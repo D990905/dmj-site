@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 210" role="img" aria-label="택킹 방향 다이어그램 — 바람 쪽(업윈드)으로 노즈를 통과시키는 회전">
+  <defs>
+    <marker id="ahTackPath" markerWidth="9" markerHeight="9" refX="6.5" refY="3.2" orient="auto">
+      <path d="M0 0 L7 3.2 L0 6.4 Z" fill="#0A2540"/>
+    </marker>
+    <marker id="ahTackWind" markerWidth="9" markerHeight="9" refX="6.5" refY="3.2" orient="auto">
+      <path d="M0 0 L7 3.2 L0 6.4 Z" fill="#1F8FFF"/>
+    </marker>
+  </defs>
+  <!-- wind from top -->
+  <line x1="100" y1="10" x2="100" y2="34" stroke="#1F8FFF" stroke-width="3.4" marker-end="url(#ahTackWind)"/>
+  <text x="112" y="24" font-family="'Pretendard',sans-serif" font-size="12" font-weight="800" fill="#1F8FFF">바람</text>
+  <!-- no-go / wind zone hint -->
+  <path d="M100 40 L70 92 L130 92 Z" fill="#1F8FFF" opacity="0.08"/>
+  <!-- trajectory: nose passes UP through the wind (upwind turn) -->
+  <path d="M55 168 C58 110 70 60 100 48 C130 60 142 110 145 162"
+        fill="none" stroke="#0A2540" stroke-width="3.4" stroke-dasharray="8 6" stroke-linecap="round" marker-end="url(#ahTackPath)"/>
+  <!-- board markers (start / through-wind / end) -->
+  <path d="M55 168 l-7 12 l14 0 Z" fill="#FFB800" transform="rotate(-12 55 174)"/>
+  <path d="M100 48 l-8 13 l16 0 Z" fill="#FFB800"/>
+  <!-- label -->
+  <text x="100" y="200" text-anchor="middle" font-family="'Pretendard',sans-serif" font-size="13" font-weight="800" fill="#0A2540">택킹 — 바람 쪽(업윈드) 통과</text>
+</svg>

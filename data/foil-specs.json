@@ -1,0 +1,100 @@
+{
+  "_meta": {
+    "version": "§170 v8 (2026-05-13)",
+    "updated": "2026-05-13",
+    "purpose": "Lift Calculator 매핑용 — front wing area·AR·CL class. Levitaz SoT = levitaz-source-copy.json + §170 v7 Danny verbatim · Takoon SoT = takoon-full-spec.json (Shopify — AR field 부재).",
+    "history": [
+      "§170 v7 (2026-05-13) — Levitaz R6 FW V1/V2/V3 본사 공식 spec lock: AR 9.5 (잘못된 값) → V1 AR 13.7 / V2 AR 12.9 / V3 AR 14.3. Area V1 478→479 (UI 480 round) · V2 430 · V3 530. Danny verbatim.",
+      "§170 v8 (2026-05-13) — 전 lift calculator dropdown 15 SKU audit. Levitaz 7 cross-validated 100% consistent. Takoon 9 SKU estimated AR flagged — Danny 검수 의무. 산출: outputs/v5/levitaz_fw_all_spec_2026-05-13.json."
+    ],
+    "cl_classes": {
+      "low_ar": { "ar_max": 5, "cl": 1.15, "label": "저AR (Cruise·Glide·Starter — forgiving·고양력)" },
+      "mid_ar": { "ar_min": 5, "ar_max": 8, "cl": 1.0, "label": "중AR (general purpose)" },
+      "high_ar": { "ar_min": 8, "cl": 0.85, "label": "고AR (race·glide — drag↓ speed↑)" }
+    },
+    "danny_review_required": [
+      "Takoon 9 SKU 본사 공식 AR 값 — Shopify /products.json 에 AR field 부재. 단무지 site 제품 페이지 카피의 ~10.7/~8.3 (approx) 와 foil-presets.js 값 (5.0/5.5) 사이 wide divergence.",
+      "Takoon canonical size — Shopify catalog 에 1100/950/800/700/1500/1200/1700/800/1400 등 presets.js 값이 부재 (closest catalog size: Flow 1050·Flare 950·Swell 1050·Flash 770·X-Glide 1450·XS-Glide 940·Starter 1800·Pace 700·Pump-Pro 1350-1550).",
+      "Levitaz Free Series + R6 — §170 v7 Danny verbatim. levitaz.com 직접 fetch 미실시 — 본사 공식 확인 시 cross-check 권장.",
+      "PPC sail wing은 air wing이라 hydrodynamic CL 계산은 적용 불가 — calc는 hydrofoil front wing 전용"
+    ],
+    "brand_classification": {
+      "_note": "§180-D (Danny 2026-05-17) — 단무지공방 취급 brand 와 사용자 입력 전용 brand 분리.",
+      "_policy": "취급 brand 만 사이트 visible UI (brand cards · find-my-gear · matrix · hero · footer) 노출. 사용자 입력 전용 brand 는 calculator preset 드롭다운에서만 노출 (사용자 자기 장비 입력 편의용). §158-B 경쟁사 노출 금지 정책의 예외 영역 = calculator preset.",
+      "carried_by_dmj": ["levitaz", "takoon"],
+      "user_input_only": ["chubanga", "north"],
+      "ppc_note": "PPC 는 hydrofoil 미취급 (air wing only) — front_wings 배열 없음",
+      "ar_estimated_note": "user_input_only brand SKU 일부는 메이커 본사가 AR 공개 X (예: North Sonar HA 모든 사이즈, Armstrong HA480/580). 추정값 사용 시 SKU 객체에 `ar_estimated: true` 마킹. lift calculator 의 advisor 가 이런 SKU 를 후보로 추천할 때 UI 에 'AR 추정' 표시 의무."
+    }
+  },
+
+  "front_wings": {
+    "levitaz": [
+      { "id": "lev-fw-540", "model": "Free Series FW 540", "area_cm2": 540, "ar": 8.4, "tier": "advanced·pro", "use": "race·downwind" },
+      { "id": "lev-fw-680", "model": "Free Series FW 680", "area_cm2": 680, "ar": 8.7, "tier": "advanced", "use": "freeride·downwind 표준" },
+      { "id": "lev-fw-790", "model": "Free Series FW 790", "area_cm2": 790, "ar": 10.3, "tier": "intermediate~advanced", "use": "cruise·jibe 학습" },
+      { "id": "lev-fw-900", "model": "Free Series FW 900", "area_cm2": 900, "ar": 13.3, "tier": "beginner~intermediate", "use": "조기 takeoff·낮은 speed" },
+      { "id": "lev-r6-v1", "model": "R6 FW V1", "area_cm2": 479, "area_display_cm2": 480, "ar": 13.7, "tier": "pro", "use": "race UHM thin — primary 사이즈 (§170 v7)" },
+      { "id": "lev-r6-v2", "model": "R6 FW V2", "area_cm2": 430, "ar": 12.9, "tier": "pro", "use": "race UHM thin — 강풍 전용 작은 사이즈 (§170 v7)" },
+      { "id": "lev-r6-v3", "model": "R6 FW V3", "area_cm2": 530, "ar": 14.3, "tier": "pro", "use": "race UHM thin — FORMULA WING registered (§170 v7 · G472585)" }
+    ],
+    "chubanga": [
+      { "id": "chu-pr-glider-530", "model": "PureRacing Glider 530", "line": "PureRacing", "area_cm2": 530, "ar": 9.59, "max_chord_cm": 9.7, "span_cm": 71.3, "tier": "intermediate~advanced", "use": "performance freeride — 중풍 cruise·jibe (§180-C Danny 2026-05-17 본사 spec)" },
+      { "id": "chu-pr-glider-620", "model": "PureRacing Glider 620", "line": "PureRacing", "area_cm2": 620, "ar": 11.29, "max_chord_cm": 9.9, "span_cm": 83.7, "tier": "intermediate~advanced", "use": "light wind freeride — 약풍·고AR (§180-C Danny 2026-05-17 본사 spec)" }
+    ],
+    "north": [
+      { "id": "nor-ha-550", "model": "Sonar HA 550", "line": "Sonar HA", "area_cm2": 550, "ar": 10.0, "ar_estimated": true, "tier": "advanced·pro", "use": "race·kite·high-speed (§180-E v2 본사 lineup — North HA 9 sizes 100mm 간격, AR per-size TBC)" },
+      { "id": "nor-ha-650", "model": "Sonar HA 650", "line": "Sonar HA", "area_cm2": 650, "ar": 10.0, "ar_estimated": true, "tier": "advanced·pro", "use": "race·kite·high-speed (§180-E v2 AR estimated)" },
+      { "id": "nor-ha-750", "model": "Sonar HA 750", "line": "Sonar HA", "area_cm2": 750, "ar": 10.0, "ar_estimated": true, "tier": "advanced", "use": "race·high-speed wing/kite (§180-E v2 AR estimated)" },
+      { "id": "nor-ha-850", "model": "Sonar HA 850", "line": "Sonar HA", "area_cm2": 850, "ar": 10.5, "ar_estimated": true, "tier": "intermediate~advanced", "use": "core wing-foil·playful·responsive (§180-E v2 AR estimated)" },
+      { "id": "nor-ha-950", "model": "Sonar HA 950", "line": "Sonar HA", "area_cm2": 950, "ar": 10.5, "ar_estimated": true, "tier": "intermediate~advanced", "use": "core wing-foil·prone (§180-E v2 AR estimated)" },
+      { "id": "nor-ha-1050", "model": "Sonar HA 1050", "line": "Sonar HA", "area_cm2": 1050, "ar": 10.5, "span_cm": 105.0, "tier": "intermediate", "use": "core wing-foil·earlier lift·lighter wind (§180-E v2 본사 spec confirmed)" },
+      { "id": "nor-ha-1150", "model": "Sonar HA 1150", "line": "Sonar HA", "area_cm2": 1150, "ar": 10.5, "ar_estimated": true, "tier": "intermediate", "use": "light wind wing·downwind (§180-E v2 AR estimated)" },
+      { "id": "nor-ha-1250", "model": "Sonar HA 1250", "line": "Sonar HA", "area_cm2": 1250, "ar": 10.5, "ar_estimated": true, "tier": "beginner~intermediate", "use": "light wind·heavy rider·downwind (§180-E v2 AR estimated)" },
+      { "id": "nor-ha-1450", "model": "Sonar HA 1450", "line": "Sonar HA", "area_cm2": 1450, "ar": 11.0, "ar_estimated": true, "tier": "beginner~intermediate", "use": "very light wind·dock start·pumping (§180-E v2 AR estimated)" }
+    ],
+    "takoon": [
+      { "id": "tak-flow", "model": "Foil Flow Front Wing", "area_cm2": 1100, "ar": 5.0, "tier": "intermediate", "use": "freeride · forgiving radius" },
+      { "id": "tak-flare", "model": "Foil Flare Front Wing", "area_cm2": 950, "ar": 5.5, "tier": "intermediate~advanced", "use": "freeride·wave 진입" },
+      { "id": "tak-swell", "model": "Foil Swell Front Wing", "area_cm2": 800, "ar": 6.5, "tier": "advanced", "use": "wave·downwind" },
+      { "id": "tak-flash", "model": "Foil Flash Front Wing", "area_cm2": 700, "ar": 7.5, "tier": "advanced·pro", "use": "speed·race-light" },
+      { "id": "tak-x-glide", "model": "X-Glide V2 Front Wing", "area_cm2": 1500, "ar": 4.0, "tier": "beginner", "use": "first foil — large·forgiving" },
+      { "id": "tak-x-glide-xs", "model": "XS Glide Front Wing", "area_cm2": 1200, "ar": 4.5, "tier": "beginner~intermediate", "use": "second foil progression" },
+      { "id": "tak-starter", "model": "Foil Starter Front Wing", "area_cm2": 1700, "ar": 3.8, "tier": "beginner", "use": "very first foil — max forgiving" },
+      { "id": "tak-pace", "model": "Foil Pace Front Wing", "area_cm2": 800, "ar": 7.0, "tier": "advanced", "use": "freeride performance" },
+      { "id": "tak-pump-pro", "model": "Foil Pump Pro Front Wing", "area_cm2": 1400, "ar": 9.5, "tier": "advanced·pump", "use": "pump foil glide 전용" }
+    ],
+    "ppc_sail_wing_note": "PPC M1 / M1-X / M2 / FDS 는 air wing (hand-held sail). Lift calc 대상이 아님 (윙 사이즈는 풍속·체중 기반 별도 mapping)."
+  },
+
+  "boards": {
+    "takoon": [
+      { "id": "tak-cruise", "model": "Cruise", "volume_l_range": [110, 145], "tier": "beginner", "use": "first board — 안정적 standup" },
+      { "id": "tak-slide", "model": "Slide", "volume_l_range": [80, 105], "tier": "intermediate", "use": "freeride mid-volume" },
+      { "id": "tak-glide", "model": "Glide", "volume_l_range": [55, 80], "tier": "intermediate~advanced", "use": "freeride progression" },
+      { "id": "tak-glide-mid", "model": "Glide Midlength", "volume_l_range": [60, 85], "tier": "advanced", "use": "downwind·SUP foil" },
+      { "id": "tak-ultra-glide", "model": "Ultra Glide", "volume_l_range": [45, 70], "tier": "advanced·pro", "use": "high-perf race-light" },
+      { "id": "tak-prosurf", "model": "Pro Surf", "volume_l_range": [30, 55], "tier": "pro", "use": "wave foil sinker" }
+    ],
+    "levitaz": [
+      { "id": "lev-boom-fs-95", "model": "Boom FS 95", "volume_l_range": [95, 95], "tier": "intermediate", "use": "freeride mid" },
+      { "id": "lev-boom-fs-83", "model": "Boom FS 83", "volume_l_range": [83, 83], "tier": "intermediate~advanced", "use": "freeride performance" },
+      { "id": "lev-boom-fs-63", "model": "Boom FS 63", "volume_l_range": [63, 63], "tier": "advanced·pro", "use": "race·sinker" }
+    ]
+  },
+
+  "wings_air": {
+    "_note": "Air wing — Lift Calculator의 hydrofoil 산출과 별개. 풍속·체중 기반 size guide 사용.",
+    "takoon": [
+      { "id": "tak-wing-v4", "model": "Wing V4", "sizes_m2": [2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0], "tier": "all" },
+      { "id": "tak-wing-v4-pro", "model": "Wing V4 Pro", "sizes_m2": [2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5], "tier": "advanced" },
+      { "id": "tak-wing-vx-pro-2", "model": "Wing VX Pro 2", "sizes_m2": [3.0, 4.0, 5.0, 6.0], "tier": "pro·race" }
+    ],
+    "ppc": [
+      { "id": "ppc-m2", "model": "M2", "sizes_m2": [3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0], "tier": "intermediate~advanced" },
+      { "id": "ppc-m1-x", "model": "M1-X", "sizes_m2": [3.5, 4.0, 4.5, 5.0, 5.5, 6.0], "tier": "advanced·high-perf" },
+      { "id": "ppc-m1", "model": "M1", "sizes_m2": [3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0], "tier": "all-condition" },
+      { "id": "ppc-fds", "model": "FDS", "sizes_m2": [3.5, 4.0, 4.5, 5.0, 5.5, 6.0], "tier": "race·pro" }
+    ]
+  }
+}

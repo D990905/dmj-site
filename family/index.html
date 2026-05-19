@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<title>가족 라이딩 가이드 — 가족이 함께 타는 윙포일 | 단무지공방</title>
+<meta name="description" content="엄마·아빠·자녀가 같이 즐기는 윙·포일 가족 라이딩 가이드. 가족 시나리오 추천, 3-4 set bundle 패키지, 한국 family-friendly spot, 가족 1:1 컨설팅">
+<link rel="canonical" href="https://dmjgroup.kr/family/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="가족 라이딩 가이드 | 단무지공방">
+<meta property="og:description" content="3세대 라이딩 — 부모와 자녀가 함께하는 윙·포일">
+<meta property="og:locale" content="ko_KR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+
+<style>
+  .demo-hero {
+    position: relative;
+    background:
+      radial-gradient(ellipse at 80% 20%, rgba(255,184,0,0.20), transparent 55%),
+      radial-gradient(ellipse at 30% 80%, rgba(42,140,92,0.30), transparent 60%),
+      linear-gradient(135deg, var(--color-navy) 0%, #163E2C 100%);
+    color: #fff;
+    padding: 140px 0 88px;
+    overflow: hidden;
+  }
+  .demo-hero__crumb { font-size: 0.8125rem; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+  .demo-hero__crumb a { color: rgba(255,255,255,0.6); text-decoration: none; }
+  .demo-hero__crumb a:hover { color: #fff; }
+  .demo-hero__crumb .sep { margin: 0 8px; opacity: 0.5; }
+  .demo-hero__eyebrow {
+    display: inline-block; font-family: var(--font-sans-en);
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.18em;
+    color: #7CD9A7; padding: 6px 14px;
+    background: rgba(63,184,126,0.18); border: 1px solid rgba(63,184,126,0.42);
+    border-radius: 999px; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .demo-hero__title {
+    font-size: clamp(2rem, 4vw + 1rem, 3.5rem); font-weight: 800;
+    line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 20px;
+  }
+  .demo-hero__title em { font-style: normal; color: #FFB800; }
+  .demo-hero__lead {
+    font-size: 1.125rem; line-height: 1.65;
+    color: rgba(255,255,255,0.78); max-width: 56ch; margin: 0 0 32px;
+  }
+  .demo-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .demo-section { padding: 80px 0; }
+  .demo-section--mist { background: var(--color-mist); }
+  .demo-section__head { max-width: 64ch; margin-bottom: 48px; }
+  .demo-section__eyebrow {
+    font-family: var(--font-sans-en);
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.16em;
+    color: var(--color-sea); text-transform: uppercase; margin-bottom: 12px;
+    display: block;
+  }
+  .demo-section__title {
+    font-size: clamp(1.5rem, 2.5vw + 0.75rem, 2.25rem);
+    font-weight: 800; line-height: 1.18; letter-spacing: -0.025em;
+    color: var(--color-navy); margin: 0 0 16px;
+  }
+  .demo-section__lead {
+    font-size: 1.0625rem; line-height: 1.7;
+    color: var(--color-slate); margin: 0;
+  }
+
+  /* Why family — 3-stack */
+  .why-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  }
+  @media (max-width: 760px) { .why-grid { grid-template-columns: 1fr; } }
+  .why-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 24px;
+  }
+  .why-card__num {
+    font-family: var(--font-sans-en); font-weight: 900;
+    font-size: 0.875rem; color: var(--color-sun);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 8px;
+  }
+  .why-card__title {
+    font-size: 1.1875rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  .why-card__body {
+    font-size: 0.9375rem; line-height: 1.65;
+    color: var(--color-slate); margin: 0;
+  }
+
+  /* Family scenario card */
+  .scenario {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; margin-bottom: 24px;
+  }
+  .scenario__head {
+    padding: 20px 28px;
+    background: linear-gradient(135deg, var(--color-navy), #163E2C);
+    color: #fff;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .scenario__title {
+    font-size: 1.125rem; font-weight: 700;
+    letter-spacing: -0.01em; margin: 0;
+  }
+  .scenario__pill {
+    background: rgba(255,184,0,0.22); color: var(--color-sun);
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase;
+  }
+  .scenario__body {
+    padding: 24px 28px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;
+  }
+  .scenario-member {
+    background: var(--color-mist);
+    border-radius: 10px; padding: 16px;
+  }
+  .scenario-member__role {
+    font-family: var(--font-sans-en); font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--color-sea-dark); margin-bottom: 6px; display: block;
+  }
+  .scenario-member__name {
+    font-size: 0.9375rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 8px;
+  }
+  .scenario-member__list {
+    list-style: none; padding: 0; margin: 0;
+  }
+  .scenario-member__list li {
+    font-size: 0.8125rem; line-height: 1.45;
+    color: var(--color-charcoal); margin-bottom: 4px;
+    padding-left: 14px; position: relative;
+  }
+  .scenario-member__list li::before {
+    content: "·"; position: absolute; left: 4px; color: var(--color-sea);
+    font-weight: 700;
+  }
+
+  /* Spot grid */
+  .spot-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .spot-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .spot-card__region {
+    font-family: var(--font-sans-en); font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--color-sea); margin-bottom: 6px; display: block;
+  }
+  .spot-card__name { font-size: 1rem; font-weight: 700; color: var(--color-navy); margin: 0 0 8px; }
+  .spot-card__why { font-size: 0.875rem; line-height: 1.55; color: var(--color-slate); margin: 0 0 10px; }
+  .spot-card__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .spot-card__tag {
+    background: rgba(63,184,126,0.12); color: #1F6F45;
+    padding: 3px 9px; border-radius: 999px;
+    font-size: 0.6875rem; font-weight: 600;
+  }
+
+  .demo-cta {
+    background: linear-gradient(135deg, var(--color-navy), #163E2C);
+    color: #fff;
+    border-radius: 24px; padding: 56px 48px;
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: center;
+  }
+  @media (max-width: 760px) {
+    .demo-cta { grid-template-columns: 1fr; padding: 40px 28px; }
+  }
+  .demo-cta__title {
+    font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2rem);
+    font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; line-height: 1.18;
+  }
+  .demo-cta__lead {
+    font-size: 1rem; line-height: 1.65;
+    color: rgba(255,255,255,0.78); margin: 0 0 24px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Trust bar -->
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>3회 올림픽 출전 코치 운영</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>가족 3-4 set bundle 견적</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>가족 1:1 컨설팅</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>protected spot 가이드</span>
+</div></div></div>
+
+<!-- Header -->
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="../index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="../takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="../style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="../style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="../find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="../genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="../genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="../genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="../level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="../level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="../level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="../women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="../junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="../family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 스마트 컨설팅 (CTA) -->
+        <a href="../find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <a href="../login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== Mobile Menu ========== -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="../find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="../login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">라이딩 스타일</li>
+    <li><a href="../style/flat-speed.html">Flat·Speed</a></li>
+    <li><a href="../style/choppy-freeride.html">Choppy·Freeride</a></li>
+    <li><a href="../style/wave.html">Wave</a></li>
+    <li><a href="../style/hybrid.html">Hybrid</a></li>
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="../level/beginner.html">입문</a></li><li><a href="../level/novice.html">초급</a></li>
+    <li><a href="../level/intermediate.html">중급</a></li>
+    <li><a href="../level/advanced.html">상급</a></li>
+    <li><a href="../level/pro.html">선수</a></li>
+    <li hidden><a href="../women/index.html">여성 라이더</a></li>
+    <li hidden><a href="../junior/index.html">유소년·어린이</a></li>
+    <li hidden><a href="../family/index.html">가족 라이딩</a></li>
+  </ul>
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+
+<!-- Hero -->
+<section class="demo-hero">
+  <div class="container">
+    <nav class="demo-hero__crumb"><a href="../index.html">단무지공방</a><span class="sep">/</span><a href="../index.html#consultation">컨설팅</a><span class="sep">/</span><span style="color:#fff">가족 라이딩</span></nav>
+    <span class="demo-hero__eyebrow">For Family Riders</span>
+    <h1 class="demo-hero__title">가족이 함께 타는<br><em>윙포일</em></h1>
+    <p class="demo-hero__lead">엄마·아빠·자녀가 같이 즐기는 워터스포츠. 전문 퍼포먼스 어드바이저가 가족 구성·체중·레벨에 맞춰 3-4 set bundle을 큐레이션합니다. 한국 family-friendly spot 가이드 + 가족 1:1 컨설팅 무료.</p>
+    <div class="demo-hero__ctas">
+      <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="btn btn--accent btn--lg">가족 1:1 컨설팅 시작</a>
+      <a href="../find-my-gear.html" class="btn btn--ghost-light btn--lg">개별 셋업 찾기 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Section 1: Why family wing/foil -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Why Family</span>
+      <h2 class="demo-section__title">가족 윙·포일이 매력적인 3가지 이유</h2>
+      <p class="demo-section__lead">단무지 운영진이 한국 라이더 커뮤니티에서 발견한 가족 라이딩의 강점. 단순히 같이 타는 것 이상의 가치가 있습니다.</p>
+    </div>
+    <div class="why-grid">
+      <article class="why-card">
+        <span class="why-card__num">Stage 1 · 시간</span>
+        <h3 class="why-card__title">한 spot에서 3-4 시간 함께</h3>
+        <p class="why-card__body">자녀와 함께하는 시간이 점점 줄어드는 시기. 윙·포일은 1회 출조에 가족 모두가 동시에 참여 가능한 매우 드문 워터스포츠입니다. 부모가 1라운드 라이딩하는 동안 자녀가 강습, 자녀 라이딩 시 부모가 SUP — 시간 layering이 자연스럽습니다.</p>
+      </article>
+      <article class="why-card">
+        <span class="why-card__num">Stage 2 · 안전</span>
+        <h3 class="why-card__title">Parents-on-water 자체가 가장 큰 안전 자산</h3>
+        <p class="why-card__body">자녀 입문기에 부모가 같이 라이더라는 사실이 가장 큰 안전 보강입니다. 즉각 picking up, 같은 spot 인지, 같은 컨디션 판단 — 외부 강사·인솔자에게 의존하지 않는 가족 안전망. 부모 본인의 라이딩 학습이 그 시작</p>
+      </article>
+      <article class="why-card">
+        <span class="why-card__num">Stage 3 · 평생</span>
+        <h3 class="why-card__title">다음 20년 가족 라이프스타일</h3>
+        <p class="why-card__body">윙·포일은 8세부터 60+세까지 가능한 흔치 않은 워터스포츠. 자녀 8세 시작 → 30+ 시즌, 부모 50대 시작 → 70대까지. 한 가족의 라이프스타일을 평생 단위로 짜는 큰 결정입니다.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Section 2: Family Scenarios -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Family Scenarios</span>
+      <h2 class="demo-section__title">가족 구성별 추천 시나리오</h2>
+      <p class="demo-section__lead">전문 퍼포먼스 어드바이저가 1:1 컨설팅으로 가장 자주 만나는 3가지 가족 패턴. 정확한 사이즈·brand·예산은 카톡 1:1로 확정합니다.</p>
+    </div>
+
+    <article class="scenario">
+      <header class="scenario__head">
+        <h3 class="scenario__title">Scenario A · 4인 가족 · 부모 + 청소년 자녀 2명</h3>
+        <span class="scenario__pill">대표 패턴</span>
+      </header>
+      <div class="scenario__body">
+        <div class="scenario-member">
+          <span class="scenario-member__role">아빠 (45세 / 80kg / 중급)</span>
+          <p class="scenario-member__name">한국 표준 셋업</p>
+          <ul class="scenario-member__list">
+            <li>PPC M1-X 5.0 / 5.5</li>
+            <li>Levitaz FW 680 + Mast 84</li>
+            <li>Takoon Glide 5'6"</li>
+            <li>WIP 3/2 wetsuit + harness</li>
+          </ul>
+        </div>
+        <div class="scenario-member">
+          <span class="scenario-member__role">엄마 (42세 / 55kg / 입문)</span>
+          <p class="scenario-member__name">Women fit 입문 셋업</p>
+          <ul class="scenario-member__list">
+            <li>PPC M2 4.0 / 4.5</li>
+            <li>Levitaz FW 790 + Mast 76</li>
+            <li>Takoon Cruise 5'2"</li>
+            <li>WIP women wetsuit + impact vest</li>
+          </ul>
+        </div>
+        <div class="scenario-member">
+          <span class="scenario-member__role">큰아들 (15세 / 50kg / 입문)</span>
+          <p class="scenario-member__name">유소년 입문 셋업</p>
+          <ul class="scenario-member__list">
+            <li>Takoon V4 3.5 / 4.0</li>
+            <li>Levitaz FW 790 + Mast 76</li>
+            <li>Takoon Cruise 5'0"</li>
+            <li>WIP Junior vest + helmet 필수</li>
+          </ul>
+        </div>
+        <div class="scenario-member">
+          <span class="scenario-member__role">막내딸 (11세 / 32kg)</span>
+          <p class="scenario-member__name">1:1 컨설팅 only</p>
+          <ul class="scenario-member__list">
+            <li>직접 sales 차단 segment</li>
+            <li>강습 partnership 우선</li>
+            <li>안전 장비 (vest·helmet)</li>
+            <li>2026 시즌 트레이너 단계</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="scenario">
+      <header class="scenario__head">
+        <h3 class="scenario__title">Scenario B · 3인 가족 · 부모 + 청소년 자녀</h3>
+        <span class="scenario__pill">시작 패턴</span>
+      </header>
+      <div class="scenario__body">
+        <div class="scenario-member">
+          <span class="scenario-member__role">아빠 (50세 / 78kg / 입문)</span>
+          <p class="scenario-member__name">시니어 입문 셋업</p>
+          <ul class="scenario-member__list">
+            <li>PPC M2 5.0 (forgiveness)</li>
+            <li>Levitaz FW 790 + Mast 76</li>
+            <li>Takoon Glide Midlength 5'6"</li>
+            <li>관절 부담 최소화 progression</li>
+          </ul>
+        </div>
+        <div class="scenario-member">
+          <span class="scenario-member__role">엄마 (47세 / 60kg / 입문)</span>
+          <p class="scenario-member__name">Women fit + 시니어 path</p>
+          <ul class="scenario-member__list">
+            <li>PPC M2 4.0 / 4.5</li>
+            <li>Levitaz FW 790 + Mast 76</li>
+            <li>Takoon Cruise 5'2"</li>
+            <li>WIP women wetsuit + impact vest</li>
+          </ul>
+        </div>
+        <div class="scenario-member">
+          <span class="scenario-member__role">자녀 (16세 / 60kg / 중급)</span>
+          <p class="scenario-member__name">청소년 중급 — 빠른 progression</p>
+          <ul class="scenario-member__list">
+            <li>PPC M1-X 4.5 / 5.0</li>
+            <li>Levitaz FW 680 + Mast 84</li>
+            <li>Takoon Glide 5'4"</li>
+            <li>대회 youth division 검토 가능</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="scenario">
+      <header class="scenario__head">
+        <h3 class="scenario__title">Scenario C · 2인 가족 · 부모 + 자녀</h3>
+        <span class="scenario__pill">단순 시작</span>
+      </header>
+      <div class="scenario__body">
+        <div class="scenario-member">
+          <span class="scenario-member__role">부모 (40세 / 65kg / 중급)</span>
+          <p class="scenario-member__name">단무지 표준 freeride</p>
+          <ul class="scenario-member__list">
+            <li>PPC M1-X 4.5 / 5.0</li>
+            <li>Levitaz FW 680 + Mast 84</li>
+            <li>Takoon Glide 5'4"</li>
+            <li>WIP wetsuit + harness</li>
+          </ul>
+        </div>
+        <div class="scenario-member">
+          <span class="scenario-member__role">자녀 (13세 / 45kg / 입문)</span>
+          <p class="scenario-member__name">유소년 입문 — 강습 동반</p>
+          <ul class="scenario-member__list">
+            <li>Takoon V4 3.0 / 3.5</li>
+            <li>Levitaz FW 790 + Mast 76</li>
+            <li>Takoon Cruise 4'8"</li>
+            <li>WIP Junior vest + helmet 필수</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- Section 3: Family Bundle Pricing Note -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Bundle Curation</span>
+      <h2 class="demo-section__title">가족 패키지 — 3-4 set bundle 견적</h2>
+      <p class="demo-section__lead">가족 단위 3-4 set 동시 구입 시 전문 퍼포먼스 어드바이저가 직접 패키지 견적을 산출합니다. 네 가지 브랜드 라인업 cross-sell로 brand 단일 매장 대비 효율적인 구성 가능. 구체적 가격은 가족 구성·시즌·재고에 따라 변동 → 카톡 1:1 견적.</p>
+    </div>
+    <div style="background:linear-gradient(135deg, var(--color-mist), #fff);border:1px solid var(--border);border-radius:16px;padding:32px 28px">
+      <h3 style="font-size:1.25rem;font-weight:700;color:var(--color-navy);margin:0 0 16px;letter-spacing:-0.01em">패키지 산출 시 고려 항목</h3>
+      <ul style="line-height:1.85;color:var(--color-slate);font-size:0.9375rem;padding-left:20px;margin:0 0 24px">
+        <li><strong style="color:var(--color-navy)">구성원별 윙·포일·board·웻슈트 사이즈</strong> — 정확한 체중·신장 기반</li>
+        <li><strong style="color:var(--color-navy)">공유 가능 항목</strong> — mast·STAB·fuselage 일부 공유로 구성 비용 절감</li>
+        <li><strong style="color:var(--color-navy)">시즌 우선순위</strong> — 모든 구성원 동시 시작 vs. 단계별 입문</li>
+        <li><strong style="color:var(--color-navy)">안전 장비 가중치</strong> — 자녀 포함 시 WIP Junior 라인 필수</li>
+        <li><strong style="color:var(--color-navy)">강습 partnership</strong> — 자녀 강습 시즌 단위 일정 협의</li>
+        <li><strong style="color:var(--color-navy)">Future upgrade path</strong> — 한두 시즌 후 upgrade 여지를 남기는 입문 셋업 vs. long-term 셋업</li>
+      </ul>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="btn btn--accent btn--lg">가족 패키지 견적 시작</a>
+        <a href="../find-my-gear.html" class="btn btn--ghost btn--lg">먼저 개별 quiz →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 4: Family Spots -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Family-Friendly Spots</span>
+      <h2 class="demo-section__title">한국 가족 라이딩 spot 가이드</h2>
+      <p class="demo-section__lead">전문 퍼포먼스 어드바이저가 가족 라이딩에 추천하는 스팟. protected (방파제·만), shallow water, 강습 partnership 가능, 가족 편의시설 (주차·화장실·식당) 기준 큐레이션.</p>
+    </div>
+    <div class="spot-grid">
+<article class="spot-card">
+        <span class="spot-card__region">연안 · 강원</span>
+        <h3 class="spot-card__name">강원 freeride hub</h3>
+        <p class="spot-card__why">한국 윙·포일 hub. protected bay·강습소 다수. 가족 편의시설 우수</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Protected</span>
+          <span class="spot-card__tag">강습 OK</span>
+          <span class="spot-card__tag">시설 ★</span>
+        </div>
+      </article>
+      <article class="spot-card">
+        <span class="spot-card__region">연안 · 강원</span>
+        <h3 class="spot-card__name">강원 학습 spot</h3>
+        <p class="spot-card__why">완만한 해저·일관된 wind. 자녀 입문기에 최적</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Shallow</span>
+          <span class="spot-card__tag">Consistent wind</span>
+        </div>
+      </article>
+      <article class="spot-card">
+        <span class="spot-card__region">연안 · 강원</span>
+        <h3 class="spot-card__name">강원 long-beach spot</h3>
+        <p class="spot-card__why">긴 해변·다양한 wind 방향. 가족 단체 출조에 적합</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Large beach</span>
+          <span class="spot-card__tag">Multi-wind</span>
+        </div>
+      </article>
+      <article class="spot-card">
+        <span class="spot-card__region">남해안 도서</span>
+        <h3 class="spot-card__name">남부 protected bay</h3>
+        <p class="spot-card__why">Protected bay·shallow. 가족 휴가 + 라이딩 결합에 최적</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Protected</span>
+          <span class="spot-card__tag">Tourism friendly</span>
+        </div>
+      </article>
+      <article class="spot-card">
+        <span class="spot-card__region">남해안 도서</span>
+        <h3 class="spot-card__name">남부 wave spot</h3>
+        <p class="spot-card__why">파도·바람 동시. 중급 이상 가족·청소년 라이더에게 추천</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Wave + wind</span>
+          <span class="spot-card__tag">중급+</span>
+        </div>
+      </article>
+      <article class="spot-card">
+        <span class="spot-card__region">내수면</span>
+        <h3 class="spot-card__name">도심 강·호수 spot</h3>
+        <p class="spot-card__why">Flat·도심 접근성. 가족 평일 트레이닝·자녀 강습에 적합</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Flat</span>
+          <span class="spot-card__tag">도심 접근</span>
+        </div>
+      </article>
+      <article class="spot-card">
+        <span class="spot-card__region">내수면</span>
+        <h3 class="spot-card__name">대청호</h3>
+        <p class="spot-card__why">Protected·flat 호수. 자녀 첫 시즌 입문에 안전한 환경</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Flat lake</span>
+          <span class="spot-card__tag">초입문 친화</span>
+        </div>
+      </article>
+      <article class="spot-card">
+        <span class="spot-card__region">남해</span>
+        <h3 class="spot-card__name">남해 만 spot</h3>
+        <p class="spot-card__why">남해 만 protected. 가을·봄·겨울 시즌에 강원도 대안</p>
+        <div class="spot-card__tags">
+          <span class="spot-card__tag">Protected</span>
+          <span class="spot-card__tag">시즌 대안</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Section 5: 1:1 Family CTA -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-cta">
+      <div>
+        <span style="display:inline-block;background:rgba(255,184,0,0.18);color:var(--color-sun);font-size:0.6875rem;font-weight:700;padding:6px 14px;border-radius:999px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px">★ 추천 · 가족 1:1 컨설팅</span>
+        <h3 class="demo-cta__title">가족 구성원 모두의 셋업 — 한 번에 설계</h3>
+        <p class="demo-cta__lead">가족 구성원 각자의 연령·체중·신장·레벨·이전 워터스포츠 경험을 카톡으로 알려주시면, 전문 퍼포먼스 어드바이저가 네 가지 브랜드 라인업에서 가족 시나리오 패키지를 1:1로 큐레이션합니다. 안전 장비·강습 partnership·시즌 일정 모두 포함. 무료, 가입 불필요.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="btn btn--accent btn--lg">가족 패키지 견적</a>
+          <a href="../women/index.html" class="btn btn--ghost-light btn--lg">여성 라이더 가이드</a>
+          <a href="../junior/index.html" class="btn btn--ghost-light btn--lg">유소년 가이드</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-sans-en);font-size:5rem;font-weight:900;color:#FFB800;line-height:1;letter-spacing:-0.05em;text-align:center">3-4</div>
+        <div style="font-size:0.8125rem;color:rgba(255,255,255,0.6);text-align:center;margin-top:8px">set bundle 동시 큐레이션</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="../membership.html">회원 등급 안내</a></li>
+          <li><a href="../glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="../calculator.html">Lift Calculator</a></li>
+          <li><a href="../find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="../level/beginner.html">입문 가이드</a></li><li><a href="../level/novice.html">초급 가이드</a></li>
+          <li><a href="../level/intermediate.html">중급 가이드</a></li>
+          <li><a href="../level/advanced.html">상급 가이드</a></li>
+          <li><a href="../level/pro.html">선수 가이드</a></li>
+          <li><a href="../premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="../levitaz.html">Levitaz</a></li>
+          <li><a href="../ppc.html">PPC</a></li>
+          <li><a href="../takoon.html">Takoon</a></li>
+          <li><a href="../wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="../products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="../policy/shipping.html">배송 정책</a></li>
+          <li><a href="../policy/refund.html">환불 정책</a></li>
+          <li><a href="../policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="../policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="../policy/privacy.html">개인정보처리방침</a>
+        <a href="../policy/terms.html">이용약관</a>
+        <a href="../policy/refund.html">환불정책</a>
+        <a href="../policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="kakao-fab" aria-label="카톡 상담">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</a>
+
+<script src="../assets/js/main.js" defer></script>
+  <script src="../assets/js/nav-auth.js" defer></script>
+  <!-- §173 — 옥코치 AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="../assets/css/agent-deny.css">
+  <script src="../assets/js/agent-deny.js" defer></script>
+</body>
+</html>

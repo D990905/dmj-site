@@ -1,0 +1,1489 @@
+<!-- DO_NOT_REVERT §165 v4 — Phase B 10축 스킬 진단 페이지 · §155 v3 동기.
+     5 스킬 (토우 택킹/힐 택킹/토 자이빙/힐 자이빙/점핑) × Port/Starboard = 10 axes.
+     5-level 한국어 등급 (매우 불안정 2 / 불안정 4 / 보통 6 / 안정적 8 / 매우 안정적 10) — 100점 만점.
+     §165 v4 — 5-zone (입문/초급/중급/상급/선수) · Score 5-tier (0-20/21-40/41-60/61-80/81-100) · Speed 5-zone (≤12/13-19/20-24/25-29/30+).
+     약점 3개 자동 + 육상/해상 분리.
+     ⛔ Wave/Downwind 5 스킬 v1 세트 영구 금지.
+     SoT: project_dmj_phase_b_skill_assessment.md / reference_dmj_10axis_skill_taxonomy.md / reference_dmj_skill_training_programs.md / reference_dmj_level_4_categories.md (§155 v3). -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<title>10축 스킬 진단 (Phase B) | 단무지공방</title>
+<meta name="description" content="토우/힐 택킹·토/힐 자이빙·점핑 5 스킬 × 좌우 방향 = 10축. 5단계 한국어 등급 (매우 불안정 ~ 매우 안정적) 100점 만점. 약쪽(weaker side) 강화 + 육상·해상 훈련 분리.">
+<meta name="robots" content="noindex,nofollow">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
+</div></div></div>
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <a href="find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <!-- DO_NOT_REVERT §171-B — cart icon. -->
+        <a href="cart.html" class="nav__link nav__cart" role="menuitem" aria-label="장바구니">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="nav__cart-badge" data-cart-badge hidden>0</span>
+        </a>
+        <a href="login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="skill-assessment.html" style="color:var(--color-sun);font-weight:700">10축 스킬 진단 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="membership.html">회원 등급 안내 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="levitaz.html">Levitaz</a></li>
+    <li><a href="ppc.html">PPC</a></li>
+    <li><a href="takoon.html">Takoon</a></li>
+    <li><a href="wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="level/beginner.html">입문</a></li><li><a href="level/novice.html">초급</a></li>
+    <li><a href="level/intermediate.html">중급</a></li>
+    <li><a href="level/advanced.html">상급</a></li>
+    <li><a href="level/pro.html">선수</a></li>
+  </ul>
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+<!-- ========== 1. Hero ========== -->
+<section class="cons-hero cons-hero--with-image">
+  <!-- DO_NOT_REVERT §158-B — 경쟁사 brand (North/Cabrinha/Duotone/F-One/Naish/Armstrong 등) 노출 영구 금지.
+       이전 `sean-herbert-pro.jpg` 는 race fleet 배경에 North wing 보임 → 회귀. Danny 직접 승인 Drive 자산 (wave-hero) 으로 교체. -->
+  <picture class="cons-hero__bg-image" aria-hidden="true">
+    <source srcset="assets/images/style/wave/wave-hero.webp" type="image/webp">
+    <img src="assets/images/style/wave/wave-hero.jpg" alt="" loading="eager" decoding="async">
+  </picture>
+  <div class="container">
+    <div class="cons-hero__inner">
+      <div class="cons-hero__crumb"><a href="index.html">홈</a><span class="sep">›</span><span>10축 스킬 진단</span></div>
+      <span class="cons-hero__eyebrow">PHASE B · 스킬 진단</span>
+      <h1 class="cons-hero__title">10축 스킬 진단으로 <em>진짜 약점</em>을 찾으세요</h1>
+      <p class="cons-hero__lead">토우/힐 택킹·자이빙·점핑 5 스킬 × 좌우 방향(포트/스타보드) = 10축으로 측정합니다. 5단계 한국어 등급(매우 불안정 ~ 매우 안정적)으로 평가해 100점 만점으로 종합 레벨이 자동 산출됩니다. 약쪽(weaker side) 강화가 진짜 마스터리의 시작입니다.</p>
+      <div class="cons-hero__cta">
+        <a href="#assessment" class="btn btn--accent">진단 시작하기 ↓</a>
+        <a href="consult.html" class="btn btn--ghost" style="color:#fff;border-color:rgba(255,255,255,.4)">1:1 구매 상담하기</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 2. Assessment (Pentagon + Sliders) ========== -->
+<section class="skill-page" id="assessment">
+  <div class="container">
+    <!-- DO_NOT_REVERT §169-I — Danny 2026-05-12: Goofy/Regular stance 질문 영구 lock.
+         펜타곤 P/S 추상 라벨 단독 회귀 X. stance-aware (편/약) tag pill 의무.
+         매핑: Regular = 오른발 뒤 편 → S축 (우반구 = Day 1A lock) = 편 / P축 (좌반구) = 약.
+                Goofy = 왼발 뒤 편 → P축 = 편 / S축 = 약. -->
+    <div class="stance-picker" id="stance-picker" role="radiogroup" aria-label="발 방향 stance">
+      <div class="stance-picker__head">
+        <h2 class="stance-picker__title">먼저, 발 방향(Stance) 부터 알려주세요</h2>
+        <p class="stance-picker__lead">사람마다 편한 쪽과 약한 쪽이 stance 에 따라 다릅니다. 진단 카드에 <span class="stance-pill stance-pill--easy">편</span> / <span class="stance-pill stance-pill--weak">약</span> tag 가 자동 표시됩니다.</p>
+      </div>
+      <div class="stance-picker__opts">
+        <label class="stance-opt">
+          <input type="radio" name="stance" value="regular">
+          <span class="stance-opt__viz" aria-hidden="true">
+            <span class="stance-opt__foot stance-opt__foot--front">L</span>
+            <span class="stance-opt__foot stance-opt__foot--back">R</span>
+          </span>
+          <span class="stance-opt__body">
+            <span class="stance-opt__name">Regular</span>
+            <span class="stance-opt__hint">왼발 앞 · <b>오른발 뒤</b> 가 편함</span>
+          </span>
+        </label>
+        <label class="stance-opt">
+          <input type="radio" name="stance" value="goofy">
+          <span class="stance-opt__viz" aria-hidden="true">
+            <span class="stance-opt__foot stance-opt__foot--front">R</span>
+            <span class="stance-opt__foot stance-opt__foot--back">L</span>
+          </span>
+          <span class="stance-opt__body">
+            <span class="stance-opt__name">Goofy</span>
+            <span class="stance-opt__hint">오른발 앞 · <b>왼발 뒤</b> 가 편함</span>
+          </span>
+        </label>
+      </div>
+    </div>
+    <div class="skill-layout">
+
+      <!-- LEFT: Live SVG pentagon + speed gauge -->
+      <aside class="skill-pentagon-wrap" aria-label="실시간 진단 결과">
+        <h2 style="margin:0 0 6px;font-size:18px;color:var(--color-navy)">실시간 진단</h2>
+        <p style="margin:0 0 16px;font-size:13px;color:var(--color-slate);line-height:1.55;word-break:keep-all">슬라이더를 움직이면 펜타곤이 즉시 갱신됩니다. P=Port(좌측 택), S=Starboard(우측 택). 5단계 한국어 등급으로 평가합니다.</p>
+
+        <div class="score-display" aria-live="polite">
+          <div class="score-display__row">
+            <span class="score-display__label">현재 점수</span>
+            <span class="score-display__value"><span id="score-total">0</span> <span class="score-display__max">/ 100</span></span>
+          </div>
+          <div class="score-display__tier">
+            종합 레벨 <span class="tier-badge" id="tier-badge">—</span>
+          </div>
+        </div>
+
+        <!-- DO_NOT_REVERT §165 v6 — Danny 2026-05-13: viewBox 좌우 +70px 확장 (3시·9시 label 잘림 fix). Pentagon 자체는 ±150 유지. -->
+        <svg class="skill-pentagon" viewBox="-220 -160 440 320" aria-label="10축 스킬 펜타곤 차트" role="img">
+          <!-- 5 rings (level 1..5) -->
+          <g id="pentagon-rings"></g>
+          <!-- 10 axis lines -->
+          <g id="pentagon-axes"></g>
+          <!-- Filled polygon — updates live -->
+          <polygon class="skill-pentagon__poly" id="pentagon-poly" points=""/>
+          <!-- Axis labels -->
+          <g id="pentagon-labels"></g>
+        </svg>
+
+        <div class="speed-gauge" aria-label="속도 게이지">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <strong style="font-size:14px;color:var(--color-navy)">내 최고 속도</strong>
+            <span class="speed-gauge__current"><span id="speed-display">0</span> kt</span>
+          </div>
+          <div class="speed-gauge__bar" aria-hidden="true">
+            <div class="speed-gauge__pointer" id="speed-pointer" style="left:0%"></div>
+          </div>
+          <!-- §165 v4-B 5-zone (Danny v1 · 2026-05-12) — 라벨 = transition boundary kt + tier name. 절대 위치로 gradient stop 와 정확 정렬 -->
+          <div class="speed-gauge__meta speed-gauge__meta--abs">
+            <span style="left:0%">0 kt</span>
+            <span style="left:25%">11 입문</span>
+            <span style="left:45%">19 초급</span>
+            <span style="left:62.5%">26 중급</span>
+            <span style="left:75%">31 상급</span>
+            <span style="left:100%">31+ 선수</span>
+          </div>
+          <p style="margin:10px 0 0;font-size:13px;color:var(--color-slate)" id="speed-tier-label">아직 입력 전</p>
+        </div>
+      </aside>
+
+      <!-- RIGHT: 10 sliders + speed input -->
+      <div>
+        <h2 style="margin:0 0 8px;font-size:22px;color:var(--color-navy)">5 스킬 × 좌우 택 = 10축</h2>
+        <p style="margin:0 0 20px;font-size:14px;color:var(--color-slate);line-height:1.6;word-break:keep-all">각 스킬을 <b>포트(P)</b>와 <b>스타보드(S)</b> 두 방향으로 따로 평가해 주세요. 5단계 한국어 등급(매우 불안정 2점 → 매우 안정적 10점)으로 산출됩니다. 양쪽 점수 차이가 진짜 약점을 드러냅니다.</p>
+
+        <div class="skill-sliders" id="slider-grid">
+          <!-- Sliders rendered via JS -->
+        </div>
+
+        <div class="speed-input-row">
+          <div class="speed-input-row__head">
+            <span class="skill-slider-row__name">자가 측정 최고 속도 (kt)</span>
+            <span class="skill-slider-row__value"><span id="speed-input-value">0</span> kt</span>
+          </div>
+          <!-- DO_NOT_REVERT §165 v5 — Danny 2026-05-13: step=0.1 소수점 입력 허용. step=1 정수 입력 회귀 영구 X. -->
+          <input type="number" min="0" max="50" value="0" id="speed-input" step="0.1" placeholder="예: 22.5" aria-label="최고 속도 (kt, 소수점 1자리 허용)">
+          <p class="skill-slider-row__desc">GPS 시계·SpeedCoach·Waterspeed 등 어느 디바이스든 OK. 모르면 0으로 두세요.</p>
+        </div>
+
+        <div class="skill-cta-row" style="margin-top:24px;justify-content:flex-start">
+          <button id="save-btn" class="btn btn--accent">결과 저장 (이 브라우저)</button>
+          <button id="reset-btn" class="btn btn--ghost">초기화</button>
+        </div>
+        <p style="margin:12px 0 0;font-size:12px;color:var(--color-slate);word-break:keep-all" id="save-status">결과는 브라우저 localStorage에만 저장됩니다. 회원 계정 연동은 백엔드 완성 후 (Phase 12).</p>
+      </div>
+    </div>
+
+    <!-- ========== 3a. 총평 — Stance-aware insight (§169-J v2 · Danny 2026-05-13) ========== -->
+    <!-- DO_NOT_REVERT §169-J v2 — 총평 section 위치 (펜타곤 다음 + 약점 카드 위) 영구 lock.
+         Stance + 약점 패턴 + 종합 등급 기반 personalized 인사이트. Danny biomechanical voice (Tom Myers Anatomy Trains + 운동학).
+         h2 title: 퍼포먼스 인사이트 (Danny 2026-05-16) — 정적 HTML, JS 런타임 재렌더 없음 (renderOverallSummary 는 meta/body 만 갱신). -->
+    <div class="skill-overall" id="overall-summary" hidden>
+      <div class="skill-overall__head">
+        <h2 class="skill-overall__title">🎯 총평 — 퍼포먼스 인사이트</h2>
+        <p class="skill-overall__meta" id="overall-meta"></p>
+      </div>
+      <div class="skill-overall__body" id="overall-body"></div>
+      <div class="skill-overall__cta">
+        <a href="consult.html" class="btn btn--accent">1:1 구매 상담하기 →</a>
+        <a href="find-my-gear.html" class="btn btn--ghost">맞춤 장비 진단 →</a>
+      </div>
+    </div>
+
+    <!-- ========== 3. Weakness analysis (auto) ========== -->
+    <div class="skill-weakness" id="weakness-section">
+      <h2>약쪽 3 영역 — 단무지가 추천하는 다음 스텝</h2>
+      <p class="skill-weakness__lead" id="weakness-lead">슬라이더 값을 모두 조정하면 가장 약한 3개 축이 자동으로 표시됩니다. 양쪽 모두 약한 스킬이면 "양쪽 모두 약함 — 기초부터 다지기"로 합쳐서 안내합니다. 각 카드에는 <b>육상 훈련</b>과 <b>해상 훈련</b>이 분리되어 표시됩니다.</p>
+      <div class="skill-weakness__cards" id="weakness-cards">
+        <!-- 3 cards via JS -->
+      </div>
+    </div>
+
+    <!-- ========== 4. CTA ========== -->
+    <div style="text-align:center;margin-top:40px">
+      <h3 style="font-size:20px;color:var(--color-navy);margin:0 0 12px">진단 결과로 1:1 컨설팅 받기</h3>
+      <p style="font-size:14px;color:var(--color-slate);max-width:560px;margin:0 auto 20px;word-break:keep-all">진단 결과를 가지고 단무지공방 1:1 컨설팅을 신청하시면 약쪽 강화 트레이닝 + 적합한 장비 셋업을 함께 제안합니다.</p>
+      <div class="skill-cta-row">
+        <a href="consult.html" class="btn btn--accent">1:1 구매 상담하기</a>
+        <a href="find-my-gear.html" class="btn btn--ghost">Find My Gear 통합 진단 →</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== Footer ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="skill-assessment.html">스킬 진단 (Phase B)</a></li>
+          <li><a href="membership.html">회원 등급 안내</a></li>
+          <li><a href="glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="calculator.html">Lift Calculator</a></li>
+          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="level/beginner.html">입문 가이드</a></li><li><a href="level/novice.html">초급 가이드</a></li>
+          <li><a href="level/intermediate.html">중급 가이드</a></li>
+          <li><a href="level/advanced.html">상급 가이드</a></li>
+          <li><a href="level/pro.html">선수 가이드</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="levitaz.html">Levitaz</a></li>
+          <li><a href="ppc.html">PPC</a></li>
+          <li><a href="takoon.html">Takoon</a></li>
+          <li><a href="wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="policy/shipping.html">배송 정책</a></li>
+          <li><a href="policy/refund.html">환불 정책</a></li>
+          <li><a href="policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="policy/privacy.html">개인정보처리방침</a>
+        <a href="policy/terms.html">이용약관</a>
+        <a href="policy/refund.html">환불정책</a>
+        <a href="policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+<!-- §169-K — auth-shim.js (per-user localStorage namespace) 필수. skill-assessment 데이터 = per-user. -->
+<script src="assets/js/auth-shim.js" defer></script>
+<!-- §171-B cart system — for nav badge. -->
+<script src="assets/js/cart.js" defer></script>
+
+<!-- ========== Phase B Skill Assessment JS (§165 v2) ========== -->
+<script>
+(function () {
+  'use strict';
+
+  // ---- §165 v2 Canonical 5 skills ----
+  // ⛔ Wave/Downwind 5-skill set (§165 v1) 영구 폐기
+  var SKILLS = [
+    { key: 'toeside-tack', ko: '토우 택킹', short: '토우택' },
+    { key: 'heelside-tack', ko: '힐 택킹', short: '힐택' },
+    { key: 'toeside-jibe', ko: '토 자이빙', short: '토자' },
+    { key: 'heelside-jibe', ko: '힐 자이빙', short: '힐자' },
+    { key: 'jumping', ko: '점핑', short: '점프' }
+  ];
+
+  // DO_NOT_REVERT §169 — P/S 좌우 swap (Danny 2026-05-12). 우=Starboard / 좌=Port. AXES 순서 영구 lock.
+  // Pentagon axis order (CW from top, Starboard RIGHT, Port LEFT)
+  //  1.토우 택킹·S / 2.힐 택킹·S / 3.토 자이빙·S / 4.힐 자이빙·S / 5.점핑·S  (우반구 i=0..4)
+  //  6.점핑·P    / 7.힐 자이빙·P / 8.토 자이빙·P / 9.힐 택킹·P    / 10.토우 택킹·P (좌반구 i=5..9)
+  // 3시(i=2) = 토자·S / 9시(i=7) = 토자·P  ← mental model 확정.
+  // ⚠️ localStorage key = `{한국어 스킬명}_{port|starboard}` 패턴 (snapshot.scores 객체) — AXES 순서 swap 해도 JSON key 형태는 동일하므로 v1 payload 후방호환 유지.
+  var AXES = [
+    { key: 'toeside-tack-s',  skill: SKILLS[0], tack: 'S', tackLabel: '스타보드' },
+    { key: 'heelside-tack-s', skill: SKILLS[1], tack: 'S', tackLabel: '스타보드' },
+    { key: 'toeside-jibe-s',  skill: SKILLS[2], tack: 'S', tackLabel: '스타보드' },
+    { key: 'heelside-jibe-s', skill: SKILLS[3], tack: 'S', tackLabel: '스타보드' },
+    { key: 'jumping-s',       skill: SKILLS[4], tack: 'S', tackLabel: '스타보드' },
+    { key: 'jumping-p',       skill: SKILLS[4], tack: 'P', tackLabel: '포트' },
+    { key: 'heelside-jibe-p', skill: SKILLS[3], tack: 'P', tackLabel: '포트' },
+    { key: 'toeside-jibe-p',  skill: SKILLS[2], tack: 'P', tackLabel: '포트' },
+    { key: 'heelside-tack-p', skill: SKILLS[1], tack: 'P', tackLabel: '포트' },
+    { key: 'toeside-tack-p',  skill: SKILLS[0], tack: 'P', tackLabel: '포트' }
+  ];
+
+  // ---- §165 v2 5-level rubric (Korean labels + scores) ----
+  // 0 = 미입력 (인덱스 0, score 0)
+  // 1 = 매우 불안정 (2점) / 2 = 불안정 (4) / 3 = 보통 (6) / 4 = 안정적 (8) / 5 = 매우 안정적 (10)
+  var LEVELS = [
+    { label: '미입력', score: 0 },
+    { label: '매우 불안정', score: 2 },
+    { label: '불안정', score: 4 },
+    { label: '보통', score: 6 },
+    { label: '안정적', score: 8 },
+    { label: '매우 안정적', score: 10 }
+  ];
+
+  // ---- Tier mapping (100점 만점 → 종합 레벨 · §155 v2 / §165 v3 4-tier) ----
+  // §155 v3 + §165 v4 — Score 5-tier (0-20 입문 / 21-40 초급 / 41-60 중급 / 61-80 상급 / 81-100 선수)
+  function getOverallTier(total) {
+    if (total === 0) return { label: '—', color: 'var(--color-slate)' };
+    if (total <= 20) return { label: '입문', color: '#4ade80' };
+    if (total <= 40) return { label: '초급', color: '#67e8f9' };
+    if (total <= 60) return { label: '중급', color: '#3FB8C9' };
+    if (total <= 80) return { label: '상급', color: '#FF8A3D' };
+    return                  { label: '선수', color: '#FFB800' };
+  }
+
+  // DO_NOT_REVERT §165 v4-B + §165 v5 — Speed 5-zone canonical (Danny 2026-05-12 v1 + 2026-05-13 소수점 boundary 정정)
+  // ≤10 입문 / 11-18 초급 / 19-25 중급 / 26-30 상급 / 31+ 선수
+  // 소수점 boundary: 28.5 → 상급 (≤30 → 상급), 30.5 → 상급 (< 31, 31+ 가 선수), 31.0 → 선수.
+  // 이전 thresholds (≤12/13-19/20-24/25-29/30+) 영구 폐기. 회귀 영구 금지.
+  function getSpeedTier(v) {
+    if (v <= 0)  return { label: '아직 입력 전', color: 'var(--color-slate)' };
+    if (v <= 10) return { label: '입문 영역', color: '#4ade80' };
+    if (v <= 18) return { label: '초급 영역', color: '#67e8f9' };
+    if (v <= 25) return { label: '중급 영역', color: '#3FB8C9' };
+    if (v < 31)  return { label: '상급 영역', color: '#FF8A3D' }; // 26-30.x 상급 (소수점 허용)
+    return                { label: '선수 영역', color: '#FFB800' }; // 31+ 선수
+  }
+
+  // ---- Pentagon geometry ----
+  var CX = 0, CY = 0, R = 120;
+  var N = 10;
+  // DO_NOT_REVERT §169-K — per-user localStorage namespace. window.DMJAuth.{get,set,remove}UserData('skill_assessment_v1') 통해 access.
+  // 직접 localStorage.getItem('dmj_skill_assessment_v1') 회귀 영구 X (privacy leak — User A → User B 데이터 누출).
+  var STORAGE_SUFFIX = 'skill_assessment_v1';
+  var TRAINING_DATA_URL = 'data/skill-training-programs.json';
+
+  // ---- §169-I v2 — Per-axis stance/comfort 매핑 (Danny 2026-05-12 정정) ----
+  // ⚠ Wingfoil P/S 정의 = HAND not foot (오른손 앞 = Starboard tack, 왼손 앞 = Port tack).
+  // 발 위치는 tack 결정 X (cross-stance 가능).
+  //
+  // ⛔ 폐기 v1 매핑 (simple "P=편/S=약 for Regular"): per-axis 동작별 편/약 무시 → 잘못된 가이드.
+  //
+  // ✅ v2 매핑 (per-axis biomechanics):
+  //   Regular 라이더:
+  //     - 토 (toe-side maneuver): S=편 / P=약  → toe-side natural on S tack (오른손 앞 + 자연 face-into-wind)
+  //     - 힐 (heel-side maneuver): P=편 / S=약  → heel-side natural on P tack
+  //   Goofy 라이더: 반대
+  //     - 토: P=편 / S=약
+  //     - 힐: S=편 / P=약
+  //   점핑 (jumping): stance 의존 약함 → null (편/약 표시 없음, 양쪽 동일)
+  function stanceComfort(axis, stance) {
+    if (!stance || !axis) return null;
+    var skillKey = axis.skill.key;
+    var tack = axis.tack;
+    // 점핑 = stance-neutral (양쪽 동일)
+    if (skillKey === 'jumping') return null;
+    var isToeSide = skillKey.indexOf('toeside') !== -1;
+    if (stance === 'regular') {
+      if (isToeSide) return tack === 'S' ? 'easy' : 'weak';
+      return tack === 'P' ? 'easy' : 'weak'; // heel-side
+    }
+    if (stance === 'goofy') {
+      if (isToeSide) return tack === 'P' ? 'easy' : 'weak';
+      return tack === 'S' ? 'easy' : 'weak'; // heel-side
+    }
+    return null;
+  }
+  function comfortLabel(c) {
+    if (c === 'easy') return '편';
+    if (c === 'weak') return '약';
+    return '';
+  }
+  // §169-I v2 — back foot label per axis × stance.
+  //   Regular 의 약쪽 = cross-stance = 왼발 뒤 (Danny 의 원래 통찰)
+  //   Regular 의 편쪽 = natural-stance = 오른발 뒤
+  //   Goofy 반대.
+  function backFootLabel(axis, stance) {
+    if (!stance || !axis) return '';
+    if (axis.skill.key === 'jumping') return ''; // stance-neutral
+    var comfort = stanceComfort(axis, stance);
+    if (stance === 'regular') return comfort === 'easy' ? '오른발 뒤' : '왼발 뒤';
+    return comfort === 'easy' ? '왼발 뒤' : '오른발 뒤'; // goofy
+  }
+
+  // Inline fallback (loaded if fetch fails — e.g. file:// protocol)
+  var TRAINING_INLINE = {
+    "토우 택킹_port": {
+      "육상": { title: "토우 택킹 · 포트 — 육상 시뮬레이션", description: "보드 위 토우 택킹 시뮬레이션. 좌측 손 인계 타이밍(left-hand release) 측정. 거울 앞에서 자세 확인.", duration: "30분 × 5세트 (100회 반복)", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "토우 택킹 · 포트 — 해상 세션", description: "단무지 입문·초급 가이드 'Toeside 첫 택킹' 세션. 평수 spot에서 1시간 반복. 1:1 컨설팅 권장.", conditions: "8-12 kt 가벼운 바람 · 평수면", consultation_link: "consult.html" }
+    },
+    "토우 택킹_starboard": {
+      "육상": { title: "토우 택킹 · 스타보드 — 육상 시뮬레이션", description: "우측 손 인계 + 발끝 회전(toe pivot) 분리 연습. 약쪽이 보통 여기. 거울 앞에서 좌우 비교.", duration: "30분 × 5세트 (100회 반복)", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "토우 택킹 · 스타보드 — 해상 세션", description: "약쪽 강화 세션. 같은 spot에서 스타보드 진입만 의도적으로 반복. 좌우 비대칭 해소가 핵심.", conditions: "8-12 kt 가벼운 바람 · 평수면", consultation_link: "consult.html" }
+    },
+    "힐 택킹_port": {
+      "육상": { title: "힐 택킹 · 포트 — 육상 시뮬레이션", description: "힐사이드 무게중심 이동 + 윙 sheet-in 타이밍 분리 연습. 발뒤꿈치 압박 강도 조절.", duration: "20분 × 6세트", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "힐 택킹 · 포트 — 해상 세션", description: "단무지 중급 가이드 'Heelside Tack' 세션. PPC M1-X + Stab Carve 셋업 권장. 평수면 우선.", conditions: "10-15 kt 안정 바람 · 평수면", consultation_link: "consult.html" }
+    },
+    "힐 택킹_starboard": {
+      "육상": { title: "힐 택킹 · 스타보드 — 육상 시뮬레이션", description: "스타보드 힐사이드 진입 — 반대쪽 어깨 회전 추가 연습. 발끝 들어올림(toe lift) 동작 분리.", duration: "20분 × 6세트", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "힐 택킹 · 스타보드 — 해상 세션", description: "약쪽 보강. 카톡 1:1로 영상 코칭 받으면 좌우 비대칭이 빠르게 줄어듭니다.", conditions: "10-15 kt 안정 바람 · 평수면", consultation_link: "consult.html" }
+    },
+    "토 자이빙_port": {
+      "육상": { title: "토 자이빙 · 포트 — 육상 시뮬레이션", description: "토사이드 자이빙 회전 반경 시각화 — 트램폴린/스케이트보드로 발끝 압박 + 윙 swap 타이밍 연습.", duration: "25분 × 4세트", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "토 자이빙 · 포트 — 해상 세션", description: "단무지 중급 가이드 'Toeside Jibe' 세션. Levitaz FW 680 + 16mm 카본 HR 매칭으로 글라이드 유지.", conditions: "12-18 kt 중바람 · 평수면 또는 약 chop", consultation_link: "consult.html" }
+    },
+    "토 자이빙_starboard": {
+      "육상": { title: "토 자이빙 · 스타보드 — 육상 시뮬레이션", description: "스타보드 토사이드 자이빙 — 약쪽이 흔히 여기. 회전 반경을 좌측보다 크게 잡고 점진적 축소.", duration: "25분 × 4세트", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "토 자이빙 · 스타보드 — 해상 세션", description: "약쪽 강화 세션. 같은 셋업으로 스타보드 진입만 반복. 영상 촬영해 카톡으로 보내주시면 코칭 가능.", conditions: "12-18 kt 중바람 · 평수면 또는 약 chop", consultation_link: "consult.html" }
+    },
+    "힐 자이빙_port": {
+      "육상": { title: "힐 자이빙 · 포트 — 육상 시뮬레이션", description: "힐사이드 자이빙 무릎 굽힘 + 윙 swap 타이밍 코디네이션. 거울 앞 좌우 비교.", duration: "20분 × 5세트", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "힐 자이빙 · 포트 — 해상 세션", description: "단무지 중급 가이드 'Heelside Jibe' 세션. Takoon Flare/Swell 또는 PPC M2 매칭 권장.", conditions: "12-18 kt 중바람 · 평수면 또는 약 chop", consultation_link: "consult.html" }
+    },
+    "힐 자이빙_starboard": {
+      "육상": { title: "힐 자이빙 · 스타보드 — 육상 시뮬레이션", description: "스타보드 힐사이드 진입 — 반대쪽 어깨 회전 + 발뒤꿈치 압박 좌우 비교.", duration: "20분 × 5세트", equipment_link: "level/intermediate.html#jibe-tack" },
+      "해상": { title: "힐 자이빙 · 스타보드 — 해상 세션", description: "약쪽 보강 세션. 좌우 비대칭은 1:1 영상 코칭으로 빠르게 해소됩니다.", conditions: "12-18 kt 중바람 · 평수면 또는 약 chop", consultation_link: "consult.html" }
+    },
+    "점핑_port": {
+      "육상": { title: "점핑 · 포트 — 육상 시뮬레이션", description: "트램폴린 또는 스케이트보드로 포트 takeoff 동작 분리 연습. 무릎 굽힘 + 어깨 회전 + 윙 sheet-in 타이밍 코디네이션.", duration: "25분 × 4세트", equipment_link: "level/advanced.html" },
+      "해상": { title: "점핑 · 포트 — 해상 세션", description: "Choppy 컨디션에서 작은 chop wave 활용. 단무지 상급 가이드 'Aerial 기초' 세션. PPC Sonic FDS + Boom 63 매칭.", conditions: "15-20 kt · 작은 chop wave", consultation_link: "consult.html" }
+    },
+    "점핑_starboard": {
+      "육상": { title: "점핑 · 스타보드 — 육상 시뮬레이션", description: "트램폴린 또는 스케이트보드로 starboard takeoff 동작 분리 연습. 무릎 굽힘 + 어깨 회전 + 윙 sheet-in 타이밍 코디네이션.", duration: "25분 × 4세트", equipment_link: "level/advanced.html" },
+      "해상": { title: "점핑 · 스타보드 — 해상 세션", description: "Choppy 컨디션 15-20 kt + 작은 chop wave 활용. 단무지 상급 가이드 'Aerial 기초' 세션. PPC Sonic FDS + Boom 63 매칭.", conditions: "15-20 kt · 작은 chop wave", consultation_link: "consult.html" }
+    }
+  };
+
+  var TRAINING_DATA = TRAINING_INLINE; // 기본은 inline. fetch 성공 시 덮어쓰기.
+
+  // State: 10 slider 인덱스 (0..5) + speed (kt) + stance (§169-I)
+  var state = {
+    indices: new Array(N).fill(0),  // 각 슬라이더의 등급 인덱스 (0~5)
+    speed: 0,
+    stance: null  // null | 'regular' | 'goofy' — §169-I (Danny 2026-05-12)
+  };
+
+  function scoreOf(idx) { return LEVELS[idx].score; }
+  function totalScore() {
+    return state.indices.reduce(function (sum, idx) { return sum + scoreOf(idx); }, 0);
+  }
+
+  // ---- Polar coords for axis i ----
+  // DO_NOT_REVERT §165 v4-A + §169 — radar chart axis +18° offset + P/S swap (Danny 2026-05-12)
+  // 회전 이유: 12시·6시 가 P/S 경계 (sky/sea line). 우반구(0~4 indices) = Starboard, 좌반구(5~9 indices) = Port. 3시(i=2)=토자·S / 9시(i=7)=토자·P 핵심 mental model.
+  // 회귀 영구 금지 — offset 제거 시 또는 AXES 순서 reverse 시 P/S 좌우 구분 깨짐.
+  function axisPoint(i, level) {
+    var angle = (i * 360 / N - 90 + 18) * Math.PI / 180;
+    var r = (level / 5) * R;
+    return {
+      x: CX + r * Math.cos(angle),
+      y: CY + r * Math.sin(angle)
+    };
+  }
+
+  // ---- Render static SVG (rings, axes, labels) ----
+  function renderStaticSvg() {
+    var rings = document.getElementById('pentagon-rings');
+    var axes = document.getElementById('pentagon-axes');
+    rings.innerHTML = '';
+    axes.innerHTML = '';
+
+    // 5 concentric polygons (one per level 1..5)
+    for (var lvl = 1; lvl <= 5; lvl++) {
+      var pts = [];
+      for (var i = 0; i < N; i++) {
+        var p = axisPoint(i, lvl);
+        pts.push(p.x.toFixed(2) + ',' + p.y.toFixed(2));
+      }
+      var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      poly.setAttribute('points', pts.join(' '));
+      poly.setAttribute('class', 'skill-pentagon__ring');
+      rings.appendChild(poly);
+    }
+
+    // 10 axis lines (labels rendered separately so they can update on stance change)
+    for (var i = 0; i < N; i++) {
+      var pTip = axisPoint(i, 5);
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', CX);
+      line.setAttribute('y1', CY);
+      line.setAttribute('x2', pTip.x.toFixed(2));
+      line.setAttribute('y2', pTip.y.toFixed(2));
+      line.setAttribute('class', 'skill-pentagon__axis');
+      axes.appendChild(line);
+    }
+    renderPentagonLabels();
+  }
+
+  // ---- §169-I + §165 v6 — Pentagon label render (stance-aware + 각도별 text-anchor)
+  // §165 v6 (Danny 2026-05-13): 3시·9시 라벨 잘림 fix. text-anchor 각도별 분기:
+  //   x > 30  (오른쪽) → start  (라벨이 label 점에서 우측으로 뻗음)
+  //   x < -30 (왼쪽)  → end    (라벨이 좌측으로 뻗음)
+  //   |x| ≤ 30 (top/bottom) → middle
+  function renderPentagonLabels() {
+    var labels = document.getElementById('pentagon-labels');
+    labels.innerHTML = '';
+    for (var i = 0; i < N; i++) {
+      var pLabel = axisPoint(i, 5.55);
+      var anchor = 'middle';
+      if (pLabel.x > 30) anchor = 'start';
+      else if (pLabel.x < -30) anchor = 'end';
+
+      var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', pLabel.x.toFixed(2));
+      text.setAttribute('y', pLabel.y.toFixed(2));
+      text.setAttribute('text-anchor', anchor);
+      text.setAttribute('dominant-baseline', 'middle');
+      text.setAttribute('class', 'skill-pentagon__label skill-pentagon__label--' + AXES[i].tack.toLowerCase());
+
+      var mainSpan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      mainSpan.textContent = AXES[i].skill.short + ' · ' + AXES[i].tack;
+      text.appendChild(mainSpan);
+
+      var comfort = stanceComfort(AXES[i], state.stance);
+      if (comfort) {
+        var pill = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+        pill.textContent = ' (' + comfortLabel(comfort) + ')';
+        pill.setAttribute('class', 'skill-pentagon__label-pill skill-pentagon__label-pill--' + comfort);
+        pill.setAttribute('fill', comfort === 'easy' ? '#166534' : '#9a3412');
+        pill.setAttribute('font-weight', '800');
+        text.appendChild(pill);
+      }
+
+      labels.appendChild(text);
+    }
+  }
+
+  // ---- Render slider rows (pairs: skill × P/S) ----
+  function renderSliders() {
+    var grid = document.getElementById('slider-grid');
+    grid.innerHTML = '';
+
+    SKILLS.forEach(function (s) {
+      ['P', 'S'].forEach(function (t) {
+        var key = s.key + '-' + t.toLowerCase();
+        var axisIdx = AXES.findIndex(function (a) { return a.key === key; });
+        var ax = AXES[axisIdx];
+
+        var row = document.createElement('div');
+        row.className = 'skill-slider-row';
+        row.setAttribute('data-tack', t);
+        row.innerHTML =
+          '<div class="skill-slider-row__head">' +
+            '<div>' +
+              '<span class="skill-slider-row__name">' + s.ko + '</span>' +
+              '<span class="skill-slider-row__tack skill-slider-row__tack--' + t.toLowerCase() + '">' + t + ' · ' + ax.tackLabel + '</span>' +
+              '<span class="stance-pill" data-stance-axis="' + key + '" hidden></span>' +
+            '</div>' +
+            '<span class="skill-slider-row__value" id="value-' + key + '">0</span>' +
+          '</div>' +
+          '<input type="range" min="0" max="5" step="1" value="0" data-axis-idx="' + axisIdx + '" id="slider-' + key + '" aria-label="' + s.ko + ' ' + ax.tackLabel + ' 등급">' +
+          '<p class="skill-slider-row__desc" id="desc-' + key + '">' + LEVELS[0].label + '</p>';
+        grid.appendChild(row);
+      });
+    });
+
+    // Wire listeners
+    document.querySelectorAll('#slider-grid input[type=range]').forEach(function (input) {
+      input.addEventListener('input', function (e) {
+        var idx = parseInt(e.target.getAttribute('data-axis-idx'), 10);
+        var newIdx = parseInt(e.target.value, 10);
+        state.indices[idx] = newIdx;
+        var key = AXES[idx].key;
+        document.getElementById('value-' + key).textContent = LEVELS[newIdx].score;
+        document.getElementById('desc-' + key).textContent = LEVELS[newIdx].label + (newIdx > 0 ? ' (' + LEVELS[newIdx].score + '점)' : '');
+        updatePolygon();
+        updateScoreDisplay();
+        computeWeakness();
+      });
+    });
+  }
+
+  // ---- §169-I — Stance update (pentagon labels + slider pills + UI) ----
+  function setStance(value) {
+    if (value !== 'regular' && value !== 'goofy') value = null;
+    state.stance = value;
+    // Re-render pentagon labels (편/약 tspan)
+    renderPentagonLabels();
+    // Update slider tack pills (per-axis, §169-I v2)
+    document.querySelectorAll('[data-stance-axis]').forEach(function (pill) {
+      var axisKey = pill.getAttribute('data-stance-axis');
+      var axis = AXES.find(function (a) { return a.key === axisKey; });
+      if (!axis) return;
+      var comfort = stanceComfort(axis, value);
+      if (!comfort) {
+        pill.hidden = true;
+        pill.textContent = '';
+        pill.className = 'stance-pill';
+        return;
+      }
+      pill.hidden = false;
+      var foot = backFootLabel(axis, value);
+      pill.textContent = comfortLabel(comfort) + (foot ? ' (' + foot + ')' : '');
+      pill.className = 'stance-pill stance-pill--' + (comfort === 'easy' ? 'easy' : 'weak');
+    });
+    // Update stance picker visual selection
+    document.querySelectorAll('.stance-opt').forEach(function (opt) {
+      var input = opt.querySelector('input[type=radio]');
+      if (input && input.value === value) {
+        input.checked = true;
+        opt.classList.add('is-checked');
+      } else {
+        opt.classList.remove('is-checked');
+      }
+    });
+    // Re-compute weakness with stance context
+    computeWeakness();
+  }
+
+  // ---- Update polygon ----
+  function updatePolygon() {
+    var pts = [];
+    for (var i = 0; i < N; i++) {
+      var p = axisPoint(i, state.indices[i]);
+      pts.push(p.x.toFixed(2) + ',' + p.y.toFixed(2));
+    }
+    document.getElementById('pentagon-poly').setAttribute('points', pts.join(' '));
+  }
+
+  // ---- Update 100점 만점 + 종합 레벨 ----
+  function updateScoreDisplay() {
+    var total = totalScore();
+    var tier = getOverallTier(total);
+    document.getElementById('score-total').textContent = total;
+    var badge = document.getElementById('tier-badge');
+    badge.textContent = tier.label;
+    badge.style.background = tier.color;
+    badge.style.color = (tier.label === '—') ? 'var(--color-slate)' : '#fff';
+  }
+
+  // ---- Update speed gauge ----
+  // §165 v5 (Danny 2026-05-13) — 소수점 1자리 표시. 정수 떨어지면 .0 생략 (예: 22.5 / 30).
+  function fmtSpeed(v) {
+    var n = Math.round(v * 10) / 10;
+    return (n % 1 === 0) ? String(n) : n.toFixed(1);
+  }
+  function updateSpeedGauge() {
+    var v = Math.max(0, Math.min(50, state.speed));
+    var disp = fmtSpeed(v);
+    document.getElementById('speed-display').textContent = disp;
+    document.getElementById('speed-input-value').textContent = disp;
+    document.getElementById('speed-pointer').style.left = (Math.min(v, 40) / 40 * 100) + '%';
+    var tier = getSpeedTier(v);
+    var label = document.getElementById('speed-tier-label');
+    label.innerHTML = '내 최고 속도: <b style="color:' + tier.color + '">' + disp + ' kt</b> — ' + tier.label;
+  }
+
+  // ---- Training data fetch (best-effort, fallback to inline) ----
+  function loadTrainingData() {
+    try {
+      fetch(TRAINING_DATA_URL, { cache: 'no-cache' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (data && typeof data === 'object') {
+            // Strip _meta and use rest
+            var clean = {};
+            Object.keys(data).forEach(function (k) {
+              if (k !== '_meta') clean[k] = data[k];
+            });
+            if (Object.keys(clean).length >= 10) {
+              TRAINING_DATA = clean;
+            }
+          }
+        })
+        .catch(function () { /* fallback to inline */ });
+    } catch (e) { /* fallback */ }
+  }
+
+  // ---- §169-J v2 — Render 총평 (stance-aware biomechanical insight) ----
+  // Danny 2026-05-13: 약점 카드 위, stance + 약점 패턴 + 종합 등급 기반 personalized 해석.
+  // Tom Myers Anatomy Trains 의 BFL (Back Functional Line) + 운동학 (yaw·pitch · pivot axis) framework 적용.
+  function renderOverallSummary() {
+    var wrap = document.getElementById('overall-summary');
+    var meta = document.getElementById('overall-meta');
+    var body = document.getElementById('overall-body');
+    if (!wrap || !meta || !body) return;
+
+    var anyEntered = state.indices.some(function (v) { return v > 0; });
+    if (!anyEntered) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+
+    var total = totalScore();
+    var tier = getOverallTier(total);
+    var stance = state.stance;
+    var stanceLabel = stance === 'regular' ? 'Regular (왼발 앞 · 오른발 뒤 기본자세)'
+                    : stance === 'goofy'   ? 'Goofy (오른발 앞 · 왼발 뒤 기본자세)'
+                    : '스탠스 미선택';
+
+    meta.innerHTML = stanceLabel + ' · 총점 <b>' + total + '/100</b> · 종합 등급 <b style="color:' + tier.color + '">' + tier.label + '</b>';
+
+    // Identify weak axes (score ≤ 6 + entered)
+    var weakAxes = [];
+    AXES.forEach(function (ax, i) {
+      if (state.indices[i] === 0) return;
+      var sc = scoreOf(state.indices[i]);
+      if (sc > 6) return;
+      weakAxes.push({ ax: ax, score: sc });
+    });
+
+    // Build body content (stance-aware)
+    var html = '';
+
+    if (!stance) {
+      // 스탠스 미선택 — encourage selection
+      html += '<p class="skill-overall__lead">스탠스 (Regular/Goofy) 를 선택하시면 약점 패턴의 <b>biomechanical 해석</b> 과 단무지공방 12주 land + 13주 water 프로그램 맞춤 진입 단계를 받을 수 있습니다.</p>';
+      html += '<p class="skill-overall__hint">상단 stance picker 에서 본인 stance 를 선택해주세요.</p>';
+    } else if (weakAxes.length === 0) {
+      // 약점 없음 — congratulate + next-level framing
+      html += '<p class="skill-overall__lead">' + stanceLabel.split(' (')[0] + ' 라이더 · 입력하신 모든 axis 가 안정적 (8점) 이상입니다. <b>약점 영역 없음</b> — 다음 단계 (속도 향상 · 점핑 · cross-stance riding · race line precision) 로 도전하실 시점입니다.</p>';
+      html += '<p class="skill-overall__hint">단무지공방 컨설팅에서 본인 영상 분석을 통해 mastery 단계의 미세 조정 포인트를 함께 찾을 수 있습니다.</p>';
+    } else {
+      // 약점 있음 — stance + 약점 패턴 기반 biomechanical 해석
+      // Pattern detection: 토 vs 힐 어느 쪽 약점이 더 많은가? 자이빙 vs 택킹?
+      var toeWeak = 0, heelWeak = 0, jibeWeak = 0, tackWeak = 0, jumpWeak = 0;
+      weakAxes.forEach(function (w) {
+        var k = w.ax.skill.key;
+        if (k.indexOf('toeside') !== -1) toeWeak++;
+        if (k.indexOf('heelside') !== -1) heelWeak++;
+        if (k.indexOf('jibe') !== -1) jibeWeak++;
+        if (k.indexOf('tack') !== -1) tackWeak++;
+        if (k === 'jumping') jumpWeak++;
+      });
+
+      // Stance-specific cross-stance pattern check
+      var crossStanceWeak = weakAxes.filter(function (w) {
+        return stanceComfort(w.ax, stance) === 'weak';
+      }).length;
+
+      html += '<p class="skill-overall__lead">' + stanceLabel.split(' (')[0] + ' 라이더 · 약점 axis ' + weakAxes.length + ' 영역';
+      if (crossStanceWeak >= weakAxes.length * 0.6) {
+        html += ' — <b>대부분 cross-stance maneuver</b> (' + (stance === 'regular' ? '왼발 뒤' : '오른발 뒤') + ' 상황) 약함</p>';
+      } else {
+        html += '</p>';
+      }
+
+      // Pattern-based biomechanical insight
+      html += '<div class="skill-overall__insight">';
+      html += '<h3>🧬 기능 해부학 관점 (Anatomy Trains · Back Functional Line)</h3>';
+      if (stance === 'regular') {
+        html += '<p>Regular 라이더의 자연스러운 force chain 은 <b>우측 hip → 우측 lat (BFL: Back Functional Line)</b> 입니다. ';
+        html += '본인 같은 패턴이 보인다면 <b>좌측 hip + 좌측 lat 의 통합 force transmission (cross-spiral)</b> 이 상대적으로 약하다는 신호입니다.';
+        html += ' Cross-stance maneuver (왼발이 뒷발로 가는 상황) 에서 보드 컨트롤이 즉시 무너지는 이유가 여기에 있어요.</p>';
+      } else {
+        html += '<p>Goofy 라이더의 자연스러운 force chain 은 <b>좌측 hip → 좌측 lat (BFL)</b> 입니다. ';
+        html += '본인 약점 패턴은 <b>우측 hip + 우측 lat 통합 (cross-spiral)</b> 이 상대적으로 약하다는 신호입니다.';
+        html += ' Cross-stance (오른발 뒷발) maneuver 에서 보드 균형이 흔들리는 원인입니다.</p>';
+      }
+      html += '</div>';
+
+      html += '<div class="skill-overall__insight">';
+      html += '<h3>⚙️ 운동학 관점 (Yaw · Pitch · Pivot)</h3>';
+      html += '<p>회전 시 보드의 yaw (수평 회전) + pitch (상하 기울기) 가 동시에 일어나며, <b>뒷발 = pivot axis</b> 역할을 합니다. ';
+      html += (stance === 'regular' ? '왼발' : '오른발') + ' 이 뒷발이 되는 순간 <b>신경근 협응 (intermuscular coordination) + reactive strength</b> 가 부족하면 보드 컨트롤이 즉시 무너집니다.</p>';
+      if (jibeWeak > tackWeak) {
+        html += '<p class="skill-overall__sub-insight">→ 자이빙 (downwind 회전) 약점 우세 = 회전 중 <b>속도 손실 회복</b> 어려움. 회전 반경 + 가속 재진입 connection 훈련 필요.</p>';
+      } else if (tackWeak > jibeWeak) {
+        html += '<p class="skill-overall__sub-insight">→ 택킹 (upwind 회전) 약점 우세 = 회전 중 <b>윙 sheet-in 타이밍 + 발끝 회전</b> 협응 부족.</p>';
+      }
+      if (jumpWeak > 0) {
+        html += '<p class="skill-overall__sub-insight">→ 점핑 약점 = <b>takeoff power + 무릎 굽힘 → 신전 (triple extension)</b> reactive strength 강화 필요. 트램폴린 / 박스 점프 도움.</p>';
+      }
+      html += '</div>';
+
+      html += '<div class="skill-overall__insight">';
+      html += '<h3>📋 제안 — 단무지공방 12주 + 13주 프로그램</h3>';
+      html += '<ol>';
+      html += '<li><b>육상 12주 program</b> (§167 v2): ';
+      html += (stance === 'regular' ? '좌측' : '우측') + ' hip stability + ' + (stance === 'regular' ? '좌측 (L-side)' : '우측 (R-side)') + ' rotational core (Phase 1-3 우선)</li>';
+      html += '<li><b>해상 13주 7-stage curriculum</b> (§168 v2): cross-stance 진입 단계 (Stage 5: Cross-stance) 에 충분히 머무름. ' + (stance === 'regular' ? '왼발' : '오른발') + ' 뒷발 의도 반복 학습.</li>';
+      html += '<li><b>1:1 컨설팅</b>: 본인 라이딩 영상 분석 + Danny 박사 + 조수철 코치 직접 처방 (개인 약점 axis 별 drill 매칭)</li>';
+      html += '</ol>';
+      html += '<p class="skill-overall__hint">📚 본 인사이트는 검증된 문헌 기반: Packheiser et al. 2020 (footedness meta-analysis · n=145K), Bishop et al. 2018 (inter-limb asymmetry ≥ 5% threshold), Promsri et al. 2020 (dominant·non-dominant 운동 제어). 참고: <code>outputs/dmj_stance_preference_literature_review.md</code></p>';
+      html += '</div>';
+    }
+
+    body.innerHTML = html;
+  }
+
+  // ---- §169-J v3 — Tier-gated weakness card detail (Danny 2026-05-13) ----
+  // DO_NOT_REVERT §169-J v3 — 약점 카드 surface = 3-step preview + 자세히 보기 toggle.
+  // Expanded 시 3-stage (1주 land / 2-3주 gliding / 4-9주 foiling cross-stance) accordion.
+  // Tier 별 단계적 unlock (회원 → 단무지 → 단골 라이더 → 코어).
+  // tier → 1-5 (0 = 비로그인 방문자)
+  function getUserContentTier() {
+    if (!window.DMJAuth || !window.DMJAuth.isLoggedIn || !window.DMJAuth.isLoggedIn()) return 0;
+    var u = window.DMJAuth.currentUser ? window.DMJAuth.currentUser() : null;
+    if (!u) return 0;
+    var slug = (u.tier || 'member').toString().toLowerCase();
+    var labelMap = {
+      'member': 1, '회원': 1,
+      'danmuji': 2, '단무지': 2, 'danmuji_member': 2,
+      'regular': 3, '단골': 3, '단골 라이더': 3, 'regular_rider': 3,
+      'preorder': 4, '선주문': 4,
+      'junior': 4, '쥬니어': 4, 'junior_rider': 4,
+      'senior': 4, '시니어': 4, 'senior_rider': 4,
+      'core': 5, '코어': 5, 'core_rider': 5,
+      'admin': 5, '관리자': 5
+    };
+    var base = labelMap[slug] || 1;
+    return base;
+  }
+  function getUserTierLabel(tier) {
+    var labels = ['방문자', '회원', '단무지 회원', '단골 라이더', '선주문·팀라이더', '코어·관리자'];
+    return labels[tier] || '회원';
+  }
+
+  // §169-J v3 — Generate stance-aware stage content per axis (3 stages).
+  // 12주 land (§167 v2) + 13주 water 7-stage (§168 v2) reference 정확.
+  function buildAxisStages(axis, stance) {
+    var skillKey = axis.skill.key;
+    var skillKo = axis.skill.ko;
+    var tackKo = axis.tackLabel;
+    var comfort = stanceComfort(axis, stance);
+    var foot = backFootLabel(axis, stance);
+    var isCross = comfort === 'weak';
+    var sideKo = stance === 'regular' ? '좌측' : (stance === 'goofy' ? '우측' : '약쪽');
+    var backFootKo = stance === 'regular' ? '왼발' : (stance === 'goofy' ? '오른발' : '뒷발');
+
+    // Skill-specific Stage 1 (land) focus
+    var stage1Focus, stage1Drills;
+    if (skillKey.indexOf('toeside') !== -1) {
+      stage1Focus = sideKo + ' hip rotation + ankle plantarflexion (발끝 회전 mechanics)';
+      stage1Drills = [
+        '한 발 균형 (Single Leg Stance) — ' + (foot || '뒷발') + ' 30초 × 5세트',
+        'Side Plank — 약쪽 60초 × 3세트',
+        'Lateral Lunge — ' + (foot || '뒷발 쪽') + ' 10회 × 3세트',
+        '발끝 회전 simulation — 거울 앞 좌우 비교 100회'
+      ];
+    } else if (skillKey.indexOf('heelside') !== -1) {
+      stage1Focus = sideKo + ' hip extension + ankle dorsiflexion (발뒤꿈치 압박 mechanics)';
+      stage1Drills = [
+        'Glute Bridge — ' + sideKo + ' 단측 15회 × 4세트',
+        'Romanian Deadlift — ' + sideKo + ' single-leg 8회 × 3세트',
+        'Side Plank hip dip — 약쪽 12회 × 3세트',
+        '발뒤꿈치 압박 시뮬레이션 — 거울 앞 좌우 비교 100회'
+      ];
+    } else {
+      // jumping
+      stage1Focus = 'Reactive strength + triple extension (발목·무릎·hip 3단 신전)';
+      stage1Drills = [
+        'Box Jump — 30cm 박스 8회 × 4세트',
+        'Pogo Hop — 양쪽 + 단측 각 30초 × 3세트',
+        'Drop Jump — 20cm 8회 × 3세트',
+        'Tuck Jump — 무릎 가슴 접촉 8회 × 3세트'
+      ];
+    }
+
+    // Stage 2 (water gliding)
+    var stage2Title, stage2Body;
+    if (skillKey === 'jumping') {
+      stage2Title = '글라이딩 안정성 재확인 (Stage 2-3: Gliding kneeling+standup+glide)';
+      stage2Body = '점핑 전제 = 안정된 글라이딩. 미풍 8-12 kt 평수면에서 standup 5분 sustain. high-buoyancy beginner board 권장.';
+    } else {
+      stage2Title = (isCross ? 'Cross-stance' : 'Natural-stance') + ' 글라이딩 · ' + (foot || backFootKo + ' 뒷발') + ' 발 스위치 학습';
+      stage2Body = '미풍 8-12 kt 환경, no-foil 글라이딩 (보드 평면 sliding). ' + (isCross
+        ? backFootKo + ' 을 의도적으로 뒷발로 두고 발 스위치를 100회 반복 (cross-stance 진입 mechanics).'
+        : '자연 stance 로 양 방향 글라이딩 안정화. 발 스위치 timing 학습.');
+    }
+
+    // Stage 3 (water foiling + cross-stance / advanced maneuver)
+    var stage3Title, stage3Body;
+    if (skillKey === 'jumping') {
+      stage3Title = '점핑 — Choppy 컨디션 takeoff (Stage 7: Aerial 진입)';
+      stage3Body = '15-20 kt + 작은 chop wave 활용. Triple extension (무릎-hip-어깨) timing → 윙 sheet-in 동시 firing. PPC Sonic FDS + Boom 63 권장.';
+    } else if (skillKey.indexOf('tack') !== -1) {
+      stage3Title = (isCross ? 'Cross-stance' : '') + ' ' + skillKo + ' · ' + tackKo + ' 정복 (Stage 6-7: HS+TS Tack)';
+      stage3Body = (isCross
+        ? '약쪽 (' + backFootKo + ' 뒷발) 진입 의도 반복. 회전 중 ' + (skillKey.indexOf('toeside') !== -1 ? '발끝 회전 + 어깨 회전' : '발뒤꿈치 압박 + 무게 이동') + ' coordination. 처음엔 회전 반경 크게, 점진적 축소.'
+        : '자연 stance 강화 + 회전 중 윙 sheet-in timing 정밀화. Levitaz FW 680 + 16mm 카본 HR.');
+    } else {
+      // jibe
+      stage3Title = (isCross ? 'Cross-stance' : '') + ' ' + skillKo + ' · ' + tackKo + ' 카빙 (Stage 4-5: Foiling Carving + Cross-stance)';
+      stage3Body = (isCross
+        ? 'S-curve 깊이 점진 증가. 약쪽 진입 시 보드 컨트롤 무너지지 않도록 reactive strength 동원. TS 자이빙 후 cross-stance 라이딩 5분 sustain 목표.'
+        : '자연 stance 자이빙 회전 반경 정밀화. 속도 손실 회복 (가속 재진입) 학습. Takoon Flare/Swell 또는 PPC M2.');
+    }
+
+    return {
+      stage1: {
+        weeks: '1주차',
+        location: 'land',
+        title: stage1Focus,
+        drills: stage1Drills,
+        landPhase: '12주 land Phase 1 (Flexibility) + Phase 2 (Mobility)'
+      },
+      stage2: {
+        weeks: '2-3주차',
+        location: 'water',
+        title: stage2Title,
+        body: stage2Body,
+        gear: skillKey === 'jumping' ? 'PPC Sonic FDS 6.0 + Takoon Cruise 6\'10"' : 'Takoon Cruise 6\'10" (high-buoyancy beginner) + Levitaz FW 900',
+        waterStage: '13주 water Stage 1-2 (Land + Gliding kneeling+standup+glide)'
+      },
+      stage3: {
+        weeks: '4-9주차',
+        location: 'water',
+        title: stage3Title,
+        body: stage3Body,
+        waterStage: skillKey === 'jumping'
+          ? '13주 water Stage 7 (HS+TS Tack 정복) + 점핑 진입'
+          : (skillKey.indexOf('tack') !== -1
+              ? '13주 water Stage 6-7 (HS Jibe → HS+TS Tack)'
+              : '13주 water Stage 4-5 (Foiling Carving + Cross-stance)')
+      }
+    };
+  }
+
+  // §169-J v3 — Render a single stage with tier-gating.
+  // requiredTier = minimum tier number to view full content.
+  function renderStage(stage, stageNum, requiredTier, userTier, axisKey) {
+    var locationClass = stage.location === 'land' ? 'land' : 'water';
+    var locationLabel = stage.location === 'land' ? '🏡 육상 (land)' : '🌊 해상 (water)';
+    var headerHtml = '<div class="skill-detail__stage-head">' +
+      '<span class="skill-detail__stage-num">Stage ' + stageNum + '</span>' +
+      '<span class="skill-detail__stage-weeks">' + stage.weeks + '</span>' +
+      '<span class="skill-detail__stage-loc skill-detail__stage-loc--' + locationClass + '">' + locationLabel + '</span>' +
+    '</div>';
+    var titleHtml = '<h4 class="skill-detail__stage-title">' + stage.title + '</h4>';
+    var bodyHtml = '';
+    if (stage.drills && stage.drills.length) {
+      bodyHtml += '<ul class="skill-detail__drills">';
+      stage.drills.forEach(function (d) { bodyHtml += '<li>' + d + '</li>'; });
+      bodyHtml += '</ul>';
+    }
+    if (stage.body) bodyHtml += '<p class="skill-detail__body">' + stage.body + '</p>';
+    if (stage.gear) bodyHtml += '<p class="skill-detail__gear"><b>권장 장비:</b> ' + stage.gear + '</p>';
+    if (stage.landPhase) bodyHtml += '<p class="skill-detail__ref">📚 매핑: ' + stage.landPhase + '</p>';
+    if (stage.waterStage) bodyHtml += '<p class="skill-detail__ref">📚 매핑: ' + stage.waterStage + '</p>';
+
+    var html = '<section class="skill-detail__stage skill-detail__stage--' + locationClass + '">' + headerHtml + titleHtml;
+    if (userTier >= requiredTier) {
+      html += '<div class="skill-detail__stage-body">' + bodyHtml + '</div>';
+    } else {
+      // locked
+      var nextTierLabel = getUserTierLabel(requiredTier);
+      var youLabel = getUserTierLabel(userTier);
+      var ctaHref = userTier === 0 ? 'signup.html?redirect=skill-assessment.html' : 'membership.html';
+      var ctaLabel = userTier === 0 ? '회원가입 →' : '회원 등급 안내 →';
+      html += '<div class="skill-detail__locked" data-required-tier="' + requiredTier + '">' +
+        '<div class="skill-detail__locked-content" aria-hidden="true">' + bodyHtml + '</div>' +
+        '<div class="skill-detail__locked-overlay">' +
+          '<span class="skill-detail__locked-icon" aria-hidden="true">🔒</span>' +
+          '<p class="skill-detail__locked-msg"><b>' + nextTierLabel + '</b> 등급에서 공개됩니다.' +
+            '<br><small>당신: <b>' + youLabel + '</b>' +
+            (userTier === 0 ? ' → 회원가입 시 contents 일부 unlock' : ' → 컨설팅·구매 시 자동 승급') + '</small>' +
+          '</p>' +
+          '<a href="' + ctaHref + '" class="btn btn--ghost btn--sm">' + ctaLabel + '</a>' +
+        '</div>' +
+      '</div>';
+    }
+    html += '</section>';
+    return html;
+  }
+
+  // §169-J v3 — Build expandable detail markup for one axis (or combined skill).
+  function buildExpandedDetail(axis, axisKey, combined) {
+    var userTier = getUserContentTier();
+    var stages = buildAxisStages(axis, state.stance);
+
+    // Required tier per stage (event override already applied via getUserContentTier)
+    // Stage 1 (land) — Tier 1 (회원)
+    // Stage 2 (water gliding) — Tier 2 (단무지)
+    // Stage 3 (water foiling + cross-stance) — Tier 4 (선주문·팀라이더+)
+    // Stage 3 video demo block — Tier 3 (단골 라이더)
+    var html = '';
+    html += '<div class="skill-detail" data-axis="' + axisKey + '">';
+
+    html += renderStage(stages.stage1, 1, 1, userTier, axisKey);
+    html += renderStage(stages.stage2, 2, 2, userTier, axisKey);
+
+    // Stage 3 — first show stage block (Tier 4 gate for full detail), then nested video block (Tier 3 gate)
+    html += renderStage(stages.stage3, 3, 4, userTier, axisKey);
+
+    // Stage 3 video demo (Tier 3 = 단골 라이더)
+    if (userTier >= 3) {
+      html += '<div class="skill-detail__video">' +
+        '<span class="skill-detail__video-tag">🎬 Danny 시연 영상</span>' +
+        '<p>약쪽 axis 별 Danny 직접 시연 영상 (placeholder) — Phase 12 video CDN 연동 예정.</p>' +
+        '<div class="skill-detail__video-thumb" aria-hidden="true">시연 영상 자리 (단골 라이더 unlocked)</div>' +
+      '</div>';
+    } else {
+      var ctaHref2 = userTier === 0 ? 'signup.html?redirect=skill-assessment.html' : 'membership.html';
+      var ctaLabel2 = userTier === 0 ? '회원가입 →' : '회원 등급 안내 →';
+      html += '<div class="skill-detail__locked skill-detail__locked--video" data-required-tier="3">' +
+        '<div class="skill-detail__locked-overlay">' +
+          '<span class="skill-detail__locked-icon" aria-hidden="true">🔒</span>' +
+          '<p class="skill-detail__locked-msg">🎬 <b>단골 라이더</b> 등급에서 Danny 시연 영상 공개<br><small>현재: ' + getUserTierLabel(userTier) + '</small></p>' +
+          '<a href="' + ctaHref2 + '" class="btn btn--ghost btn--sm">' + ctaLabel2 + '</a>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // CTA row
+    html += '<div class="skill-detail__cta">' +
+      '<a href="consult.html" class="btn btn--accent btn--sm">1:1 구매 상담하기 →</a>' +
+      '<a href="find-my-gear.html" class="btn btn--ghost btn--sm">Stage 별 장비 견적 →</a>' +
+      '<a href="membership.html" class="btn btn--ghost btn--sm">12주 land + 13주 water 프로그램 →</a>' +
+    '</div>';
+
+    html += '</div>'; // .skill-detail
+    return html;
+  }
+
+  // §169-J v3 — 3-step preview (collapsed card surface)
+  function buildPreview(axis) {
+    var stages = buildAxisStages(axis, state.stance);
+    return '<div class="skill-weakness-card__preview">' +
+      '<div class="skill-weakness-card__preview-head">📋 추천 순서 (3 단계)</div>' +
+      '<ol class="skill-weakness-card__preview-list">' +
+        '<li><b>Step 1</b> (' + stages.stage1.weeks + ') — ' + (stages.stage1.title.split(' + ')[0] || stages.stage1.title) + ' <span class="skill-weakness-card__preview-loc">🏡</span></li>' +
+        '<li><b>Step 2</b> (' + stages.stage2.weeks + ') — ' + stages.stage2.title.split(' · ')[0] + ' <span class="skill-weakness-card__preview-loc">🌊</span></li>' +
+        '<li><b>Step 3</b> (' + stages.stage3.weeks + ') — ' + stages.stage3.title.split(' (')[0] + ' <span class="skill-weakness-card__preview-loc">🌊</span></li>' +
+      '</ol>' +
+    '</div>';
+  }
+
+  // ---- Compute weakness analysis ----
+  // DO_NOT_REVERT §169-J — Danny 2026-05-12: "약점 top 3" 제한 영구 폐기.
+  // 임계값 기반 (score ≤ 6 보통 이하) + 모든 약점 axis 표시. 카드 수 가변 (1~10).
+  // 동일 스킬 P+S 둘 다 약하면 "양쪽 모두 약함" 한 카드로 합치는 기존 logic 유지.
+  function computeWeakness() {
+    var cardsEl = document.getElementById('weakness-cards');
+    var lead = document.getElementById('weakness-lead');
+    var section = document.getElementById('weakness-section');
+    var heading = section ? section.querySelector('h2') : null;
+
+    var anyEntered = state.indices.some(function (v) { return v > 0; });
+    // §169-J v2 — 총평 section 도 동시 update (stance + 약점 패턴 기반 insight)
+    renderOverallSummary();
+    if (!anyEntered) {
+      cardsEl.innerHTML = '';
+      if (heading) heading.textContent = '약점 분석 — 슬라이더를 조정하면 자동 표시';
+      lead.textContent = '슬라이더 값을 조정하면 약점 axis 가 자동으로 표시됩니다. 점수가 보통(6) 이하인 axis 모두가 약점으로 표시되며, 양쪽(P+S) 모두 약한 스킬은 한 카드로 합쳐 "양쪽 모두 약함 — 기초부터 다지기"로 안내합니다.';
+      return;
+    }
+
+    // §169-J — Collect ALL axes meeting weakness threshold (score ≤ 6, 보통 이하)
+    var WEAK_THRESHOLD = 6;
+    var weakItems = [];
+    AXES.forEach(function (ax, i) {
+      var idx = state.indices[i];
+      if (idx === 0) return; // 미입력 skip (사용자가 응답 안 함)
+      var sc = scoreOf(idx);
+      if (sc > WEAK_THRESHOLD) return; // 안정적/매우 안정적 skip
+      weakItems.push({ axisIdx: i, score: sc, ax: ax });
+    });
+
+    if (weakItems.length === 0) {
+      // 입력은 했는데 모두 안정적 이상 → 약점 없음
+      cardsEl.innerHTML = '<div class="skill-weakness-card" style="border-color:#22c55e"><h3 style="color:#15803d">🎉 약점 영역 없음</h3><p class="skill-weakness-card__sub">입력하신 모든 axis 가 안정적(8점) 이상입니다. 다음은 <b>속도·점핑·신기술</b> 영역으로 도전해보세요.</p></div>';
+      if (heading) heading.textContent = '약점 분석 — 안정적 이상';
+      lead.textContent = '입력한 axis 모두 보통(6점) 초과 → 약점 영역 없음. 다음 단계 (점핑·고급 maneuver) 으로 진입 시점입니다.';
+      return;
+    }
+
+    // §169-J — Sort by score ASC (가장 약한 순), index tie-break
+    weakItems.sort(function (a, b) {
+      if (a.score !== b.score) return a.score - b.score;
+      return a.axisIdx - b.axisIdx;
+    });
+
+    // §169-J — Combine same-skill P+S if both meet threshold (기존 logic 유지)
+    var skillCounts = {};
+    weakItems.forEach(function (w) {
+      var sk = w.ax.skill.key;
+      skillCounts[sk] = (skillCounts[sk] || 0) + 1;
+    });
+
+    var rendered = [];
+    var alreadyCombined = {};
+    weakItems.forEach(function (w) {
+      var sk = w.ax.skill.key;
+      if (skillCounts[sk] === 2 && alreadyCombined[sk]) return;
+      var isCombined = skillCounts[sk] === 2;
+      if (isCombined) alreadyCombined[sk] = true;
+      rendered.push({ axisIdx: w.axisIdx, combined: isCombined });
+    });
+
+    // §169-J — Dynamic heading 약점 N 영역
+    if (heading) heading.textContent = '약점 분석 — ' + rendered.length + ' 영역';
+
+    cardsEl.innerHTML = '';
+    rendered.forEach(function (r, cardIdx) {
+      var ax = AXES[r.axisIdx];
+      var sk = ax.skill;
+      var idx = state.indices[r.axisIdx];
+      var sc = scoreOf(idx);
+
+      var titleHtml, subHtml, trainingHtml;
+      if (r.combined) {
+        var keyP = sk.ko + '_port';
+        var keyS = sk.ko + '_starboard';
+        var pData = TRAINING_DATA[keyP];
+        var sData = TRAINING_DATA[keyS];
+        var pIdx = state.indices[AXES.findIndex(function (a) { return a.skill.key === sk.key && a.tack === 'P'; })];
+        var sIdx = state.indices[AXES.findIndex(function (a) { return a.skill.key === sk.key && a.tack === 'S'; })];
+        titleHtml = sk.ko + ' · 양쪽 모두 약함';
+        subHtml = '포트 <b>' + scoreOf(pIdx) + '/10</b> · 스타보드 <b>' + scoreOf(sIdx) + '/10</b> → <b>기초부터 다지기</b>';
+        trainingHtml = renderTrainingBlocks(pData, sData);
+      } else {
+        var keyDir = sk.ko + '_' + (ax.tack === 'P' ? 'port' : 'starboard');
+        var data = TRAINING_DATA[keyDir];
+        titleHtml = sk.ko + ' · ' + ax.tackLabel;
+        // §169-I v2 — stance-aware per-axis subHtml
+        var comfort = stanceComfort(ax, state.stance);
+        var foot = backFootLabel(ax, state.stance);
+        var stanceCtx = '';
+        if (comfort === 'weak') {
+          stanceCtx = ' <span class="stance-pill stance-pill--weak">약' + (foot ? ' (' + foot + ')' : '') + '</span>';
+        } else if (comfort === 'easy') {
+          stanceCtx = ' <span class="stance-pill stance-pill--easy">편' + (foot ? ' (' + foot + ')' : '') + '</span>';
+        }
+        subHtml = ax.tack + ' 방향 · 현재 점수 <b>' + sc + '/10</b> (' + LEVELS[idx].label + ')' + stanceCtx;
+        trainingHtml = renderTrainingBlocks(data, null);
+      }
+
+      // §169-J v3 — preview + expandable detail per card
+      var axisKey = r.combined ? sk.key + '-combined' : ax.key;
+      var previewHtml = buildPreview(ax);
+      var detailHtml = buildExpandedDetail(ax, axisKey, r.combined);
+      var detailId = 'skill-detail-' + axisKey + '-' + cardIdx;
+
+      var card = document.createElement('div');
+      card.className = 'skill-weakness-card';
+      card.setAttribute('data-axis-key', axisKey);
+      card.innerHTML =
+        '<h3>' + titleHtml + '</h3>' +
+        '<p class="skill-weakness-card__sub">' + subHtml + '</p>' +
+        previewHtml +
+        '<button type="button" class="skill-weakness-card__toggle" aria-expanded="false" aria-controls="' + detailId + '" data-toggle-detail>' +
+          '<span class="skill-weakness-card__toggle-label">자세히 보기</span>' +
+          '<span class="skill-weakness-card__toggle-icon" aria-hidden="true">↓</span>' +
+        '</button>' +
+        '<div class="skill-weakness-card__detail" id="' + detailId + '" hidden>' + detailHtml + '</div>' +
+        '<div class="skill-weakness-card__legacy">' + trainingHtml +
+          '<p class="skill-weakness-card__row"><b>1:1 컨설팅</b> → <a href="consult.html">1:1 구매 상담하기 ↗</a></p>' +
+        '</div>';
+      cardsEl.appendChild(card);
+    });
+
+    // §169-J v3 — Wire up "자세히 보기" toggle (delegated)
+    cardsEl.querySelectorAll('[data-toggle-detail]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var card = btn.closest('.skill-weakness-card');
+        if (!card) return;
+        var detail = card.querySelector('.skill-weakness-card__detail');
+        if (!detail) return;
+        var expanded = card.classList.toggle('is-expanded');
+        btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        detail.hidden = !expanded;
+        btn.querySelector('.skill-weakness-card__toggle-label').textContent = expanded ? '간단히 보기' : '자세히 보기';
+        btn.querySelector('.skill-weakness-card__toggle-icon').textContent = expanded ? '↑' : '↓';
+      });
+    });
+
+    // §169-I v2 — stance-aware lead text (per-axis biomechanics)
+    var stanceNote = '';
+    if (state.stance === 'regular') {
+      stanceNote = ' Regular 라이더는 보통 <b>토우 P · 힐 S · 자이빙 동일 패턴</b> 에서 약한 경향 — 모두 <b>왼발 뒤 cross-stance</b> 상황입니다.';
+    } else if (state.stance === 'goofy') {
+      stanceNote = ' Goofy 라이더는 보통 <b>토우 S · 힐 P · 자이빙 동일 패턴</b> 에서 약한 경향 — 모두 <b>오른발 뒤 cross-stance</b> 상황입니다.';
+    }
+    // §169-J — Dynamic count, no "top 3" framing
+    lead.innerHTML = '점수 보통(6) 이하 axis 를 모두 자동 정렬했습니다 (총 <b>' + rendered.length + ' 영역</b>). 같은 스킬이 양쪽 모두 약하면 한 카드로 합쳐 "양쪽 모두 약함 — 기초부터 다지기"로 안내합니다. 각 카드에는 육상·해상 훈련이 분리되어 있습니다.' + stanceNote;
+  }
+
+  function renderTrainingBlocks(dataA, dataB) {
+    // dataA: primary direction (or combined: port). dataB: combined: starboard (else null)
+    var html = '';
+    var land = dataA && dataA['육상'];
+    var water = dataA && dataA['해상'];
+    var landB = dataB && dataB['육상'];
+    var waterB = dataB && dataB['해상'];
+
+    if (land) {
+      html += '<div class="training-block training-block--land">' +
+        '<span class="training-block__tag">육상 훈련</span>' +
+        '<strong>' + (land.title || '') + '</strong>' +
+        '<p>' + (land.description || '') + '</p>' +
+        (land.duration ? '<span class="training-block__meta">⏱ ' + land.duration + '</span>' : '') +
+        '</div>';
+    }
+    if (landB && landB.title !== (land && land.title)) {
+      html += '<div class="training-block training-block--land">' +
+        '<span class="training-block__tag">육상 훈련 (S)</span>' +
+        '<strong>' + (landB.title || '') + '</strong>' +
+        '<p>' + (landB.description || '') + '</p>' +
+        (landB.duration ? '<span class="training-block__meta">⏱ ' + landB.duration + '</span>' : '') +
+        '</div>';
+    }
+    if (water) {
+      html += '<div class="training-block training-block--water">' +
+        '<span class="training-block__tag">해상 훈련</span>' +
+        '<strong>' + (water.title || '') + '</strong>' +
+        '<p>' + (water.description || '') + '</p>' +
+        (water.conditions ? '<span class="training-block__meta">🌊 ' + water.conditions + '</span>' : '') +
+        '</div>';
+    }
+    if (waterB && waterB.title !== (water && water.title)) {
+      html += '<div class="training-block training-block--water">' +
+        '<span class="training-block__tag">해상 훈련 (S)</span>' +
+        '<strong>' + (waterB.title || '') + '</strong>' +
+        '<p>' + (waterB.description || '') + '</p>' +
+        (waterB.conditions ? '<span class="training-block__meta">🌊 ' + waterB.conditions + '</span>' : '') +
+        '</div>';
+    }
+    return html;
+  }
+
+  // ---- localStorage ----
+  // DO_NOT_REVERT §169 — payload v3 (AXES P/S swap 적용 후 인덱스 의미가 변경됨).
+  // v1/v2 (P-first AXES) → v3 (S-first AXES) 마이그레이션: 인덱스 0..4 ↔ 5..9 swap.
+  function saveToLocalStorage() {
+    try {
+      var payload = {
+        v: 4,  // §169-I — stance field 추가 (v3 → v4)
+        ts: new Date().toISOString(),
+        indices: state.indices,
+        speed: state.speed,
+        stance: state.stance
+      };
+      // §169-K — per-user namespace. 로그인 시 dmj_user_<userId>_skill_assessment_v1, 비로그인 시 dmj_anon_skill_assessment_v1.
+      if (window.DMJAuth && window.DMJAuth.setUserData) {
+        window.DMJAuth.setUserData(STORAGE_SUFFIX, JSON.stringify(payload));
+      } else {
+        // fallback (auth-shim.js 로드 실패 시) — 글로벌 키 사용. 정상 동작 시 도달 X.
+        localStorage.setItem('dmj_' + STORAGE_SUFFIX, JSON.stringify(payload));
+      }
+      var st = document.getElementById('save-status');
+      var who = (window.DMJAuth && window.DMJAuth.isLoggedIn && window.DMJAuth.isLoggedIn()) ? '계정에' : '이 브라우저에';
+      st.innerHTML = '<b style="color:var(--color-sea)">저장됨</b> · ' + new Date().toLocaleString('ko-KR') + ' · ' + who + ' 저장됩니다 (Phase 12 후 클라우드 동기화 예정).';
+    } catch (e) {
+      console.warn('[skill-assessment] save failed', e);
+      document.getElementById('save-status').textContent = '저장 실패: 브라우저 storage 권한을 확인하세요.';
+    }
+  }
+
+  function restoreFromLocalStorage() {
+    try {
+      // §169-K — per-user namespace 읽기. 글로벌 dmj_skill_assessment_v1 직접 read 회귀 X.
+      var raw = (window.DMJAuth && window.DMJAuth.getUserData)
+        ? window.DMJAuth.getUserData(STORAGE_SUFFIX)
+        : localStorage.getItem('dmj_' + STORAGE_SUFFIX);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      if (!data) return;
+
+      // v1 (values 0..5) and v2 (indices 0..5) are compatible — both 0..5 index
+      var arr = Array.isArray(data.indices) ? data.indices : (Array.isArray(data.values) ? data.values : null);
+      if (!arr || arr.length !== N) return;
+
+      state.indices = arr.map(function (v) {
+        var n = parseInt(v, 10);
+        return isNaN(n) ? 0 : Math.max(0, Math.min(5, n));
+      });
+
+      // §169 migration — pre-v3 payloads were saved with P-first AXES order. Swap halves so values map to new S-first order.
+      var savedVersion = parseInt(data.v, 10) || 1;
+      if (savedVersion < 3) {
+        var swapped = state.indices.slice(5, 10).concat(state.indices.slice(0, 5));
+        state.indices = swapped;
+        console.info('[skill-assessment] migrated v' + savedVersion + ' → v3 (P/S swap)');
+      }
+      // §165 v5 — parseFloat (소수점 1자리 허용). parseInt 회귀 시 소수점 truncate.
+      state.speed = Math.max(0, Math.min(50, parseFloat(data.speed) || 0)); // input clamp 0-50 (gauge displays 0-40 + 선수 zone 31+)
+      // §169-I — stance field (v4+). v3 미만은 null (사용자가 stance picker 로 선택해야 함).
+      if (data.stance === 'regular' || data.stance === 'goofy') {
+        state.stance = data.stance;
+      }
+
+      AXES.forEach(function (ax, i) {
+        var slider = document.getElementById('slider-' + ax.key);
+        if (slider) {
+          slider.value = state.indices[i];
+          document.getElementById('value-' + ax.key).textContent = LEVELS[state.indices[i]].score;
+          var idx = state.indices[i];
+          document.getElementById('desc-' + ax.key).textContent = LEVELS[idx].label + (idx > 0 ? ' (' + LEVELS[idx].score + '점)' : '');
+        }
+      });
+      document.getElementById('speed-input').value = state.speed;
+      // §169-I — stance UI 갱신 (라벨 + slider pill + picker visual)
+      setStance(state.stance);
+      updatePolygon();
+      updateScoreDisplay();
+      updateSpeedGauge();
+      computeWeakness();
+    } catch (e) {
+      console.warn('[skill-assessment] restore failed', e);
+    }
+  }
+
+  function resetAll() {
+    state.indices = new Array(N).fill(0);
+    state.speed = 0;
+    AXES.forEach(function (ax) {
+      var slider = document.getElementById('slider-' + ax.key);
+      if (slider) {
+        slider.value = 0;
+        document.getElementById('value-' + ax.key).textContent = 0;
+        document.getElementById('desc-' + ax.key).textContent = LEVELS[0].label;
+      }
+    });
+    document.getElementById('speed-input').value = 0;
+    updatePolygon();
+    updateScoreDisplay();
+    updateSpeedGauge();
+    computeWeakness();
+    document.getElementById('save-status').textContent = '결과는 브라우저 localStorage에만 저장됩니다. 회원 계정 연동은 백엔드 완성 후 (Phase 12).';
+  }
+
+  // ---- Init ----
+  document.addEventListener('DOMContentLoaded', function () {
+    loadTrainingData();
+    renderStaticSvg();
+    renderSliders();
+    updatePolygon();
+    updateScoreDisplay();
+    updateSpeedGauge();
+    computeWeakness();
+
+    // Speed input — §165 v5 (Danny 2026-05-13) parseFloat 소수점 1자리 허용
+    document.getElementById('speed-input').addEventListener('input', function (e) {
+      var v = parseFloat(e.target.value);
+      if (isNaN(v)) v = 0;
+      // 소수점 1자리 round (step=0.1 정합)
+      v = Math.round(v * 10) / 10;
+      state.speed = Math.max(0, Math.min(50, v));
+      updateSpeedGauge();
+    });
+
+    // §169-I — Stance picker radio change handler
+    document.querySelectorAll('input[name="stance"]').forEach(function (radio) {
+      radio.addEventListener('change', function (e) {
+        if (e.target.checked) {
+          setStance(e.target.value);
+          // Auto-save stance (사용자 추가 액션 없이 즉시 반영)
+          if (state.indices.some(function (v) { return v > 0; })) {
+            // 진단 진행 중이면 자동 저장 (stance 만 변경된 상태)
+            // §169-K — per-user namespace read
+            try {
+              var raw = (window.DMJAuth && window.DMJAuth.getUserData)
+                ? window.DMJAuth.getUserData(STORAGE_SUFFIX)
+                : localStorage.getItem('dmj_' + STORAGE_SUFFIX);
+              if (raw) saveToLocalStorage();
+            } catch (_) {}
+          }
+        }
+      });
+    });
+
+    // Save / reset
+    document.getElementById('save-btn').addEventListener('click', saveToLocalStorage);
+    document.getElementById('reset-btn').addEventListener('click', function () {
+      if (confirm('모든 슬라이더와 속도 값을 초기화합니다. 진행할까요?')) resetAll();
+    });
+
+    // §169-I — initial stance UI render (default state.stance = null, pill hidden)
+    setStance(state.stance);
+
+    // Restore previous assessment if any (slight delay so fetch can populate TRAINING_DATA first)
+    setTimeout(restoreFromLocalStorage, 60);
+  });
+})();
+</script>
+  <script src="assets/js/nav-auth.js" defer></script>
+  <!-- §173 — 옥코치 AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <script src="assets/js/agent-deny.js" defer></script>
+</body>
+</html>

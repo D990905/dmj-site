@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>이미지 → 페이지 매핑 검수 · 단무지공방</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg:#0A2540; --bg2:#0F2E50; --surf:#13355c; --line:rgba(255,255,255,.12);
+    --ink:#E6EDF7; --mute:#94A6BE; --sun:#FFB800; --sea:#3FB8C9; --grass:#3FB87E;
+    --pink:#FF6B8A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-feature-settings:'ss03';word-break:keep-all;line-height:1.5}
+  header{padding:24px 32px;background:linear-gradient(135deg,#0A2540 0%,#13355c 100%);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+  h1{margin:0 0 6px;font-size:20px;font-weight:800;letter-spacing:-.01em}
+  .sub{color:var(--mute);font-size:13px;margin:0}
+  .toolbar{display:flex;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .pill{padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:12px;color:var(--mute);cursor:pointer}
+  .pill.active{background:var(--sun);color:#0A2540;border-color:var(--sun);font-weight:700}
+  .pill.solid{background:var(--grass);color:#fff;border:none;font-weight:700;cursor:pointer}
+  .pill.solid:hover{filter:brightness(1.08)}
+  main{padding:24px 32px 80px;max-width:1600px;margin:0 auto}
+  .section-title{font-size:14px;text-transform:uppercase;letter-spacing:.12em;color:var(--mute);margin:28px 0 12px;font-weight:700;display:flex;align-items:center;gap:10px}
+  .section-title .ct{color:var(--sun);font-family:'JetBrains Mono',monospace}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,border-color .15s}
+  .card:hover{border-color:var(--sea)}
+  .thumb-wrap{position:relative;aspect-ratio:3/2;overflow:hidden;background:var(--surf)}
+  .thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+  .thumb-wrap.loading::before{content:'로딩중...';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:12px}
+  .thumb-wrap.err::before{content:'⚠ 로드 실패 (Drive 로그인 확인)';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--pink);font-size:11px;text-align:center;padding:8px}
+  .badge{position:absolute;top:8px;left:8px;padding:3px 8px;background:rgba(10,37,64,.92);border:1px solid var(--line);border-radius:999px;font-size:10px;letter-spacing:.04em;color:var(--ink)}
+  .meta{padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+  .name{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .controls{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+  select,input[type=text]{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink);padding:7px 10px;border-radius:8px;font-size:12px;font-family:inherit}
+  select:focus,input:focus{outline:none;border-color:var(--sea)}
+  select option{background:#0A2540;color:var(--ink)}
+  .tone-row{display:flex;gap:4px;flex-wrap:wrap}
+  .tone{padding:3px 7px;border:1px solid var(--line);border-radius:6px;font-size:10px;cursor:pointer;background:rgba(255,255,255,.04);color:var(--mute);user-select:none}
+  .tone.on{background:var(--sea);color:#0A2540;font-weight:700;border-color:var(--sea)}
+  .summary{position:fixed;bottom:0;left:0;right:0;background:#091e36;border-top:2px solid var(--sun);padding:14px 32px;z-index:20;display:flex;gap:14px;align-items:center}
+  .summary-stat{font-size:13px;color:var(--mute)}
+  .summary-stat b{color:var(--sun);font-family:'JetBrains Mono',monospace;font-size:15px}
+  .btn-export{background:var(--sun);color:#0A2540;border:none;padding:10px 18px;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px;font-family:inherit}
+  .btn-export:hover{filter:brightness(1.05)}
+  dialog{padding:0;border:none;border-radius:12px;background:#0A2540;color:var(--ink);max-width:90vw;width:800px;max-height:90vh;overflow:hidden}
+  dialog::backdrop{background:rgba(0,0,0,.7)}
+  .dlg-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .dlg-head h3{margin:0;font-size:15px}
+  .dlg-head button{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit}
+  .dlg-body{padding:16px 20px;overflow:auto;max-height:calc(90vh - 100px)}
+  pre{background:#040b16;border:1px solid var(--line);border-radius:8px;padding:14px;color:var(--ink);font-size:11px;overflow:auto;font-family:'JetBrains Mono',monospace}
+  .note{background:rgba(255,184,0,.08);border:1px solid rgba(255,184,0,.3);border-radius:8px;padding:12px 14px;color:var(--ink);font-size:13px;margin:16px 0}
+  .note b{color:var(--sun)}
+  .filter-bar{display:flex;gap:8px;align-items:center;margin:0 0 6px;flex-wrap:wrap}
+  .source-link{font-size:11px;color:var(--sea);text-decoration:none}
+  .source-link:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>이미지 → 페이지 매핑 검수</h1>
+  <p class="sub">Danny 공유 Drive 자산 → 단무지공방 사이트 hero/background 매핑. 각 사진 dropdown 으로 페이지 지정 → 우하단 <b>매핑 export</b> 클릭 → 결과 JSON 을 chat 에 붙여넣어 주세요. <b>저장은 export 시점</b> — 새로고침하면 초기화됩니다 (localStorage 미사용 정책).</p>
+  <div class="toolbar">
+    <span class="pill active" data-filter="all">전체</span>
+    <span class="pill" data-filter="brazil">Sean Brazil (42)</span>
+    <span class="pill" data-filter="webres">Joshua PPC (16)</span>
+    <span class="pill" data-filter="danny">Danny 본인 (3)</span>
+    <span class="pill" data-filter="assigned">매핑 완료만</span>
+    <span class="pill" data-filter="unassigned">미매핑만</span>
+  </div>
+</header>
+
+<main>
+
+<div class="note">
+  <b>사용법:</b> 썸네일은 로컬 `thumbs/` 폴더 (500px JPEG) 에서 직접 로드 — Drive 인증 불필요. 색감 태그 다중 선택 가능. 페이지 dropdown 비워두면 "미매핑". 썸네일 클릭 → Drive 원본 새 탭.
+</div>
+
+<div class="section-title">Folder 1 — Sean Brazil 2025 <span class="ct">42 photos · 사진가 R. Hajduk</span> <a class="source-link" href="https://drive.google.com/drive/folders/1q1-94idiUhddZNBtNMZwBnLvDcSHINQJ" target="_blank">↗ Drive</a></div>
+<div class="grid" id="grid-brazil"></div>
+
+<div class="section-title">Folder 2 — Web Res (PPC by Joshua McCormack) <span class="ct">16 photos · 색감 좋음</span> <a class="source-link" href="https://drive.google.com/drive/folders/1xIy_pYOu0wlt0P_4ObwbkS3BznNGNRyp" target="_blank">↗ Drive</a></div>
+<div class="grid" id="grid-webres"></div>
+
+<div class="section-title">Danny 본인 사진 <span class="ct">3 photos · USP/profile 후보 — 옥덕필 박사 (about · 컨설팅 hero · index hero · USP 섹션)</span></div>
+<div class="grid" id="grid-danny"></div>
+
+</main>
+
+<div class="summary">
+  <div class="summary-stat">매핑 완료 <b id="stat-done">0</b> / <b id="stat-total">0</b></div>
+  <div class="summary-stat">사용 페이지 <b id="stat-pages">0</b></div>
+  <button class="btn-export" onclick="exportMapping()">매핑 export →</button>
+  <button class="btn-export" style="background:rgba(255,255,255,.1);color:var(--ink)" onclick="clearAll()">전체 초기화</button>
+</div>
+
+<dialog id="dlg">
+  <div class="dlg-head">
+    <h3>매핑 결과 — Chat 에 붙여넣기</h3>
+    <button onclick="copyOutput()">복사</button>
+    <button onclick="document.getElementById('dlg').close()">닫기</button>
+  </div>
+  <div class="dlg-body">
+    <pre id="output"></pre>
+  </div>
+</dialog>
+
+<script>
+// Page mapping targets (단무지공방 사이트 구조)
+const PAGES = [
+  { group: '메인', val: 'index', label: 'index.html (메인 hero)' },
+  { group: '브랜드', val: 'levitaz', label: 'levitaz.html hero' },
+  { group: '브랜드', val: 'ppc', label: 'ppc.html hero' },
+  { group: '브랜드', val: 'takoon', label: 'takoon.html hero' },
+  { group: '브랜드', val: 'wip', label: 'wip.html hero' },
+  { group: '스타일', val: 'style-flat', label: 'style/flat-speed.html hero' },
+  { group: '스타일', val: 'style-choppy', label: 'style/choppy-freeride.html hero' },
+  { group: '스타일', val: 'style-wave', label: 'style/wave.html (lock — Danny 명시 자산)' },
+  { group: '스타일', val: 'style-hybrid', label: 'style/hybrid.html (lock — Danny 명시 자산)' },
+  { group: '레벨', val: 'level-beginner', label: 'level/beginner.html hero' },
+  { group: '레벨', val: 'level-intermediate', label: 'level/intermediate.html hero' },
+  { group: '레벨', val: 'level-advanced', label: 'level/advanced.html (현재 Sean Herbert)' },
+  { group: '레벨', val: 'level-pro', label: 'level/pro.html (현재 Sean Herbert)' },
+  { group: '종목', val: 'genre-wing', label: 'genre/wing.html hero' },
+  { group: '종목', val: 'genre-kite', label: 'genre/kite.html hero' },
+  { group: '종목', val: 'genre-sup', label: 'genre/sup.html hero' },
+  { group: '종목', val: 'genre-parawing', label: 'genre/parawing.html hero' },
+  { group: '종목', val: 'genre-pump', label: 'genre/pump.html hero' },
+  { group: '종목', val: 'genre-surf', label: 'genre/surf.html hero' },
+  { group: '기타', val: 'find-my-gear', label: 'find-my-gear.html hero' },
+  { group: '기타', val: 'premium', label: 'premium.html hero' },
+  { group: '기타', val: 'about', label: 'about/profile (옥덕필 박사 섹션)' },
+  { group: '기타', val: 'calculator', label: 'calculator.html hero/section' },
+  { group: '기타', val: 'image-strip', label: 'image-strip (보조 cell)' },
+  { group: '기타', val: 'archive', label: '보관 (미사용)' }
+];
+
+const TONES = ['cool-blue', 'warm-sunset', 'muted-gray', 'vibrant', 'dramatic', 'lifestyle', 'action', 'product'];
+
+// File data (loaded from JSON)
+const DANNY_PERSONAL = [
+  { id: '1cWYsV6G3sfwHCUlm5Pdb2bHfyK1wVgtH', name: 'A24K6934.jpg (Danny 본인 #1)', src: 'danny' },
+  { id: '1jhS1BXMsP7EcQLba4o1wrp0K7DS8eStQ', name: 'Danny 본인 #2', src: 'danny' },
+  { id: '1Ta7v8-UHQC_7SB7nkJUty9LEjgKNVBGV', name: 'Danny 본인 #3', src: 'danny' }
+];
+let allFiles = [];
+const STATE = {};  // { fileId: { page, tones: [], note } }
+
+async function loadFiles() {
+  const [brazil, webres] = await Promise.all([
+    fetch('brazil-files.json').then(r => r.json()),
+    fetch('webres-files.json').then(r => r.json())
+  ]);
+  brazil.forEach(f => { f.src = 'brazil'; });
+  webres.forEach(f => { f.src = 'webres'; });
+  allFiles = [...brazil, ...webres, ...DANNY_PERSONAL];
+  document.getElementById('stat-total').textContent = allFiles.length;
+  renderGrid('brazil', brazil);
+  renderGrid('webres', webres);
+  renderGrid('danny', DANNY_PERSONAL);
+  updateStats();
+}
+
+function renderGrid(srcKey, list) {
+  const grid = document.getElementById('grid-' + srcKey);
+  grid.innerHTML = list.map(f => cardHtml(f, srcKey)).join('');
+  // Wire up thumb loading
+  list.forEach(f => {
+    const img = document.getElementById('img-' + f.id);
+    if (!img) return;
+    img.addEventListener('load', () => img.parentElement.classList.remove('loading'));
+    img.addEventListener('error', () => {
+      img.parentElement.classList.remove('loading');
+      img.parentElement.classList.add('err');
+      img.style.display = 'none';
+    });
+  });
+  list.forEach(f => {
+    const sel = document.getElementById('sel-' + f.id);
+    if (sel) sel.addEventListener('change', () => updateState(f.id, 'page', sel.value));
+  });
+  // Tone toggles
+  list.forEach(f => {
+    document.querySelectorAll('.tone[data-fid="' + f.id + '"]').forEach(t => {
+      t.addEventListener('click', () => {
+        t.classList.toggle('on');
+        const tones = [...document.querySelectorAll('.tone[data-fid="' + f.id + '"].on')].map(x => x.dataset.tone);
+        updateState(f.id, 'tones', tones);
+      });
+    });
+    const note = document.getElementById('note-' + f.id);
+    if (note) note.addEventListener('input', () => updateState(f.id, 'note', note.value));
+  });
+}
+
+function cardHtml(f, srcKey) {
+  const thumbUrl = `thumbs/${f.id}.jpg`;
+  const driveLink = `https://drive.google.com/file/d/${f.id}/view`;
+  const srcLabel = srcKey === 'brazil' ? 'Sean Brazil' : srcKey === 'webres' ? 'PPC Joshua' : 'Danny 본인';
+  return `<div class="card" data-src="${srcKey}" data-id="${f.id}">
+    <div class="thumb-wrap loading">
+      <span class="badge">${srcLabel}</span>
+      <img id="img-${f.id}" src="${thumbUrl}" alt="${f.name}" loading="lazy" onclick="window.open('${driveLink}','_blank')">
+    </div>
+    <div class="meta">
+      <div class="name" title="${f.name}">${f.name}</div>
+      <div class="controls">
+        <select id="sel-${f.id}">
+          <option value="">— 페이지 선택 —</option>
+          ${groupedOptions()}
+        </select>
+        <div class="tone-row">
+          ${TONES.map(t => `<span class="tone" data-fid="${f.id}" data-tone="${t}">${t}</span>`).join('')}
+        </div>
+        <input type="text" id="note-${f.id}" placeholder="메모 (선택)" />
+      </div>
+    </div>
+  </div>`;
+}
+
+function groupedOptions() {
+  const groups = {};
+  PAGES.forEach(p => { (groups[p.group] = groups[p.group] || []).push(p); });
+  return Object.entries(groups).map(([g, ps]) =>
+    `<optgroup label="${g}">` + ps.map(p => `<option value="${p.val}">${p.label}</option>`).join('') + '</optgroup>'
+  ).join('');
+}
+
+function updateState(fid, key, val) {
+  STATE[fid] = STATE[fid] || { page: '', tones: [], note: '' };
+  STATE[fid][key] = val;
+  updateStats();
+}
+
+function updateStats() {
+  const done = Object.values(STATE).filter(s => s.page).length;
+  document.getElementById('stat-done').textContent = done;
+  const pages = new Set(Object.values(STATE).filter(s => s.page).map(s => s.page));
+  document.getElementById('stat-pages').textContent = pages.size;
+  // Filter visibility
+  const f = document.querySelector('.pill.active').dataset.filter;
+  document.querySelectorAll('.card').forEach(c => {
+    const id = c.dataset.id, src = c.dataset.src;
+    const has = STATE[id] && STATE[id].page;
+    let show = true;
+    if (f === 'brazil') show = src === 'brazil';
+    else if (f === 'webres') show = src === 'webres';
+    else if (f === 'danny') show = src === 'danny';
+    else if (f === 'assigned') show = !!has;
+    else if (f === 'unassigned') show = !has;
+    c.style.display = show ? '' : 'none';
+  });
+}
+
+document.querySelectorAll('.pill[data-filter]').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.pill[data-filter]').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    updateStats();
+  });
+});
+
+function exportMapping() {
+  const out = { _meta: { exported: new Date().toISOString(), total: allFiles.length, assigned: Object.values(STATE).filter(s => s.page).length }, mappings: [] };
+  allFiles.forEach(f => {
+    const s = STATE[f.id];
+    if (!s || !s.page) return;
+    out.mappings.push({
+      id: f.id,
+      name: f.name,
+      src: f.src,
+      page: s.page,
+      tones: s.tones || [],
+      note: s.note || '',
+      drive_url: `https://drive.google.com/file/d/${f.id}/view`
+    });
+  });
+  document.getElementById('output').textContent = JSON.stringify(out, null, 2);
+  document.getElementById('dlg').showModal();
+}
+
+function copyOutput() {
+  const text = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('복사 완료. Chat 에 붙여넣어 주세요.'));
+}
+
+function clearAll() {
+  if (!confirm('전체 매핑 초기화?')) return;
+  for (const k in STATE) delete STATE[k];
+  document.querySelectorAll('select').forEach(s => s.value = '');
+  document.querySelectorAll('.tone.on').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('input[type=text]').forEach(i => i.value = '');
+  updateStats();
+}
+
+loadFiles();
+</script>
+
+</body>
+</html>

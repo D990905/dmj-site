@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "source": "ppcfoiling.com 공식 페이지 (production: ppcfoiling.com — ppc-foiling.com은 alternate domain, accessible X)",
+    "fetched": "2026-05-10",
+    "purpose": "본사 영문 카피 source-of-truth. 사이트 표시는 한국어 자연 의역",
+    "license": "단무지공방 = PPC 한국 정식 수입 partner. brand 자산 사용 권한 보유"
+  },
+  "brand": {
+    "url": "https://ppcfoiling.com/pages/technology",
+    "tagline": "Building different since day one",
+    "construction_motto": "State of the Art Construction",
+    "construction_intro": "No one is doing it like us. PPC has full control of our supply chain with our in-house design and ownership of all materials and processes.",
+    "secret_formula": "Behind every PPC board lies a carefully guarded formula, a proprietary blend of materials and meticulous lay-up techniques that elevate our boards to a league of their own.",
+    "key_value_propositions": [
+      "Exceptional stiffness, facilitating an efficient transfer of energy from rider to foil",
+      "Unmatched durability, longevity and lighter than anything else available",
+      "The stiffest, highest performing wings on the market. Achieve new heights and control at speed"
+    ],
+    "warranty_satisfaction": {
+      "boards": "5 years",
+      "accessories": "1 year",
+      "paddles": "1 year",
+      "wings": "6 months",
+      "wings_register_bonus": "Register wing for additional 6+ (total 1 year)",
+      "satisfaction_clause": "If any of our products don't meet your standards, return it unused and in original packaging within 14 days and we'll issue you a full refund."
+    }
+  }
+}

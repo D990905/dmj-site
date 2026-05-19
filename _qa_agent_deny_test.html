@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>옥코치 AI Agent — QA 검증 페이지 (§173-B / §173-D)</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <style>
+    body { font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", sans-serif; background: #F4F8FB; color: #0A2540; padding: 32px 20px 200px; max-width: 920px; margin: 0 auto; line-height: 1.6; }
+    h1 { color: #0A2540; border-bottom: 3px solid #FFB800; padding-bottom: 8px; }
+    h2 { color: #0A2540; margin-top: 32px; }
+    .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 16px 0; }
+    .test-card { background: #fff; border: 1.5px solid rgba(10, 37, 64, 0.12); border-radius: 12px; padding: 14px; box-shadow: 0 2px 6px rgba(10, 37, 64, 0.06); }
+    .test-card button { background: linear-gradient(135deg, #0A2540 0%, #102E50 100%); color: #fff; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 700; font-size: 13px; margin-top: 8px; }
+    .test-card button:hover { box-shadow: 0 4px 10px rgba(10, 37, 64, 0.22); }
+    .test-card .q { font-weight: 700; color: #0A2540; word-break: keep-all; }
+    .test-card .expected { font-size: 12px; color: #5C6F7E; margin-top: 4px; }
+    .console { background: #061A2E; color: #BFE6FF; padding: 14px; border-radius: 12px; font-family: "SF Mono", Menlo, monospace; font-size: 12px; max-height: 320px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+    .legend { background: #FFF8E0; border-left: 4px solid #FFB800; padding: 12px 16px; border-radius: 8px; margin: 16px 0; font-size: 13px; }
+    .legend code { background: rgba(10,37,64,0.08); padding: 2px 6px; border-radius: 4px; font-family: "SF Mono", monospace; }
+    .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+    .avatar-grid figure { background: #fff; border: 1.5px solid rgba(10, 37, 64, 0.12); border-radius: 12px; padding: 12px; text-align: center; margin: 0; }
+    .avatar-grid img { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; border-radius: 8px; background: #BCE4F4; }
+    .avatar-grid figcaption { font-size: 12px; color: #0A2540; margin-top: 8px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>옥코치 AI Agent — QA 검증 페이지 (§173-B / §173-D)</h1>
+
+  <div class="legend">
+    <strong>이 페이지는 검증 전용입니다 (noindex,nofollow).</strong><br>
+    각 카드의 [질문하기] 버튼 클릭 → 우하단 옥코치 widget 자동 open → 답변 출력.<br>
+    카테고리 ([FAQ] / [KB] / [Fallback]) 별로 응답 source 확인.<br>
+    또한 콘솔에서 <code>DMJAgent._findBestMatch('query')</code>, <code>DMJAgent._findKnowledgeMatches('query')</code>, <code>DMJAgent._botReplyFor('query')</code> 직접 호출 가능.
+  </div>
+
+  <h2>1. 옥코치 Avatar — Danny 실제 사진 (§173-D · 2026-05-16)</h2>
+  <p style="font-size:12.5px;color:#5C6F7E;margin:-4px 0 8px">
+    Danny 결정 (2026-05-16): 플랫 마스코트 → 신뢰감 부족 판단으로 폐기. 정체성 "대니" → "옥코치"(옥덕필 코치 본인) 변경 + face-centered crop 사진으로 복원. WebP primary + PNG fallback, 4 사이즈 (48/80/160/240).
+  </p>
+  <div class="avatar-grid">
+    <figure>
+      <picture>
+        <source type="image/webp" srcset="assets/images/agent-deny-photo-48.webp">
+        <img src="assets/images/agent-deny-photo-48.png" alt="48px chat bubble" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:#0A2540">
+      </picture>
+      <figcaption>48px — chat bubble</figcaption>
+    </figure>
+    <figure>
+      <picture>
+        <source type="image/webp" srcset="assets/images/agent-deny-photo-80.webp">
+        <img src="assets/images/agent-deny-photo-80.png" alt="80px widget header" style="width:80px;height:80px;border-radius:50%;object-fit:cover;background:#0A2540">
+      </picture>
+      <figcaption>80px — widget header</figcaption>
+    </figure>
+    <figure>
+      <picture>
+        <source type="image/webp" srcset="assets/images/agent-deny-photo-160.webp">
+        <img src="assets/images/agent-deny-photo-160.png" alt="160px founder card" style="width:160px;height:160px;border-radius:50%;object-fit:cover;background:#0A2540">
+      </picture>
+      <figcaption>160px — founder card</figcaption>
+    </figure>
+    <figure>
+      <picture>
+        <source type="image/webp" srcset="assets/images/agent-deny-photo-240.webp">
+        <img src="assets/images/agent-deny-photo-240.png" alt="240px hero" style="width:240px;height:240px;border-radius:50%;object-fit:cover;background:#0A2540">
+      </picture>
+      <figcaption>240px — hero</figcaption>
+    </figure>
+  </div>
+
+  <h2>2. FAQ 매칭 시나리오 (Tier 1 — 짧은 답변)</h2>
+  <div class="test-grid">
+    <div class="test-card"><div class="q">윙포일 처음인데?</div><div class="expected">→ FAQ <code>site-start</code></div><button onclick="window.DMJAgent.ask('윙포일 처음인데?')">질문하기</button></div>
+    <div class="test-card"><div class="q">Find My Gear 어떻게 쓰나요?</div><div class="expected">→ FAQ <code>fmg-howto</code></div><button onclick="window.DMJAgent.ask('Find My Gear 어떻게 쓰나요?')">질문하기</button></div>
+    <div class="test-card"><div class="q">10축 스킬 진단은 뭔가요?</div><div class="expected">→ FAQ <code>skill-assessment-start</code></div><button onclick="window.DMJAgent.ask('10축 스킬 진단은 뭔가요?')">질문하기</button></div>
+    <div class="test-card"><div class="q">회원 등급 할인율?</div><div class="expected">→ FAQ <code>membership</code></div><button onclick="window.DMJAgent.ask('회원 등급 할인율?')">질문하기</button></div>
+    <div class="test-card"><div class="q">이벤트 무료 컨설팅?</div><div class="expected">→ FAQ <code>event-free-consult</code></div><button onclick="window.DMJAgent.ask('이벤트 무료 컨설팅?')">질문하기</button></div>
+    <div class="test-card"><div class="q">옥코치가 누구야?</div><div class="expected">→ FAQ <code>agent-self</code></div><button onclick="window.DMJAgent.ask('옥코치가 누구야?')">질문하기</button></div>
+  </div>
+
+  <h2>3. KB RAG 시나리오 (Tier 2 — 깊은 canonical 답변)</h2>
+  <div class="test-grid">
+    <div class="test-card"><div class="q">96cm 마스트 진입 timing?</div><div class="expected">→ KB <code>kb-mast-adv</code> + safety</div><button onclick="window.DMJAgent.ask('96cm 마스트 진입 timing?')">질문하기</button></div>
+    <div class="test-card"><div class="q">Goofy 가 더 적나요?</div><div class="expected">→ KB <code>kb-stance-stats</code> (Packheiser 2020)</div><button onclick="window.DMJAgent.ask('Goofy 가 더 적나요?')">질문하기</button></div>
+    <div class="test-card"><div class="q">약쪽 (weak side) 훈련?</div><div class="expected">→ KB <code>kb-weak-side</code> (Bishop·Promsri)</div><button onclick="window.DMJAgent.ask('약쪽 weak side 훈련?')">질문하기</button></div>
+    <div class="test-card"><div class="q">Lift 양력 방정식 ρ?</div><div class="expected">→ KB <code>kb-lift-calc</code></div><button onclick="window.DMJAgent.ask('Lift 양력 방정식 ρ?')">질문하기</button></div>
+    <div class="test-card"><div class="q">선수 race Levitaz R6?</div><div class="expected">→ KB <code>kb-pro-equipment</code></div><button onclick="window.DMJAgent.ask('선수 race Levitaz R6?')">질문하기</button></div>
+    <div class="test-card"><div class="q">Levitaz vs Takoon 어느게 좋아요?</div><div class="expected">→ KB <code>kb-brand-style-mapping</code></div><button onclick="window.DMJAgent.ask('Levitaz vs Takoon 어느게 좋아요?')">질문하기</button></div>
+  </div>
+
+  <h2>4. Fallback 시나리오 (Tier 3 — hallucination 차단)</h2>
+  <div class="test-grid">
+    <div class="test-card"><div class="q">asdfqwer xxxxx</div><div class="expected">→ Fallback (consulting@dmjgroup.kr)</div><button onclick="window.DMJAgent.ask('asdfqwer xxxxx')">질문하기</button></div>
+    <div class="test-card"><div class="q">화성에서 윙포일?</div><div class="expected">→ Fallback or low KB score</div><button onclick="window.DMJAgent.ask('화성에서 윙포일?')">질문하기</button></div>
+  </div>
+
+  <h2>5. Phase 2 — 의도 분류 + 유도 대화 (slot-filling flow)</h2>
+  <p style="font-size:12.5px;color:#5C6F7E;margin:-4px 0 8px">
+    모호한 질문 → 의도 분류 → "적합도 문의" 는 slot-filling flow (실력→체중→풍속→예산→추천). 그 외 의도는 1-shot routing 또는 funnel chip.
+  </p>
+  <div class="test-grid">
+    <div class="test-card"><div class="q">이 보드 나한테 맞아?</div><div class="expected">→ fit-check → slot-filling flow 시작 (실력 chip)</div><button onclick="window.DMJAgent.ask('이 보드 나한테 맞아?')">질문하기</button></div>
+    <div class="test-card"><div class="q">초보인데 윙포일 가능할까요?</div><div class="expected">→ fit-check → flow</div><button onclick="window.DMJAgent.ask('초보인데 윙포일 가능할까요?')">질문하기</button></div>
+    <div class="test-card"><div class="q">입문 셋업 추천해줘</div><div class="expected">→ setup-recommendation → 입문 레벨 deep-link</div><button onclick="window.DMJAgent.ask('입문 셋업 추천해줘')">질문하기</button></div>
+    <div class="test-card"><div class="q">추천해줘</div><div class="expected">→ setup-recommendation (실력 미식별) → fit-check flow 유도</div><button onclick="window.DMJAgent.ask('추천해줘')">질문하기</button></div>
+    <div class="test-card"><div class="q">얼마야?</div><div class="expected">→ price-inquiry → 회원 할인 안내 + funnel</div><button onclick="window.DMJAgent.ask('얼마야?')">질문하기</button></div>
+    <div class="test-card"><div class="q">find my gear 어디 있어?</div><div class="expected">→ navigation → sitemap deep-link</div><button onclick="window.DMJAgent.ask('find my gear 어디 있어?')">질문하기</button></div>
+  </div>
+  <div class="legend" style="margin-top:12px">
+    <strong>Phase 2 콘솔 debug:</strong><br>
+    <code>DMJAgent._classifyIntent('이거 나한테 맞아?')</code> → 의도 반환<br>
+    <code>DMJAgent._state.flow</code> → 진행 중인 slot-filling flow 상태 ({intent, step, slots})<br>
+    flow 진행 중 "취소"/"그만" 입력 → flow 중단
+  </div>
+
+  <h2>5. 콘솔 debug</h2>
+  <div class="console" id="console">DevTools 열고 콘솔에서 직접 호출:
+
+  DMJAgent._findBestMatch('윙포일 처음')
+  → { entry, score }
+
+  DMJAgent._findKnowledgeMatches('96cm 마스트')
+  → [{ chunk, score }, ...]
+
+  DMJAgent._botReplyFor('Goofy 비율')
+  → { answer, page_links, related }
+
+  DMJAgent._knowledgeChunks()
+  → 전체 KB chunks 배열 (48 chunks)
+
+  DMJAgent.clearHistory()
+  → 채팅 기록 초기화 + 다시 greeting 표시</div>
+
+  <h2>6. 모바일 fullscreen test</h2>
+  <p>DevTools → Responsive Mode → iPhone SE (375×667) 또는 iPhone 12 (390×844) 로 전환 후 widget open → fullscreen 동작 확인.</p>
+
+  <h2>7. 로그인 상태 분기 test</h2>
+  <p>비로그인 vs 로그인 시 greeting 분기:</p>
+  <ul>
+    <li><strong>비로그인</strong>: "<strong>옥코치</strong> — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ ..."</li>
+    <li><strong>로그인 시</strong>: "안녕하세요 <em>{nickname}</em>님! <strong>옥코치</strong> — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ ..."</li>
+  </ul>
+  <p>로그인 페이지 → 회원가입 후 widget 재진입.</p>
+
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <script src="assets/js/auth-shim.js" defer></script>
+  <script src="assets/js/nav-auth.js" defer></script>
+  <script src="assets/js/agent-deny.js" defer></script>
+</body>
+</html>

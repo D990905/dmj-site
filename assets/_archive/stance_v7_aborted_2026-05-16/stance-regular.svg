@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Regular 스탠스 — 왼발 앞, 오른발 뒤">
+  <!-- nose label -->
+  <text x="100" y="14" text-anchor="middle" font-family="'Pretendard',sans-serif" font-size="11" font-weight="700" fill="#5C6F7E">노즈 ↑ 앞</text>
+  <!-- board (top-down, nose up) -->
+  <path d="M100 22 C112 22 122 30 126 48 C131 70 131 130 126 152 C122 170 112 178 100 178 C88 178 78 170 74 152 C69 130 69 70 74 48 C78 30 88 22 100 22 Z"
+        fill="#F5F7FA" stroke="#0A2540" stroke-width="2.5"/>
+  <!-- front foot = LEFT (toward nose) -->
+  <rect x="74" y="64" width="52" height="17" rx="8.5" fill="#1F8FFF"/>
+  <text x="100" y="76.5" text-anchor="middle" font-family="'Pretendard',sans-serif" font-size="11" font-weight="900" fill="#fff">L · 앞발</text>
+  <!-- back foot = RIGHT (toward tail) -->
+  <rect x="74" y="122" width="52" height="17" rx="8.5" fill="#0A2540"/>
+  <text x="100" y="134.5" text-anchor="middle" font-family="'Pretendard',sans-serif" font-size="11" font-weight="900" fill="#fff">R · 뒷발</text>
+  <!-- label -->
+  <text x="100" y="194" text-anchor="middle" font-family="'Pretendard',sans-serif" font-size="13" font-weight="800" fill="#1F8FFF">Regular — 왼발이 앞</text>
+</svg>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Boom FS 63 (63L 풀카본) — Levitaz 상세 | 단무지공방</title>
+<meta name="description" content="Boom FS 63 (63L 풀카본) 제품 상세. Sporty·direct — 상급자 전용 sinker board. 제원·성능 시각화·카테고리 비교. 단무지공방 한국 정식 수입." />
+<meta property="og:title" content="Boom FS 63 (63L 풀카본) — Levitaz 상세 | 단무지공방" />
+<meta property="og:description" content="Sporty·direct — 상급자 전용 sinker board" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet" href="../../assets/css/style.css" />
+<link rel="stylesheet" href="../product-detail.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">본문 바로가기</a>
+
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>1년 AS 보증</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담</span>
+</div></div></div>
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="../../index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="../../index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="../../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="../../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="../../takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="../../wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="../../index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="../../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="../../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="../../style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="../../style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 3. 종목 -->
+        <div class="nav__has-sub" role="none">
+          <a href="../../index.html#genre" class="nav__link">종목</a>
+          <div class="nav__sub" role="menu">
+            <a href="../../genre/sup.html" class="nav__sub-link" role="menuitem"><b>SUP</b><span>다운윈드·SUP 포일</span></a>
+            <a href="../../genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>Wingfoil</span></a>
+            <a href="../../genre/kite.html" class="nav__sub-link" role="menuitem"><b>카이트</b><span>Kite·Formula Kite</span></a>
+            <a href="../../genre/parawing.html" class="nav__sub-link" role="menuitem"><b>패러윙</b><span>Parawing</span></a>
+            <a href="../../genre/pump.html" class="nav__sub-link" role="menuitem"><b>펌핑포일</b><span>Pumpfoil</span></a>
+            <a href="../../genre/surf.html" class="nav__sub-link" role="menuitem"><b>서핑</b><span>Surffoil</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 -->
+        <div class="nav__has-sub" role="none">
+          <a href="../../catalog.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="../../catalog.html#wing" class="nav__sub-link" role="menuitem"><b>윙</b><span>네 브랜드 윙 전체</span></a>
+            <a href="../../catalog.html#foil" class="nav__sub-link" role="menuitem"><b>포일</b><span>프론트·스태빌·매스트·퓨즈</span></a>
+            <a href="../../catalog.html#board" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문~프로 보드</span></a>
+            <a href="../../catalog.html#accessory" class="nav__sub-link" role="menuitem"><b>악세서리</b><span>웻수트·하니스·헬멧·임팩트자켓</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="../../index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="../../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문자</b><span>첫 시즌·첫 셋업</span></a>
+            <a href="../../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>초·중급</b><span>Jibe·tack 정복</span></a>
+            <a href="../../level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급자</b><span>전문 분야 진입</span></a>
+            <a href="../../level/pro.html" class="nav__sub-link" role="menuitem"><b>선수레벨</b><span>Race·대회</span></a>
+            <a href="../../women/index.html" class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="../../junior/index.html" class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="../../family/index.html" class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 6. 스마트 컨설팅 (CTA) -->
+        <a href="../../find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="product-detail">
+  <!-- Hero -->
+  <section class="pd-hero">
+    <div class="container pd-hero__grid">
+      <div class="pd-hero__visual">
+        <div class="pd-hero__image-wrap" data-brand="levitaz">
+          <img src="https://levitaz.com/uploads/shop/levitaz-boom-44-wing-foil-board-product-single-1000x1000px.jpg" alt="Boom FS 63 (63L 풀카본) 제품 사진"
+               class="pd-hero__image"
+               loading="eager"
+               decoding="async"
+               onerror="this.classList.add('pd-hero__image--err')" />
+          <span class="pd-hero__brand-mark" data-brand="levitaz">Levitaz</span>
+        </div>
+        <ol class="pd-hero__crumbs">
+          <li><a href="../../index.html">단무지공방</a></li>
+          <li><a href="../../levitaz.html">Levitaz</a></li>
+          <li>Boom FS 63 (63L 풀카본)</li>
+        </ol>
+      </div>
+      <div class="pd-hero__copy">
+        <span class="pd-hero__category">보드 · 상급자 sinker</span>
+        <h1 class="pd-hero__title">Boom FS 63 (63L 풀카본)</h1>
+        <p class="pd-hero__tagline">Sporty·direct — 상급자 전용 sinker board</p>
+        
+    <div class="telemetry">
+      <div class="telemetry__head">
+        <span class="telemetry__pip"></span>
+        <span class="telemetry__title">PERFORMANCE TELEMETRY</span>
+        <span class="telemetry__chip">DMJ-CALIBRATED</span>
+      </div>
+      <div class="telemetry__gauges">
+        
+        <div class="gauge">
+          <div class="gauge__ring" style="--p:100.0">
+            <span class="gauge__num">5<small>/5</small></span>
+          </div>
+          <span class="gauge__label">속도<em>Speed</em></span>
+        </div>
+        
+        <div class="gauge">
+          <div class="gauge__ring" style="--p:60.0">
+            <span class="gauge__num">3<small>/5</small></span>
+          </div>
+          <span class="gauge__label">글라이드<em>Glide</em></span>
+        </div>
+        
+        <div class="gauge">
+          <div class="gauge__ring" style="--p:100.0">
+            <span class="gauge__num">5<small>/5</small></span>
+          </div>
+          <span class="gauge__label">조작성<em>Maneuver</em></span>
+        </div>
+      </div>
+    </div>
+        
+    <aside class="best-for">
+      <div class="best-for__top">
+        <span class="best-for__brand">Levitaz</span>
+        <span class="best-for__model">Boom FS 63 (63L 풀카본)</span>
+      </div>
+      <div class="best-for__rating" data-tier="advanced">
+        <span class="best-for__rating-num">상급자</span>
+        <span class="best-for__rating-label">권장 라이더 등급</span>
+      </div>
+      <dl class="best-for__stats">
+        <dt>추천 스킬</dt><dd>상급자~선수</dd>
+        <dt>체중 범위</dt><dd>60–80kg</dd>
+        <dt>풍속 범위</dt><dd>16–30노트</dd>
+        <dt>스타일</dt><dd>Flat-Speed · Race</dd>
+        <dt>한국 spot</dt><dd>양양 · 강릉 · 제주</dd>
+        <dt>본사 워런티</dt><dd>한국 적용 <strong>6개월</strong> <span style="font-size:0.85em;color:var(--text-secondary)">(Free Series · EU 외 정책)</span></dd>
+      </dl>
+    </aside>
+        <div class="pd-hero__cta">
+          <a href="https://pf.kakao.com/_DMJ" class="btn btn--accent btn--lg" target="_blank" rel="noopener">카톡 1:1 상담</a>
+          <a href="../../find-my-gear.html" class="btn btn--ghost btn--lg">1분 진단 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skill journey -->
+  <section class="section section--tight">
+    <div class="container">
+      <h2 class="section-head section-head--center">라이딩 여정에서 이 모델의 위치</h2>
+      <p class="section-sub section-sub--center">현재 모델은 어느 단계의 라이더에게 적합한지, 다음 step은 무엇인지 표시합니다.</p>
+      
+    <ol class="journey">
+      
+        <li class="journey-step journey-step--passed" data-tier="beginner">
+          <span class="journey-step__dot"></span>
+          <span class="journey-step__label">입문자</span>
+        </li>
+        <li class="journey-step journey-step--passed" data-tier="intermediate">
+          <span class="journey-step__dot"></span>
+          <span class="journey-step__label">초중급</span>
+        </li>
+        <li class="journey-step journey-step--active" data-tier="advanced">
+          <span class="journey-step__dot"></span>
+          <span class="journey-step__label">상급자</span>
+        </li>
+        <li class="journey-step" data-tier="pro">
+          <span class="journey-step__dot"></span>
+          <span class="journey-step__label">선수레벨</span>
+        </li>
+    </ol>
+    </div>
+  </section>
+
+  <!-- Performance attribute bars -->
+  <section class="section section--mist">
+    <div class="container">
+      <h2 class="section-head section-head--center">Performance Attributes</h2>
+      <ul class="attr-list">
+        
+        <li class="attr-row" tabindex="0">
+          <div class="attr-row__head">
+            <span class="attr-row__label"><span class="attr-row__kr">숙련도 요구</span><span class="attr-row__en">Skill required</span></span>
+            <span class="attr-row__stars" aria-label="5 of 5">★★★★★</span>
+            <span class="attr-row__num">5<span>/5</span></span>
+          </div>
+          <div class="attr-bar" data-score="5"><div class="attr-bar__fill attr-bar__fill--equip" style="width:100.0%"></div></div>
+          <p class="attr-row__desc">라이더 실력 요구도. 별 많을수록 입문에는 부담</p>
+        </li>
+
+        <li class="attr-row" tabindex="0">
+          <div class="attr-row__head">
+            <span class="attr-row__label"><span class="attr-row__kr">속도감</span><span class="attr-row__en">Speed feel</span></span>
+            <span class="attr-row__stars" aria-label="5 of 5">★★★★★</span>
+            <span class="attr-row__num">5<span>/5</span></span>
+          </div>
+          <div class="attr-bar" data-score="5"><div class="attr-bar__fill attr-bar__fill--equip" style="width:100.0%"></div></div>
+          <p class="attr-row__desc">탑엔드 속도와 가속의 강도. 5 = race grade</p>
+        </li>
+
+        <li class="attr-row" tabindex="0">
+          <div class="attr-row__head">
+            <span class="attr-row__label"><span class="attr-row__kr">글라이드</span><span class="attr-row__en">Glide</span></span>
+            <span class="attr-row__stars" aria-label="3 of 5">★★★☆☆</span>
+            <span class="attr-row__num">3<span>/5</span></span>
+          </div>
+          <div class="attr-bar" data-score="3"><div class="attr-bar__fill attr-bar__fill--equip" style="width:60.0%"></div></div>
+          <p class="attr-row__desc">lift 유지력·다운윈드 적합도. 5 = 무한 글라이딩</p>
+        </li>
+
+        <li class="attr-row" tabindex="0">
+          <div class="attr-row__head">
+            <span class="attr-row__label"><span class="attr-row__kr">조작성</span><span class="attr-row__en">Maneuverability</span></span>
+            <span class="attr-row__stars" aria-label="5 of 5">★★★★★</span>
+            <span class="attr-row__num">5<span>/5</span></span>
+          </div>
+          <div class="attr-bar" data-score="5"><div class="attr-bar__fill attr-bar__fill--equip" style="width:100.0%"></div></div>
+          <p class="attr-row__desc">jibe·tack·trick 회전 응답. 5 = 즉각</p>
+        </li>
+
+        <li class="attr-row" tabindex="0">
+          <div class="attr-row__head">
+            <span class="attr-row__label"><span class="attr-row__kr">안정성</span><span class="attr-row__en">Stability</span></span>
+            <span class="attr-row__stars" aria-label="2 of 5">★★☆☆☆</span>
+            <span class="attr-row__num">2<span>/5</span></span>
+          </div>
+          <div class="attr-bar" data-score="2"><div class="attr-bar__fill attr-bar__fill--equip" style="width:40.0%"></div></div>
+          <p class="attr-row__desc">정지·낙상 안전성. 5 = 입문 친화</p>
+        </li>
+
+        <li class="attr-row" tabindex="0">
+          <div class="attr-row__head">
+            <span class="attr-row__label"><span class="attr-row__kr">펌프 효율</span><span class="attr-row__en">Pump efficiency</span></span>
+            <span class="attr-row__stars" aria-label="3 of 5">★★★☆☆</span>
+            <span class="attr-row__num">3<span>/5</span></span>
+          </div>
+          <div class="attr-bar" data-score="3"><div class="attr-bar__fill attr-bar__fill--equip" style="width:60.0%"></div></div>
+          <p class="attr-row__desc">1 펌핑당 글라이드 거리. 5 = SUP foil 적합</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Spec table -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-head section-head--center">제원 (Specifications)</h2>
+      <p class="section-sub section-sub--center">본사 공식 스펙 + 한국 가격. 정확한 견적은 카톡 1:1 상담으로 확인하세요.</p>
+      
+    <div class="spec-table-wrap">
+      <table class="spec-table">
+        <caption class="spec-table__caption">공통 사양</caption>
+        <tbody>
+          <tr><th scope="row">재질</th><td>Full carbon (PVC core 없음)</td></tr><tr><th scope="row">용도</th><td>Freeride · Race</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="spec-table-wrap">
+      <table class="spec-table spec-table--sized">
+        <caption class="spec-table__caption">사이즈별 사양</caption>
+        <thead>
+          <tr><th scope="col">사이즈</th><th scope="col">Volume</th><th scope="col">권장 체중</th><th scope="col">권장 풍속</th><th scope="col">한국 가격</th></tr>
+        </thead>
+        <tbody>
+          <tr id="size-63"><th scope="row">Boom FS 63 (150×45 cm)</th><td>63 L</td><td>60–80kg</td><td>16–30노트</td><td>협의 중</td></tr>
+        </tbody>
+      </table>
+      <p class="spec-table__note">* 사이즈별 정확 견적은 카톡 1:1 상담으로 확인하세요.</p>
+    </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section section--mist">
+    <div class="container">
+      <h2 class="section-head section-head--center">핵심 특징</h2>
+      <p class="section-sub section-sub--center">단무지 퍼포먼스 어드바이저가 직접 라이딩·검증한 5가지 포인트</p>
+      <ul class="feature-list">
+        <li class="feature-item">
+          <h4 class="feature-item__title">Sinker 구조</h4>
+          <p class="feature-item__body">정지 시 떠 있지 않습니다. 중급 이상 권장 — 입문자에게는 비추</p>
+        </li>
+        <li class="feature-item">
+          <h4 class="feature-item__title">Direct response</h4>
+          <p class="feature-item__body">보드가 작아 발동작 100%가 보드에 전달. Mathis Ghio 등 Levitaz 국가대표 라이더 선호</p>
+        </li>
+        <li class="feature-item">
+          <h4 class="feature-item__title">풀카본 강성</h4>
+          <p class="feature-item__body">PVC core 없는 100% 카본. flex 거의 없음 → race grade direct feel</p>
+        </li>
+        <li class="feature-item">
+          <h4 class="feature-item__title">63L = 50~75kg sweet spot</h4>
+          <p class="feature-item__body">65kg 라이더에 완벽. 80kg 이상은 부유력 부족</p>
+        </li>
+        <li class="feature-item">
+          <h4 class="feature-item__title">jibe·tack 정밀</h4>
+          <p class="feature-item__body">보드 작아서 회전 빠릅니다. 상급자 라이더의 무기 보드</p>
+        </li></ul>
+    </div>
+  </section>
+
+  <!-- Voice -->
+  <section class="section section--tight">
+    <div class="container">
+      <blockquote class="rider-voice">
+        <p class="rider-voice__quote">"처음 사신 분 후회하는 case 자주 봅니다. Boom 83 후 본인 실력 검증되면 그 다음에 사세요."</p>
+        <footer class="rider-voice__src">— 단무지공방 큐레이션 노트</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- Category compare -->
+  <section class="section">
+    <div class="container">
+      
+    <div class="compare-section">
+      <h2 class="compare-section__title">카테고리 비교 — Boom FS 보드</h2>
+      <p class="compare-section__sub">같은 카테고리 라인업 가로 비교. 현재 모델 <span class="compare-current-pin">●</span></p>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>모델</th><th>가격</th><th>체중 범위</th><th>풍속 범위</th><th>스킬</th><th>한 줄 특성</th></tr></thead>
+          <tbody><tr class="compare-row compare-row--current"><th scope="row"><span class="compare-row__link">Boom FS 63 (63L 풀카본)</span></th><td>₩4,200,000~</td><td>60–80kg</td><td>16–30노트</td><td>상급자~선수</td><td>Sporty·direct — 상급자 전용 sinker bo…</td></tr><tr class="compare-row"><th scope="row"><a href="boom-fs-83.html" class="compare-row__link">Boom FS 83 (83L 풀카본)</a></th><td>₩4,000,000~</td><td>60–90kg</td><td>12–28노트</td><td>초중급자~상급자</td><td>All-round sweet spot — 가장 무난한 선택</td></tr><tr class="compare-row"><th scope="row"><a href="boom-fs-95.html" class="compare-row__link">Boom FS 95 (95L 풀카본)</a></th><td>₩4,300,000~</td><td>75–110kg</td><td>10–22노트</td><td>입문~초급</td><td>Max early take-off — 입문·약풍·heavy…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Cross-sell -->
+  <section class="section section--mist">
+    <div class="container">
+      <h2 class="section-head section-head--center">함께 보면 좋은 모델</h2>
+      <p class="section-sub section-sub--center">같은 카테고리 다른 옵션 + 보완 장비. 이 모델 외 다른 답안도 비교하세요.</p>
+      <div class="xsell-grid">
+        <a href="../levitaz/boom-fs-83.html" class="xsell-card">
+          <div class="xsell-card__visual">
+            <img src="https://levitaz.com/uploads/shop/levitaz-boom-75-wing-foil-board-product-single-1000x1000px.jpg" alt="Boom FS 83 (83L 풀카본)" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('xsell-card__visual--ph')" />
+          </div>
+          <div class="xsell-card__body">
+            <span class="xsell-card__brand">Levitaz</span>
+            <h4 class="xsell-card__name">Boom FS 83 (83L 풀카본)</h4>
+            <p class="xsell-card__tag">All-round sweet spot — 가장 무난한 선택</p>
+            <span class="xsell-card__skill">→ 초중급자~상급자</span>
+          </div>
+        </a>
+        <a href="../levitaz/fw-540.html" class="xsell-card">
+          <div class="xsell-card__visual">
+            <img src="https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_540_v2000x2000px.jpg" alt="Free Series FW 540" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('xsell-card__visual--ph')" />
+          </div>
+          <div class="xsell-card__body">
+            <span class="xsell-card__brand">Levitaz</span>
+            <h4 class="xsell-card__name">Free Series FW 540</h4>
+            <p class="xsell-card__tag">강풍 컨디션에서 가장 정확하게 달리는 윙</p>
+            <span class="xsell-card__skill">→ 상급자~선수</span>
+          </div>
+        </a>
+        <a href="../levitaz/r6-race.html" class="xsell-card">
+          <div class="xsell-card__visual">
+            <img src="https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg" alt="R6 Race Series V1" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('xsell-card__visual--ph')" />
+          </div>
+          <div class="xsell-card__body">
+            <span class="xsell-card__brand">Levitaz</span>
+            <h4 class="xsell-card__name">R6 Race Series V1</h4>
+            <p class="xsell-card__tag">Olympic 검증 race grade — 0.1초가 의미를 갖는 환경</p>
+            <span class="xsell-card__skill">→ 선수레벨</span>
+          </div>
+        </a></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="pd-cta">
+        <h2 class="pd-cta__title">결정이 어려우면 — 단무지에 물어보세요</h2>
+        <p class="pd-cta__body">옥덕필 코치가 라이딩 스타일·체중·spot·풍속 패턴 분석해서 best fit 추천합니다. 평균 응답 시간 8분.</p>
+        <div class="pd-cta__actions">
+          <a href="https://pf.kakao.com/_DMJ" class="btn btn--accent btn--lg" target="_blank" rel="noopener">카톡 1:1 상담 — 8분 응답</a>
+          <a href="../../find-my-gear.html" class="btn btn--secondary btn--lg">1분 진단 시작 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <p class="footer-copyright">© 2026 단무지공방 (DMJ·공방) · Levitaz · PPC · Takoon · Forward WIP 한국 정식 수입</p>
+      <p class="footer-disclaimer">본 상세 페이지의 가격·제원은 본사 자료 기준 — 실제 견적은 카톡 1:1 상담으로 확인하세요.</p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,770 @@
+{
+  "_meta": {
+    "phase": 11,
+    "version": "1.0",
+    "updated": "2026-05-05",
+    "note": "Phase 11 detail page용 augmented data. products.json + brand hub 가격 + performance pentagon + cross-sell 통합. KRW 가격은 RRP × 환율 기반 estimate (Danny 검증 필요).",
+    "performance_axes": ["skill", "speed", "glide", "maneuverability", "stability"],
+    "performance_scale": "1-5 (5 = best in class)"
+  },
+  "skus": [
+    {
+      "id": "r6-race",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Race Foil System",
+      "category_kr": "포일 · 레이스 시스템",
+      "model": "R6 Race Series V1",
+      "tagline": "Olympic 검증 race grade — 0.1초가 의미를 갖는 환경",
+      "rider_fit": "선수",
+      "skill_levels": ["pro"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg"
+      ],
+      "spec": {
+        "용도": "Formula Kite race 전용",
+        "재질": "Stainless-steel box + Titanium mast + Carbon front wing",
+        "구조": "Integrated trim system (on-water 조절 가능)",
+        "프론트 윙 사이즈": "V1 480cm² (AR 13.7) · V2 430cm² (AR 12.9) · V3 530cm² (AR 14.3 · FORMULA WING)",
+        "검증": "2024 Paris Olympic Formula Kite 사용",
+        "가격": "₩6,800,000~ (시스템 구성별)"
+      },
+      "features": [
+        ["Olympic 검증", "2024 Paris Olympic Formula Kite race system. 세계 정상급 라이더가 선택한 정밀함입니다."],
+        ["Titanium mast", "부식·갈바닉 반응 최소화. 잦은 race 환경에서도 mast 결합부가 흔들리지 않습니다."],
+        ["On-water trim", "라이딩 중 trim 조절 가능. race 중 컨디션 변화에 즉각 대응."],
+        ["Stainless-steel box", "기존 알루미늄 box 대비 강성과 정밀도 모두 상위 클래스."],
+        ["Free Series 호환 X", "R6는 race-only 시스템. Free Series mast/foil과 부품 호환 안 됩니다."]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 4, "maneuverability": 3, "stability": 3},
+      "rider_voice": "Free Series로 시작해서 실력이 race grade에 도달했을 때, 그다음 step. 일반 freeride 목적엔 over-spec.",
+      "cross_sell": ["fw-540", "boom-fs-63", "fw-680"]
+    },
+
+    {
+      "id": "fw-540",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Front Wing",
+      "category_kr": "프론트 윙 · 강풍 정밀",
+      "model": "Free Series FW 540",
+      "tagline": "강풍 컨디션에서 가장 정확하게 달리는 윙",
+      "rider_fit": "상급~선수 (50~85kg)",
+      "skill_levels": ["advanced", "pro"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz-shaka-ha-1100-75-hydrofoil-side-front.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz-shaka-ha-1100-75-hydrofoil-side-front.jpg"
+      ],
+      "spec": {
+        "Wing area": "540 cm²",
+        "Span": "67 cm",
+        "Aspect ratio": "8.4",
+        "재질": "Full carbon · Titanium box",
+        "용도": "Kite/Wing/Big Surf — 22~35노트",
+        "체중대": "50~85kg",
+        "가격": "₩2,420,000 (RRP × 환율 추정)"
+      },
+      "features": [
+        ["AR 8.4 좁은 단면", "양력은 줄여도 속도는 미친 듯이 뽑아줍니다. 강풍 spot 전용 setup."],
+        ["탑엔드 스피드", "22~35노트 이상에서 가장 정확. lift loss 최소화로 라이딩 라인이 깔끔."],
+        ["Free Series 호환", "Free Series mast/fuselage와 100% 호환. 다른 wing으로 즉시 swap 가능."],
+        ["Titanium 일체형 box", "장시간 sea water에서도 부식 없음. 1년 daily 사용 후에도 결합부 그대로."],
+        ["체중대 50~85kg", "위 체중대에서 sweet spot. 90kg 이상은 FW680 권장."]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 3, "maneuverability": 4, "stability": 2},
+      "rider_voice": "강풍 day의 답안. 16노트 미만에선 lift 부족 — 한국에서 1 size only면 FW680을 권합니다.",
+      "cross_sell": ["fw-680", "boom-fs-63", "r6-race"]
+    },
+
+    {
+      "id": "fw-680",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Front Wing",
+      "category_kr": "프론트 윙 · 한국 표준",
+      "model": "Free Series FW 680",
+      "tagline": "★ 한 사이즈만 고르라면 무조건 이거",
+      "rider_fit": "중상급~상급 (50~95kg)",
+      "skill_levels": ["intermediate", "advanced"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz-shaka-ha-1300-75-hydrofoil-side-front_2022-05-12-073947_xgmk.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz-shaka-ha-1300-75-hydrofoil-side-front_2022-05-12-073947_xgmk.jpg"
+      ],
+      "spec": {
+        "Wing area": "680 cm²",
+        "Span": "77 cm",
+        "Aspect ratio": "8.7",
+        "재질": "Full carbon · Titanium box",
+        "용도": "Kite/Wing/Surf — 16~30노트",
+        "체중대": "50~95kg",
+        "가격": "₩2,460,000 (RRP × 환율 추정)"
+      },
+      "features": [
+        ["★ 한국 표준", "한국 라이더에게 친숙한 사이즈. 후회 확률 가장 낮음."],
+        ["가장 여유로운 균형", "16~30노트, 50~95kg 모두 cover. 첫 카본 윙으로도 long-term setup으로도 OK."],
+        ["일관된 lift", "AR 8.7로 lift와 maneuverability 균형. jibe·tack 학습에 가장 적합."],
+        ["Free Series 호환", "FW540/790/900과 부품 swap 가능. 1 mast로 4 wing 운용."]
+      ],
+      "performance": {"skill": 4, "speed": 4, "glide": 4, "maneuverability": 4, "stability": 4},
+      "rider_voice": "추천 1순위. 중상급부터 freeride 라이더까지 가장 여유로운 균형의 wing.",
+      "cross_sell": ["fw-790", "fw-540", "boom-fs-83"]
+    },
+
+    {
+      "id": "fw-790",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Front Wing",
+      "category_kr": "프론트 윙 · 글라이드 우선",
+      "model": "Free Series FW 790",
+      "tagline": "핸들링이 쉽습니다 — 글라이드 우선",
+      "rider_fit": "중급 · downwind 라이더 표준",
+      "skill_levels": ["intermediate"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz-shaka-ha-1600-pro-90-hydrofoil-side-front.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz-shaka-ha-1600-pro-90-hydrofoil-side-front.jpg"
+      ],
+      "spec": {
+        "Wing area": "790 cm²",
+        "Span": "90 cm",
+        "Aspect ratio": "10.3",
+        "재질": "Full carbon · Titanium box",
+        "용도": "Wing/Downwind/Surf — 12~25노트",
+        "체중대": "60~100kg",
+        "가격": "₩2,670,000 (RRP × 환율 추정)"
+      },
+      "features": [
+        ["AR 10.3 high glide", "글라이드가 끝없이 이어집니다. downwind 라이더의 1순위."],
+        ["Soft wave 강점", "swell 라이딩에서 lift loss 최소화. 작은 파도 day에 최고."],
+        ["12노트도 OK", "FW680보다 미풍에서 더 여유롭습니다. 미풍 day가 잦은 spot용."],
+        ["핸들링이 쉽습니다", "stall 영역이 넓어서 실수해도 떨어지지 않음. 중급 학습에 좋음."],
+        ["FW680과 swap", "1 mast/fuselage로 FW680↔790 swap. 풍속별 최적 wing 운용."]
+      ],
+      "performance": {"skill": 3, "speed": 3, "glide": 5, "maneuverability": 3, "stability": 4},
+      "rider_voice": "downwind에 진심이거나 약풍 day가 많은 컨디션이라면 FW680 다음으로 추천합니다.",
+      "cross_sell": ["fw-680", "fw-900", "boom-fs-95"]
+    },
+
+    {
+      "id": "fw-900",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Front Wing",
+      "category_kr": "프론트 윙 · 약풍·다운윈드",
+      "model": "Free Series FW 900",
+      "tagline": "약풍 12노트도 안 부는 날에 마법 부리는 윙",
+      "rider_fit": "약풍 라이더 · downwind/SUP foil",
+      "skill_levels": ["beginner", "intermediate"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz-shaka-l-2000-75-hydrofoil-side-front.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz-shaka-l-2000-75-hydrofoil-side-front.jpg"
+      ],
+      "spec": {
+        "Wing area": "900 cm²",
+        "Span": "110 cm",
+        "Aspect ratio": "13.3",
+        "재질": "Full carbon · Titanium box",
+        "용도": "Wing/Downwind/SUP/Pump — 8~18노트",
+        "체중대": "70~110kg (heavy rider 가능)",
+        "가격": "₩2,780,000 (RRP × 환율 추정)"
+      },
+      "features": [
+        ["8~12노트 구간 lift", "한국 약풍 day에 진짜 마법. 다른 wing이면 못 떠오르는 풍속에서 take-off."],
+        ["AR 13.3 ultra glide", "1번 펌핑으로 글라이드가 무한정 이어집니다. SUP foil pumping 전용."],
+        ["heavy rider OK", "100kg 이상 라이더도 take-off 부드럽게. wing area + AR 시너지."],
+        ["다운윈드 1순위", "downwind run에서 paddle-up 후 lift가 가장 일찍 살아납니다."],
+        ["강풍에서는 over-spec", "20노트 이상 day엔 FW680/540 권장. 약풍 specialty wing입니다."]
+      ],
+      "performance": {"skill": 3, "speed": 2, "glide": 5, "maneuverability": 2, "stability": 5},
+      "rider_voice": "약풍 day에 다른 윙이면 못 떠올랐을 텐데 — 그 답을 가진 windfree 답안.",
+      "cross_sell": ["fw-790", "fw-680", "boom-fs-95"]
+    },
+
+    {
+      "id": "boom-fs-63",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · 상급 sinker",
+      "model": "Boom FS 63 (63L 풀카본)",
+      "tagline": "Sporty·direct — 상급 전용 sinker board",
+      "rider_fit": "상급 freeride·race 라이더",
+      "skill_levels": ["advanced", "pro"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz-boom-44-wing-foil-board-product-single-1000x1000px.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz-boom-44-wing-foil-board-product-single-1000x1000px.jpg"
+      ],
+      "spec": {
+        "Volume": "63 L",
+        "Length": "150 cm",
+        "Width": "45 cm",
+        "재질": "Full carbon (PVC core 없음)",
+        "용도": "Freeride · Race",
+        "체중대": "65~80kg (기본 floatation 없음)",
+        "가격": "₩5,400,000"
+      },
+      "features": [
+        ["Sinker 구조", "정지 시 떠 있지 않습니다. 중급 이상 권장 — 입문·초급 라이더에게는 비추."],
+        ["Direct response", "보드가 작아 발동작 100%가 보드에 전달. Mathis Ghio 등 Levitaz 국가대표 라이더 선호."],
+        ["풀카본 강성", "PVC core 없는 100% 카본. flex 거의 없음 → race grade direct feel."],
+        ["63L = 50~75kg sweet spot", "65kg 라이더에 완벽. 80kg 이상은 부유력 부족."],
+        ["jibe·tack 정밀", "보드 작아서 회전 빠릅니다. 상급 라이더의 무기 보드."]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 3, "maneuverability": 5, "stability": 2},
+      "rider_voice": "처음 사신 분 후회하는 case 자주 봅니다. Boom 83 후 본인 실력 검증되면 그 다음에 사세요.",
+      "cross_sell": ["boom-fs-83", "fw-540", "r6-race"]
+    },
+
+    {
+      "id": "boom-fs-83",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · all-round",
+      "model": "Boom FS 83 (83L 풀카본)",
+      "tagline": "All-round sweet spot — 가장 무난한 선택",
+      "rider_fit": "중급~선수 (60~90kg)",
+      "skill_levels": ["intermediate", "advanced", "pro"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz-boom-75-wing-foil-board-product-single-1000x1000px.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz-boom-75-wing-foil-board-product-single-1000x1000px.jpg"
+      ],
+      "spec": {
+        "Volume": "83 L",
+        "Length": "170 cm",
+        "Width": "48.1 cm",
+        "재질": "Full carbon · PVC core sandwich",
+        "용도": "Freeride · all-around",
+        "체중대": "60~90kg",
+        "가격": "₩5,570,000"
+      },
+      "features": [
+        ["Sweet spot 83L", "입문·초급부터 freeride 라이더까지 cover. 가장 후회 없는 size."],
+        ["jibe·tack 학습 적합", "회전이 너무 빠르지도 느리지도 않은 균형. tack 정복 단계에 딱."],
+        ["풀카본 + PVC core", "carbon 강성 + PVC core 부력. Boom 63보다 여유롭지만 direct."],
+        ["170cm × 48cm", "대부분 한국 라이더 표준 size. 가장 친숙한 사이즈입니다."],
+        ["Free Series 호환", "FW540/680/790/900 모두 장착. 1 보드로 풍속별 wing 운용."]
+      ],
+      "performance": {"skill": 4, "speed": 4, "glide": 4, "maneuverability": 4, "stability": 4},
+      "rider_voice": "추천 1순위. 1년→2년차 라이더의 표준 보드입니다.",
+      "cross_sell": ["boom-fs-95", "boom-fs-63", "fw-680"]
+    },
+
+    {
+      "id": "boom-fs-95",
+      "brand": "levitaz",
+      "brand_label": "Levitaz",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · 미풍 레이스",
+      "model": "Boom FS 95 (95L 풀카본)",
+      "tagline": "미풍 레이스보드 — 중급-선수 · 미풍레이싱·다운윈드·하이브리드",
+      "rider_fit": "중급~선수 · heavy rider (75~110kg)",
+      "skill_levels": ["intermediate", "advanced", "pro"],
+      "hero_image": "https://levitaz.com/uploads/shop/levitaz-boom-94-wing-foil-board-product-single-1000x1000px_2021-05-03-095914.jpg",
+      "gallery": [
+        "https://levitaz.com/uploads/shop/levitaz-boom-94-wing-foil-board-product-single-1000x1000px_2021-05-03-095914.jpg"
+      ],
+      "spec": {
+        "Volume": "95 L",
+        "Length": "194 cm",
+        "Width": "48 cm",
+        "재질": "Full carbon · PVC core",
+        "용도": "미풍 레이싱 · 다운윈드 · 하이브리드 · early take-off",
+        "체중대": "75~110kg",
+        "가격": "₩5,740,000"
+      },
+      "features": [
+        ["미풍 early take-off", "95L 부력이 만드는 안정성으로 약한 바람에서도 일찍 떠오릅니다. 미풍 레이스 컨디션의 답안."],
+        ["heavy rider 레이스보드", "100kg 이상에서도 take-off 부드러움. 미풍 레이싱에서 체중 핸디캡을 부력으로 상쇄."],
+        ["풀카본 강성", "다운윈드·하이브리드 주행에서 카본 강성이 만드는 직진성과 반응성."],
+        ["한 보드로 cover", "미풍 레이싱·다운윈드·하이브리드까지 — 컨디션별로 보드를 바꾸지 않아도 됩니다."],
+        ["중급-선수 포지션", "Jibe·tack이 안정된 중급 이상이 미풍 day의 무기로 쓰는 보드."]
+      ],
+      "performance": {"skill": 4, "speed": 4, "glide": 5, "maneuverability": 3, "stability": 5},
+      "rider_voice": "미풍 컨디션의 레이스보드 — 95L 부력이 만드는 안정성으로 약한 바람에서도 일찍 떠오릅니다. 다운윈드·하이브리드까지 한 보드로 cover.",
+      "cross_sell": ["boom-fs-83", "fw-680", "fw-900"]
+    },
+
+    {
+      "id": "m2",
+      "brand": "ppc",
+      "brand_label": "PPC",
+      "category": "Wing",
+      "category_kr": "윙 · 입문 (Entry)",
+      "model": "M2 Wing",
+      "tagline": "입문·초급도 컨트롤이 쉬운 versatile all-rounder",
+      "rider_fit": "입문~초급 라이더",
+      "skill_levels": ["beginner", "intermediate"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/f1b1ef9c627f14c84b46165096846486.jpg?v=1774912416",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/f1b1ef9c627f14c84b46165096846486.jpg?v=1774912416"
+      ],
+      "spec": {
+        "사이즈": "3.5 / 4.0 / 4.5 / 5.0 / 5.5 / 6.0 / 7.0",
+        "재질": "Standard PE + Dyneema reinforce",
+        "구조": "Single-skin, dual-handle",
+        "용도": "Beginner all-rounder · freeride",
+        "보증": "5년",
+        "가격": "₩1,180,000~₩1,520,000 (size별)"
+      },
+      "features": [
+        ["입문·초급 친화", "M-series 중 가장 안정적인 컨트롤. 처음 윙 잡으신 분 학습 부담 없습니다."],
+        ["versatile size 폭", "3.5~7.0 m² 7 size. 약풍 day부터 강풍 day까지 1 model로 cover."],
+        ["가성비 PE", "M1·M1-X 대비 합리적 가격. 첫 시즌 학습용으로 후회 적은 선택."],
+        ["5년 보증", "PPC 본사 5년 fabric defect 보증. 첫 윙으로 부담 적음."],
+        ["다음 step = M1-X", "본인 실력 1 시즌 후 M1-X로 자연스러운 진보. PPC tier 진보 path 명확."]
+      ],
+      "performance": {"skill": 2, "speed": 3, "glide": 3, "maneuverability": 4, "stability": 5},
+      "rider_voice": "PPC 입문 라이더의 첫 wing. 첫 시즌 학습이 부드러워서 후회 없어요.",
+      "cross_sell": ["m1-x", "m1", "fds"]
+    },
+
+    {
+      "id": "m1-x",
+      "brand": "ppc",
+      "brand_label": "PPC",
+      "category": "Wing",
+      "category_kr": "윙 · 중급 (Mid)",
+      "model": "M1-X Wing",
+      "tagline": "ExoPE-85 경량 — 중급 라이더의 다음 단계",
+      "rider_fit": "중급 라이더 · 손목 부담 줄이고 싶은 분",
+      "skill_levels": ["intermediate", "advanced"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/0a1658397c6edc7f1c4d4868accda992.jpg?v=1776403592",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/0a1658397c6edc7f1c4d4868accda992.jpg?v=1776403592"
+      ],
+      "spec": {
+        "사이즈": "3.5 / 4.0 / 4.5 / 5.0 / 5.5 / 6.0 / 7.0",
+        "재질": "ExoPE-85 lightweight fabric + Dyneema",
+        "구조": "Single-skin, lightweight handle",
+        "용도": "Intermediate freeride · long session",
+        "보증": "5년",
+        "가격": "₩1,420,000~₩1,820,000 (size별)"
+      },
+      "features": [
+        ["ExoPE-85 경량 원단", "M1 대비 약 20% 가벼움. 1시간+ 라이딩에서 손목 피로 차이 확실."],
+        ["반응성 향상", "경량 구조 → 윙이 빨라짐. M2의 안정감에 더해 응답 속도 개선."],
+        ["jibe·tack 빠름", "가벼워서 회전 빠릅니다. trick 학습 단계에 적합."],
+        ["M1보다 손목 친화", "M1의 정밀 컨트롤은 양보하지만 일반 freeride에 가장 무리 없음."],
+        ["다음 step = M1", "race·정밀 컨트롤 원하시면 M1. 일반 라이딩이면 M1-X에서 끝낼 수 있음."]
+      ],
+      "performance": {"skill": 4, "speed": 4, "glide": 4, "maneuverability": 4, "stability": 4},
+      "rider_voice": "M1 좋은데 무게 부담됐던 분들의 답안. ExoPE-85 원단으로 손목 안 아픈 wing.",
+      "cross_sell": ["m2", "m1", "fds"]
+    },
+
+    {
+      "id": "m1",
+      "brand": "ppc",
+      "brand_label": "PPC",
+      "category": "Wing",
+      "category_kr": "윙 · 상급 (Advanced)",
+      "model": "M1 Wing",
+      "tagline": "정밀 컨트롤·고출력 — 상급 라이더의 reference wing",
+      "rider_fit": "상급 freeride·race 라이더",
+      "skill_levels": ["advanced", "pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/a72f6737697cd9be2999d13c37ed1b21.png?v=1773888787",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/a72f6737697cd9be2999d13c37ed1b21.png?v=1773888787"
+      ],
+      "spec": {
+        "사이즈": "3.5 / 4.0 / 4.5 / 5.0 / 5.5 / 6.0 / 7.0",
+        "재질": "Premium PE + Dyneema double-skin reinforce",
+        "구조": "Single-skin, race-grade fabric",
+        "용도": "Advanced freeride · race",
+        "보증": "5년",
+        "가격": "₩1,580,000~₩1,980,000 (size별)"
+      },
+      "features": [
+        ["Premium PE 원단", "M2/M1-X 대비 stiffness 한 단계 위. 강풍에서도 윙이 흔들림 없음."],
+        ["정밀 컨트롤", "야생마처럼 달리는 control feel. 상급 라이더의 reference 1순위."],
+        ["고출력 lift", "고풍속 day에 가장 정확한 power 출력. race 시작점."],
+        ["손목 부담 vs M1-X", "M1-X보다 무거움. 상급 라이더용 — 입문에는 비추."],
+        ["다음 step = FDS", "race grade로 가시면 Sonic FDS. M1은 일반 freeride 최고점."]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 4, "maneuverability": 4, "stability": 3},
+      "rider_voice": "야생마처럼 달리는 정밀 control wing. 상급 라이더의 reference 1순위.",
+      "cross_sell": ["m1-x", "fds", "m2"]
+    },
+
+    {
+      "id": "fds",
+      "brand": "ppc",
+      "brand_label": "PPC",
+      "category": "Wing",
+      "category_kr": "윙 · 선수 (Race)",
+      "model": "Sonic FDS Wing",
+      "tagline": "Full Dual Skin race — 선수 레벨",
+      "rider_fit": "선수 race 라이더",
+      "skill_levels": ["pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/3cd5afb5c68228bf40b4b670e7eebdc0.png?v=1773894554",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/3cd5afb5c68228bf40b4b670e7eebdc0.png?v=1773894554"
+      ],
+      "spec": {
+        "사이즈": "3.5 / 4.0 / 4.5 / 5.0 / 5.5 / 6.0",
+        "재질": "Full Dual Skin (FDS) — race-spec",
+        "구조": "Dual-skin profile · cambered shape",
+        "용도": "Race · upwind · top-speed",
+        "보증": "5년",
+        "가격": "₩2,100,000~₩2,580,000 (size별)"
+      },
+      "features": [
+        ["Full Dual Skin", "윙 양면이 모두 skin으로 감싸짐. single-skin 대비 lift 효율 30% 이상 상승."],
+        ["Upwind 압도적", "race 라인에서 upwind 각도가 다른 wing 대비 명확히 sharp."],
+        ["Top speed 클래스", "M1보다 top-end 빠릅니다. 30노트+ day에 차이 체감."],
+        ["selan-dual setup", "single-skin과 다른 핸들링. 학습 곡선 있음 — M1 5년차 이후 권장."],
+        ["일반 freeride에는 over-spec", "race 목적 아니면 M1으로 충분. FDS는 경쟁용 specialty."]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 5, "maneuverability": 3, "stability": 3},
+      "rider_voice": "선수 dual-skin race wing. 업윈드와 최고 속도에서 압도적이에요",
+      "cross_sell": ["m1", "m1-x", "r6-race"]
+    },
+
+    {
+      "id": "cruise",
+      "brand": "takoon",
+      "brand_label": "Takoon",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · 입문",
+      "model": "Cruise",
+      "tagline": "윙포일 첫 보드의 정석",
+      "rider_fit": "입문 wingfoil 라이더 (모든 체중대)",
+      "skill_levels": ["beginner"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Cruise_1200x1200_07dc0705-315a-473f-b9c6-e76ee9237a06.png",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Cruise_1200x1200_07dc0705-315a-473f-b9c6-e76ee9237a06.png"
+      ],
+      "spec": {
+        "사이즈": "5'4\" / 5'10\" / 6'2\" / 6'10\" / 7'2\"",
+        "Volume": "75~145L (size별)",
+        "재질": "EPS core + Bamboo deck + Carbon reinforce",
+        "용도": "Wingfoil entry · learning",
+        "체중대": "size별 50~120kg cover",
+        "보증": "2년",
+        "가격": "₩1,250,000~₩1,580,000 (size별)"
+      },
+      "features": [
+        ["입문·초급 친화", "5'10\" / 6'2\" size가 한국 표준. 부유력 충분해서 정지 자세 학습 쉬움."],
+        ["Bamboo deck 내구성", "EPS+epoxy 입문 보드 대비 deck 강도 한 단계 위. 1년 daily 사용에도 무리 없음."],
+        ["가성비 입문 1순위", "Levitaz Boom 95L 대비 절반 가격. 입문 시즌용으로 부담 적음."],
+        ["다음 step", "1년 학습 후 Glide(freeride)로 step-down 자연스러움. tier 진보 path 명확."],
+        ["wingfoil 전용", "kite/SUP 별도 모델 — Cruise는 wingfoil entry specialty."]
+      ],
+      "performance": {"skill": 2, "speed": 3, "glide": 3, "maneuverability": 3, "stability": 5},
+      "rider_voice": "윙포일 첫 보드의 정석. 5'6~6'0, 입문·초급 학습이 자연스럽습니다.",
+      "cross_sell": ["glide", "glide-midlength", "slide"]
+    },
+
+    {
+      "id": "slide",
+      "brand": "takoon",
+      "brand_label": "Takoon",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · 패러윙 (Parawing)",
+      "model": "Slide",
+      "tagline": "패러윙 (Parawing) 전용 midlength",
+      "rider_fit": "중급~상급 · parawing 입문 라이더",
+      "skill_levels": ["intermediate", "advanced"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Slide-6_0-Board---main-Bigger.png",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Slide-6_0-Board---main-Bigger.png"
+      ],
+      "spec": {
+        "사이즈": "5'4\" / 5'10\" / 6'4\" / 7'0\"",
+        "Volume": "50~120L (size별)",
+        "재질": "EPS + Carbon stringer",
+        "용도": "Parawing · downwind hybrid",
+        "체중대": "size별 50~100kg",
+        "보증": "2년",
+        "가격": "₩1,950,000~₩2,340,000 (size별)"
+      },
+      "features": [
+        ["Parawing 전용 설계", "패러윙(연결되지 않은 윙) 라이딩에 최적화된 outline + rocker."],
+        ["일반 wingfoil도 OK", "Parawing 외 일반 wingfoil도 호환. Glide 대비 paddle-up 더 쉬움."],
+        ["midlength shape", "5'4~7'0 사이즈 폭. 자기 size 찾기 쉽습니다."],
+        ["downwind hybrid", "parawing + downwind run 라이딩 가능. 2-in-1 specialty."],
+        ["new category", "국내 parawing 도입 초기 — 본인 실력 검증 후 구매 권장."]
+      ],
+      "performance": {"skill": 4, "speed": 4, "glide": 4, "maneuverability": 4, "stability": 3},
+      "rider_voice": "Parawing·일반 wingfoil 모두 OK. 5'4~7'0 사이즈 폭 넓어 자기 size 찾기 쉬워요.",
+      "cross_sell": ["glide", "ultra-glide", "glide-midlength"]
+    },
+
+    {
+      "id": "glide",
+      "brand": "takoon",
+      "brand_label": "Takoon",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · 프리라이드",
+      "model": "Glide 2026",
+      "tagline": "윙포일/프리라이드 — versatile freeride·wave·race",
+      "rider_fit": "중급~상급 freeride 라이더",
+      "skill_levels": ["intermediate", "advanced"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Glide-5_0-White---Image-01_bigger_cd0d5cfe-0e37-4266-951d-0f5d8540530a.png",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Glide-5_0-White---Image-01_bigger_cd0d5cfe-0e37-4266-951d-0f5d8540530a.png"
+      ],
+      "spec": {
+        "사이즈": "5'4\" / 5'8\" / 5'10\" / 6'4\" / 7'2\"",
+        "Volume": "45~145L (size별)",
+        "재질": "EPS + Carbon-stringer · 2026 update",
+        "용도": "Freeride · wave · race-curious",
+        "체중대": "size별 60~110kg",
+        "보증": "2년",
+        "가격": "₩1,850,000~₩2,050,000 (size별)"
+      },
+      "features": [
+        ["2026 outline update", "기존 Glide의 인기 shape 유지 + 디테일 매끄럽게. nose rocker 약간 down."],
+        ["versatile freeride", "freeride·wave·약한 race 모두 cover. 1 보드로 다목적."],
+        ["sweet spot 5'8\"~5'10\"", "한국 라이더 표준 size. 60~80kg 라이더의 freeride 답안."],
+        ["jibe·tack 자연스러움", "회전 균형이 가장 좋은 shape. trick 학습에도 OK."],
+        ["Cruise 다음 단계", "Cruise 1년 후 자연스러운 step-down. 보드 size·volume 모두 적정."]
+      ],
+      "performance": {"skill": 4, "speed": 4, "glide": 4, "maneuverability": 4, "stability": 3},
+      "rider_voice": "중급~상급 freeride 표준. 2026 디테일 업데이트로 더 매끄럽게.",
+      "cross_sell": ["cruise", "glide-midlength", "ultra-glide"]
+    },
+
+    {
+      "id": "glide-midlength",
+      "brand": "takoon",
+      "brand_label": "Takoon",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · midlength hybrid",
+      "model": "Glide Midlength 2026",
+      "tagline": "Hybrid versatile — Wing/Downwind/SUP 다목적",
+      "rider_fit": "가족 라이딩·hybrid 다목적 라이더",
+      "skill_levels": ["intermediate", "advanced"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Glide-Midlength---White-6_0---Image-01.png",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Glide-Midlength---White-6_0---Image-01.png"
+      ],
+      "spec": {
+        "사이즈": "5'8\" / 6'2\" / 6'8\" / 7'2\"",
+        "Volume": "80~135L (size별)",
+        "재질": "EPS + Carbon · longboard hybrid",
+        "용도": "Wing/Downwind/SUP 다목적",
+        "체중대": "size별 60~110kg",
+        "보증": "2년",
+        "가격": "₩1,850,000~₩2,280,000 (size별)"
+      },
+      "features": [
+        ["longboard 안정성", "midlength outline = 정지 자세 안정. wingfoil 입문도 OK."],
+        ["downwind run 가능", "midlength shape로 paddle-up 쉬움. downwind hybrid에 강점."],
+        ["SUP foil 호환", "SUP foil session에도 사용. 1 보드로 3 카테고리 cover."],
+        ["가족 라이딩 추천", "안정적이라 부부·가족 라이딩에 적합. 라이더 교체 가능."],
+        ["sweet spot 6'2\"~6'8\"", "한국 라이더 표준. 70~90kg에서 가장 versatile."]
+      ],
+      "performance": {"skill": 3, "speed": 3, "glide": 4, "maneuverability": 3, "stability": 5},
+      "rider_voice": "longboard 안정성 + glide 속도감 합친 midlength. 가족 라이딩 추천.",
+      "cross_sell": ["glide", "ultra-glide", "cruise"]
+    },
+
+    {
+      "id": "ultra-glide",
+      "brand": "takoon",
+      "brand_label": "Takoon",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · downwind/SUP 전용",
+      "model": "Ultra Glide 2026",
+      "tagline": "다운윈드 / SUP 포일 전용",
+      "rider_fit": "다운윈드·SUP foil 라이더",
+      "skill_levels": ["intermediate", "advanced"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Ultra-Glide-6_6-White---Image-01_bigger.png",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Ultra-Glide-6_6-White---Image-01_bigger.png"
+      ],
+      "spec": {
+        "사이즈": "5'8\" / 6'2\" / 6'6\" / 7'0\" / 7'4\"",
+        "Volume": "60~140L (size별)",
+        "재질": "EPS + 풀카본 · long shape",
+        "용도": "Downwind run · SUP foil",
+        "체중대": "size별 60~100kg",
+        "보증": "2년",
+        "가격": "₩1,950,000~₩2,280,000 (size별)"
+      },
+      "features": [
+        ["paddle-up 최강", "downwind 전용 outline. paddle-up 가장 쉬운 보드 중 하나."],
+        ["약풍 day 무한 glide", "SUP foil pumping에서 1번 펌핑으로 글라이드 길게."],
+        ["wingfoil은 비추", "wingfoil 라이딩엔 over-glide. downwind specialty 보드."],
+        ["7'0\" sweet spot", "70~85kg downwind 라이더 표준. paddle 컨트롤 균형."],
+        ["FW900 시너지", "Levitaz FW900 wing과 함께 약풍 day setup. 한 시즌 8노트도 cover."]
+      ],
+      "performance": {"skill": 4, "speed": 4, "glide": 5, "maneuverability": 3, "stability": 4},
+      "rider_voice": "다운윈드 SUP foil 전용. paddle-up 쉽고 약풍 day의 무한 glide.",
+      "cross_sell": ["glide-midlength", "glide", "fw-900"]
+    },
+
+    {
+      "id": "prosurf",
+      "brand": "takoon",
+      "brand_label": "Takoon",
+      "category": "Surf Foil Board",
+      "category_kr": "보드 · 펌핑·서핑 포일",
+      "model": "Prosurf 2026",
+      "tagline": "펌핑포일 / 서핑포일 — wave 라이딩 전용",
+      "rider_fit": "wave foil 라이더",
+      "skill_levels": ["intermediate", "advanced"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Prosurf_bigger.png",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Prosurf_bigger.png"
+      ],
+      "spec": {
+        "사이즈": "4'10\" / 5'0\" / 5'4\" / 5'8\"",
+        "Volume": "30~75L (size별)",
+        "재질": "EPS + Carbon · compact wave shape",
+        "용도": "Wave foil · pumping foil",
+        "체중대": "size별 55~85kg",
+        "보증": "2년",
+        "가격": "₩1,750,000~₩2,050,000 (size별)"
+      },
+      "features": [
+        ["compact wave outline", "5'4\" 이하 짧은 길이. 작은 파도부터 빠른 회전 가능."],
+        ["pumping foil 강점", "1번 펌핑으로 글라이드 연장. wave 사이 connect 라이딩."],
+        ["surf foil 입문 OK", "wingfoil 상급 라이더가 surf foil 진입할 때 첫 보드."],
+        ["wingfoil 비추", "wingfoil 라이딩엔 over-spec. wave/pumping specialty."],
+        ["입문 인기", "일반 spot 작은 파도에도 즐길 수 있는 wave foil 입문."]
+      ],
+      "performance": {"skill": 5, "speed": 4, "glide": 4, "maneuverability": 5, "stability": 2},
+      "rider_voice": "wave foil 컴팩트 보드. 일반 spot 작은 파도부터 즐겨요.",
+      "cross_sell": ["glide", "ultra-glide", "slide"]
+    },
+
+    {
+      "id": "helmet",
+      "brand": "wip",
+      "brand_label": "Forward WIP",
+      "category": "Safety",
+      "category_kr": "안전 · 헬멧",
+      "model": "WiFLEX Pro Helmet",
+      "tagline": "수상 전용 헬멧 — foil 충돌·낙상 보호",
+      "rider_fit": "전 라이더 권장",
+      "skill_levels": ["beginner", "intermediate", "advanced", "pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0279/4022/5124/products/7.PROWIP2.0HELMET-MATRED.jpg",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0279/4022/5124/products/7.PROWIP2.0HELMET-MATRED.jpg"
+      ],
+      "spec": {
+        "사이즈": "S / M / L / XL",
+        "재질": "EPS shell + ABS outer",
+        "구조": "수상 전용 ventilation",
+        "용도": "Wingfoil · Kitefoil · SUP foil",
+        "보증": "1년",
+        "가격": "₩290,000 (size 동일)"
+      },
+      "features": [
+        ["수상 전용 설계", "일반 자전거·스케이트 헬멧과 다른 ventilation. 물 빠짐 빠릅니다."],
+        ["EPS 충격 흡수", "foil 부딪힘·낙상 모두 cover. wave session에서 머리 보호."],
+        ["가벼움 290g", "1시간+ 라이딩에도 목 부담 적음. Wipper 2.0 대비 약간 가볍."],
+        ["턱끈 quick-release", "낙상 시 순식간 해제. 안전 인증 표준."],
+        ["입문·초급 필수", "1년차 라이더의 보호장비 1순위. 강습 현장에서도 강조됩니다."]
+      ],
+      "performance": {"skill": 1, "speed": 1, "glide": 1, "maneuverability": 1, "stability": 1},
+      "rider_voice": "프로레벨 수상 헬멧. EPS 쉘로 충격 흡수 강화.",
+      "cross_sell": ["impact-vest", "harness", "boots"]
+    },
+
+    {
+      "id": "harness",
+      "brand": "wip",
+      "brand_label": "Forward WIP",
+      "category": "Comfort",
+      "category_kr": "편의 · 윙 하니스",
+      "model": "Waistfoil Harness 3.0",
+      "tagline": "장시간 라이딩 — 팔 피로 감소",
+      "rider_fit": "중급~상급 (1시간+ session 라이더)",
+      "skill_levels": ["intermediate", "advanced", "pro"],
+      "hero_image": "",
+      "gallery": [],
+      "spec": {
+        "사이즈": "허리 70~110cm 조절",
+        "재질": "Neoprene + EVA padding",
+        "구조": "Hook + 분리 strap",
+        "용도": "Wingfoil 윙 hooking",
+        "보증": "1년",
+        "가격": "₩220,000"
+      },
+      "features": [
+        ["윙 hooking 1순위", "윙 손잡이를 hook에 걸어 양손 자유. 1시간+ session 필수템."],
+        ["등 통증 감소", "윙 무게가 허리로 분산. 어깨·팔 피로 70% 감소 (Danny 체감)."],
+        ["70~110cm 조절", "대부분 라이더 size cover. 외투 위에도 착용 가능."],
+        ["분리 strap quick-release", "낙상 시 hook 해제 쉬움. 안전 우선 설계."],
+        ["다음 step = EXO", "race grade harness EXO Sailing Harness. 일반 freeride는 Waistfoil Harness 3.0이면 충분."]
+      ],
+      "performance": {"skill": 1, "speed": 1, "glide": 1, "maneuverability": 1, "stability": 1},
+      "rider_voice": "윙포일 등 통증 한 방에. 70~110cm 조절, 1시간+ 라이딩 차이 확실.",
+      "cross_sell": ["helmet", "impact-vest", "boots"]
+    },
+
+    {
+      "id": "impact-vest",
+      "brand": "wip",
+      "brand_label": "Forward WIP",
+      "category": "Safety",
+      "category_kr": "안전 · 임팩트 베스트",
+      "model": "Kompact Impact Vest 50N",
+      "tagline": "낙상·foil 충돌 보호 — EN ISO 12402-5 인증",
+      "rider_fit": "전 라이더 권장",
+      "skill_levels": ["beginner", "intermediate", "advanced", "pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0279/4022/5124/products/kompact.jpg",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0279/4022/5124/products/kompact.jpg"
+      ],
+      "spec": {
+        "사이즈": "XS / S / M / L / XL",
+        "재질": "Neoprene + closed-cell foam",
+        "구조": "Front zipper + side adjuster",
+        "인증": "EN ISO 12402-5 (50N buoyancy)",
+        "용도": "Wingfoil · Kitefoil · SUP",
+        "보증": "1년",
+        "가격": "₩320,000 (size 동일)"
+      },
+      "features": [
+        ["50N 부유력 인증", "낙상 시 자동 부유. 입문·초급 학습 안전."],
+        ["foil 충돌 보호", "가슴·등 closed-cell foam 충격 흡수. wave session 필수."],
+        ["가벼움 ~700g", "동작성 유지. 일반 wingfoil 라이딩에 무리 없음."],
+        ["측면 adjuster", "체형별 fit 조절. neoprene 한 sizing이지만 변경 가능."],
+        ["입문·초급 1순위", "1년차 라이더의 보호장비 1순위. 헬멧과 함께 권장."]
+      ],
+      "performance": {"skill": 1, "speed": 1, "glide": 1, "maneuverability": 1, "stability": 1},
+      "rider_voice": "EN ISO 12402-5 50N 인증. 안전과 동작성 모두 잡았어요.",
+      "cross_sell": ["helmet", "harness", "boots"]
+    },
+
+    {
+      "id": "boots",
+      "brand": "wip",
+      "brand_label": "Forward WIP",
+      "category": "Comfort",
+      "category_kr": "편의 · 부츠",
+      "model": "Wetsuit Boots 3mm",
+      "tagline": "발 보호 + 그립 — 봄·가을 4계절 표준",
+      "rider_fit": "전 라이더",
+      "skill_levels": ["beginner", "intermediate", "advanced", "pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0279/4022/5124/products/1.IMPACTVEST50NJUNIOR.jpg",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0279/4022/5124/products/1.IMPACTVEST50NJUNIOR.jpg"
+      ],
+      "spec": {
+        "사이즈": "230 / 240 / 250 / 260 / 270 / 280 / 290 mm",
+        "재질": "Neoprene 3mm + rubber sole",
+        "구조": "Round-toe + back zipper",
+        "용도": "수상 전 카테고리 · 4계절 (3mm)",
+        "보증": "1년",
+        "가격": "₩130,000"
+      },
+      "features": [
+        ["발 보호", "foil 부딪힘·바위 spot에서 발가락 보호. 모래 외 spot 필수."],
+        ["rubber sole 그립", "보드 deck에서 미끄러짐 최소. 라이딩 자세 유지."],
+        ["3mm 4계절", "봄·가을 한국 표준. 여름 7~8월에는 다소 더움 (3mm)."],
+        ["back zipper", "신고 벗기 빠름. wet 환경에서도 zipper 동작."],
+        ["heavy session 필수", "1년차 라이더의 보호장비 3순위. 헬멧·베스트 다음 권장."]
+      ],
+      "performance": {"skill": 1, "speed": 1, "glide": 1, "maneuverability": 1, "stability": 1},
+      "rider_voice": "발 보호 + 그립 한 번에. 4계절 표준 부츠.",
+      "cross_sell": ["impact-vest", "helmet", "harness"]
+    }
+  ]
+}

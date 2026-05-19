@@ -1,0 +1,847 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-15",
+  "note": "§173 Phase 2 — 옥코치 사이트 콘텐츠 맵. 옥코치가 사용자 질문을 '답할 수 있는 유형'으로 유도하고 deep-link 할 수 있게 하는 manifest. 각 page = url/type/콘텐츠/답하는 질문/관련 의도. hallucination 차단: 사이트에 실재하는 페이지만 등록.",
+  "intents": {
+    "fit-check": "적합도 문의 — 이거 나한테 맞아? 초보인데 가능?",
+    "size-inquiry": "사이즈 문의 — 몇 L 보드? 윙 사이즈?",
+    "price-inquiry": "가격 문의 — 얼마? 예산",
+    "performance-compare": "성능·비교 문의 — M1 vs M2? 이거 잘 나가?",
+    "setup-recommendation": "셋업 추천 — 입문 셋업 추천해줘",
+    "lesson-consult": "강습·컨설팅 문의",
+    "navigation": "사이트 길찾기 — X 어디 있어?"
+  },
+  "tools": [
+    {
+      "id": "find-my-gear",
+      "url": "find-my-gear.html",
+      "title": "Find My Gear",
+      "type": "tool",
+      "content": "5분 장비 추천 퀴즈. 레벨·체중·풍속·라이딩 스타일 4축으로 본인 맞춤 장비 추천. 비회원도 가능, 로그인 시 결과 이관.",
+      "answers": [
+        "내게 맞는 장비?",
+        "장비 추천 받고 싶어",
+        "뭐부터 사야 해?",
+        "초보 셋업"
+      ],
+      "intents": [
+        "fit-check",
+        "setup-recommendation",
+        "size-inquiry"
+      ]
+    },
+    {
+      "id": "calculator",
+      "url": "calculator.html",
+      "title": "Lift Calculator",
+      "type": "tool",
+      "content": "윙 사이즈·lift 계산기. 체중·풍속·foil 면적·물 종류(바다/민물)·수면 상태(플랫/초피/너울) 입력 → takeoff 속도·권장 사이즈 산출.",
+      "answers": [
+        "윙 사이즈 계산",
+        "내 체중에 맞는 포일?",
+        "takeoff 속도 얼마?",
+        "lift 계산"
+      ],
+      "intents": [
+        "size-inquiry",
+        "performance-compare"
+      ]
+    },
+    {
+      "id": "skill-assessment",
+      "url": "skill-assessment.html",
+      "title": "10축 스킬 진단",
+      "type": "tool",
+      "content": "5 스킬(토우/힐 택킹, 토우/힐 자이빙, 점핑) × 좌우(P/S) 10축 100점 진단. 약점 plane 매칭 → 12주 land + 13주 water training 프로그램 자동 추천.",
+      "answers": [
+        "내 실력 진단",
+        "내 약점이 뭐야?",
+        "스킬 레벨 확인",
+        "P/S 진단"
+      ],
+      "intents": [
+        "fit-check",
+        "lesson-consult"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "id": "index",
+      "url": "index.html",
+      "title": "단무지공방 홈",
+      "type": "hub",
+      "content": "단무지공방 소개. 옥덕필 박사(3× 올림픽·운동생리학 박사·3개국 NT 코치) + 조수철 선수. persona-grid 로 본인 단계 진입. Levitaz/PPC/Takoon/WIP 4 브랜드 큐레이션.",
+      "answers": [
+        "단무지공방이 뭐야?",
+        "여기 뭐하는 곳?",
+        "홈으로"
+      ],
+      "intents": [
+        "navigation",
+        "lesson-consult"
+      ]
+    },
+    {
+      "id": "level-novice",
+      "url": "level/novice.html",
+      "title": "레벨 — 노비스 (입문 전)",
+      "type": "level",
+      "content": "윙포일 시작 전 단계. 입문 준비·첫 장비·안전.",
+      "answers": [
+        "윙포일 아예 처음",
+        "시작도 안 했는데"
+      ],
+      "intents": [
+        "fit-check",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "level-beginner",
+      "url": "level/beginner.html",
+      "title": "레벨 — 입문 (Beginner)",
+      "type": "level",
+      "content": "입문자 16-entry 추천 매트릭스. PPC M2 wing + Takoon Starter foil + 짧은 알루미늄 마스트. 흔한 실수·USP·안전장비.",
+      "answers": [
+        "입문자 셋업",
+        "초보 장비",
+        "처음 뭐 사?"
+      ],
+      "intents": [
+        "fit-check",
+        "setup-recommendation",
+        "size-inquiry"
+      ]
+    },
+    {
+      "id": "level-intermediate",
+      "url": "level/intermediate.html",
+      "title": "레벨 — 중급 (Intermediate)",
+      "type": "level",
+      "content": "중급 16-entry 매트릭스. Levitaz FW 790/900 또는 Takoon Flow + Mast 84 + PPC M1-X. 스타일별 분기.",
+      "answers": [
+        "중급 셋업",
+        "다음 단계 장비",
+        "84cm 마스트 가도 돼?"
+      ],
+      "intents": [
+        "fit-check",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "level-advanced",
+      "url": "level/advanced.html",
+      "title": "레벨 — 상급 (Advanced)",
+      "type": "level",
+      "content": "상급 16-entry 매트릭스. Levitaz FW 540/680 + Mast 96 + PPC FDS/M1 + Levitaz Boom FS / Takoon 보드. 스타일별 분기.",
+      "answers": [
+        "상급 셋업",
+        "96cm 마스트",
+        "카본 포일"
+      ],
+      "intents": [
+        "fit-check",
+        "setup-recommendation",
+        "performance-compare"
+      ]
+    },
+    {
+      "id": "level-pro",
+      "url": "level/pro.html",
+      "title": "레벨 — 선수 (Pro)",
+      "type": "level",
+      "content": "선수 16-entry 매트릭스. Levitaz R6 풀세트 + PPC Sonic FDS / Takoon Carbon Pro. race grade.",
+      "answers": [
+        "선수 셋업",
+        "레이스 장비",
+        "R6"
+      ],
+      "intents": [
+        "fit-check",
+        "setup-recommendation",
+        "performance-compare"
+      ]
+    },
+    {
+      "id": "style-flat-speed",
+      "url": "style/flat-speed.html",
+      "title": "스타일 — Flat·Speed",
+      "type": "style",
+      "content": "평수면·속도 라이딩. Levitaz Free Series 추천. 강풍 셋업.",
+      "answers": [
+        "속도 위주",
+        "평수면 라이딩",
+        "빠르게 타고 싶어"
+      ],
+      "intents": [
+        "setup-recommendation",
+        "performance-compare"
+      ]
+    },
+    {
+      "id": "style-choppy-freeride",
+      "url": "style/choppy-freeride.html",
+      "title": "스타일 — Choppy·Freeride",
+      "type": "style",
+      "content": "잔파도·자유 라이딩. Takoon Flow/Flare 추천.",
+      "answers": [
+        "프리라이드",
+        "잔파도",
+        "자유롭게"
+      ],
+      "intents": [
+        "setup-recommendation",
+        "performance-compare"
+      ]
+    },
+    {
+      "id": "style-wave",
+      "url": "style/wave.html",
+      "title": "스타일 — Wave",
+      "type": "style",
+      "content": "파도 라이딩. Takoon Swell/Flash wave-tuned 추천. short turn radius.",
+      "answers": [
+        "파도 타고 싶어",
+        "웨이브",
+        "서핑 같은"
+      ],
+      "intents": [
+        "setup-recommendation",
+        "performance-compare"
+      ]
+    },
+    {
+      "id": "style-hybrid",
+      "url": "style/hybrid.html",
+      "title": "스타일 — Hybrid",
+      "type": "style",
+      "content": "다목적 하이브리드. Levitaz Free Series race-grade 균형.",
+      "answers": [
+        "다 조금씩",
+        "올라운드",
+        "하이브리드"
+      ],
+      "intents": [
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "genre-wing",
+      "url": "genre/wing.html",
+      "title": "장르 — 윙포일",
+      "type": "genre",
+      "content": "윙포일 종목 메인. 윙·포일·보드 기본.",
+      "answers": [
+        "윙포일이 뭐야",
+        "윙포일 입문"
+      ],
+      "intents": [
+        "navigation",
+        "fit-check"
+      ]
+    },
+    {
+      "id": "genre-kite",
+      "url": "genre/kite.html",
+      "title": "장르 — 카이트",
+      "type": "genre",
+      "content": "카이트포일·포뮬러 카이트. Levitaz R6 cross-platform race.",
+      "answers": [
+        "카이트",
+        "카이트포일"
+      ],
+      "intents": [
+        "navigation",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "genre-sup",
+      "url": "genre/sup.html",
+      "title": "장르 — SUP·다운윈드",
+      "type": "genre",
+      "content": "SUP 포일·다운윈드. Takoon Ultra Glide.",
+      "answers": [
+        "SUP",
+        "다운윈드",
+        "패들"
+      ],
+      "intents": [
+        "navigation",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "genre-surf",
+      "url": "genre/surf.html",
+      "title": "장르 — 서프포일",
+      "type": "genre",
+      "content": "서프포일·프론사이드. Takoon Prosurf.",
+      "answers": [
+        "서프포일",
+        "서핑 포일"
+      ],
+      "intents": [
+        "navigation",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "genre-pump",
+      "url": "genre/pump.html",
+      "title": "장르 — 펌프포일",
+      "type": "genre",
+      "content": "펌프포일·약풍. Takoon Pump 라인. 풀-펌프 기술.",
+      "answers": [
+        "펌프포일",
+        "펌핑",
+        "약풍에서"
+      ],
+      "intents": [
+        "navigation",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "genre-parawing",
+      "url": "genre/parawing.html",
+      "title": "장르 — 패러윙",
+      "type": "genre",
+      "content": "패러윙. Takoon Cloud / Slide 보드.",
+      "answers": [
+        "패러윙",
+        "parawing"
+      ],
+      "intents": [
+        "navigation",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "brand-levitaz",
+      "url": "levitaz.html",
+      "title": "브랜드 — Levitaz",
+      "type": "brand",
+      "content": "Levitaz 포일 전문. Free Series FW 540/680/790/900 + Mast 76/84/96 + R6 Race. 중급~선수 race-grade.",
+      "answers": [
+        "Levitaz",
+        "레비타즈",
+        "Free Series",
+        "FW 포일"
+      ],
+      "intents": [
+        "performance-compare",
+        "price-inquiry",
+        "navigation"
+      ]
+    },
+    {
+      "id": "brand-ppc",
+      "url": "ppc.html",
+      "title": "브랜드 — PPC",
+      "type": "brand",
+      "content": "PPC 더블스킨 윙 전문 (한국). M2(forgiving)/M1-X(경량)/M1(race-leaning)/Sonic FDS(race). 회원 등급별 10-40% 할인.",
+      "answers": [
+        "PPC",
+        "M1",
+        "M2",
+        "M1-X",
+        "FDS 윙"
+      ],
+      "intents": [
+        "performance-compare",
+        "price-inquiry",
+        "navigation"
+      ]
+    },
+    {
+      "id": "brand-takoon",
+      "url": "takoon.html",
+      "title": "브랜드 — Takoon",
+      "type": "brand",
+      "content": "Takoon 윙(ripstop) + 포일 + 보드 풀라인업. Wing V4/V4 Pro/VX Pro 2, 보드 6종, 포일 컴포넌트.",
+      "answers": [
+        "Takoon",
+        "타쿤",
+        "V4 윙",
+        "Takoon 보드"
+      ],
+      "intents": [
+        "performance-compare",
+        "price-inquiry",
+        "navigation"
+      ]
+    },
+    {
+      "id": "brand-wip",
+      "url": "wip.html",
+      "title": "브랜드 — Forward WIP",
+      "type": "brand",
+      "content": "Forward WIP 보호장비. Helmet/Harness/Impact Vest/Wetsuit/Boots.",
+      "answers": [
+        "WIP",
+        "안전장비",
+        "헬멧",
+        "임팩트 베스트",
+        "하네스"
+      ],
+      "intents": [
+        "navigation",
+        "price-inquiry",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "products-levitaz",
+      "url": "levitaz.html",
+      "title": "제품 — Levitaz 디테일",
+      "type": "product-section",
+      "content": "Levitaz 제품 detail: FW 540/680/790/900 (front wing, 체중·풍속·tier별), Boom FS 63/83/95, R6 Race. 각 페이지 spec·가격·성능.",
+      "answers": [
+        "FW 790 스펙",
+        "Boom FS 가격",
+        "R6 성능"
+      ],
+      "intents": [
+        "price-inquiry",
+        "performance-compare",
+        "size-inquiry"
+      ],
+      "detail_pages": [
+        "products/levitaz/fw-540.html",
+        "products/levitaz/fw-680.html",
+        "products/levitaz/fw-790.html",
+        "products/levitaz/fw-900.html",
+        "products/levitaz/boom-fs-63.html",
+        "products/levitaz/boom-fs-83.html",
+        "products/levitaz/boom-fs-95.html",
+        "products/levitaz/r6-race.html"
+      ]
+    },
+    {
+      "id": "products-ppc",
+      "url": "ppc.html",
+      "title": "제품 — PPC 디테일",
+      "type": "product-section",
+      "content": "PPC 윙 detail: M1, M1-X, M2, FDS. 각 페이지 spec·가격·기술 특성·회원 할인.",
+      "answers": [
+        "M1 스펙",
+        "M2 가격",
+        "M1-X 무게"
+      ],
+      "intents": [
+        "price-inquiry",
+        "performance-compare"
+      ],
+      "detail_pages": [
+        "products/ppc/m1.html",
+        "products/ppc/m1-x.html",
+        "products/ppc/m2.html",
+        "products/ppc/fds.html"
+      ]
+    },
+    {
+      "id": "products-takoon",
+      "url": "takoon.html",
+      "title": "제품 — Takoon 디테일",
+      "type": "product-section",
+      "content": "Takoon detail: 윙(V4/V4 Pro/VX Pro 2), 보드(Cruise/Slide/Glide/Glide Midlength/Ultra Glide/Prosurf/Glide Air), 포일 컴포넌트(front wing·mast·stab·complete), 펌프포일.",
+      "answers": [
+        "V4 윙 가격",
+        "Glide 보드 사이즈",
+        "Takoon 포일 스펙"
+      ],
+      "intents": [
+        "price-inquiry",
+        "performance-compare",
+        "size-inquiry"
+      ],
+      "detail_pages": [
+        "products/takoon/wing-v4.html",
+        "products/takoon/wing-v4-pro.html",
+        "products/takoon/wing-vx-pro-2.html",
+        "products/takoon/cruise.html",
+        "products/takoon/slide.html",
+        "products/takoon/glide.html",
+        "products/takoon/glide-midlength.html",
+        "products/takoon/ultra-glide.html",
+        "products/takoon/prosurf.html",
+        "products/takoon/glide-air.html",
+        "products/takoon/glide-air-midlength.html",
+        "products/takoon/foil-starter.html",
+        "products/takoon/foil-x-glide-v2.html",
+        "products/takoon/foil-flow-carbon.html",
+        "products/takoon/foil-flare-carbon.html",
+        "products/takoon/foil-pump-one.html"
+      ]
+    },
+    {
+      "id": "products-wip",
+      "url": "wip.html",
+      "title": "제품 — WIP 디테일",
+      "type": "product-section",
+      "content": "WIP 보호장비 detail: Helmet, Harness, Impact Vest + size chart.",
+      "answers": [
+        "헬멧 사이즈",
+        "하네스 가격",
+        "임팩트 베스트"
+      ],
+      "intents": [
+        "price-inquiry",
+        "size-inquiry",
+        "setup-recommendation"
+      ],
+      "detail_pages": [
+        "products/wip/helmet.html",
+        "products/wip/harness.html",
+        "products/wip/impact-vest.html",
+        "products/wip/size-chart.html"
+      ]
+    },
+    {
+      "id": "glossary",
+      "url": "glossary.html",
+      "title": "용어집 (글로서리)",
+      "type": "info",
+      "content": "윙·포일 용어 한국어 정리. 어택앵글, Points of Sail 7방향, 택/자이브, 케비테이션, 라이딩 기술.",
+      "answers": [
+        "용어 어려워",
+        "이게 무슨 뜻?",
+        "Points of Sail"
+      ],
+      "intents": [
+        "navigation",
+        "performance-compare"
+      ]
+    },
+    {
+      "id": "membership",
+      "url": "membership.html",
+      "title": "회원 등급",
+      "type": "info",
+      "content": "9단계 회원 등급. 방문자→회원→단무지→단골 라이더→선주문→팀라이더3종→관리자. PPC 라인 10/20/25/30/35/40% 차등 할인.",
+      "answers": [
+        "회원 등급",
+        "할인율",
+        "단골 라이더 등급",
+        "팀라이더"
+      ],
+      "intents": [
+        "price-inquiry",
+        "navigation"
+      ]
+    },
+    {
+      "id": "premium",
+      "url": "premium.html",
+      "title": "프리미엄 컨설팅",
+      "type": "info",
+      "content": "옥덕필 박사 1:1 풀 어드바이저. 진단·12주 프로그램 커스터마이즈·장비 풀패키지·시즌 코칭.",
+      "answers": [
+        "프리미엄 컨설팅",
+        "VIP 상담"
+      ],
+      "intents": [
+        "lesson-consult"
+      ]
+    },
+    {
+      "id": "consult",
+      "url": "consult.html",
+      "title": "1:1 구매 상담",
+      "type": "info",
+      "content": "Danny 박사 + 조수철 코치 직접 응대. 라이딩 수준·예산·spot 환경 기반 셋업 안내.",
+      "answers": [
+        "1:1 상담",
+        "구매 상담",
+        "전문가에게 물어보고 싶어"
+      ],
+      "intents": [
+        "lesson-consult"
+      ]
+    },
+    {
+      "id": "signup",
+      "url": "signup.html",
+      "title": "회원가입",
+      "type": "account",
+      "content": "이메일·비밀번호 가입. 진단 결과·장바구니 자동 저장.",
+      "answers": [
+        "회원가입",
+        "가입 어떻게"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "login",
+      "url": "login.html",
+      "title": "로그인",
+      "type": "account",
+      "content": "로그인. 비회원 진단 결과 로그인 시 이관.",
+      "answers": [
+        "로그인",
+        "로그인 어디서"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "profile",
+      "url": "profile.html",
+      "title": "마이페이지",
+      "type": "account",
+      "content": "진단 결과·My Gear·구매 이력·회원 등급. 체중·스팟·실력 프로필.",
+      "answers": [
+        "내 정보",
+        "마이페이지",
+        "내 진단 결과"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "password-reset",
+      "url": "password-reset.html",
+      "title": "비밀번호 찾기",
+      "type": "account",
+      "content": "비밀번호 재설정.",
+      "answers": [
+        "비밀번호 잊었어",
+        "비번 찾기"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "cart",
+      "url": "cart.html",
+      "title": "장바구니",
+      "type": "commerce",
+      "content": "장바구니. 회원 계정 저장. 견적 요청으로 연결.",
+      "answers": [
+        "장바구니",
+        "담은 거 보기"
+      ],
+      "intents": [
+        "navigation",
+        "price-inquiry"
+      ]
+    },
+    {
+      "id": "quote",
+      "url": "quote.html",
+      "title": "견적 요청",
+      "type": "commerce",
+      "content": "정식 견적서 발행 (사업자 144-55-01008). 회원 등급별 할인 자동 적용. 무통장 입금 flow.",
+      "answers": [
+        "견적",
+        "견적서 받기",
+        "구매하려면"
+      ],
+      "intents": [
+        "price-inquiry",
+        "navigation"
+      ]
+    },
+    {
+      "id": "policies",
+      "url": "policies.html",
+      "title": "정책·안내",
+      "type": "info",
+      "content": "환불·배송·개인정보·이용약관 통합. 사업자 정보.",
+      "answers": [
+        "환불 정책",
+        "배송",
+        "약관"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "policy-refund",
+      "url": "policy/refund.html",
+      "title": "환불 정책",
+      "type": "info",
+      "content": "환불·교환 정책 상세.",
+      "answers": [
+        "환불 어떻게",
+        "교환 가능?"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "policy-shipping",
+      "url": "policy/shipping.html",
+      "title": "배송 정책",
+      "type": "info",
+      "content": "배송 정책·배송비 상세.",
+      "answers": [
+        "배송비",
+        "언제 와?"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "policy-privacy",
+      "url": "policy/privacy.html",
+      "title": "개인정보 처리방침",
+      "type": "info",
+      "content": "개인정보 처리방침.",
+      "answers": [
+        "개인정보"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "policy-terms",
+      "url": "policy/terms.html",
+      "title": "이용약관",
+      "type": "info",
+      "content": "이용약관.",
+      "answers": [
+        "이용약관"
+      ],
+      "intents": [
+        "navigation"
+      ]
+    },
+    {
+      "id": "junior",
+      "url": "junior/index.html",
+      "title": "쥬니어 프로그램",
+      "type": "demographic",
+      "content": "유소년 윙포일. 옥덕필 수석코치 직접 코칭. wing_offset -2.",
+      "answers": [
+        "애들 윙포일",
+        "쥬니어",
+        "어린이 강습"
+      ],
+      "intents": [
+        "fit-check",
+        "lesson-consult",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "women",
+      "url": "women/index.html",
+      "title": "여성 프로그램",
+      "type": "demographic",
+      "content": "여성 윙포일. wing_offset -1 demographic adjustment.",
+      "answers": [
+        "여성 윙포일",
+        "여자도 가능?"
+      ],
+      "intents": [
+        "fit-check",
+        "setup-recommendation"
+      ]
+    },
+    {
+      "id": "family",
+      "url": "family/index.html",
+      "title": "가족 프로그램",
+      "type": "demographic",
+      "content": "가족 단위 윙포일.",
+      "answers": [
+        "가족이 같이",
+        "가족 프로그램"
+      ],
+      "intents": [
+        "fit-check",
+        "lesson-consult"
+      ]
+    }
+  ],
+  "intent_routing": {
+    "fit-check": {
+      "primary_tool": "find-my-gear",
+      "secondary_tools": [
+        "skill-assessment"
+      ],
+      "flow": "slot-filling: 실력 → 체중 → 스팟/풍속 → 예산 → find-my-gear 결과 + level page deep-link",
+      "deep_links": [
+        "find-my-gear.html",
+        "skill-assessment.html"
+      ]
+    },
+    "size-inquiry": {
+      "primary_tool": "calculator",
+      "secondary_tools": [
+        "find-my-gear"
+      ],
+      "flow": "slot-filling: 체중 → 실력 → (윙/보드/포일 중 무엇) → calculator 또는 board/wing size guide KB chunk",
+      "deep_links": [
+        "calculator.html",
+        "find-my-gear.html"
+      ]
+    },
+    "price-inquiry": {
+      "primary_pages": [
+        "membership",
+        "quote"
+      ],
+      "flow": "제품 지정 시 → 해당 product-section deep-link + 회원 할인 안내. 미지정 시 → 어떤 제품?",
+      "deep_links": [
+        "membership.html",
+        "quote.html"
+      ]
+    },
+    "performance-compare": {
+      "primary_kb": [
+        "kb-ppc-wing-characteristics",
+        "kb-brand-style-mapping",
+        "kb-takoon-foil-guideline"
+      ],
+      "flow": "비교 대상 식별 → KB chunk + product-section deep-link",
+      "deep_links": [
+        "levitaz.html",
+        "takoon.html",
+        "ppc.html",
+        "glossary.html"
+      ]
+    },
+    "setup-recommendation": {
+      "primary_tool": "find-my-gear",
+      "flow": "실력 식별 → level page 추천 + find-my-gear 유도",
+      "deep_links": [
+        "find-my-gear.html",
+        "level/beginner.html",
+        "level/intermediate.html",
+        "level/advanced.html",
+        "level/pro.html"
+      ]
+    },
+    "lesson-consult": {
+      "primary_pages": [
+        "consult",
+        "premium",
+        "skill-assessment"
+      ],
+      "flow": "강습/컨설팅 의도 명확 → consult.html + 이벤트 무료 안내",
+      "deep_links": [
+        "consult.html",
+        "premium.html",
+        "skill-assessment.html"
+      ]
+    },
+    "navigation": {
+      "flow": "사이트맵 page 매칭 → 해당 페이지 deep-link",
+      "deep_links": []
+    }
+  }
+}

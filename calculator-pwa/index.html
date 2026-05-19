@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+<meta name="theme-color" content="#061A2E">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lifting Calc">
+<meta name="mobile-web-app-capable" content="yes">
+
+<title>Lifting Calc · 단무지공방</title>
+<meta name="description" content="윙포일 라이딩 윙 사이즈·속도 계산기. takeoff 임계 속도 v_min + 권장 윙 사이즈 + VMG 어드바이저.">
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./icons/favicon.svg">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<!-- ========== App Bar ========== -->
+<header class="appbar" role="banner">
+  <div class="appbar__inner">
+    <div class="appbar__brand">
+      <span class="appbar__mark" aria-hidden="true">L↑</span>
+      <span class="appbar__title">Lifting Calc</span>
+    </div>
+    <button class="appbar__action" type="button" id="btn-reset" aria-label="기본값으로 초기화">↻</button>
+  </div>
+  <p class="appbar__sub">윙포일 takeoff 속도 + 윙 사이즈 계산기 · 단무지공방</p>
+</header>
+
+<main class="page">
+
+  <!-- ========== 입력 ========== -->
+  <section class="card" aria-labelledby="sec-input">
+    <h2 class="card__title" id="sec-input"><span class="card__title-icon">📊</span> 입력</h2>
+
+    <form id="calc-form" novalidate>
+
+      <div class="row row--grid2">
+        <div class="field">
+          <label class="field__label" for="ci-rider">라이더 체중 <small>kg</small></label>
+          <input class="field__input" type="number" id="ci-rider" name="rider_kg"
+                 min="20" max="150" step="1" value="70" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label class="field__label" for="ci-gear">착용 장비 <small>kg · 슈트·하네스 등</small></label>
+          <input class="field__input" type="number" id="ci-gear" name="gear_kg"
+                 min="0" max="30" step="0.5" value="10" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="field__label" for="ci-foil-preset">프론트 윙 (preset)</label>
+        <select class="field__input field__select" id="ci-foil-preset"></select>
+      </div>
+
+      <div class="row row--grid2">
+        <div class="field">
+          <label class="field__label" for="ci-area">윙 area <small>cm²</small></label>
+          <input class="field__input" type="number" id="ci-area" name="front_wing_area_cm2"
+                 min="200" max="3000" step="10" value="1200" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label class="field__label" for="ci-ar">aspect ratio (AR)</label>
+          <input class="field__input" type="number" id="ci-ar" name="front_wing_ar"
+                 min="2" max="14" step="0.1" value="6.5" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="field__label" for="ci-wind">풍속 <small>kt</small></label>
+        <input class="field__input" type="number" id="ci-wind" name="wind_kt"
+               min="3" max="45" step="0.5" value="13" inputmode="decimal">
+        <p class="field__hint">미풍 ≤10kt → 윙 ↑ · 중풍 11–16kt · 강풍 ≥17kt → 윙 ↓</p>
+      </div>
+
+      <div class="row">
+        <p class="field__label">펌핑 스킬</p>
+        <div class="radio-group radio-group--3">
+          <label class="radio">
+            <input type="radio" name="pumping" value="hard">
+            <span class="radio__body"><b>마스터</b><small>v_min 아래 부상</small></span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="pumping" value="moderate" checked>
+            <span class="radio__body"><b>보통</b><small>v_min 부근</small></span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="pumping" value="easy">
+            <span class="radio__body"><b>못함</b><small>v_min 위 안정</small></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row row--grid2">
+        <div class="field">
+          <p class="field__label">물 종류</p>
+          <div class="radio-group radio-group--2">
+            <label class="radio">
+              <input type="radio" name="water_type" value="sea" checked>
+              <span class="radio__body"><b>바다</b><small>ρ 1025</small></span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="water_type" value="fresh">
+              <span class="radio__body"><b>강·호수</b><small>ρ 1000</small></span>
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <p class="field__label">수면 상태</p>
+          <div class="radio-group radio-group--2">
+            <label class="radio">
+              <input type="radio" name="surface" value="flat" checked>
+              <span class="radio__body"><b>플랫</b><small>×1.00</small></span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="surface" value="choppy">
+              <span class="radio__body"><b>초피</b><small>×1.05</small></span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="surface" value="swell">
+              <span class="radio__body"><b>너울</b><small>×0.95</small></span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="surface" value="mixed">
+              <span class="radio__body"><b>혼합</b><small>×1.00</small></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- ========== 결과 — Takeoff ========== -->
+  <section class="card card--result" aria-labelledby="sec-result">
+    <h2 class="card__title" id="sec-result"><span class="card__title-icon">✓</span> Takeoff 결과</h2>
+
+    <div id="feasible-badge" class="badge badge--ok">— takeoff 가능 —</div>
+
+    <div class="result-grid">
+      <div class="result-cell result-cell--major">
+        <p class="result-cell__label">v_min · 임계 속도</p>
+        <p class="result-cell__value"><span id="r-vmin">—</span><small>kt</small></p>
+      </div>
+      <div class="result-cell result-cell--major">
+        <p class="result-cell__label">v_target · 목표 글라이딩</p>
+        <p class="result-cell__value"><span id="r-vtarget">—</span><small>kt</small></p>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-cell result-cell--full">
+        <p class="result-cell__label">추천 윙 사이즈 <small>부상 가능 최소</small></p>
+        <p class="result-cell__value result-cell__value--accent"><span id="r-wing">—</span><small>m²</small></p>
+        <p class="result-cell__sub" id="r-wing-detail"></p>
+      </div>
+    </div>
+
+    <details class="meta-details">
+      <summary>참고값 보기</summary>
+      <dl class="meta-dl">
+        <dt>풍속 등급</dt><dd id="r-windtier">—</dd>
+        <dt>CL · AR class</dt><dd id="r-meta">—</dd>
+        <dt>총 질량 (rider + gear)</dt><dd id="r-mass">—</dd>
+        <dt>물 / 수면 보정</dt><dd id="r-water-surface">—</dd>
+      </dl>
+      <p class="formula" id="r-formula">v_min = √(2 · M · g / (ρ · A · CL))</p>
+    </details>
+  </section>
+
+  <!-- ========== 윙 사이즈 추천 (WSO) ========== -->
+  <section class="card" aria-labelledby="sec-wso">
+    <h2 class="card__title" id="sec-wso"><span class="card__title-icon">🪁</span> 윙 사이즈 추천</h2>
+    <p class="card__lead">스킬·선호도·마스트 길이 기반 권장 윙 (min / optimal / max).</p>
+
+    <div class="row">
+      <label class="field__label" for="wso-skill">스킬 등급 <small>(heel angle 기준)</small></label>
+      <select class="field__input field__select" id="wso-skill">
+        <option value="입문">입문 (9°)</option>
+        <option value="초급">초급 (19°)</option>
+        <option value="중급">중급 (29°)</option>
+        <option value="상급">상급 (39°)</option>
+        <option value="선수">선수 (42°)</option>
+        <option value="상급-선수" selected>상급–선수 (41°)</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <p class="field__label">사이즈 선호</p>
+      <div class="radio-group radio-group--3">
+        <label class="radio">
+          <input type="radio" name="wso-pref" value="small" checked>
+          <span class="radio__body"><b>작게</b><small>×0.92</small></span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="wso-pref" value="mid">
+          <span class="radio__body"><b>보통</b><small>×1.00</small></span>
+        </label>
+        <label class="radio">
+          <input type="radio" name="wso-pref" value="big">
+          <span class="radio__body"><b>크게</b><small>×1.08</small></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="row row--grid2">
+      <div class="field">
+        <label class="field__label" for="wso-mast">마스트 <small>cm</small></label>
+        <input class="field__input" type="number" id="wso-mast" min="65" max="130" step="1" value="112" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label class="field__label" for="wso-height">신장 <small>cm</small></label>
+        <input class="field__input" type="number" id="wso-height" min="140" max="210" step="1" value="175" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="row">
+      <label class="field__label" for="wso-wingar">윙 AR <small>(인플레이터블 윙)</small></label>
+      <input class="field__input" type="number" id="wso-wingar" min="3" max="9" step="0.1" value="4.5" inputmode="decimal">
+    </div>
+
+    <!-- ── Bracket ── -->
+    <div class="bracket" id="wso-bracket" role="group" aria-label="추천 윙 사이즈 bracket">
+      <div class="bracket__cell">
+        <p class="bracket__label">Min</p>
+        <p class="bracket__val"><span id="wso-min">—</span><small>m²</small></p>
+      </div>
+      <div class="bracket__cell bracket__cell--opt">
+        <p class="bracket__label">Optimal</p>
+        <p class="bracket__val"><span id="wso-opt">—</span><small>m²</small></p>
+      </div>
+      <div class="bracket__cell">
+        <p class="bracket__label">Max</p>
+        <p class="bracket__val"><span id="wso-max">—</span><small>m²</small></p>
+      </div>
+    </div>
+
+    <!-- ── flags ── -->
+    <div class="flags" id="wso-flags" aria-live="polite"></div>
+
+    <!-- ── 한계속도 / VMG (per wing size) ── -->
+    <h3 class="card__subtitle">한계 속도 (풍상 진행) · VMG</h3>
+    <div class="vlimit-grid" id="wso-vlimit">
+      <div class="vlimit-cell">
+        <p class="vlimit-cell__label">−0.5 m²</p>
+        <p class="vlimit-cell__val" id="wso-vlim-min">—</p>
+        <p class="vlimit-cell__vmg" id="wso-vlim-min-vmg">VMG —</p>
+        <p class="vlimit-cell__delta" id="wso-vlim-min-delta">—</p>
+      </div>
+      <div class="vlimit-cell vlimit-cell--opt">
+        <p class="vlimit-cell__label">Optimal</p>
+        <p class="vlimit-cell__val" id="wso-vlim-opt">—</p>
+        <p class="vlimit-cell__vmg" id="wso-vlim-opt-vmg">VMG —</p>
+        <p class="vlimit-cell__delta" id="wso-vlim-opt-delta">tack <span id="wso-vlim-tack">—</span>°</p>
+      </div>
+      <div class="vlimit-cell">
+        <p class="vlimit-cell__label">+0.5 m²</p>
+        <p class="vlimit-cell__val" id="wso-vlim-max">—</p>
+        <p class="vlimit-cell__vmg" id="wso-vlim-max-vmg">VMG —</p>
+        <p class="vlimit-cell__delta" id="wso-vlim-max-delta">—</p>
+      </div>
+    </div>
+    <p class="card__caption">
+      풍상 진행 속도 = 윙 끌어주는 힘 vs 포일 저항의 균형점.
+      윙 ↑ → 속도 ↑ (라이더 한계까지). 강풍·큰 윙은 라이더 기댐 한계로 수렴.
+    </p>
+
+    <!-- ── VMG advisor ── -->
+    <div class="advisor" id="wso-advisor">
+      <p class="advisor__title">🧭 VMG 어드바이저 <small>무엇을 바꾸면 빨라지나</small></p>
+      <p class="advisor__base" id="wso-adv-base-vb">현재 상태 —</p>
+      <ol class="advisor__list" id="wso-advisor-list"></ol>
+      <p class="advisor__hint">VMG 개선폭이 큰 순서대로 정렬. 0 또는 음수는 효과 없거나 손해.</p>
+    </div>
+
+    <!-- ── overpowered evolution box ── -->
+    <div class="evolution" id="wso-evolution" hidden>
+      <p class="evolution__warn" id="wso-evo-warning">⚠ —</p>
+      <p class="evolution__tip-title">💡 진화 팁</p>
+      <p class="evolution__body" id="wso-evo-body">—</p>
+    </div>
+
+    <!-- ── 이론 측정값 (collapsed by default on mobile) ── -->
+    <details class="meta-details">
+      <summary>📐 이론 측정값 (라이딩 기초 데이터)</summary>
+      <dl class="meta-dl">
+        <dt>원래 계산값 (반올림 전)</dt><dd id="wso-raw">—</dd>
+        <dt>이상적 윙 사이즈 (완벽 스킬 가정)</dt><dd id="wso-aceil">—</dd>
+        <dt>최소 윙 사이즈 (이 아래는 부상 불가)</dt><dd id="wso-amin">—</dd>
+        <dt>최대 윙 사이즈 (라이더가 견딜 한계)</dt><dd id="wso-amax">—</dd>
+        <dt>체감 풍속 (라이더가 받는 바람)</dt><dd id="wso-vapp">—</dd>
+        <dt>포일 효율 (L/D)</dt><dd id="wso-ldfoil">—</dd>
+        <dt>윙 효율 (이론 최대)</dt><dd id="wso-ldwmax">—</dd>
+        <dt>윙 효율 (실제 · 스킬 보정)</dt><dd id="wso-ldweff">—</dd>
+        <dt>윙 길이 / 라이더 도달 한계</dt><dd id="wso-clear">—</dd>
+        <dt>본인 스킬 활용도</dt><dd><span id="wso-eta-pct">—</span>%</dd>
+      </dl>
+      <p class="caveat">
+        ⚠ 이론 최대 ≠ 실제 라이딩.
+        L/D는 장비가 낼 수 있는 이론 최대치 — 실제 라이딩은 스킬·바람·물결로 <strong>50–95%만 활용</strong>.
+        입문 ~50%, 선수 ~95%.
+      </p>
+    </details>
+  </section>
+
+  <!-- ========== 도움말 ========== -->
+  <section class="card card--help" aria-labelledby="sec-help">
+    <h2 class="card__title" id="sec-help"><span class="card__title-icon">ℹ️</span> 용어 도움말</h2>
+    <dl class="glossary">
+      <dt>v_min</dt><dd>foil 이 라이더 무게를 들 수 있는 최저 속도 (takeoff 임계).</dd>
+      <dt>v_target</dt><dd>v_min × 펌핑·수면 보정 — 실전에서 부상 직전 도달해야 할 속도.</dd>
+      <dt>SOG</dt><dd>Speed Over Ground — GPS 기준 보드 절대 진행 속도.</dd>
+      <dt>VMG</dt><dd>Velocity Made Good — 풍상 방향으로의 실효 진척 속도 = SOG × cos(풍상 진행 각도).</dd>
+      <dt>AR</dt><dd>Aspect Ratio — foil 의 길이²/면적. 높을수록 효율 ↑, 저속 takeoff ↓.</dd>
+      <dt>L/D</dt><dd>Lift/Drag — 양력/항력 비. 같은 무게를 적은 저항으로 끌면 빠르게 풍상 진행.</dd>
+      <dt>depowered</dt><dd>라이더가 옆으로 받는 힘이 한계에 도달 → 윙이 풀파워를 못 냄.</dd>
+    </dl>
+  </section>
+
+  <footer class="page-footer">
+    <p>© 2026 DMJ·공방 단무지공방 · Lifting Calculator v1 (PWA)</p>
+    <p><small id="sw-status">SW 상태: —</small></p>
+  </footer>
+
+</main>
+
+<!-- Engine + presets + app -->
+<script src="./js/lift-calculator.js"></script>
+<script src="./js/foil-presets.js"></script>
+<script src="./app.js"></script>
+
+</body>
+</html>

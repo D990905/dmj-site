@@ -1,0 +1,402 @@
+<!-- DO_NOT_REVERT §171 v2 (Danny 2026-05-13) — 1:1 구매 상담 페이지.
+     find-my-gear 결과 자동 첨부 + per-user namespace (§169-K) consult_history 저장.
+     Phase 12 Supabase Function 백엔드 = 관리자 이메일 + 카톡 alert 발송 예정 (TODO 주석 유지). -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<title>1:1 구매 상담 — Danny 박사 + 조수철 코치 직접 응대 | 단무지공방</title>
+<meta name="description" content="단무지공방 1:1 구매 상담. Danny(PhD 운동생리학·3회 올림픽) + 조수철 코치가 라이딩 수준·예산·spot 환경 기반으로 셋업을 직접 안내합니다.">
+<link rel="canonical" href="https://dmjgroup.kr/consult.html">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  /* §171 v2 — consult.html scoped styles (auth-card 패턴 재사용 + form 확장). */
+  .consult-shell { min-height: 70vh; display: flex; align-items: flex-start; justify-content: center; padding: 60px 20px; background: linear-gradient(180deg, #fff 0%, var(--color-mist) 100%); }
+  .consult-card { width: 100%; max-width: 640px; background: #fff; border: 1px solid rgba(10,37,64,.08); border-radius: 16px; padding: 40px 36px; box-shadow: 0 8px 24px rgba(10,37,64,.06); }
+  .consult-card h1 { font-size: 28px; margin: 0 0 6px; color: var(--color-navy); font-weight: 800; letter-spacing: -.01em; word-break: keep-all; line-height: 1.3; }
+  .consult-card .consult-eyebrow { display: inline-block; background: rgba(31,143,255,.10); color: var(--color-sea-dark); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; margin-bottom: 12px; }
+  .consult-card .consult-sub { color: var(--color-slate); font-size: 14.5px; margin: 0 0 28px; word-break: keep-all; line-height: 1.6; }
+  .consult-form { display: flex; flex-direction: column; gap: 14px; }
+  .consult-form .field { display: flex; flex-direction: column; gap: 6px; }
+  .consult-form label { font-size: 13px; font-weight: 700; color: var(--color-navy); letter-spacing: .01em; }
+  .consult-form label .req { color: #d04848; margin-left: 3px; }
+  .consult-form input[type=text],
+  .consult-form input[type=tel],
+  .consult-form input[type=email],
+  .consult-form select,
+  .consult-form textarea { width: 100%; padding: 12px 14px; border: 1px solid rgba(10,37,64,.16); border-radius: 10px; font-size: 14.5px; font-family: inherit; background: #fff; color: var(--color-navy); }
+  .consult-form input:focus,
+  .consult-form select:focus,
+  .consult-form textarea:focus { outline: none; border-color: var(--color-sea); box-shadow: 0 0 0 3px rgba(31,143,255,.12); }
+  .consult-form textarea { min-height: 120px; resize: vertical; line-height: 1.55; }
+  .consult-form .field--row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 540px) { .consult-form .field--row { grid-template-columns: 1fr; } }
+  .consult-attach { background: rgba(31,143,255,.08); border: 1px solid rgba(31,143,255,.20); border-radius: 10px; padding: 14px 16px; font-size: 13.5px; color: var(--color-navy); line-height: 1.55; word-break: keep-all; }
+  .consult-attach strong { display: block; font-size: 11px; color: var(--color-sea-dark); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 6px; }
+  .consult-form button[type=submit] { background: var(--color-sun); color: var(--color-navy); border: none; padding: 14px; border-radius: 10px; font-weight: 800; font-size: 15px; cursor: pointer; font-family: inherit; margin-top: 10px; }
+  .consult-form button[type=submit]:hover { filter: brightness(1.04); }
+  .consult-error { background: rgba(208,72,72,.08); border: 1px solid rgba(208,72,72,.24); color: #a13333; padding: 10px 14px; border-radius: 8px; font-size: 13px; line-height: 1.5; }
+  .consult-confirm { text-align: center; padding: 20px 0; }
+  .consult-confirm__icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(42,140,92,.12); color: #2A8C5C; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; font-size: 32px; font-weight: 800; }
+  .consult-confirm__title { font-size: 22px; font-weight: 800; color: var(--color-navy); margin: 0 0 12px; word-break: keep-all; }
+  .consult-confirm__lead { font-size: 14.5px; color: var(--color-slate); margin: 0 0 24px; word-break: keep-all; line-height: 1.65; }
+  .consult-confirm__actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
+</div></div></div>
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <a href="find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <!-- DO_NOT_REVERT §171-B — cart icon. badge auto-updates via cart.js. -->
+        <a href="cart.html" class="nav__link nav__cart" role="menuitem" aria-label="장바구니">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="nav__cart-badge" data-cart-badge hidden>0</span>
+        </a>
+        <a href="login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="levitaz.html">Levitaz</a></li>
+    <li><a href="ppc.html">PPC</a></li>
+    <li><a href="takoon.html">Takoon</a></li>
+    <li><a href="wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="level/beginner.html">입문</a></li><li><a href="level/novice.html">초급</a></li>
+    <li><a href="level/intermediate.html">중급</a></li>
+    <li><a href="level/advanced.html">상급</a></li>
+    <li><a href="level/pro.html">선수</a></li>
+  </ul>
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+<!-- ========== Consult Shell ========== -->
+<main class="consult-shell">
+  <div class="consult-card" id="consult-card">
+    <span class="consult-eyebrow">1:1 구매 상담</span>
+    <h1>Danny 박사 + 조수철 코치<br>직접 응대합니다</h1>
+    <p class="consult-sub">라이딩 수준·예산·spot 환경에 맞춰 윙·포일·보드·안전장비 셋업을 큐레이션합니다. 1영업일 이내 회신.</p>
+
+    <div id="consult-error" class="consult-error" role="alert" hidden></div>
+
+    <form id="consult-form" class="consult-form" novalidate>
+      <div class="field--row">
+        <div class="field">
+          <label for="c-name">이름 <span class="req">*</span></label>
+          <input type="text" id="c-name" name="name" autocomplete="name" required placeholder="홍길동">
+        </div>
+        <div class="field">
+          <label for="c-phone">연락처 <span class="req">*</span></label>
+          <input type="tel" id="c-phone" name="phone" autocomplete="tel" required placeholder="010-1234-5678">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="c-email">이메일 <span class="req">*</span></label>
+        <input type="email" id="c-email" name="email" autocomplete="email" required placeholder="rider@example.com">
+      </div>
+
+      <div class="field--row">
+        <div class="field">
+          <label for="c-level">라이딩 수준</label>
+          <select id="c-level" name="level">
+            <option value="">선택</option>
+            <option value="입문">입문</option>
+            <option value="초급">초급</option>
+            <option value="중급">중급</option>
+            <option value="상급">상급</option>
+            <option value="선수">선수</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="c-budget">예산</label>
+          <select id="c-budget" name="budget">
+            <option value="">선택</option>
+            <option value="500만원 미만">500만원 미만</option>
+            <option value="500-1000만">500-1000만</option>
+            <option value="1000-2000만">1000-2000만</option>
+            <option value="2000만+">2000만+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="c-message">궁금한 점</label>
+        <textarea id="c-message" name="message" placeholder="현재 사용 중인 장비, 라이딩 spot, 자주 라이딩하는 풍속 조건 등을 적어주시면 더 정확한 안내가 가능합니다."></textarea>
+      </div>
+
+      <!-- §171 v2 — find-my-gear 최근 추천 결과 자동 첨부 (있을 때만 표시) -->
+      <div id="consult-attach" class="consult-attach" hidden>
+        <strong>자동 첨부 — Find My Gear 최근 추천</strong>
+        <span id="consult-attach-text"></span>
+      </div>
+
+      <button type="submit">상담 신청하기</button>
+    </form>
+  </div>
+</main>
+
+<!-- ========== Footer (canonical 4-col) ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="membership.html">회원 등급 안내</a></li>
+          <li><a href="glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="calculator.html">Lift Calculator</a></li>
+          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="level/beginner.html">입문 가이드</a></li><li><a href="level/novice.html">초급 가이드</a></li>
+          <li><a href="level/intermediate.html">중급 가이드</a></li>
+          <li><a href="level/advanced.html">상급 가이드</a></li>
+          <li><a href="level/pro.html">선수 가이드</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="levitaz.html">Levitaz</a></li>
+          <li><a href="ppc.html">PPC</a></li>
+          <li><a href="takoon.html">Takoon</a></li>
+          <li><a href="wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="policy/shipping.html">배송 정책</a></li>
+          <li><a href="policy/refund.html">환불 정책</a></li>
+          <li><a href="policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="policy/privacy.html">개인정보처리방침</a>
+        <a href="policy/terms.html">이용약관</a>
+        <a href="policy/refund.html">환불정책</a>
+        <a href="policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/auth-shim.js" defer></script>
+<script src="assets/js/cart.js" defer></script>
+<script>
+// §171 v2 — Consult form handler (localStorage sprint shim, login NOT required).
+// TODO §171 Phase 12 — Supabase Function backend: 관리자 이메일 + 카톡 alert 발송 (현재 console.info placeholder).
+document.addEventListener('DOMContentLoaded', function () {
+  // Prefill name/email from currentUser if logged in.
+  try {
+    if (window.DMJAuth && window.DMJAuth.isLoggedIn && window.DMJAuth.isLoggedIn()) {
+      var u = window.DMJAuth.currentUser();
+      if (u) {
+        if (u.nickname || u.name) document.getElementById('c-name').value = u.nickname || u.name || '';
+        if (u.email) document.getElementById('c-email').value = u.email;
+        if (u.phone) document.getElementById('c-phone').value = u.phone;
+      }
+    }
+  } catch (e) { /* noop */ }
+
+  // Auto-attach latest fmg_history entry (per-user namespace).
+  var attachedFmg = null;
+  try {
+    if (window.DMJAuth && window.DMJAuth.getUserData) {
+      var raw = window.DMJAuth.getUserData('fmg_history');
+      if (raw) {
+        var arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) {
+          attachedFmg = arr[arr.length - 1]; // latest
+          var totalDisp = attachedFmg.totalKRW
+            ? '₩' + Number(attachedFmg.totalKRW).toLocaleString('ko-KR')
+            : '—';
+          var skuCount = Array.isArray(attachedFmg.recommendations) ? attachedFmg.recommendations.length : 0;
+          var atxt = document.getElementById('consult-attach-text');
+          atxt.textContent = '최근 추천 결과: ' + (attachedFmg.summary || '추천 결과') + ' · ' + totalDisp + ' 합계 · ' + skuCount + ' SKU';
+          document.getElementById('consult-attach').hidden = false;
+        }
+      }
+    }
+  } catch (e) { console.warn('[Consult] fmg attach failed', e); }
+
+  var form = document.getElementById('consult-form');
+  var err = document.getElementById('consult-error');
+  if (!form) return;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    err.hidden = true; err.textContent = '';
+
+    var data = new FormData(form);
+    var payload = {
+      id: 'consult_' + Date.now().toString(36),
+      submittedAt: Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      name: String(data.get('name') || '').trim(),
+      phone: String(data.get('phone') || '').trim(),
+      email: String(data.get('email') || '').trim(),
+      level: String(data.get('level') || '').trim(),
+      budget: String(data.get('budget') || '').trim(),
+      message: String(data.get('message') || '').trim(),
+      fmg_snapshot: attachedFmg || null,
+      loggedIn: !!(window.DMJAuth && window.DMJAuth.isLoggedIn && window.DMJAuth.isLoggedIn()),
+      userId: (window.DMJAuth && window.DMJAuth.currentUserId && window.DMJAuth.currentUserId()) || null
+    };
+
+    // Validate required fields
+    if (!payload.name || !payload.phone || !payload.email) {
+      err.textContent = '이름·연락처·이메일은 필수 입력입니다.';
+      err.hidden = false;
+      return;
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email)) {
+      err.textContent = '이메일 형식이 올바르지 않습니다.';
+      err.hidden = false;
+      return;
+    }
+
+    // §169-K v3 — save to user-namespace (or anon fallback).
+    try {
+      if (window.DMJAuth && window.DMJAuth.getUserData && window.DMJAuth.setUserData) {
+        var raw2 = window.DMJAuth.getUserData('consult_history') || '[]';
+        var hist;
+        try { hist = JSON.parse(raw2); if (!Array.isArray(hist)) hist = []; }
+        catch (e2) { hist = []; }
+        hist.push(payload);
+        if (hist.length > 20) hist = hist.slice(-20);
+        window.DMJAuth.setUserData('consult_history', JSON.stringify(hist));
+      }
+    } catch (e3) { console.warn('[Consult] save history failed', e3); }
+
+    // TODO §171 Phase 12 — POST to Supabase Function (admin email + Kakao notify).
+    console.info('[Consult] new request', payload);
+
+    // Show confirmation screen
+    var card = document.getElementById('consult-card');
+    card.innerHTML = ''
+      + '<div class="consult-confirm">'
+      + '  <div class="consult-confirm__icon">✓</div>'
+      + '  <h2 class="consult-confirm__title">상담 신청이 접수되었습니다</h2>'
+      + '  <p class="consult-confirm__lead">단무지공방 운영팀이 <strong>1영업일 이내</strong> 회신드립니다.<br>급한 문의는 카톡 1:1 상담을 이용해주세요.</p>'
+      + '  <div class="consult-confirm__actions">'
+      + '    <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="btn btn--accent">카톡 1:1 상담</a>'
+      + '    <a href="index.html" class="btn btn--ghost">홈으로</a>'
+      + '  </div>'
+      + '</div>';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+</script>
+<script src="assets/js/main.js" defer></script>
+<script src="assets/js/nav-auth.js" defer></script>
+  <!-- §173 — 옥코치 AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <script src="assets/js/agent-deny.js" defer></script>
+</body>
+</html>

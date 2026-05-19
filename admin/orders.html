@@ -1,0 +1,352 @@
+<!-- DO_NOT_REVERT §174 — Danny 2026-05-13: Admin tool for order timeline management.
+     Access control: Danny (kor22@me.com) only. Phase 12 시 조수철 추가 + Supabase RBAC.
+     Phase 1 = 로컬 only — 단무지공방 컴퓨터에서 Danny 가 직접 stage update.
+     데이터 source = localStorage iterate (dmj_user_<uid>_orders).
+     UI = order list + stage dropdown + admin message composer.
+     2026-05-16: 카피 누수 정리 — h1 "(§174)" 및 본문 "§H" 내부 참조 제거 (렌더 텍스트에서만, 기능 동일). -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<meta name="robots" content="noindex,nofollow">
+<title>관리자 · 주문 진행 관리 | 단무지공방</title>
+<meta name="description" content="단무지공방 관리자 도구 — 주문 진행 stage 업데이트, 관리자 메시지 전송.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+  .admin-page { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
+  .admin-page__header { background: var(--color-navy); color: #fff; border-radius: 16px; padding: 24px 28px; margin-bottom: 20px; }
+  .admin-page__header h1 { font-size: 22px; margin: 0 0 6px; font-weight: 800; }
+  .admin-page__header p { font-size: 13px; margin: 0; color: rgba(255,255,255,.78); line-height: 1.55; word-break: keep-all; }
+  .admin-page__back { display: inline-block; margin-bottom: 12px; font-size: 13px; color: var(--color-sea); text-decoration: none; }
+  .admin-page__back:hover { text-decoration: underline; }
+  .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .admin-stat { background: #fff; border-radius: 12px; padding: 14px 16px; border: 1px solid rgba(10,37,64,.08); }
+  .admin-stat__value { font-family: 'Inter', sans-serif; font-weight: 800; font-size: 22px; color: var(--color-navy); }
+  .admin-stat__label { font-size: 11px; font-weight: 700; color: var(--color-slate); letter-spacing: .04em; text-transform: uppercase; margin-top: 4px; }
+  .admin-orders-list { display: flex; flex-direction: column; gap: 14px; }
+  .admin-order-row { background: #fff; border: 1px solid rgba(10,37,64,.1); border-radius: 12px; padding: 16px 18px; }
+  .admin-order-row__head { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; cursor: pointer; user-select: none; }
+  .admin-order-row__id { font-weight: 800; color: var(--color-navy); font-size: 15px; font-family: 'Inter', sans-serif; }
+  .admin-order-row__user { font-size: 13px; color: var(--color-slate); }
+  .admin-order-row__user b { color: var(--color-navy); }
+  .admin-order-row__stage { background: rgba(63,184,201,.16); color: var(--color-sea-dark, #1d6b76); padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .admin-order-row__total { margin-left: auto; font-family: 'Inter', sans-serif; font-weight: 800; color: var(--color-navy); font-size: 15px; }
+  .admin-order-row__expand { background: var(--color-mist); border-radius: 10px; padding: 14px 16px; margin-top: 10px; display: none; }
+  .admin-order-row.is-open .admin-order-row__expand { display: block; }
+  .admin-form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
+  .admin-form-row label { font-size: 12px; font-weight: 700; color: var(--color-slate); }
+  .admin-form-row select, .admin-form-row input, .admin-form-row textarea {
+    padding: 8px 10px; border: 1px solid rgba(10,37,64,.18); border-radius: 8px; font-size: 13px; font-family: inherit; background: #fff;
+  }
+  .admin-form-row textarea { flex: 1 1 360px; min-height: 60px; resize: vertical; }
+  .admin-form-row input[type="text"] { flex: 1 1 200px; }
+  .admin-btn { background: var(--color-navy); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .admin-btn:hover { background: #001f38; }
+  .admin-btn--ghost { background: transparent; color: var(--color-navy); border: 1px solid rgba(10,37,64,.2); }
+  .admin-stages-summary { font-size: 12px; color: var(--color-slate); margin: 8px 0; line-height: 1.7; }
+  .admin-stages-summary span { display: inline-block; padding: 2px 8px; border-radius: 6px; margin-right: 4px; margin-bottom: 4px; background: rgba(10,37,64,.04); }
+  .admin-stages-summary span.is-past { background: rgba(63,184,201,.16); color: var(--color-sea-dark, #1d6b76); }
+  .admin-stages-summary span.is-current { background: var(--color-sun); color: var(--color-navy); font-weight: 800; }
+  .admin-msg-list { margin-top: 10px; }
+  .admin-msg-list .order-admin-msg { margin: 6px 0; }
+  .admin-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--color-navy); color: #fff; padding: 12px 22px; border-radius: 999px; font-size: 13px; font-weight: 700; opacity: 0; transition: opacity .25s ease; pointer-events: none; z-index: 9999; }
+  .admin-toast.is-visible { opacity: 1; }
+  .admin-empty { background: #fff; border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--color-slate); }
+  .admin-deny { background: rgba(220,38,38,.06); border: 1px solid rgba(220,38,38,.2); border-radius: 12px; padding: 28px 24px; color: #b91c1c; text-align: center; }
+  .admin-deny h2 { color: #b91c1c; font-size: 18px; margin: 0 0 8px; }
+  .admin-deny p { font-size: 14px; margin: 0; }
+  .admin-deny a { color: var(--color-sea); text-decoration: none; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<main class="admin-page">
+  <a href="../profile.html" class="admin-page__back">← 마이 페이지로</a>
+  <div class="admin-page__header">
+    <h1>관리자 · 주문 진행 관리</h1>
+    <p>전체 회원의 주문 진행을 한곳에서 관리합니다. stage update / 관리자 메시지 전송 즉시 사용자 마이 페이지에 반영. Phase 1 = 로컬 only (단무지공방 컴퓨터). Phase 12 = Supabase realtime sync.</p>
+  </div>
+
+  <div id="admin-gate"></div>
+</main>
+
+<div class="admin-toast" id="admin-toast" role="status" aria-live="polite"></div>
+
+<script src="../assets/js/auth-shim.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // §174 admin tool — access control
+  // Phase 1: Danny (kor22@me.com) only. Phase 12 시 조수철 추가 + Supabase RBAC.
+  var ADMIN_EMAILS = ['kor22@me.com'];
+
+  var ORDER_STAGES = [
+    { n: 1, label: '견적요청중' },
+    { n: 2, label: '최종견적수렴중' },
+    { n: 3, label: '최종견적회신완료' },
+    { n: 4, label: '입금완료' },
+    { n: 5, label: '오더진행중' },
+    { n: 6, label: '통관진행중' },
+    { n: 7, label: '배송중' },
+    { n: 8, label: '배송완료' }
+  ];
+
+  var gate = document.getElementById('admin-gate');
+  var toastEl = document.getElementById('admin-toast');
+  function toast(msg, ms) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-visible');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { toastEl.classList.remove('is-visible'); }, ms || 2200);
+  }
+  function fmtKRW(n) { return n == null || isNaN(n) ? '—' : '₩' + Math.round(Number(n)).toLocaleString('ko-KR'); }
+  function fmtTs(ts) {
+    if (!ts) return '—';
+    try {
+      var d = new Date(ts);
+      if (isNaN(d.getTime())) return String(ts);
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var dd = String(d.getDate()).padStart(2, '0');
+      var hh = String(d.getHours()).padStart(2, '0');
+      var mm = String(d.getMinutes()).padStart(2, '0');
+      return y + '-' + m + '-' + dd + ' ' + hh + ':' + mm;
+    } catch (e) { return String(ts); }
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function ready() {
+    if (!window.DMJAuth) { setTimeout(ready, 30); return; }
+    var user = window.DMJAuth.currentUser();
+    if (!user) {
+      gate.innerHTML = '<div class="admin-deny">'
+        + '<h2>로그인이 필요합니다</h2>'
+        + '<p>관리자 도구는 로그인 후 접근 가능합니다. <a href="../login.html?redirect=admin/orders.html">로그인 →</a></p>'
+        + '</div>';
+      return;
+    }
+    var email = String(user.email || '').toLowerCase();
+    var allowed = ADMIN_EMAILS.indexOf(email) >= 0 || (user.tier === 'admin');
+    if (!allowed) {
+      gate.innerHTML = '<div class="admin-deny">'
+        + '<h2>접근 권한 없음</h2>'
+        + '<p>이 페이지는 관리자만 접근할 수 있습니다.<br>현재 로그인: <b>' + esc(user.email) + '</b></p>'
+        + '<p style="margin-top:10px"><a href="../profile.html">마이 페이지로 →</a></p>'
+        + '</div>';
+      return;
+    }
+    render();
+  }
+
+  // Aggregate all orders across all users (localStorage iterate).
+  function aggregateAllOrders() {
+    var users = window.DMJAuth._readUsers();
+    var rows = [];
+    Object.keys(users).forEach(function (emailKey) {
+      var u = users[emailKey];
+      if (!u || !u.id) return;
+      var key = 'dmj_user_' + u.id + '_orders';
+      var raw;
+      try { raw = localStorage.getItem(key); } catch (e) { raw = null; }
+      if (!raw) return;
+      var arr;
+      try { arr = JSON.parse(raw); } catch (e) { arr = null; }
+      if (!Array.isArray(arr)) return;
+      arr.forEach(function (o, idx) {
+        rows.push({
+          userId: u.id,
+          userEmail: u.email,
+          userNickname: u.nickname || '',
+          orderIdx: idx,
+          storageKey: key,
+          order: o
+        });
+      });
+    });
+    return rows;
+  }
+
+  function writeUserOrders(storageKey, ordersArr) {
+    try { localStorage.setItem(storageKey, JSON.stringify(ordersArr)); }
+    catch (e) { console.warn('[admin] write failed', e); }
+  }
+
+  function reloadOrders(storageKey) {
+    try { var raw = localStorage.getItem(storageKey); return raw ? JSON.parse(raw) : []; }
+    catch (e) { return []; }
+  }
+
+  function render() {
+    var rows = aggregateAllOrders();
+    var total = rows.length;
+    var byStage = {};
+    rows.forEach(function (r) {
+      var s = Number(r.order.currentStage) || 1;
+      byStage[s] = (byStage[s] || 0) + 1;
+    });
+    var pending = (byStage[1] || 0) + (byStage[2] || 0);
+    var inFlight = (byStage[5] || 0) + (byStage[6] || 0) + (byStage[7] || 0);
+    var done = (byStage[8] || 0);
+
+    var statsHtml = '<div class="admin-stats">'
+      + '<div class="admin-stat"><div class="admin-stat__value">' + total + '</div><div class="admin-stat__label">전체 주문</div></div>'
+      + '<div class="admin-stat"><div class="admin-stat__value">' + pending + '</div><div class="admin-stat__label">견적 단계 (1-2)</div></div>'
+      + '<div class="admin-stat"><div class="admin-stat__value">' + inFlight + '</div><div class="admin-stat__label">진행 중 (5-7)</div></div>'
+      + '<div class="admin-stat"><div class="admin-stat__value">' + done + '</div><div class="admin-stat__label">배송 완료 (8)</div></div>'
+      + '</div>';
+
+    if (!rows.length) {
+      gate.innerHTML = statsHtml + '<div class="admin-empty">아직 등록된 주문이 없습니다. 사용자가 quote.html 에서 견적요청을 보내면 여기에 노출됩니다.</div>';
+      return;
+    }
+
+    // Sort by createdAt desc
+    rows.sort(function (a, b) {
+      var ta = new Date(a.order.createdAt || 0).getTime();
+      var tb = new Date(b.order.createdAt || 0).getTime();
+      return tb - ta;
+    });
+
+    var listHtml = rows.map(function (r) {
+      var o = r.order;
+      var cur = Number(o.currentStage) || 1;
+      var curLabel = (ORDER_STAGES[cur - 1] || {}).label || '—';
+      var lastUpd = (o.stages && o.stages.length) ? fmtTs(o.stages[o.stages.length - 1].timestamp) : fmtTs(o.createdAt);
+
+      var stagesSummary = ORDER_STAGES.map(function (s) {
+        var cls = s.n < cur ? 'is-past' : (s.n === cur ? 'is-current' : '');
+        return '<span class="' + cls + '">' + s.n + ' ' + s.label + '</span>';
+      }).join('');
+
+      var stageOpts = ORDER_STAGES.map(function (s) {
+        return '<option value="' + s.n + '"' + (s.n === cur ? ' selected' : '') + '>' + s.n + '. ' + s.label + '</option>';
+      }).join('');
+
+      var msgsHtml = '';
+      var msgs = o.adminMessages || [];
+      if (msgs.length) {
+        msgsHtml = '<div class="admin-msg-list">' + msgs.map(function (m) {
+          return '<div class="order-admin-msg">'
+            + '<div class="order-admin-msg__head"><b>' + esc(m.from || '관리자') + '</b><span class="order-admin-msg__ts">' + fmtTs(m.ts) + '</span></div>'
+            + '<div class="order-admin-msg__body">' + esc(m.body || '').replace(/\n/g, '<br>') + '</div>'
+            + '</div>';
+        }).join('') + '</div>';
+      } else {
+        msgsHtml = '<p style="font-size:12px;color:var(--color-slate);margin:8px 0">메시지 없음</p>';
+      }
+
+      var itemsHtml = (o.items || []).map(function (it) {
+        var sz = it.size ? ' · ' + esc(it.size) : '';
+        var qty = it.qty ? ' × ' + it.qty : '';
+        return '<li>' + esc(it.name || it.sku) + sz + qty + '</li>';
+      }).join('');
+
+      return '<div class="admin-order-row" data-storage-key="' + esc(r.storageKey) + '" data-order-idx="' + r.orderIdx + '">'
+        + '<div class="admin-order-row__head" data-toggle-row>'
+        +   '<span class="admin-order-row__id">' + esc(o.id) + '</span>'
+        +   '<span class="admin-order-row__user"><b>' + esc(r.userNickname || r.userEmail) + '</b> · ' + esc(r.userEmail) + '</span>'
+        +   '<span class="admin-order-row__stage">' + cur + '. ' + esc(curLabel) + '</span>'
+        +   '<span class="admin-order-row__total">' + fmtKRW(o.totalKRW) + '</span>'
+        + '</div>'
+        + '<div class="admin-order-row__expand">'
+        +   '<div class="admin-stages-summary">' + stagesSummary + '</div>'
+        +   '<p style="font-size:12px;color:var(--color-slate);margin:0 0 8px"><b>생성:</b> ' + fmtTs(o.createdAt) + ' · <b>마지막 갱신:</b> ' + lastUpd + ' · <b>견적번호:</b> ' + esc(o.quoteId || '—') + ' · <b>FMG 연결:</b> ' + esc(o.fmgEntryId || '—') + '</p>'
+        +   '<details style="margin:8px 0"><summary style="cursor:pointer;font-size:12px;font-weight:700">상품 목록 (' + ((o.items || []).length) + ')</summary><ul style="font-size:13px;margin:8px 0 0;padding-left:20px;line-height:1.6">' + itemsHtml + '</ul></details>'
+        +   '<form class="admin-stage-form" data-action="update-stage">'
+        +     '<div class="admin-form-row">'
+        +       '<label>다음 stage:</label>'
+        +       '<select name="stage">' + stageOpts + '</select>'
+        +       '<input type="text" name="note" placeholder="메모 (선택)" maxlength="200">'
+        +       '<button type="submit" class="admin-btn">stage 저장</button>'
+        +     '</div>'
+        +   '</form>'
+        +   '<form class="admin-msg-form" data-action="add-message">'
+        +     '<div class="admin-form-row">'
+        +       '<label>관리자 메시지:</label>'
+        +       '<textarea name="body" placeholder="사용자에게 전달할 메시지를 입력하세요." maxlength="2000"></textarea>'
+        +       '<button type="submit" class="admin-btn">메시지 전송</button>'
+        +     '</div>'
+        +   '</form>'
+        +   '<div style="margin-top:10px"><b style="font-size:12px;color:var(--color-slate)">이전 메시지</b>' + msgsHtml + '</div>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    gate.innerHTML = statsHtml + '<div class="admin-orders-list">' + listHtml + '</div>';
+
+    // Bind handlers
+    gate.addEventListener('click', function (e) {
+      var toggle = e.target.closest('[data-toggle-row]');
+      if (toggle) {
+        var row = toggle.closest('.admin-order-row');
+        if (row) row.classList.toggle('is-open');
+      }
+    });
+
+    gate.addEventListener('submit', function (e) {
+      var form = e.target;
+      if (!form || !form.matches) return;
+      var action = form.getAttribute('data-action');
+      if (!action) return;
+      e.preventDefault();
+      var row = form.closest('.admin-order-row');
+      if (!row) return;
+      var storageKey = row.getAttribute('data-storage-key');
+      var idx = parseInt(row.getAttribute('data-order-idx'), 10);
+      var orders = reloadOrders(storageKey);
+      if (!Array.isArray(orders) || !orders[idx]) {
+        toast('주문을 찾을 수 없습니다 — 새로고침 필요');
+        return;
+      }
+      var o = orders[idx];
+
+      if (action === 'update-stage') {
+        var newStage = parseInt(form.elements['stage'].value, 10);
+        var note = form.elements['note'].value.trim();
+        if (!newStage || newStage < 1 || newStage > 8) { toast('유효하지 않은 stage'); return; }
+        var label = (ORDER_STAGES[newStage - 1] || {}).label || '';
+        o.currentStage = newStage;
+        o.stages = o.stages || [];
+        // Append entry — always append (audit trail). If stage already exists, still log new entry.
+        o.stages.push({ stage: newStage, label: label, timestamp: new Date().toISOString(), note: note });
+        orders[idx] = o;
+        writeUserOrders(storageKey, orders);
+        toast('stage 저장 완료 → ' + newStage + '. ' + label);
+        render();
+      } else if (action === 'add-message') {
+        var body = form.elements['body'].value.trim();
+        if (!body) { toast('메시지를 입력하세요'); return; }
+        o.adminMessages = o.adminMessages || [];
+        o.adminMessages.push({ ts: new Date().toISOString(), from: '관리자', body: body });
+        orders[idx] = o;
+        writeUserOrders(storageKey, orders);
+        toast('메시지 전송 완료');
+        render();
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ready);
+  } else {
+    ready();
+  }
+})();
+</script>
+
+</body>
+</html>

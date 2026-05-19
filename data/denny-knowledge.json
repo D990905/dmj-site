@@ -1,0 +1,1201 @@
+{
+  "version": "1.3.0",
+  "generatedAt": "2026-05-13",
+  "updatedAt": "2026-05-15",
+  "note": "§173-B — 옥코치 RAG knowledge base. canonical memory + 검증 논문 + 브랜드 spec → chunked corpus. hallucination 0 보장: chunk content 는 canonical 인용·풀어쓰기만. 모르는 영역 = consulting@dmjgroup.kr 안내. v1.1: Danny 8 canonical 메모리 ingest. v1.2: 전국 워터스포츠 클럽·유통사 정보. v1.3: Task C 웹 리서치(.itmz) 병합 — 검증/추가/연맹 분리 (community — 정보 제공 ONLY, 추천·보증 X). v1.4: 챗 정체성 '대니' → '옥코치' (옥덕필 코치 본인) 변경 §173-D 2026-05-16.",
+  "categories": {
+    "consulting": "Danny canonical 컨설팅 지식",
+    "papers": "Peer-reviewed 논문 (DOI 검증)",
+    "brand": "브랜드 spec / policy",
+    "policy": "사이트·운영 정책",
+    "training": "트레이닝 프로그램",
+    "community": "전국 워터스포츠 커뮤니티 정보 (정보 제공 ONLY — 추천·보증 X)"
+  },
+  "chunks": [
+    {
+      "id": "kb-mast-beg",
+      "category": "consulting",
+      "topic": "mast-length",
+      "level": "beginner",
+      "tags": [
+        "마스트",
+        "마스트 길이",
+        "입문",
+        "76cm",
+        "80cm",
+        "충격",
+        "감지",
+        "레버리지",
+        "포일",
+        "처음"
+      ],
+      "source": "reference_dmj_mast_length_progression.md §1",
+      "title": "입문 단계 — 짧은 마스트 (75~80cm)",
+      "content": "**입문 단계는 짧은 마스트 (75~80cm) 가 절대적으로 유리합니다.** 옥덕필 박사 강의 핵심 USP 입니다.\n\n세 가지 이유:\n\n1. **충격 최소화** — 전복(fall) 시 보드와 포일 사이 공간이 작아 라이더 체공·낙하 거리가 짧고, 포일에 부딪힐 확률이 줄어듭니다.\n2. **포일 감지 (proprioception)** — 짧은 마스트는 포일에서 발생하는 lift·glide·stall 의 미세한 진동이 보드를 거쳐 발로 즉시 전달됩니다. 발끝으로 포일을 감각할 수 있어 학습 곡선이 가파릅니다.\n3. **레버리지 (지렛대) 최소화** — 마스트가 짧으면 같은 발 동작이 포일에 미치는 영향이 작아, 학습 단계의 과한 입력에도 시스템이 무너지지 않습니다.\n\n**입문자에게 \"긴 마스트가 좋다\" 류 조언은 절대 잘못입니다.** 76cm vs 80cm 은 둘 다 짧은 범주로, 첫 시즌은 어디든 학습 차이 미미합니다."
+    },
+    {
+      "id": "kb-mast-int",
+      "category": "consulting",
+      "topic": "mast-length",
+      "level": "intermediate",
+      "tags": [
+        "마스트",
+        "84cm",
+        "초중급",
+        "피칭",
+        "벤틸레이션",
+        "jibe",
+        "tack"
+      ],
+      "source": "reference_dmj_mast_length_progression.md §2",
+      "title": "초·중급 단계 — 84cm (피칭 모멘텀 대응)",
+      "content": "**50 시간 이상 라이딩 + jibe·tack 30%+ 성공률 도달 시 84cm 으로 upgrade.**\n\n이 단계의 도전 과제는 **피칭 (pitching) 모멘텀** 입니다. 빠른 속도 + 작은 발·체중 이동만으로도 보드가 앞뒤로 솟구치거나 가라앉습니다. 짧은 마스트로는 포일이 한 번 솟구치면 바로 수면 위로 노출(벤틸레이션)되어 lift 를 잃고 라이더가 전복합니다.\n\n**84cm 은 같은 피칭 입력에 대해 포일이 수면 아래에서 더 오래 머물러 회복이 가능합니다.** 한국 freeride spot 에서 가장 일반적인 표준 길이이기도 합니다."
+    },
+    {
+      "id": "kb-mast-adv",
+      "category": "consulting",
+      "topic": "mast-length",
+      "level": "advanced",
+      "tags": [
+        "마스트",
+        "96cm",
+        "상급자",
+        "카운터밸런스",
+        "벤틸레이션",
+        "카타폴트",
+        "carving",
+        "lean angle"
+      ],
+      "source": "reference_dmj_mast_length_progression.md §3",
+      "title": "상급자 단계 — 96cm (카운터밸런스 라이딩)",
+      "content": "**상급자는 96cm.** 단순 직진이 아니라 보드를 좌우로 깊이 기울이는 카운터밸런스 라이딩을 위해서입니다.\n\n세 가지 장점:\n\n1. **카운터밸런스 라이딩** — 윙에 강한 압력 + 깊은 lean angle 에서 마스트·포일이 사선으로 배치돼 윙·라이더·포일이 하나의 균형 시스템으로 작동. 96cm 은 포일이 충분한 깊이에서 작동하므로 ocean swell·downwind 깊은 carving 이 가능합니다.\n2. **벤틸레이션 (ventilation) 예방** — 포일 윗면에 공기 기포가 끼어들어 lift 를 잃는 현상. 짧은 마스트일수록 포일이 수면에 가까워 공기가 쉽게 도달. 96cm 은 충분히 깊은 곳에서 작동 → 공기 유입 차단.\n3. **카타폴트 (catapult) 위험 관리** — 피칭이 커진 상태에서 포일이 솟구치면 라이더가 앞으로 던져지는 사고. 96cm 은 회복 윈도우를 확보합니다.\n\n**96cm 은 무조건 상급자만.** 96cm 으로 fall 하면 회복까지 약 5초가 걸려, helmet + impact vest 필수 + fall drill 학습 후 진입하셔야 합니다."
+    },
+    {
+      "id": "kb-mast-pro",
+      "category": "consulting",
+      "topic": "mast-length",
+      "level": "pro",
+      "tags": [
+        "마스트",
+        "선수",
+        "race",
+        "UHM",
+        "thin",
+        "carbon",
+        "탑스피드"
+      ],
+      "source": "reference_dmj_mast_length_progression.md §4",
+      "title": "선수 단계 — 96cm+ race spec (UHM 카본·thin)",
+      "content": "**선수는 96cm UHM 카본 thin race spec.**\n\n같은 96cm 이라도 race 용은:\n- **UHM (Ultra High Modulus) 카본** — 강성 극대화로 고속에서도 휨 최소.\n- **Thin profile** (예: Carbon HM 13mm) — drag 최소화 → top speed 우선.\n- 보드를 깊이 기울인 상태에서도 윙 압력을 잃지 않고 race line 유지.\n\nrace tactical line · lean angle · top speed 모두를 위한 race-grade 셋업의 핵심입니다."
+    },
+    {
+      "id": "kb-mast-progression",
+      "category": "consulting",
+      "topic": "mast-length",
+      "level": "all",
+      "tags": [
+        "마스트 진화",
+        "76 84 96",
+        "진화 곡선",
+        "라이딩 시간",
+        "업그레이드 timing"
+      ],
+      "source": "reference_dmj_mast_length_progression.md §5",
+      "title": "마스트 진화 곡선 요약 (전체 진화 path)",
+      "content": "**라이더의 진화 = 마스트의 진화**\n\n```\n입문 (0~50시간) → 초중급 (50~150시간) → 상급자 (150시간+) → 선수\n75~80cm 짧은 → 84cm 표준 → 96cm 카운터밸런스 → 96cm UHM thin race\n```\n\n마스트 업그레이드 timing:\n- **84cm 가는 timing**: 50 시간 라이딩 + jibe·tack 30%+ 성공률. 그 전에는 76cm 유지가 안전.\n- **96cm 가는 timing**: 상급자만. helmet + impact vest 필수 + fall drill 학습 완료 후.\n- **마스트 한 개로 평생 X**: 76 → 84 → 96 단계마다 마스트를 갱신하는 것이 안전·성능 모두 효율적."
+    },
+    {
+      "id": "kb-wind-classification",
+      "category": "consulting",
+      "topic": "wind-classification",
+      "tags": [
+        "풍속",
+        "미풍",
+        "중풍",
+        "강풍",
+        "윙 사이즈",
+        "knot",
+        "kt",
+        "사이즈업",
+        "사이즈다운"
+      ],
+      "source": "reference_dmj_wind_classification.md",
+      "title": "DMJ 풍속 3-tier 분류 + ±1 사이즈 fallback",
+      "content": "**단무지공방 디폴트 풍속 = 중풍 11–16 kt.** 라이더 spot 풍속이 디폴트와 다르면 윙 사이즈를 ±1 단계 조정합니다.\n\n| 등급 | 풍속 (knot) | 사이즈 분기 |\n|---|---|---|\n| 미풍 | ≤ 10 kt | 윙 한 사이즈 ↑ |\n| 중풍 | 11–16 kt | site default |\n| 강풍 | ≥ 17 kt | 윙 한 사이즈 ↓ |\n\n사이즈 step 단위는 일반적으로 0.5 m² (예: 4.0 → 4.5 또는 5.0 → 4.5). 라이더 체중·foil 면적·보드 volume 에 따라 fine-tune 이 필요하면 **1:1 컨설팅** 에서 정밀 조정해 드립니다."
+    },
+    {
+      "id": "kb-wing-size-v4",
+      "category": "brand",
+      "topic": "wing-size",
+      "brand": "Takoon",
+      "tags": [
+        "Takoon V4",
+        "윙 사이즈",
+        "체중별",
+        "quiver",
+        "단일 윙",
+        "2 wings"
+      ],
+      "source": "reference_takoon_wing_size_guide.md §1",
+      "title": "Takoon V4 / V4 Pro 체중별 권장 윙 사이즈",
+      "content": "**Takoon 공식 wing size guide (V4 / V4 Pro 공통, adult male 기준):**\n\n**단일 wing (1 사이즈)**:\n- 55kg → 4.0m\n- 65–75kg → 5.0m\n- 75–85kg → 5.5m\n- 90+kg → 6.0m (V4 Pro 는 6.5m 까지)\n\n**2 wings (저풍속·강풍 모두 cover — 단무지 표준 권장 quiver)**:\n- 55kg → 3.0m / 4.5m\n- 65–75kg → 4.0m / 5.5m\n- 75–85kg → 4.5m / 6.0m\n- 90+kg → 5.0m / 6.0m (V4) / 5.0m / 6.5m (V4 Pro)\n\n**3 wings (선수·전풍속 — 풀 quiver)**:\n- 55kg → 2.5m / 4.0m / 5.0m\n- 65–75kg → 3.0m / 4.5m / 5.5m\n- 75–85kg → 3.0m / 4.5m / 6.0m\n- 90+kg → 3.5m / 5.0m / 6.0m (V4) / 6.5m (V4 Pro)\n\n**여성·유소년·시니어는 demographic_adjustments 적용** (예: 여성 default wing_offset = -1)."
+    },
+    {
+      "id": "kb-wing-v4-vs-pro",
+      "category": "brand",
+      "topic": "wing-comparison",
+      "brand": "Takoon",
+      "tags": [
+        "V4",
+        "V4 Pro",
+        "차이",
+        "UPE Project 85",
+        "ripstop",
+        "boom"
+      ],
+      "source": "reference_takoon_wing_size_guide.md §1-4",
+      "title": "Takoon V4 vs V4 Pro 차이점",
+      "content": "**V4 (green, versatile)**: 모든 체중 default 권장. 가성비·내구성 우선.\n\n**V4 Pro (UPE Project 85, orange/베이지)**: 고급 ripstop. 90+kg light wind 시 6.5m 가능 (V4는 max 6.0m).\n\n**Boom V2 매핑 (사이즈별 핸들링)**:\n- Boom V2 950 (작은 boom): 저~중간 사이즈 wing\n- Boom V2 1010 (큰 boom): 큰 사이즈 wing\n- **5.0m wing 분기**: V4 → Boom 1010 (큰 boom) / V4 Pro → Boom 950 (작은 boom)\n\n→ V4 Pro 의 한 단계 가벼운 boom 핸들링이 USP 입니다."
+    },
+    {
+      "id": "kb-lift-calc",
+      "category": "consulting",
+      "topic": "lift-physics",
+      "tags": [
+        "lift",
+        "양력",
+        "ρ",
+        "밀도",
+        "바다",
+        "민물",
+        "수면",
+        "초피",
+        "너울",
+        "calculator"
+      ],
+      "source": "reference_dmj_water_surface_corrections.md",
+      "title": "Lift 양력 방정식 + 물 종류 + 수면 보정",
+      "content": "**Lift = ½ · ρ · v² · A · CL** (표준 hydrofoil 양력 방정식)\n\n**물 종류 (density ρ)**:\n- 바다 (해수, default): ρ = 1025 kg/m³ (염도 ~35‰ 표준)\n- 강·호수 (민물): ρ = 1000 kg/m³ (4°C 순수 H₂O)\n- v_min ∝ 1/√ρ → 민물에서 v_min 은 바다 대비 약 +1.24%\n\n**수면 상태 (v_target multiplier)**:\n- 플랫 (평수면): × 1.00\n- 초피 (잔물결): × 1.05 (drag 증가, lift 손실 ~5%)\n- 너울성 파도: × 1.03 (trim 변동, glide 손실 ~3%)\n- 초피+너울 혼합: × 1.08 (합산 효과, 가법)\n\nv_target = v_min × pump_factor × surface_factor. 수면 상태는 takeoff 자체보다 glide 유지 비용에 영향을 줍니다.\n\n출처: 일반 유체역학 표준 + Danny 누적 코칭 케이스 (v1 추정값)."
+    },
+    {
+      "id": "kb-stance-stats",
+      "category": "papers",
+      "topic": "stance-preference",
+      "tags": [
+        "Goofy",
+        "Regular",
+        "스탠스",
+        "비율",
+        "통계",
+        "footedness",
+        "Packheiser",
+        "Furley"
+      ],
+      "source": "outputs/dmj_stance_preference_literature_review.md §2",
+      "title": "Goofy vs Regular 비율 — 검증 논문 기반",
+      "content": "**Goofy 는 \"희소 / drop-out\" 이 아닙니다.** 1/4 ~ 1/3 비율로 안정적으로 존재합니다.\n\n**Packheiser et al. 2020** (Sci Rep n=145,135 메타분석):\n- Left-footed 12.1% (보수적 기준)\n- Non-right-footed 23.7% (left + mixed)\n- 오른손잡이 중 left-footed = 3.2%\n- 왼손잡이 중 left-footed = 60.1%\n- 남성이 여성보다 non-right-footed 4.1%p ↑\n- **운동선수 집단에서 left-footedness 유병률 ↑**\n\n**Furley, Dörr & Loffing 2018** (recreational surfer n=394):\n- Goofy ≈ 25% 자기보고 (Regular ~75%)\n- 단, 표본은 독일·EU 중심\n\n**결론**: \"오른손잡이 = Regular\" 는 통계적으로 거짓. 단무지공방은 Goofy ≥ 25% 가정으로 강사·장비·코칭 콘텐츠를 양 스탠스 동등 처리합니다.\n\n인용: Packheiser et al., *Sci Rep* 2020, https://doi.org/10.1038/s41598-020-71478-w | Furley et al., *Laterality* 2018, https://doi.org/10.1080/1357650X.2018.1433192"
+    },
+    {
+      "id": "kb-stance-determinants",
+      "category": "papers",
+      "topic": "stance-preference",
+      "tags": [
+        "스탠스 결정",
+        "footedness",
+        "handedness",
+        "lateralization",
+        "Elias",
+        "van Melick",
+        "mobilizer",
+        "stabilizer"
+      ],
+      "source": "outputs/dmj_stance_preference_literature_review.md §3",
+      "title": "스탠스 결정 인자 — 다축 lateral preference",
+      "content": "**스탠스는 단일 trait 가 아닌 다축 lateral preference 의 표현형**입니다.\n\n**Elias, Bryden & Bulman-Fleming 1998** (Neuropsychologia):\n- Cerebral lateralization 은 손잡이보다 **발잡이에 더 잘 인코딩**됨 (귀 우세 ↔ 발 우세 p=0.003)\n\n**van Melick et al. 2017** (PLoS ONE n=41):\n- \"공차는 발\" 자기보고 100% 일치, 그러나 외다리 균형(stabilization)은 다른 다리\n- 남성 33.3%, 여성 15% 에서 mobilizer ≠ stabilizer\n- **보드 위 앞발 = stabilizer 발일 가능성 ↑**, 단순 \"공차는 발\"로 stance 예측 불가\n\n**Hart & Gabbard 1998** (Perceptual Motor Skills):\n- Mobilizer/stabilizer 이중성 원전적 reference\n\n인용: Elias et al., *Neuropsychologia* 1998, https://doi.org/10.1016/S0028-3932(97)00107-3 | van Melick et al., *PLoS ONE* 2017, https://doi.org/10.1371/journal.pone.0189876"
+    },
+    {
+      "id": "kb-weak-side",
+      "category": "papers",
+      "topic": "asymmetry",
+      "tags": [
+        "약쪽",
+        "weak side",
+        "비대칭",
+        "LSI",
+        "asymmetry",
+        "Bishop",
+        "Promsri",
+        "reactive balance"
+      ],
+      "source": "outputs/dmj_stance_preference_literature_review.md §4-5",
+      "title": "약쪽 (weak side) 훈련 원칙 — 검증 논문 기반",
+      "content": "**\"약쪽은 타고난 한계가 아니라 학습 빈도의 결과입니다.\"** 엘리트일수록 좌우 격차가 줄어듭니다 (Furley 2018 frontside-backside 격차 narrowing).\n\n**Bishop, Turner & Read 2018** (J Sports Sci 18-study systematic review):\n- Inter-limb asymmetry ≥ 5% → 점프·킥·power 과제에서 측정 가능한 성능 손실\n- LSI (Limb Symmetry Index) ≥ 90% = ACL 재활 표준\n- 단일 cut-off 위험 → 종목·과제 specific\n\n**Promsri et al. 2020** (Brain Sci n=26 PCA 분석):\n- **우세 다리 = 예측적(predictive) 제어**, 비우세 다리 = 반응적(reactive) 제어\n- 약쪽 훈련 = 정적 균형 X, **외란 응답·sudden stance switch 훈련**이 더 효과적\n\n**단무지공방 적용**:\n- 10-axis pentagon P/S 점수 차 > 20점 = 약쪽 표적 훈련 자동 추천\n- 약쪽 처방 = volume × specificity (단순 반복 X) + reactive balance\n- 90% LSI 임계 = \"all-around\" 인증 조건 (skill-assessment 상위 진입)\n\n인용: Bishop et al., *J Sports Sci* 2018, https://doi.org/10.1080/02640414.2017.1361894 | Promsri et al., *Brain Sci* 2020, https://doi.org/10.3390/brainsci10030128"
+    },
+    {
+      "id": "kb-brand-style-mapping",
+      "category": "brand",
+      "topic": "style-foil-mapping",
+      "tags": [
+        "스타일",
+        "Levitaz",
+        "Takoon",
+        "Flat-Speed",
+        "Hybrid",
+        "Choppy",
+        "Wave",
+        "foil 추천"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §2",
+      "title": "스타일별 Brand foil 매핑 (중급·상급)",
+      "content": "**Danny 2026-05-06 final 결정**:\n\n| 스타일 | 추천 Brand | 이유 |\n|---|---|---|\n| **Flat·Speed** (속도·평수면) | **Levitaz Free Series** | top-end speed 표준 |\n| **Hybrid** (하이브리드) | **Levitaz Free Series** | 다목적 race-grade 균형 |\n| **Choppy·Freeride** | **Takoon** (Flow / Flare) | choppy·turn 정밀 컨트롤 |\n| **Wave** | **Takoon** (Swell / Flash · wave-tuned) | wave riding short turn radius |\n\nDanny 명시 인용 — *\"어차피 웨이브는 타쿤이죠. 레비타즈로 갈 이유가 없어요.\"*\n\n→ ADV Choppy·Freeride/Wave 보드는 Takoon 1차 단일 추천 (Glide Midlength / Prosurf)."
+    },
+    {
+      "id": "kb-levitaz-fw-size",
+      "category": "brand",
+      "topic": "foil-size",
+      "brand": "Levitaz",
+      "tags": [
+        "Levitaz",
+        "Free Series",
+        "FW",
+        "540",
+        "680",
+        "790",
+        "900",
+        "체중",
+        "풍속"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §5",
+      "title": "Levitaz Free Series Wing 사이즈 매핑 (체중·풍속)",
+      "content": "**Levitaz Free Series 4 사이즈** (tier · 체중 · 풍속별):\n\n| 모델 | tier | 체중 적정 | 풍속 적정 |\n|---|---|---|---|\n| FW 540 | **상급~선수** | 50~85 kg | 22~35 노트 |\n| FW 680 | **상급** | 50~95 kg | 16~30 노트 |\n| FW 790 | **중급** | 60~100 kg | 12~25 노트 |\n| FW 900 | **중급** (큰 사이즈) | 70~110 kg | 8~18 노트 (약풍 강자) |\n\n**선수(Pro) 단계 — Flat·Speed/Hybrid**:\n- light (50–65kg) → FW 790\n- mid-light (65–75kg) → FW 680\n- mid-heavy (75–85kg) → FW 540 (flat-speed) / FW 680 (hybrid)\n- heavy (85kg+) → FW 540\n\nID 명명: `lvz-fs540`, `lvz-fs680`, `lvz-fs790`, `lvz-fs900` (fs = Free Series)."
+    },
+    {
+      "id": "kb-levitaz-mast",
+      "category": "brand",
+      "topic": "mast",
+      "brand": "Levitaz",
+      "tags": [
+        "Levitaz mast",
+        "76",
+        "84",
+        "96",
+        "한국 매핑"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §6",
+      "title": "Levitaz Free Series Mast 매핑",
+      "content": "| 모델 | tier | 한국 매핑 |\n|---|---|---|\n| Mast 84 | **중급** | ~83 cm 매핑, 가장 일반적인 길이 |\n| Mast 96 | **상급** | ~93 cm 매핑, downwind·ocean swell |\n| Mast 76 | **특수 케이스** | Pump foil·shorter mast 필요 시 (표준 progression 제외) |\n\n표준 진화 path = 76 → 84 → 96 (입문 → 초중급 → 상급)."
+    },
+    {
+      "id": "kb-pro-equipment",
+      "category": "brand",
+      "topic": "pro-setup",
+      "tags": [
+        "선수",
+        "pro",
+        "race",
+        "Levitaz R6",
+        "PPC Sonic FDS",
+        "kite race"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §3",
+      "title": "선수(Pro) 단계 race 셋업 — Levitaz R6 + PPC Sonic FDS",
+      "content": "**Pro Flat·Speed / Hybrid (race) 풀세트**:\n- **Foil**: **Levitaz R6 풀세트 무조건** (R6 Front Wing + R6 Mast + R6 Stab + R6 Fuselage)\n- **Wing**: **PPC Sonic FDS** (Full Dual Skin) 유일\n- Takoon V4 Pro / VX Pro 2 = race wing 아님 (freeride race-tuned)\n\n**Levitaz R6 USP** — Wingfoil race + Kite race **cross-platform 호환**. 한 시스템으로 두 종목, Olympic 검증 race grade.\n\n**Pro Choppy·Freeride / Wave**:\n- Foil: Takoon Carbon Pro (Flow Carbon · Flare Carbon · Swell · Flash) + Carbon HM 13/16mm + Glide HA Stab — Danny 검수 대기\n- Wing: PPC M2 (forgiving 더블스킨) 또는 Takoon Wing V4\n- R6 적용 가능성은 Danny 검수 대기"
+    },
+    {
+      "id": "kb-wing-structure",
+      "category": "brand",
+      "topic": "wing-structure",
+      "tags": [
+        "윙 구조",
+        "싱글 스킨",
+        "세미 듀얼",
+        "풀 듀얼",
+        "FDS",
+        "더블스킨",
+        "인플레터블 금지"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §1",
+      "title": "Wing 구조 3-tier 분류 (옥덕필 강의 verified)",
+      "content": "| 구분 | 한국어 표기 | 영문 | 용도 |\n|---|---|---|---|\n| 🟢 | **싱글 스킨** | Single Skin | 입문·웨이브·경량 |\n| 🟡 | **세미 듀얼 스킨** | Semi Dual Skin | mid-tier |\n| 🔴 | **풀 듀얼 스킨 / FDS** | Full Dual Skin | race·고급 (PPC FDS 모델명 유래) |\n\n**용어 사용 규칙**:\n- ❌ 금지: \"인플레터블 윙\", \"에어 윙\"\n- ✅ 사용: \"더블스킨 윙\" (일반), \"풀 듀얼스킨\" / \"FDS\" (최상급), \"세미 듀얼스킨\" (mid), \"싱글 스킨\" (입문)"
+    },
+    {
+      "id": "kb-brand-categories",
+      "category": "brand",
+      "topic": "brand-overview",
+      "tags": [
+        "Levitaz",
+        "PPC",
+        "Takoon",
+        "WIP",
+        "브랜드",
+        "카테고리"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §4",
+      "title": "단무지공방 4 브랜드 카테고리 분리",
+      "content": "| Brand | 카테고리 | 모델 |\n|---|---|---|\n| **Levitaz** | 포일만 (foil component) | Free Series FW 540/680/790/900 + Mast 76/84/96 + Stab 180 + R6 Race |\n| **PPC** | 더블스킨 wing 만 | M2 / M1-X / M1 / Sonic FDS |\n| **Takoon** | 더블스킨 wing (ripstop, 카본 wing 없음) + foil 라인업 | Wing V4/V4 Pro/VX Pro 2 + Foil Starter/X-Glide V2/Flow/Flare/Flow Carbon/Flare Carbon/Swell/Flash + Masts + Stabs |\n| **Forward WIP** | 보호장비만 | Helmet/Harness/Impact Vest/Wetsuit 3-2·4-3/Boots |\n\n**중요**: `tkn-flow-carbon`, `tkn-flare-carbon`, `tkn-swell`, `tkn-flash` 는 **foil front wing** (foil 부품) — 더블스킨 wing 아님."
+    },
+    {
+      "id": "kb-danny-credentials",
+      "category": "consulting",
+      "topic": "danny-bio",
+      "tags": [
+        "옥덕필",
+        "Danny",
+        "credentials",
+        "경력",
+        "올림픽",
+        "박사",
+        "단무지공방"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §10",
+      "title": "옥덕필 박사 (Danny) 경력 — Hero 카피 SoT",
+      "content": "**옥덕필 박사 (Danny Ok)**:\n- 대한민국 최초의 아시안게임 윈드서핑 금메달리스트\n- 올림픽 3회 연속 단독 출전\n- 3개국 윈드서핑 국가대표팀 코치 역임\n- **운동생리학 박사 (PhD Exercise Physiology)**\n\n**조수철 선수**:\n- 국가대표 포뮬러 카이트 선수\n\n**단무지공방** — 옥덕필 박사와 조수철 선수가 함께 운영하는 윙포일 퍼포먼스 컨설팅 서비스. 체중·레벨·스타일·성별·연령별로 Levitaz · PPC · Takoon · WIP 네 브랜드 장비를 큐레이션."
+    },
+    {
+      "id": "kb-deny-self",
+      "category": "policy",
+      "topic": "denny-identity",
+      "tags": [
+        "옥코치",
+        "대니",
+        "AI",
+        "에이전트",
+        "정체성",
+        "Phase 1",
+        "Phase 2"
+      ],
+      "source": "Task D Spec §173-B",
+      "title": "옥코치가 누구야?",
+      "content": "**옥코치** — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ 윙포일·라이딩 컨설팅 채널이에요.\n\n이 챗은 옥코치 노하우를 빠르게 안내해 드리는 AI 어시스턴트입니다:\n- **현재 Phase 1**: 정적 FAQ 130+ entries + canonical 지식 베이스 (Danny memory + 검증 논문 + 브랜드 spec) 검색 기반 응답\n- **곧 Phase 2**: Claude API LLM backend + 실시간 RAG\n\n옥코치의 강의·논문·brand spec 만 인용·풀어쓰기 합니다. 모르는 영역은 솔직히 인정하고 **consulting@dmjgroup.kr** 으로 안내드려요."
+    },
+    {
+      "id": "kb-skill-10axis",
+      "category": "consulting",
+      "topic": "skill-assessment",
+      "tags": [
+        "10축",
+        "스킬 진단",
+        "P",
+        "S",
+        "Port",
+        "Starboard",
+        "택",
+        "자이브",
+        "점핑"
+      ],
+      "source": "skill-assessment.html + reference_dmjgroup §165",
+      "title": "10축 스킬 진단 (5 스킬 × P/S)",
+      "content": "**10축 스킬 진단** = 5 가지 스킬을 좌(P) · 우(S) 양쪽 따로 진단하는 100점 만점 시스템.\n\n5 스킬:\n1. 토우 택킹 (Toe-side Tack)\n2. 힐 택킹 (Heel-side Tack)\n3. 토 자이빙 (Toe-side Jibe)\n4. 힐 자이빙 (Heel-side Jibe)\n5. 점핑 (Jump)\n\n각 스킬을 **P (Port = 좌측) + S (Starboard = 우측)** 양쪽 평가 → 총 10 축.\n\n5-step rubric (각 축 100점):\n- 시도조차 못함 → 0점\n- 시도하지만 실패 → 25점\n- 가끔 성공 → 50점\n- 자주 성공 → 75점\n- 일관되게 성공 → 100점\n\n**P/S 점수 차 > 20점** = 약쪽 lock-in 가능성 → 12주 land + 13주 water training 자동 매칭."
+    },
+    {
+      "id": "kb-water-training-7stages",
+      "category": "training",
+      "topic": "water-training",
+      "tags": [
+        "13주",
+        "water training",
+        "7 stage",
+        "Land",
+        "Gliding",
+        "Foiling",
+        "Carving",
+        "Cross-stance",
+        "HS Jibe",
+        "HS Tack",
+        "TS Tack"
+      ],
+      "source": "skill-training-programs.json + §168",
+      "title": "13주 Water Training — 7 Stage 정규 커리큘럼",
+      "content": "**Land → Gliding → Foiling Up/Down → Foiling Carving → Cross-stance → HS Jibe → HS+TS Tack** 7-stage 13주.\n\n각 stage 의미:\n1. **Land** — 보드·윙 셋업·body position·beach drill\n2. **Gliding** — 수상 글라이딩 (foiling 전 단계)\n3. **Foiling Up/Down** — 처음 떠오르고 내려오는 컨트롤\n4. **Foiling Carving** — 떠 있는 상태에서 좌우 carving\n5. **Cross-stance** — 약쪽 스탠스 진입 (P/S 약한 쪽)\n6. **HS Jibe** — Heel-side Jibe (downwind turn)\n7. **HS + TS Tack** — Heel-side & Toe-side Tack (upwind turn)\n\nLand 12주 (육상)와 짝으로 진행. 1회 2시간 · 주 3–5회 추천."
+    },
+    {
+      "id": "kb-land-training-12week",
+      "category": "training",
+      "topic": "land-training",
+      "tags": [
+        "12주",
+        "land training",
+        "유연성",
+        "가동성",
+        "근지구력",
+        "근력",
+        "파워",
+        "민첩성",
+        "FITT-VP"
+      ],
+      "source": "12주 land program references + §167",
+      "title": "12주 Land Training — 6 단계 진화 프로그램",
+      "content": "**옥덕필 박사 설계 12주 육상 운동 프로그램**.\n\n6 단계:\n1. **유연성 (Flexibility)** — Week 1–2\n2. **가동성 (Mobility)** — Week 3–4\n3. **근지구력 (Muscular Endurance)** — Week 5–6\n4. **근력 (Strength)** — Week 7–8\n5. **근파워 (Power)** — Week 9–10\n6. **민첩성 (Agility)** — Week 11–12\n\n**8 동작 자가진단** 으로 본인 약점 plane 을 찾고 그에 맞춰 훈련. Plane = 시상(sagittal) · 관상(frontal) · 횡단(transverse) · 균형(balance).\n\nFITT-VP principle (ACSM 11판 Ch.6) — Frequency · Intensity · Time · Type · Volume · Progression.\n\n참고문헌 (11편 모두 DOI·ISBN 검증):\n- Myers, *Anatomy Trains* 4th ed (Elsevier 2020)\n- Schmidt et al., *Motor Control and Learning* 6th ed (Human Kinetics 2019)\n- Bishop et al., *J Sports Sci* 2018 (inter-limb asymmetry)\n- ACSM, *Guidelines for Exercise Testing and Prescription* 11th ed (2021)"
+    },
+    {
+      "id": "kb-stance-coaching",
+      "category": "consulting",
+      "topic": "stance-coaching",
+      "tags": [
+        "스탠스 진단",
+        "Waterloo",
+        "WFQ",
+        "stabilizer",
+        "mobilizer",
+        "약쪽 framing",
+        "1:1 coaching"
+      ],
+      "source": "outputs/dmj_stance_preference_literature_review.md §5",
+      "title": "단무지 1:1 코칭 — 스탠스 진단 프로토콜",
+      "content": "**약쪽 진단 4-step protocol** (단무지 1:1 코칭):\n\n1. **Waterloo Footedness Questionnaire-Revised (WFQ-R)** — 자기보고 (van Melick 2017 표준)\n2. **외다리 stabilizer test** — 어느 발이 더 편한가?\n3. **외다리 mobilizer test** — 공차는 발은?\n4. **약쪽 tack 실측** — skill-assessment §165 스코어카드\n\n**세 가지가 일치하지 않으면 = 비대칭이 deeply rooted 가 아니라 trainable.**\n\n첫 세션 framing:\n> \"당신의 약쪽은 결함이 아니라 학습 빈도의 결과입니다. 1/4 윙포일러는 Goofy 이고, 엘리트도 frontside-backside 격차가 줄어듭니다 (Furley 2018).\"\n\n90% LSI 임계 = \"all-around\" 인증 조건 (skill-assessment Tier 상위 진입)."
+    },
+    {
+      "id": "kb-membership-tiers",
+      "category": "policy",
+      "topic": "membership",
+      "tags": [
+        "회원 등급",
+        "tier",
+        "할인",
+        "단무지",
+        "단골 라이더",
+        "팀라이더"
+      ],
+      "source": "site/membership.html + DO_NOT_REVERT",
+      "title": "회원 등급 9단계 + PPC 라인 할인율",
+      "content": "**9단계 회원 등급**:\n1. 방문자\n2. 회원\n3. 단무지\n4. 단골 라이더\n5. 선주문\n6. 쥬니어 팀라이더\n7. 시니어 팀라이더\n8. 코어 팀라이더\n9. 관리자\n\n**PPC 라인 할인 차등**: 10% / 20% / 25% / 30% / 35% / 40%\n\n"
+    },
+    {
+      "id": "kb-business-info",
+      "category": "policy",
+      "topic": "business",
+      "tags": [
+        "사업자",
+        "144-55-01008",
+        "단무지공방",
+        "회사 정보"
+      ],
+      "source": "site/policies.html",
+      "title": "단무지공방 사업자 정보",
+      "content": "**단무지공방** (개인사업자)\n- 사업자번호: **144-55-01008**\n- 대표자: 이정희\n- 운영자: 옥덕필 박사 (Danny Ok) + 조수철 선수\n- 컨설팅 문의: consulting@dmjgroup.kr"
+    },
+    {
+      "id": "kb-find-my-gear",
+      "category": "policy",
+      "topic": "find-my-gear",
+      "tags": [
+        "Find My Gear",
+        "퀴즈",
+        "장비 추천",
+        "5분",
+        "체중",
+        "풍속",
+        "스타일"
+      ],
+      "source": "site/find-my-gear.html",
+      "title": "Find My Gear — 5분 장비 추천 퀴즈",
+      "content": "**Find My Gear** 는 4축으로 본인에게 맞는 장비를 추천하는 5분 퀴즈입니다:\n1. 라이딩 **레벨** (입문·초중급·상급·선수)\n2. **체중** (light / mid-light / mid-heavy / heavy)\n3. 주 **풍속** spot (미풍 ≤10kt / 중풍 11–16kt / 강풍 ≥17kt)\n4. **라이딩 스타일** (Flat-Speed / Hybrid / Choppy-Freeride / Wave)\n\n결과는 회원 계정에 저장됩니다. **비회원도 가능** (로그인 시 결과 이관)."
+    },
+    {
+      "id": "kb-wip-protection",
+      "category": "brand",
+      "topic": "protection-gear",
+      "brand": "WIP",
+      "tags": [
+        "WIP",
+        "안전장비",
+        "헬멧",
+        "임팩트 베스트",
+        "하네스",
+        "부츠",
+        "Forward"
+      ],
+      "source": "site/wip.html + DO_NOT_REVERT §145",
+      "title": "Forward WIP 안전장비 4-tier",
+      "content": "**Forward WIP** = 보호장비 전문 브랜드. 단무지공방은 4 카테고리 모두 취급:\n\n- **Helmet** — 헬멧 (96cm 마스트 이상은 필수)\n- **Impact Vest** — 임팩트 베스트 (water start fall 대비)\n- **Harness** — 하네스 (장시간 라이딩 피로 경감)\n- **Boots** — 부츠 (겨울·웨이브·강풍 spot)\n- **Wetsuit** — 3-2 / 4-3 (시즌·수온별)\n\n레벨별 안전장비 정확 모델명은 DO_NOT_REVERT §145 lock (Kompact 분기 포함)."
+    },
+    {
+      "id": "kb-knowledge-fallback",
+      "category": "policy",
+      "topic": "fallback",
+      "tags": [
+        "fallback",
+        "모름",
+        "consulting",
+        "이메일",
+        "1:1 상담"
+      ],
+      "source": "Task D Spec §173-B",
+      "title": "옥코치 fallback — 모르는 영역",
+      "content": "제가 답을 찾지 못한 영역은 솔직히 인정해 드릴게요 😅 \n\n다음 경로로 단무지공방 옥덕필 박사가 직접 답변드립니다:\n- **컨설팅 이메일**: consulting@dmjgroup.kr\n- **1:1 상담 페이지**: 사이트 내 신청 가능\n저는 hallucination (없는 사실 만들기) 을 차단하기 위해 **canonical source 외 답변을 하지 않도록 설계**되어 있습니다."
+    },
+    {
+      "id": "kb-pumping",
+      "category": "consulting",
+      "topic": "pumping",
+      "tags": [
+        "펌핑",
+        "pump",
+        "pump foil",
+        "약풍",
+        "다리 펌프",
+        "wing pump"
+      ],
+      "source": "site/genre/pump.html + glossary",
+      "title": "펌핑 (Pumping) — 약풍·pump foil 기술",
+      "content": "**펌핑** = 보드를 위아래로 굴려 포일 양력을 추가 발생시키는 동작.\n\n**풀-펌프 (Full Pump)** = 다리 + 윙 동기화. 마스터하면 **약풍에서도 라이딩 가능**합니다.\n\n구분:\n- **Wing pump**: 윙으로 추진력 보충\n- **Foil pump (다리 펌프)**: 다리 굴려 포일 양력 생성\n- **Combined**: 둘 다 동기화 — 추진력 최대\n\n약풍 (≤10kt) spot 에서는 pump foil 셋업이 vital. Levitaz FW 900 / Takoon Foil-X Glide 가 약풍 wing area 큰 옵션입니다."
+    },
+    {
+      "id": "kb-attack-angle",
+      "category": "consulting",
+      "topic": "attack-angle",
+      "tags": [
+        "어택앵글",
+        "attack angle",
+        "공격각",
+        "양력",
+        "케비테이션",
+        "시상면"
+      ],
+      "source": "glossary.html + 12주 program §167",
+      "title": "어택앵글 (Attack Angle) — 시상면 plane 매핑",
+      "content": "**어택앵글** = 포일이 물 흐름에 대해 들어가는 **공격각**.\n\n- 너무 낮으면 → 양력 부족 → 내려앉음\n- 너무 높으면 → **케비테이션 (cavitation)** → 튕겨 나감 (vaporization · lift 손실)\n\n단무지공방 진단의 **시상면 (sagittal) plane** = 이 어택앵글 조절 능력에 매핑됩니다.\n\n관련 plane:\n- **시상면 (sagittal)** — 어택앵글 (앞뒤 컨트롤)\n- **관상면 (frontal)** — heel/toe edge\n- **횡단면 (transverse)** — tack/jibe 회전\n- **균형 (balance)** — 좌우 + 외란 응답\n\n12주 land program 에서 plane별 약점에 맞춰 처방됩니다."
+    },
+    {
+      "id": "kb-cavitation",
+      "category": "consulting",
+      "topic": "cavitation",
+      "tags": [
+        "케비테이션",
+        "cavitation",
+        "ventilation",
+        "벤틸레이션",
+        "포일 튐"
+      ],
+      "source": "glossary.html",
+      "title": "케비테이션 vs 벤틸레이션 — 차이점",
+      "content": "**케비테이션 (Cavitation)** — 포일 표면 근처에서 물의 압력이 vapor pressure 이하로 떨어져 기포가 생기는 현상. lift 급격히 손실되어 라이더가 튕겨 나감. **고속·고기울임에서 자주 발생.**\n\n**벤틸레이션 (Ventilation)** — 수면 공기가 포일 윗면으로 끼어들어오는 현상. 짧은 마스트일수록 자주. lift 손실 → 라이더 전복.\n\n**예방**:\n- 어택앵글 안정적 유지\n- 마스트 길이 진화 (76 → 84 → 96) 따라 깊은 깊이 작동\n- 96cm 은 ventilation 빈도 현저히 감소\n\n둘 다 catapult (라이더가 앞으로 던져지는 사고) 위험과 직접 연결."
+    },
+    {
+      "id": "kb-points-of-sail",
+      "category": "consulting",
+      "topic": "points-of-sail",
+      "tags": [
+        "points of sail",
+        "7방향",
+        "코스",
+        "close-hauled",
+        "beam reach",
+        "broad reach",
+        "run"
+      ],
+      "source": "site/glossary.html",
+      "title": "Points of Sail 7방향 — 바람 대비 코스",
+      "content": "**Points of Sail 7방향** — 바람 대비 진행 방향:\n\n1. **No-Go Zone** — 바람 정면 (0~30°, 진행 불가)\n2. **Close-Hauled** — 가장 upwind 가능 각도\n3. **Beam Reach** — 바람 측면 (90°)\n4. **Broad Reach** — 바람 등 뒤 (135°)\n5. **Run** — 정후방 downwind\n\n좌우 미러 (port tack / starboard tack) 로 총 7방향.\n\n각 방향마다 트리밍·자세·윙 각도가 다릅니다. 글로서리 페이지에 한국어 그림으로 정리되어 있어요."
+    },
+    {
+      "id": "kb-tack-vs-jibe",
+      "category": "consulting",
+      "topic": "tack-jibe",
+      "tags": [
+        "택",
+        "자이브",
+        "tack",
+        "jibe",
+        "upwind",
+        "downwind",
+        "13주 stage 6-7"
+      ],
+      "source": "site/glossary.html + 13주 water training",
+      "title": "택 (Tack) vs 자이브 (Jibe) — 방향 전환",
+      "content": "**택 (Tack)** = 바람을 향해 머리 돌리는 턴 (**upwind turn**)\n**자이브 (Jibe)** = 바람을 등 뒤로 돌리는 턴 (**downwind turn**)\n\n학습 순서:\n- **Jibe 가 먼저** (13주 water training stage 6 = HS Jibe)\n- **Tack 이 나중** (stage 7 = HS + TS Tack)\n\n각 turn 은 toe-side (TS) vs heel-side (HS) 로 다시 나뉘어, 좌우 (P/S) 와 cross 하면 총 8 가지 진단 (4 turn × 2 side)."
+    },
+    {
+      "id": "kb-beginner-guide",
+      "category": "consulting",
+      "topic": "beginner",
+      "level": "beginner",
+      "tags": [
+        "입문",
+        "처음",
+        "beginner",
+        "PPC M2",
+        "Takoon V4",
+        "starter",
+        "X-Glide"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §3",
+      "title": "입문자 (Beginner) 표준 셋업",
+      "content": "**입문자 16-entry 표준 셋업**:\n\n- **Wing**: PPC M2 (forgiving) primary / Takoon V4 alt\n- **Foil**: **Takoon 만** (`tkn-starter` + `tkn-mast-aluminium-19` + `tkn-stab-evo`)\n- **Mast**: 짧은 19mm 알루미늄 = 충격·감지·레버리지 모두 유리\n- **Levitaz Free Series 절대 X** (입문자에게 race-grade 는 위험)\n\n입문자에게 절대 금지:\n- 96cm mast\n- Levitaz Free Series (race grade)\n- PPC FDS (Full Dual Skin, race wing)\n\n입문 시 안전장비: WIP Impact Vest + Helmet 권장 (96cm 진입 시 의무)."
+    },
+    {
+      "id": "kb-intermediate-guide",
+      "category": "consulting",
+      "topic": "intermediate",
+      "level": "intermediate",
+      "tags": [
+        "중급",
+        "intermediate",
+        "FW 790",
+        "FW 900",
+        "Mast 84",
+        "PPC M1-X"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §3",
+      "title": "중급 (Intermediate) 표준 셋업",
+      "content": "**중급 16-entry**:\n\n| 스타일 | Foil primary | Wing primary |\n|---|---|---|\n| Flat·Speed | Levitaz FW 790/900 + Mast 84 | PPC M1-X |\n| Hybrid | Levitaz FW 790/900 + Mast 84 | PPC M1-X |\n| Choppy·Freeride | Takoon Flow + HR 16mm | PPC M1-X |\n| Wave | Takoon Flare + HR 16mm + Carve Stab | PPC M2 (forgiving) |\n\n**FW 사이즈 결정 룰 (체중)**:\n- light, mid-light → FW 790\n- mid-heavy, heavy → FW 900\n\n→ 50시간 라이딩 + jibe·tack 30%+ 성공 시 84cm mast 로 upgrade."
+    },
+    {
+      "id": "kb-advanced-guide",
+      "category": "consulting",
+      "topic": "advanced",
+      "level": "advanced",
+      "tags": [
+        "상급",
+        "advanced",
+        "FW 540",
+        "FW 680",
+        "Mast 96",
+        "PPC FDS",
+        "Boom FS"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §3",
+      "title": "상급자 (Advanced) 표준 셋업",
+      "content": "**상급자 16-entry**:\n\n| 스타일 | Foil primary | Wing primary | Board 1차 |\n|---|---|---|---|\n| Flat·Speed | Levitaz FW 540 + Mast 96 | PPC FDS (race 직전) | Levitaz Boom FS (light/mid-light → FS 83, mid-heavy/heavy → FS 95) |\n| Hybrid | Levitaz FW 680 + Mast 96 | PPC M1 | Levitaz Boom FS (FS 83/95) |\n| Choppy·Freeride | Takoon Flare Carbon + HM 16mm | PPC M1 | **Takoon Glide Midlength** (5'10/75L · 6'0/85L · 6'4/95L · 6'6/105L) |\n| Wave | Takoon Swell + HM 16mm | PPC M2 | **Takoon Prosurf** (5'0/60L · 5'1/65L · 5'2/70L) |\n\n**Board 분기 정책**:\n- Flat·Speed/Hybrid → 1차 Levitaz / 2차 Takoon (가격 부담 시)\n- Choppy/Wave → Takoon 1차 단일 (\"웨이브는 타쿤\" — Danny 명시)"
+    },
+    {
+      "id": "kb-pro-guide",
+      "category": "consulting",
+      "topic": "pro",
+      "level": "pro",
+      "tags": [
+        "선수",
+        "pro",
+        "race",
+        "Levitaz R6",
+        "PPC Sonic FDS",
+        "kite race",
+        "Olympic"
+      ],
+      "source": "reference_dmjgroup_site_rules.md §3",
+      "title": "선수 (Pro) 표준 셋업 — Race grade",
+      "content": "**선수 16-entry**:\n\n**Flat·Speed / Hybrid (8 entries)**:\n- **Foil**: **Levitaz R6 풀세트 무조건** (R6 Front Wing + R6 Mast + R6 Stab + R6 Fuselage)\n- **Wing primary**: **PPC Sonic FDS** (Full Dual Skin)\n- Wing alt: PPC M1\n\n**Choppy·Freeride / Wave (8 entries)**:\n- Foil: Takoon Carbon Pro (Flow Carbon · Flare Carbon · Swell · Flash) + Carbon HM 13/16mm + Glide HA Stab — Danny 검수 대기\n- Wing primary: PPC M2 (forgiving 더블스킨) / Wing alt: Takoon Wing V4\n- R6 적용 가능성: Danny 검수 대기\n\n**Levitaz R6 USP**: Wingfoil race + Kite race **cross-platform 호환**. Olympic 검증 race grade."
+    },
+    {
+      "id": "kb-fx-currency",
+      "category": "policy",
+      "topic": "pricing",
+      "tags": [
+        "환율",
+        "FX",
+        "1500",
+        "USD",
+        "EUR",
+        "CHF",
+        "가격 정책"
+      ],
+      "source": "DO_NOT_REVERT §151 v5.3",
+      "title": "단무지공방 v5.3 환율 통일 정책",
+      "content": "**v5.3 환율 통일 (2026-05-12)**:\n\n- USD/KRW: **1500** (4 브랜드 공통)\n- EUR/KRW: **1800** (Levitaz·Takoon)\n- CHF/KRW: **1900** (WIP)\n\n본사가격 reference 표기 + 사이트가 표기 정정 batch 완료. 모든 가격은 위 환율 기준 환산."
+    },
+    {
+      "id": "kb-12week-references",
+      "category": "papers",
+      "topic": "12week-program-papers",
+      "tags": [
+        "12주",
+        "참고문헌",
+        "Anatomy Trains",
+        "Schmidt",
+        "ACSM",
+        "Bishop",
+        "verified"
+      ],
+      "source": "outputs/dmj_12week_program_references_verified.md",
+      "title": "12주 land program 참고문헌 — 11 편 모두 verified",
+      "content": "**11 편 모두 DOI·ISBN 검증 완료 (no fabrication)**:\n\n**텍스트북**:\n1. Myers TW. *Anatomy Trains* 4th ed. Elsevier 2020. ISBN 9780702078132\n2. Stecco C. *Functional Atlas of the Human Fascial System*. Elsevier 2015. ISBN 9780702044304\n3. Schmidt RA, Lee TD et al. *Motor Control and Learning* 6th ed. Human Kinetics 2019. ISBN 9781492547754\n4. Magill RA, Anderson DI. *Motor Learning and Control* 11th ed. McGraw-Hill 2017. ISBN 9781260084023\n5. ACSM. *Guidelines for Exercise Testing and Prescription* 11th ed. Wolters Kluwer 2021. ISBN 9781975150181\n\n**저널 논문**:\n6. Schleip R, Müller DG. Training principles for fascial connective tissues. *J Bodyw Mov Ther* 2013;17(1):103-115. doi:10.1016/j.jbmt.2012.06.007\n7. Bishop C, Turner A, Read P. Effects of inter-limb asymmetries on physical and sports performance. *J Sports Sci* 2018;36(10):1135-1144. doi:10.1080/02640414.2017.1361894\n8. Maloney SJ. The relationship between asymmetry and athletic performance. *J Strength Cond Res* 2019;33(9):2579-2593. doi:10.1519/JSC.0000000000002608\n9. Munro AG, Herrington LC. Between-session reliability of four hop tests and the agility T-test. *J Strength Cond Res* 2011;25(5):1470-1477. doi:10.1519/JSC.0b013e3181d83335\n10. Hortobágyi T, Maffiuletti NA. Neural adaptations to electrical stimulation strength training. *Eur J Appl Physiol* 2011;111(10):2439-2449. doi:10.1007/s00421-011-2012-2\n11. Carroll TJ et al. Contralateral effects of unilateral strength training. *J Appl Physiol* 2006;101(5):1514-1522. doi:10.1152/japplphysiol.00531.2006"
+    },
+    {
+      "id": "kb-safety-96cm",
+      "category": "consulting",
+      "topic": "safety",
+      "tags": [
+        "안전",
+        "96cm",
+        "helmet",
+        "impact vest",
+        "fall drill",
+        "catapult"
+      ],
+      "source": "reference_dmj_mast_length_progression.md §7",
+      "title": "96cm Mast 진입 안전 프로토콜",
+      "content": "**96cm 으로 fall 하면 회복까지 약 5초** — water start ground time 이 길어집니다. 진입 전 필수 조건:\n\n1. **상급자 수준** (150 시간+ 라이딩 누적)\n2. **Helmet 필수** (Forward WIP)\n3. **Impact Vest 필수**\n4. **Fall drill 학습 완료**\n5. **카타폴트 위험 인지 + 회복 패턴 학습**\n\n같은 96cm 이라도 race 용 (UHM 카본 thin) 은 선수 단계 spec 으로, 상급자→선수 진화 시 한 단계 더 업그레이드 합니다."
+    },
+    {
+      "id": "kb-stance-frontside",
+      "category": "papers",
+      "topic": "stance-frontside",
+      "tags": [
+        "frontside",
+        "backside",
+        "Regular",
+        "Goofy",
+        "toe-side",
+        "heel-side",
+        "Furley"
+      ],
+      "source": "outputs/dmj_stance_preference_literature_review.md §4.1",
+      "title": "Frontside / Backside — 스탠스별 시야 방향",
+      "content": "**보드 스포츠 \"약쪽\" framing** (Furley et al. 2018):\n\n- **Regular (왼발 앞)** → starboard tack 에서 toe-side, port tack 에서 heel-side. Frontside = 일반적으로 starboard.\n- **Goofy (오른발 앞)** → port tack 에서 toe-side, starboard tack 에서 heel-side. Frontside = port.\n\n**Recreational surfer (n=394) Study 1**: frontside 자기보고 능숙도 높음 (시각 정보 획득 용이).\n\n**Professional (n=2,552 wave score) Study 2**: frontside 우위 명확하지 않음 → **엘리트 레벨에서 약쪽 격차가 좁혀짐**.\n\n→ \"약쪽 훈련은 작동한다\" 의 자연 실험. 단무지 1:1 코칭이 measurable 효과를 가질 수 있는 근거.\n\n인용: Furley P, Dörr J, Loffing F. Goofy vs. Regular: Laterality effects in surfing. *Laterality* 2018;23(6):663-682. doi:10.1080/1357650X.2018.1433192"
+    },
+    {
+      "id": "kb-pricing-policy-summary",
+      "category": "policy",
+      "topic": "pricing",
+      "tags": [
+        "가격",
+        "할인",
+        "Phase 1",
+        "견적",
+        "장바구니",
+        "결제"
+      ],
+      "source": "site/quote.html + DO_NOT_REVERT §149",
+      "title": "단무지공방 가격·견적·결제 flow",
+      "content": "**v5.3 가격 표기 통일**:\n- 환율 USD 1500 / EUR 1800 / CHF 1900\n- 본사가격 reference 표기 + 사이트가 표기\n- 모든 SKU 재고 있음 가정 (사이트 visible UI)\n\n**결제 flow (Phase 1, Cafe24 launch 전)**:\n1. 장바구니 담기\n2. **견적 요청** (quote.html)\n3. 단무지공방 정식 견적서 발행 (사업자번호 144-55-01008)\n4. 회원 등급별 자동 할인 (10/15/20/25/30/35/40%)\n5. 무통장 입금 → 입금 확인 → 배송\n\n**환불·교환·배송** 정책은 policy 페이지에 명시."
+    },
+    {
+      "id": "kb-takoon-board-overview",
+      "category": "brand",
+      "topic": "takoon-board",
+      "brand": "Takoon",
+      "tags": [
+        "Takoon 보드",
+        "Glide",
+        "Cruise",
+        "Slide",
+        "Ultra Glide",
+        "Prosurf",
+        "Midlength"
+      ],
+      "source": "site/takoon.html + reference_dmjgroup §3",
+      "title": "Takoon 보드 라인업 6 모델",
+      "content": "Takoon 보드 라인업 (Wing 보드):\n\n- **Cruise** — 입문~초중급 cruising 보드\n- **Slide** — 입문 versatile\n- **Glide** — 중급 표준 wing 보드\n- **Glide Midlength** — 상급 Choppy·Freeride (5'10/75L · 6'0/85L · 6'4/95L · 6'6/105L)\n- **Ultra Glide** — 중급 mid-heavy/heavy\n- **Prosurf** — 상급 Wave 전용 (5'0/60L · 5'1/65L · 5'2/70L · 펌프+서핑 dual)\n\n+ Glide Air / Glide Air Midlength = inflatable 버전."
+    },
+    {
+      "id": "kb-takoon-foil-tier",
+      "category": "brand",
+      "topic": "takoon-foil",
+      "brand": "Takoon",
+      "tags": [
+        "Takoon foil",
+        "Starter",
+        "X-Glide",
+        "Flow",
+        "Flare",
+        "Swell",
+        "Flash",
+        "Carbon"
+      ],
+      "source": "site/takoon.html + reference_dmjgroup §4",
+      "title": "Takoon Foil Skill 3-tier 매핑",
+      "content": "**Takoon Foil front wing tier**:\n\n- **Starter** — 입문 전용 (큰 wing area, low aspect)\n- **X-Glide V2** — 입문~초중급 progression\n- **Flow** — 중급 freeride 표준\n- **Flare** — 중급 wave-leaning\n- **Flow Carbon** — 상급 freeride race-tuned\n- **Flare Carbon** — 상급 wave\n- **Swell** — 상급 wave-tuned (short turn radius)\n- **Flash** — 상급/선수 wave + race transition\n\n**Mast 라인업**:\n- Aluminium 17.5/19mm — 입문\n- Carbon HR 16/18mm — 중급\n- Carbon HM 13/16/18mm — 상급/선수 (thin profile)\n\n**Stab**: Evo (입문) → Glide (중급) → Carve (wave) → Glide HA (상급 high aspect)"
+    },
+    {
+      "id": "kb-ppc-overview",
+      "category": "brand",
+      "topic": "ppc-wing",
+      "brand": "PPC",
+      "tags": [
+        "PPC",
+        "M2",
+        "M1-X",
+        "M1",
+        "Sonic FDS",
+        "더블스킨"
+      ],
+      "source": "site/ppc.html + reference_dmjgroup §4",
+      "title": "PPC Wing 라인업 — Forgiving → Race",
+      "content": "**PPC = 더블스킨 wing 전문 브랜드 (한국)**:\n\n- **M2** — Forgiving (입문·중급 wave·균형 우선)\n- **M1-X** — 중급 표준 (freeride · all-around)\n- **M1** — 상급 race-leaning\n- **Sonic FDS** — 선수 race only (Full Dual Skin, race wing 유일)\n\n**할인 차등**: PPC 라인은 회원 등급별 10–40% 차등 할인이 적용됩니다 (단무지공방 USP)."
+    },
+    {
+      "id": "kb-equipment-flow",
+      "category": "consulting",
+      "topic": "user-flow",
+      "tags": [
+        "flow",
+        "user journey",
+        "추천 system",
+        "site-start",
+        "FMG",
+        "skill assessment"
+      ],
+      "source": "Site IA + Task D Phase 1 spec",
+      "title": "단무지공방 사이트 user flow — 어디서 시작?",
+      "content": "**입문자 권장 flow**:\n1. **Find My Gear** (5분 퀴즈) → 본인 장비 추천 받기\n2. **회원가입**\n3. **장바구니 → 견적 요청** → 무통장 입금\n4. (필요시) **1:1 컨설팅**\n\n**이미 라이딩 중인 분 flow**:\n1. **10축 스킬 진단** (P/S 좌우 5 스킬 100점 만점)\n2. 약점 plane 자동 매칭 → **12주 land + 13주 water training** 프로그램\n3. 진단 결과 회원 계정 저장\n4. (필요시) **프리미엄 1:1 컨설팅** (옥덕필 박사 직접)\n\n**홈(index.html) → persona-grid** 에서 본인 단계 선택 후 진입 가능."
+    },
+    {
+      "id": "kb-deny-persona",
+      "category": "policy",
+      "topic": "persona",
+      "tags": [
+        "페르소나",
+        "voice",
+        "옥코치 톤",
+        "존댓말",
+        "친근"
+      ],
+      "source": "Task D Priority 4",
+      "title": "옥코치 페르소나 — 응답 voice 가이드",
+      "content": "**옥코치 응답 톤**:\n- **존댓말 · 친근 · 과학적 근거 명시**\n- 옥덕필 박사(Danny) 본인 voice — credential 인지 (3× 올림픽 / 운동생리학 박사 / 3개국 NT 코치)\n- 답변 시 출처 명시 (\"Packheiser 2020 연구에 의하면…\")\n- 모르는 영역은 솔직히 인정 → consulting@dmjgroup.kr 안내\n- hallucination 차단: canonical source 외 답변 X\n\n**인사**: \"안녕하세요! **옥코치** — 단무지공방 옥덕필 박사 입니다 ✨ 윙포일·라이딩 컨설팅 — 무엇을 도와드릴까요?\"\n\n**답변 후**: 항상 \"관련 정보 더 보기\" 카드 표시 (top-3 related)."
+    },
+    {
+      "id": "kb-plane-mapping",
+      "category": "consulting",
+      "topic": "plane-wingfoil-mapping",
+      "tags": [
+        "plane",
+        "평면",
+        "시상면",
+        "관상면",
+        "횡단면",
+        "균형",
+        "sagittal",
+        "frontal",
+        "transverse",
+        "어택앵글",
+        "트리밍",
+        "힐컨트롤",
+        "피칭",
+        "회전",
+        "약점"
+      ],
+      "source": "reference_dmj_plane_to_wingfoil_mapping.md",
+      "title": "Plane ↔ Wingfoil 문제 매핑 (약점 plane 진단)",
+      "content": "**4 평면별로 약점이 있으면 윙포일에서 다음이 어렵습니다** (Danny canonical):\n\n| 평면 | 약점 시 어려움 | 운동학 근거 |\n|---|---|---|\n| **시상면 (Sagittal)** | 어택앵글 조절 · 트리밍 조절 · 힐컨트롤 | rider 의 sagittal flexion/extension = 보드 heel-toe edge weight shift = AoA + heel angle |\n| **관상면 (Frontal)** | 보드 전후 균형 · 글라이딩 · 피칭컨트롤 | rider 의 frontal lateral sway (side-stance) = 보드 nose-tail weight transfer = pitch/trim |\n| **횡단면 (Transverse)** | 회전 (택·자이빙) · heel/toe edge 전환 | rider 의 transverse rotation = 보드 yaw 회전 + 어깨·골반 분절 회전 |\n| **균형 (Vestibular/Proprioception)** | foiling 자체 | proprioception + 전정계 결손 시 lift 자체가 불안정 |\n\n12주 land program 의 8 동작 자가진단으로 약점 plane 을 찾고, 그 plane 에 맞춰 처방합니다."
+    },
+    {
+      "id": "kb-plane-side-stance",
+      "category": "consulting",
+      "topic": "plane-wingfoil-mapping",
+      "tags": [
+        "side-stance",
+        "사이드 스탠스",
+        "좌표 변환",
+        "보드 axis",
+        "90도",
+        "yaw",
+        "rotation"
+      ],
+      "source": "reference_dmj_plane_to_wingfoil_mapping.md",
+      "title": "Side-stance 좌표 변환 — 몸 평면 ↔ 보드 축",
+      "content": "**윙포일은 surf-style side stance** 라서, rider 의 body plane 과 board axis 가 **90° rotation 관계**입니다.\n\n- Rider **sagittal** (몸 앞뒤 굴신) → 보드 **heel-toe lateral axis** weight shift\n- Rider **frontal** (몸 좌우 sway) → 보드 **nose-tail long axis** weight transfer\n- Rider **transverse** (몸 회전) → 보드 **yaw** 회전\n\n이 좌표 변환 때문에 \"몸의 어느 평면이 약한가\"가 \"보드의 어느 축 컨트롤이 어려운가\"로 직접 매핑됩니다. 단순히 한 평면이 약하다고 모든 게 안 되는 게 아니라, 평면별로 어려움이 특정됩니다."
+    },
+    {
+      "id": "kb-beginner-session-3stage",
+      "category": "consulting",
+      "topic": "beginner-session",
+      "level": "beginner",
+      "tags": [
+        "입문자",
+        "세션 분리",
+        "3단계",
+        "육상 시뮬레이션",
+        "수상 조작",
+        "수상 띄우기",
+        "마스트 위치",
+        "마스트 뒤로",
+        "마스트 후방",
+        "마스트 후방 이동",
+        "후방 이동",
+        "다이브",
+        "보드 솟구침",
+        "첫 세션",
+        "처음"
+      ],
+      "source": "reference_dmj_beginner_session_separation.md",
+      "title": "입문자 세션 분리 3단계 (Danny 강의 핵심 USP)",
+      "content": "**입문자 함정**: 모든 세션을 같은 장비로 + 모든 세션 \"테이크오프\"를 목표로 → 글라이딩 감각을 못 익힌 채 리프트업만 시도 → 보드 솟구침·다이브.\n\n**올바른 3단계 분리**:\n\n**1단계 — 육상 시뮬레이션**: 작은 윙, 육상에서. 윙 조작(피칭·롤링·시팅·트랜지션·각도)을 안전하게 학습. 손 위치 / 윈드윈도우 감각 / 윙 무게 / 트랜지션 흐름.\n\n**2단계 — 수상 조작 학습 (띄우기 X)**: 작은 윙 + SUP/윈드서핑/넓은 윙포일 보드. **테이크오프 시도 절대 X**. 물 위에서 윙 조작만. 물 위 자세 / 보드 trim / 바람 각도 / 글라이딩 시 윙 컨트롤.\n\n**3단계 — 수상 띄우기**: 적정 사이즈 장비. **마스트 위치를 후방(테일 쪽)으로 이동** — 원래 셋업보다 뒤로 옮기면 리프트업이 약해지고 글라이딩 감각이 우세 → 다이브 방지. 글라이딩 자신감이 생기면 마스트를 점진적으로 전방 이동 → 자연스러운 테이크오프. **한 번에 전방 이동 금지.**"
+    },
+    {
+      "id": "kb-apparent-wind",
+      "category": "consulting",
+      "topic": "apparent-wind",
+      "tags": [
+        "겉보기 바람",
+        "apparent wind",
+        "참바람",
+        "true wind",
+        "윙 사이즈 다운",
+        "보드 속도",
+        "입문 초중급",
+        "초중급",
+        "사이즈 진화",
+        "윙 사이즈 왜 줄",
+        "사이즈 줄여",
+        "윙 줄여",
+        "윙 작게",
+        "한 사이즈 작게"
+      ],
+      "source": "reference_dmj_apparent_wind_progression.md",
+      "title": "겉보기 바람 — 입문→초중급 윙 사이즈 다운 원리",
+      "content": "**우리는 참바람이 아니라 겉보기 바람의 세기로 라이딩합니다** (Danny canonical).\n\n- **True wind (참바람)**: 정지 상태에서 느끼는 실제 바람\n- **Apparent wind (겉보기 바람)**: 참바람 + 라이더 진행 방향 반대 벡터의 합성\n\n**진화 원리**:\n- 입문: 보드 속도가 낮음 → 겉보기 바람 ≈ 참바람\n- 초중급: 보드 속도가 현저히 증가 → 겉보기 바람 = 참바람 + 보드 속도 → 같은 윙도 압력이 더 강하게 느껴짐 → **한 사이즈 작게가 자연스러운 진화**\n\n예: 입문 시 참바람 12kt 에 5.0㎡. 초중급 가서 참바람 12kt + 보드 15kt → 겉보기 ~19kt 체감 → 4.5 또는 4.0㎡ 가 적정.\n\n⚠️ 정량 수치(몇 kt 강해진다)의 절대값은 라이더 속도·풍향에 의존하므로 명시하지 않습니다."
+    },
+    {
+      "id": "kb-takoon-board-specs",
+      "category": "brand",
+      "topic": "takoon-board",
+      "brand": "Takoon",
+      "tags": [
+        "Takoon 보드",
+        "Cruise",
+        "Slide",
+        "Glide Midlength",
+        "Ultra Glide",
+        "Glide",
+        "Prosurf",
+        "보드 사이즈",
+        "리터",
+        "볼륨"
+      ],
+      "source": "reference_takoon_board_specs.md",
+      "title": "Takoon 6 보드 라인업 size 가이드",
+      "content": "**Takoon 6 보드 size 범위**:\n\n- **Cruise** (입문 cross-category): 5'6 90L / 5'10 110L / 6'0 125L — 3 사이즈\n- **Slide** (패러윙 전용): 5'4 50L ~ 7'0 120L — 8 사이즈\n- **Glide Midlength** (하이브리드): 4'10 45L ~ 7'2 145L — 11 사이즈, mid-length ultra versatile\n- **Ultra Glide** (SUP/다운윈드): 5'8 60L ~ 7'4 140L — 9 사이즈, midlength light wind 효율\n- **Glide** (윙): 4'9 60L ~ 5'8 110L — 6+ 사이즈, high-performing freeride·wave·race\n- **Prosurf** (펌프+서핑 dual): 4'9 50L ~ 5'2 70L — 5 사이즈"
+    },
+    {
+      "id": "kb-takoon-board-sizing-logic",
+      "category": "brand",
+      "topic": "takoon-board",
+      "brand": "Takoon",
+      "tags": [
+        "보드 추천",
+        "보드 볼륨",
+        "체중",
+        "장비 무게",
+        "사이즈 결정",
+        "컨디션 조정",
+        "choppy",
+        "take-off"
+      ],
+      "source": "reference_takoon_board_specs.md",
+      "title": "Takoon 보드 볼륨 추천 로직 (체중·레벨·컨디션)",
+      "content": "**장비 무게 ~10kg** 가정 (윙 3kg / 헬멧+라이프자켓 1-2kg / 하네스 2kg / 슈트 2-3kg).\n\n**70kg 라이더 기준 레벨별 볼륨**:\n- 입문: 체중 × 1.5배 이상 (105L 이상)\n- 중급: 체중 + 장비 + 15-20L (95-100L 이상)\n- 상급: 체중 + 장비 + 0-10L (80-90L)\n- 선수: 컨디션 따라 70-90L\n\n**컨디션 조정**:\n- choppy/wave 또는 balance 가 어려움 → base × +5% (중복 합산 X, 단일 5%만)\n- take-off 가 어려움 → 더 긴 선형(longer) 보드 선택"
+    },
+    {
+      "id": "kb-takoon-foil-guideline",
+      "category": "brand",
+      "topic": "takoon-foil",
+      "brand": "Takoon",
+      "tags": [
+        "Takoon 포일",
+        "포일 추천",
+        "포일 입문자",
+        "입문 포일",
+        "포일 선택",
+        "complete foil",
+        "front wing 추천",
+        "Starter",
+        "X-Glide",
+        "Flow",
+        "Flare",
+        "Swell",
+        "Flash",
+        "Carbon 마스트",
+        "포일 스탭",
+        "skill tier"
+      ],
+      "source": "reference_takoon_foil_guideline.md",
+      "title": "Takoon 포일 선택 가이드 (skill 3-tier)",
+      "content": "**Takoon 포일 컴포넌트 — skill 3-tier 매핑**:\n\n**Complete Foils**: Beginner = Starter / X-Glide V2 · Int-Adv = Flare Aluminium / Flow Aluminium · Pro = Flare Carbon / Flow Carbon\n\n**Front Wings**: Beginner = Starter / X-Glide V2 · Int-Adv = Flow / Flare · Pro = Flow / Flare / Swell / Flash\n\n**Masts**: Beginner = Aluminium 17.5mm / 19mm · Int-Adv = Carbon HR 16mm / Carbon HM 16mm · Pro = Carbon HM 13mm\n\n**Stabs**: Beginner = Evo / Glide · Int-Adv = Carve / Glide HA · Pro = Carve / Glide HA\n\n입문자에게는 Takoon Starter / X-Glide V2 우선. **입문자에게 Levitaz 절대 X** (brand 차별화 정책). Levitaz Free Series wing 매핑과는 분리됩니다."
+    },
+    {
+      "id": "kb-takoon-pumpfoil-guideline",
+      "category": "brand",
+      "topic": "takoon-pumpfoil",
+      "brand": "Takoon",
+      "tags": [
+        "펌핑포일",
+        "펌프포일",
+        "pump foil",
+        "펌핑",
+        "서핑포일",
+        "서핑 포일",
+        "Pump One",
+        "Pump Carbon",
+        "Pump Wood",
+        "Prosurf",
+        "UHM 13mm"
+      ],
+      "source": "reference_takoon_pumpfoil_guideline.md",
+      "title": "Takoon 펌핑포일·서핑포일 가이드 (skill 3-tier)",
+      "content": "**Takoon 펌핑포일·서핑포일 카테고리 전용 매핑**:\n\n**Pack**: Beginner = Pack Pump One Carbon/Wood · Int-Adv = Pump Performance Pack\n\n**Boards**: Beginner~Pro = Pump Carbon · Beginner~Int = Pump Wood\n\n**Foils**: Beginner = Pump One Complete Foil Set / Pump One Front Wing · Int-Adv = Complete Pump Foil Set / Pump Front Wing · Pro = Pump Pro Front Wing\n\n**Mast**: Beginner = Aluminium 17/19mm · Int-Adv = Carbon HR 18mm / HM 18mm / HM 16mm · Pro = Carbon UHM 13mm\n\n**Stabs**: Beginner = Glide · Int-Adv = Glide HA / Carve · Pro = Pump HA\n\n**서핑 장르**: Prosurf 보드 (펌프와 dual purpose), 동일한 펌프 foil component 사용. **Prosurf = wave 우선** vs **Pump board = pumping efficiency 우선**."
+    },
+    {
+      "id": "kb-ppc-wing-characteristics",
+      "category": "brand",
+      "topic": "ppc-wing",
+      "brand": "PPC",
+      "tags": [
+        "PPC",
+        "M1",
+        "M1-X",
+        "M2",
+        "M1 vs M2",
+        "M1 M2 차이",
+        "윙 모델 차이",
+        "윙 비교",
+        "모델 차이",
+        "윙 모델",
+        "택킹",
+        "펄럭임",
+        "리딩엣지",
+        "경량",
+        "가성비",
+        "Takoon V4"
+      ],
+      "source": "reference_ppc_wing_model_characteristics.md",
+      "title": "PPC 윙 모델별 기술 특성 (페인포인트 매칭)",
+      "content": "**PPC 윙 — 페인포인트·선호별 추천**:\n\n| 페인포인트 / 선호 | 추천 | 이유 |\n|---|---|---|\n| 택킹이 잘 안 됨 (펄럭임 싫음) | **PPC M1** | 펄럭임 최소, 리딩엣지 플랫 |\n| 리딩엣지 최대 플랫 원함 | **PPC M1** | 프로파일 가장 평평, 정밀 컨트롤 |\n| 가벼워야 함 | **PPC M1-X** | M1 대비 경량화, 장시간·펌핑·이륙 부담 ↓ |\n| 가성비 중시 | **PPC M2** | M1·M1-X 대비 가격 우호적 + 적정 성능 |\n| 최저가 우선 | **Takoon Wing V4** | PPC 라인 아래 가격대, 입문·세컨드 |\n\n**풍속 빈도 ↔ 가격 비례 원칙**: 자주 라이딩하는 풍속 구간 → 고급 모델 (투자 가치 ↑). 가끔 타는 구간 → 가성비 모델. 사용 빈도 10% 미만 구간은 추천에서 제외합니다."
+    },
+    {
+      "id": "kb-wip-pricing-policy",
+      "category": "policy",
+      "topic": "wip-pricing",
+      "brand": "WIP",
+      "tags": [
+        "Forward WIP",
+        "WIP",
+        "B2B",
+        "SS26",
+        "선주문",
+        "pre-order",
+        "할인",
+        "wholesale",
+        "한국 판매가",
+        "관부가세"
+      ],
+      "source": "reference_wip_pricing_policy.md",
+      "title": "Forward WIP B2B 정책 SS26",
+      "content": "**Forward WIP (Swiss Retailer) B2B 정책 SS26**:\n\n**Pre-order timeline**: Start 2025-06-16 / Deadline before production 2025-08-07 / Final 2025-10-10 / 배송 시작 2026-03-01 (split 2nd 2026-05-01). 최소 1st order 1,500 CHF.\n\n**Wholesale mark-up**: 1.8 / 40%\n\n**Pre-order discount**: Aug 7 이전 조기 발주 = 더 큰 할인 (최대 14% — >20K€ + 15% pre-order increase). Oct 10 이전 정상. In-season re-order mark-up 1.80-1.90.\n\n**Payment**: 주문 ≥10,000€ → 20% 선금 + 40% (30일) + 40% (60일). <10,000€ → 선금 또는 30일 net.\n\n**Shipment**: Suisse >1,000 CHF Franco 무료. B2C dropship PD <350€ → +5€ picking fee.\n\n**한국 판매가 산식 (WIP)**: (RETAIL Ex VAT € × 환율) + 운송료 + 관부가세 (× 1.08 × 1.10)"
+    },
+    {
+      "id": "kb-community-clubs-verified",
+      "category": "community",
+      "topic": "watersports-clubs",
+      "tags": [
+        "윈드서핑 클럽",
+        "윙포일 클럽",
+        "카이트 클럽",
+        "워터스포츠 클럽",
+        "동호회",
+        "지역 클럽",
+        "어디서 타",
+        "어디서 배워 클럽",
+        "근처 클럽",
+        "서울",
+        "뚝섬",
+        "한강",
+        "경기",
+        "평택호",
+        "강원",
+        "양양",
+        "충남",
+        "당진",
+        "부산",
+        "다대포",
+        "송정",
+        "경남",
+        "통영",
+        "경북",
+        "포항",
+        "제주",
+        "하이윈드",
+        "쥬티",
+        "카이트존",
+        "엉클서프",
+        "카이터스",
+        "스테이지하우스"
+      ],
+      "source": "Task C 웹 리서치 2026-05-15 (출처 URL 검증) — '한국 워터스포츠 클럽 정리.itmz'",
+      "title": "전국 워터스포츠 클럽·스쿨 — 웹 출처 검증 (정보 제공 — 추천·보증 X)",
+      "content": "_⚠️ 아래는 웹 검색으로 **출처 URL 까지 확인된** 정보 제공일 뿐이에요. **단무지공방은 특정 클럽을 추천·보증하지 않습니다.** 운영 현황·연락처는 각 클럽에 직접 확인을 권장드려요._\n\n**서울 (한강 뚝섬 중심)**\n- 하이윈드 카이트보딩 클럽 (Hiwind) — 광진구 뚝섬 29번. 카이트·윈드·윙포일·펌핑포일 강습. (hiwind.co.kr)\n- 윈드서핑 하이윈드클럽 — 뚝섬 34번 선착장. 윈드서핑. (m.hiwind.kr)\n- Speed33 윈드서핑 클럽 — 광진구 뚝섬 33번. 윈드서핑. (speed33.com)\n- 쥬티 윈드서핑 클럽 — 뚝섬유원지. 윈드서핑·윙포일·eFoil. (IG @zootywindsurfing_club)\n- 카이트존 (KITEZONE) — 강동구 고덕동 (샵). 카이트·윈드·윙포일. (kitezone.co.kr)\n- Jeju Kite Lab 서울 한강 지점 — 카이트·윙포일·eFoil. (jejukitelab.com)\n\n**경기**\n- 카이트존스포츠 (평택호) — 평택시 현덕면, 평택호 관광단지. 카이트·윙포일·eFoil 강습. (kitezonesports.com)\n\n**강원**\n- 엉클서프 양양 지점 — 양양 죽도·인구해변. 윈드서핑·서핑. (unclesurf.quv.kr)\n\n**충남**\n- 카이트존 석문교육장 (부분 확인) — 당진 석문. 카이트·윈드·윙포일.\n\n**부산**\n- 다대포 해양레포츠센터 — 사하구 다대포해수욕장. 카이트·윈드·윙포일 (공공 레포츠센터). (busanddp.co.kr)\n- 엉클서프 송정 본점 — 해운대구 송정. 윈드서핑·서핑 25년. (unclesurf.quv.kr)\n- 부산윈드서핑·카이트보딩연합회 — 동호인 연합회. (Daum카페 busanwinds)\n\n**경남**\n- 통영윈드서핑(카이트보딩)협회 / 통영산양스포츠파크 — 통영 산양읍. 윈드서핑.\n\n**경북**\n- 포항해양스포츠아카데미 — 포항 영일대·죽천. 윈드서핑 (포항시체육회, 3~11월).\n- 환동해포항서핑클럽 (HPSC, 부분 확인) — 포항. (hpsc.or.kr)\n\n**제주**\n- 카이터스 (KITERS) 제주카이트서핑클럽 — 제주시 매촌4길 3. 카이트서핑. (kiters.co.kr)\n- Stagehouse (스테이지하우스) — 제주 동부. 카이트서핑 (IKO 인증).\n- Jeju Kite Lab — 제주도. 카이트·윙포일·eFoil (IKO 인증).\n- 제주 쥬티클럽 — 서귀포 성산읍 섭지코지 인근. 윈드·윙포일·카이트. (jejuzooty.modoo.at)\n\n_지역별 검증 수: 서울 6 · 경기 1 · 강원 1 · 충남 1(부분) · 부산 3 · 경남 1 · 경북 2 · 제주 4. 인천·충북·전남·전북·대전·울산·대구·광주는 출처로 확정된 클럽을 아직 찾지 못했어요. 강습·컨설팅은 단무지공방이 직접 1:1 로 운영하니 그쪽도 참고해 주세요._"
+    },
+    {
+      "id": "kb-community-clubs-supplementary",
+      "category": "community",
+      "topic": "watersports-clubs",
+      "tags": [
+        "윈드서핑 클럽",
+        "동호회",
+        "지역 클럽",
+        "낙동강",
+        "진하",
+        "태화강",
+        "고성",
+        "당항포",
+        "진주",
+        "사천",
+        "영일만",
+        "천해지풍",
+        "울진",
+        "춘천",
+        "시화호",
+        "군산",
+        "여수",
+        "신안",
+        "홀통",
+        "대전",
+        "남매지",
+        "상명대",
+        "가천대",
+        "전라권",
+        "광주",
+        "근처 윈드서핑"
+      ],
+      "source": "Danny 받아쓰기 목록 2026-05-15 (출처 미검증 — 추가 정보)",
+      "title": "전국 워터스포츠 클럽 — 추가 정보 (출처 미검증, 직접 확인 필요)",
+      "content": "_⚠️ 아래는 Danny 가 받아쓴 목록으로, **아직 웹 출처로 검증되지 않은 추가 정보**예요. 위 '웹 출처 검증' 목록과 별개로, **운영 현황·정확한 명칭·위치는 직접 확인이 꼭 필요**합니다. 단무지공방은 특정 클럽을 추천·보증하지 않습니다._\n\n**부산·경남·경북** — 부산 낙동강 윈드서핑 / 울산 진하 마우이클럽 / 울산 태화강 윈드헌트클럽 / 경남 고성 당항포 당하이윈드서핑 / 경남 진주·사천 진사윈드서핑클럽 / 경북 포항 영일만 윈드서핑클럽 / 포항 천해지풍 윈드서핑클럽 / 경북 울진군 요트학교 / 부산·경상도 카이트보딩 클럽\n\n**서울·경기·강원** — 서울 뚝섬 아리수 윈드서핑클럽·돌핀서프 / 서울시 윈드서핑연맹 / 송파구 윈드서핑연합회 / 경기 시화호 시화윈드서핑클럽 / 강원 춘천 춘천윈드서핑아카데미\n\n**충청·전라** — 충남 윈드서핑·카이트연맹 / 대전윈드서핑클럽 / 전북 군산윈드서핑클럽 / 전남 여수 이순신 윈드서핑클럽·여수윈드서핑카이트보딩 연합회 / 전남 신안 홀통 윈드서핑클럽 / 카이트 전라권 유저모임 / 광주·전남 카이트보딩클럽\n\n**제주** — 임프로 윈드서핑클럽 / 제주 윈드서핑\n\n**대학 동아리** — 상명대학교 윈드서핑 / 가천대학교 윈드서핑클럽\n\n**미확인 (명칭·위치 확인 필요)** — 남매지 윈드서핑 (지역 미확인) / 김쌍기 윈드서핑클럽 (지역 미확인) / '양양윈드서핑클럽' (위치 상이 — 미확인. 참고로 양양에는 엉클서프 양양 지점이 웹 출처로 확인됨)\n\n_참고: Danny 목록의 '제주 ㅈ티클럽'은 웹 검증 결과 **'제주 쥬티클럽'** (서귀포 성산읍)으로 확인되어 위 검증 목록에 반영했어요._"
+    },
+    {
+      "id": "kb-community-federations",
+      "category": "community",
+      "topic": "federations",
+      "tags": [
+        "연맹",
+        "협회",
+        "전국 단체",
+        "KWKF",
+        "대한윈드서핑카이트보딩연맹",
+        "KWPL",
+        "리그",
+        "국민생활체육",
+        "윈드서핑 연맹",
+        "카이트보딩 연맹"
+      ],
+      "source": "Task C 웹 리서치 + Danny 목록 2026-05-15",
+      "title": "전국 워터스포츠 연맹·단체 (정보 제공 — 추천·보증 X)",
+      "content": "_⚠️ 정보 제공일 뿐이며, 단무지공방은 특정 단체를 추천·보증하지 않습니다. 현행 운영은 직접 확인을 권장드려요._\n\n**웹 출처 확인된 전국 단체**\n- **대한윈드서핑카이트보딩연맹 (KWKF)** — 서울 마포구 월드컵경기장 내. 시도지부: 서울·부산·울산·대구·광주·경남·경북·제주. (kwkf.or.kr)\n- **국민생활체육 전국윈드서핑·카이트보딩연합회** — (Facebook @kwasa7)\n\n**미확인 / 추가 정보 (직접 확인 필요)**\n- 시화호카이트서핑클럽 · 시화윈드서핑클럽 (경기 시화호) — 카페·블로그 활동은 확인되나 현행 운영 상세·연락처 미확인\n- KWPL (윈드서핑·윙포일 리그) — Danny 목록 항목, 출처 미검증\n\n_지역 클럽 정보는 '전국 워터스포츠 클럽' chunk 들을 참고해 주세요._"
+    },
+    {
+      "id": "kb-community-distributors",
+      "category": "community",
+      "topic": "distributors",
+      "tags": [
+        "유통사",
+        "수입사",
+        "장비 어디서 사",
+        "브랜드 수입",
+        "노스",
+        "North",
+        "듀오톤",
+        "Duotone",
+        "스타보드",
+        "Starboard",
+        "카이트존",
+        "오존",
+        "Ozone",
+        "네쉬",
+        "Naish",
+        "장비 구매처"
+      ],
+      "source": "Danny 받아쓰기 목록 2026-05-15 (유통사·수입사)",
+      "title": "워터스포츠 브랜드 유통사·수입사 정보 (정보 제공 — 추천·보증 X)",
+      "content": "_⚠️ 아래는 정리된 정보 제공일 뿐이에요. **단무지공방은 특정 유통사를 추천·보증하지 않습니다.** 정확한 취급 브랜드·재고는 각 사에 직접 확인을 권장드려요._\n\n정리된 정보로는 국내에 다음과 같은 워터스포츠 브랜드 유통사·수입사가 있는 것으로 보입니다:\n\n- **노스코리아** (North)\n- **듀오톤코리아** (Duotone)\n- **스타보드코리아** (Starboard)\n- **카이트존**\n- **오존스포츠** (Ozone)\n- **네쉬코리아** (Naish)\n\n참고로 **단무지공방은 Levitaz · PPC · Takoon · Forward WIP** 4개 브랜드를 직접 큐레이션해 드려요. 본인 레벨·체중·스타일에 맞는 장비는 **Find My Gear** 퀴즈나 1:1 컨설팅으로 안내받으실 수 있습니다."
+    }
+  ]
+}

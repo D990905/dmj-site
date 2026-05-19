@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="DMJ Lifting Calculator (maskable)">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0A2540"/>
+      <stop offset="100%" stop-color="#061A2E"/>
+    </linearGradient>
+  </defs>
+  <!-- Maskable: full bleed solid bg, content within centered 80% safe zone (51px padding all sides) -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- Safe-zone-contained icon: scaled 0.7 from center -->
+  <g transform="translate(256 256) scale(0.7) translate(-256 -256)">
+    <!-- water wave -->
+    <path d="M0 380 Q 64 350 128 380 T 256 380 T 384 380 T 512 380 L 512 512 L 0 512 Z" fill="#1F8FFF" opacity="0.55"/>
+    <path d="M0 410 Q 64 380 128 410 T 256 410 T 384 410 T 512 410 L 512 512 L 0 512 Z" fill="#1F8FFF" opacity="0.85"/>
+
+    <!-- foil silhouette -->
+    <g transform="translate(256 240)">
+      <rect x="-6" y="-50" width="12" height="120" rx="3" fill="#FFB800"/>
+      <path d="M -120 -50 Q -60 -75 0 -60 Q 60 -75 120 -50 Q 60 -28 0 -34 Q -60 -28 -120 -50 Z" fill="#FFB800"/>
+      <path d="M -55 70 Q -25 60 0 64 Q 25 60 55 70 Q 25 78 0 76 Q -25 78 -55 70 Z" fill="#FFB800" opacity="0.95"/>
+    </g>
+
+    <!-- "L↑" mark -->
+    <g transform="translate(76 100)">
+      <text x="0" y="56" font-family="Inter, system-ui, sans-serif" font-weight="900" font-size="84" fill="#fff">L</text>
+      <text x="60" y="56" font-family="Inter, system-ui, sans-serif" font-weight="600" font-size="36" fill="#FFB800">↑</text>
+    </g>
+  </g>
+</svg>

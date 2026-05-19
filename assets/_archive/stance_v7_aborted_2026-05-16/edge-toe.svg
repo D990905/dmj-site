@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 210" role="img" aria-label="토 엣지 압력 다이어그램 — 발가락 쪽 엣지로 체중 이동">
+  <defs>
+    <marker id="ahToe" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0 0 L6.5 3 L0 6 Z" fill="#FFB800"/>
+    </marker>
+  </defs>
+  <!-- board (top-down, nose up) -->
+  <path d="M100 22 C112 22 122 30 126 48 C131 70 131 130 126 152 C122 170 112 178 100 178 C88 178 78 170 74 152 C69 130 69 70 74 48 C78 30 88 22 100 22 Z"
+        fill="#F5F7FA" stroke="#0A2540" stroke-width="2.5"/>
+  <!-- toe-side rail highlighted (digs in) -->
+  <path d="M126 48 C131 70 131 130 126 152" fill="none" stroke="#FFB800" stroke-width="6" stroke-linecap="round" opacity="0.92"/>
+  <!-- feet (side-stance, across board) -->
+  <rect x="76" y="70" width="48" height="15" rx="7.5" fill="#0A2540"/>
+  <rect x="76" y="125" width="48" height="15" rx="7.5" fill="#0A2540"/>
+  <!-- toe markers (right edge of each foot) -->
+  <circle cx="118" cy="73.5" r="2.1" fill="#FFB800"/><circle cx="118" cy="77.5" r="2.1" fill="#FFB800"/><circle cx="118" cy="81.5" r="2.1" fill="#FFB800"/>
+  <circle cx="118" cy="128.5" r="2.1" fill="#FFB800"/><circle cx="118" cy="132.5" r="2.1" fill="#FFB800"/><circle cx="118" cy="136.5" r="2.1" fill="#FFB800"/>
+  <!-- pressure arrows toward toe rail -->
+  <line x1="98" y1="77.5" x2="140" y2="77.5" stroke="#FFB800" stroke-width="3.4" marker-end="url(#ahToe)"/>
+  <line x1="98" y1="132.5" x2="140" y2="132.5" stroke="#FFB800" stroke-width="3.4" marker-end="url(#ahToe)"/>
+  <!-- nose marker -->
+  <text x="100" y="14" text-anchor="middle" font-family="'Pretendard',sans-serif" font-size="11" font-weight="700" fill="#5C6F7E">노즈</text>
+  <!-- label -->
+  <text x="100" y="200" text-anchor="middle" font-family="'Pretendard',sans-serif" font-size="13" font-weight="800" fill="#0A2540">토 엣지 (발가락 쪽) 압력</text>
+</svg>

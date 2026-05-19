@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "source": "levitaz.com 공식 shop 페이지",
+    "fetched": "2026-05-10",
+    "purpose": "본사 영문 카피 source-of-truth. 사이트 표시는 한국어 자연 번역. 이 파일 내용은 절대 수정 금지 (본사 원문 보존)",
+    "license": "단무지공방 = Levitaz 한국 정식 수입 partner. brand 자산 사용 권한 보유"
+  },
+  "free_series_front_wings": {
+    "url": "https://levitaz.com/shop/product/free-series-front-wings/",
+    "tagline": "High-Performance Free Series Front Wing",
+    "construction_highlights": [
+      "Integrated titanium interface for a play-free fit and ultra-precise power transfer",
+      "Pressed into the front wing during lamination for a permanent, ultra-stiff bond in the system's most highly loaded area",
+      "All main connection threads are located in titanium for reduced wear, easier maintenance, and long-term durability",
+      "Corrosion-resistant construction for reliable use in saltwater environments",
+      "One-tool system: all key connections on the hydrofoil setup and board use the same T30 Torx tool"
+    ],
+    "included": "Cover, 2 x M6x20 glider connection screws and TX30 tool",
+    "variants": {
+      "fw-540": {
+        "variant_id": 25301,
+        "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25301",
+        "headline": "Built for extremely high top-end performance, agile handling, and precise control.",
+        "key_benefits": [
+          "High top-end performance",
+          "Agile control",
+          "Direct response"
+        ],
+        "description": "The FW 540 is the smallest front wing in the Free Series, optimized for riders who want maximum top-end performance with agile and easy control. With a 67 cm span, 540 cm² area, and 8.4 aspect ratio, it is positioned for kite, wing, and big wave surf use.",
+        "product_features": [
+          "Free Series-specific outline and anhedral geometry for agility and balance",
+          "Lift-to-drag ratio optimized for its specific application",
+          "Designed for kite, wing, and big wave surf use"
+        ],
+        "spec": {
+          "span_cm": 67,
+          "area_cm2": 540,
+          "aspect_ratio": 8.4
+        }
+      },
+      "fw-680": {
+        "variant_id": 25308,
+        "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25308",
+        "headline": "Built for high top-end performance, balanced agility, and precise control.",
+        "key_benefits": [
+          "High top-end performance",
+          "Balanced agility",
+          "Precise control"
+        ],
+        "description": "The FW 680 is designed for riders who want strong speed potential with a more balanced mix of glide, control, and agility. Positioned between the smaller, more radical sizes and the larger freeride-oriented wings, it delivers an efficient, precise ride feel across multiple disciplines.",
+        "product_features": [
+          "Free Series-specific outline and anhedral geometry for agility and balance",
+          "Lift-to-drag ratio optimized for its specific application",
+          "Tuned for efficient speed, control, and versatile use"
+        ],
+        "spec": {
+          "span_cm": 77,
+          "area_cm2": 680,
+          "aspect_ratio": 8.7
+        }
+      },
+      "fw-790": {
+        "variant_id": 25340,
+        "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25340",
+        "headline": "Built for efficient glide, balanced control, and versatile freeride performance.",
+        "key_benefits": [
+          "Efficient glide",
+          "Balanced control",
+          "Versatile performance"
+        ],
+        "description": "The FW 790 is designed for riders who want a balanced mix of early lift, smooth glide, and precise control. Positioned deeper in the freeride range, it offers a more accessible and versatile ride feel while maintaining the speed efficiency and clean handling that define the Free Series.",
+        "product_features": [
+          "Free Series-specific outline and anhedral geometry for balanced handling",
+          "Lift-to-drag ratio optimized for smooth glide and controlled freeride performance",
+          "Tuned for versatile use across a wide range of conditions"
+        ],
+        "spec": {
+          "span_cm": 90,
+          "area_cm2": 790,
+          "aspect_ratio": 10.3
+        }
+      },
+      "fw-900": {
+        "variant_id": 25347,
+        "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25347",
+        "headline": "Built for early lift, smooth glide, and balanced freeride performance.",
+        "key_benefits": [
+          "Early lift",
+          "Smooth glide",
+          "Balanced control"
+        ],
+        "description": "The FW 900 is designed for riders who want an efficient freeride wing with easy lift, clean glide, and a stable, confidence-inspiring ride feel. It sits in the sweet spot for versatile freeride use, combining accessible handling with the efficient performance and precise control that define the Free Series.",
+        "product_features": [
+          "Free Series-specific outline and anhedral geometry for balanced handling",
+          "Lift-to-drag ratio optimized for smooth glide and efficient freeride use",
+          "Tuned for versatile performance across a wide range of conditions"
+        ],
+        "spec": {
+          "span_cm": 110,
+          "area_cm2": 900,
+          "aspect_ratio": 13.3
+        }
+      }
+    },
+    "image_url_pattern": {
+      "base": "https://levitaz.com/uploads/shop/",
+      "front_wing": "levitaz_free_series_frontwing_{size}_{angle}2000x2000px.jpg",
+      "size": [
+        "540",
+        "680",
+        "790",
+        "900"
+      ],
+      "angle": {
+        "v": "front + mast 각도",
+        "o": "top-down (위에서 본 평면)",
+        "u": "side-profile (옆 단면)"
+      }
+    }
+  },
+  "boom_scc_boards": {
+    "url": "https://levitaz.com/shop/product/boom-scc-boards/",
+    "tagline": "Built for maximum flow, early lift, and efficient glide across wing, parawing, and downwind sessions.",
+    "intro": "Sometimes you do not need three boards for three conditions. You need one that gets you on foil more often. Boom SCC Boards fill exactly that gap with efficient mid-length shapes for glide, stability, and early lift-off, combined with an ultra-light, stiff hollow construction feel. Built for wing, parawing, and downwind use, they are designed to release cleanly, stay calm in the air, and keep the ride efficient without feeling sluggish.",
+    "key_benefits": [
+      "Early take-off",
+      "Efficient glide",
+      "Ultra-light & ultra-stiff hollow construction"
+    ],
+    "description": "Boom SCC Boards are the mid-length hollow-construction boards of the Free Series, built for riders who want earlier lift, more glide, and a calm, efficient ride without giving up agility. Positioned between a classic wing board and a pure downwind shape, they combine enough length for efficiency, enough balance for control, and enough responsiveness to keep turns, transitions, and maneuvers lively and fun.",
+    "construction_highlights": [
+      "Hollow SCC construction for an ultra-light, extremely stiff shell feel",
+      "Reinforced US mast track area for uncompromising power transfer under load",
+      "Low swing weight for easier handling in turns, transitions, and quick corrections",
+      "Clean energy transfer for more efficient pumping",
+      "Narrow nose and tail with a far-forward mast position to reduce perceived inertia"
+    ],
+    "scope_of_delivery": "Straps, Foil-to-Board Mounting Hardware & Premium Boardbag",
+    "variants": {
+      "fs-63": {
+        "variant_id": 25554,
+        "url": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25554",
+        "spec": {
+          "dimensions_cm": [
+            150,
+            45,
+            13
+          ],
+          "dimensions_imperial": "4'11\" × 17.7\" × 5.3\"",
+          "volume_l": 63,
+          "weight_kg": 3.8
+        }
+      },
+      "fs-83": {
+        "variant_id": 25590,
+        "url": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25590",
+        "spec": {
+          "dimensions_cm": [
+            170,
+            48.1,
+            15.5
+          ],
+          "dimensions_imperial": "5'7\" × 18.9\" × 6.1\"",
+          "volume_l": 83,
+          "weight_kg": 4.1
+        }
+      },
+      "fs-95": {
+        "variant_id": 25596,
+        "url": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25596",
+        "spec": {
+          "dimensions_cm": [
+            194,
+            48,
+            16
+          ],
+          "dimensions_imperial": "6'4.4\" × 18.9\" × 6.3\"",
+          "volume_l": 95,
+          "weight_kg": 4.5
+        }
+      }
+    },
+    "image_url_pattern": {
+      "base": "https://levitaz.com/uploads/shop/",
+      "pattern": "levitaz_free_series_boom_{volume}_ssc_{angle}2000x2000px.jpg",
+      "volume": [
+        "63",
+        "83",
+        "95"
+      ],
+      "angle": [
+        "overview",
+        "deck",
+        "bottom",
+        "rail"
+      ]
+    }
+  }
+}

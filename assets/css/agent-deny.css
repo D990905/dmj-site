@@ -1,0 +1,814 @@
+/* §173 — 옥코치 AI Agent (Phase 1) chat widget styles  (구 명 '대니' → '옥코치' §173-D 2026-05-16)
+ * DO_NOT_REVERT §173 — 전 페이지 floating widget 영구 노출.
+ * All selectors scoped under `.agent-deny-*` to avoid clashes with style.css.
+ * Korean typography: word-break:keep-all + line-height 1.55. */
+
+/* ============================================================
+ * FAB (Floating Action Button)
+ * ============================================================ */
+.agent-deny-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 9999;
+  background: linear-gradient(145deg, #0A2540 0%, #061A2E 100%);
+  box-shadow:
+    0 8px 24px rgba(10, 37, 64, 0.32),
+    0 2px 6px rgba(10, 37, 64, 0.18),
+    inset 0 0 0 3px rgba(255, 184, 0, 0.55);
+  overflow: visible;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+.agent-deny-fab:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    0 12px 32px rgba(10, 37, 64, 0.42),
+    0 4px 10px rgba(10, 37, 64, 0.24),
+    inset 0 0 0 3px rgba(255, 184, 0, 0.85);
+}
+.agent-deny-fab:focus-visible {
+  box-shadow:
+    0 0 0 4px rgba(31, 143, 255, 0.45),
+    0 8px 24px rgba(10, 37, 64, 0.32),
+    inset 0 0 0 3px rgba(255, 184, 0, 0.85);
+}
+.agent-deny-fab:active { transform: translateY(0) scale(0.98); }
+
+.agent-deny-fab__avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* §173-C v3 — photo asset 는 이미 face-centered square crop. object-position center default. */
+.agent-deny-fab__avatar svg,
+.agent-deny-fab__avatar img,
+.agent-deny-fab__avatar picture,
+.agent-deny-fab__avatar picture img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 50%;
+}
+
+/* Pulse ring (idle attention) */
+.agent-deny-fab::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 184, 0, 0.55);
+  pointer-events: none;
+  animation: agent-deny-pulse 3.6s ease-out infinite;
+}
+@keyframes agent-deny-pulse {
+  0%   { transform: scale(1);    opacity: 0.85; }
+  70%  { transform: scale(1.32); opacity: 0; }
+  100% { transform: scale(1.32); opacity: 0; }
+}
+
+/* Badge / notification dot */
+.agent-deny-fab__badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: #FFB800;
+  color: #0A2540;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 22px;
+  text-align: center;
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  box-shadow: 0 2px 6px rgba(10, 37, 64, 0.28);
+  pointer-events: none;
+  display: none;
+}
+.agent-deny-fab[data-has-badge="true"] .agent-deny-fab__badge { display: block; }
+
+/* Hide FAB when panel open */
+.agent-deny-fab[data-hidden="true"] {
+  opacity: 0;
+  transform: scale(0.6) translateY(20px);
+  pointer-events: none;
+}
+
+/* ============================================================
+ * Panel (chat container)
+ * ============================================================ */
+.agent-deny-panel {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  width: 380px;
+  height: 560px;
+  max-height: calc(100vh - 140px);
+  background: rgba(255, 255, 255, 0.96);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
+  border-radius: 18px;
+  box-shadow:
+    0 24px 56px rgba(10, 37, 64, 0.32),
+    0 6px 16px rgba(10, 37, 64, 0.18),
+    0 0 0 1px rgba(10, 37, 64, 0.08);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.24s cubic-bezier(0.34, 1.36, 0.64, 1);
+  font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", sans-serif;
+  color: #0A2540;
+}
+.agent-deny-panel[data-open="true"] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  animation: agent-deny-slide-up 0.32s cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+@keyframes agent-deny-slide-up {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ============================================================
+ * Panel header
+ * ============================================================ */
+.agent-deny-panel__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #0A2540 0%, #061A2E 100%);
+  color: #fff;
+  border-bottom: 3px solid #FFB800;
+  flex-shrink: 0;
+}
+.agent-deny-panel__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 184, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(255, 184, 0, 0.55);
+}
+.agent-deny-panel__avatar svg,
+.agent-deny-panel__avatar img,
+.agent-deny-panel__avatar picture,
+.agent-deny-panel__avatar picture img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 50%;
+}
+.agent-deny-panel__avatar picture { display: block; width: 100%; height: 100%; }
+.agent-deny-fab__avatar picture { display: block; width: 100%; height: 100%; }
+
+/* §173-B — Knowledge chunk citation styling (smaller, italic) */
+.agent-deny-msg--bot em {
+  font-size: 11.5px;
+  opacity: 0.78;
+}
+.agent-deny-panel__titles {
+  flex: 1;
+  min-width: 0;
+}
+.agent-deny-panel__title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 0;
+  word-break: keep-all;
+}
+.agent-deny-panel__title::after {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 6px;
+  background: #4ADE80;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.32);
+  vertical-align: middle;
+}
+.agent-deny-panel__subtitle {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 2px 0 0;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+}
+.agent-deny-panel__close {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+.agent-deny-panel__close:hover { background: rgba(255, 255, 255, 0.18); }
+.agent-deny-panel__close:focus-visible { outline: 2px solid #FFB800; outline-offset: 2px; }
+
+/* ============================================================
+ * Body (message list)
+ * ============================================================ */
+.agent-deny-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #CBD3DA transparent;
+}
+.agent-deny-panel__body::-webkit-scrollbar { width: 6px; }
+.agent-deny-panel__body::-webkit-scrollbar-thumb { background: #CBD3DA; border-radius: 3px; }
+.agent-deny-panel__body::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================================
+ * Message bubbles
+ * ============================================================ */
+.agent-deny-msg {
+  max-width: 92%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  word-break: keep-all;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  animation: agent-deny-pop 0.22s cubic-bezier(0.34, 1.36, 0.64, 1);
+  font-weight: 500;
+  white-space: normal;
+}
+.agent-deny-msg--bot br + br {
+  /* §173-B — paragraph break spacing */
+  display: block;
+  content: "";
+  margin-top: 4px;
+}
+@keyframes agent-deny-pop {
+  from { opacity: 0; transform: scale(0.92) translateY(6px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.agent-deny-msg--bot {
+  align-self: flex-start;
+  background: linear-gradient(135deg, #0A2540 0%, #102E50 100%);
+  color: #fff;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 6px rgba(10, 37, 64, 0.18);
+}
+.agent-deny-msg--bot strong { color: #FFD24D; font-weight: 800; }
+.agent-deny-msg--bot a { color: #FFD24D; text-decoration: underline; }
+.agent-deny-msg--bot em { color: #BFE6FF; font-style: normal; font-weight: 700; }
+
+.agent-deny-msg--user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #FFE08A 0%, #FFB800 100%);
+  color: #0A2540;
+  border-bottom-right-radius: 4px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(255, 184, 0, 0.24);
+}
+
+/* Page-link buttons inside bot reply */
+.agent-deny-msg__links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  align-self: flex-start;
+  max-width: 86%;
+}
+.agent-deny-msg__page-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #FFB800;
+  color: #0A2540;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 20px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  word-break: keep-all;
+  text-align: left;
+  font-family: inherit;
+  line-height: 1.4;
+}
+.agent-deny-msg__page-link::before {
+  content: "→";
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.agent-deny-msg__page-link:hover {
+  transform: translateY(-1px);
+  background: #FFD24D;
+  box-shadow: 0 4px 10px rgba(255, 184, 0, 0.36);
+}
+.agent-deny-msg__page-link:focus-visible {
+  outline: 2px solid #1F8FFF;
+  outline-offset: 2px;
+}
+
+/* §173 Phase 2 — slot-filling 답변 chips (유도 대화) */
+.agent-deny-msg__slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  align-self: flex-start;
+  max-width: 92%;
+}
+.agent-deny-msg__slot-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: #fff;
+  color: #0A2540;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 18px;
+  border: 1.5px solid #1F8FFF;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  word-break: keep-all;
+  font-family: inherit;
+  line-height: 1.4;
+}
+.agent-deny-msg__slot-btn:hover {
+  background: #1F8FFF;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(31, 143, 255, 0.32);
+}
+.agent-deny-msg__slot-btn:focus-visible {
+  outline: 2px solid #FFB800;
+  outline-offset: 2px;
+}
+.agent-deny-msg__slot-btn.is-selected {
+  background: #1F8FFF;
+  color: #fff;
+  border-color: #1F8FFF;
+}
+.agent-deny-msg__slot-btn.is-disabled,
+.agent-deny-msg__slot-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.agent-deny-msg__slot-btn.is-disabled:hover {
+  background: #fff;
+  color: #0A2540;
+  transform: none;
+}
+.agent-deny-msg__slot-btn.is-selected.is-disabled,
+.agent-deny-msg__slot-btn.is-selected:disabled {
+  opacity: 0.85;
+  background: #1F8FFF;
+  color: #fff;
+}
+
+/* §173 v9 (Danny 2026-05-16) — 매트릭스 추천 컴팩트 카드 (옥코치 챗 안에서 바로 보여주는 셋업).
+   기존 페이지 링크/슬롯 칩과 같은 max-width 86%, navy/yellow 톤 일관. */
+.agent-deny-msg__reccard {
+  align-self: flex-start;
+  max-width: 86%;
+  margin-top: 8px;
+  padding: 12px 14px 14px;
+  background: #fff;
+  border: 1px solid rgba(10, 37, 64, 0.12);
+  border-left: 3px solid #FFB800;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(10, 37, 64, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.agent-deny-msg__reccard-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #5C6F7E;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.agent-deny-msg__reccard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agent-deny-msg__reccard-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #0A2540;
+}
+.agent-deny-msg__reccard-label {
+  font-weight: 700;
+  color: #1F8FFF;
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.agent-deny-msg__reccard-name {
+  font-weight: 600;
+  word-break: keep-all;
+}
+.agent-deny-msg__reccard-price {
+  font-weight: 700;
+  color: #0A2540;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.agent-deny-msg__reccard-total {
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(10, 37, 64, 0.15);
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0A2540;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.agent-deny-msg__reccard-reason {
+  font-size: 12px;
+  color: #5C6F7E;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+.agent-deny-msg__reccard-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  padding: 8px 14px;
+  background: #FFB800;
+  color: #0A2540;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.agent-deny-msg__reccard-link:hover {
+  background: #FFD24D;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 184, 0, 0.36);
+}
+.agent-deny-msg__reccard-link:focus-visible {
+  outline: 2px solid #1F8FFF;
+  outline-offset: 2px;
+}
+
+/* Related FAQ card */
+.agent-deny-msg__related {
+  align-self: flex-start;
+  max-width: 86%;
+  margin-top: 4px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid rgba(10, 37, 64, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(10, 37, 64, 0.06);
+}
+.agent-deny-msg__related-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5C6F7E;
+  letter-spacing: 0.02em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+.agent-deny-msg__related-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.agent-deny-msg__related-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  font-size: 12.5px;
+  color: #0A2540;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.12s ease, color 0.12s ease;
+  font-family: inherit;
+  font-weight: 500;
+  word-break: keep-all;
+  line-height: 1.45;
+}
+.agent-deny-msg__related-btn::before {
+  content: "▸ ";
+  color: #1F8FFF;
+  font-weight: 700;
+}
+.agent-deny-msg__related-btn:hover {
+  background: rgba(31, 143, 255, 0.08);
+  color: #061A2E;
+}
+.agent-deny-msg__related-btn:focus-visible {
+  outline: 2px solid #1F8FFF;
+  outline-offset: 1px;
+}
+
+/* ============================================================
+ * Typing indicator
+ * ============================================================ */
+.agent-deny-typing {
+  align-self: flex-start;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #0A2540 0%, #102E50 100%);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  display: flex;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(10, 37, 64, 0.18);
+}
+.agent-deny-typing__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFB800;
+  animation: agent-deny-typing 1.2s ease-in-out infinite;
+}
+.agent-deny-typing__dot:nth-child(2) { animation-delay: 0.15s; }
+.agent-deny-typing__dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes agent-deny-typing {
+  0%, 60%, 100% { transform: translateY(0);   opacity: 0.5; }
+  30%           { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ============================================================
+ * Quick replies (chip row) — §173 v8 secondary 위치 + 작은 사이즈
+ * ============================================================ */
+.agent-deny-quickreplies-wrap {
+  padding: 6px 14px 4px;
+  background: rgba(248, 250, 251, 0.85);
+  border-top: 1px solid rgba(10, 37, 64, 0.06);
+  flex-shrink: 0;
+}
+.agent-deny-quickreplies-wrap:has(.agent-deny-quickreplies:empty) { display: none; }
+.agent-deny-quickreplies-label {
+  font-size: 10.5px;
+  color: #8A98A4;
+  margin: 0 0 4px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.agent-deny-quickreplies {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.agent-deny-quickreplies::-webkit-scrollbar { display: none; }
+.agent-deny-quickreplies:empty { display: none; }
+
+.agent-deny-chip {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  background: rgba(31, 143, 255, 0.08);
+  color: #5C6F7E;
+  border: 1px solid rgba(31, 143, 255, 0.16);
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: background 0.15s ease, transform 0.15s ease, color 0.15s ease;
+  word-break: keep-all;
+}
+.agent-deny-chip:hover {
+  background: rgba(31, 143, 255, 0.18);
+  color: #0A2540;
+  transform: translateY(-1px);
+}
+.agent-deny-chip:focus-visible {
+  outline: 2px solid #1F8FFF;
+  outline-offset: 1px;
+}
+
+/* ============================================================
+ * Footer (input area) — §173 v8 강화: 더 큰 input, sun-yellow send 강조
+ * ============================================================ */
+.agent-deny-panel__footer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  background: #fff;
+  border-top: 2px solid rgba(255, 184, 0, 0.32);
+  flex-shrink: 0;
+  align-items: flex-end;
+  position: relative;
+}
+.agent-deny-panel__footer::before {
+  /* §173 v8 — subtle "여기 입력하세요" indicator */
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: -2px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #FFB800 50%, transparent 100%);
+  opacity: 0.7;
+}
+.agent-deny-input {
+  flex: 1;
+  min-height: 52px;
+  max-height: 140px;
+  padding: 11px 14px;
+  border: 2px solid rgba(10, 37, 64, 0.18);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  font-family: inherit;
+  color: #0A2540;
+  background: #F8FAFB;
+  resize: none;
+  outline: none;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  word-break: keep-all;
+}
+.agent-deny-input:hover { border-color: rgba(10, 37, 64, 0.28); }
+.agent-deny-input:focus {
+  border-color: #1F8FFF;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(31, 143, 255, 0.16);
+}
+.agent-deny-input::placeholder {
+  color: #8A98A4;
+  font-weight: 500;
+}
+
+.agent-deny-send {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #FFB800 0%, #E0A100 100%);
+  color: #0A2540;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 3px 10px rgba(255, 184, 0, 0.42);
+}
+.agent-deny-send:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #FFD24D 0%, #FFB800 100%);
+  box-shadow: 0 6px 16px rgba(255, 184, 0, 0.52);
+}
+.agent-deny-send:focus-visible {
+  outline: 3px solid #1F8FFF;
+  outline-offset: 2px;
+}
+.agent-deny-send:active {
+  transform: translateY(0);
+}
+.agent-deny-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.agent-deny-send__icon {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.agent-deny-send:hover .agent-deny-send__icon {
+  transform: translateX(2px);
+}
+
+/* ============================================================
+ * Backdrop (mobile only)
+ * ============================================================ */
+.agent-deny-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 26, 46, 0.45);
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.agent-deny-backdrop[data-open="true"] {
+  opacity: 1;
+}
+
+/* ============================================================
+ * Mobile breakpoint (<=540px) — fullscreen panel
+ * ============================================================ */
+@media (max-width: 540px) {
+  .agent-deny-fab {
+    width: 56px;
+    height: 56px;
+    bottom: 16px;
+    right: 16px;
+  }
+  .agent-deny-fab__badge {
+    min-width: 20px;
+    height: 20px;
+    font-size: 11px;
+    line-height: 20px;
+  }
+
+  .agent-deny-panel {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.99);
+  }
+  .agent-deny-backdrop {
+    display: block;
+  }
+
+  .agent-deny-panel__header {
+    padding: 14px 14px;
+    padding-top: max(14px, env(safe-area-inset-top));
+  }
+  .agent-deny-panel__footer {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .agent-deny-msg { font-size: 14px; }
+}
+
+/* ============================================================
+ * Accessibility — reduced motion
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .agent-deny-fab::before { animation: none; }
+  .agent-deny-msg,
+  .agent-deny-panel[data-open="true"] { animation: none; }
+  .agent-deny-typing__dot { animation: none; opacity: 0.85; }
+}
+
+/* Hide default state */
+.agent-deny-panel[data-open="false"] { display: flex; /* still in DOM for transitions */ }
+
+/* No-flash boot state */
+.agent-deny-fab[data-booting="true"],
+.agent-deny-panel[data-booting="true"] {
+  opacity: 0;
+  pointer-events: none;
+}

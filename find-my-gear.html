@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<title>Find My Gear — 1분 만에 내 윙·포일 셋업 찾기 | 단무지공방</title>
+<meta name="description" content="성별·연령·레벨·체중·스타일 5가지만 답하면 1분 만에 전문 퍼포먼스 어드바이저가 큐레이션한 윙·포일·보드 셋업이 나옵니다. 16 × 4 = 64 시나리오 매트릭스 + 인구통계 보정값">
+<link rel="canonical" href="https://dmjgroup.kr/find-my-gear.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Find My Gear | 단무지공방">
+<meta property="og:description" content="1분 만에 내 윙·포일 셋업 찾기. 인구통계 보정 + 16 × 4 = 64 시나리오 매트릭스 큐레이션">
+<meta property="og:locale" content="ko_KR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<!-- §169 v3 (Danny 2026-05-14) — 장비 dropdown 카테고리 진입 처리.
+     ?category=foil / board / wing / safety 진입 시 카테고리 banner 표시 + quiz hint.
+     quiz flow 자체는 유지 (5-step), banner 만 카테고리 명시.
+     DO_NOT_REVERT §169 v3. -->
+<script>
+(function() {
+  var params = new URLSearchParams(location.search);
+  var category = params.get('category');
+  if (!category) return;
+  var categoryLabels = {
+    'foil': { ko: '포일', desc: 'FW · Mast · Stab · 세트' },
+    'board': { ko: '보드', desc: '입문 보드 · 중상급 셰이프' },
+    'wing': { ko: '윙', desc: '핸들 · 붐 · FDS' },
+    'safety': { ko: '안전장비', desc: '헬멧 · 임팩트 베스트 · 하니스' }
+  };
+  var meta = categoryLabels[category];
+  if (!meta) return;
+  function injectBanner() {
+    if (document.querySelector('.fmg-category-banner')) return; // idempotent
+    var quizSection = document.querySelector('.quiz-frame, .quiz-section, .quiz-wizard, #quiz-section, [data-quiz]');
+    if (!quizSection) return;
+    var banner = document.createElement('div');
+    banner.className = 'fmg-category-banner';
+    banner.innerHTML =
+      '<span class="fmg-category-banner__label">카테고리: <strong>' + meta.ko + '</strong></span>' +
+      '<span class="fmg-category-banner__desc">' + meta.desc + '</span>' +
+      '<button type="button" class="fmg-category-banner__clear">전체 보기 →</button>';
+    var clearBtn = banner.querySelector('.fmg-category-banner__clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function() {
+        location.href = location.pathname;
+      });
+    }
+    // quiz-frame 의 첫 child 앞에 삽입 (progress bar 위)
+    if (quizSection.firstElementChild) {
+      quizSection.insertBefore(banner, quizSection.firstElementChild);
+    } else {
+      quizSection.appendChild(banner);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectBanner);
+  } else {
+    injectBanner();
+  }
+})();
+</script>
+</head>
+<body>
+
+<!-- Minimal header -->
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="/" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 스마트 컨설팅 (CTA) -->
+        <a href="find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <!-- DO_NOT_REVERT §171-B — cart icon. badge auto-updates via cart.js. -->
+        <a href="cart.html" class="nav__link nav__cart" role="menuitem" aria-label="장바구니">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="nav__cart-badge" data-cart-badge hidden>0</span>
+        </a>
+        <a href="login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== Mobile Menu ========== -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="levitaz.html">Levitaz</a></li>
+    <li><a href="ppc.html">PPC</a></li>
+    <li><a href="takoon.html">Takoon</a></li>
+    <li><a href="wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">라이딩 스타일</li>
+    <li><a href="style/flat-speed.html">Flat·Speed</a></li>
+    <li><a href="style/choppy-freeride.html">Choppy·Freeride</a></li>
+    <li><a href="style/wave.html">Wave</a></li>
+    <li><a href="style/hybrid.html">Hybrid</a></li>
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="levitaz.html">Levitaz</a></li>
+    <li><a href="ppc.html">PPC</a></li>
+    <li><a href="takoon.html">Takoon</a></li>
+    <li><a href="wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="level/beginner.html">입문</a></li><li><a href="level/novice.html">초급</a></li>
+    <li><a href="level/intermediate.html">중급</a></li>
+    <li><a href="level/advanced.html">상급</a></li>
+    <li><a href="level/pro.html">선수</a></li>
+    <li hidden><a href="women/index.html">여성 라이더</a></li>
+    <li hidden><a href="junior/index.html">유소년·어린이</a></li>
+    <li hidden><a href="family/index.html">가족 라이딩</a></li>
+  </ul>
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+
+<main class="quiz-frame">
+
+  <!-- Progress -->
+  <div class="quiz-progress">
+    <div class="quiz-progress__bar">
+      <div class="quiz-progress__fill" id="progressBar" style="width:20%"></div>
+    </div>
+    <div class="quiz-progress__label">
+      <span id="stepLabel">Step 1 / 5</span>
+      <span>약 1분 소요</span>
+    </div>
+  </div>
+
+  <!-- Step 1: Demographic (NEW v1.3) -->
+  <section class="quiz-step" id="step-demographic" data-step="1">
+    <div class="quiz-step__head">
+      <span class="quiz-step__num">Q1 · Rider Profile</span>
+      <h1 class="quiz-step__title">당신은?</h1>
+      <p class="quiz-step__lead">성별·연령에 따라 윙·포일·보드 보정값이 적용됩니다.</p>
+    </div>
+    <div class="quiz-options" role="radiogroup" aria-label="라이더 프로필 선택">
+      <button class="quiz-option" data-value="adult_male">
+        <h3 class="quiz-option__title">성인 남성</h3>
+        <p class="quiz-option__desc">18+ · 60-90kg 표준 매트릭스 그대로</p>
+      </button>
+      <button class="quiz-option" data-value="adult_female">
+        <h3 class="quiz-option__title">성인 여성</h3>
+        <p class="quiz-option__desc">18+ · 윙 1단계 작게, 보드 볼륨 +5L 보정</p>
+      </button>
+      <button class="quiz-option" data-value="youth">
+        <h3 class="quiz-option__title">유소년 (13-17)</h3>
+        <p class="quiz-option__desc">중·고등학생, 안전 장비 필수, 작은 사이즈</p>
+      </button>
+      <button class="quiz-option" data-value="senior">
+        <h3 class="quiz-option__title">시니어 (65세 이상)</h3>
+        <p class="quiz-option__desc">안정성·관절 부담 최소화 우선</p>
+      </button>
+    </div>
+    <div class="quiz-actions">
+      <button class="quiz-back" disabled>← 이전</button>
+      <span style="font-size:0.875rem;color:rgba(255,255,255,0.5)">선택 시 자동 진행</span>
+    </div>
+  </section>
+
+  <!-- Step 2: Level -->
+  <section class="quiz-step" id="step-level" data-step="2" style="display:none">
+    <div class="quiz-step__head">
+      <span class="quiz-step__num">Q2 · Skill Level</span>
+      <h1 class="quiz-step__title">현재 본인 라이딩 레벨은?</h1>
+      <p class="quiz-step__lead">정확한 레벨 진단이 큐레이션의 시작입니다.</p>
+    </div>
+    <div class="quiz-options quiz-options--5col" role="radiogroup" aria-label="레벨 선택"><!-- §155 v3: 5 라이더 레벨 (입문/초급/중급/상급/선수) -->
+      <button class="quiz-option" data-value="beginner">
+        <h3 class="quiz-option__title">입문</h3>
+        <p class="quiz-option__desc">글라이딩 단계, foiling 시도 전</p>
+      </button>
+      <button class="quiz-option" data-value="novice">
+        <h3 class="quiz-option__title">초급</h3>
+        <p class="quiz-option__desc">테이크오프 + 기본 라이딩, 택·자이빙 미완성</p>
+      </button>
+      <button class="quiz-option" data-value="intermediate">
+        <h3 class="quiz-option__title">중급</h3>
+        <p class="quiz-option__desc">원활한 foiling, 택·자이빙 부분 완성</p>
+      </button>
+      <button class="quiz-option" data-value="advanced">
+        <h3 class="quiz-option__title">상급</h3>
+        <p class="quiz-option__desc">모든 라이딩 만족 수준</p>
+      </button>
+      <button class="quiz-option" data-value="pro">
+        <h3 class="quiz-option__title">선수</h3>
+        <p class="quiz-option__desc">점핑·고속 마스터</p>
+      </button>
+    </div>
+    <div class="quiz-actions">
+      <button class="quiz-back">← 이전</button>
+      <span style="font-size:0.875rem;color:rgba(255,255,255,0.5)">선택 시 자동 진행</span>
+    </div>
+  </section>
+
+  <!-- Step 3: Weight -->
+  <section class="quiz-step" id="step-weight" data-step="3" style="display:none">
+    <div class="quiz-step__head">
+      <span class="quiz-step__num">Q3 · Body Weight</span>
+      <h1 class="quiz-step__title">본인 체중은?</h1>
+      <p class="quiz-step__lead">체중에 따라 윙·포일·보드 size가 정확히 갈라집니다.</p>
+    </div>
+    <div class="quiz-options" role="radiogroup" aria-label="체중 선택">
+      <button class="quiz-option" data-value="light">
+        <h3 class="quiz-option__title">~60kg</h3>
+        <p class="quiz-option__desc">50–65kg 범위, 작은 윙·작은 보드 가능</p>
+      </button>
+      <button class="quiz-option" data-value="mid-light">
+        <h3 class="quiz-option__title">~70kg</h3>
+        <p class="quiz-option__desc">65–75kg 범위, 한국 표준 셋업</p>
+      </button>
+      <button class="quiz-option" data-value="mid-heavy">
+        <h3 class="quiz-option__title">~80kg</h3>
+        <p class="quiz-option__desc">75–85kg 범위, 큰 윙·중간 보드</p>
+      </button>
+      <button class="quiz-option" data-value="heavy">
+        <h3 class="quiz-option__title">90kg+</h3>
+        <p class="quiz-option__desc">85kg 이상, 큰 사이즈 매트릭스</p>
+      </button>
+    </div>
+    <div class="quiz-actions">
+      <button class="quiz-back">← 이전</button>
+      <span style="font-size:0.875rem;color:rgba(255,255,255,0.5)">선택 시 자동 진행</span>
+    </div>
+  </section>
+
+  <!-- Step 4: Style -->
+  <section class="quiz-step" id="step-style" data-step="4" style="display:none">
+    <div class="quiz-step__head">
+      <span class="quiz-step__num">Q4 · Riding Style</span>
+      <h1 class="quiz-step__title">주로 라이딩하는 컨디션은?</h1>
+      <p class="quiz-step__lead">본인이 가장 자주 가는 컨디션의 특성</p>
+    </div>
+    <div class="quiz-options" role="radiogroup" aria-label="스타일 선택">
+      <button class="quiz-option" data-value="flat-speed">
+        <h3 class="quiz-option__title">Flat·Speed</h3>
+        <p class="quiz-option__desc">평수면·속도, 잔잔한 컨디션</p>
+      </button>
+      <button class="quiz-option" data-value="choppy-freeride">
+        <h3 class="quiz-option__title">Choppy·Freeride</h3>
+        <p class="quiz-option__desc">한국 일반 컨디션, 표준 셋업</p>
+      </button>
+      <button class="quiz-option" data-value="wave">
+        <h3 class="quiz-option__title">Wave</h3>
+        <p class="quiz-option__desc">파도 라이딩, 파도가 좋은 컨디션</p>
+      </button>
+      <button class="quiz-option" data-value="hybrid">
+        <h3 class="quiz-option__title">Hybrid</h3>
+        <p class="quiz-option__desc">다목적, 여러 컨디션 조합</p>
+      </button>
+    </div>
+    <div class="quiz-actions">
+      <button class="quiz-back">← 이전</button>
+      <span style="font-size:0.875rem;color:rgba(255,255,255,0.5)">선택 시 자동 진행</span>
+    </div>
+  </section>
+
+  <!-- Step 5: Sport (informational only — for future personalization) -->
+  <section class="quiz-step" id="step-sport" data-step="5" style="display:none">
+    <div class="quiz-step__head">
+      <span class="quiz-step__num">Q5 · Sport Focus (선택)</span>
+      <h1 class="quiz-step__title">주력 sport는?</h1>
+      <p class="quiz-step__lead">큐레이션 우선순위에 영향. 한 가지만 골라주세요.</p>
+    </div>
+    <div class="quiz-options" role="radiogroup" aria-label="sport 선택">
+      <button class="quiz-option" data-value="wing">
+        <h3 class="quiz-option__title">Wingfoil</h3>
+        <p class="quiz-option__desc">윙포일 메인. 가장 흔한 선택</p>
+      </button>
+      <button class="quiz-option" data-value="downwind">
+        <h3 class="quiz-option__title">Downwind / SUP</h3>
+        <p class="quiz-option__desc">다운윈드·SUP 포일 우선</p>
+      </button>
+      <button class="quiz-option" data-value="wave-pump">
+        <h3 class="quiz-option__title">Wave / Pumping</h3>
+        <p class="quiz-option__desc">Wave riding · pumping foil</p>
+      </button>
+      <button class="quiz-option" data-value="parawing">
+        <h3 class="quiz-option__title">Parawing</h3>
+        <p class="quiz-option__desc">패러윙 카테고리</p>
+      </button>
+    </div>
+    <div class="quiz-actions">
+      <button class="quiz-back">← 이전</button>
+      <span style="font-size:0.875rem;color:rgba(255,255,255,0.5)">선택 시 자동 진행</span>
+    </div>
+  </section>
+
+  <!-- Result -->
+  <section class="quiz-step" id="step-result" data-step="6" style="display:none">
+    <div id="result-container"></div>
+    <div class="quiz-actions" style="margin-top:32px;justify-content:center">
+      <button class="quiz-back" id="restart">↻ 처음부터 다시</button>
+    </div>
+
+    <!-- Premium upsell — 액세스 코드 모델 (DO_NOT_REVERT §100/§104) -->
+    <div class="premium-gate" style="margin-top:28px" role="region" aria-label="프리미엄 진단 안내">
+      <div class="premium-gate__lock" aria-hidden="true">🔒</div>
+      <p class="premium-gate__title">개인 풍속 분포 분석 + Lift Calculator full <span class="premium-badge">프리미엄</span></p>
+      <p class="premium-gate__desc">본인 spot 풍속 5분위 분포 + 페인 포인트 multi-select → quiver 1/2/3 wing 진단 + SKU 매핑 + 가격 견적까지. 회원가입 + 본인 장비 등록으로 액세스 코드를 받으면 사용 가능 (현재 무료).</p>
+      <a href="premium.html" class="premium-cta">액세스 코드 받기</a>
+    </div>
+
+    <!-- DO_NOT_REVERT §165 — Phase B 스킬 진단 통합 안내 -->
+    <div class="premium-gate" style="margin-top:20px;background:linear-gradient(135deg,rgba(31,143,255,0.08),rgba(255,184,0,0.06));border-color:rgba(255,184,0,0.4)" role="region" aria-label="Phase B 스킬 진단 안내">
+      <p class="premium-gate__title" style="color:var(--color-navy)"><span style="background:var(--color-sun);color:var(--color-navy);padding:2px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.04em;margin-right:8px">PHASE B</span>10축 스킬 진단도 함께 받아보세요</p>
+      <p class="premium-gate__desc" style="color:var(--color-slate)">자이브·택·웨이브·다운윈드·점프 5스킬 × 포트/스타보드 좌우 분리. 약쪽(weaker side)을 자동 진단하고 트레이닝·장비 다음 스텝을 추천합니다.</p>
+      <a href="skill-assessment.html" class="premium-cta" style="background:var(--color-navy);color:#fff">10축 스킬 진단 시작 →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="skill-assessment.html">스킬 진단 (Phase B)</a></li>
+          <li><a href="membership.html">회원 등급 안내</a></li>
+          <li><a href="glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="calculator.html">Lift Calculator</a></li>
+          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="level/beginner.html">입문 가이드</a></li><li><a href="level/novice.html">초급 가이드</a></li>
+          <li><a href="level/intermediate.html">중급 가이드</a></li>
+          <li><a href="level/advanced.html">상급 가이드</a></li>
+          <li><a href="level/pro.html">선수 가이드</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="levitaz.html">Levitaz</a></li>
+          <li><a href="ppc.html">PPC</a></li>
+          <li><a href="takoon.html">Takoon</a></li>
+          <li><a href="wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="policy/shipping.html">배송 정책</a></li>
+          <li><a href="policy/refund.html">환불 정책</a></li>
+          <li><a href="policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="policy/privacy.html">개인정보처리방침</a>
+        <a href="policy/terms.html">이용약관</a>
+        <a href="policy/refund.html">환불정책</a>
+        <a href="policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- §175-B matrix data file:// fallback (canonical = data/dmj-matrix-inline.js) -->
+<!--     이전 인라인 DMJ_DATA_INLINE 블록 (구 449-458) → data/dmj-matrix-inline.js 외부 단일 source 로 통합. -->
+<script src="data/dmj-matrix-inline.js"></script>
+<!-- §171-B cart system — auth-shim + cart utility (loaded before matrix.js renderItem uses DMJCart). -->
+<script src="assets/js/auth-shim.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/matrix.js"></script>
+<script src="assets/js/access-code.js"></script>
+<script>
+(function () {
+  'use strict';
+  if (window.DMJAccess) { window.DMJAccess.applyUnlock(); }
+
+  const state = {
+    demographic: null,
+    level: null,
+    weight: null,
+    style: null,
+    sport: null,
+    step: 1
+  };
+
+  const STEPS = ['step-demographic', 'step-level', 'step-weight', 'step-style', 'step-sport', 'step-result'];
+  const KEYS = ['demographic', 'level', 'weight', 'style', 'sport'];
+  const TOTAL = 5;
+
+  function showStep(idx) {
+    STEPS.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = (i === idx) ? '' : 'none';
+    });
+    state.step = idx + 1;
+    const pct = idx >= TOTAL ? 100 : ((idx + 1) / TOTAL) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('stepLabel').textContent = idx >= TOTAL ? '완료' : 'Step ' + (idx + 1) + ' / ' + TOTAL;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function selectOption(stepIdx, value) {
+    state[KEYS[stepIdx]] = value;
+    if (stepIdx + 1 < TOTAL) {
+      setTimeout(() => showStep(stepIdx + 1), 280);
+    } else {
+      // submit
+      setTimeout(() => renderResult(), 280);
+    }
+  }
+
+  // §171 v2 (Danny 2026-05-13) — guard so we save fmg_history only once per quiz completion
+  // (re-renders / DOM thrashing X). Reset on restart.
+  state.savedThisSession = false;
+  // §171-C — active entry id (set by saveFmgHistoryOnce or restoreFromEntry).
+  state.activeFmgEntryId = null;
+
+  // §171-C (Danny 2026-05-13) — fmg_history state-aware routing helper.
+  // Exposed on window.DMJFmg so cart.js / quote.html can mutate the latest entry's state.
+  // DO_NOT_REVERT §171-C — schema lock (state ∈ {recommendation_only, cart_added, quote_submitted}).
+  function updateFmgState(entryId, newState, extra) {
+    if (!window.DMJAuth || !window.DMJAuth.getUserData || !window.DMJAuth.setUserData) return false;
+    try {
+      var raw = window.DMJAuth.getUserData('fmg_history') || '[]';
+      var history = JSON.parse(raw);
+      if (!Array.isArray(history)) return false;
+      var idx = -1;
+      if (entryId) {
+        for (var i = 0; i < history.length; i++) {
+          if (history[i] && history[i].id === entryId) { idx = i; break; }
+        }
+      }
+      // fallback to latest entry if entryId not found / null
+      if (idx < 0) idx = history.length - 1;
+      if (idx < 0) return false;
+      history[idx].state = newState;
+      if (extra && typeof extra === 'object') {
+        Object.keys(extra).forEach(function (k) { history[idx][k] = extra[k]; });
+      }
+      window.DMJAuth.setUserData('fmg_history', JSON.stringify(history));
+      console.info('[FMG] state →', newState, 'on', history[idx].id);
+      return true;
+    } catch (err) {
+      console.warn('[FMG] updateFmgState failed', err);
+      return false;
+    }
+  }
+
+  // Expose helper for other pages (cart.js cart-add hook, quote.html submit hook).
+  window.DMJFmg = window.DMJFmg || {};
+  window.DMJFmg.updateFmgState = updateFmgState;
+  window.DMJFmg._setActiveEntryId = function (id) { state.activeFmgEntryId = id; };
+  window.DMJFmg._getActiveEntryId = function () { return state.activeFmgEntryId; };
+  // Convenience accessor that reads from storage (used by cart.js / quote.html
+  // when find-my-gear.html is not the host page — see DMJFmg.markLatestCartAdded etc.).
+  window.DMJFmg.getLatestEntryId = function () {
+    try {
+      var raw = window.DMJAuth && window.DMJAuth.getUserData ? window.DMJAuth.getUserData('fmg_history') : null;
+      var hist = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(hist) && hist.length) return hist[hist.length - 1].id;
+    } catch (e) {}
+    return null;
+  };
+
+  // §171-C — restore from saved fmg_history entry via URL `?restore=<entry-id>`.
+  // 성공 시 퀴즈 step skip, 결과 페이지 직접 노출. invalid id → silent fallback to step 1.
+  async function tryRestoreFromUrlParam() {
+    var params;
+    try { params = new URLSearchParams(window.location.search || ''); }
+    catch (e) { return false; }
+    var restoreId = params.get('restore');
+    if (!restoreId) return false;
+
+    if (!window.DMJAuth || !window.DMJAuth.getUserData) return false;
+    var raw, history;
+    try {
+      raw = window.DMJAuth.getUserData('fmg_history') || '[]';
+      history = JSON.parse(raw);
+    } catch (e) { history = []; }
+    if (!Array.isArray(history)) return false;
+
+    var entry = history.find(function (h) { return h && h.id === restoreId; });
+    if (!entry) {
+      console.warn('[FMG] restore: entry not found', restoreId);
+      return false;
+    }
+    if (!entry.level || !entry.weight || !entry.style) {
+      console.warn('[FMG] restore: incomplete entry', restoreId);
+      return false;
+    }
+
+    // Hydrate state so "다시 진단" path still works.
+    state.level = entry.level;
+    state.weight = entry.weight;
+    state.style = entry.style;
+    state.demographic = entry.demographic || null;
+    state.sport = entry.sport || null;
+    state.savedThisSession = true; // 복원 = 새 entry 저장 X (이미 존재)
+    state.activeFmgEntryId = entry.id;
+
+    showStep(TOTAL); // result step
+
+    // Render an "이전 추천 — 다시 시작하려면 ↻ 클릭" hint banner above results.
+    var container = document.getElementById('result-container');
+    if (!container) return false;
+    if (!window.DMJMatrix) {
+      container.innerHTML = '<p style="color:#fff;text-align:center;padding:48px">매트릭스 로딩 실패. 잠시 후 다시 시도해 주세요.<br><br>문의: <a href="mailto:consulting@dmjgroup.kr" style="color:#FFB800;text-decoration:underline">consulting@dmjgroup.kr</a></p>';
+      return true;
+    }
+    try {
+      await window.DMJMatrix.renderQuiz(
+        entry.level, entry.weight, entry.style,
+        '#result-container',
+        { demographic: entry.demographic, sport: entry.sport }
+      );
+      injectResultCTAs();
+      // 복원 안내 banner — quiz-result 상단.
+      var result = container.querySelector('.quiz-result');
+      if (result && !result.querySelector('.fmg-restore-banner')) {
+        var banner = document.createElement('div');
+        banner.className = 'fmg-restore-banner';
+        banner.style.cssText = 'background:rgba(31,143,255,0.12);border:1px solid rgba(31,143,255,0.35);border-radius:10px;padding:10px 14px;margin:0 0 16px;color:#fff;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap';
+        var dateStr = entry.savedAt ? new Date(entry.savedAt).toLocaleDateString('ko-KR') : '';
+        banner.innerHTML = '<span>📋 이전 추천 (' + dateStr + ') — 저장된 결과를 보고 있습니다.</span>'
+          + '<a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700;text-decoration:none">↻ 퀴즈 다시 시작</a>';
+        result.insertBefore(banner, result.firstChild);
+      }
+      return true;
+    } catch (err) {
+      console.error('[FMG] restore render failed:', err);
+      return false;
+    }
+  }
+
+  async function renderResult() {
+    showStep(TOTAL); // result step idx
+    const container = document.getElementById('result-container');
+    if (!window.DMJMatrix) {
+      container.innerHTML = '<p style="color:#fff;text-align:center;padding:48px">매트릭스 로딩 실패. 잠시 후 다시 시도해 주세요.<br><br>문의: <a href="mailto:consulting@dmjgroup.kr" style="color:#FFB800;text-decoration:underline">consulting@dmjgroup.kr</a></p>';
+      return;
+    }
+    try {
+      await window.DMJMatrix.renderQuiz(
+        state.level,
+        state.weight,
+        state.style,
+        '#result-container',
+        { demographic: state.demographic, sport: state.sport }
+      );
+      // §171 v2 — inject 2 CTA buttons + save snapshot to fmg_history.
+      injectResultCTAs();
+      saveFmgHistoryOnce();
+    } catch (err) {
+      console.error('[FindMyGear] render failed:', err);
+      container.innerHTML = '<div style="color:#fff;text-align:center;padding:48px">'
+        + '<p style="font-size:1.0625rem;margin:0 0 12px">결과 데이터를 불러오지 못했습니다.</p>'
+        + '<p style="color:rgba(255,255,255,0.6);font-size:0.875rem;margin:0 0 24px">로컬에서 file:// 로 열고 계시다면 새로고침해 주세요.</p>'
+        + '<a href="mailto:consulting@dmjgroup.kr" class="btn btn--accent">문의: consulting@dmjgroup.kr</a>'
+        + '</div>';
+    }
+  }
+
+  // §171 v3 (Danny 2026-05-13) — 2 CTA horizontal layout + 동일 사이즈.
+  //   1) 견적서 바로 요청하기 → cart 자동 담기 + quote.html (회원 전용)
+  //   2) 1:1 구매 상담하기 → consult.html (로그인 X 도 가능, 친화적 진입)
+  //   layout/sizing rules → style.css `.fmg-result-cta` (DO_NOT_REVERT §171 v3).
+  function injectResultCTAs() {
+    const result = document.querySelector('#result-container .quiz-result');
+    if (!result) return;
+    // 중복 삽입 방지
+    if (result.querySelector('.fmg-result-cta')) return;
+    // 합계(요약) 카드 바로 아래, 기존 .quiz-result__cta 위에 삽입.
+    // §172 v2 (Danny 2026-05-13): 2 button 둘 다 yellow (btn--accent). 카톡 1:1 컨설팅 row 영구 hide.
+    //  - 견적서 바로 요청하기 → yellow (primary)
+    //  - 1:1 구매 상담하기 → yellow (primary, 동일 가중치)
+    //  - 카톡 1:1 컨설팅 (legacy .quiz-result__cta) → display:none (hidden + style hard-removed). DO_NOT_REVERT.
+    const ctaRow = result.querySelector('.quiz-result__cta');
+    const wrap = document.createElement('div');
+    wrap.className = 'fmg-result-cta';
+    wrap.innerHTML = ''
+      + '<a class="btn btn--accent" id="fmg-quote-btn" href="#" style="cursor:pointer">견적서 바로 요청하기 →</a>'
+      + '<a class="btn btn--accent" href="consult.html" id="fmg-consult-btn">1:1 구매 상담하기 →</a>';
+    if (ctaRow) {
+      result.insertBefore(wrap, ctaRow);
+      ctaRow.hidden = true;
+      ctaRow.style.display = 'none'; // 강제 hide — hidden 속성 CSS override 회귀 가드
+    } else {
+      result.appendChild(wrap);
+    }
+
+    // Wire quote button — login enforce + auto add SKUs to cart.
+    const quoteBtn = document.getElementById('fmg-quote-btn');
+    if (quoteBtn) {
+      quoteBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const loggedIn = !!(window.DMJAuth && window.DMJAuth.isLoggedIn && window.DMJAuth.isLoggedIn());
+        if (!loggedIn) {
+          alert('견적서 작성을 위해 로그인이 필요합니다.');
+          window.location.href = 'login.html?redirect=quote.html';
+          return;
+        }
+        if (!window.DMJCart) {
+          console.warn('[FMG] DMJCart not loaded — cannot auto-fill cart.');
+          window.location.href = 'quote.html';
+          return;
+        }
+        const last = window.DMJMatrix && window.DMJMatrix._lastQuizResult;
+        if (last && Array.isArray(last.recommendations)) {
+          last.recommendations.forEach(function (r) {
+            if (!r || !r.sku) return;
+            try { window.DMJCart.add({ sku: r.sku, qty: 1, size: r.size || null, addedAt: Date.now() }); }
+            catch (err) { console.warn('[FMG] cart add failed', r, err); }
+          });
+        }
+        window.location.href = 'quote.html';
+      });
+    }
+  }
+
+  // §171 v2 + §169-K v3 — fmg_history save (per-user namespace).
+  // 비로그인 시 dmj_anon_fmg_history (로그인 시 auth-shim 가 user namespace 로 마이그레이션).
+  function saveFmgHistoryOnce() {
+    if (state.savedThisSession) return;
+    if (!window.DMJAuth || !window.DMJAuth.getUserData || !window.DMJAuth.setUserData) {
+      console.warn('[FMG] DMJAuth not loaded — fmg_history skip.');
+      return;
+    }
+    const last = window.DMJMatrix && window.DMJMatrix._lastQuizResult;
+    if (!last) {
+      console.warn('[FMG] _lastQuizResult not set — fmg_history skip.');
+      return;
+    }
+    try {
+      const entry = {
+        id: 'fmg_' + Date.now().toString(36),
+        savedAt: last.savedAt || Date.now(),
+        date: last.date || new Date().toISOString().split('T')[0],
+        level: last.level,
+        weight: last.weight,
+        style: last.style,
+        demographic: last.demographic,
+        recommendations: last.recommendations || [],
+        totalKRW: last.totalKRW || 0,
+        summary: last.summary || '',
+        // §171-C (Danny 2026-05-13) — state-aware routing schema.
+        //   'recommendation_only' (default) → 결과 페이지 복원
+        //   'cart_added' → cart.html
+        //   'quote_submitted' → quote.html?orderId=… 또는 profile.html#section-orders
+        // DO_NOT_REVERT §171-C — schema lock. 추가 state 명시 승인 필요.
+        state: 'recommendation_only',
+        cartSnapshot: [],
+        orderId: null
+      };
+      const raw = window.DMJAuth.getUserData('fmg_history') || '[]';
+      let history;
+      try { history = JSON.parse(raw); if (!Array.isArray(history)) history = []; }
+      catch (e) { history = []; }
+      history.push(entry);
+      // keep last 20
+      if (history.length > 20) history = history.slice(-20);
+      window.DMJAuth.setUserData('fmg_history', JSON.stringify(history));
+      state.savedThisSession = true;
+      // §171-C — remember active entry id so subsequent cart-add / quote-submit can update its state.
+      state.activeFmgEntryId = entry.id;
+      try { window.DMJFmg && window.DMJFmg._setActiveEntryId && window.DMJFmg._setActiveEntryId(entry.id); } catch (e) {}
+      console.info('[FMG] history saved', entry.id, entry.summary);
+    } catch (err) {
+      console.warn('[FMG] save failed', err);
+    }
+  }
+
+  // bind option buttons
+  STEPS.slice(0, TOTAL).forEach((id, i) => {
+    const sec = document.getElementById(id);
+    if (!sec) return;
+    sec.querySelectorAll('.quiz-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sec.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('quiz-option--selected'));
+        btn.classList.add('quiz-option--selected');
+        selectOption(i, btn.dataset.value);
+      });
+    });
+    sec.querySelectorAll('.quiz-back').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (i > 0) showStep(i - 1);
+      });
+    });
+  });
+
+  // restart
+  document.getElementById('restart').addEventListener('click', () => {
+    state.demographic = state.level = state.weight = state.style = state.sport = null;
+    state.savedThisSession = false; // §171 v2 — allow re-save on next completion
+    state.activeFmgEntryId = null;  // §171-C — disconnect from any restored entry
+    document.querySelectorAll('.quiz-option--selected').forEach(b => b.classList.remove('quiz-option--selected'));
+    showStep(0);
+  });
+
+  // §171-C — wire cart-add side-effect: when user clicks "+ 장바구니" on a result SKU,
+  // mark the active FMG entry as 'cart_added' + record snapshot of cart at that moment.
+  document.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('[data-cart-add]') : null;
+    if (!btn) return;
+    // matrix.js handles the actual add (delegated handler) — we run AFTER on next tick.
+    setTimeout(function () {
+      if (!state.activeFmgEntryId) return;
+      if (!window.DMJCart) return;
+      var snapshot = [];
+      try { snapshot = window.DMJCart.getItems(); } catch (err) { snapshot = []; }
+      // Only flip state if at least one item from the recommendations is actually in cart.
+      // (toggle-off case: cart 비어있으면 state 회귀 X — recommendation_only 유지하려면 reset 필요하지만
+      //  user 의도 = "결과 다시 보기"가 가장 자연스러우므로 latest=cart_added 유지 + snapshot=[] OK.)
+      if (snapshot.length > 0) {
+        updateFmgState(state.activeFmgEntryId, 'cart_added', { cartSnapshot: snapshot });
+      }
+    }, 50);
+  });
+
+  // §173 v9 (Danny 2026-05-16) — chat → find-my-gear deep-link.
+  // 옥코치 AI 챗에서 슬롯이 다 채워진 다음 ?level=&weight=&style= 로 직행하면 퀴즈 step skip,
+  // 같은 매트릭스 lookup 으로 바로 결과 노출. fmg_history 까지 동일 경로로 저장.
+  // exact parity: chat-card 의 추천 = 이 deep-link 결과 = 사용자가 quiz 5-step 다 풀었을 때 결과.
+  // DO_NOT_REVERT §173 v9.
+  async function tryDirectFromUrlParams() {
+    var params;
+    try { params = new URLSearchParams(window.location.search || ''); }
+    catch (e) { return false; }
+
+    var lvl = params.get('level');
+    var wt = params.get('weight');
+    var sty = params.get('style');
+    if (!lvl || !wt || !sty) return false;
+
+    // Whitelist canonical values — 잘못된 값이면 자연스럽게 quiz 로 fallback.
+    var validLevels = ['novice', 'beginner', 'intermediate', 'advanced', 'pro'];
+    var validWeights = ['light', 'mid-light', 'mid-heavy', 'heavy'];
+    var validStyles = ['flat-speed', 'choppy-freeride', 'wave', 'hybrid'];
+    var validDemographics = ['adult_female', 'youth', 'senior', 'child'];
+    if (validLevels.indexOf(lvl) < 0) return false;
+    if (validWeights.indexOf(wt) < 0) return false;
+    if (validStyles.indexOf(sty) < 0) return false;
+
+    var demo = params.get('demographic');
+    if (demo && validDemographics.indexOf(demo) < 0) demo = null;
+    var sport = params.get('sport') || null;
+
+    state.level = lvl;
+    state.weight = wt;
+    state.style = sty;
+    state.demographic = demo || null;
+    state.sport = sport;
+    state.savedThisSession = false; // allow saveFmgHistoryOnce()
+
+    showStep(TOTAL); // result step
+
+    if (!window.DMJMatrix) {
+      var c0 = document.getElementById('result-container');
+      if (c0) c0.innerHTML = '<p style="color:#fff;text-align:center;padding:48px">매트릭스 로딩 실패. 잠시 후 다시 시도해 주세요.</p>';
+      return true;
+    }
+    try {
+      await window.DMJMatrix.renderQuiz(lvl, wt, sty, '#result-container',
+        { demographic: demo, sport: sport });
+      injectResultCTAs();
+      saveFmgHistoryOnce();
+
+      // 챗 deep-link 시 안내 banner 표시 — 사용자가 어떻게 여기 도달했는지 명시.
+      if (params.get('fromchat') === '1') {
+        var container = document.getElementById('result-container');
+        var result = container && container.querySelector('.quiz-result');
+        if (result && !result.querySelector('.fmg-fromchat-banner')) {
+          var banner = document.createElement('div');
+          banner.className = 'fmg-fromchat-banner';
+          banner.style.cssText = 'background:rgba(255,184,0,0.12);border:1px solid rgba(255,184,0,0.4);border-radius:10px;padding:10px 14px;margin:0 0 16px;color:#fff;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap';
+          banner.innerHTML = '<span>✨ 옥코치 AI 챗에서 받은 슬롯으로 바로 결과를 보여드려요.</span>'
+            + '<a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700;text-decoration:none">↻ 퀴즈 처음부터</a>';
+          result.insertBefore(banner, result.firstChild);
+        }
+      }
+      return true;
+    } catch (err) {
+      console.error('[FMG] direct render failed:', err);
+      return false;
+    }
+  }
+
+  // §171-C — initial: try restore, then try direct-from-params, else start quiz at step 0.
+  (async function init() {
+    var restored = false;
+    try { restored = await tryRestoreFromUrlParam(); } catch (err) { restored = false; }
+    if (!restored) {
+      try { restored = await tryDirectFromUrlParams(); } catch (err) { restored = false; }
+    }
+    if (!restored) showStep(0);
+  })();
+})();
+</script>
+  <script src="assets/js/nav-auth.js" defer></script>
+  <!-- §173 — 옥코치 AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <script src="assets/js/agent-deny.js" defer></script>
+</body>
+</html>
