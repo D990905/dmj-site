@@ -472,11 +472,46 @@
   const KEYS = ['demographic', 'level', 'weight', 'style', 'sport'];
   const TOTAL = 5;
 
+  // §180 (Danny 2026-05-21) — Q3 체중 옵션 demographic-aware (Option A).
+  //   매트릭스 weight tier 4개 (light/mid-light/mid-heavy/heavy) = data-value 키 불변.
+  //   adult_female 일 때 버튼 라벨만 여성 체중 분포 (~40/~50/~60/70+) 로 교체 —
+  //   매트릭스 4 tier 를 "여성 분포 4분위" 로 추상 해석 (1:1 매핑). 70kg+ → heavy 원안 유지.
+  //   adult_male·youth·senior 는 기존 60/70/80/90+ 그대로. DO_NOT_REVERT §180.
+  const WEIGHT_OPTION_LABELS = {
+    _default: {
+      'light':     { title: '~60kg', desc: '50–65kg 범위, 작은 윙·작은 보드 가능' },
+      'mid-light': { title: '~70kg', desc: '65–75kg 범위, 한국 표준 셋업' },
+      'mid-heavy': { title: '~80kg', desc: '75–85kg 범위, 큰 윙·중간 보드' },
+      'heavy':     { title: '90kg+', desc: '85kg 이상, 큰 사이즈 매트릭스' }
+    },
+    adult_female: {
+      'light':     { title: '~40kg', desc: '45kg 이하, 작은 윙·작은 보드' },
+      'mid-light': { title: '~50kg', desc: '45–55kg 범위, 한국 여성 표준 셋업' },
+      'mid-heavy': { title: '~60kg', desc: '55–65kg 범위, 큰 윙·중간 보드' },
+      'heavy':     { title: '70kg+', desc: '65kg 이상, 큰 사이즈 셋업' }
+    }
+  };
+  function applyWeightLabels(demographic) {
+    const set = WEIGHT_OPTION_LABELS[demographic] || WEIGHT_OPTION_LABELS._default;
+    const stepEl = document.getElementById('step-weight');
+    if (!stepEl) return;
+    Object.keys(set).forEach(key => {
+      const btn = stepEl.querySelector('.quiz-option[data-value="' + key + '"]');
+      if (!btn) return;
+      const h3 = btn.querySelector('.quiz-option__title');
+      const p = btn.querySelector('.quiz-option__desc');
+      if (h3) h3.textContent = set[key].title;
+      if (p) p.textContent = set[key].desc;
+    });
+  }
+
   function showStep(idx) {
     STEPS.forEach((id, i) => {
       const el = document.getElementById(id);
       if (el) el.style.display = (i === idx) ? '' : 'none';
     });
+    // §180 — Q3(step-weight, idx 2) 진입 시 demographic 별 체중 라벨 적용.
+    if (idx === 2) applyWeightLabels(state.demographic);
     state.step = idx + 1;
     const pct = idx >= TOTAL ? 100 : ((idx + 1) / TOTAL) * 100;
     document.getElementById('progressBar').style.width = pct + '%';

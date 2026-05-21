@@ -175,6 +175,23 @@
     'mid-heavy': '75–85kg',
     'heavy': '85kg 이상'
   };
+  // §180 (Danny 2026-05-21) — demographic 별 체중 라벨 (퀴즈 결과 제목·카드 배지용).
+  //   매트릭스 weight 키 (light/mid-light/mid-heavy/heavy) 불변. browse 뷰(매트릭스
+  //   카드·그룹 헤드)는 WEIGHT_LABELS(남성 기준) 그대로 — adult_female 퀴즈 결과에서만
+  //   여성 라벨 적용. find-my-gear.html WEIGHT_OPTION_LABELS 와 짝. DO_NOT_REVERT §180.
+  const WEIGHT_LABELS_BY_DEMO = {
+    'adult_female': {
+      'light': '~40kg',
+      'mid-light': '~50kg',
+      'mid-heavy': '~60kg',
+      'heavy': '70kg+'
+    }
+  };
+  function weightLabelFor(weightKey, demographic) {
+    const demoSet = demographic && WEIGHT_LABELS_BY_DEMO[demographic];
+    if (demoSet && demoSet[weightKey]) return demoSet[weightKey];
+    return WEIGHT_LABELS[weightKey] || weightKey;
+  }
   // §155 v3 — 5-level canonical (beginner / novice / intermediate / advanced / pro)
   const LEVEL_LABELS = {
     'beginner': '입문',
@@ -248,10 +265,14 @@
     'tkn-stab-glide': 'products/takoon.html#stab-glide',
     'tkn-stab-carve': 'products/takoon.html#stab-carve',
     'tkn-stab-glide-ha': 'products/takoon/foil-stab-glide-ha.html',
-    // Boards (9)
+    // Boards (12 — §178-A 2026-05-19: PPC R1 race board 3 SKU 신규)
     'lvz-boom-fs63': 'products/levitaz/boom-fs-63.html',
     'lvz-boom-fs83': 'products/levitaz/boom-fs-83.html',
     'lvz-boom-fs95': 'products/levitaz/boom-fs-95.html',
+    'ppc-r1-73': 'products/ppc/r1.html',                // PPC R1 73L (Track/Tuttle 동가)
+    'ppc-r1-83': 'products/ppc/r1.html',                // PPC R1 83L
+    'ppc-r1-93': 'products/ppc/r1.html',                // PPC R1 93L
+    'ppc-r1': 'products/ppc/r1.html',                   // alias (size 미지정 시 페이지 hub)
     'takoon-cruise': 'products/takoon/cruise.html',
     'takoon-slide': 'products/takoon/slide.html',
     'takoon-glide-midlength': 'products/takoon/glide-midlength.html',
@@ -279,6 +300,17 @@
     },
     'lvz-boom-fs95': {
       "95L": { volume_l: 95, weight_kg: null, length_cm: 194, width_cm: 48, recommended_kg: '75–110' }
+    },
+    // §178-A PPC R1 race board (2026-05-19) — Track/Tuttle 동가, 사이즈만 다름.
+    // 본사 spec: ppcfoiling.com/products/new-ppc-r1-race-foil-board
+    'ppc-r1-73': {
+      "73L": { volume_l: 73, weight_kg: 3.1,  length_cm: 152.4, width_cm: 50.8, recommended_kg: '50–70' }
+    },
+    'ppc-r1-83': {
+      "83L": { volume_l: 83, weight_kg: 3.95, length_cm: 160.0, width_cm: 53.3, recommended_kg: '65–85' }
+    },
+    'ppc-r1-93': {
+      "93L": { volume_l: 93, weight_kg: 4.4,  length_cm: 167.6, width_cm: 55.9, recommended_kg: '80–95' }
     },
     'takoon-cruise': {
       "5'6\"":  { volume_l: 75,  weight_kg: 12.0, length_cm: null, width_cm: null, recommended_kg: '50–70' },
@@ -356,6 +388,12 @@
     'lvz-boom-fs63': 4660000,                          // Boom FS 63 SCC (€2415.83 × 1800 = ₩4,348,500 + 500K) × 1.188 = ₩5,760,018 → ₩5,760K [§171 v6]
     'lvz-boom-fs83': 4810000,                          // Boom FS 83 SCC (€2499.17 × 1800 = ₩4,498,500 + 500K) × 1.188 = ₩5,938,218 → ₩5,938K [§171 v6]
     'lvz-boom-fs95': 4960000,                          // Boom FS 95 SCC (€2582.50 × 1800 = ₩4,648,500 + 500K) × 1.188 = ₩6,116,418 → ₩6,116K [§171 v6]
+    // §178-A PPC R1 race board 3 SKU × 2 옵션 (Track/Tuttle 동가) — 2026-05-19. Track/Tuttle 가격 차이 X.
+    // §171 v6 산식: (USD × 1500 + 500K BOARD ship) × 1.188, round ₩10K (site display).
+    'ppc-r1-73': 5780000,                              // R1 73L Track or Tuttle ($2,910 × 1500 + 500K) × 1.188 = ₩5,779,620 → ₩5,780K [§178-A]
+    'ppc-r1-83': 5820000,                              // R1 83L Track or Tuttle ($2,930 × 1500 + 500K) × 1.188 = ₩5,815,260 → ₩5,820K [§178-A]
+    'ppc-r1-93': 5870000,                              // R1 93L Track or Tuttle ($2,960 × 1500 + 500K) × 1.188 = ₩5,868,720 → ₩5,870K [§178-A]
+    'ppc-r1': 5820000,                                 // alias = 83L 대표가 (find-my-gear hub link)
     // Levitaz Free Series Front Wings (FOIL_FW ship 200K baked)
     'lvz-fs540': 1860000,                              // FW 540 (€940.83 × 1800 = ₩1,693,500 + 200K) × 1.188 = ₩2,249,478 → ₩2,249K [§171 v6]
     'lvz-fs680': 1880000,                              // FW 680 (€957.50 × 1800 = ₩1,723,500 + 200K) × 1.188 = ₩2,285,118 → ₩2,285K [§171 v6]
@@ -740,7 +778,7 @@
 
   // v1.6 — renderEntryCard now includes per-item prices, board specs, detail-page deep links,
   //        and a 합계 summary row (Danny 명시 2026-05-09, DO_NOT_REVERT §112).
-  function renderEntryCard(entry) {
+  function renderEntryCard(entry, demographic) {
     const sizes_m2 = entry.wing.sizes_m2 || [];
     const wingSize = pickWingSize(sizes_m2);
     const wingPrimary = entry.wing.primary;
@@ -890,7 +928,7 @@
     return `
       <article class="mtx-card" data-level="${entry.level}" data-weight="${entry.weight}" data-style="${entry.style}">
         <header class="mtx-card__head">
-          <span class="mtx-card__weight">${WEIGHT_LABELS[entry.weight]}</span>
+          <span class="mtx-card__weight">${weightLabelFor(entry.weight, demographic)}</span>
           <span class="mtx-card__style">${STYLE_LABELS[entry.style]}</span>
         </header>
 
@@ -1075,7 +1113,7 @@
     const titleParts = [
       demoLabel,
       LEVEL_LABELS[level],
-      WEIGHT_LABELS[effectiveWeight],
+      weightLabelFor(effectiveWeight, demographic),
       STYLE_LABELS[style]
     ].filter(Boolean).join(' · ');
 
@@ -1106,7 +1144,7 @@
           ${subline ? `<p class="quiz-result__sub" style="color:rgba(255,255,255,0.88);margin:8px 0 0;font-size:1rem;line-height:1.5">${subline}</p>` : ''}
         </div>
         ${warning}
-        ${renderEntryCard(e)}
+        ${renderEntryCard(e, demographic)}
         ${modularNote}
         <div class="quiz-result__cta">
           <a href="${ASSETS_BASE}consult.html" class="btn btn--accent btn--lg">1:1 구매 상담하기</a>

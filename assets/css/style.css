@@ -5395,6 +5395,8 @@ p {
    sprint shim localStorage auth + profile.html (10 sections) + gear card form
    ========================================================================== */
 .auth-error { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25); color: #b91c1c; border-radius: 10px; padding: 10px 12px; font-size: 13px; margin-bottom: 12px; word-break: keep-all; line-height: 1.5; }
+/* §179 — 비밀번호 재설정 완료 메시지 (password-reset.html) */
+.auth-success { background: rgba(22,163,74,0.08); border: 1px solid rgba(22,163,74,0.28); color: #15803d; border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 16px; word-break: keep-all; line-height: 1.55; text-align: center; font-weight: 600; }
 
 .profile-page { padding: 40px 0 80px; background: linear-gradient(180deg, var(--color-mist) 0%, #fff 60%); }
 .profile-page .container { max-width: 960px; }

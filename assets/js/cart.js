@@ -285,7 +285,11 @@
   function classifyBySkuPrefix(sku) {
     var s = String(sku || '').toLowerCase();
     if (!s) return null;
-    // PPC = wings (M1, M1-X, M2, M1-R SDS, Sonic FDS)
+    // PPC = wings (M1, M1-X, M2, M1-R SDS, Sonic FDS) — except PPC R1 race board.
+    // §178-A (2026-05-19) — 'ppc-r1*' = board, 다른 PPC SKU = wing.
+    if (s.indexOf('ppc-r1') === 0) {
+      return { cat: 'board', label: '보드' };
+    }
     if (s.indexOf('ppc-') === 0) {
       if (s.indexOf('fds') >= 0 || s.indexOf('sds') >= 0) return { cat: 'wing-fds', label: '윙 (싱글붐/FDS)' };
       return { cat: 'wing-handle', label: '윙 (핸들 윙)' };

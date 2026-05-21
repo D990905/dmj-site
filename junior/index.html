@@ -31,6 +31,19 @@
     padding: 140px 0 88px;
     overflow: hidden;
   }
+  /* §180 (2026-05-21) — 유소년 hero 사진 적용. DO_NOT_REVERT */
+  .demo-hero__bg-image {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    z-index: 0; pointer-events: none;
+  }
+  .demo-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(6,26,46,0.55) 0%, rgba(8,28,52,0.84) 100%);
+    z-index: 1; pointer-events: none;
+  }
+  .demo-hero .container { position: relative; z-index: 2; }
   .demo-hero__crumb { font-size: 0.8125rem; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
   .demo-hero__crumb a { color: rgba(255,255,255,0.6); text-decoration: none; }
   .demo-hero__crumb a:hover { color: #fff; }
@@ -339,11 +352,12 @@
 
 <!-- Hero -->
 <section class="demo-hero">
+  <img class="demo-hero__bg-image" src="../assets/images/junior/junior-hero.jpg" alt="빨강·파랑 윙과 보드를 들고 해변에 선 유소년 라이더 — 단무지공방 유소년·어린이 가이드" loading="eager" onerror="this.style.opacity=0" />
   <div class="container">
     <nav class="demo-hero__crumb"><a href="../index.html">단무지공방</a><span class="sep">/</span><a href="../index.html#consultation">컨설팅</a><span class="sep">/</span><span style="color:#fff">유소년·어린이</span></nav>
     <span class="demo-hero__eyebrow">Junior · Child · Safety First</span>
     <h1 class="demo-hero__title">다음 세대 라이더<br><em>안전한 첫 시즌</em></h1>
-    <p class="demo-hero__lead">단무지공방은 13-17세 유소년과 8-12세 어린이 라이더의 안전한 입문을 함께합니다. 안전 장비 — WIP impact vest·helmet — 우선, 강습·인솔자 동반 권장, 부모님 1:1 컨설팅 무료.</p>
+    <p class="demo-hero__lead">단무지공방은 13-17세 유소년과 8-12세 어린이 라이더의 안전한 입문을 함께합니다. 안전 장비 — WIP impact vest·helmet — 우선, 강습·인솔자 동반 권장, 부모님 1:1 컨설팅 무료</p>
     <div class="demo-hero__ctas">
       <a href="../consult.html" class="btn btn--accent btn--lg">부모 1:1 구매 상담하기</a>
       <a href="../wip.html" class="btn btn--ghost-light btn--lg">WIP 안전 장비 보기 →</a>
@@ -389,11 +403,11 @@
       </article>
       <article class="faq-item">
         <h3 class="faq-item__q">자녀 체중·신장이 작아 장비를 못 쓰나요?</h3>
-        <p class="faq-item__a">아닙니다. wing 2.5-3.5m² · 짧은 mast (Levitaz 76cm) · 작은 board (Takoon Cruise 4'8") 라인업이 있어 <strong>25-55kg 체중 범위</strong>까지 cover합니다. 정확한 사이즈는 1:1 컨설팅에서 자녀 체중·신장 기준으로 산출.</p>
+        <p class="faq-item__a">아닙니다. wing 2.5-3.5m² · 짧은 mast (Levitaz 76cm) · 작은 board (Takoon Cruise 4'8") 라인업이 있어 <strong>25-55kg 체중 범위</strong>까지 cover합니다. 정확한 사이즈는 1:1 컨설팅에서 자녀 체중·신장 기준으로 산출</p>
       </article>
       <article class="faq-item">
         <h3 class="faq-item__q">대회·경기 출전이 가능한가요?</h3>
-        <p class="faq-item__a">국내·국제 대회 youth division (15세 이상)이 점차 확대되고 있습니다. 전문 퍼포먼스 어드바이저는 <strong>유망 youth 라이더의 협회 등록·대회 출전 지원</strong>도 1:1로 컨설팅합니다. 옥덕필 수석코치 (3회 올림픽 출전)의 직접 코칭 가능.</p>
+        <p class="faq-item__a">국내·국제 대회 youth division (15세 이상)이 점차 확대되고 있습니다. 전문 퍼포먼스 어드바이저는 <strong>유망 youth 라이더의 협회 등록·대회 출전 지원</strong>도 1:1로 컨설팅합니다. 옥덕필 수석코치 (3회 올림픽 출전)의 직접 코칭 가능</p>
       </article>
       <article class="faq-item">
         <h3 class="faq-item__q">자녀가 무서워 하는데 어떻게 해야 하나요?</h3>
@@ -401,7 +415,7 @@
       </article>
       <article class="faq-item">
         <h3 class="faq-item__q">예산 가이드는?</h3>
-        <p class="faq-item__a">시작 풀세트 (안전 장비 + wing + foil + board) 기준 <strong>중·소형 사이즈는 일반 성인 셋업 대비 10-20% 낮은 가격</strong>으로 가능합니다. 정확한 가격·재고·견적은 <a href="../consult.html">1:1 구매 상담</a> (가입 불필요).</p>
+        <p class="faq-item__a">시작 풀세트 (안전 장비 + wing + foil + board) 기준 <strong>중·소형 사이즈는 일반 성인 셋업 대비 10-20% 낮은 가격</strong>으로 가능합니다. 정확한 가격·재고·견적은 <a href="../consult.html">1:1 구매 상담</a> (가입 불필요)</p>
       </article>
     </div>
   </div>
@@ -413,20 +427,19 @@
     <div class="demo-section__head">
       <span class="demo-section__eyebrow">3-tier By Age</span>
       <h2 class="demo-section__title">연령·체중별 추천 path</h2>
-      <p class="demo-section__lead">3 tier — 13-17세 (유소년) / 8-12세 (어린이, 1:1 컨설팅 only) / 8세 미만 (강습·체험 only). 직접 sales 차단 정책은 자녀의 안전과 progression 페이스를 위한 것입니다.</p>
+      <p class="demo-section__lead">3 tier — 8세 미만 (강습·체험 only) / 8-12세 (어린이, 1:1 컨설팅 only) / 13-17세 (유소년). 직접 sales 차단 정책은 자녀의 안전과 progression 페이스를 위한 것입니다.</p>
     </div>
     <div class="age-grid">
-      <article class="age-card">
-        <span class="age-card__age">Tier 1 · Youth</span>
-        <h3 class="age-card__title">13-17세 유소년</h3>
+      <article class="age-card age-card--restricted">
+        <span class="age-card__age">Tier 1 · Restricted</span>
+        <h3 class="age-card__title">8세 미만</h3>
         <ul class="age-card__list">
-          <li>체중 40-55kg 범위 default</li>
-          <li>Wing 2.5-3.5m² (PPC M2 small / Takoon V4 small)</li>
-          <li>Foil Levitaz FW 790 + Mast 76cm</li>
-          <li>Board Takoon Cruise 4'8"</li>
-          <li>WIP impact vest XS/S + helmet 필수</li>
+          <li>장비 sales 진행 X</li>
+          <li>강습·체험 partnership만</li>
+          <li>SUP·서핑 등 진입 워터스포츠 권장</li>
+          <li>윙·포일 입문은 8세 이후 검토</li>
         </ul>
-        <p class="age-card__note">강습 동반 권장. 협회 등록 강사 partnership. 대회 youth division 출전 지원 가능.</p>
+        <p class="age-card__note">8세 미만은 발달 단계와 안전성을 고려하여 전문 퍼포먼스 어드바이저가 직접 라이딩 시작을 권장하지 않습니다. 강습 partnership으로 워터스포츠 즐거움을 먼저 경험하세요.</p>
       </article>
       <article class="age-card age-card--restricted">
         <span class="age-card__age">Tier 2 · Child · 1:1 only</span>
@@ -440,16 +453,17 @@
         </ul>
         <p class="age-card__note">12세 미만 자녀의 신체조건·체력·진행 속도가 progression 페이스를 결정합니다. <a href="../consult.html">1:1 구매 상담</a>으로 시작하세요.</p>
       </article>
-      <article class="age-card age-card--restricted">
-        <span class="age-card__age">Tier 3 · Restricted</span>
-        <h3 class="age-card__title">8세 미만</h3>
+      <article class="age-card">
+        <span class="age-card__age">Tier 3 · Youth</span>
+        <h3 class="age-card__title">13-17세 유소년</h3>
         <ul class="age-card__list">
-          <li>장비 sales 진행 X</li>
-          <li>강습·체험 partnership만</li>
-          <li>SUP·서핑 등 진입 워터스포츠 권장</li>
-          <li>윙·포일 입문은 8세 이후 검토</li>
+          <li>체중 40-55kg 범위 default</li>
+          <li>Wing 2.5-3.5m² (PPC M2 small / Takoon V4 small)</li>
+          <li>Foil Levitaz FW 790 + Mast 76cm</li>
+          <li>Board Takoon Cruise 4'8"</li>
+          <li>WIP impact vest XS/S + helmet 필수</li>
         </ul>
-        <p class="age-card__note">8세 미만은 발달 단계와 안전성을 고려하여 전문 퍼포먼스 어드바이저가 직접 라이딩 시작을 권장하지 않습니다. 강습 partnership으로 워터스포츠 즐거움을 먼저 경험하세요.</p>
+        <p class="age-card__note">강습 동반 권장. 협회 등록 강사 partnership. 대회 youth division 출전 지원 가능</p>
       </article>
     </div>
   </div>
@@ -461,7 +475,7 @@
     <div class="demo-section__head">
       <span class="demo-section__eyebrow">Curated Equipment</span>
       <h2 class="demo-section__title">유소년 라이더 친화 네 브랜드 셋업</h2>
-      <p class="demo-section__lead">Tier 1 (13-17세) 기준 추천. 정확한 사이즈는 자녀 체중·신장·spot 기반으로 1:1 컨설팅에서 확정합니다.</p>
+      <p class="demo-section__lead">Tier 3 (13-17세) 기준 추천. 정확한 사이즈는 자녀 체중·신장·spot 기반으로 1:1 컨설팅에서 확정합니다.</p>
     </div>
     <div class="gear-grid">
       <article class="gear-card">
@@ -546,8 +560,8 @@
     <div class="demo-cta">
       <div>
         <span style="display:inline-block;background:rgba(255,184,0,0.18);color:var(--color-sun);font-size:0.6875rem;font-weight:700;padding:6px 14px;border-radius:999px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px">★ 추천 · 부모 1:1 컨설팅</span>
-        <h3 class="demo-cta__title">자녀 안전·progression — 함께 설계합니다</h3>
-        <p class="demo-cta__lead">자녀의 연령·체중·신장·이전 워터스포츠 경험·라이딩 spot을 카톡으로 알려주시면, 전문 퍼포먼스 어드바이저가 안전 장비 사이즈·강습 partnership·1년 시즌 단위 progression 로드맵을 1:1로 추천합니다. 무료, 가입 불필요.</p>
+        <h3 class="demo-cta__title">자녀 안전·progression — 함께 설계합니다.</h3>
+        <p class="demo-cta__lead">자녀의 연령·체중·신장·이전 워터스포츠 경험·라이딩 spot을 카톡으로 알려주시면, 전문 퍼포먼스 어드바이저가 안전 장비 사이즈·강습 partnership·1년 시즌 단위 progression 로드맵을 1:1로 추천합니다. 무료, 가입 불필요</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap">
           <a href="../consult.html" class="btn btn--accent btn--lg">1:1 구매 상담하기</a>
           <a href="../wip.html" class="btn btn--ghost-light btn--lg">WIP 안전 장비 →</a>
@@ -567,7 +581,7 @@
     <div class="demo-section__head">
       <span class="demo-section__eyebrow">Coming Soon</span>
       <h2 class="demo-section__title">강습 partnership 네트워크</h2>
-      <p class="demo-section__lead">한국 윈드/카이트/SUP 협회 등록 강사 partnership을 통해 자녀의 안전한 첫 시즌을 지원합니다. 전국 강습소 partnership 확장 중.</p>
+      <p class="demo-section__lead">한국 윈드/카이트/SUP 협회 등록 강사 partnership을 통해 자녀의 안전한 첫 시즌을 지원합니다. 전국 강습소 partnership 확장 중</p>
     </div>
     <div class="grid-3cols"><!-- DO_NOT_REVERT §163: 3 placeholder 카드 (강습 partnership) -->
       <div class="placeholder-card">

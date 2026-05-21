@@ -134,6 +134,36 @@
     return user;
   }
 
+  // §179 (Danny 2026-05-21) — 비밀번호 재설정 (Phase 1 localStorage in-browser reset).
+  // 이메일 발송 backend 없음 → 이 브라우저 localStorage(dmj_users)에 등록된 계정을 직접 재설정.
+  // 보안 주: localStorage-only 모델에서 계정은 가입한 브라우저에만 존재. 그 브라우저 접근자는
+  //   이미 dmj_users/dmj_session 을 콘솔로 조작 가능 → in-browser 재설정이 별도 취약점을 추가하지 않음.
+  //   Phase 12 Supabase 연동 시 실제 이메일 링크 방식으로 교체. DO_NOT_REVERT §179.
+
+  // 이 브라우저에 해당 이메일 계정이 등록돼 있는지 (재설정 step 1 검증용).
+  function accountExists(email) {
+    var key = String(email || '').trim().toLowerCase();
+    if (!emailValid(key)) return false;
+    var users = readUsers();
+    return !!users[key];
+  }
+
+  // 비밀번호 재설정 — passwordHash 만 교체. 세션은 만들지 않음 (재설정 후 새 비번으로 로그인 유도).
+  async function resetPassword(email, newPassword) {
+    email = String(email || '').trim();
+    if (!emailValid(email)) throw new Error('이메일 형식이 올바르지 않습니다.');
+    if (!newPassword || String(newPassword).length < 8) throw new Error('비밀번호는 8자 이상이어야 합니다.');
+    var key = email.toLowerCase();
+    var users = readUsers();
+    var user = users[key];
+    if (!user) throw new Error('이 브라우저에 등록된 계정이 없습니다.');
+    user.passwordHash = await hashPassword(newPassword);
+    user.passwordResetAt = Date.now();
+    users[key] = user;
+    writeUsers(users);
+    return user;
+  }
+
   function logout() {
     clearSession();
   }
@@ -443,6 +473,9 @@
     isLoggedIn: isLoggedIn,
     updateUser: updateUser,
     hashPassword: hashPassword,
+    // §179 — 비밀번호 재설정 (password-reset.html 에서 사용)
+    accountExists: accountExists,
+    resetPassword: resetPassword,
     // §169-K — per-user namespace helpers (skill-assessment / profile / find-my-gear 등에서 사용)
     currentUserId: currentUserId,
     userKey: userKey,

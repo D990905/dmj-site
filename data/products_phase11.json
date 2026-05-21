@@ -287,6 +287,132 @@
     },
 
     {
+      "id": "ppc-r1-73",
+      "brand": "ppc",
+      "brand_label": "PPC",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · race-grade · light·강풍",
+      "model": "PPC R1 Race Foil Board (73L)",
+      "tagline": "MCT 풀카본 race-grade — light·강풍 라이더용",
+      "rider_fit": "상급~선수 (50~70kg) · 강풍 race",
+      "skill_levels": ["advanced", "pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/aa6da3ef88c1fc6bd2edbafa1b3f23bf.png?v=1773888073",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/aa6da3ef88c1fc6bd2edbafa1b3f23bf.png?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/888e5fa9f65a5f5fdd6df201b334ce8e.png?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/499eaa398e572d588cb655da00e4c777.jpg?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/9ffe5b6d786ad4b73f698a73f928f387.jpg?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/a9c4d5c205dbf570b23707a77a5ac5b5.png?v=1773888073"
+      ],
+      "spec": {
+        "Size": "5'0\" × 20\"",
+        "Volume": "73 L",
+        "Weight": "3.1 kg",
+        "Foil Box": "Track 또는 Tuttle (동가)",
+        "재질": "MCT (Moulded Core Technology) · full lightweight carbon",
+        "용도": "Race · flat-speed · top-end · light·강풍",
+        "체중대": "50~70kg",
+        "워런티": "12개월 (얇은 ultra-light 빌드 특별 정책)",
+        "제작": "Built to order — 본사 주문 후 빌드",
+        "가격": "₩5,780,000"
+      },
+      "features": [
+        ["MCT 풀카본", "PPC 고유 Moulded Core Technology — 강성·responsiveness·에너지 전달 최상"],
+        ["Early lift + top-end speed", "미풍에서도 빠른 take-off, 강풍에서 압도적 top-end. race 출발·끝 모두 우위"],
+        ["Track 또는 Tuttle 선택", "PPC 포일 = Track 권장. Levitaz·기타 Tuttle 포일 호환 가능"],
+        ["Sean Herbert 검증", "World Cup 서킷 포디움 우승 보드 — race 최정점에서 검증"],
+        ["73L 강풍 race", "50~70kg 라이더용. light·강풍 컨디션 sinker board"]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 4, "maneuverability": 4, "stability": 3},
+      "rider_voice": "Race 라인을 노린다면 — R1. World Cup 보드를 한국에서. Track/Tuttle 동가, 본인 포일 시스템에 맞춰.",
+      "cross_sell": ["ppc-r1-83", "fds", "r6-race"]
+    },
+
+    {
+      "id": "ppc-r1-83",
+      "brand": "ppc",
+      "brand_label": "PPC",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · race-grade · all-round",
+      "model": "PPC R1 Race Foil Board (83L)",
+      "tagline": "MCT 풀카본 race-grade — all-round race 가장 무난",
+      "rider_fit": "상급~선수 (65~85kg) · all-round race",
+      "skill_levels": ["advanced", "pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/aa6da3ef88c1fc6bd2edbafa1b3f23bf.png?v=1773888073",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/aa6da3ef88c1fc6bd2edbafa1b3f23bf.png?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/888e5fa9f65a5f5fdd6df201b334ce8e.png?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/499eaa398e572d588cb655da00e4c777.jpg?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/9ffe5b6d786ad4b73f698a73f928f387.jpg?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/a9c4d5c205dbf570b23707a77a5ac5b5.png?v=1773888073"
+      ],
+      "spec": {
+        "Size": "5'3\" × 21\"",
+        "Volume": "83 L",
+        "Weight": "3.95 kg",
+        "Foil Box": "Track 또는 Tuttle (동가)",
+        "재질": "MCT (Moulded Core Technology) · full lightweight carbon",
+        "용도": "Race · all-round race · 일반 풍속",
+        "체중대": "65~85kg",
+        "워런티": "12개월 (얇은 ultra-light 빌드 특별 정책)",
+        "제작": "Built to order — 본사 주문 후 빌드",
+        "가격": "₩5,820,000"
+      },
+      "features": [
+        ["83L 표준 race", "65~85kg 라이더 표준 — 한국 race 라이더가 가장 자주 선택할 사이즈"],
+        ["MCT 풀카본", "강성·responsiveness 최상 — 다이렉트 응답"],
+        ["Track 또는 Tuttle", "포일 시스템에 맞춰 선택 (동가)"],
+        ["Sean Herbert 보드", "World Cup 우승 보드"],
+        ["all-round race", "강풍·중풍 모두 cover — race 출발 1순위"]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 5, "maneuverability": 4, "stability": 3},
+      "rider_voice": "Race 라인을 노린다면 — R1. 본인 포일이 PPC면 Track, Levitaz면 Tuttle. World Cup 보드를 한국에서.",
+      "cross_sell": ["ppc-r1-73", "ppc-r1-93", "fds", "r6-race"]
+    },
+
+    {
+      "id": "ppc-r1-93",
+      "brand": "ppc",
+      "brand_label": "PPC",
+      "category": "Wingfoil Board",
+      "category_kr": "보드 · race-grade · 미풍·heavy",
+      "model": "PPC R1 Race Foil Board (93L)",
+      "tagline": "MCT 풀카본 race-grade — heavy·미풍 라이더용",
+      "rider_fit": "상급~선수 (80~95kg) · 미풍 race · early lift",
+      "skill_levels": ["advanced", "pro"],
+      "hero_image": "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/aa6da3ef88c1fc6bd2edbafa1b3f23bf.png?v=1773888073",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/aa6da3ef88c1fc6bd2edbafa1b3f23bf.png?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/888e5fa9f65a5f5fdd6df201b334ce8e.png?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/499eaa398e572d588cb655da00e4c777.jpg?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/9ffe5b6d786ad4b73f698a73f928f387.jpg?v=1773888073",
+        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/a9c4d5c205dbf570b23707a77a5ac5b5.png?v=1773888073"
+      ],
+      "spec": {
+        "Size": "5'6\" × 22\"",
+        "Volume": "93 L",
+        "Weight": "4.4 kg",
+        "Foil Box": "Track 또는 Tuttle (동가)",
+        "재질": "MCT (Moulded Core Technology) · full lightweight carbon",
+        "용도": "Race · 미풍 race · early lift · heavy rider",
+        "체중대": "80~95kg",
+        "워런티": "12개월 (얇은 ultra-light 빌드 특별 정책)",
+        "제작": "Built to order — 본사 주문 후 빌드",
+        "가격": "₩5,870,000"
+      },
+      "features": [
+        ["93L 미풍·heavy", "80~95kg 라이더 + 미풍 race 컨디션 — early lift 우선"],
+        ["MCT 풀카본 + 큰 부력", "race-grade 강성에 부력 보강 — 미풍 race에서 결정적"],
+        ["Track 또는 Tuttle", "포일 시스템 선택"],
+        ["Sean Herbert 보드", "World Cup race-grade 보드"],
+        ["미풍 race·downwind", "약한 바람에서도 일찍 떠오름 — 미풍 day 답안"]
+      ],
+      "performance": {"skill": 5, "speed": 5, "glide": 5, "maneuverability": 3, "stability": 4},
+      "rider_voice": "heavy rider이거나 미풍 race를 자주 뛴다면 — 93L이 정답. early lift 차이가 race 결과를 가릅니다.",
+      "cross_sell": ["ppc-r1-83", "boom-fs-95", "fds"]
+    },
+
+    {
       "id": "m2",
       "brand": "ppc",
       "brand_label": "PPC",
