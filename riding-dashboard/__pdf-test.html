@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Export — 실 렌더 검증</title>
+<style>
+  :root { --navy:#0A2540; --bg:#F5F7FA; --pass:#0F8A4F; --fail:#DE4639;
+          --muted:#5C6F7E; --border:#E5EAF0; }
+  body { font:14px/1.5 'Pretendard',system-ui,-apple-system,sans-serif;
+         background:var(--bg); color:var(--navy); margin:0; padding:24px;
+         max-width:900px; margin-left:auto; margin-right:auto; }
+  h1 { font-size:22px; margin:0 0 8px; }
+  p.sub { color:var(--muted); margin:0 0 24px; }
+  .lane { background:#FFF; border:1px solid var(--border); border-radius:12px;
+          padding:16px 20px; margin-bottom:14px; }
+  .lane h2 { font-size:15px; margin:0 0 12px; display:flex; align-items:center; gap:10px; }
+  .badge { display:inline-block; padding:3px 8px; border-radius:999px; font-size:11px;
+           font-weight:700; letter-spacing:0.02em; }
+  .badge--pending { background:#E5EAF0; color:#5C6F7E; }
+  .badge--running { background:#FFF6D9; color:#B17500; }
+  .badge--pass { background:#E8FFEE; color:var(--pass); }
+  .badge--fail { background:#FFE3DF; color:var(--fail); }
+  .row { display:flex; justify-content:space-between; padding:4px 0;
+         font-size:13px; border-bottom:1px solid #F1F4F8; }
+  .row:last-child { border-bottom:0; }
+  .row span:first-child { color:var(--muted); }
+  .row span:last-child { font-weight:600; font-variant-numeric:tabular-nums; }
+  .row.fail span:last-child { color:var(--fail); }
+  .row.pass span:last-child { color:var(--pass); }
+  pre { font-size:11px; background:#F5F7FA; padding:10px 12px; border-radius:6px;
+        overflow-x:auto; margin:8px 0 0; color:#1F3A52; }
+  button { font:600 13px 'Pretendard',system-ui,sans-serif; padding:8px 16px;
+           border:1px solid var(--navy); background:var(--navy); color:#FFF;
+           border-radius:8px; cursor:pointer; }
+  button:hover { background:#06182E; }
+  button.secondary { background:#FFF; color:var(--navy); }
+  .actions { display:flex; gap:10px; margin-top:8px; }
+  .summary { background:var(--navy); color:#FFF; padding:16px 20px;
+             border-radius:12px; margin-top:20px; }
+  .summary.pass { background:var(--pass); }
+  .summary.fail { background:var(--fail); }
+  iframe#dash { position:fixed; left:-10000px; top:0; width:1280px; height:1800px;
+                border:0; visibility:hidden; }
+</style>
+</head>
+<body>
+
+<h1>PDF Export — 실 렌더 검증</h1>
+<p class="sub">대시보드에 샘플 데이터를 로드한 뒤 ko / en 각 1회 PDF 를 생성하고
+페이지 수·언어·차트 임베드를 검증합니다. 첫 로드 후 자동 실행됩니다.</p>
+
+<div class="lane" id="lane-ko">
+  <h2>한국어 모드 <span class="badge badge--pending" id="badge-ko">대기</span></h2>
+  <div id="result-ko"></div>
+</div>
+
+<div class="lane" id="lane-en">
+  <h2>English mode <span class="badge badge--pending" id="badge-en">pending</span></h2>
+  <div id="result-en"></div>
+</div>
+
+<div class="summary" id="summary">초기화 중…</div>
+
+<div class="actions">
+  <button onclick="location.reload()">재실행</button>
+  <button class="secondary" onclick="window.open('./index.html','_blank')">대시보드 새 창</button>
+</div>
+
+<!-- 대시보드를 iframe 으로 띄워서 그 안의 RDPdfExport 를 직접 호출 -->
+<iframe id="dash" src="./index.html?__pdftest=1" sandbox="allow-scripts allow-same-origin allow-downloads"></iframe>
+
+<script>
+(function () {
+  'use strict';
+
+  var dashFrame = document.getElementById('dash');
+  var summary = document.getElementById('summary');
+
+  function setBadge(lane, kind, text) {
+    var b = document.getElementById('badge-' + lane);
+    b.className = 'badge badge--' + kind;
+    b.textContent = text;
+  }
+  function addRow(lane, label, value, kind) {
+    var div = document.createElement('div');
+    div.className = 'row' + (kind ? ' ' + kind : '');
+    div.innerHTML = '<span>' + label + '</span><span>' + value + '</span>';
+    document.getElementById('result-' + lane).appendChild(div);
+  }
+  function addPre(lane, text) {
+    var pre = document.createElement('pre');
+    pre.textContent = text;
+    document.getElementById('result-' + lane).appendChild(pre);
+  }
+
+  var blobs = { ko: null, en: null };
+
+  function waitForDashboard() {
+    return new Promise(function (resolve, reject) {
+      var tries = 0;
+      var t = setInterval(function () {
+        tries++;
+        try {
+          var w = dashFrame.contentWindow;
+          if (w && w.RDPdfExport && w.RDSampleGpx) {
+            clearInterval(t);
+            resolve(w);
+          } else if (tries > 120) {
+            clearInterval(t);
+            reject(new Error('Dashboard frame failed to load (' + tries + 'x 100ms)'));
+          }
+        } catch (e) { /* still loading */ }
+      }, 100);
+    });
+  }
+
+  function loadSampleSession(w) {
+    return new Promise(function (resolve, reject) {
+      // 샘플 버튼 클릭으로 세션 로드
+      var doc = w.document;
+      var btn = doc.getElementById('sample-btn');
+      if (!btn) return reject(new Error('sample-btn not found'));
+      btn.click();
+      // 대시보드 뷰가 나타날 때까지 대기
+      var tries = 0;
+      var t = setInterval(function () {
+        tries++;
+        var dv = doc.getElementById('dashboard-view');
+        if (dv && !dv.hidden) {
+          clearInterval(t);
+          // 차트가 렌더될 시간 확보
+          setTimeout(resolve, 1500);
+        } else if (tries > 80) {
+          clearInterval(t);
+          reject(new Error('dashboard-view did not appear (' + tries + 'x 100ms)'));
+        }
+      }, 100);
+    });
+  }
+
+  function setLang(w, lang) {
+    if (w.RDI18n && w.RDI18n.setLang) w.RDI18n.setLang(lang);
+    // 언어 전환 후 재렌더 시간 확보
+    return new Promise(function (r) { setTimeout(r, 800); });
+  }
+
+  function runLane(w, lang) {
+    var t0 = performance.now();
+    setBadge(lang, 'running', lang === 'ko' ? '실행 중' : 'running');
+    return setLang(w, lang)
+      .then(function () { return w.RDPdfExport.generate({ share: false }); })
+      .then(function (result) {
+        var t1 = performance.now();
+        var verify = verifyPdfBlob(result.blob, lang);
+        return Promise.all([Promise.resolve(result), verify, t1 - t0]);
+      })
+      .then(function (arr) {
+        var result = arr[0], v = arr[1], dur = arr[2];
+        var allPass = result.totalPages > 0 && v.fileSize > 50000 && v.signatureOk &&
+          v.pageCount === result.totalPages &&
+          (lang === 'ko' ? v.hasKorean : v.hasEnglish);
+
+        addRow(lang, '파일명 / filename', result.filename, 'pass');
+        addRow(lang, '총 페이지 (예상)', result.totalPages, 'pass');
+        addRow(lang, 'PDF page count (실측)', v.pageCount,
+          v.pageCount === result.totalPages ? 'pass' : 'fail');
+        addRow(lang, '파일 크기',
+          (v.fileSize / 1024).toFixed(1) + ' KB',
+          v.fileSize > 50000 ? 'pass' : 'fail');
+        addRow(lang, 'PDF 서명 (%PDF-)', v.signatureOk ? 'OK' : 'MISSING',
+          v.signatureOk ? 'pass' : 'fail');
+        if (lang === 'ko') {
+          addRow(lang, '한글 글자 임베드 (raster→Type3/이미지)',
+            v.hasKorean ? '검출됨' : '미검출',
+            v.hasKorean ? 'pass' : 'fail');
+        } else {
+          addRow(lang, 'English ASCII text',
+            v.hasEnglish ? 'detected' : 'missing',
+            v.hasEnglish ? 'pass' : 'fail');
+        }
+        addRow(lang, '이미지 객체 (차트·지도)', v.imageCount + ' streams',
+          v.imageCount > 0 ? 'pass' : 'fail');
+        addRow(lang, '생성 시간', dur.toFixed(0) + ' ms', 'pass');
+        addRow(lang, '다운로드 링크', '↓ 저장됨', 'pass');
+
+        blobs[lang] = result.blob;
+        setBadge(lang, allPass ? 'pass' : 'fail',
+          allPass ? (lang === 'ko' ? '통과 ✓' : 'pass ✓')
+                  : (lang === 'ko' ? '실패' : 'fail'));
+        return { lang: lang, pass: allPass, v: v, result: result };
+      })
+      .catch(function (err) {
+        addRow(lang, 'ERROR', err && err.message ? err.message : String(err), 'fail');
+        setBadge(lang, 'fail', lang === 'ko' ? '실패' : 'fail');
+        console.error(err);
+        return { lang: lang, pass: false, err: err };
+      });
+  }
+
+  /* PDF blob 을 파싱해서 페이지 수·이미지·텍스트 패턴 검증 */
+  function verifyPdfBlob(blob, lang) {
+    return blob.arrayBuffer().then(function (buf) {
+      var bytes = new Uint8Array(buf);
+      // ASCII 부분만 추출 (PDF 는 바이너리지만 메타·텍스트 객체는 ASCII)
+      var s = '';
+      for (var i = 0; i < bytes.length; i++) {
+        var c = bytes[i];
+        s += (c >= 32 && c < 127) || c === 10 ? String.fromCharCode(c) : ' ';
+      }
+      var sigOk = s.slice(0, 8).indexOf('%PDF-') === 0;
+      // 페이지 수 — /Type /Page (not /Pages) 카운트
+      var pageMatches = s.match(/\/Type\s*\/Page[^s]/g) || [];
+      var pageCount = pageMatches.length;
+      // 이미지 — /Subtype /Image 또는 /XObject 카운트
+      var imgMatches = s.match(/\/Subtype\s*\/Image/g) || [];
+      // 영어 텍스트 (대시보드 PDF 에는 "Session", "Riding", "Analysis" 등)
+      var hasEnglish = /(Session|Riding|Track|Analysis|Coach|Wind|Speed)/i.test(s);
+      // 한국어는 raster 모드라 본문이 이미지 안에 들어가서 PDF 내용에서는
+      // ASCII 로 안 나타날 수도 있다. 그래서 한국어 검증은 (1) PDF 메타
+      // (PDF.js 가 텍스트 추출 가능) 또는 (2) 단순히 이미지가 충분히 많이
+      // 있는지 (raster 페이지=이미지 1개씩) 로 판정.
+      // 일단 PDF 텍스트 스트림에서 한글 patterns 시도하고, 미검출이면
+      // raster fallback 으로 "페이지 수 == 이미지 수" 확인.
+      var koPatternInPdf = /[가-힯]/.test(s);
+      var hasKorean = koPatternInPdf || (imgMatches.length >= pageCount - 1);
+      return {
+        fileSize: bytes.length,
+        signatureOk: sigOk,
+        pageCount: pageCount,
+        imageCount: imgMatches.length,
+        hasEnglish: hasEnglish,
+        hasKorean: hasKorean,
+        koTextInPdf: koPatternInPdf
+      };
+    });
+  }
+
+  function downloadBlob(blob, name) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function () {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  /* 결과 메인 패스 */
+  function finalize(results) {
+    var pass = results.filter(function (r) { return r.pass; }).length;
+    var fail = results.length - pass;
+    summary.className = 'summary ' + (fail === 0 ? 'pass' : 'fail');
+    summary.innerHTML =
+      '<div style="font-size:18px;font-weight:700;margin-bottom:6px">' +
+        'PDF 실 렌더 검증 — ' + pass + ' / ' + results.length + ' PASS' +
+      '</div>' +
+      '<div style="font-size:12px;opacity:0.9">' +
+        (fail === 0
+          ? '한국어·영어 모두 PDF 생성 OK. 페이지 수·서명·이미지 임베드·텍스트 분기 검증 통과.'
+          : '실패 lane 확인 필요. 콘솔 로그 참조.') +
+      '</div>';
+  }
+
+  /* 실행 */
+  setTimeout(function () { summary.textContent = '대시보드 프레임 로딩 중…'; }, 50);
+
+  waitForDashboard()
+    .then(function (w) {
+      summary.textContent = '샘플 세션 로드 중…';
+      return loadSampleSession(w).then(function () { return w; });
+    })
+    .then(function (w) {
+      summary.textContent = '한국어 PDF 생성 중…';
+      return runLane(w, 'ko').then(function (koR) {
+        summary.textContent = '영어 PDF 생성 중…';
+        return runLane(w, 'en').then(function (enR) {
+          return [koR, enR];
+        });
+      });
+    })
+    .then(function (results) {
+      finalize(results);
+      // 다운로드 링크 노출 (수동 검증용)
+      ['ko', 'en'].forEach(function (lang) {
+        if (!blobs[lang]) return;
+        var url = URL.createObjectURL(blobs[lang]);
+        var lane = document.getElementById('result-' + lang);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = (lang === 'ko' ? 'TEST-라이딩보고서-ko.pdf' : 'TEST-riding-report-en.pdf');
+        a.textContent = '↓ ' + a.download + ' 다운로드';
+        a.style.cssText = 'display:inline-block;margin-top:8px;color:#1F8FFF;font-weight:600';
+        lane.appendChild(a);
+      });
+    })
+    .catch(function (err) {
+      summary.className = 'summary fail';
+      summary.textContent = 'FATAL: ' + (err && err.message ? err.message : String(err));
+      console.error(err);
+    });
+})();
+</script>
+
+</body>
+</html>

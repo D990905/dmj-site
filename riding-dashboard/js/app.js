@@ -163,6 +163,32 @@
     $('new-file-btn').addEventListener('click', resetToIntro);
     $('save-session-btn').addEventListener('click', saveCurrentSession);
 
+    /* PDF 보고서 — 클릭 시 lazy load → 9 페이지 PDF 생성.
+       모바일 Web Share API 지원 시 버튼 라벨을 "공유" 로 자동 변경하고
+       navigator.share({files}) 로 OS 공유 시트를 띄운다.
+       (Danny 2026-05-26) */
+    var pdfBtn = $('pdf-export-btn');
+    if (pdfBtn && window.RDPdfExport) {
+      var canShare = window.RDPdfExport.canShareFiles();
+      if (canShare) {
+        pdfBtn.textContent = '📤 PDF 공유';
+        pdfBtn.setAttribute('aria-label', 'PDF 보고서 공유');
+      }
+      pdfBtn.addEventListener('click', function () {
+        if (pdfBtn.disabled) return;
+        pdfBtn.disabled = true;
+        var origText = pdfBtn.textContent;
+        pdfBtn.textContent = (window.RDI18n && window.RDI18n.T)
+          ? window.RDI18n.T('생성 중…') : '생성 중…';
+        window.RDPdfExport.generate({ share: canShare })
+          .catch(function (e) { console.warn('PDF export failed:', e); })
+          .then(function () {
+            pdfBtn.disabled = false;
+            pdfBtn.textContent = origText;
+          });
+      });
+    }
+
     /* 세션 제목 인라인 편집 — 제목 클릭·✎ 아이콘으로 진입,
        Enter·blur 저장, Esc 취소 */
     var titleH2 = $('session-title'), titleInp = $('session-title-input'),
@@ -475,8 +501,10 @@
       applyCurrentEdits();   // state.session 설정 + 재분석
       $('intro-view').hidden = true;
       $('dashboard-view').hidden = false;
+      resetAnimMarks();        /* 새 분석 — 카운트업 재시작 (2026-05-26) */
       renderDashboard();
       window.scrollTo(0, 0);
+      showHeroSummary();       /* 분석 완료 임팩트 — Layer 2 (2026-05-26) */
     } catch (e) {
       showError(e && e.message ? e.message : 'GPX 파일을 분석하지 못했습니다.');
     }
@@ -510,8 +538,10 @@
       applyCurrentEdits();   // state.session 설정 + 재분석
       $('intro-view').hidden = true;
       $('dashboard-view').hidden = false;
+      resetAnimMarks();        /* 새 분석 — 카운트업 재시작 (2026-05-26) */
       renderDashboard();
       window.scrollTo(0, 0);
+      showHeroSummary();       /* 분석 완료 임팩트 — Layer 2 (2026-05-26) */
     } catch (e) {
       showError(e && e.message ? e.message : 'VKX 파일을 분석하지 못했습니다.');
     }
@@ -582,6 +612,201 @@
     renderHrSection();
     renderSessionSummary();
     renderSavedSessions();
+    /* 시각 폴리시 — 분석 결과 KPI 들이 0 → 최종값으로 카운트업 (Danny
+       2026-05-26 Layer 1). data-rd-num 이 부여된 노드만 잡힌다. 재렌더
+       (언어 토글·트랙 편집)에서는 이미 카운트가 끝난 노드는 건너뛰어
+       값 점멸이 없다. requestAnimationFrame 으로 차트 렌더와 시각적으로
+       겹쳐 첫 인상의 임팩트를 만든다. */
+    if (window.RDAnim) {
+      requestAnimationFrame(function () {
+        try { window.RDAnim.markRendered({}); }
+        catch (e) { /* 시각 헬퍼 실패는 무음 — 데이터는 이미 렌더됨 */ }
+      });
+    }
+  }
+  /* 새 파일을 분석할 때마다 카운트업 다시 시작 — onNewAnalysis 가
+     state.analysis 갱신 직후 호출. */
+  function resetAnimMarks() {
+    if (window.RDAnim) {
+      try { window.RDAnim.resetCounted(); }
+      catch (e) { /* noop */ }
+    }
+  }
+
+  /* ============================================================
+   * 분석 완료 Hero Summary 오버레이 (Layer 2 — Danny 2026-05-26)
+   * ------------------------------------------------------------
+   * 분석이 끝난 직후 1회만 표시. 큰 글자 KPI 4개(VPS·이동 시간·최고
+   * 속도·총 거리) + 트랙 GPS overview 의 SVG path 가 옅게 깔린다.
+   * 5초 자동 dismiss 또는 클릭(skip 버튼·배경 어디든)으로 사라진다.
+   * 데이터 흐름은 건드리지 않는다 — state.analysis 의 기존 산출값만
+   * 골라 표시한다. (Esc 키도 dismiss 처리)
+   * ============================================================ */
+  var heroDismissTimer = null;
+
+  function dismissHeroSummary() {
+    var el = $('hero-summary');
+    if (!el || el.hidden) return;
+    if (heroDismissTimer) { clearTimeout(heroDismissTimer); heroDismissTimer = null; }
+    el.classList.add('is-leaving');
+    setTimeout(function () {
+      el.hidden = true;
+      el.classList.remove('is-leaving');
+      el.setAttribute('aria-hidden', 'true');
+      document.removeEventListener('keydown', heroEsc);
+    }, 480);
+  }
+  function heroEsc(e) {
+    if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') {
+      dismissHeroSummary();
+    }
+  }
+
+  /* 트랙 GPS overview SVG path 생성 — 분석에 영향 없는 시각 전용 추출.
+     normalizeSession 산출물의 samples (lat/lng) 를 box 에 맞춰 정규화한
+     path 문자열을 반환. 너무 많으면 균등 추출 (시각만, 분석 영향 X). */
+  function buildHeroTrackPath(session, w, h) {
+    if (!session || !session.samples || session.samples.length < 2) return '';
+    var pts = session.samples;
+    var n = pts.length;
+    var STEP = Math.max(1, Math.floor(n / 200));
+    var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
+    for (var i = 0; i < n; i += STEP) {
+      var p = pts[i];
+      if (p.lat < minLat) minLat = p.lat;
+      if (p.lat > maxLat) maxLat = p.lat;
+      if (p.lng < minLng) minLng = p.lng;
+      if (p.lng > maxLng) maxLng = p.lng;
+    }
+    var dLat = maxLat - minLat || 1e-9;
+    var dLng = maxLng - minLng || 1e-9;
+    var pad = 40;
+    var sX = (w - 2 * pad) / dLng;
+    var sY = (h - 2 * pad) / dLat;
+    var s = Math.min(sX, sY);
+    var offX = (w - dLng * s) / 2;
+    var offY = (h - dLat * s) / 2;
+    var d = '';
+    for (var j = 0; j < n; j += STEP) {
+      var q = pts[j];
+      var x = offX + (q.lng - minLng) * s;
+      var y = offY + (maxLat - q.lat) * s;       /* Y inverted */
+      d += (j === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+    }
+    return d;
+  }
+
+  /* 인라인 SVG 아이콘 — Lucide 스타일 line icons. 외부 의존성 X.
+     stroke=currentColor, width/height=1em 으로 부모 컨텍스트 따른다. */
+  var HERO_ICONS = {
+    trophy:    '<svg class="rd-icon rd-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+    timer:     '<svg class="rd-icon rd-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>',
+    gauge:     '<svg class="rd-icon rd-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>',
+    route:     '<svg class="rd-icon rd-icon--lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg>'
+  };
+
+  function showHeroSummary() {
+    var s = state.session;
+    var a = state.analysis;
+    if (!s || !a || !a.summary) return;
+    var hero = $('hero-summary');
+    if (!hero) return;
+
+    /* 제목·메타 */
+    $('hero-title').textContent = state.sessionName || '라이딩 세션';
+    var meta = fmtDate(s.startEpoch);
+    var src = s.speedSource === 'device' ? 'Device' : 'GPS';
+    $('hero-meta').textContent = meta + ' · ' + (SPORTS[state.sport].label || state.sport) +
+      ' · ' + src;
+
+    /* 4 핵심 KPI */
+    var sum = a.summary;
+    var u = unitLabel();
+    var hasTime = sum.hasTime;
+    /* VPS — coach.js 의 산출치(state.vps) 가 있으면 종합 점수, 없으면 '—' */
+    var vpsScore = (state.vps && state.vps.ok && state.vps.overall &&
+                    state.vps.overall.score != null)
+      ? state.vps.overall.score : null;
+
+    var kpis = [];
+    if (vpsScore != null) {
+      kpis.push({
+        icon:'trophy',
+        label:'세일링 퍼포먼스',
+        valueStr:String(vpsScore),
+        unit:'<small>/ 100</small>'
+      });
+    }
+    if (hasTime) {
+      kpis.push({
+        icon:'timer',
+        label:'이동 시간',
+        valueStr:fmtDur(sum.movingTimeSec),
+        unit:''
+      });
+      kpis.push({
+        icon:'gauge',
+        label:'최고 속도',
+        valueStr:fmtSpeed(sum.maxSpeedMs),
+        unit:'<small>' + u + '</small>'
+      });
+    }
+    kpis.push({
+      icon:'route',
+      label:'총 거리',
+      valueStr:(sum.totalDistanceM / 1000).toFixed(2),
+      unit:'<small>km</small>'
+    });
+
+    $('hero-kpis').innerHTML = kpis.map(function (k) {
+      return '<div class="rd-hero-kpi">' +
+        HERO_ICONS[k.icon] +
+        '<span class="rd-hero-kpi__val">' + numHtml(k.valueStr) + k.unit + '</span>' +
+        '<span class="rd-hero-kpi__lbl">' + esc(k.label) + '</span>' +
+        '</div>';
+    }).join('');
+
+    /* 트랙 SVG path 생성 */
+    var heroSvg = $('hero-track');
+    if (heroSvg) {
+      var pathD = buildHeroTrackPath(s, 800, 600);
+      heroSvg.innerHTML = pathD
+        ? '<defs><linearGradient id="hero-track-grad" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0%" stop-color="#1F8FFF" stop-opacity=".55"/>' +
+          '<stop offset="100%" stop-color="#0A2540" stop-opacity=".25"/>' +
+          '</linearGradient></defs>' +
+          '<path d="' + pathD + '" fill="none" ' +
+          'stroke="url(#hero-track-grad)" stroke-width="3" ' +
+          'stroke-linecap="round" stroke-linejoin="round" ' +
+          'stroke-dasharray="5000" stroke-dashoffset="5000">' +
+          '<animate attributeName="stroke-dashoffset" from="5000" to="0" ' +
+          'dur="1.8s" fill="freeze"/></path>'
+        : '';
+    }
+
+    /* 표시 + 카운트업 */
+    hero.hidden = false;
+    hero.setAttribute('aria-hidden', 'false');
+    if (window.RDAnim) {
+      requestAnimationFrame(function () {
+        try { window.RDAnim.countAll($('hero-kpis')); }
+        catch (e) {}
+      });
+    }
+
+    /* 5초 자동 dismiss */
+    if (heroDismissTimer) clearTimeout(heroDismissTimer);
+    heroDismissTimer = setTimeout(dismissHeroSummary, 5000);
+
+    /* 클릭 / 키보드 dismiss — 한 번만 부착 */
+    hero.onclick = function (ev) {
+      /* skip 버튼은 자체 처리 — 중복 호출 무시 */
+      if (ev.target && ev.target.id === 'hero-skip') return;
+      dismissHeroSummary();
+    };
+    var skipBtn = $('hero-skip');
+    if (skipBtn) skipBtn.onclick = function () { dismissHeroSummary(); };
+    document.addEventListener('keydown', heroEsc);
   }
 
   /* 언어 토글 (한↔영) — 세션이 로드돼 있으면 전 대시보드 재렌더하여
@@ -678,10 +903,37 @@
     endTitleEdit();                     /* 입력값 폐기 — state.sessionName 유지 */
   }
 
+  /* statTile — 라벨/값/보조 3행 KPI 타일.
+     2026-05-26 시각 폴리시: 값(value)이 단일 숫자(또는 prefix+숫자+suffix)
+     꼴이면 data-rd-num 을 부여해 카운트업 대상이 된다. 'min:sec' 같은
+     비숫자 라벨은 자동으로 카운트업 제외된다.
+     value 가 이미 문자열이면 그대로 두고, 안에 첫 숫자만 카운트업 대상으로
+     쓴다(예: '12.34 kt' → suffix=' kt', target=12.34). */
   function statTile(label, value, sub) {
+    var valHtml = numHtml(value);
     return '<div class="stat"><span class="stat__label">' + label + '</span>' +
-      '<span class="stat__value">' + value + '</span>' +
+      '<span class="stat__value">' + valHtml + '</span>' +
       (sub ? '<span class="stat__sub">' + sub + '</span>' : '') + '</div>';
+  }
+
+  /* numHtml — 문자열 값을 받아 첫 숫자를 카운트업 가능한 span 으로 감싼다.
+     '12.34 kt' → <span data-rd-num="12.34" data-rd-suffix=" kt">12.34 kt</span>
+     숫자가 없거나 '미입력' '—' 같은 라벨은 그대로 둔다. */
+  function numHtml(value) {
+    if (value == null) return '—';
+    var s = String(value);
+    /* 부호·소수·천단위 콤마 허용. 첫 매치만 카운트업 대상. */
+    var m = s.match(/^(\D*)(-?\d{1,3}(?:,\d{3})*(?:\.\d+)?|-?\d+(?:\.\d+)?)(.*)$/);
+    if (!m) return s;       /* 숫자 없음 — 그대로 */
+    var prefix = m[1], numStr = m[2], suffix = m[3];
+    var raw = parseFloat(numStr.replace(/,/g, ''));
+    if (!isFinite(raw)) return s;
+    var decimals = (numStr.indexOf('.') >= 0)
+      ? numStr.split('.')[1].length : 0;
+    return '<span data-rd-num="' + raw + '"' +
+      (prefix ? ' data-rd-prefix="' + esc(prefix) + '"' : '') +
+      (suffix ? ' data-rd-suffix="' + esc(suffix) + '"' : '') +
+      ' data-rd-decimals="' + decimals + '">' + esc(s) + '</span>';
   }
 
   /* 회전 지표 정의 툴팁 — 효율·손실·소요·회복이 같은 기준을 보도록
@@ -1142,8 +1394,9 @@
     ];
     box.innerHTML = items.map(function (it) {
       var v = it[1] > 0 ? fmtSpeed(it[1]) : '—';
-      return '<div class="metric"><span class="metric__val">' + v + '</span>' +
-        '<span class="metric__label">' + it[0] + '</span></div>';
+      /* numHtml 로 wrap → 카운트업 가능 (2026-05-26 시각 폴리시) */
+      return '<div class="metric"><span class="metric__val">' + numHtml(v) +
+        '</span><span class="metric__label">' + it[0] + '</span></div>';
     }).join('');
   }
 
@@ -3584,8 +3837,10 @@
       return '<div class="' + cls + '">' + inner + '</div>';
     }
     var s = seg.score, tone = vpsTone(s);
+    /* 점수 숫자에 data-rd-num 부여 → 카운트업 (2026-05-26 시각 폴리시) */
     inner += '<div class="vps-tile__scorerow">' +
-      '<span class="vps-tile__score vps-score--' + tone + '">' + s + '</span>' +
+      '<span class="vps-tile__score vps-score--' + tone + '"' +
+      ' data-rd-num="' + s + '" data-rd-decimals="0">' + s + '</span>' +
       '<span class="vps-tile__max">/ 100</span></div>' +
       '<div class="vps-bar"><div class="vps-bar__fill vps-fill--' + tone +
       '" style="width:' + s + '%"></div></div>';

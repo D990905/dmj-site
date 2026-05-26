@@ -9,7 +9,7 @@
 <meta name="description" content="윙포일·세일링 GPX 트랙 분석 — 속도·택킹/자이빙 효율·VMG·TWA 폴라. 코치 등급 분석.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <!-- 메인 사이트 헤더·내비 스타일 — dashboard.css 를 뒤에 두어 대시보드 본문 스타일이 우선한다 -->
-<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/style.css?v=mobile-tap-fix-20260526">
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -88,7 +88,7 @@
         <button class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
         </button>
-        <a href="https://pf.kakao.com/" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </a>
         <button class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
@@ -167,6 +167,27 @@
           aria-pressed="true">한글</button>
   <button type="button" class="rd-langtoggle__btn" data-rd-lang-btn="en"
           aria-pressed="false">English</button>
+</div>
+
+<!-- ===================== 분석 완료 Hero Summary (2026-05-26 시각 폴리시 Layer 2) =====================
+     GPX 분석이 끝난 직후 1회만 표시되는 임팩트 오버레이. 트랙 GPS overview
+     SVG 위에 4개 핵심 KPI(VPS·이동 시간·최고 속도·총 거리)를 큰 글자로
+     얹는다. 사용자가 클릭하거나 5초 후 자동으로 fade out → 대시보드 본
+     화면으로 넘어간다. 다크 X — 라이트 테마 유지. 데이터는 app.js
+     showHeroSummary() 가 채운다. -->
+<div id="hero-summary" class="rd-hero" hidden aria-hidden="true">
+  <button type="button" class="rd-hero__skip" id="hero-skip">대시보드 바로 보기 →</button>
+  <div class="rd-hero__bg" aria-hidden="true">
+    <svg id="hero-track" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice"></svg>
+  </div>
+  <div class="rd-hero__scrim" aria-hidden="true"></div>
+  <div class="rd-hero__content">
+    <p class="rd-hero__kicker">라이딩 분석 완료</p>
+    <h2 class="rd-hero__title" id="hero-title">라이딩 세션</h2>
+    <p class="rd-hero__meta" id="hero-meta">—</p>
+    <div class="rd-hero__kpis" id="hero-kpis"></div>
+    <p class="rd-hero__hint">아무 곳이나 누르면 대시보드로 이동합니다</p>
+  </div>
 </div>
 
 <main class="app-main">
@@ -264,6 +285,10 @@
       </div>
       <div class="dash__head-actions">
         <button type="button" class="btn btn--ghost" id="new-file-btn">새 파일</button>
+        <!-- PDF 보고서 다운로드 (Danny 2026-05-26) — 모바일 Web Share API 지원 시
+             ⬇ 버튼을 ↗ 공유 버튼으로 자동 전환 (RDPdfExport.canShareFiles). -->
+        <button type="button" class="btn btn--ghost" id="pdf-export-btn"
+                aria-label="PDF 보고서 다운로드">📄 PDF 보고서</button>
         <button type="button" class="btn btn--primary" id="save-session-btn">이 세션 저장</button>
       </div>
     </div>
@@ -310,7 +335,7 @@
     </div>
 
     <!-- VPS -->
-    <div class="card card--vps" id="vps-card"></div>
+    <div class="card card--vps card--hero" id="vps-card"></div>
 
     <!-- 세션 평균 — SPS 바로 아래. 포트/스타보드 × 풍상/풍하 평균 (G) -->
     <div class="card" id="session-avg-card" hidden></div>
@@ -740,6 +765,9 @@
 <script src="js/storage.js"></script>
 <!-- 차트 디자인 토큰 (단일 소스) — charts.js 보다 먼저 로드 -->
 <script src="js/chart-theme.js"></script>
+<!-- 시각 폴리시 모션 헬퍼 (Danny 2026-05-26 — KPI 카운트업·등장 stagger).
+     charts.js 보다 먼저 로드해 차트 렌더가 끝난 직후 KPI 카운트가 함께 시작. -->
+<script src="js/anim.js"></script>
 <script src="js/charts.js"></script>
 <!-- 라이딩 리플레이 뷰어 (지도·영상 동기 재생) -->
 <script src="js/replay.js"></script>
@@ -749,6 +777,9 @@
 <script src="js/coach.js"></script>
 <!-- 샘플 데이터 (file:// 에서도 동작하도록 인라인) -->
 <script src="sample/sample-gpx-data.js"></script>
+<!-- PDF 보고서 생성 — html2pdf.js · Pretendard 는 클릭 시점에 lazy load
+     (초기 페이지 로드 영향 0). (Danny 2026-05-26) -->
+<script src="js/pdf-export.js"></script>
 <!-- 앱 -->
 <script src="js/app.js"></script>
 <!-- 메인 사이트 헤더·내비 동작 (헤더 스크롤·모바일 메뉴·계정 드롭다운) -->
