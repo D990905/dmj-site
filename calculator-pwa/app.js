@@ -54,11 +54,12 @@
 
     var P = window.DMJ_FOIL_PRESETS;
     if (!P) return;
+    // §180-D — Levitaz·Takoon = 단무지 취급 / Chubanga·North = 사용자 보유 포일 입력용
     var groups = [
       ['levitaz', 'Levitaz'],
-      ['chubanga', 'Chubanga'],
       ['takoon', 'Takoon'],
-      ['north', 'North']
+      ['chubanga', 'Chubanga · 직접 입력용'],
+      ['north', 'North · 직접 입력용']
     ];
     groups.forEach(function (grp) {
       var arr = P[grp[0]];
@@ -197,7 +198,7 @@
     var ar      = num('ci-ar', 6.5);
     var gear    = num('ci-gear', 10);
     var skill   = $('#wso-skill') ? $('#wso-skill').value : '상급-선수';
-    var pref    = radioVal('wso-pref', 'small');
+    var gust    = radioVal('wso-gust', 'clean');   // §181-G — 변풍 정도
     var mast    = num('wso-mast', 112);
     var height  = num('wso-height', 175);
     var wingAR  = num('wso-wingar', 4.5);
@@ -217,28 +218,49 @@
       mast_cm: mast,
       rider_height_cm: height,
       wing_ar: wingAR,
-      preference: pref,
+      preference: 'mid',   // §181-G — wingSizeOptimal 은 진단용. 추천은 wingRecommendation(변풍) 사용
       gear_kg: gear
     });
 
-    if (r.error) {
-      ['wso-min', 'wso-opt', 'wso-max'].forEach(function (id) { text(id, '—'); });
+    // §181-F/G (Danny 2026-05-22) — 추천은 풍상 VMG 곡선에서 파생 + 변풍 정도 반영.
+    var rec = window.DMJLift.wingRecommendation
+      ? window.DMJLift.wingRecommendation({
+          v_wind_kt: windKt, m_rider_kg: rider, skill: skill,
+          foil_ar: ar, wing_ar: wingAR, gear_kg: gear
+        }, { gust: gust })
+      : null;
+    function fmtWing(v) {
+      return (v % 1 === 0) ? v.toFixed(1) : String(Math.round(v * 100) / 100);
+    }
+
+    if (r.error || !rec || !rec.feasible) {
+      ['wso-min', 'wso-opt'].forEach(function (id) { text(id, '—'); });
       $('#wso-evolution').hidden = true;
       return;
     }
 
-    text('wso-opt', r.optimal.toFixed(1));
-    text('wso-min', r.min.toFixed(1));
-    text('wso-max', r.max.toFixed(1));
+    // 퍼포먼스(곡선 정점, 메인) + practical(변풍 반영 실사용 추천)
+    text('wso-opt', fmtWing(rec.performance));
+    text('wso-min', fmtWing(rec.practical));
+    var GUST_LABEL = {
+      clean: { name: '깨끗한 바람', sub: '정점 그대로 — 퍼포먼스와 동일' },
+      light: { name: '약간의 변풍', sub: '정점 − 0.5 m² — 다루기 쉬움' },
+      heavy: { name: '심한 변풍',   sub: '정점 − 1.0 m² — 컨트롤 우선' }
+    };
+    var gInfo = GUST_LABEL[rec.gust] || GUST_LABEL.clean;
+    if ($('#wso-min-label')) $('#wso-min-label').textContent = '실사용 추천 — ' + gInfo.name;
+    if ($('#wso-min-sub')) $('#wso-min-sub').textContent = gInfo.sub;
 
     // size cap visualization
-    var capMsg = '레이싱 클래스 규정상 max ' + (r.size_cap_m2 || 7.4) + ' m².';
-    ['#wso-min', '#wso-opt', '#wso-max'].forEach(function (sel) {
+    var sizeCap = r.size_cap_m2 || 7.4;
+    var capMsg = '레이싱 클래스 규정상 max ' + sizeCap + ' m².';
+    var capHit = rec.performance > sizeCap - 1e-6;
+    ['#wso-min', '#wso-opt'].forEach(function (sel) {
       var el = $(sel);
       if (!el) return;
       var parent = el.closest('.bracket__cell');
       if (!parent) return;
-      if (r.size_cap_hit) {
+      if (capHit) {
         parent.setAttribute('title', capMsg);
         parent.classList.add('bracket__cell--capped');
       } else {
@@ -247,9 +269,26 @@
       }
     });
 
-    // v-limit / VMG per wing size
-    if (r.v_upwind_detail) {
-      var det = r.v_upwind_detail;
+    // v-limit 3셀 = 퍼포먼스 윙 ±0.5 m² 속도 민감도 (변풍 선택과 무관, 고정 윈도)
+    function vlFromUpwind(u) {
+      if (!u || u.error) return { feasible: false, kt: 0, vmg_kt: 0, depowered: false,
+        tack_angle_deg: 0, beta_deg: 0 };
+      return { feasible: !!u.feasible, kt: u.V_boat_kt, vmg_kt: u.V_vmg_kt,
+        depowered: !!u.depowered, tack_angle_deg: u.tack_angle_deg, beta_deg: u.beta_deg };
+    }
+    function upwindAtArea(area) {
+      return window.DMJLift.upwindSpeed({
+        v_wind_kt: windKt, m_rider_kg: rider, gear_kg: gear, skill: skill,
+        foil_ar: ar, wing_area_m2: area, wing_ar: wingAR
+      });
+    }
+    var vUpwindDetail = {
+      min: vlFromUpwind(upwindAtArea(rec.performance - 0.5)),
+      optimal: vlFromUpwind(rec.performance_detail),
+      max: vlFromUpwind(upwindAtArea(rec.performance + 0.5))
+    };
+    if (vUpwindDetail) {
+      var det = vUpwindDetail;
       var allDepow = det.min.depowered && det.optimal.depowered && det.max.depowered &&
         Math.abs(det.min.kt - det.optimal.kt) < 0.05 &&
         Math.abs(det.max.kt - det.optimal.kt) < 0.05;
@@ -286,10 +325,25 @@
     }
     renderUpwindAdvisor({
       v_wind_kt: windKt, m_rider_kg: rider, gear_kg: gear, skill: skill,
-      foil_ar: ar, wing_area_m2: r.optimal, wing_ar: wingAR,
+      foil_ar: ar, wing_area_m2: rec.performance, wing_ar: wingAR,
       foil_pool: foilPool, current_foil_id: currentFoilId,
       front_wing_area_cm2: currentArea, foil_brand: foilBrand
     });
+
+    // §181 곡선 그래프 — §181-F/G: 마커 = 퍼포먼스 정점 + 변풍 반영 실사용 추천
+    renderUpwindCurveGraph(
+      { v_wind_kt: windKt, m_rider_kg: rider, gear_kg: gear, skill: skill,
+        foil_ar: ar, wing_ar: wingAR },
+      { performance: rec.performance, practical: rec.practical, gust: rec.gust,
+        size_cap_m2: r.size_cap_m2 || 7.4 }
+    );
+
+    // §181-B (Danny 2026-05-21) — heel 각도별 버틸 수 있는 max 윙 그래프
+    renderHeelMaxWingGraph(
+      { m_rider_kg: rider, gear_kg: gear, v_wind_kt: windKt, skill: skill,
+        foil_ar: ar, wing_ar: wingAR, ref_wing_m2: rec.performance },
+      { optimal: rec.performance, size_cap_m2: r.size_cap_m2 || 7.4 }
+    );
 
     // 이론 측정값 (collapsed by default)
     text('wso-raw',     r.raw.toFixed(3) + ' m²');
@@ -313,7 +367,7 @@
       addFlag(flags, '✓ in-bounds', 'ok');
 
     // evolution box (lower skill + overpowered)
-    renderEvolution(skill, r.overpowered, r.optimal);
+    renderEvolution(skill, r.overpowered, rec.performance);
   }
 
   function formatVlim(id, vl) {
@@ -426,6 +480,294 @@
     }
   }
 
+  /* §181 (Danny 2026-05-21) — 윙 사이즈별 속도 역U자 곡선 그래프 (SVG)
+     입력 p = upwindCurve 인자, rec = { min, optimal, max, size_cap_m2 } */
+  var wsoCurveMetric = 'vb';     // 'vb' 보드 속도 | 'vmg'
+  var wsoCurveLastArgs = null;   // 토글 재렌더용
+
+  function renderUpwindCurveGraph(p, rec) {
+    var wrap = $('#wso-curve-svg');
+    var legendEl = $('#wso-curve-legend');
+    var captionEl = $('#wso-curve-caption');
+    if (!wrap || !window.DMJLift || !window.DMJLift.upwindCurve) return;
+    wsoCurveLastArgs = { p: p, rec: rec };
+
+    var A_MIN = 2.5, A_MAX = 8.5, STEP = 0.25;
+    var cap = (rec && rec.size_cap_m2) ? rec.size_cap_m2 : 7.4;
+    var curve = window.DMJLift.upwindCurve(p, { area_min_m2: A_MIN, area_max_m2: A_MAX, step_m2: STEP });
+    var pts = curve.points || [];
+    var feas = pts.filter(function (q) { return q.feasible; });
+
+    if (feas.length < 2) {
+      wrap.innerHTML = '<p class="wso-curve__empty">현재 입력 조합에서는 풍상으로 진행 가능한 윙 사이즈가 없습니다.<br>풍속을 높이거나 더 효율 좋은 포일을 선택해 보세요.</p>';
+      if (legendEl) legendEl.innerHTML = '';
+      if (captionEl) captionEl.textContent = '';
+      return;
+    }
+
+    var metric = wsoCurveMetric;
+    function val(q) { return metric === 'vmg' ? q.V_vmg_kt : q.V_boat_kt; }
+    var yLabel = (metric === 'vmg') ? 'VMG' : '보드 속도';
+
+    // ── y 범위 (보기 좋은 상한) ──
+    var yMax = 1;
+    pts.forEach(function (q) { if (val(q) > yMax) yMax = val(q); });
+    var yTop = Math.ceil(yMax * 1.14 / 2) * 2;
+    if (yTop < 4) yTop = 4;
+
+    // ── SVG 좌표계 ──
+    var W = 480, H = 280, mL = 42, mR = 16, mT = 16, mB = 40;
+    var pw = W - mL - mR, ph = H - mT - mB;
+    function sx(a) { return mL + (a - A_MIN) / (A_MAX - A_MIN) * pw; }
+    function sy(v) { return mT + ph - (Math.max(0, v) / yTop) * ph; }
+    function f1(n) { return Math.round(n * 10) / 10; }
+
+    var s = [];
+    s.push('<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="윙 사이즈별 ' + yLabel + ' 곡선">');
+    s.push('<rect x="' + mL + '" y="' + mT + '" width="' + pw + '" height="' + ph + '" fill="#fbfcfd" stroke="#E3E8EE"/>');
+
+    // y 격자 + 눈금
+    for (var i = 0; i <= 4; i++) {
+      var yv = yTop * i / 4, yy = sy(yv);
+      s.push('<line x1="' + mL + '" y1="' + f1(yy) + '" x2="' + (mL + pw) + '" y2="' + f1(yy) + '" stroke="#EDF1F5"/>');
+      s.push('<text x="' + (mL - 6) + '" y="' + f1(yy + 3) + '" text-anchor="end" font-size="9" fill="#5C6F7E">' + yv.toFixed(0) + '</text>');
+    }
+    s.push('<text x="13" y="' + (mT + ph / 2) + '" text-anchor="middle" font-size="9" fill="#5C6F7E" transform="rotate(-90 13 ' + (mT + ph / 2) + ')">' + yLabel + ' (kt)</text>');
+
+    // x 눈금 (정수)
+    for (var a = 3; a <= 8; a++) {
+      var xx = sx(a);
+      s.push('<line x1="' + f1(xx) + '" y1="' + (mT + ph) + '" x2="' + f1(xx) + '" y2="' + (mT + ph + 4) + '" stroke="#C8D2DC"/>');
+      s.push('<text x="' + f1(xx) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">' + a + '</text>');
+    }
+    s.push('<text x="' + (mL + pw / 2) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">윙 사이즈 (m²)</text>');
+
+    // §181-F/G — 추천 밴드: 실사용(변풍 반영) ~ 퍼포먼스
+    var recPerf = (rec && rec.performance) ? rec.performance : null;
+    var recPrac = (rec && rec.practical) ? rec.practical : null;
+    if (recPerf && recPrac && recPerf > recPrac) {
+      var bx1 = sx(Math.max(A_MIN, recPrac)), bx2 = sx(Math.min(A_MAX, recPerf));
+      s.push('<rect x="' + f1(bx1) + '" y="' + mT + '" width="' + f1(bx2 - bx1) + '" height="' + ph + '" fill="#FFB800" fill-opacity="0.14"/>');
+    }
+
+    // 레이싱 클래스 상한 (7.4) 점선
+    if (cap >= A_MIN && cap <= A_MAX) {
+      var cx = sx(cap);
+      s.push('<line x1="' + f1(cx) + '" y1="' + mT + '" x2="' + f1(cx) + '" y2="' + (mT + ph) + '" stroke="#8b2014" stroke-width="1.2" stroke-dasharray="4 3"/>');
+      s.push('<text x="' + f1(cx - 4) + '" y="' + (mT + ph - 6) + '" text-anchor="end" font-size="8" fill="#8b2014">레이싱 상한 ' + cap + '</text>');
+    }
+
+    // 곡선 (영역 채움 + 라인)
+    var lineD = '';
+    pts.forEach(function (q, idx) {
+      lineD += (idx === 0 ? 'M' : 'L') + f1(sx(q.area_m2)) + ' ' + f1(sy(val(q))) + ' ';
+    });
+    var areaD = lineD + 'L' + f1(sx(pts[pts.length - 1].area_m2)) + ' ' + (mT + ph) +
+                ' L' + f1(sx(pts[0].area_m2)) + ' ' + (mT + ph) + ' Z';
+    s.push('<path d="' + areaD + '" fill="#1F8FFF" fill-opacity="0.09"/>');
+    s.push('<path d="' + lineD + '" fill="none" stroke="#0A2540" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>');
+
+    // 마커 helper
+    function dot(area, value, color, label, labelAbove) {
+      var x = sx(Math.max(A_MIN, Math.min(A_MAX, area))), y = sy(value);
+      var g = '';
+      g += '<circle cx="' + f1(x) + '" cy="' + f1(y) + '" r="5" fill="' + color + '" stroke="#fff" stroke-width="1.8"/>';
+      if (label) {
+        var ly = labelAbove ? (y - 11) : (y + 19);
+        var tw = label.length * 6.0 + 8;
+        var lx = Math.max(mL + tw / 2, Math.min(mL + pw - tw / 2, x));
+        g += '<rect x="' + f1(lx - tw / 2) + '" y="' + f1(ly - 9) + '" width="' + f1(tw) + '" height="14" rx="3" fill="' + color + '"/>';
+        g += '<text x="' + f1(lx) + '" y="' + f1(ly + 1.5) + '" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">' + label + '</text>';
+      }
+      return g;
+    }
+    function ptValAt(area) {
+      var best = null, bd = 99;
+      pts.forEach(function (q) { var d = Math.abs(q.area_m2 - area); if (d < bd) { bd = d; best = q; } });
+      return best;
+    }
+
+    var peak = curve.optimum;
+    // §181-F/G — 마커: 퍼포먼스(곡선 정점) + 변풍 반영 실사용 추천.
+    //   깨끗한 바람(둘이 같음)이면 마커 1개만 표시.
+    function fmtM(v) { return (v % 1 === 0) ? v.toFixed(1) : String(Math.round(v * 100) / 100); }
+    var perfPt = recPerf ? ptValAt(recPerf) : peak;
+    var pracPt = recPrac ? ptValAt(recPrac) : null;
+    var twoMarkers = recPerf && recPrac && Math.abs(recPerf - recPrac) > 0.01;
+    if (twoMarkers && pracPt) s.push(dot(recPrac, val(pracPt), '#1F8FFF', '실사용 ' + fmtM(recPrac), false));
+    if (perfPt) s.push(dot(recPerf || perfPt.area_m2, val(perfPt), '#0A2540', '퍼포먼스 ' + fmtM(recPerf || perfPt.area_m2), true));
+
+    s.push('</svg>');
+    wrap.innerHTML = s.join('');
+
+    // ── 범례 ──
+    if (legendEl) {
+      var lg = [];
+      lg.push('<span><i style="background:#0A2540"></i>속도 곡선</span>');
+      lg.push('<span><i style="background:#0A2540;border-radius:50%;width:10px;height:10px;border-top:0"></i>퍼포먼스 추천 (곡선 정점)</span>');
+      if (twoMarkers) {
+        lg.push('<span><i style="background:#FFB800;opacity:0.5"></i>실사용~퍼포먼스 범위</span>');
+        lg.push('<span><i style="background:#1F8FFF;border-radius:50%;width:10px;height:10px;border-top:0"></i>실사용 추천 (변풍 반영)</span>');
+      }
+      lg.push('<span style="color:#8b2014"><i class="dash"></i>레이싱 클래스 상한 ' + cap + ' m²</span>');
+      legendEl.innerHTML = lg.join('');
+    }
+
+    // ── 캡션 (곡선 모양 자동 설명) ──
+    if (captionEl) {
+      var firstFeas = feas[0], lastFeas = feas[feas.length - 1];
+      var peakV = peak ? val(peak) : 0;
+      var endV = val(lastFeas);
+      var dropFromPeak = peakV - endV;
+      var risingToEnd = peak && (peak.area_m2 >= lastFeas.area_m2 - 0.3);
+      var fallingFromStart = peak && (peak.area_m2 <= firstFeas.area_m2 + 0.3);
+      var txt;
+      if (!risingToEnd && !fallingFromStart && dropFromPeak >= 0.3) {
+        txt = '<b>역U자 곡선</b> — 윙을 키우면 끄는 힘이 늘어 속도가 오르지만, '
+            + '약 ' + peak.area_m2.toFixed(1) + ' m² 를 넘으면 윙 자체 저항이 커져 다시 느려집니다. '
+            + '이 조합의 최고 속도 지점은 약 <b>' + peak.area_m2.toFixed(1) + ' m²</b> 입니다.';
+      } else if (fallingFromStart) {
+        txt = '바람이 강해 <b>작은 윙일수록 빠릅니다</b> — 큰 윙은 라이더가 다 받쳐내지 못해 오히려 느려집니다.';
+      } else {
+        txt = '이 조합에서는 <b>윙을 키울수록 속도가 오릅니다</b> — 라이더·바람 조건상 사용 가능한 범위 안에서는 과출력 정점이 나타나지 않습니다. '
+            + '실제 사이즈는 컨트롤·이착수 편의를 고려해 추천 범위에서 고르세요.';
+      }
+      captionEl.innerHTML = txt;
+    }
+  }
+
+  /* §181 — 곡선 그래프 보드 속도 ↔ VMG 토글 */
+  (function () {
+    var tg = $('#wso-curve-toggle');
+    if (!tg) return;
+    tg.addEventListener('click', function (e) {
+      var btn = e.target.closest('button[data-metric]');
+      if (!btn) return;
+      wsoCurveMetric = btn.getAttribute('data-metric');
+      tg.querySelectorAll('button').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      if (wsoCurveLastArgs) renderUpwindCurveGraph(wsoCurveLastArgs.p, wsoCurveLastArgs.rec);
+    });
+  })();
+
+  /* §181-B (Danny 2026-05-21) — heel 각도별 버틸 수 있는 max 윙 사이즈 그래프 (SVG)
+     입력 p = heelMaxWingCurve 인자, rec = { optimal, size_cap_m2 } */
+  function renderHeelMaxWingGraph(p, rec) {
+    var wrap = $('#wso-heelcurve-svg');
+    var legendEl = $('#wso-heelcurve-legend');
+    var captionEl = $('#wso-heelcurve-caption');
+    if (!wrap || !window.DMJLift || !window.DMJLift.heelMaxWingCurve) return;
+
+    var curve = window.DMJLift.heelMaxWingCurve(p, { deg_min: 0, deg_max: 45, step_deg: 1 });
+    if (curve.error) {
+      wrap.innerHTML = '<p class="wso-curve__empty">입력값을 확인해 주세요.</p>';
+      if (legendEl) legendEl.innerHTML = '';
+      if (captionEl) captionEl.textContent = '';
+      return;
+    }
+    var pts = curve.points, marks = curve.skill_marks || [];
+    var curSkill = String(p.skill || '중급');
+    var cap = (rec && rec.size_cap_m2) ? rec.size_cap_m2 : 7.4;
+
+    // y 상한 — 곡선 max 와 cap 둘 다 보이게
+    var yMaxData = pts[pts.length - 1].max_wing_m2;
+    var yTop = Math.ceil(Math.max(yMaxData, cap) * 1.12 / 2) * 2;
+    if (yTop < 4) yTop = 4;
+
+    var W = 480, H = 280, mL = 42, mR = 16, mT = 16, mB = 40;
+    var pw = W - mL - mR, ph = H - mT - mB;
+    var D_MIN = 0, D_MAX = 45;
+    function sx(d) { return mL + (d - D_MIN) / (D_MAX - D_MIN) * pw; }
+    function sy(v) { return mT + ph - (Math.max(0, v) / yTop) * ph; }
+    function f1(n) { return Math.round(n * 10) / 10; }
+
+    var s = [];
+    s.push('<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="heel 각도별 버틸 수 있는 max 윙 사이즈 곡선">');
+    s.push('<rect x="' + mL + '" y="' + mT + '" width="' + pw + '" height="' + ph + '" fill="#fbfcfd" stroke="#E3E8EE"/>');
+
+    // y 격자 + 눈금
+    for (var i = 0; i <= 4; i++) {
+      var yv = yTop * i / 4, yy = sy(yv);
+      s.push('<line x1="' + mL + '" y1="' + f1(yy) + '" x2="' + (mL + pw) + '" y2="' + f1(yy) + '" stroke="#EDF1F5"/>');
+      s.push('<text x="' + (mL - 6) + '" y="' + f1(yy + 3) + '" text-anchor="end" font-size="9" fill="#5C6F7E">' + yv.toFixed(0) + '</text>');
+    }
+    s.push('<text x="13" y="' + (mT + ph / 2) + '" text-anchor="middle" font-size="9" fill="#5C6F7E" transform="rotate(-90 13 ' + (mT + ph / 2) + ')">버틸 수 있는 max 윙 (m²)</text>');
+
+    // x 눈금 (heel 각도)
+    [0, 10, 20, 30, 40].forEach(function (d) {
+      var xx = sx(d);
+      s.push('<line x1="' + f1(xx) + '" y1="' + (mT + ph) + '" x2="' + f1(xx) + '" y2="' + (mT + ph + 4) + '" stroke="#C8D2DC"/>');
+      s.push('<text x="' + f1(xx) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">' + d + '°</text>');
+    });
+    s.push('<text x="' + (mL + pw / 2) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">heel (기댐) 각도</text>');
+
+    // 레이싱 클래스 상한 (7.4) 수평 점선
+    if (cap <= yTop) {
+      var cy = sy(cap);
+      s.push('<line x1="' + mL + '" y1="' + f1(cy) + '" x2="' + (mL + pw) + '" y2="' + f1(cy) + '" stroke="#8b2014" stroke-width="1.2" stroke-dasharray="4 3"/>');
+      s.push('<text x="' + (mL + pw - 3) + '" y="' + f1(cy - 4) + '" text-anchor="end" font-size="8" fill="#8b2014">레이싱 상한 ' + cap + ' m²</text>');
+    }
+
+    // 곡선 (영역 채움 + 라인)
+    var lineD = '';
+    pts.forEach(function (q, idx) {
+      lineD += (idx === 0 ? 'M' : 'L') + f1(sx(q.heel_deg)) + ' ' + f1(sy(q.max_wing_m2)) + ' ';
+    });
+    var areaD = lineD + 'L' + f1(sx(pts[pts.length - 1].heel_deg)) + ' ' + (mT + ph) +
+                ' L' + f1(sx(pts[0].heel_deg)) + ' ' + (mT + ph) + ' Z';
+    s.push('<path d="' + areaD + '" fill="#1F8FFF" fill-opacity="0.09"/>');
+    s.push('<path d="' + lineD + '" fill="none" stroke="#0A2540" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>');
+
+    // 스킬별 heel 각도 마커 — 비현재 스킬은 작은 흰 점, 현재 스킬은 강조 + 라벨
+    var curMark = null;
+    marks.forEach(function (mk) {
+      if (mk.skill === curSkill) { curMark = mk; return; }
+      var x = sx(mk.heel_deg), y = sy(mk.max_wing_m2);
+      s.push('<circle cx="' + f1(x) + '" cy="' + f1(y) + '" r="3.2" fill="#fff" stroke="#5C6F7E" stroke-width="1.4"/>');
+    });
+    if (curMark) {
+      var cx2 = sx(curMark.heel_deg), cy2 = sy(curMark.max_wing_m2);
+      s.push('<circle cx="' + f1(cx2) + '" cy="' + f1(cy2) + '" r="5.5" fill="#0A2540" stroke="#fff" stroke-width="1.8"/>');
+      var lbl = curMark.skill + ' ' + curMark.heel_deg + '° · ' + curMark.max_wing_m2.toFixed(1) + ' m²';
+      var tw = lbl.length * 6.2 + 10;
+      var lx = Math.max(mL + tw / 2, Math.min(mL + pw - tw / 2, cx2));
+      var ly = cy2 - 12;
+      s.push('<rect x="' + f1(lx - tw / 2) + '" y="' + f1(ly - 9) + '" width="' + f1(tw) + '" height="14" rx="3" fill="#0A2540"/>');
+      s.push('<text x="' + f1(lx) + '" y="' + f1(ly + 1.5) + '" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">' + lbl + '</text>');
+    }
+
+    s.push('</svg>');
+    wrap.innerHTML = s.join('');
+
+    // ── 범례 ──
+    if (legendEl) {
+      legendEl.innerHTML =
+        '<span><i style="background:#0A2540"></i>버틸 수 있는 max 윙</span>'
+        + '<span><i style="background:#0A2540;border-radius:50%;width:10px;height:10px;border-top:0"></i>현재 스킬</span>'
+        + '<span><i style="background:#fff;border:1.4px solid #5C6F7E;border-radius:50%;width:9px;height:9px"></i>다른 스킬 등급</span>'
+        + '<span style="color:#8b2014"><i class="dash"></i>레이싱 클래스 상한 ' + cap + ' m²</span>';
+    }
+
+    // ── 캡션 ──
+    if (captionEl) {
+      var cm = curMark || marks[0];
+      var maxW = cm ? cm.max_wing_m2 : 0;
+      var txt = 'heel(기댐) 각도 = 라이더가 바람 반대쪽으로 기대는 각도. 클수록 윙의 측면 견인력을 더 버틸 수 있어 '
+              + '<b>더 큰 윙</b>이 가능합니다. 현재 스킬 <b>' + (cm ? cm.skill : '') + ' ' + (cm ? cm.heel_deg : '') + '°</b> 기준 '
+              + '버틸 수 있는 윙은 약 <b>' + maxW.toFixed(1) + ' m²</b> 입니다.';
+      if (rec && rec.optimal) {
+        if (rec.optimal > maxW + 0.1) {
+          txt += ' 추천 사이즈 ' + rec.optimal.toFixed(1) + ' m² 가 이 한계를 넘어 — 강풍에서 과출력(컨트롤 어려움) 영역입니다.';
+        } else {
+          txt += ' 추천 사이즈 ' + rec.optimal.toFixed(1) + ' m² 는 한계 안에 있습니다.';
+        }
+      }
+      txt += '<br><span style="color:#5C6F7E">스킬별 heel: 입문 9° / 초급 19° / 중급 29° / 상급 39° / 상급-선수 41° / 선수 42°</span>';
+      captionEl.innerHTML = txt;
+    }
+  }
+
   var LOWER_SKILLS = { '입문': true, '초급': true, '중급': true };
 
   function renderEvolution(skill, overpowered, recommended) {
@@ -454,7 +796,7 @@
     });
     // radios → defaults
     var defaults = {
-      pumping: 'moderate', water_type: 'sea', surface: 'flat', 'wso-pref': 'small'
+      pumping: 'moderate', water_type: 'sea', surface: 'flat', 'wso-gust': 'clean'
     };
     Object.keys(defaults).forEach(function (name) {
       var sel = 'input[name="' + name + '"][value="' + defaults[name] + '"]';
@@ -478,7 +820,7 @@
     });
     var presetSel = $('#ci-foil-preset');
     if (presetSel) presetSel.addEventListener('change', onPresetChange);
-    $$('#wso-skill, #wso-mast, #wso-height, #wso-wingar, input[name="wso-pref"]').forEach(function (el) {
+    $$('#wso-skill, #wso-mast, #wso-height, #wso-wingar, input[name="wso-gust"]').forEach(function (el) {
       el.addEventListener('input', recomputeWSO);
       el.addEventListener('change', recomputeWSO);
     });

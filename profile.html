@@ -363,6 +363,8 @@
          empty state = greyed pentagon + CTA, 토글 X. -->
     <section class="profile-section profile-section--dashboard">
       <h2 class="profile-section__title">스킬 진단 결과</h2>
+      <!-- v2 — 데이터 주도 스킬 레벨 재평가 추천·동의 카드 (불일치 시에만 노출) -->
+      <div id="skill-level-rec" hidden></div>
       <div class="dash-section" data-section="skill">
         <div class="dash-section__compact" id="skill-compact"></div>
         <button type="button" class="dash-section__toggle" data-toggle="skill" hidden>자세히 보기 ↓</button>
@@ -531,6 +533,8 @@
 </datalist>
 
 <script src="assets/js/auth-shim.js" defer></script>
+<!-- v2 데이터 주도 스킬 레벨 평가 — 추천·동의 카드 -->
+<script src="assets/js/skill-level.js" defer></script>
 <!-- §171-B cart system — for nav badge. -->
 <script src="assets/js/cart.js" defer></script>
 <script src="assets/js/nav-auth.js" defer></script>
@@ -927,7 +931,8 @@
           var sk = JSON.parse(skRaw);
           if (sk && (patch.stance === 'regular' || patch.stance === 'goofy')) {
             sk.stance = patch.stance;
-            sk.v = 4;
+            // sk.v 는 건드리지 않는다 — 버전 스탬프는 indices 인코딩을 반영해야 한다.
+            // (v 를 강제로 바꾸면 5점 indices 가 레거시로 오인되어 점수가 깨진다.)
             window.DMJAuth.setUserData('skill_assessment_v1', JSON.stringify(sk));
           }
         }
@@ -1793,10 +1798,12 @@
     renderGearList();
 
     // ===== 5. §E 스킬 진단 결과 =====
-    // DO_NOT_REVERT §169-E v3 — Danny 2026-05-12: 스킬 진단 ↔ profile schema sync fix.
-    // skill-assessment 저장 schema = { v: 4, ts, indices: [0..5, ...], speed, stance }.
-    // score/totalScore field 존재 X — `indices` 배열에서 derive 의무 (LEVELS[idx].score = idx*2).
-    // 회귀 영구 X: profile 가 `data.score`/`data.totalScore` 만 읽고 0 fallback 하는 v2 로직.
+    // §169-E v5 (Danny 2026-05-23) — 5점 만족도 척도로 전환.
+    // skill-assessment 저장 schema = { v: 5, ts, indices: [0..4 ×10], speed, stance }.
+    //   인덱스 0 매우불만족 ~ 4 매우만족. 미입력 상태 폐지.
+    // DO_NOT_REVERT — 종합 점수는 skill-assessment.html surveyScore01 과 반드시 같은 값.
+    //   skill-level.js surveyScore(5점 indices) 가 canonical 산식. 레거시 payload(v<5)는
+    //   normalizeSurveyIndices 로 먼저 5점으로 변환. (이전 70 vs 90 불일치 회귀 방지)
     // DO_NOT_REVERT §169-N v3 — Danny 2026-05-13: compact mini-dashboard + 자세히 보기 토글.
     (function () {
       var compact = document.getElementById('skill-compact');
@@ -1808,40 +1815,45 @@
       var data = null;
       if (raw) { try { data = JSON.parse(raw); } catch (e) { data = null; } }
 
-      // §169-E v3 — Derive score from indices (skill-assessment canonical schema).
-      // LEVELS: 0→0, 1→2, 2→4, 3→6, 4→8, 5→10 (총 0..100점)
-      var LEVEL_SCORES = [0, 2, 4, 6, 8, 10];
-      var indices = (data && Array.isArray(data.indices)) ? data.indices : [];
+      // 저장 indices → 5점 척도(0..4) 정규화. 미니 펜타곤·약점/강점 카운트·점수 모두 이 배열 사용.
+      // 레거시 payload(v<5)는 6단계 인코딩 → 5점으로 마이그레이션된다.
+      var fivePt = (data && Array.isArray(data.indices) && window.DMJSkillLevel)
+        ? window.DMJSkillLevel.normalizeSurveyIndices(data.indices, data.v)
+        : [];
+      // 종합 점수 — skill-assessment.html surveyScore01 과 동일하게 canonical surveyScore 사용.
       var score = 0;
-      if (indices.length) {
-        score = indices.reduce(function (sum, idx) {
-          var n = parseInt(idx, 10);
-          return sum + (LEVEL_SCORES[n] || 0);
-        }, 0);
+      if (fivePt.length && window.DMJSkillLevel) {
+        var sv = window.DMJSkillLevel.surveyScore(fivePt);
+        score = sv ? Math.round(sv.score) : 0;
       } else if (data && typeof data.score === 'number') {
-        score = data.score; // legacy schema fallback
+        score = Math.round(data.score); // legacy schema fallback
       } else if (data && typeof data.totalScore === 'number') {
-        score = data.totalScore; // legacy schema fallback
+        score = Math.round(data.totalScore); // legacy schema fallback
       }
       var hasAssessment = !!(data && score > 0);
 
       // ---- Mini pentagon (R=60, 10 axes, +18° offset matching skill-assessment) ----
+      // 5점 척도(level 0..4) — skill-assessment axisPoint 와 동일하게 (level+1)/5
+      // 로 매핑한다. 최저 등급(매우불만족=0)도 중심이 아니라 R/5 에 찍어,
+      // 모든 축이 최저이거나 P/S 가 극단으로 엇갈려도 폴리곤이 별 모양을
+      // 유지한다 (미입력 제거 후 idx 0 이 중심으로 collapse 하던 버그 수정
+      // — Danny 2026-05-24). 링도 등급마다 1개씩(5개).
       function miniPentagonSvg(idxArr, isEmpty) {
-        var R = 60, CX = 0, CY = 0, N = 10;
+        var R = 60, CX = 0, CY = 0, N = 10, MAXLVL = 4;
         function pt(i, level) {
           var angle = (i * 360 / N - 90 + 18) * Math.PI / 180;
-          var r = (level / 5) * R;
+          var r = ((level + 1) / (MAXLVL + 1)) * R;
           return { x: CX + r * Math.cos(angle), y: CY + r * Math.sin(angle) };
         }
         var rings = '';
-        for (var lvl = 1; lvl <= 5; lvl++) {
+        for (var lvl = 0; lvl <= MAXLVL; lvl++) {
           var ringPts = [];
           for (var i = 0; i < N; i++) { var p = pt(i, lvl); ringPts.push(p.x.toFixed(1) + ',' + p.y.toFixed(1)); }
           rings += '<polygon points="' + ringPts.join(' ') + '" fill="none" stroke="rgba(10,37,64,0.10)" stroke-width="1"/>';
         }
         var axes = '';
         for (var k = 0; k < N; k++) {
-          var tip = pt(k, 5);
+          var tip = pt(k, MAXLVL);
           axes += '<line x1="0" y1="0" x2="' + tip.x.toFixed(1) + '" y2="' + tip.y.toFixed(1) + '" stroke="rgba(10,37,64,0.10)" stroke-width="1"/>';
         }
         var polyPts = [];
@@ -1857,11 +1869,10 @@
       }
 
       if (!hasAssessment) {
-        // Empty state — raw 없거나, 파싱 실패, 또는 모든 슬라이더 미입력 (실제로 0점). 토글 hidden.
+        // Empty state — raw 없거나 파싱 실패. (미입력 폐지 — 저장된 진단은 항상 점수 > 0)
         var leadMsg = !raw
           ? '아직 스킬 진단을 받지 않으셨습니다. 10축 진단으로 약점을 파악하고 맞춤 트레이닝을 받으세요.'
-          : (data ? '저장된 진단의 모든 슬라이더가 미입력 상태입니다. 처음부터 다시 진행해주세요.'
-                  : '진단 데이터를 읽을 수 없습니다. 처음부터 다시 진행해주세요.');
+          : '진단 데이터를 읽을 수 없습니다. 처음부터 다시 진행해주세요.';
         compact.innerHTML = ''
           + '<div class="dash-empty-row">'
           +   '<div class="dash-empty-row__viz">' + miniPentagonSvg([], true) + '</div>'
@@ -1874,27 +1885,24 @@
         return;
       }
 
-      // §169-E v3 — Tier derived from score (§155 v3 + §165 v4 — 5-tier 0/20/40/60/80/100)
-      var tier = data.tier || data.tierLabel;
-      var tierColor = '#3FB8C9';
-      if (!tier) {
-        if (score === 0) { tier = '—'; tierColor = 'var(--color-slate)'; }
-        else if (score <= 20) { tier = '입문'; tierColor = '#4ade80'; }
-        else if (score <= 40) { tier = '초급'; tierColor = '#67e8f9'; }
-        else if (score <= 60) { tier = '중급'; tierColor = '#3FB8C9'; }
-        else if (score <= 80) { tier = '상급'; tierColor = '#FF8A3D'; }
-        else { tier = '선수'; tierColor = '#FFB800'; }
-      } else {
-        // re-derive color from tier label
-        var colorMap = { '입문': '#4ade80', '초급': '#67e8f9', '중급': '#3FB8C9', '상급': '#FF8A3D', '선수': '#FFB800' };
-        tierColor = colorMap[tier] || '#3FB8C9';
-      }
-      // 약점 / 강점 카운트: index ≤ 2 (보통 미만) 약점, index ≥ 4 (안정적+) 강점
+      // §169-E v4 (Danny 2026-05-23) — 등급은 항상 위 종합 점수에서 파생한다.
+      // 경계(20/40/60/80)는 skill-assessment getOverallTier · skill-level
+      // tierFromScore 와 동일. 저장된 stale tier 필드를 쓰면 요약과 상세 등급이
+      // 어긋날 수 있어 점수 파생만 신뢰한다.
+      var tier, tierColor;
+      if (score === 0) { tier = '—'; tierColor = 'var(--color-slate)'; }
+      else if (score <= 20) { tier = '입문'; tierColor = '#4ade80'; }
+      else if (score <= 40) { tier = '초급'; tierColor = '#67e8f9'; }
+      else if (score <= 60) { tier = '중급'; tierColor = '#3FB8C9'; }
+      else if (score <= 80) { tier = '상급'; tierColor = '#FF8A3D'; }
+      else { tier = '선수'; tierColor = '#FFB800'; }
+      // 약점 / 강점 카운트 (5점 척도): index ≤ 1 (불만족 이하) 약점, index ≥ 3 (만족 이상) 강점
       var weakCount = 0, strongCount = 0;
-      indices.forEach(function (idx) {
-        var n = parseInt(idx, 10) || 0;
-        if (n > 0 && n <= 2) weakCount++;
-        else if (n >= 4) strongCount++;
+      fivePt.forEach(function (idx) {
+        var n = parseInt(idx, 10);
+        if (isNaN(n)) return;
+        if (n <= 1) weakCount++;
+        else if (n >= 3) strongCount++;
       });
       var speed = (data && typeof data.speed === 'number') ? data.speed : 0;
       var stance = (data && data.stance) || null;
@@ -1906,7 +1914,7 @@
       // Compact view
       compact.innerHTML = ''
         + '<div class="skill-compact-grid">'
-        +   '<div class="skill-compact-grid__viz">' + miniPentagonSvg(indices, false) + '</div>'
+        +   '<div class="skill-compact-grid__viz">' + miniPentagonSvg(fivePt, false) + '</div>'
         +   '<div class="skill-compact-grid__body">'
         +     '<div class="skill-compact-grid__head">'
         +       '<div class="skill-compact-grid__score">' + score + '<span> / 100</span></div>'
@@ -1933,6 +1941,197 @@
         +   '</div>'
         + '</div>';
       if (toggleBtn) toggleBtn.hidden = false;
+    })();
+
+    // ===== 5-B. v2 데이터 주도 스킬 레벨 — 추천·동의 카드 =====
+    // 설계안: 스킬레벨_데이터주도_설계안_v2_2026-05-22.md §5
+    // 라이딩 대시보드 객관 데이터 기준 등급 ≠ 현재 저장 레벨이면, 근거 수치와
+    // 함께 새 레벨을 "추천"한다. 동의 시에만 갱신한다 (일방 변경 금지).
+    (function () {
+      var host = document.getElementById('skill-level-rec');
+      if (!host) return;
+      var SL = window.DMJSkillLevel;
+      if (!SL) { host.hidden = true; return; }
+
+      // --- 라이딩 대시보드 세션 (전역 localStorage) ---
+      var sessions = [];
+      try {
+        var rawS = localStorage.getItem('rd_sessions_v1');
+        var arrS = rawS ? JSON.parse(rawS) : [];
+        if (Array.isArray(arrS)) sessions = arrS;
+      } catch (e) {}
+
+      // --- 설문 (10축 스킬 진단, per-user) ---
+      // indices 는 normalizeSurveyIndices 로 5점 척도(0..4)로 정규화해 넘긴다 (레거시 payload 호환).
+      var survey = null;
+      try {
+        var rawSv = window.DMJAuth.getUserData('skill_assessment_v1');
+        var sv = rawSv ? JSON.parse(rawSv) : null;
+        if (sv && Array.isArray(sv.indices)) {
+          survey = { indices: SL.normalizeSurveyIndices(sv.indices, sv.v) };
+        }
+      } catch (e) {}
+
+      // --- 동의 이력 (per-user) ---
+      var consent = null;
+      try {
+        var rawC = window.DMJAuth.getUserData('skill_level_v1');
+        consent = rawC ? JSON.parse(rawC) : null;
+      } catch (e) {}
+
+      // --- 현재 저장 레벨: 동의 레벨 > 설문 등급 > 대시보드 라이더 ---
+      var currentLevel = (consent && consent.level) || null;
+      if (!currentLevel && survey) {
+        var sres = SL.surveyScore(survey.indices);
+        if (sres) currentLevel = sres.tier;
+      }
+      if (!currentLevel) {
+        try {
+          var rawR = localStorage.getItem('rd_rider_v1');
+          var rd = rawR ? JSON.parse(rawR) : null;
+          if (rd && rd.skill) currentLevel = rd.skill;
+        } catch (e) {}
+      }
+
+      // --- 스누즈: "유지" 선택 후 새 세션이 쌓이기 전엔 재노출 안 함 ---
+      var snoozed = !!(consent && consent.snoozeUntilCount != null &&
+                       sessions.length <= consent.snoozeUntilCount);
+
+      var ev = SL.evaluate({ currentLevel: currentLevel, sessions: sessions, survey: survey });
+
+      if (!ev.shouldRecommend || snoozed) { host.hidden = true; return; }
+
+      function esc(s) {
+        return String(s).replace(/[&<>]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c];
+        });
+      }
+      function metricRow(label, valueText, impliedTier) {
+        var col = SL.TIER_COLOR[impliedTier] || 'var(--color-slate)';
+        return '<div style="display:flex;justify-content:space-between;align-items:baseline;'
+          + 'gap:8px;padding:6px 0;border-bottom:1px solid rgba(10,37,64,0.06)">'
+          + '<span style="font-size:13px;color:var(--color-slate)">' + esc(label) + '</span>'
+          + '<span style="font-size:13px;font-weight:700;color:var(--color-navy)">' + esc(valueText)
+          + (impliedTier ? ' <span style="color:' + col + ';font-weight:800">' + esc(impliedTier) + ' 구간</span>' : '')
+          + '</span></div>';
+      }
+
+      function renderCard() {
+        var e = ev.evidence || {};
+        var rec = ev.recommendation;
+        var recColor = ev.recommendedColor;
+        var curColor = SL.TIER_COLOR[ev.currentLevel] || 'var(--color-slate)';
+        var dir = rec.direction === 'up' ? '상향' : '조정';
+
+        var evHtml = '';
+        if (e.tackEff != null)
+          evHtml += metricRow('택킹 효율 (상위 50% · 바람 보정)', String(e.tackEff), SL.tierFromScore(e.tackEff));
+        if (e.gybeEff != null)
+          evHtml += metricRow('자이빙 효율 (상위 50% · 바람 보정)', String(e.gybeEff), SL.tierFromScore(e.gybeEff));
+        if (e.maxSpeedKt != null)
+          evHtml += metricRow('최고 속도', e.maxSpeedKt + ' kt', SL.tierFromScore(SL.speedScore(e.maxSpeedKt)));
+        if (e.upwindTwa != null)
+          evHtml += metricRow('풍상 각도', e.upwindTwa + '°', SL.tierFromScore(SL.upwindScore(e.upwindTwa)));
+        evHtml += metricRow('분석 범위',
+          e.sessionCount + '개 세션 · 회전 ' + e.maneuverCount + '회'
+          + (e.bothSides ? ' · 양쪽 택 측정' : ' · 한쪽 택만'), '');
+
+        var confPct = Math.round((e.confidence || 0) * 100);
+
+        host.innerHTML = ''
+          + '<div style="border:1.5px solid ' + recColor + ';border-radius:14px;'
+          +   'background:linear-gradient(180deg,rgba(255,184,0,0.06),rgba(255,255,255,0));'
+          +   'padding:20px 22px;margin-bottom:18px">'
+          +   '<div style="display:inline-block;font-size:11px;font-weight:800;letter-spacing:0.04em;'
+          +     'color:#fff;background:' + recColor + ';border-radius:999px;padding:4px 12px;margin-bottom:12px">'
+          +     '스킬 레벨 재평가 ' + dir + ' 제안</div>'
+          +   '<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:var(--color-navy);'
+          +     'word-break:keep-all">최근 라이딩 데이터를 분석한 결과, 현재 레벨과 차이가 확인됩니다. '
+          +     '아래 근거를 확인하시고 레벨 변경에 동의하실 수 있습니다.</p>'
+          +   '<div style="display:flex;align-items:center;justify-content:center;gap:16px;'
+          +     'margin:0 0 16px;flex-wrap:wrap">'
+          +     '<div style="text-align:center">'
+          +       '<div style="font-size:11px;color:var(--color-slate);margin-bottom:4px">현재 레벨</div>'
+          +       '<div style="font-size:20px;font-weight:800;color:' + curColor + '">' + esc(ev.currentLevel) + '</div>'
+          +     '</div>'
+          +     '<div style="font-size:22px;color:var(--color-slate)">→</div>'
+          +     '<div style="text-align:center">'
+          +       '<div style="font-size:11px;color:var(--color-slate);margin-bottom:4px">제안 레벨</div>'
+          +       '<div style="font-size:24px;font-weight:900;color:' + recColor + '">' + esc(ev.recommendedLevel) + '</div>'
+          +     '</div>'
+          +   '</div>'
+          +   '<div style="background:rgba(255,255,255,0.7);border-radius:10px;padding:10px 14px;margin-bottom:14px">'
+          +     '<div style="font-size:12px;font-weight:800;color:var(--color-navy);margin-bottom:4px">근거 데이터</div>'
+          +     evHtml
+          +     '<div style="margin-top:8px;font-size:12px;color:var(--color-slate)">'
+          +       '신뢰도 <b style="color:var(--color-navy)">' + esc(rec.strength) + ' (' + confPct + '%)</b></div>'
+          +   '</div>'
+          +   '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+          +     '<button type="button" id="skill-rec-agree" '
+          +       'style="flex:1;min-width:160px;background:' + recColor + ';color:#fff;border:none;'
+          +       'border-radius:9px;padding:12px 16px;font-size:14px;font-weight:800;cursor:pointer">'
+          +       '동의 — ' + esc(ev.recommendedLevel) + '(으)로 변경</button>'
+          +     '<button type="button" id="skill-rec-keep" '
+          +       'style="flex:0 0 auto;background:transparent;color:var(--color-slate);'
+          +       'border:1.5px solid rgba(10,37,64,0.18);border-radius:9px;padding:12px 20px;'
+          +       'font-size:14px;font-weight:700;cursor:pointer">현재 레벨 유지</button>'
+          +   '</div>'
+          + '</div>';
+        host.hidden = false;
+
+        var agree = document.getElementById('skill-rec-agree');
+        var keep = document.getElementById('skill-rec-keep');
+        if (agree) agree.addEventListener('click', onAgree);
+        if (keep) keep.addEventListener('click', onKeep);
+      }
+
+      function onAgree() {
+        var payload = {
+          level: ev.recommendedLevel,
+          prevLevel: ev.currentLevel,
+          source: 'consent',
+          ts: Date.now(),
+          evidence: ev.evidence,
+          blendedScore: ev.blendedScore
+        };
+        try { window.DMJAuth.setUserData('skill_level_v1', JSON.stringify(payload)); } catch (e) {}
+        // 대시보드 라이더 프로필 스킬도 동기화 (전역 localStorage)
+        try {
+          var rawR = localStorage.getItem('rd_rider_v1');
+          var rd = rawR ? JSON.parse(rawR) : {};
+          if (rd && typeof rd === 'object') {
+            rd.skill = ev.recommendedLevel;
+            localStorage.setItem('rd_rider_v1', JSON.stringify(rd));
+          }
+        } catch (e) {}
+        host.innerHTML = ''
+          + '<div style="border:1.5px solid ' + ev.recommendedColor + ';border-radius:14px;'
+          +   'background:rgba(255,184,0,0.08);padding:16px 20px;margin-bottom:18px">'
+          +   '<p style="margin:0;font-size:14px;font-weight:700;color:var(--color-navy);word-break:keep-all">'
+          +     '스킬 레벨이 <b style="color:' + ev.recommendedColor + '">' + esc(ev.recommendedLevel)
+          +     '</b>(으)로 변경되었습니다. 라이딩 데이터가 쌓이면 다시 검토해 드립니다.</p>'
+          + '</div>';
+      }
+
+      function onKeep() {
+        var payload = {
+          level: ev.currentLevel,
+          source: (consent && consent.source) || 'survey',
+          ts: Date.now(),
+          snoozeUntilCount: sessions.length,
+          declinedLevel: ev.recommendedLevel
+        };
+        try { window.DMJAuth.setUserData('skill_level_v1', JSON.stringify(payload)); } catch (e) {}
+        host.innerHTML = ''
+          + '<div style="border:1px solid rgba(10,37,64,0.14);border-radius:14px;'
+          +   'background:rgba(10,37,64,0.03);padding:16px 20px;margin-bottom:18px">'
+          +   '<p style="margin:0;font-size:14px;color:var(--color-slate);word-break:keep-all">'
+          +     '현재 레벨 <b style="color:var(--color-navy)">' + esc(ev.currentLevel)
+          +     '</b>(을)를 유지합니다. 다음 라이딩이 분석되면 다시 제안해 드립니다.</p>'
+          + '</div>';
+      }
+
+      renderCard();
     })();
 
     // ===== 6. §F find-my-gear archive =====
@@ -2526,7 +2725,7 @@
   }
 })();
 </script>
-  <!-- §173 — 옥코치 AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="assets/css/agent-deny.css">
   <script src="assets/js/agent-deny.js" defer></script>
 </body>

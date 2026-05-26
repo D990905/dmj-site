@@ -779,13 +779,16 @@
        이전 §176-D (50/51/53/56/59/63) revert.
        상급-선수 = 상급 50° + 선수 45° midpoint 47.5° → 47° (floor, 기존 51 from 51.5 floor 패턴 일치).
 
-     CL_WING_MAX: 일반 inflatable wingfoil wing 의 peak C_L (camber 10-12% AR~4)
-       canonical 1.2 (Folkersma 2019 LEI airfoil + DMJ wind-tunnel proxy estimate). */
+     CL_WING_MAX: inflatable wingfoil wing 의 풍상 지속 주행 실효 최대 C_L.
+       2D LEI airfoil peak 는 ~1.2 (Folkersma 2019 + DMJ wind-tunnel proxy) 이나,
+       §181-D (Danny 2026-05-22) 에서 실효 지속 peak 1.00 으로 재보정 — 스팬방향
+       트위스트·능동 디파워·3D 유한스팬 효과로 2D peak 보다 낮음. 상세는 아래
+       §181-D 블록(WING_CD0_PARASITIC 선언부 위쪽) 참조. */
   var TACK_ANGLE_DEG = {
     '입문': 65, '초급': 60, '중급': 55,
     '상급': 50, '선수': 45, '상급-선수': 47
   };
-  var CL_WING_MAX = 1.2;
+  var CL_WING_MAX = 1.00;   // §181-D (Danny 2026-05-22) — 1.2→1.00 재보정. DO_NOT_REVERT §181-D
 
   var PREF_FACTOR = {
     small: 0.92,   // 작게 쓰기 선호 (Danny)
@@ -794,7 +797,22 @@
   };
 
   function ldFoil(ar) { return 9.13 * Math.sqrt(ar); }
-  function ldWing(ar) { return 1.83 * Math.sqrt(ar); }
+
+  /* §181-C (Danny 2026-05-21) — 윙 L/D 계수 1.83 → 2.2 재캘리브레이션.
+     DO_NOT_REVERT §181-C.
+     기존 1.83 (L/D_max AR4.5 = 3.88) 은 풍상 보드 속도를 계통적으로 과소예측.
+     Danny 현장 ground truth: 11kt·상급-선수·7m²·80kg → ~18kt (모델은 14.9kt).
+     원인 = cosβ/LDwing 항력항 과대 → β~18° 부근에서 wing thrust 조기 소멸.
+     anchor (11kt → ~18kt) 보정 → 2.2 (L/D_max AR4.5 = 4.67, 결과 18.3kt).
+     §179 의 이론 도출(1.83)은 LEI-airfoil 보수 추정 — 실측 anchor 우선. */
+  var LDWING_K = 2.2;
+  function ldWing(ar) { return LDWING_K * Math.sqrt(ar); }
+
+  /* §181-C — 풍상 보드 속도(V_b) sweep 상한. 기존 §176-C 21kt cap 은 과소예측
+     모델 시절 calibration → 윙 L/D 재보정 후 15·20kt 에서 binding 되어 단조 증가
+     파괴 + Danny anchor 모순 → 35kt 로 상향. 35 = 8-25kt 실사용역에서 binding
+     되지 않는 runaway sanity guard. */
+  var UPWIND_VB_CAP_KT = 35;
 
   /* §179 (Danny 2026-05-16) — L/D(CL) wing polar (depower L/D drop)
      DO_NOT_REVERT §179.
@@ -802,7 +820,7 @@
      CD(CL, AR) = CD_0 + CL² / (π · e · AR)
      L/D(CL, AR) = CL / CD(CL, AR)
      CL_opt(AR) = √(CD_0·π·e·AR) = 0.360·√AR  (max L/D point)
-     L/D_max(AR) = 1.83·√AR  (matches ldWing)
+     L/D_max(AR) = 1.83·√AR  (LEI-airfoil 이론 도출; ldWing 은 §181-C 에서 2.2 로 실측 보정)
 
      Constants (LEI inflatable wing — Folkersma/Schmehl/Viré 2019):
        CD_0 = 0.098,  e = 0.42
@@ -820,9 +838,119 @@
   }
   function clOptWing(ar) { return 0.360 * Math.sqrt(ar); }
 
+  /* §181 (Danny 2026-05-21) — 옵션 C: 윙 형상 항력 + heel 약결합 (역U자 모델).
+     DO_NOT_REVERT §181. §178 (선형 empirical V_b 보정) 을 영구 대체.
+
+     §178 의 문제: bestVb *= (1 + 0.02·(A−5.5)) 선형 보정 → "윙 클수록 무조건
+     빠름" 으로 귀결 → 비현실. 실제로는 큰 윙 = parasitic drag ↑ → 적정 사이즈
+     초과 시 V_b 하락. 윙 면적별 V_b 는 역U자 (optimum 존재) 가 맞음.
+
+     옵션 C 두 항:
+       (1) 윙 형상 항력 (parasitic) — stateAt() 폴라 sweep 에 추가:
+           D_wing = 0.5·ρ_air·V_app²·A·CD0_WING   (전방 저항 성분 = D_wing·cos β)
+           CD0_WING = 0.04 — 윙포일 표준 baseline. Danny 실측 데이터 확보 시 calibrate.
+           면적 A ↑ → D_wing ↑ → V_b 균형점에 부담.
+       (2) Heel 한계 ↔ 윙 면적 결합:
+           H_max_eff = H_max_base·(A/A_ref)^WING_HEEL_COUPLE_EXP
+           §181 v2 (Danny 2026-05-21): 지수 0 확정 → 결합 비활성. 근거 = 라이더
+           측면력 한계 H_max = M·g·tan θ 는 체중·heel 로만 결정, 윙 크기와 무관.
+           상수·메커니즘은 향후 재조정 대비 보존 (지수만 0).
+
+     합성: thrust 이득 (면적 ∝) vs parasitic 손실 (면적 ∝, V_app² 가중) →
+       작은 윙 = powered 영역 (thrust ∝ A, V_b 상승) /
+       큰 윙 = depowered 영역 (parasitic dominate, V_b 하강) → 역U자 곡선.
+       적정 사이즈에서 V_b 최대. 가벼운 라이더는 optimum 이 작은 쪽으로 이동.
+     depowered 영역에서도 (1)(2) 가 wing area 를 살아있게 만들어 §178 이 지적한
+     "heel cap binding 시 A 수학적 소거" 문제를 물리적으로 해결.
+
+     §181 v2 (Danny 2026-05-21) — calibration 확정:
+       · WING_CD0_PARASITIC 0.04 — 유지 (윙포일 표준 baseline).
+       · WING_HEEL_COUPLE_EXP 0.5 → 0 (§181 v2). 지수 0.5 는 depowered 영역에서
+         양력추력 ∝ A^0.5 로 키워 parasitic 하강분을 상쇄 → 역U자 소멸. 지수 0
+         (결합 제거) → clean 역U자. ※ §181-E (2026-05-22) 에서 −1.2 로 재보정 —
+         §181 v2 의 "H_max 는 윙 크기와 무관" 논증은 윙 모멘트암 증가를 빠뜨려
+         정정됨 (아래 §181-E 블록 참조). */
+
+  /* §181-D (Danny 2026-05-22) — 윙 곡선 재보정: CL_WING_MAX 1.2 → 1.00.
+     DO_NOT_REVERT §181-D.  (CL_WING_MAX 선언은 위쪽 §176 블록에 있음.)
+
+     문제: §181 v2 곡선은 윙-사이즈 풍상 VMG 의 정점(최적 윙)을 계통적으로 작게
+       잡았다 (작은 윙 과선호 편향). 라이딩 대시보드 what-if 10kt 차트가 5.5 m²
+       에서 정점을 찍고 더 큰 윙은 VMG 가 오히려 떨어져, 약풍일수록 큰 윙이
+       유리하다는 도메인 사실과 정반대였다.
+
+     Danny ground-truth anchor 2개:
+       · 12kt / 70kg / 중급 / foil AR 6.5       → 최적 윙 ≈ 6 m²
+       · 10kt / 70kg / 상급-선수 / foil AR 13.7 → 최적 윙 ≈ 7.4 m²
+         (10kt 곡선은 표시구간 2.5~7.4 m² 에서 단조 증가해야 한다)
+
+     메커니즘: 역U자 정점은 powered→depowered(heel-cap) 전이 윙 면적과 일치한다.
+       A_transition = 2·H_max / (ρ_air·V_a²·CL_eff_max·cos β),  CL_eff_max = CL_WING_MAX·η.
+       CL_WING_MAX ↓ → CL_eff_max ↓ → A_transition ∝ 1/CL_eff_max ↑ → 정점이 큰 윙
+       쪽으로 이동.
+
+     CD0(WING_CD0_PARASITIC) 대신 CL_WING_MAX 를 쓴 이유 — §181-C 속도 anchor 보존:
+       CD0 ↑ 도 정점을 키우지만 형상 항력이 커져 depowered 영역 보드속도까지 낮춘다.
+       CD0 0.08 검증 시 §181-C anchor(11kt·80kg·상급-선수·7m²)의 V_boat 가 18.1 →
+       15.9 kt 로 하락 → 절대속도 회귀. CL_WING_MAX 는 powered/depowered 전이점만
+       옮기고 항력은 그대로라, depowered 영역(heel-cap 으로 CL 이 이미 제한된 큰 윙·
+       강풍 영역)의 절대 보드속도는 불변 → §181-C anchor 18.1 kt 정확히 유지.
+
+     보정 결과 (수정 전 → 후, 0.25 m² step 곡선 정점):
+       · 12kt/70kg/중급/foil6.5       : 5.0 → 6.25 m² (≈6, 0.5 그리드 표시 6.0~6.5)
+       · 10kt/70kg/상급-선수/foil13.7 : 6.0 → 7.5 m² (표시구간 2.5~7.4 단조 증가)
+       · §181-C V_boat anchor 18.1 kt 불변, 풍속 sweep 8/12/16/20kt 단조성 유지,
+         역U자 형태 유지, runSelfTest 62/62 · runDannyMatrixTest PASS 유지.
+
+     1.00 의 물리 타당성: 기존 1.2 는 LEI airfoil 의 2D peak C_L (Folkersma 2019 +
+       wind-tunnel proxy). 핸드헬드 윙의 지속 풍상 주행에서 실효 최대 C_L 은 스팬
+       방향 트위스트·능동 디파워·3D 유한스팬 효과로 2D peak 보다 낮다. 1.00 은
+       Danny 현장 anchor 로 보정한 실효 지속 peak C_L.
+     주의: 이 재보정은 §181 풍상 VMG 곡선(upwindCurve/upwindSpeed)에만 적용된다.
+       별도 시스템인 wingSizeOptimal(Danny 매트릭스 경험식)은 변경 없음. */
+  var WING_CD0_PARASITIC = 0.04;   // §181 — 윙 형상 항력 계수
+
+  /* §181-E (Danny 2026-05-22) — 선수 커브 풍속 민감도 완만화:
+     WING_HEEL_COUPLE_EXP 0 → −1.2,  WING_AREA_REF_M2 5.5 → 7.5.
+     DO_NOT_REVERT §181-E.
+
+     문제: §181-D(CL_WING_MAX 1.00) 후에도 선수(foil AR 13.7) 커브가 10→12kt
+       구간에서 너무 가파르게 떨어졌다. 10kt→7.5㎡ 는 맞으나 12kt→5.25㎡ —
+       Danny 기준(12kt/70kg/선수 → ~6.3㎡)보다 ~1㎡ 작다. 역U 정점은 heel-cap
+       전이 면적 A_transition ∝ 1/V_a² 이고 V_a 가 풍속에 거의 선형 증가 →
+       최적 윙이 ~1/W² 로 급강하 (관측 지수 ≈ −2).
+
+     해결 — heel↔면적 결합 지수를 음수로:
+       H_max_eff = H_max_base·(A/A_ref)^exp.  exp<0 → 큰 윙일수록 유효 heel
+       측면력 한계가 작아진다. A_transition ∝ (1/V_a²)^(1/(1−exp)) 이므로
+       풍속 민감도 지수가 −2/(1−exp) 로 완만해진다. exp=−1.2 → 지수 ≈ −0.9.
+       물리 근거: 큰 핸드헬드 윙은 추력중심(CE)이 높아 같은 측면력에도 전복
+       모멘트가 커진다 → 라이더가 안전하게 실을 수 있는 측면력이 줄어든다.
+       §181 v2 의 exp=0 논증은 라이더 복원 모멘트만 봤고 윙의 모멘트암 증가를
+       빠뜨렸다. 부호(−)는 물리, 크기(−1.2)는 Danny 현장 anchor 보정값이다.
+
+     A_ref 5.5 → 7.5: 결합의 피벗(coupling=1 지점)을 선수 10kt 최적(~7.5㎡)에
+       맞춘다. 효과 (1) 10kt 앵커 고정, (2) §181-C anchor(11kt·80kg·상급-선수·
+       7㎡)가 피벗 근처라 V_boat 18.1kt 정확히 보존 (A_ref=5.5 면 16.6kt 로 회귀).
+
+     보정 결과 (수정 전 → 후, 0.25㎡ step 곡선 정점, 선수/70kg/foil13.7):
+       8kt 9.5→9.5 · 10kt 7.5→7.5 · 12kt 5.25→6.25 · 14kt 3.75→5.25 ·
+       16kt 3.0→4.5 · 18kt 2.25→4.0 · 20kt 2.0→3.0  (전 구간 단조·역U 유지)
+       §181-C V_boat 18.1kt 불변 · runSelfTest 62/62 · matrix PASS. */
+  var WING_AREA_REF_M2 = 7.5;      // §181-E (Danny 2026-05-22) — 5.5→7.5, heel 결합 피벗
+  var WING_HEEL_COUPLE_EXP = -1.2; // §181-E (Danny 2026-05-22) — 0→−1.2, 풍속 민감도 완만화. DO_NOT_REVERT §181-E
+
   /* §176 — 풍상 45° 진행 속도 (upwind polar equilibrium speed)
      입력: v_wind_kt, m_rider_kg, gear_kg, skill, foil_ar, wing_area_m2, wing_ar, c_l_max
-     출력: V_boat_kt (tack 방향), V_vmg_kt (풍상 component), depowered/feasible flag 등 */
+     출력: V_boat_kt (tack 방향), V_vmg_kt (풍상 component), depowered/feasible flag 등
+
+     §181 (Danny 2026-05-21) — 윙 면적 효과는 stateAt() 의 형상 항력 + heel 약결합
+       으로 물리 모델링 (역U자). §178 선형 후처리 보정은 제거됨.
+
+     보드 부력 (board volume) 무시 — intentional (Danny 2026-05-19 명시).
+       cruise 영역 (foil 위 떠 있음) 에서 보드 부력은 V_b 결정에 영향 X.
+       보드 사이즈는 takeoff 영역 (calculate() 함수) 에서만 영향.
+       추후 board induced drag (wetted area) 모델링이 필요하면 별도 task. */
   function upwindSpeed(p) {
     var V_t_kt = Number(p.v_wind_kt);
     var m = Number(p.m_rider_kg);
@@ -857,13 +985,18 @@
 
     var CL_eff_max = clMax * eta;
     var D_foil = mTotal * CONST.G / LDfoil_eff;        // forward foil drag (N), L=Mg
-    var H_max  = mTotal * CONST.G * Math.tan(heelRad); // side-force capacity (N)
+
+    // §181 — heel 측면력 한계. H_max = M·g·tan(θ_heel).
+    // §181 v2: WING_HEEL_COUPLE_EXP=0 → heelCouple=1 (윙 면적 결합 비활성).
+    var H_max_base = mTotal * CONST.G * Math.tan(heelRad);     // side-force capacity (N)
+    var heelCouple = Math.pow(wingArea / WING_AREA_REF_M2, WING_HEEL_COUPLE_EXP);
+    var H_max = H_max_base * heelCouple;                       // 결합 적용 후 (exp 0 → ×1)
 
     function stateAt(V_b) {
       var V_a2 = V_b * V_b + V_t * V_t + 2 * V_t * V_b * Math.cos(tackRad);
       if (V_a2 <= 1e-9) {
         return { V_a: 0, beta: 0, sin_b: 0, cos_b: 1, CL: 0, T: 0, H: 0,
-                 depowered: false, valid: false };
+                 D_wing: 0, depowered: false, valid: false };
       }
       var V_a = Math.sqrt(V_a2);
       var cos_b = (V_b + V_t * Math.cos(tackRad)) / V_a;
@@ -875,29 +1008,29 @@
         ? (2 * H_max) / (WING_OPT.RHO_AIR * V_a2 * wingArea * cos_b)
         : Infinity;
       var CL = Math.min(CL_eff_max, CL_heel_cap);
-      var c_thrust_per_CL = sin_b - cos_b / LDwing_eff;
-      var T = 0;
-      if (c_thrust_per_CL > 0 && CL > 0) {
-        T = 0.5 * WING_OPT.RHO_AIR * V_a2 * wingArea * CL * c_thrust_per_CL;
-      }
-      var H = 0.5 * WING_OPT.RHO_AIR * V_a2 * wingArea * CL * cos_b;
+      var q = 0.5 * WING_OPT.RHO_AIR * V_a2 * wingArea;  // 동압 × 면적 (N)
+      // §181 — 순(net) 전방 추력 = 양력 추력 − (유도저항 + 윙 형상저항) 전방성분.
+      //   양력 추력 계수      = CL·(sin β − cos β/LD_wing)   [유도저항 포함]
+      //   윙 형상저항 전방성분 = CD0_WING·cos β               [면적 ∝, V_app² 가중]
+      var liftThrustCoeff = CL * (sin_b - cos_b / LDwing_eff);
+      var thrustCoeff = liftThrustCoeff - WING_CD0_PARASITIC * cos_b;
+      var T = (thrustCoeff > 0 && CL > 0) ? (q * thrustCoeff) : 0;
+      var D_wing = q * WING_CD0_PARASITIC;              // 윙 형상 항력 (∥ V_app, N)
+      var H = q * CL * cos_b;
       return {
         V_a: V_a, beta: beta, sin_b: sin_b, cos_b: cos_b,
-        CL: CL, T: T, H: H,
+        CL: CL, T: T, H: H, D_wing: D_wing,
         depowered: (CL < CL_eff_max - 1e-6),
         valid: true
       };
     }
 
-    // §176-C/D (Danny 2026-05-16): V_b sweep cap = 21 kt — iQFOiL 실측 SOG 상한.
-    // Danny lock: "풍상 최고속도는 17-21노트 사이에서 형성됨"(2026-05-16 명시). 22-23은
-    // burst/극강풍 영역으로 race-context VMG 모델에서 제외.
-    // §176-E (2026-05-16): 선수 TWA 50°→45° 변경. 결과: 선수 (tack 45°) max VMG =
-    // 21 × cos(45°) ≈ 14.8 kt. Danny "11-14 일반" 상한을 약간 상회 — 5° 균등 spacing
-    // 의 직관성 우선 (race-context VMG 정밀도 후순위).
-    // VMG = SOG × cos(TWA) — 일반 SOG 17-21 × cos(45-55°) → VMG 9.8-14.8.
-    // Sweep V_b ∈ [0, 21 kt] in 0.1 kt steps. Find largest V_b where T ≥ D_foil.
-    var V_max = 21 * CONST.KT_TO_MS;
+    // §181-C (Danny 2026-05-21): V_b sweep 상한 = UPWIND_VB_CAP_KT (35 kt).
+    // 기존 §176-C 21kt cap 은 풍상 속도 과소예측 모델 시절 calibration → §181-C
+    // 윙 L/D 재보정(1.83→2.2) 후 15·20kt 에서 binding 되어 단조 증가 파괴 →
+    // 35 로 상향. 35 = 8-25kt 실사용역에서 binding 되지 않는 runaway sanity guard.
+    // VMG = SOG × cos(TWA). Sweep V_b ∈ [0, cap] 0.1 kt step, T ≥ D_foil 최대 V_b.
+    var V_max = UPWIND_VB_CAP_KT * CONST.KT_TO_MS;
     var step = 0.1 * CONST.KT_TO_MS;
     var bestVb = 0;
     var feasible = false;
@@ -915,6 +1048,10 @@
       bestState = stateAt(0);
     }
 
+    // §181 (Danny 2026-05-21) — §178 선형 empirical V_b 보정 제거.
+    // 윙 면적 효과는 stateAt() 의 형상 항력 + heel 약결합으로 폴라 sweep 안에서
+    // 물리 모델링됨 (역U자 곡선). 추가 후처리 보정 불필요.
+
     var V_boat_kt = bestVb * CONST.MS_TO_KT;
     var V_vmg_kt  = V_boat_kt * Math.cos(tackRad);
 
@@ -931,7 +1068,10 @@
       feasible: feasible,
       side_force_N: Math.round(bestState.H * 10) / 10,
       side_force_max_N: Math.round(H_max * 10) / 10,
+      side_force_max_base_N: Math.round(H_max_base * 10) / 10,   // §181 — heel 결합 전
+      heel_couple_factor: Math.round(heelCouple * 1000) / 1000,  // §181 — (A/A_ref)^0.5
       D_foil_N: Math.round(D_foil * 10) / 10,
+      D_wing_N: Math.round((bestState.D_wing || 0) * 10) / 10,   // §181 — 윙 형상 항력
       LD_wing_eff: Math.round(LDwing_eff * 100) / 100,
       LD_foil_eff: Math.round(LDfoil_eff * 100) / 100,
       eta: eta,
@@ -1147,6 +1287,188 @@
       wing_area_larger: largerArea,
       delta_smaller_kt: Math.round((smaller.V_boat_kt - base.V_boat_kt) * 10) / 10,
       delta_larger_kt:  Math.round((larger.V_boat_kt  - base.V_boat_kt) * 10) / 10
+    };
+  }
+
+  /* §181 (Danny 2026-05-21) — 윙 사이즈 sweep → V_b/VMG 역U자 곡선 데이터.
+     계산기 결과 UI 의 역U자 그래프가 호출. 입력 p 는 upwindSpeed 와 동일하되
+     wing_area_m2 는 무시되고 [area_min, area_max] 를 step 간격으로 sweep.
+     opts = { area_min_m2, area_max_m2, step_m2 } (기본 3.0~8.0 · 0.25 간격).
+     반환: { points:[{area_m2,V_boat_kt,V_vmg_kt,feasible,depowered}], optimum, ... }
+       optimum = VMG (풍상 진척 속도) 최대 지점. tack 각 고정이므로 V_b 최대와 동일점. */
+  function upwindCurve(p, opts) {
+    opts = opts || {};
+    var aMin = (opts.area_min_m2 > 0) ? Number(opts.area_min_m2) : 3.0;
+    var aMax = (opts.area_max_m2 > 0) ? Number(opts.area_max_m2) : 8.0;
+    var step = (opts.step_m2 > 0) ? Number(opts.step_m2) : 0.25;
+    if (aMax < aMin) { var sw = aMin; aMin = aMax; aMax = sw; }
+    var points = [];
+    var optimum = null;
+    for (var a = aMin; a <= aMax + 1e-9; a += step) {
+      var area = Math.round(a * 100) / 100;
+      var u = upwindSpeed(Object.assign({}, p, { wing_area_m2: area }));
+      var pt = {
+        area_m2:   area,
+        V_boat_kt: (u && u.feasible) ? u.V_boat_kt : 0,
+        V_vmg_kt:  (u && u.feasible) ? u.V_vmg_kt  : 0,
+        feasible:  !!(u && u.feasible),
+        depowered: !!(u && u.depowered)
+      };
+      points.push(pt);
+      if (pt.feasible && (!optimum || pt.V_vmg_kt > optimum.V_vmg_kt)) {
+        optimum = pt;
+      }
+    }
+    return {
+      points: points,
+      optimum: optimum,
+      area_min_m2: aMin,
+      area_max_m2: aMax,
+      step_m2: step
+    };
+  }
+
+  /* §181-F (Danny 2026-05-22) — 윙 사이즈 추천 (풍상 VMG 곡선 파생).
+     DO_NOT_REVERT §181-F.  §181-G (2026-05-22) 에서 변풍(gust) 오프셋 추가.
+
+     Danny 결정: 계산기·대시보드의 윙 추천은 §181 풍상 VMG 곡선(upwindCurve)에서
+     직접 파생한다. 두 값을 제시 —
+       · performance = VMG 곡선 정점 (해당 풍속 풍상 VMG 최대 윙). 항상 메인.
+       · practical   = performance − gust 오프셋 (바람 상태별 실사용 추천).
+
+     §181-G (Danny 2026-05-22) — 변풍(gust) 정도가 실사용 추천을 조절:
+       · clean (깨끗한 바람) → 오프셋 0    → practical = performance
+       · light (약간의 변풍) → 오프셋 0.5㎡ → 한 사이즈 작게 (다루기 쉬움)
+       · heavy (심한 변풍)   → 오프셋 1.0㎡ → 두 사이즈 작게
+       깨끗한 바람일수록 큰 윙으로 풍상 VMG 를 극대화, 변풍이 심할수록 작은
+       윙으로 컨트롤성을 확보한다. practical 은 풍상 주행 가능한 최소 윙 미만으로
+       내려가지 않는다.
+
+     옛 wingSizeOptimal/DANNY_MATRIX 경험식(K_master 매트릭스)은 §181 곡선
+     재보정 후 곡선과 어긋나므로 추천 산출에서 분리됨 — wingSizeOptimal 은
+     이론 측정값(A_min_drive·A_max_heel·L/D·clearance) 진단 출력으로만 유지.
+
+     입력 p = upwindSpeed/upwindCurve 와 동일. opts.gust = 'clean'|'light'|'heavy'
+       (기본 'clean'). opts.offset_m2 로 오프셋 직접 지정 가능.
+     반환: { feasible, performance, practical, gust, gust_offset_m2, peak_raw_m2,
+             min_feasible_m2, performance_vmg_kt, practical_vmg_kt,
+             performance_detail, practical_detail, curve }. */
+  var GUST_OFFSET_M2 = { clean: 0, light: 0.5, heavy: 1.0 };
+
+  function wingRecommendation(p, opts) {
+    opts = opts || {};
+    var gust = (opts.gust && (opts.gust in GUST_OFFSET_M2)) ? opts.gust : 'clean';
+    var gustOffset = (opts.offset_m2 != null) ? Number(opts.offset_m2) : GUST_OFFSET_M2[gust];
+    var aMin = (opts.area_min_m2 > 0) ? Number(opts.area_min_m2) : 2.0;
+    var aMax = (opts.area_max_m2 > 0) ? Number(opts.area_max_m2) : 9.5;
+    var step = (opts.step_m2 > 0) ? Number(opts.step_m2) : 0.25;
+    var curve = upwindCurve(p, { area_min_m2: aMin, area_max_m2: aMax, step_m2: step });
+    if (!curve.optimum) {
+      return { feasible: false, error: 'no_feasible_wing', curve: curve };
+    }
+    // performance = VMG 곡선 정점
+    var performance = curve.optimum.area_m2;
+    // 풍상 주행 가능한 최소 윙 (practical floor — 이 미만은 풍상 불가)
+    var feas = curve.points.filter(function (q) { return q.feasible; });
+    var minFeasible = feas.length
+      ? feas.reduce(function (m, q) { return q.area_m2 < m ? q.area_m2 : m; }, feas[0].area_m2)
+      : performance;
+    // practical = performance − gust 오프셋 (최소 풍상 가능 윙 이상으로 클램프)
+    var practical = performance - gustOffset;
+    if (practical < minFeasible) practical = minFeasible;
+    practical = Math.round(practical * 100) / 100;
+    var perfDetail = upwindSpeed(Object.assign({}, p, { wing_area_m2: performance }));
+    var pracDetail = upwindSpeed(Object.assign({}, p, { wing_area_m2: practical }));
+    return {
+      feasible: true,
+      performance: performance,
+      practical: practical,
+      gust: gust,
+      gust_offset_m2: gustOffset,
+      peak_raw_m2: performance,
+      min_feasible_m2: Math.round(minFeasible * 100) / 100,
+      performance_vmg_kt: (perfDetail && perfDetail.feasible) ? perfDetail.V_vmg_kt : null,
+      practical_vmg_kt: (pracDetail && pracDetail.feasible) ? pracDetail.V_vmg_kt : null,
+      performance_detail: perfDetail,
+      practical_detail: pracDetail,
+      curve: curve
+    };
+  }
+
+  /* §181-B (Danny 2026-05-21) — heel 각도별 max 윙 사이즈 곡선.
+     라이더 측면력 한계 H_max(θ) = M_total·g·tan θ.
+     윙 측면력 H = 0.5·ρ_air·V_a²·A·CL·cos β. H = H_max 풀면 max 사용 윙 면적:
+       A_max(θ) = 2·M_total·g·tan θ / (ρ_air·V_a²·CL_eff_max·cos β)
+     V_a·β 는 기준 윙(p.ref_wing_m2, 기본 5.5) 의 풍상 운항점에서 1회 추출 → 고정.
+     → A_max(θ) = K·tan θ. K = 라이더·운항점 상수. heel ↑ → max 윙 ↑ (tan 곡선).
+     무거운 라이더 → mTotal ↑ → K ↑ → 같은 heel 각도에서 더 큰 윙 가능.
+     opts = { deg_min, deg_max, step_deg } (기본 0~45° · 1° 간격). */
+  function heelMaxWingCurve(p, opts) {
+    var m = Number(p.m_rider_kg);
+    var V = Number(p.v_wind_kt);
+    var skill = String(p.skill || '중급');
+    if (!isFinite(m) || m <= 0 || !isFinite(V) || V <= 0 || !(skill in ETA_BY_SKILL)) {
+      return { error: 'invalid_input' };
+    }
+    var gear = (p.gear_kg != null && Number(p.gear_kg) >= 0)
+      ? Number(p.gear_kg) : WING_OPT.GEAR_DEFAULT;
+    var eta = ETA_BY_SKILL[skill] || ETA_REF;
+    var kv = KV_BY_SKILL[skill] || 1.4;
+    var clMax = Number(p.c_l_max || CL_WING_MAX);
+    var CL_eff_max = clMax * eta;
+    var mTotal = m + gear;
+    var refWing = (p.ref_wing_m2 > 0) ? Number(p.ref_wing_m2) : 5.5;
+
+    // 기준 윙의 풍상 운항점에서 V_a·β 추출 (powered riding 상태)
+    var ref = upwindSpeed({
+      v_wind_kt: V, m_rider_kg: m, gear_kg: gear, skill: skill,
+      foil_ar: Number(p.foil_ar) || 8, wing_area_m2: refWing,
+      wing_ar: Number(p.wing_ar || WING_OPT.WING_AR_DEFAULT), c_l_max: clMax
+    });
+    var V_a, betaDeg;
+    if (ref && ref.feasible && ref.V_apparent_kt > 0) {
+      V_a = ref.V_apparent_kt * CONST.KT_TO_MS;
+      betaDeg = (ref.beta_deg > 0) ? ref.beta_deg : 35;
+    } else {
+      V_a = V * CONST.KT_TO_MS * kv;   // 풍상 운항 불가 시 apparent wind 추정
+      betaDeg = 35;
+    }
+    var cosB = Math.cos(deg2rad(betaDeg));
+    if (cosB < 0.1) cosB = 0.1;
+
+    // A_max(θ) = 2·M·g·tan θ / (ρ·V_a²·CL_eff_max·cos β) = K·tan θ
+    var K = (2 * mTotal * CONST.G) /
+            (WING_OPT.RHO_AIR * V_a * V_a * CL_eff_max * cosB);
+
+    opts = opts || {};
+    var dMin = (opts.deg_min != null) ? Number(opts.deg_min) : 0;
+    var dMax = (opts.deg_max != null) ? Number(opts.deg_max) : 45;
+    var step = (opts.step_deg > 0) ? Number(opts.step_deg) : 1;
+    var points = [];
+    for (var d = dMin; d <= dMax + 1e-9; d += step) {
+      points.push({
+        heel_deg: Math.round(d * 10) / 10,
+        max_wing_m2: Math.round(K * Math.tan(deg2rad(d)) * 100) / 100
+      });
+    }
+    // 스킬별 heel 각도 마커 (§176-B 값)
+    var marks = [];
+    ['입문', '초급', '중급', '상급', '선수', '상급-선수'].forEach(function (sk) {
+      var hd = HEEL_DEG[sk];
+      if (hd == null) return;
+      marks.push({
+        skill: sk, heel_deg: hd,
+        max_wing_m2: Math.round(K * Math.tan(deg2rad(hd)) * 100) / 100
+      });
+    });
+    return {
+      points: points,
+      skill_marks: marks,
+      K: Math.round(K * 1000) / 1000,
+      V_apparent_kt: Math.round(V_a * CONST.MS_TO_KT * 10) / 10,
+      beta_deg: Math.round(betaDeg * 10) / 10,
+      deg_min: dMin,
+      deg_max: dMax
     };
   }
 
@@ -1468,6 +1790,17 @@
     upwindSpeed: upwindSpeed,
     upwindSensitivity: upwindSensitivity,
     upwindAdvisor: upwindAdvisor,
+    // ── §181 옵션 C — 윙 사이즈 역U자 곡선 (Danny 2026-05-21) ──
+    upwindCurve: upwindCurve,
+    // ── §181-F — 윙 사이즈 추천 (퍼포먼스/편안함, 곡선 파생) (Danny 2026-05-22) ──
+    wingRecommendation: wingRecommendation,
+    // ── §181-B heel 각도별 max 윙 곡선 (Danny 2026-05-21) ──
+    heelMaxWingCurve: heelMaxWingCurve,
+    WING_CD0_PARASITIC: WING_CD0_PARASITIC,
+    WING_AREA_REF_M2: WING_AREA_REF_M2,
+    WING_HEEL_COUPLE_EXP: WING_HEEL_COUPLE_EXP,
+    LDWING_K: LDWING_K,
+    UPWIND_VB_CAP_KT: UPWIND_VB_CAP_KT,
     TACK_ANGLE_DEG: TACK_ANGLE_DEG,
     CL_WING_MAX: CL_WING_MAX
   };

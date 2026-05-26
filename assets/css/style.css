@@ -5352,7 +5352,40 @@ p {
 .skill-slider-row__tack--p { background: rgba(31,143,255,0.12); color: var(--color-sea); }
 .skill-slider-row__tack--s { background: rgba(42,140,92,0.12); color: #2A8C5C; }
 .skill-slider-row__value { font-family: var(--font-sans-en, 'Inter', sans-serif); font-size: 20px; font-weight: 800; color: var(--color-sun); }
-.skill-slider-row input[type=range] { width: 100%; accent-color: var(--color-sun); }
+/* §169-D v3 패턴 — 슬라이더 빨강→초록 그라데이션 fill (만족도 척도).
+   채움 = 현재 레벨 단색 (매우불만족 빨강 ~ 매우만족 초록), 나머지 회색 #E5E7EB.
+   JS (paintSlider) 가 inline background 로 갱신. 아래는 fallback (보통=노랑). */
+.skill-slider-row input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #FBBF24 0%, #FBBF24 60%, #E5E7EB 60%, #E5E7EB 100%);
+  outline: none;
+  margin: 8px 0 4px;
+  transition: background 0.15s ease;
+}
+.skill-slider-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-navy);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(10, 37, 64, 0.3);
+  cursor: pointer;
+}
+.skill-slider-row input[type=range]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-navy);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(10, 37, 64, 0.3);
+  cursor: pointer;
+}
 .skill-slider-row__desc { font-size: 12px; color: var(--color-slate); margin-top: 6px; line-height: 1.5; min-height: 32px; word-break: keep-all; }
 .speed-input-row { background: #fff; border-radius: 12px; padding: 16px 18px; border: 1px solid rgba(10,37,64,0.08); margin-top: 18px; }
 .speed-input-row__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }

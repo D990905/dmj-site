@@ -176,7 +176,7 @@
   <!-- ========== 윙 사이즈 추천 (WSO) ========== -->
   <section class="card" aria-labelledby="sec-wso">
     <h2 class="card__title" id="sec-wso"><span class="card__title-icon">🪁</span> 윙 사이즈 추천</h2>
-    <p class="card__lead">스킬·선호도·마스트 길이 기반 권장 윙 (min / optimal / max).</p>
+    <p class="card__lead">풍상 VMG 곡선 기반 권장 윙 — 퍼포먼스(곡선 정점, 메인) + 바람 상태 반영 실사용 추천.</p>
 
     <div class="row">
       <label class="field__label" for="wso-skill">스킬 등급 <small>(heel angle 기준)</small></label>
@@ -190,20 +190,21 @@
       </select>
     </div>
 
+    <!-- §181-G (Danny 2026-05-22) — 변풍 정도 → 실사용 추천 윙 조절 -->
     <div class="row">
-      <p class="field__label">사이즈 선호</p>
+      <p class="field__label">바람 상태 (변풍 정도)</p>
       <div class="radio-group radio-group--3">
         <label class="radio">
-          <input type="radio" name="wso-pref" value="small" checked>
-          <span class="radio__body"><b>작게</b><small>×0.92</small></span>
+          <input type="radio" name="wso-gust" value="clean" checked>
+          <span class="radio__body"><b>깨끗한 바람</b><small>정점 윙</small></span>
         </label>
         <label class="radio">
-          <input type="radio" name="wso-pref" value="mid">
-          <span class="radio__body"><b>보통</b><small>×1.00</small></span>
+          <input type="radio" name="wso-gust" value="light">
+          <span class="radio__body"><b>약간의 변풍</b><small>−0.5 m²</small></span>
         </label>
         <label class="radio">
-          <input type="radio" name="wso-pref" value="big">
-          <span class="radio__body"><b>크게</b><small>×1.08</small></span>
+          <input type="radio" name="wso-gust" value="heavy">
+          <span class="radio__body"><b>심한 변풍</b><small>−1.0 m²</small></span>
         </label>
       </div>
     </div>
@@ -224,19 +225,17 @@
       <input class="field__input" type="number" id="wso-wingar" min="3" max="9" step="0.1" value="4.5" inputmode="decimal">
     </div>
 
-    <!-- ── Bracket ── -->
-    <div class="bracket" id="wso-bracket" role="group" aria-label="추천 윙 사이즈 bracket">
-      <div class="bracket__cell">
-        <p class="bracket__label">Min</p>
-        <p class="bracket__val"><span id="wso-min">—</span><small>m²</small></p>
-      </div>
+    <!-- ── Bracket ── §181-F: 추천 2종 (풍상 VMG 곡선 파생) -->
+    <div class="bracket" id="wso-bracket" role="group" aria-label="추천 윙 사이즈">
       <div class="bracket__cell bracket__cell--opt">
-        <p class="bracket__label">Optimal</p>
+        <p class="bracket__label">퍼포먼스 추천 (기본)</p>
         <p class="bracket__val"><span id="wso-opt">—</span><small>m²</small></p>
+        <p class="bracket__sub">풍상 VMG 최대 — 곡선 정점</p>
       </div>
       <div class="bracket__cell">
-        <p class="bracket__label">Max</p>
-        <p class="bracket__val"><span id="wso-max">—</span><small>m²</small></p>
+        <p class="bracket__label" id="wso-min-label">실사용 추천</p>
+        <p class="bracket__val"><span id="wso-min">—</span><small>m²</small></p>
+        <p class="bracket__sub" id="wso-min-sub">바람 상태 반영</p>
       </div>
     </div>
 
@@ -265,6 +264,31 @@
         <p class="vlimit-cell__delta" id="wso-vlim-max-delta">—</p>
       </div>
     </div>
+
+    <!-- §181 (Danny 2026-05-21) — 윙 사이즈별 속도 역U자 곡선 그래프 -->
+    <div class="wso-curve" id="wso-curve">
+      <div class="wso-curve__head">
+        <p class="wso-curve__title">📈 윙 사이즈별 속도 곡선</p>
+        <div class="wso-curve__toggle" id="wso-curve-toggle" role="group" aria-label="속도 지표 선택">
+          <button type="button" data-metric="vb" class="is-active">보드 속도</button>
+          <button type="button" data-metric="vmg">VMG</button>
+        </div>
+      </div>
+      <div class="wso-curve__svg-wrap" id="wso-curve-svg"></div>
+      <div class="wso-curve__legend" id="wso-curve-legend"></div>
+      <p class="wso-curve__caption" id="wso-curve-caption"></p>
+    </div>
+
+    <!-- §181-B (Danny 2026-05-21) — heel 각도별 버틸 수 있는 max 윙 사이즈 그래프 -->
+    <div class="wso-curve" id="wso-heelcurve">
+      <div class="wso-curve__head">
+        <p class="wso-curve__title">📐 heel 각도별 버틸 수 있는 max 윙</p>
+      </div>
+      <div class="wso-curve__svg-wrap" id="wso-heelcurve-svg"></div>
+      <div class="wso-curve__legend" id="wso-heelcurve-legend"></div>
+      <p class="wso-curve__caption" id="wso-heelcurve-caption"></p>
+    </div>
+
     <p class="card__caption">
       풍상 진행 속도 = 윙 끌어주는 힘 vs 포일 저항의 균형점.
       윙 ↑ → 속도 ↑ (라이더 한계까지). 강풍·큰 윙은 라이더 기댐 한계로 수렴.

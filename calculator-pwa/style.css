@@ -427,7 +427,7 @@ button { font-family: inherit; }
    ========================================================================== */
 .bracket {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--sp-2);
   margin: var(--sp-4) 0 var(--sp-3);
 }
@@ -468,6 +468,12 @@ button { font-family: inherit; }
   font-weight: 500;
   color: var(--slate);
   margin-left: 3px;
+}
+.bracket__sub {
+  margin: 6px 0 0;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--slate);
 }
 
 /* ==========================================================================
@@ -751,3 +757,22 @@ button { font-family: inherit; }
   .appbar, .page-footer { display: none; }
   .card { box-shadow: none; border: 1px solid var(--border); break-inside: avoid; }
 }
+
+/* ==========================================================================
+   §181 (Danny 2026-05-21) — 윙 사이즈별 속도 역U자 곡선 그래프
+   ========================================================================== */
+.wso-curve { margin: 14px 0; padding: 14px 14px 12px; border-radius: var(--r-md); background: #fff; border: 1px solid var(--border); }
+.wso-curve__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 6px; flex-wrap: wrap; }
+.wso-curve__title { font-size: 0.875rem; font-weight: 800; color: var(--navy); margin: 0; }
+.wso-curve__toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+.wso-curve__toggle button { border: 0; background: #fff; color: var(--slate); font-size: 0.6875rem; font-weight: 700; padding: 6px 12px; cursor: pointer; font-family: inherit; min-height: 0; }
+.wso-curve__toggle button.is-active { background: var(--navy); color: #fff; }
+.wso-curve__svg-wrap { width: 100%; }
+.wso-curve__svg-wrap svg { width: 100%; height: auto; display: block; }
+.wso-curve__legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 0; font-size: 0.6875rem; color: var(--slate); }
+.wso-curve__legend span { display: inline-flex; align-items: center; gap: 5px; }
+.wso-curve__legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+.wso-curve__legend i.dash { height: 0; border-top: 2px dashed currentColor; background: none !important; }
+.wso-curve__caption { font-size: 0.72rem; color: var(--slate); line-height: 1.55; margin: 8px 0 0; }
+.wso-curve__caption b { color: var(--charcoal); }
+.wso-curve__empty { font-size: 0.8125rem; color: var(--slate); text-align: center; padding: 32px 12px; line-height: 1.6; }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- §173-C v5 — (DEPRECATED 2026-05-16) 옛 "대니" 플랫 마스코트.
-     §173-D 결정: 정체성 "대니" → "옥코치" 변경 + 아바타 Danny 실제 사진으로 복원.
+     §173-D 결정: 정체성 "대니" → "Coach Danny" 변경 + 아바타 Danny 실제 사진으로 복원.
      이 SVG 는 더 이상 챗 widget 에 사용되지 않음 — 파일은 history 보존용 으로 유지.
      active avatar = agent-deny-photo-{48,80,160,240}.{webp,png}. -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="옥코치 — 단무지공방 윙포일 어드바이저 (deprecated 마스코트)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Coach Danny — 단무지공방 윙포일 어드바이저 (deprecated 마스코트)">
   <!-- 배경 원 (소프트 하늘색) -->
   <circle cx="100" cy="100" r="100" fill="#BCE4F4"/>
   <!-- 하단 바다 띠 -->

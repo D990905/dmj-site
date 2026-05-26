@@ -1,5 +1,5 @@
-// §173 — 옥코치 AI Agent Phase 1 (static FAQ + page routing)
-// §173-D (Danny 2026-05-16) — 챗 정체성 "대니" → "옥코치" (옥덕필 코치 본인) 변경.
+// §173 — Coach Danny AI Agent Phase 1 (static FAQ + page routing)
+// §173-D (Danny 2026-05-16) — 챗 정체성 "대니" → "Coach Danny" (옥덕필 코치 본인) 변경.
 //   변수·class·파일명은 그대로 유지 (agent-deny.*) — UI 표시 문자열만 갱신.
 // DO_NOT_REVERT §173 — floating widget 전 페이지 영구 노출. Phase 2 = LLM 백엔드.
 // Self-bootstrapping IIFE. Vanilla JS, no frameworks. file:// safe with inline fallback.
@@ -12,6 +12,7 @@
   var STORAGE_KEY = 'dmj_agent_chat_history';      // sessionStorage (anon)
   var USER_DATA_SUFFIX = 'agent_chat_history';     // DMJAuth namespace (logged-in)
   var GREETED_KEY = 'dmj_agent_greeted';
+  var AUTOHELLO_KEY = 'dmj_agent_autohello_seen';  // §173-F localStorage — 첫 방문 자동 인사 1회 플래그
   var HISTORY_CAP = 50;
   var TYPING_MIN = 600;
   var TYPING_MAX = 1100;
@@ -31,6 +32,7 @@
     sendBtn: null,
     quickReplies: null,
     closeBtn: null,
+    teaser: null,  // §173-F — 첫 방문 자동 인사 말풍선
     history: [],
     flow: null  // §173 Phase2 — active slot-filling flow { intent, step, slots }
   };
@@ -66,9 +68,9 @@
         answer: '제가 답을 못 찾았네요 😅 — 단무지공방에 직접 문의해 보세요. 옥덕필 박사가 1:1 컨설팅으로 답변드릴 수 있습니다 ✨',
         page_links: [{ label: '1:1 상담 신청', url: 'consult.html' }],
         related: ['consult'] },
-      { id: 'agent-self', category: 'site_guide', keywords: ['옥코치', '대니', '너 누구', '당신', '누구'],
-        question: '옥코치가 누구야?',
-        answer: '**옥코치** — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ 윙포일·라이딩 컨설팅 채널이에요. 이 챗은 FAQ + 지식 베이스 기반 AI 어시스턴트로 옥코치 노하우를 빠르게 안내해 드립니다 (Phase 1 = FAQ 130+, Phase 2 = LLM + RAG) 🌊',
+      { id: 'agent-self', category: 'site_guide', keywords: ['Coach Danny', '대니', '너 누구', '당신', '누구'],
+        question: 'Coach Danny가 누구야?',
+        answer: '**Coach Danny** — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ 윙포일·라이딩 컨설팅 채널이에요. 이 챗은 FAQ + 지식 베이스 기반 AI 어시스턴트로 Coach Danny 노하우를 빠르게 안내해 드립니다 (Phase 1 = FAQ 130+, Phase 2 = LLM + RAG) 🌊',
         page_links: [{ label: '1:1 상담 (실제 Danny)', url: 'consult.html' }],
         related: ['consult'] },
       { id: 'wingfoil-intro', category: 'wingfoil_basics', keywords: ['윙포일', '입문'],
@@ -96,8 +98,8 @@
   function knowledgeUrl()  { return relPrefix() + 'data/denny-knowledge.json'; }
   function siteMapUrl()    { return relPrefix() + 'data/denny-sitemap.json'; }
 
-  // §173-D (Danny 2026-05-16) — 옥코치 avatar = Danny 실제 사진 (face-centered crop).
-  //   "내사진으로 돌리고 옥코치로 해보자" → 카툰/마스코트 폐기, 실제 코치 정체성 통일.
+  // §173-D (Danny 2026-05-16) — Coach Danny avatar = Danny 실제 사진 (face-centered crop).
+  //   "내사진으로 돌리고 Coach Danny로 해보자" → 카툰/마스코트 폐기, 실제 코치 정체성 통일.
   //   <picture> with WebP primary + PNG fallback. Sizes: 48/80/160/240.
   //   파일 그대로 활용 (agent-deny-photo-*) — file rename 은 별도 cleanup.
   function photoBase()  { return relPrefix() + 'assets/images/agent-deny-photo-'; }
@@ -910,7 +912,7 @@
   }
 
   // §173 v9 (Danny 2026-05-16) — 매트릭스 lazy-load.
-  //   옥코치 챗은 모든 페이지에 노출되지만 matrix.js 는 일부 페이지만 로드 (find-my-gear, level/*, style/*, cart, quote).
+  //   Coach Danny 챗은 모든 페이지에 노출되지만 matrix.js 는 일부 페이지만 로드 (find-my-gear, level/*, style/*, cart, quote).
   //   Fit-check 최종 단계에서 매트릭스 데이터 + matrix.js 가 둘 다 필요 → 챗에서 prefetch + lazy-load.
   //   matrix.js 자체는 수정하지 않고 호출만 — 같은 lookup/resolveQuizResultData 사용 → exact parity 보장.
   var matrixReadyPromise = null;
@@ -1329,7 +1331,7 @@
   function greetingReply() {
     return {
       answer:
-        '안녕하세요 ✨ **옥코치**예요.\n\n'
+        '안녕하세요 ✨ **Coach Danny**예요.\n\n'
         + '어떤 게 궁금하세요? **윙포일·장비·라이딩 컨설팅** 무엇이든 물어보세요.\n\n'
         + '*이렇게 구체적으로 물어보시면 더 정확해요:*\n'
         + '• "윙포일 처음인데 뭐부터?"\n'
@@ -1343,7 +1345,7 @@
   function helpfulNoMatchReply() {
     return {
       answer:
-        '이 부분은 옥코치가 아직 답변 자료 준비 중이에요 🙏\n\n'
+        '이 부분은 Coach Danny가 아직 답변 자료 준비 중이에요 🙏\n\n'
         + '*이런 질문은 어떠세요?*\n'
         + '• "윙포일 처음인데 뭐부터?"\n'
         + '• "내 체급에 맞는 윙 사이즈는?"\n'
@@ -1359,7 +1361,7 @@
     return {
       answer:
         '**1:1 컨설팅**은 옥덕필 박사가 직접 응대드려요 ✨\n\n'
-        + '라이딩 영상·체급·spot 환경에 맞춰 맞춤 처방 가능합니다. '
+        + '라이딩 영상·체급·spot 환경에 맞춰 맞춤 처방 가능합니다. ',
       page_links: [
         { label: '1:1 상담 신청', url: 'consult.html' },
         { label: 'consulting@dmjgroup.kr 이메일', url: 'mailto:consulting@dmjgroup.kr' }
@@ -1375,7 +1377,7 @@
       answer:
         '단무지공방은 직접 **1:1 윙포일 컨설팅·강습**을 운영합니다 🙌\n\n'
         + '**옥덕필 박사**(윙) + **조수철 선수**(카이트) 공동 운영이에요. '
-        + '입문자는 **육상 → 수상 조작 → 수상 띄우기** 3단계 세션 분리가 핵심 노하우예요.\n\n'
+        + '입문자는 **육상 → 수상 조작 → 수상 띄우기** 3단계 세션 분리가 핵심 노하우예요.\n\n',
       page_links: [
         { label: '1:1 컨설팅 신청', url: 'consult.html' },
         { label: '프리미엄 컨설팅 (옥덕필 박사 풀 어드바이저)', url: 'premium.html' }
@@ -1583,9 +1585,10 @@
     var user = getCurrentUser();
     var name = userDisplayName(user);
     // §173 v8 — Welcome invitation tone: free-form 질문이 메인. 예시는 sample.
-    var nameLine = name ? '안녕하세요 **' + name + '**님!\n' : '';
+    // §173-E (2026-05-22) — 비로그인 방문자에게도 "안녕하세요" 인사 노출 (기본 인사 누락 fix).
+    var nameLine = name ? '안녕하세요 **' + name + '**님!\n' : '안녕하세요!\n';
     var greeting = nameLine
-      + '**옥코치** — 단무지공방 옥덕필 박사(Danny) 입니다 ✨\n\n'
+      + '**Coach Danny** — 단무지공방 옥덕필 박사(Danny) 입니다 ✨\n\n'
       + '윙포일 **라이딩·장비·교육** 무엇이든 자유롭게 질문해 주세요.\n\n'
       + '*예시 질문:*\n'
       + '• "윙포일 처음인데 뭐부터 시작해야 해요?"\n'
@@ -1627,7 +1630,7 @@
     var fab = document.createElement('button');
     fab.type = 'button';
     fab.className = 'agent-deny-fab';
-    fab.setAttribute('aria-label', '옥코치 — 단무지공방 윙포일 컨설팅 챗 열기');
+    fab.setAttribute('aria-label', 'Coach Danny — 단무지공방 윙포일 컨설팅 챗 열기');
     fab.setAttribute('aria-expanded', 'false');
     fab.setAttribute('aria-controls', 'agent-deny-panel');
     fab.innerHTML = ''
@@ -1648,7 +1651,7 @@
       + '<header class="agent-deny-panel__header">'
       +   '<span class="agent-deny-panel__avatar">' + avatarPictureHtml(48, '') + '</span>'
       +   '<div class="agent-deny-panel__titles">'
-      +     '<h2 class="agent-deny-panel__title" id="agent-deny-title">옥코치</h2>'
+      +     '<h2 class="agent-deny-panel__title" id="agent-deny-title">Coach Danny</h2>'
       +     '<p class="agent-deny-panel__subtitle">옥덕필 박사 · 단무지공방 윙포일 컨설팅</p>'
       +   '</div>'
       +   '<button type="button" class="agent-deny-panel__close" aria-label="대화창 닫기">×</button>'
@@ -1663,10 +1666,24 @@
       +   '<button type="submit" class="agent-deny-send" aria-label="전송 (Enter)" title="전송 (Enter)"><span class="agent-deny-send__icon">➤</span></button>'
       + '</form>';
 
+    // §173-F (2026-05-22) — 첫 방문 자동 인사 말풍선 (teaser). localStorage 1회 노출.
+    var teaser = document.createElement('div');
+    teaser.className = 'agent-deny-teaser';
+    teaser.setAttribute('data-open', 'false');
+    teaser.setAttribute('role', 'button');
+    teaser.setAttribute('tabindex', '0');
+    teaser.setAttribute('aria-label', 'Coach Danny 챗봇 열기 — 무엇이 궁금하신가요?');
+    teaser.innerHTML = ''
+      + '<button type="button" class="agent-deny-teaser__close" aria-label="인사 말풍선 닫기">×</button>'
+      + '<p class="agent-deny-teaser__text">안녕하세요! <strong>Coach Danny</strong>예요 😊<br>'
+      +   '윙포일·장비·라이딩, 무엇이 궁금하신가요?</p>';
+
     document.body.appendChild(backdrop);
     document.body.appendChild(panel);
+    document.body.appendChild(teaser);
     document.body.appendChild(fab);
 
+    widgetState.teaser = teaser;
     widgetState.fab = fab;
     widgetState.panel = panel;
     widgetState.backdrop = backdrop;
@@ -1684,6 +1701,25 @@
     var s = widgetState;
 
     s.fab.addEventListener('click', function () { toggle(); });
+
+    // §173-F — teaser 말풍선: 본문 클릭 → 패널 열기, X → 닫기. 둘 다 자동 인사 종료.
+    if (s.teaser) {
+      s.teaser.addEventListener('click', function (e) {
+        if (e.target && e.target.closest && e.target.closest('.agent-deny-teaser__close')) {
+          dismissTeaser();
+          return;
+        }
+        dismissTeaser();
+        open();
+      });
+      s.teaser.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          dismissTeaser();
+          open();
+        }
+      });
+    }
 
     s.closeBtn.addEventListener('click', function () { close(); });
     s.backdrop.addEventListener('click', function () { close(); });
@@ -1834,6 +1870,7 @@
     var s = widgetState;
     if (!s.panel || s.open) return;
     s.open = true;
+    dismissTeaser();  // §173-F — 패널 열리면 자동 인사 말풍선 종료
     s.panel.setAttribute('data-open', 'true');
     s.fab.setAttribute('aria-expanded', 'true');
     s.fab.setAttribute('data-hidden', 'true');
@@ -1994,6 +2031,40 @@
   }
 
   // ===========================================================================
+  // §173-F — First-visit auto hello (teaser bubble)
+  // ===========================================================================
+  function markAutoHelloSeen() {
+    try { localStorage.setItem(AUTOHELLO_KEY, '1'); } catch (e) {}
+  }
+
+  function hideTeaser() {
+    if (widgetState.teaser) widgetState.teaser.setAttribute('data-open', 'false');
+  }
+
+  function dismissTeaser() {
+    hideTeaser();
+    markAutoHelloSeen();
+  }
+
+  // 첫 방문이면 잠깐 뒤 자동 인사 말풍선을 띄운다. 1회만 — 이후엔 아이콘만 노출.
+  function maybeAutoHello() {
+    if (!widgetState.teaser) return;
+    var seen = false;
+    try { seen = !!localStorage.getItem(AUTOHELLO_KEY); } catch (e) {}
+    if (seen) return;             // 이미 본 방문자 — 자동 인사 생략
+    if (widgetState.open) return; // 이미 패널이 열려 있음
+    if (widgetState.history && widgetState.history.length) {
+      markAutoHelloSeen();        // 대화 기록이 있는 재방문자 — 생략
+      return;
+    }
+    setTimeout(function () {
+      if (!widgetState.teaser || widgetState.open) { markAutoHelloSeen(); return; }
+      widgetState.teaser.setAttribute('data-open', 'true');
+      markAutoHelloSeen();        // 1회 노출 후 다시 자동으로 안 뜸
+    }, 1400);
+  }
+
+  // ===========================================================================
   // Bootstrap
   // ===========================================================================
   function boot() {
@@ -2003,6 +2074,7 @@
     injectWidget();
     bindEvents();
     widgetState.history = loadHistory();
+    maybeAutoHello();
 
     loadFaq(function () {
       // Load knowledge base + sitemap in parallel (non-blocking)

@@ -837,7 +837,7 @@
   });
 
   // §173 v9 (Danny 2026-05-16) — chat → find-my-gear deep-link.
-  // 옥코치 AI 챗에서 슬롯이 다 채워진 다음 ?level=&weight=&style= 로 직행하면 퀴즈 step skip,
+  // Coach Danny AI 챗에서 슬롯이 다 채워진 다음 ?level=&weight=&style= 로 직행하면 퀴즈 step skip,
   // 같은 매트릭스 lookup 으로 바로 결과 노출. fmg_history 까지 동일 경로로 저장.
   // exact parity: chat-card 의 추천 = 이 deep-link 결과 = 사용자가 quiz 5-step 다 풀었을 때 결과.
   // DO_NOT_REVERT §173 v9.
@@ -892,7 +892,7 @@
           var banner = document.createElement('div');
           banner.className = 'fmg-fromchat-banner';
           banner.style.cssText = 'background:rgba(255,184,0,0.12);border:1px solid rgba(255,184,0,0.4);border-radius:10px;padding:10px 14px;margin:0 0 16px;color:#fff;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap';
-          banner.innerHTML = '<span>✨ 옥코치 AI 챗에서 받은 슬롯으로 바로 결과를 보여드려요.</span>'
+          banner.innerHTML = '<span>✨ Coach Danny AI 챗에서 받은 슬롯으로 바로 결과를 보여드려요.</span>'
             + '<a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700;text-decoration:none">↻ 퀴즈 처음부터</a>';
           result.insertBefore(banner, result.firstChild);
         }
@@ -916,7 +916,7 @@
 })();
 </script>
   <script src="assets/js/nav-auth.js" defer></script>
-  <!-- §173 — 옥코치 AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="assets/css/agent-deny.css">
   <script src="assets/js/agent-deny.js" defer></script>
 </body>

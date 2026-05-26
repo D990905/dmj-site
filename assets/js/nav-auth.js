@@ -12,6 +12,20 @@
 (function () {
   'use strict';
 
+  // ── 라이딩 분석 로그인 게이트 (Danny 2026-05-25) ─────────────────────────────
+  // 배경: 마이페이지 인증은 백엔드 없는 localStorage shim 이라 사실상 로그인이 안 됨
+  //   (file:// origin·기기별 격리·crypto.subtle 부재 등). 그 결과 '라이딩 분석'
+  //   (riding-dashboard/) 으로 가는 nav 링크가 로그인 사용자 dropdown 안에만 있어
+  //   Danny 가 대시보드에 진입할 수 없었다.
+  // 사실: riding-dashboard/ 에는 내부 인증 체크·로그인 리다이렉트가 전혀 없다.
+  //   직접 URL 로 열면 로그인 없이 완전히 동작한다. 유일한 게이트는 "nav 진입 링크가
+  //   로그인 상태에서만 렌더된다"는 점뿐이었다.
+  // 조치: 아래 플래그가 false 인 동안 injectRidingDashboardLink() 가 로그아웃
+  //   상태에서도 '라이딩 분석' 링크를 nav 에 노출한다.
+  // Phase 12 (Supabase Auth) 연동 시 → 이 값을 true 로 되돌리면 주입이 중단되고
+  //   원래대로 로그인 dropdown 안에서만 노출된다. (코드 삭제 X — 플래그 토글만.)
+  var RIDING_DASHBOARD_REQUIRES_LOGIN = false;
+
   // ---- Auth state detection (no auth-shim.js dependency) ----
   function getSession() {
     try {
@@ -89,6 +103,7 @@
       '</button>' +
       '<div class="nav__sub nav-auth__menu" id="' + menuId + '" role="menu">' +
         '<a href="' + prefix + 'profile.html" class="nav__sub-link" role="menuitem"><b>마이페이지</b><span>프로필 · 장비 · 진단 결과</span></a>' +
+        '<a href="' + prefix + 'riding-dashboard/index.html" class="nav__sub-link" role="menuitem"><b>라이딩 분석</b><span>GPX 세션 분석</span></a>' +
         '<a href="' + prefix + 'skill-assessment.html" class="nav__sub-link" role="menuitem"><b>스킬 진단</b><span>10축 + Speed</span></a>' +
         '<a href="' + prefix + 'find-my-gear.html" class="nav__sub-link" role="menuitem"><b>Find My Gear</b><span>1분 셋업 진단</span></a>' +
         '<a href="' + prefix + 'membership.html" class="nav__sub-link" role="menuitem"><b>회원 등급</b><span>현재 등급 · 혜택</span></a>' +
@@ -223,6 +238,7 @@
       '</div>' +
       '<div class="mobile-auth-card__actions">' +
         '<a href="' + prefix + 'profile.html">마이페이지</a>' +
+        '<a href="' + prefix + 'riding-dashboard/index.html">라이딩 분석</a>' +
         '<a href="' + prefix + 'skill-assessment.html">스킬 진단</a>' +
         '<a href="#" data-nav-logout-mobile>로그아웃</a>' +
       '</div>';
@@ -248,10 +264,57 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  // ── 라이딩 분석 게이트 해제 (Danny 2026-05-25) ───────────────────────────────
+  // 로그아웃 상태에서도 '라이딩 분석' 진입 링크를 nav 에 노출한다.
+  // 로그인 상태는 renderDesktopNav/renderMobileNav 가 만드는 계정 메뉴에 이미
+  // 링크가 있으므로 (중복 방지) 주입하지 않는다.
+  function injectRidingDashboardLink() {
+    if (RIDING_DASHBOARD_REQUIRES_LOGIN) return;  // Phase 12: 게이트 ON → 주입 중단
+    if (getSession()) return;                     // 로그인 상태 → 계정 메뉴에 이미 존재
+    var prefix = relPrefix();
+    var href = prefix + 'riding-dashboard/index.html';
+
+    // desktop — .nav__primary 의 CTA(또는 로그인) 링크 앞에 일반 nav 링크로 삽입
+    var primary = document.querySelector('.nav__primary');
+    if (primary && !primary.querySelector('[data-riding-dashboard-link]')) {
+      var a = document.createElement('a');
+      a.href = href;
+      a.className = 'nav__link';
+      a.setAttribute('role', 'menuitem');
+      a.setAttribute('data-riding-dashboard-link', '');
+      a.textContent = '라이딩 분석';
+      var anchor = primary.querySelector('.nav__link--cta') ||
+                   primary.querySelector('.nav__link--login');
+      if (anchor) primary.insertBefore(a, anchor);
+      else primary.appendChild(a);
+    }
+
+    // mobile — .mobile-menu__list 의 로그인 항목 뒤에 <li> 로 삽입
+    var mobileList = document.querySelector('.mobile-menu__list');
+    if (mobileList && !mobileList.querySelector('[data-riding-dashboard-link]')) {
+      var li = document.createElement('li');
+      var ma = document.createElement('a');
+      ma.href = href;
+      ma.setAttribute('data-riding-dashboard-link', '');
+      ma.textContent = '라이딩 분석';
+      li.appendChild(ma);
+      var loginLi = null;
+      mobileList.querySelectorAll('a').forEach(function (x) {
+        if (!loginLi && /(^|\/)login\.html$/.test(x.getAttribute('href') || '')) {
+          loginLi = x.closest('li');
+        }
+      });
+      if (loginLi && loginLi.nextSibling) mobileList.insertBefore(li, loginLi.nextSibling);
+      else if (loginLi) mobileList.appendChild(li);
+      else mobileList.insertBefore(li, mobileList.firstChild);
+    }
+  }
+
   function init() {
     try {
       renderDesktopNav();
       renderMobileNav();
+      injectRidingDashboardLink();  // 라이딩 분석 게이트 해제 (Danny 2026-05-25)
       // §145-G v9 (Danny 2026-05-14) — installSingleDropdownGuard 항상 실행 (logged out 도 다른 nav dropdown coordination 필요).
       // 이전 (renderDesktopNav 내부 호출) = logged in 만 실행 → logged out 시 multi-open 가드 누락 회귀.
       installSingleDropdownGuard();

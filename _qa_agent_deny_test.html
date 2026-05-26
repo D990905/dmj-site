@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
-  <title>옥코치 AI Agent — QA 검증 페이지 (§173-B / §173-D)</title>
+  <title>Coach Danny AI Agent — QA 검증 페이지 (§173-B / §173-D)</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/agent-deny.css">
   <style>
@@ -27,18 +27,18 @@
   </style>
 </head>
 <body>
-  <h1>옥코치 AI Agent — QA 검증 페이지 (§173-B / §173-D)</h1>
+  <h1>Coach Danny AI Agent — QA 검증 페이지 (§173-B / §173-D)</h1>
 
   <div class="legend">
     <strong>이 페이지는 검증 전용입니다 (noindex,nofollow).</strong><br>
-    각 카드의 [질문하기] 버튼 클릭 → 우하단 옥코치 widget 자동 open → 답변 출력.<br>
+    각 카드의 [질문하기] 버튼 클릭 → 우하단 Coach Danny widget 자동 open → 답변 출력.<br>
     카테고리 ([FAQ] / [KB] / [Fallback]) 별로 응답 source 확인.<br>
     또한 콘솔에서 <code>DMJAgent._findBestMatch('query')</code>, <code>DMJAgent._findKnowledgeMatches('query')</code>, <code>DMJAgent._botReplyFor('query')</code> 직접 호출 가능.
   </div>
 
-  <h2>1. 옥코치 Avatar — Danny 실제 사진 (§173-D · 2026-05-16)</h2>
+  <h2>1. Coach Danny Avatar — Danny 실제 사진 (§173-D · 2026-05-16)</h2>
   <p style="font-size:12.5px;color:#5C6F7E;margin:-4px 0 8px">
-    Danny 결정 (2026-05-16): 플랫 마스코트 → 신뢰감 부족 판단으로 폐기. 정체성 "대니" → "옥코치"(옥덕필 코치 본인) 변경 + face-centered crop 사진으로 복원. WebP primary + PNG fallback, 4 사이즈 (48/80/160/240).
+    Danny 결정 (2026-05-16): 플랫 마스코트 → 신뢰감 부족 판단으로 폐기. 정체성 "대니" → "Coach Danny"(옥덕필 코치 본인) 변경 + face-centered crop 사진으로 복원. WebP primary + PNG fallback, 4 사이즈 (48/80/160/240).
   </p>
   <div class="avatar-grid">
     <figure>
@@ -78,7 +78,7 @@
     <div class="test-card"><div class="q">10축 스킬 진단은 뭔가요?</div><div class="expected">→ FAQ <code>skill-assessment-start</code></div><button onclick="window.DMJAgent.ask('10축 스킬 진단은 뭔가요?')">질문하기</button></div>
     <div class="test-card"><div class="q">회원 등급 할인율?</div><div class="expected">→ FAQ <code>membership</code></div><button onclick="window.DMJAgent.ask('회원 등급 할인율?')">질문하기</button></div>
     <div class="test-card"><div class="q">이벤트 무료 컨설팅?</div><div class="expected">→ FAQ <code>event-free-consult</code></div><button onclick="window.DMJAgent.ask('이벤트 무료 컨설팅?')">질문하기</button></div>
-    <div class="test-card"><div class="q">옥코치가 누구야?</div><div class="expected">→ FAQ <code>agent-self</code></div><button onclick="window.DMJAgent.ask('옥코치가 누구야?')">질문하기</button></div>
+    <div class="test-card"><div class="q">Coach Danny가 누구야?</div><div class="expected">→ FAQ <code>agent-self</code></div><button onclick="window.DMJAgent.ask('Coach Danny가 누구야?')">질문하기</button></div>
   </div>
 
   <h2>3. KB RAG 시나리오 (Tier 2 — 깊은 canonical 답변)</h2>
@@ -140,8 +140,8 @@
   <h2>7. 로그인 상태 분기 test</h2>
   <p>비로그인 vs 로그인 시 greeting 분기:</p>
   <ul>
-    <li><strong>비로그인</strong>: "<strong>옥코치</strong> — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ ..."</li>
-    <li><strong>로그인 시</strong>: "안녕하세요 <em>{nickname}</em>님! <strong>옥코치</strong> — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ ..."</li>
+    <li><strong>비로그인</strong>: "<strong>Coach Danny</strong> — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ ..."</li>
+    <li><strong>로그인 시</strong>: "안녕하세요 <em>{nickname}</em>님! <strong>Coach Danny</strong> — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ ..."</li>
   </ul>
   <p>로그인 페이지 → 회원가입 후 widget 재진입.</p>
 

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "generatedAt": "2026-05-15",
-  "note": "§173 Phase 2 — 옥코치 사이트 콘텐츠 맵. 옥코치가 사용자 질문을 '답할 수 있는 유형'으로 유도하고 deep-link 할 수 있게 하는 manifest. 각 page = url/type/콘텐츠/답하는 질문/관련 의도. hallucination 차단: 사이트에 실재하는 페이지만 등록.",
+  "note": "§173 Phase 2 — Coach Danny 사이트 콘텐츠 맵. Coach Danny가 사용자 질문을 '답할 수 있는 유형'으로 유도하고 deep-link 할 수 있게 하는 manifest. 각 page = url/type/콘텐츠/답하는 질문/관련 의도. hallucination 차단: 사이트에 실재하는 페이지만 등록.",
   "intents": {
     "fit-check": "적합도 문의 — 이거 나한테 맞아? 초보인데 가능?",
     "size-inquiry": "사이즈 문의 — 몇 L 보드? 윙 사이즈?",
