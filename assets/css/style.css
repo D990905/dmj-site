@@ -586,6 +586,23 @@ a { color: inherit; text-decoration: none; }
 .mobile-menu__close > svg,
 .mobile-menu__close svg * { pointer-events: none; }
 
+/* §171-C iOS hit-test fix — 링크(<a>) 안의 SVG 가 iOS Safari 에서
+   hit-target 으로 잡혀 <a> href 까지 이벤트가 안 닿는 버그.
+   특히 모바일 메뉴의 chevron(→ / ↗) 과 네비 카트 아이콘에서 발현.
+   SVG 와 자식 element 의 pointer 이벤트를 모두 막아 부모 <a> 가
+   클릭을 받게 한다. 영향 범위는 (1) 모바일 메뉴 내 모든 링크,
+   (2) 사이트 헤더 안의 모든 링크 (카트·로고·서브메뉴 포함) 로
+   제한한다 — 본문 콘텐츠의 SVG(차트·아이콘) 는 건드리지 않는다.
+   (Danny 2026-05-26 hotfix — DO_NOT_REVERT §171-C) */
+.mobile-menu a > svg,
+.mobile-menu a svg *,
+.mobile-menu__list a > svg,
+.mobile-menu__list a svg *,
+.site-header a > svg,
+.site-header a svg *,
+.nav__cart > svg,
+.nav__cart svg * { pointer-events: none; }
+
 /* Mobile Menu */
 .mobile-menu {
   position: fixed;
@@ -6737,6 +6754,58 @@ p {
   line-height: 1.55;
 }
 .order-restock-btn { font-weight: 700; }
+
+/* --- Order cancel / delete buttons (§174-B Danny 2026-05-26) --- */
+.order-detail__action { margin-top: 8px; }
+.order-action-btn {
+  appearance: none;
+  border: 1px solid;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+.order-action-btn:hover { transform: translateY(-1px); }
+.order-action-btn--cancel { color: #C2362F; border-color: #E0908B; }
+.order-action-btn--cancel:hover { background: #FBECEA; }
+.order-action-btn--delete { color: #5C6F7E; border-color: #C7CFD8; }
+.order-action-btn--delete:hover { background: #F1F4F7; }
+
+.order-cancel-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #FBECEA;
+  color: #C2362F;
+  border: 1px solid #E0908B;
+}
+
+.order-detail--cancelled { opacity: 0.62; }
+.order-detail--cancelled .order-stage-banner { opacity: 0.7; }
+.order-detail--cancelled h3 b { text-decoration: line-through; text-decoration-color: #C2362F; }
+
+/* Archived (hidden) orders section */
+.orders-archived { margin-top: 14px; }
+.orders-archived__toggle {
+  appearance: none;
+  background: transparent;
+  border: 1px dashed #C7CFD8;
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: #5C6F7E;
+  font-size: 13px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.orders-archived__toggle:hover { background: #F1F4F7; }
+.orders-archived__list { margin-top: 10px; }
+.orders-archived--expanded { margin-top: 18px; }
 
 /* --- Cart page --- */
 .cart-page,

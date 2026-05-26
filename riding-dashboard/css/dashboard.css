@@ -1875,9 +1875,12 @@ input::placeholder { color:var(--text-dim); }
   font-variant-numeric:tabular-nums;
 }
 
-/* ---------- 우측 미니그래프 레일 ---------- */
+/* ---------- 우측 미니그래프 레일 ----------
+   top:48px — 우상단 고정 KO/EN 토글(.rd-langtoggle top:8 + height ~26)이
+   첫 번째 미니 그래프 카드의 상단 우측 아이콘을 덮지 않도록 비워 둔다.
+   (Danny 2026-05-26 fix) */
 .replay__graphs {
-  position:absolute; top:12px; right:12px; bottom:12px; z-index:16;
+  position:absolute; top:48px; right:12px; bottom:12px; z-index:16;
   width:288px; max-width:42vw;
   display:flex; flex-direction:column; gap:8px;
   overflow-y:auto; padding-right:2px;

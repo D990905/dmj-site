@@ -2409,6 +2409,11 @@
         return Array.isArray(arr) ? arr : [];
       } catch (e) { return []; }
     }
+    function saveOrders(arr) {
+      try {
+        window.DMJAuth.setUserData('orders', JSON.stringify(arr || []));
+      } catch (e) { console.warn('[orders] save failed', e); }
+    }
 
     function fmtKRWOrder(n) {
       if (n == null || isNaN(n)) return '—';
@@ -2576,10 +2581,29 @@
           + '</div>';
       }
 
-      return '<section class="order-detail" data-order-id="' + escOrder(order.id) + '">'
+      // §174-B (Danny 2026-05-26) — stage 별 액션 분기:
+      //   1-2: 취소하기(빨강, 사용자 직접 cancel) + 카톡 알림 안내
+      //   3-6: 관리자 문의만 (직접 취소 X — 운영팀 통해서만)
+      //   7-8: 삭제하기(목록 hidden, 데이터는 archive)
+      var stageActionBtn = '';
+      if (order.status === 'cancelled') {
+        stageActionBtn = '<span class="order-cancel-badge">취소됨 · '
+          + fmtOrderTs(order.cancelledAt) + '</span>';
+      } else if (cur <= 2) {
+        stageActionBtn = '<button type="button" class="order-action-btn order-action-btn--cancel" '
+          + 'data-order-cancel="' + escOrder(order.id) + '">취소하기</button>';
+      } else if (cur >= 7) {
+        stageActionBtn = '<button type="button" class="order-action-btn order-action-btn--delete" '
+          + 'data-order-delete="' + escOrder(order.id) + '">목록에서 삭제</button>';
+      }
+      // status=cancelled 인 주문은 헤더 우상단 액션 영역에 배지로만, 본문 stageBanner 는 강조 약화
+      var cancelledClass = order.status === 'cancelled' ? ' order-detail--cancelled' : '';
+
+      return '<section class="order-detail' + cancelledClass + '" data-order-id="' + escOrder(order.id) + '">'
         + '<header class="order-detail__head">'
         +   '<h3>주문번호 <b>' + escOrder(order.id) + '</b></h3>'
         +   '<p class="order-detail__sub">생성: ' + fmtOrderTs(order.createdAt) + '</p>'
+        +   (stageActionBtn ? '<div class="order-detail__action">' + stageActionBtn + '</div>' : '')
         + '</header>'
         + stageBanner
         + '<h4 class="order-detail__h4">진행 상황 (전체 단계)</h4>'
@@ -2628,9 +2652,45 @@
         return tb - ta;
       });
 
-      compact.innerHTML = orders.map(renderOrderCardCompact).join('');
-      expanded.innerHTML = orders.map(renderOrderCardExpanded).join('');
-      if (toggleBtn) toggleBtn.hidden = false;
+      // §174-B (Danny 2026-05-26) — hidden 처리된 주문은 기본 목록에서 제외.
+      // 토글로 다시 표시 가능. 데이터 자체는 archive 유지 (배열에서 제거 X).
+      var hiddenOrders = orders.filter(function (o) { return o.hidden === true; });
+      var visibleOrders = orders.filter(function (o) { return o.hidden !== true; });
+
+      compact.innerHTML = visibleOrders.map(renderOrderCardCompact).join('');
+      expanded.innerHTML = visibleOrders.map(renderOrderCardExpanded).join('');
+
+      // 삭제(hidden)된 주문이 있으면 토글 + archived 섹션 추가.
+      if (hiddenOrders.length) {
+        var arcCmp = '<div class="orders-archived">'
+          + '<button type="button" class="orders-archived__toggle" data-toggle-archived '
+          + 'aria-expanded="false">삭제한 주문 ' + hiddenOrders.length + '건 보기 ↓</button>'
+          + '<div class="orders-archived__list" hidden id="orders-archived-list">'
+          +   hiddenOrders.map(renderOrderCardCompact).join('')
+          + '</div></div>';
+        compact.insertAdjacentHTML('beforeend', arcCmp);
+        var arcEx = '<div class="orders-archived orders-archived--expanded">'
+          + '<div class="orders-archived__list" hidden id="orders-archived-list-ex">'
+          +   hiddenOrders.map(renderOrderCardExpanded).join('')
+          + '</div></div>';
+        expanded.insertAdjacentHTML('beforeend', arcEx);
+        var arcTgl = compact.querySelector('[data-toggle-archived]');
+        if (arcTgl) {
+          arcTgl.addEventListener('click', function () {
+            var lc = document.getElementById('orders-archived-list');
+            var le = document.getElementById('orders-archived-list-ex');
+            var open = arcTgl.getAttribute('aria-expanded') === 'true';
+            arcTgl.setAttribute('aria-expanded', !open);
+            arcTgl.textContent = !open
+              ? '삭제한 주문 ' + hiddenOrders.length + '건 숨기기 ↑'
+              : '삭제한 주문 ' + hiddenOrders.length + '건 보기 ↓';
+            if (lc) lc.hidden = open;
+            if (le) le.hidden = open;
+          });
+        }
+      }
+
+      if (toggleBtn) toggleBtn.hidden = visibleOrders.length === 0 && !hiddenOrders.length;
 
       // Delegated click for "상세 보기" buttons → open expanded view + scroll to anchor
       compact.addEventListener('click', function (e) {
@@ -2651,36 +2711,93 @@
       // §174-A (Danny 2026-05-26) — 장바구니에 다시 담기. order.items → DMJCart.add.
       // cart 가 비어 있을 때만 안전하게 채우고(기존 cart 와 섞이지 않게), cart.html 로 이동.
       expanded.addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-order-restock]');
-        if (!btn) return;
-        e.preventDefault();
-        var oid = btn.getAttribute('data-order-restock');
-        var order = (loadOrders() || []).find(function (o) { return o.id === oid; });
-        if (!order || !order.items || !order.items.length) {
-          alert('이 주문에서 복사할 상품이 없습니다.');
-          return;
-        }
-        if (!window.DMJCart) {
-          alert('장바구니 모듈을 불러오지 못했습니다.');
-          return;
-        }
-        // 기존 cart 와 섞이지 않도록 cart 가 비어 있지 않으면 확인.
-        var cur = window.DMJCart.getItems ? window.DMJCart.getItems() : [];
-        if (cur.length > 0) {
-          if (!confirm('장바구니에 ' + cur.length + '개 항목이 있습니다. ' +
-            '이 주문의 ' + order.items.length + ' SKU 를 추가로 담을까요? ' +
-            '(취소하면 cart 를 비우지 않습니다)')) return;
-        }
-        try {
-          order.items.forEach(function (it) {
-            window.DMJCart.add({
-              sku: it.sku, qty: it.qty || 1, size: it.size || null
+        // Restock — 1-2 단계 주문을 cart 로 복사
+        var btnRestock = e.target.closest('[data-order-restock]');
+        if (btnRestock) {
+          e.preventDefault();
+          var oid = btnRestock.getAttribute('data-order-restock');
+          var order = (loadOrders() || []).find(function (o) { return o.id === oid; });
+          if (!order || !order.items || !order.items.length) {
+            alert('이 주문에서 복사할 상품이 없습니다.');
+            return;
+          }
+          if (!window.DMJCart) {
+            alert('장바구니 모듈을 불러오지 못했습니다.');
+            return;
+          }
+          var curItems = window.DMJCart.getItems ? window.DMJCart.getItems() : [];
+          if (curItems.length > 0) {
+            if (!confirm('장바구니에 ' + curItems.length + '개 항목이 있습니다. ' +
+              '이 주문의 ' + order.items.length + ' SKU 를 추가로 담을까요? ' +
+              '(취소하면 cart 를 비우지 않습니다)')) return;
+          }
+          try {
+            order.items.forEach(function (it) {
+              window.DMJCart.add({ sku: it.sku, qty: it.qty || 1, size: it.size || null });
             });
+            window.location.href = 'cart.html';
+          } catch (err) {
+            console.warn('[order-restock] failed', err);
+            alert('장바구니에 담는 중 오류가 발생했습니다. 콘솔을 확인해 주세요.');
+          }
+          return;
+        }
+
+        // §174-B (Danny 2026-05-26) — 취소 (stage 1-2): status=cancelled + 카톡 안내.
+        // localStorage 만 갱신 (백엔드 부재). 운영팀 알림은 카카오톡 채널로 사용자 안내.
+        var btnCancel = e.target.closest('[data-order-cancel]');
+        if (btnCancel) {
+          e.preventDefault();
+          var cid = btnCancel.getAttribute('data-order-cancel');
+          var orders = loadOrders();
+          var idx = orders.findIndex(function (o) { return o.id === cid; });
+          if (idx < 0) { alert('주문을 찾지 못했습니다.'); return; }
+          var target = orders[idx];
+          if (Number(target.currentStage) > 2) {
+            alert('견적 단계가 지나 직접 취소가 어렵습니다. 관리자 문의로 진행해 주세요.');
+            return;
+          }
+          if (!confirm('주문 ' + cid + ' (₩' +
+            Number(target.totalKRW || 0).toLocaleString('ko-KR') +
+            ') 을 취소하시겠습니까?\n\n취소 요청이 등록되며, 운영팀 확인은 카카오톡으로 더 빠르게 가능합니다.')) return;
+          target.status = 'cancelled';
+          target.cancelledAt = new Date().toISOString();
+          // stage 진행 timeline 에 cancellation note 추가
+          target.stages = target.stages || [];
+          target.stages.push({
+            stage: Number(target.currentStage) || 1,
+            label: '사용자 취소',
+            timestamp: target.cancelledAt,
+            note: '사용자가 취소 요청. 운영팀 확인 대기 중.'
           });
-          window.location.href = 'cart.html';
-        } catch (err) {
-          console.warn('[order-restock] failed', err);
-          alert('장바구니에 담는 중 오류가 발생했습니다. 콘솔을 확인해 주세요.');
+          orders[idx] = target;
+          saveOrders(orders);
+          // 카톡 알림 안내
+          var notify = confirm('취소 요청이 등록되었습니다.\n\n' +
+            '운영팀 확인까지 시간이 걸릴 수 있습니다.\n' +
+            '빠른 확인은 카카오톡 채팅으로 문의 주세요.\n\n' +
+            '카카오톡 채팅을 지금 열까요?');
+          if (notify) {
+            window.open('https://pf.kakao.com/_VITZX/chat', '_blank', 'noopener');
+          }
+          window.location.reload();
+          return;
+        }
+
+        // §174-B (Danny 2026-05-26) — 삭제 (stage 7-8): hidden 플래그 (soft delete, archive 유지).
+        var btnDelete = e.target.closest('[data-order-delete]');
+        if (btnDelete) {
+          e.preventDefault();
+          var did = btnDelete.getAttribute('data-order-delete');
+          var olist = loadOrders();
+          var didx = olist.findIndex(function (o) { return o.id === did; });
+          if (didx < 0) { alert('주문을 찾지 못했습니다.'); return; }
+          if (!confirm('이 주문을 목록에서 숨길까요?\n\n주문 기록 자체는 보존됩니다 (운영 검증·재구매 시 필요). ' +
+            '아래 "삭제한 주문 보기" 토글로 다시 확인할 수 있습니다.')) return;
+          olist[didx].hidden = true;
+          olist[didx].hiddenAt = new Date().toISOString();
+          saveOrders(olist);
+          window.location.reload();
         }
       });
     })();

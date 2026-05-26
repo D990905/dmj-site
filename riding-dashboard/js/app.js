@@ -2059,11 +2059,15 @@
      한 패널에 나란히 놓아 값·신뢰도를 비교하고 골라 적용하게 한다.
      두 독립 추정(no-go·회전기하)이 일치하면 권장 신뢰도를 높여 표기. */
   var WIND_CONF_CLS = { '높음': 'high', '보통': 'mid', '낮음': 'low', '확정': 'set' };
+  /* 신뢰도 칩 — i18n 토글 시 "신뢰도" 와 값을 각각 별도 텍스트노드로 두어야
+     사전 매칭이 가능하다 (한 텍스트노드에 두 단어가 합쳐지면 walker 가
+     trimmed 전체로만 MAP 조회 → 둘 다 번역되지 않음). Danny 2026-05-26. */
   function windConfChip(conf) {
     if (!conf) return '';
     var cls = WIND_CONF_CLS[conf] || 'low';
-    return '<span class="wsrc__conf wsrc__conf--' + cls + '">신뢰도 ' +
-      conf + '</span>';
+    return '<span class="wsrc__conf wsrc__conf--' + cls + '">' +
+      '<span class="wsrc__conf-label">신뢰도</span> ' +
+      '<span class="wsrc__conf-val">' + conf + '</span></span>';
   }
   /* 소스별 추정 근거 수치 — 단위 표기 일관(°, %p) */
   function windSourceDetail(s) {
@@ -2118,7 +2122,8 @@
         '<div class="wsrc-rec__body">' +
           '<span class="wsrc-rec__tag">현재 적용</span>' +
           '<span class="wsrc-rec__val">' + Math.round(r.windDir) + '° ' +
-            compass(r.windDir) + '</span>' + windConfChip('확정') +
+            '<span class="wsrc-rec__compass">' + compass(r.windDir) +
+            '</span></span>' + windConfChip('확정') +
         '</div>' +
         '<p class="wsrc-rec__note">' + r.note +
           ' 아래 추정값으로 바꾸려면 “미리보기 적용” 후 다시 확정해 주세요.</p>' +
@@ -2129,7 +2134,8 @@
       '<div class="wsrc-rec__body">' +
         '<span class="wsrc-rec__tag">권장</span>' +
         '<span class="wsrc-rec__val">' + Math.round(r.windDir) + '° ' +
-          compass(r.windDir) + '</span>' + windConfChip(r.confidence) +
+          '<span class="wsrc-rec__compass">' + compass(r.windDir) +
+          '</span></span>' + windConfChip(r.confidence) +
         '<button type="button" class="btn btn--sm btn--primary wsrc__apply" ' +
           'data-apply-val="' + Math.round(r.windDir) + '">권장값 적용</button>' +
       '</div>' +
@@ -3822,10 +3828,22 @@
   function vpsTone(s) {
     return s >= 70 ? 'hi' : (s >= 45 ? 'mid' : 'lo');
   }
+  /* SPS 점수 → 5단계 상태색 (Danny 2026-05-26).
+     CHART-DESIGN-SYSTEM.md status 5-step 앵커를 연속 보간한 RGB 를 반환.
+     RDChartTheme.statusAt(0..1) 가 없으면 (구버전·테스트 컨텍스트) null
+     을 반환해 기존 3-tone 클래스만 적용되게 한다. */
+  function vpsStatusColor(score) {
+    if (score == null || !window.RDChartTheme ||
+        typeof RDChartTheme.statusAt !== 'function') return null;
+    return RDChartTheme.statusAt(Math.max(0, Math.min(100, score)) / 100);
+  }
 
   /* 한 점수 카드 타일 — 방향(Upwind / Overall / Downwind)과
      마네버(택킹 / 자이빙) 5개 카드가 모두 이 함수를 공유한다.
-     cmp = { avg, count } — 동일 풍속 영역대 평균(없으면 avg=null). */
+     cmp = { avg, count } — 동일 풍속 영역대 평균(없으면 avg=null).
+     라벨은 한국어 단일 단어(풍상·풍하·종합·택킹·자이빙)로 두고 EN 모드는
+     i18n MAP 이 'Upwind' 등으로 치환한다. 점수에는 5단계 상태색 (number·
+     progress bar) 을 inline style 로 입혀 카드 5장이 동일 척도로 보인다. */
   function vpsTile(label, seg, cmp, isMain) {
     var cls = 'vps-tile' + (isMain ? ' vps-tile--main' : '');
     var inner = '<span class="vps-tile__label">' + label + '</span>';
@@ -3837,13 +3855,17 @@
       return '<div class="' + cls + '">' + inner + '</div>';
     }
     var s = seg.score, tone = vpsTone(s);
+    var statColor = vpsStatusColor(s);
+    var numStyle = statColor ? ' style="color:' + statColor + '"' : '';
+    var barStyle = 'width:' + s + '%' +
+      (statColor ? ';background:' + statColor : '');
     /* 점수 숫자에 data-rd-num 부여 → 카운트업 (2026-05-26 시각 폴리시) */
     inner += '<div class="vps-tile__scorerow">' +
-      '<span class="vps-tile__score vps-score--' + tone + '"' +
+      '<span class="vps-tile__score vps-score--' + tone + '"' + numStyle +
       ' data-rd-num="' + s + '" data-rd-decimals="0">' + s + '</span>' +
       '<span class="vps-tile__max">/ 100</span></div>' +
       '<div class="vps-bar"><div class="vps-bar__fill vps-fill--' + tone +
-      '" style="width:' + s + '%"></div></div>';
+      '" style="' + barStyle + '"></div></div>';
     /* 비교 델타 — 동일 풍속 영역대(밴드) 평균 대비 (Danny 2026-05-23
        §A-2·A-3). cmp.avg 가 있으면 델타를, 없으면(같은 풍속대 세션 없음)
        '비교 데이터 부족' 을 정직하게 표기한다 — 방향 카드 5장 전부. */
@@ -3940,16 +3962,16 @@
        계산식은 불변 — 배치 순서와 비교 기준만 바꾼다. 델타는 동일
        풍속 영역대 평균 대비 (§A-2·A-3) — 5장 전부 동일 기준. */
     var grid = '<div class="vps-grid">' +
-      vpsTile('Upwind 풍상', v.upwind,
+      vpsTile('풍상', v.upwind,
         { avg: bc.upwind, count: bc.counts.upwind }, false) +
-      vpsTile('Downwind 풍하', v.downwind,
+      vpsTile('풍하', v.downwind,
         { avg: bc.downwind, count: bc.counts.downwind }, false) +
-      vpsTile('Overall 종합', v.overall,
+      vpsTile('종합', v.overall,
         { avg: bc.overall, count: bc.counts.overall }, true) +
-      vpsTile('Tacking 택킹',
+      vpsTile('택킹',
         maneuverSeg(v.overall ? v.overall.tackScore : null, '택킹'),
         { avg: bc.tack, count: bc.counts.tack }, false) +
-      vpsTile('Gybing 자이빙',
+      vpsTile('자이빙',
         maneuverSeg(v.overall ? v.overall.gybeScore : null, '자이빙'),
         { avg: bc.gybe, count: bc.counts.gybe }, false) +
       '</div>';

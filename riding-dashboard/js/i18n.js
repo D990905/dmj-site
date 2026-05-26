@@ -382,19 +382,55 @@
     'no-go zone 추정': 'No-go zone estimate',
     '회전 기하 추정': 'Maneuver geometry estimate',
     '회전 기하': 'Maneuver geometry',
+    '외부 날씨 (준비 중)': 'External weather (coming soon)',
+    '신뢰도': 'Confidence',
     '높음': 'High',
     '보통': 'Medium',
+    '중': 'Medium',
     '낮음': 'Low',
+    /* 풍향 추정 소스 — compass 8방위 (Danny 2026-05-26 i18n fix).
+       compass(deg) 가 반환하는 한국어 단어를 EN 모드에서 영문 약어로 치환.
+       단독 텍스트노드일 때만 적용되므로 windSourceRow / windRecBanner 의
+       값 출력은 방위어를 자체 <span> 으로 감싸 별도 텍스트노드로 두어야 함. */
+    '북': 'N',
+    '북동': 'NE',
+    '동': 'E',
+    '남동': 'SE',
+    '남': 'S',
+    '남서': 'SW',
+    '서': 'W',
+    '북서': 'NW',
     '풍향을 설정하고 “확정”하면 택킹·자이빙 분류와 VMG·폴라 분석이 활성화됩니다.':
       'Set the wind direction and tap "Confirm" to unlock tack / gybe classification and VMG / polar analysis.',
     '풍상·풍하 주행이 부족해 no-go zone 으로 추정할 수 없습니다.':
       'Not enough upwind / downwind sailing to estimate via no-go zone.',
     '세션 헤딩 분포의 빈 쐐기(세일 불가 구역) 중심으로 추정했습니다.':
       'Estimated from the empty wedge (no-go zone) in the heading distribution.',
+    'OpenWeather 등 외부 날씨 데이터 연동 예정입니다 — API 키를 입력하면 세션 시각·위치의 풍향을 자동으로 불러옵니다.':
+      'External weather data integration (e.g. OpenWeather) is coming — enter an API key to auto-fetch the wind direction for the session’s time and location.',
+    '풍축을 가릴 만한 택·자이브가 부족해 회전 기하로 추정할 수 없습니다.':
+      'Not enough tacks / gybes that cross the wind axis to estimate via maneuver geometry.',
+    '택·자이브 진입/탈출 헤딩의 이등분선으로 풍축을 재구성했습니다.':
+      'Reconstructed the wind axis from the bisector of tack / gybe entry / exit headings.',
+    '외부 날씨 데이터에서 불러온 풍향입니다.':
+      'Wind direction fetched from external weather data.',
+    '수동으로 확정한 풍향을 사용합니다.': 'Using the manually confirmed wind direction.',
 
-    /* ---------------- 코치(Coach Danny) 카드 ---------------- */
+    /* ---------------- 코치(옥코치 ↔ Coach Danny) 카드 ----------------
+       KO 노출 = 옥코치, EN 노출 = Coach Danny. coach.js 의 동적 narration
+       은 양 언어 모두 자체 분기로 출력하므로 여기엔 정적 라벨만 매핑한다.
+       (Danny 2026-05-26 정정 — 이전 일괄치환에서 KO 컨텍스트의 '옥코치' 가
+        실수로 영어 'Coach Danny' 로 바뀐 부분은 별도 revert 패스 필요.) */
     'Coach Danny 코멘트': 'Coach Danny',
     'Coach Danny': 'Coach Danny',
+    '옥코치': 'Coach Danny',
+    '옥코치 코멘트': 'Coach Danny Comments',
+    '옥코치 코멘트 · 장비 코칭': 'Coach Danny · Gear Coaching',
+    '💬 옥코치 코멘트 · 장비 코칭': '💬 Coach Danny · Gear Coaching',
+    '세일링 퍼포먼스 스코어·옥코치 분석에 사용 · 이 브라우저에 저장됩니다':
+      'Used by Sailing Performance Score and Coach Danny · stored in this browser',
+    '윙 사이즈는 옥코치 what-if 분석의 필수 입력입니다.':
+      'Wing size is required for Coach Danny what-if analysis.',
 
     /* ---------------- 단위·짧은 라벨 ---------------- */
     '회': 'times',
