@@ -233,6 +233,7 @@
               <label class="multi-select__opt"><input type="checkbox" value="sup"> <span>SUP</span></label>
               <label class="multi-select__opt"><input type="checkbox" value="surf"> <span>서핑</span></label>
               <label class="multi-select__opt"><input type="checkbox" value="downwind"> <span>다운윈드</span></label>
+              <label class="multi-select__opt"><input type="checkbox" value="parawing"> <span>패러윙</span></label>
               <label class="multi-select__opt"><input type="checkbox" value="pump"> <span>펌핑포일</span></label>
               <label class="multi-select__opt"><input type="checkbox" value="other"> <span>기타</span></label>
             </div>
@@ -713,7 +714,7 @@
     // Render selected sports as chips above the checkbox grid
     var SPORT_LABELS = {
       wingfoil: '윙포일', kitefoil: '카이트포일', windsurf: '윈드서핑',
-      sup: 'SUP', surf: '서핑', downwind: '다운윈드', pump: '펌핑포일', other: '기타'
+      sup: 'SUP', surf: '서핑', downwind: '다운윈드', parawing: '패러윙', pump: '펌핑포일', other: '기타'
     };
     function renderSportsChips() {
       var chipsEl = document.getElementById('sports-chips');
@@ -821,7 +822,7 @@
       }
       var sportLabels = {
         wingfoil: '윙포일', kitefoil: '카이트포일', windsurf: '윈드서핑',
-        sup: 'SUP', surf: '서핑', downwind: '다운윈드', pump: '펌핑포일', other: '기타'
+        sup: 'SUP', surf: '서핑', downwind: '다운윈드', parawing: '패러윙', pump: '펌핑포일', other: '기타'
       };
       var spotLabels = {
         gangneung: '강릉', geoje: '거제', geumgang: '금강', nakdong: '낙동강', sacheon: '사천',
@@ -2340,18 +2341,56 @@
       if (order.fmgEntryId) {
         fmgLink = '<p class="order-fmg-link"><a href="find-my-gear.html">관련 Find My Gear 추천 보기 →</a> <small>(' + escOrder(order.fmgEntryId) + ')</small></p>';
       }
+      // §174-A (Danny 2026-05-26) — 단계 명시 카드. 8 단계 timeline 만 보면
+      // 마지막 row "8. 배송완료" 가 현재 상태인 줄 오인하는 사용자가 있어,
+      // 현재 단계를 큼지막한 라벨 카드로 별도 명시한다.
+      var stageLabelNow = (ORDER_STAGES[cur - 1] || {}).label || '—';
+      var stageBanner =
+          '<div class="order-stage-banner" data-stage="' + cur + '">'
+        +   '<div class="order-stage-banner__num">' + cur + ' / 8</div>'
+        +   '<div class="order-stage-banner__body">'
+        +     '<div class="order-stage-banner__cap">현재 단계</div>'
+        +     '<div class="order-stage-banner__label"><b>' + escOrder(stageLabelNow) + '</b></div>'
+        +   '</div>'
+        + '</div>';
+
+      // §174-A (Danny 2026-05-26) — 견적요청·견적수렴 단계(cur ≤ 2) 까지는
+      // 사용자가 수량을 바꾸고 싶을 수 있으니 "장바구니에 다시 담기" 진입점을 둔다.
+      // 그 이후(cur ≥ 3) 는 입금 단계 이후라 관리자 문의로 안내.
+      var editBlock = '';
+      if (cur <= 2 && order.items && order.items.length) {
+        editBlock =
+            '<div class="order-detail__edit">'
+          +   '<button type="button" class="profile-hero__btn order-restock-btn" '
+          +     'data-order-restock="' + escOrder(order.id) + '" '
+          +     'style="text-decoration:none">↺ 장바구니에 다시 담기 (수량 수정)</button>'
+          +   '<p class="order-detail__edit-note">' + escOrder(order.items.length)
+          +     ' SKU 를 장바구니로 복사합니다. 수량 조정 후 새 견적을 요청해 주세요. '
+          +     '기존 견적은 그대로 남아 있으며 관리자가 어느 쪽으로 진행할지 확인해 드립니다.</p>'
+          + '</div>';
+      } else if (cur >= 3) {
+        editBlock =
+            '<div class="order-detail__edit">'
+          +   '<p class="order-detail__edit-note">'
+          +     '입금 단계 이후라 사용자가 직접 수정할 수 없습니다 — '
+          +     '<a href="consult.html">관리자 문의</a> 또는 카톡 상담으로 알려 주세요.</p>'
+          + '</div>';
+      }
+
       return '<section class="order-detail" data-order-id="' + escOrder(order.id) + '">'
         + '<header class="order-detail__head">'
         +   '<h3>주문번호 <b>' + escOrder(order.id) + '</b></h3>'
         +   '<p class="order-detail__sub">생성: ' + fmtOrderTs(order.createdAt) + '</p>'
         + '</header>'
-        + '<h4 class="order-detail__h4">진행 상황</h4>'
+        + stageBanner
+        + '<h4 class="order-detail__h4">진행 상황 (전체 단계)</h4>'
         + renderOrderTimelineFull(order)
         + '<h4 class="order-detail__h4">주문 상품</h4>'
         + renderOrderItemList(order)
         + '<div class="order-detail__totals">'
         +   '<div><span>총 합계</span><strong>' + fmtKRWOrder(order.totalKRW) + '</strong></div>'
         + '</div>'
+        + editBlock
         + fmgLink
         + paymentNotice
         + '<h4 class="order-detail__h4">관리자 메시지</h4>'
@@ -2408,6 +2447,42 @@
           var target = expanded.querySelector('[data-order-id="' + oid.replace(/"/g, '\\"') + '"]');
           if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 80);
+      });
+
+      // §174-A (Danny 2026-05-26) — 장바구니에 다시 담기. order.items → DMJCart.add.
+      // cart 가 비어 있을 때만 안전하게 채우고(기존 cart 와 섞이지 않게), cart.html 로 이동.
+      expanded.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-order-restock]');
+        if (!btn) return;
+        e.preventDefault();
+        var oid = btn.getAttribute('data-order-restock');
+        var order = (loadOrders() || []).find(function (o) { return o.id === oid; });
+        if (!order || !order.items || !order.items.length) {
+          alert('이 주문에서 복사할 상품이 없습니다.');
+          return;
+        }
+        if (!window.DMJCart) {
+          alert('장바구니 모듈을 불러오지 못했습니다.');
+          return;
+        }
+        // 기존 cart 와 섞이지 않도록 cart 가 비어 있지 않으면 확인.
+        var cur = window.DMJCart.getItems ? window.DMJCart.getItems() : [];
+        if (cur.length > 0) {
+          if (!confirm('장바구니에 ' + cur.length + '개 항목이 있습니다. ' +
+            '이 주문의 ' + order.items.length + ' SKU 를 추가로 담을까요? ' +
+            '(취소하면 cart 를 비우지 않습니다)')) return;
+        }
+        try {
+          order.items.forEach(function (it) {
+            window.DMJCart.add({
+              sku: it.sku, qty: it.qty || 1, size: it.size || null
+            });
+          });
+          window.location.href = 'cart.html';
+        } catch (err) {
+          console.warn('[order-restock] failed', err);
+          alert('장바구니에 담는 중 오류가 발생했습니다. 콘솔을 확인해 주세요.');
+        }
       });
     })();
 

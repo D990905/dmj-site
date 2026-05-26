@@ -12,7 +12,7 @@
 <meta name="theme-color" content="#0A2540">
 <meta name="robots" content="noindex,nofollow">
 <title>장바구니 | 단무지공방</title>
-<meta name="description" content="단무지공방 장바구니. 운송비 카테고리별 자동 계산 + 한국 관부가세 포함. 견적 요청 시 1영업일 이내 회신.">
+<meta name="description" content="단무지공방 장바구니. 견적 요청 시 1영업일 이내 회신.">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
 
@@ -135,7 +135,6 @@
   <div class="container">
     <header class="cart-page__header">
       <h1 class="cart-page__title">장바구니</h1>
-      <p class="cart-page__sub">한국 관부가세 (×1.188) 가 SKU 가격에 이미 포함되어 있습니다. 운송비는 카테고리별 자동 계산됩니다.</p>
     </header>
 
     <!-- Logged out banner -->
@@ -155,6 +154,9 @@
       <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
       <h2 class="cart-empty__title">장바구니가 비어 있습니다</h2>
       <p class="cart-empty__lead">제품 페이지에서 <strong>+ 장바구니 담기</strong>를 눌러주세요.</p>
+      <!-- DO_NOT_REVERT (Danny 2026-05-26) — 견적 제출 시 cart 가 자동으로 비워지므로(quote.html:532 DMJCart.clear),
+           최근 견적·주문이 있으면 마이페이지 진행 timeline 으로 안내한다. -->
+      <div id="cart-empty-recent" class="cart-empty-recent" hidden></div>
       <div class="cart-empty__actions">
         <a href="find-my-gear.html" class="btn btn--primary">Find My Gear 추천 받기</a>
         <a href="index.html#brands" class="btn btn--ghost">브랜드 카탈로그 보기</a>
@@ -186,7 +188,6 @@
           </div>
           <ul class="cart-summary__ship-list" id="sum-ship-list"></ul>
         </div>
-        <div class="cart-summary__note">한국 관부가세 (×1.188) 가 SKU 가격에 이미 포함되어 있습니다. 별도 청구 없음.</div>
         <div class="cart-summary__row cart-summary__row--total">
           <span>합계</span>
           <span id="sum-total" class="cart-summary__amt">₩0</span>
@@ -301,7 +302,50 @@
     banner.hidden = true; empty.hidden = true; contents.hidden = true;
 
     if (!loggedIn) { banner.hidden = false; return; }
-    if (!items.length) { empty.hidden = false; return; }
+    if (!items.length) {
+      empty.hidden = false;
+      // §174-A (Danny 2026-05-26) — 견적 제출이 cart 를 비우는 의도된 동작이라,
+      // 사용자가 "내가 담은 게 사라졌나?" 로 오인하지 않도록 최근 주문(orders) 가 있으면
+      // 마이페이지 진행 timeline 으로 가는 banner 를 띄운다. 데이터 손실 X — 상태 이동.
+      try {
+        var rawOrders = window.DMJAuth && window.DMJAuth.getUserData
+          ? window.DMJAuth.getUserData('orders') : null;
+        var orders = rawOrders ? JSON.parse(rawOrders) : [];
+        if (Array.isArray(orders) && orders.length) {
+          var active = orders.filter(function (o) {
+            var s = Number(o.currentStage) || 0;
+            return s >= 1 && s <= 7;
+          });
+          var recentEl = document.getElementById('cart-empty-recent');
+          if (recentEl && active.length) {
+            var n = active.length;
+            var latest = active[active.length - 1];
+            var itemN = (latest.items || []).length;
+            var totalKRW = latest.totalKRW || 0;
+            var totalTxt = totalKRW > 0
+              ? '₩' + totalKRW.toLocaleString('ko-KR') : '';
+            recentEl.innerHTML =
+              '<div class="cart-empty-recent__card">' +
+                '<div class="cart-empty-recent__head">' +
+                  '<strong>진행 중인 견적·주문 ' + n + '건</strong>' +
+                  '<span class="cart-empty-recent__sub">최근 ' + itemN +
+                    ' SKU' + (totalTxt ? ' · ' + totalTxt : '') + '</span>' +
+                '</div>' +
+                '<p class="cart-empty-recent__lead">' +
+                  '견적을 제출하면 장바구니가 자동으로 비워지고, 항목은 ' +
+                  '<strong>마이페이지 → 주문 진행</strong>에서 단계별로 추적됩니다.' +
+                '</p>' +
+                '<div class="cart-empty-recent__actions">' +
+                  '<a href="profile.html#orders" class="btn btn--primary">마이페이지에서 진행 보기 →</a>' +
+                  '<a href="consult.html" class="btn btn--ghost">관리자에게 문의</a>' +
+                '</div>' +
+              '</div>';
+            recentEl.hidden = false;
+          }
+        }
+      } catch (e) { console.warn('[cart] recent orders banner failed', e); }
+      return;
+    }
 
     contents.hidden = false;
     document.getElementById('cart-count-badge').textContent = '· ' + window.DMJCart.getCount() + '개';

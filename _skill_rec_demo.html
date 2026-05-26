@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<!-- 스킬 레벨 추천·동의 카드 — 크롬 미리보기 데모 (Danny 2026-05-22)
+     profile.html 의 #skill-level-rec 카드를 실제 skill-level.js 모듈로 렌더한다.
+     동의/유지 버튼도 실제로 동작한다. QA 미리보기용 — 실제 사이트 흐름에는 포함 X. -->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>스킬 레벨 추천 카드 — 미리보기</title>
+<style>
+  :root {
+    --color-navy: #0A2540;
+    --color-slate: #5a6b7d;
+    --color-sun: #FFB800;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #f4f6f8; color: var(--color-navy);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 60px; }
+  .demo-note {
+    background: #fff7e0; border: 1px solid #f0d98a; border-radius: 10px;
+    padding: 12px 16px; font-size: 13px; color: #7a5c00; margin-bottom: 24px;
+    line-height: 1.6; word-break: keep-all;
+  }
+  .section-card {
+    background: #fff; border-radius: 16px; padding: 24px 26px;
+    box-shadow: 0 1px 3px rgba(10,37,64,0.08);
+  }
+  .section-title {
+    margin: 0 0 4px; font-size: 22px; font-weight: 800; color: var(--color-navy);
+  }
+  .section-sub { margin: 0 0 18px; font-size: 13px; color: var(--color-slate); }
+  .scenario-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .scenario-row button {
+    background: #fff; border: 1.5px solid rgba(10,37,64,0.16); color: var(--color-navy);
+    border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .scenario-row button.active { background: var(--color-navy); color: #fff; border-color: var(--color-navy); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="demo-note">
+    이 화면은 <b>마이페이지(profile.html)</b> 의 "스킬 레벨 재평가 추천 카드" 미리보기입니다.
+    실제 <code>skill-level.js</code> 모듈로 Danny 프로필을 평가해 렌더한 것이며, 아래 동의/유지 버튼도 실제로 동작합니다.
+  </div>
+
+  <div class="section-card">
+    <h2 class="section-title">스킬 진단 결과</h2>
+    <p class="section-sub">마이페이지 · 라이딩 대시보드 데이터 기준 재평가</p>
+
+    <div class="scenario-row">
+      <button data-sc="danny" class="active">Danny (한국 1위 · 라이딩 데이터 3세션)</button>
+      <button data-sc="newuser">신규 사용자 (라이딩 데이터 없음)</button>
+    </div>
+
+    <!-- profile.html 의 #skill-level-rec 와 동일한 카드 호스트 -->
+    <div id="skill-level-rec"></div>
+  </div>
+</div>
+
+<script src="assets/js/skill-level.js"></script>
+<script>
+/* profile.html #skill-level-rec IIFE 와 동일한 렌더 로직 — 데모용으로 발췌. */
+(function () {
+  var host = document.getElementById('skill-level-rec');
+  var SL = window.DMJSkillLevel;
+
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c];
+    });
+  }
+  function metricRow(label, valueText, impliedTier) {
+    var col = SL.TIER_COLOR[impliedTier] || 'var(--color-slate)';
+    return '<div style="display:flex;justify-content:space-between;align-items:baseline;'
+      + 'gap:8px;padding:6px 0;border-bottom:1px solid rgba(10,37,64,0.06)">'
+      + '<span style="font-size:13px;color:var(--color-slate)">' + esc(label) + '</span>'
+      + '<span style="font-size:13px;font-weight:700;color:var(--color-navy)">' + esc(valueText)
+      + (impliedTier ? ' <span style="color:' + col + ';font-weight:800">' + esc(impliedTier) + ' 구간</span>' : '')
+      + '</span></div>';
+  }
+
+  function renderCard(ev) {
+    if (!ev.shouldRecommend) {
+      host.innerHTML = '<div style="border:1px solid rgba(10,37,64,0.14);border-radius:14px;'
+        + 'background:rgba(10,37,64,0.03);padding:16px 20px">'
+        + '<p style="margin:0;font-size:14px;color:var(--color-slate);word-break:keep-all">'
+        + '라이딩 데이터가 아직 없어 추천 카드가 표시되지 않습니다. '
+        + '대시보드에 GPX 세션을 올리면 데이터 기준으로 레벨을 재평가해 드립니다.</p></div>';
+      return;
+    }
+    var e = ev.evidence || {};
+    var rec = ev.recommendation;
+    var recColor = ev.recommendedColor;
+    var curColor = SL.TIER_COLOR[ev.currentLevel] || 'var(--color-slate)';
+    var dir = rec.direction === 'up' ? '상향' : '조정';
+
+    var evHtml = '';
+    if (e.tackEff != null)
+      evHtml += metricRow('택킹 효율 (상위 50% · 바람 보정)', String(e.tackEff), SL.tierFromScore(e.tackEff));
+    if (e.gybeEff != null)
+      evHtml += metricRow('자이빙 효율 (상위 50% · 바람 보정)', String(e.gybeEff), SL.tierFromScore(e.gybeEff));
+    if (e.maxSpeedKt != null)
+      evHtml += metricRow('최고 속도', e.maxSpeedKt + ' kt', SL.tierFromScore(SL.speedScore(e.maxSpeedKt)));
+    if (e.upwindTwa != null)
+      evHtml += metricRow('풍상 각도', e.upwindTwa + '°', SL.tierFromScore(SL.upwindScore(e.upwindTwa)));
+    evHtml += metricRow('분석 범위',
+      e.sessionCount + '개 세션 · 회전 ' + e.maneuverCount + '회'
+      + (e.bothSides ? ' · 양쪽 택 측정' : ' · 한쪽 택만'), '');
+
+    var confPct = Math.round((e.confidence || 0) * 100);
+
+    host.innerHTML = ''
+      + '<div style="border:1.5px solid ' + recColor + ';border-radius:14px;'
+      +   'background:linear-gradient(180deg,rgba(255,184,0,0.06),rgba(255,255,255,0));'
+      +   'padding:20px 22px">'
+      +   '<div style="display:inline-block;font-size:11px;font-weight:800;letter-spacing:0.04em;'
+      +     'color:#fff;background:' + recColor + ';border-radius:999px;padding:4px 12px;margin-bottom:12px">'
+      +     '스킬 레벨 재평가 ' + dir + ' 제안</div>'
+      +   '<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:var(--color-navy);'
+      +     'word-break:keep-all">최근 라이딩 데이터를 분석한 결과, 현재 레벨과 차이가 확인됩니다. '
+      +     '아래 근거를 확인하시고 레벨 변경에 동의하실 수 있습니다.</p>'
+      +   '<div style="display:flex;align-items:center;justify-content:center;gap:16px;'
+      +     'margin:0 0 16px;flex-wrap:wrap">'
+      +     '<div style="text-align:center">'
+      +       '<div style="font-size:11px;color:var(--color-slate);margin-bottom:4px">현재 레벨</div>'
+      +       '<div style="font-size:20px;font-weight:800;color:' + curColor + '">' + esc(ev.currentLevel) + '</div>'
+      +     '</div>'
+      +     '<div style="font-size:22px;color:var(--color-slate)">→</div>'
+      +     '<div style="text-align:center">'
+      +       '<div style="font-size:11px;color:var(--color-slate);margin-bottom:4px">제안 레벨</div>'
+      +       '<div style="font-size:24px;font-weight:900;color:' + recColor + '">' + esc(ev.recommendedLevel) + '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div style="background:rgba(255,255,255,0.7);border-radius:10px;padding:10px 14px;margin-bottom:14px">'
+      +     '<div style="font-size:12px;font-weight:800;color:var(--color-navy);margin-bottom:4px">근거 데이터</div>'
+      +     evHtml
+      +     '<div style="margin-top:8px;font-size:12px;color:var(--color-slate)">'
+      +       '신뢰도 <b style="color:var(--color-navy)">' + esc(rec.strength) + ' (' + confPct + '%)</b></div>'
+      +   '</div>'
+      +   '<div style="display:flex;gap:10px;flex-wrap:wrap">'
+      +     '<button type="button" id="skill-rec-agree" '
+      +       'style="flex:1;min-width:160px;background:' + recColor + ';color:#fff;border:none;'
+      +       'border-radius:9px;padding:12px 16px;font-size:14px;font-weight:800;cursor:pointer">'
+      +       '동의 — ' + esc(ev.recommendedLevel) + '(으)로 변경</button>'
+      +     '<button type="button" id="skill-rec-keep" '
+      +       'style="flex:0 0 auto;background:transparent;color:var(--color-slate);'
+      +       'border:1.5px solid rgba(10,37,64,0.18);border-radius:9px;padding:12px 20px;'
+      +       'font-size:14px;font-weight:700;cursor:pointer">현재 레벨 유지</button>'
+      +   '</div>'
+      + '</div>';
+
+    document.getElementById('skill-rec-agree').addEventListener('click', function () {
+      host.innerHTML = '<div style="border:1.5px solid ' + recColor + ';border-radius:14px;'
+        + 'background:rgba(255,184,0,0.08);padding:16px 20px">'
+        + '<p style="margin:0;font-size:14px;font-weight:700;color:var(--color-navy);word-break:keep-all">'
+        + '스킬 레벨이 <b style="color:' + recColor + '">' + esc(ev.recommendedLevel)
+        + '</b>(으)로 변경되었습니다. 라이딩 데이터가 쌓이면 다시 검토해 드립니다.</p></div>';
+    });
+    document.getElementById('skill-rec-keep').addEventListener('click', function () {
+      host.innerHTML = '<div style="border:1px solid rgba(10,37,64,0.14);border-radius:14px;'
+        + 'background:rgba(10,37,64,0.03);padding:16px 20px">'
+        + '<p style="margin:0;font-size:14px;color:var(--color-slate);word-break:keep-all">'
+        + '현재 레벨 <b style="color:var(--color-navy)">' + esc(ev.currentLevel)
+        + '</b>(을)를 유지합니다. 다음 라이딩이 분석되면 다시 제안해 드립니다.</p></div>';
+    });
+  }
+
+  function run(scenario) {
+    var ev;
+    if (scenario === 'newuser') {
+      // 5점 만족도 척도 (0 매우불만족 ~ 4 매우만족)
+      ev = SL.evaluate({ currentLevel: '중급', sessions: [], survey: { indices: [2,2,3,2,1,2,2,2,2,1] } });
+    } else {
+      ev = SL.evaluate({
+        currentLevel: '중급',
+        sessions: SL.makeDannySessions(),
+        survey: { indices: [3,3,3,3,2,3,3,2,2,1] }
+      });
+    }
+    renderCard(ev);
+  }
+
+  document.querySelectorAll('.scenario-row button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.scenario-row button').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      run(btn.getAttribute('data-sc'));
+    });
+  });
+
+  run('danny');
+})();
+</script>
+</body>
+</html>

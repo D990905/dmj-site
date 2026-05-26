@@ -6533,31 +6533,37 @@ p {
    변경 시 Danny 명시 승인 필수.
    ========================================================================== */
 
-/* --- Nav cart icon + badge --- */
+/* --- Nav cart icon + badge — Danny 2026-05-26 시인성 강화 (사이즈·기본 배경·SVG stroke) --- */
 .nav__cart {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
-  color: rgba(255, 255, 255, 0.92);
-  transition: background 0.15s ease;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.15s ease, transform 0.1s ease;
 }
-.nav__cart:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-.nav__cart--active { background: rgba(255, 184, 0, 0.16); }
+.nav__cart:hover { background: rgba(255, 255, 255, 0.22); color: #fff; transform: translateY(-1px); }
+.nav__cart--active { background: rgba(255, 184, 0, 0.28); color: #fff; }
+.nav__cart svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.4;
+}
 .nav__cart-badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
+  top: -4px;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
   border-radius: 999px;
   background: var(--color-sun);
   color: var(--color-navy);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
@@ -6565,8 +6571,113 @@ p {
   line-height: 1;
   letter-spacing: 0;
   border: 2px solid var(--color-navy);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
 }
 .nav__cart-badge[hidden] { display: none !important; }
+
+/* --- Cart empty: recent orders banner (Danny 2026-05-26) --- */
+.cart-empty-recent { margin: 18px 0 20px; }
+.cart-empty-recent__card {
+  border: 1px solid rgba(31, 143, 255, 0.28);
+  background: linear-gradient(180deg, rgba(31, 143, 255, 0.06), rgba(31, 143, 255, 0.02));
+  border-radius: 12px;
+  padding: 16px 18px;
+  text-align: left;
+}
+.cart-empty-recent__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 6px;
+}
+.cart-empty-recent__head strong { color: var(--color-navy); font-size: 15px; }
+.cart-empty-recent__sub { color: #5C6F7E; font-size: 13px; }
+.cart-empty-recent__lead {
+  color: #324052;
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+.cart-empty-recent__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --- Order detail: 현재 단계 강조 banner + 다시 담기 (Danny 2026-05-26) --- */
+.order-stage-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 12px 0 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(31,143,255,0.12), rgba(31,143,255,0.04));
+  border: 1px solid rgba(31,143,255,0.30);
+}
+.order-stage-banner__num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-sea);
+  line-height: 1;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.order-stage-banner__cap {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5C6F7E;
+  margin-bottom: 2px;
+}
+.order-stage-banner__label {
+  font-size: 18px;
+  color: var(--color-navy);
+}
+/* 견적 단계(1-2) 파랑, 입금·주문(3-4) 노랑, 통관·배송(5-7) 초록, 완료(8) 진녹 */
+.order-stage-banner[data-stage="1"],
+.order-stage-banner[data-stage="2"] {
+  background: linear-gradient(180deg, rgba(31,143,255,0.14), rgba(31,143,255,0.04));
+  border-color: rgba(31,143,255,0.32);
+}
+.order-stage-banner[data-stage="3"],
+.order-stage-banner[data-stage="4"] {
+  background: linear-gradient(180deg, rgba(255,184,0,0.18), rgba(255,184,0,0.04));
+  border-color: rgba(255,184,0,0.4);
+}
+.order-stage-banner[data-stage="3"] .order-stage-banner__num,
+.order-stage-banner[data-stage="4"] .order-stage-banner__num { color: #C97A00; }
+.order-stage-banner[data-stage="5"],
+.order-stage-banner[data-stage="6"],
+.order-stage-banner[data-stage="7"] {
+  background: linear-gradient(180deg, rgba(31,160,85,0.14), rgba(31,160,85,0.04));
+  border-color: rgba(31,160,85,0.32);
+}
+.order-stage-banner[data-stage="5"] .order-stage-banner__num,
+.order-stage-banner[data-stage="6"] .order-stage-banner__num,
+.order-stage-banner[data-stage="7"] .order-stage-banner__num { color: #1FA055; }
+.order-stage-banner[data-stage="8"] {
+  background: linear-gradient(180deg, rgba(31,160,85,0.22), rgba(31,160,85,0.08));
+  border-color: rgba(31,160,85,0.45);
+}
+.order-stage-banner[data-stage="8"] .order-stage-banner__num { color: #1FA055; }
+
+.order-detail__edit {
+  margin: 14px 0 4px;
+  padding: 12px 14px;
+  background: #F7FAFC;
+  border-radius: 10px;
+  border: 1px solid rgba(10,37,64,0.08);
+}
+.order-detail__edit-note {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #5C6F7E;
+  line-height: 1.55;
+}
+.order-restock-btn { font-weight: 700; }
 
 /* --- Cart page --- */
 .cart-page,
