@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iOS click test</title>
+<style>
+body { font-family: -apple-system, sans-serif; padding: 20px; line-height: 1.6; }
+.btn { display:block; width: 100%; padding: 16px; margin: 12px 0; background: #FFB800; color: #0A2540; text-decoration:none; border:none; border-radius: 8px; font-size: 16px; font-weight: 700; text-align: center; cursor: pointer; }
+.btn:active { opacity: 0.7; }
+.log { background: #f0f0f0; padding: 12px; margin-top: 20px; border-radius: 6px; font-size: 13px; font-family: monospace; white-space: pre-wrap; min-height: 100px; }
+</style>
+</head>
+<body>
+<h1>iOS click test (no scripts from main site)</h1>
+<p>This page has NO service workers, NO main site scripts. Pure click test.</p>
+
+<a class="btn" href="https://www.google.com">A. Link to google (a href)</a>
+<button class="btn" id="b">B. JS button (onclick log)</button>
+<div class="btn" id="c">C. DIV with click handler</div>
+<a class="btn" href="index.html">D. Link to home (a href)</a>
+
+<div class="log" id="log">tap one of the buttons above; this log will show events
+[load] ready: <span id="ready"></span></div>
+
+<script>
+(function(){
+  document.getElementById('ready').textContent = new Date().toISOString();
+  var log = document.getElementById('log');
+  function add(s){ log.textContent += '\n' + s; }
+  document.getElementById('b').addEventListener('click', function(){ add('[B click] '+ new Date().toISOString()); });
+  document.getElementById('c').addEventListener('click', function(){ add('[C click] '+ new Date().toISOString()); });
+  document.addEventListener('touchstart', function(e){ add('[touchstart] target='+ (e.target.tagName) + '#' + (e.target.id||'') ); }, {passive:true});
+  document.addEventListener('touchend',   function(e){ add('[touchend  ] target='+ (e.target.tagName) + '#' + (e.target.id||'') ); }, {passive:true});
+
+  // Unregister any service workers (cleanup safety)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      add('[sw] regs found: '+ regs.length);
+      regs.forEach(function(r){ add('[sw] '+ (r.active && r.active.scriptURL || 'unknown')); });
+    });
+  }
+})();
+</script>
+</body>
+</html>
