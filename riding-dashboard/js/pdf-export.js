@@ -216,18 +216,21 @@
   var STYLE_ID = 'rd-pdf-style';
   function injectPdfStyle() {
     if ($(STYLE_ID)) return;
-    /* #rd-pdf-root 위치 — Danny 2026-05-27 §174 PDF 백지 fix.
-       이전: position:fixed; left:-10000px → html2canvas 가 fixed +
-       off-screen 요소를 capture 할 때 빈 canvas 를 반환하는 알려진
-       버그(eKoopmans/html2pdf.js#422)로 PDF 가 백지로 나왔다.
-       해결: position:absolute 로 document flow 외부에 두되, left:0/top:0
-       에 배치 후 z-index:-9999 + opacity:0 으로 시각적으로만 가린다.
-       opacity:0 은 html2canvas 의 clone-and-render 파이프라인에서
-       무시되므로(cloned doc 의 inline style 로 override) PDF 출력에는
-       영향 없다. windowWidth:794 가 layout 의 컨텍스트를 잡아준다. */
+    /* #rd-pdf-root 위치 — Danny 2026-05-27 §174 (수정 §176) PDF 백지 fix.
+       히스토리:
+         v1 (broken): position:fixed; left:-10000px
+            → html2canvas#422 known bug, off-screen fixed = blank PDF.
+         v2 (still broken): position:absolute; left:0; top:0; opacity:0
+            → opacity:0 이 html2canvas 의 capture pipeline 에서 무시되지
+              않고 그대로 적용되어 PDF 가 876 bytes (거의 빈) 로 나옴.
+         v3 (this — Danny 2026-05-27 §176): position:absolute + top:-99999px.
+            요소는 fully visible (opacity:1, no z-index trick) 상태로
+            layout 을 정상적으로 잡지만, 뷰포트 위쪽으로 멀리 떨어져
+            사용자는 못 본다. 음수 LEFT 와 달리 음수 TOP 은 html2canvas
+            의 viewport-based capture 와 충돌 없이 정상 동작한다. */
     var css = ""
-      + "#rd-pdf-root{position:absolute;left:0;top:0;width:794px;"
-      +   "z-index:-9999;opacity:0;pointer-events:none;"
+      + "#rd-pdf-root{position:absolute;left:0;top:-99999px;width:794px;"
+      +   "pointer-events:none;"
       +   "background:#FFFFFF;color:#0A2540;"
       +   "font-family:'Pretendard',system-ui,-apple-system,sans-serif;"
       +   "font-weight:400;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased}"
@@ -836,21 +839,17 @@
                   'font-family',
                   "'Pretendard',system-ui,-apple-system,sans-serif",
                   'important');
-                /* Danny 2026-05-27 §174 — 원본 #rd-pdf-root 은 opacity:0
-                   으로 화면에서 가려져 있다. cloned doc 에서는 opacity 를
-                   복원해야 html2canvas 가 실제 픽셀을 그릴 수 있다.
-                   transform/position 도 일반 흐름으로 복원 — fixed/translateX
-                   같은 hide 트릭이 cloned 에 누설되면 bounding rect 가
-                   여전히 off-screen 으로 잡혀 백지 PDF 가 되돌아온다. */
+                /* Danny 2026-05-27 §176 — 원본 #rd-pdf-root 은
+                   top:-99999px 로 뷰포트 위로 빠져 있다. cloned doc 에서는
+                   top 을 정상화해서 html2canvas 가 (0,0) 기준으로 캡쳐할 수
+                   있게 한다. opacity/z-index trick 은 더 이상 사용 안 함. */
                 var pdfRoot = clonedDoc.getElementById('rd-pdf-root');
                 if (pdfRoot) {
-                  pdfRoot.style.setProperty('opacity', '1', 'important');
                   pdfRoot.style.setProperty('position', 'static', 'important');
                   pdfRoot.style.setProperty('left', 'auto', 'important');
                   pdfRoot.style.setProperty('top', 'auto', 'important');
-                  pdfRoot.style.setProperty('z-index', 'auto', 'important');
-                  pdfRoot.style.setProperty('pointer-events', 'auto', 'important');
                   pdfRoot.style.setProperty('transform', 'none', 'important');
+                  pdfRoot.style.setProperty('pointer-events', 'auto', 'important');
                 }
               } catch (e) { /* noop */ }
             }

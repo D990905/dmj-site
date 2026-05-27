@@ -33,18 +33,18 @@ retry_git "git add -A" || { echo "ABORT: git add failed"; read -n 1; exit 1; }
 
 echo ""
 echo "==> Committing..."
-git commit -m "§175 — 라이딩 오버랩 toggle + click-to-map UX fix
+git commit -m "§176 — PDF blank fix v3 (opacity:0 → top:-99999px)
 
-- HR trend chart speed overlay now OFF by default (clean HR-only view).
-  Added '심박만 | 라이딩 오버랩' toggle next to elapsed/clock toggle.
-  state.hrShowSpeed drives renderHrChart includeSpeed option.
-  Card hint text adapts to mode ('우측 축 = 속도' only when overlay on).
+Previous §174 fix (position:absolute + opacity:0 + z-index:-9999 + onclone
+opacity:1 restoration) still produced 876-byte (essentially blank) PDFs.
+html2canvas's clone-and-render pipeline doesn't reliably override opacity
+even with onclone setProperty(opacity, 1, important).
 
-- Click-to-map jump now also smooth-scrolls the map card into view when
-  it's less than 35% visible in the viewport. Function was already wired
-  correctly (verified: panMapToLatLng received correct lat/lng) but user
-  couldn't see map change because it was scrolled out above the chart.
-  Now clicking the chart deterministically brings the map into view." 2>&1 || echo "(maybe nothing to commit)"
+Switching to top:-99999px keeps element fully visible (opacity:1, no z-index
+trick) with proper layout, but positioned far above the viewport so the user
+can't see it. Unlike negative LEFT (which breaks html2canvas#422), negative
+TOP is well-supported by html2canvas. onclone callback now only normalizes
+position to static for clean capture, no opacity restoration needed." 2>&1 || echo "(maybe nothing to commit)"
 
 echo ""
 echo "==> Pushing to origin/main (with retry)..."
