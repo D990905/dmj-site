@@ -33,18 +33,25 @@ retry_git "git add -A" || { echo "ABORT: git add failed"; read -n 1; exit 1; }
 
 echo ""
 echo "==> Committing..."
-git commit -m "§176 — PDF blank fix v3 (opacity:0 → top:-99999px)
+git commit -m "§177 — PDF blank fix v4 — replace html2pdf bundle with standalone html2canvas + jsPDF
 
-Previous §174 fix (position:absolute + opacity:0 + z-index:-9999 + onclone
-opacity:1 restoration) still produced 876-byte (essentially blank) PDFs.
-html2canvas's clone-and-render pipeline doesn't reliably override opacity
-even with onclone setProperty(opacity, 1, important).
+Root cause finally identified: html2pdf.js 0.10.1's bundled html2canvas
+returns blank canvases in modern Chrome (PDF output always ~3KB regardless
+of input — confirmed even with simple test div). Standalone html2canvas
+1.4.1 loaded from same CDN captures the SAME element correctly. Library
+bundle is broken, not our CSS/positioning.
 
-Switching to top:-99999px keeps element fully visible (opacity:1, no z-index
-trick) with proper layout, but positioned far above the viewport so the user
-can't see it. Unlike negative LEFT (which breaks html2canvas#422), negative
-TOP is well-supported by html2canvas. onclone callback now only normalizes
-position to static for clean capture, no opacity restoration needed." 2>&1 || echo "(maybe nothing to commit)"
+Solution:
+  - Remove html2pdf dependency entirely.
+  - Lazy-load standalone html2canvas 1.4.1 + jsPDF 2.5.1 from cdnjs.
+  - Capture each .pdf-page individually (scale: 1.5) — sequential
+    Promise chain for memory safety.
+  - Compose PDF via jsPDF.addImage + addPage per page.
+  - onclone still applies Pretendard font for Korean rendering.
+
+Also reverted #rd-pdf-root CSS to position:absolute + top:-99999px (clean
+hide without opacity tricks). The new per-page renderer doesn't need any
+position normalization in onclone." 2>&1 || echo "(maybe nothing to commit)"
 
 echo ""
 echo "==> Pushing to origin/main (with retry)..."

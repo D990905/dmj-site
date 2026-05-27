@@ -958,12 +958,30 @@
      쓴다(예: '12.34 kt' → suffix=' kt', target=12.34).
      2026-05-26 Layer 1.5: opts.spark — 시계열 배열을 받으면 미니 sparkline
      SVG 를 타일 하단에 그린다. opts.trend — { delta, label, dir } chip 표시.
-     opts.color — sparkline 그라데이션 hex 색 (기본 sea). */
+     opts.color — sparkline 그라데이션 hex 색 (기본 sea).
+     opts.donutPct — 0~100 진행 도넛 표시 (성공률·효율 같은 % 지표).
+     opts.donutColor — 도넛 진행 색. donutPct 있으면 sparkline 대신
+     도넛이 값 옆에 배치된다(타일 안 split 레이아웃). */
   function statTile(label, value, sub, opts) {
     var valHtml = numHtml(value);
+    var trendHtml = (opts && opts.trend) ? trendChip(opts.trend) : '';
+    /* 도넛 % 지표 모드 — 값 옆에 미니 도넛 (Layer 1.5) */
+    if (opts && opts.donutPct != null && isFinite(opts.donutPct)) {
+      var dColor = opts.donutColor ||
+        (opts.donutPct >= 70 ? '#27AE60' :
+         opts.donutPct >= 40 ? '#E0A100' : '#C0392B');
+      return '<div class="stat stat--with-donut">' +
+        '<span class="stat__label">' + label +
+        (trendHtml ? trendHtml : '') + '</span>' +
+        '<div class="stat__donutrow">' +
+        donutSvg(opts.donutPct, 100, dColor, { size: 64, stroke: 7 }) +
+        '<div class="stat__donutmeta">' +
+        '<span class="stat__value stat__value--donut">' + valHtml + '</span>' +
+        (sub ? '<span class="stat__sub">' + sub + '</span>' : '') +
+        '</div></div></div>';
+    }
     var sparkHtml = (opts && opts.spark)
       ? sparklineSvg(opts.spark, opts.color || '#1F8FFF') : '';
-    var trendHtml = (opts && opts.trend) ? trendChip(opts.trend) : '';
     return '<div class="stat"><span class="stat__label">' + label +
       (trendHtml ? trendHtml : '') + '</span>' +
       '<span class="stat__value">' + valHtml + '</span>' +
@@ -1099,15 +1117,69 @@
     var s = state.analysis.summary;
     var foiling = SPORTS[state.sport].foiling;
     var u = unitLabel();
-    // 단위는 카드 제목(괄호)에, 값은 숫자만 — 일관 표기
-    var html = statTile('총 거리 (km)', (s.totalDistanceM / 1000).toFixed(2));
+
+    /* Layer 1.5 — KPI 시계열 미니 sparkline 데이터 추출.
+       state.session.samples 의 속도·거리 progression 을 100점 이하로 균등
+       추출한다. 분석에 영향 없는 시각 전용 (Danny 2026-05-26). */
+    var sparkSpeed = [], sparkCum = [];
+    var totalSec = 0, sCount = 0;
+    if (state.session && state.session.samples && state.session.hasTime) {
+      var samps = state.session.samples;
+      var stride = Math.max(1, Math.floor(samps.length / 80));
+      for (var i = 0; i < samps.length; i += stride) {
+        var sp = samps[i].speed;
+        if (sp != null && isFinite(sp)) sparkSpeed.push(sp);
+        sparkCum.push(samps[i].cumDist || 0);
+      }
+      sCount = sparkCum.length;
+    }
+
+    /* 트렌드 chip — 저장된 세션이 있으면 이전 세션 대비 비교 (Layer 1.5).
+       Storage.loadSessions 가 시간 역순 정렬 가정. 이번 세션과 동일 시그니처는
+       제외한다(다시 보기 시 자기 자신과 비교 방지). */
+    function deltaTrend(prevVal, curVal, unit) {
+      if (prevVal == null || !isFinite(prevVal) || prevVal === 0) return null;
+      var pct = ((curVal - prevVal) / prevVal) * 100;
+      return { delta: pct, label: 'vs 이전', dir: pct >= 0 ? 'good' : 'bad', unit: '%' };
+    }
+    var prev = null;
+    try {
+      if (window.Storage && Storage.listSessions) {
+        var sessions = Storage.listSessions() || [];
+        /* listSessions 는 dateEpoch 오름차순. 현재 세션 startEpoch 와 다른
+           가장 최근(끝쪽) 세션을 비교 대상으로. ±10초 이내는 same 세션 간주. */
+        var curEp = state.session.startEpoch || 0;
+        for (var p = sessions.length - 1; p >= 0; p--) {
+          if (Math.abs((sessions[p].dateEpoch || 0) - curEp) > 10000) {
+            prev = sessions[p]; break;
+          }
+        }
+      }
+    } catch (e) { /* noop — 시각 chip 만 영향 */ }
+
+    var html = statTile('총 거리 (km)',
+      (s.totalDistanceM / 1000).toFixed(2),
+      null,
+      { spark: sparkCum,
+        trend: prev ? deltaTrend(prev.distanceM / 1000, s.totalDistanceM / 1000) : null,
+        color: '#1F8FFF' });
     if (s.hasTime) {
       html += statTile('이동 시간 (min:sec)', fmtDur(s.movingTimeSec),
-        '전체 ' + fmtDur(s.totalDurationSec));
-      html += statTile('최고 속도 (' + u + ')', fmtSpeed(s.maxSpeedMs), '2초 구간 최고');
-      html += statTile('평균 속도 (' + u + ')', fmtSpeed(s.avgSpeedMovingMs), '이동 중');
+        '전체 ' + fmtDur(s.totalDurationSec),
+        { trend: prev ? deltaTrend(prev.movingTimeSec, s.movingTimeSec) : null });
+      html += statTile('최고 속도 (' + u + ')', fmtSpeed(s.maxSpeedMs),
+        '2초 구간 최고',
+        { spark: sparkSpeed,
+          trend: prev ? deltaTrend(prev.maxSpeedMs, s.maxSpeedMs) : null,
+          color: '#EF7D00' });
+      html += statTile('평균 속도 (' + u + ')', fmtSpeed(s.avgSpeedMovingMs),
+        '이동 중',
+        { spark: sparkSpeed,
+          trend: prev ? deltaTrend(prev.avgSpeedMovingMs, s.avgSpeedMovingMs) : null,
+          color: '#1F8FFF' });
       html += statTile((foiling ? '포일링' : '플레이닝') + ' 시간 (min:sec)',
-        fmtDur(s.activeTimeSec), Math.round(s.activeRatio * 100) + '% 비율');
+        fmtDur(s.activeTimeSec),
+        Math.round(s.activeRatio * 100) + '% 비율');
     }
     html += statTile('풍향 (°)',
       state.windDir != null ? String(state.windDir) : '미입력',
@@ -2376,11 +2448,16 @@
     var stats = statTile('전체 회전', ms.total + ' times');
     if (state.windDir != null) {
       stats += statTile('택킹 횟수', ms.tack + ' times');
+      /* 성공률 — 미니 도넛 + 숫자 (Layer 1.5 — Danny 2026-05-26) */
       stats += statTile(tipLabel('택킹 성공률', SUCCESS_TIP),
-        pctTile(ms.tackSuccessRate), successSub(ms.tackSuccess, ms.tackSuccessTotal));
+        pctTile(ms.tackSuccessRate),
+        successSub(ms.tackSuccess, ms.tackSuccessTotal),
+        { donutPct: ms.tackSuccessRate });
       stats += statTile('자이빙 횟수', ms.gybe + ' times');
       stats += statTile(tipLabel('자이빙 성공률', SUCCESS_TIP),
-        pctTile(ms.gybeSuccessRate), successSub(ms.gybeSuccess, ms.gybeSuccessTotal));
+        pctTile(ms.gybeSuccessRate),
+        successSub(ms.gybeSuccess, ms.gybeSuccessTotal),
+        { donutPct: ms.gybeSuccessRate });
     } else {
       stats += statTile('택킹 / 자이빙', '풍향 필요', '풍향 입력 시 분류');
     }

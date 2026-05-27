@@ -26,12 +26,21 @@
   'use strict';
 
   /* ============================================================
-   * CDN URLs — 결정 근거는 spec 문서 참조.
-   *  - html2pdf.js 0.10.1 = jsPDF + html2canvas 번들 (cdnjs, 130KB)
-   *  - Pretendard 1.3.9 = 한국어·라틴 일관 (jsdelivr GitHub raw, 38KB subset)
+   * CDN URLs — Danny 2026-05-27 §177 PDF 백지 fix v4 (라이브러리 교체).
+   *  이전: html2pdf.js 0.10.1 (jsPDF + html2canvas 번들).
+   *    문제 — 0.10.1 의 내장 html2canvas 가 빈 canvas 를 반환해 PDF 가
+   *    876~3048 bytes (사실상 백지) 로 나옴. CDN 으로 같은 환경에서
+   *    standalone html2canvas 1.4.1 을 따로 로드해 같은 element 를
+   *    캡쳐하니 정상 PNG (5710+ bytes) — 즉 html2pdf 번들 문제 확정.
+   *  해결 — html2pdf 의존성 제거. standalone html2canvas 1.4.1 +
+   *    jsPDF 2.5.1 을 직접 로드해서 page 단위로 캡쳐 후 jsPDF.addImage
+   *    + addPage 로 합쳐서 blob 생성. 더 안정적이고 control 도 더 좋다.
+   *  - Pretendard 1.3.9 = 한국어·라틴 일관 (그대로 유지)
    * ============================================================ */
-  var HTML2PDF_CDN =
-    'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+  var HTML2CANVAS_CDN =
+    'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  var JSPDF_CDN =
+    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
   var PRETENDARD_REG =
     'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/' +
     'packages/pretendard/dist/web/static/woff2/Pretendard-Regular.woff2';
@@ -56,24 +65,38 @@
   }
 
   /* ============================================================
-   * Lazy loader — script & font 1회만 로드
+   * Lazy loader — script & font 1회만 로드 (Danny 2026-05-27 §177).
+   * html2canvas + jsPDF 를 각각 따로 로드. html2pdf 번들 대신 standalone.
    * ============================================================ */
-  var _libPromise = null;
-  function ensureHtml2Pdf() {
-    if (global.html2pdf) return Promise.resolve(global.html2pdf);
-    if (_libPromise) return _libPromise;
-    _libPromise = new Promise(function (resolve, reject) {
+  function _loadScript(src, globalCheck) {
+    return new Promise(function (resolve, reject) {
       var s = document.createElement('script');
-      s.src = HTML2PDF_CDN;
+      s.src = src;
       s.async = true;
       s.onload = function () {
-        if (global.html2pdf) resolve(global.html2pdf);
-        else reject(new Error('html2pdf loaded but global undefined'));
+        var g = globalCheck();
+        if (g) resolve(g);
+        else reject(new Error('Script loaded but global undefined: ' + src));
       };
-      s.onerror = function () { reject(new Error('html2pdf CDN load failed')); };
+      s.onerror = function () { reject(new Error('CDN load failed: ' + src)); };
       document.head.appendChild(s);
     });
-    return _libPromise;
+  }
+  var _h2cPromise = null;
+  function ensureH2C() {
+    if (global.html2canvas) return Promise.resolve(global.html2canvas);
+    if (_h2cPromise) return _h2cPromise;
+    _h2cPromise = _loadScript(HTML2CANVAS_CDN, function () { return global.html2canvas; });
+    return _h2cPromise;
+  }
+  var _jspdfPromise = null;
+  function ensureJsPDF() {
+    if (global.jspdf && global.jspdf.jsPDF) return Promise.resolve(global.jspdf.jsPDF);
+    if (_jspdfPromise) return _jspdfPromise;
+    _jspdfPromise = _loadScript(JSPDF_CDN, function () {
+      return global.jspdf && global.jspdf.jsPDF;
+    });
+    return _jspdfPromise;
   }
 
   var _fontInjected = false;
@@ -808,6 +831,50 @@
     showStatus._t = setTimeout(function () { t.hidden = true; }, 3200);
   }
 
+  /* §177 — page-by-page renderer (html2canvas + jsPDF 직접 사용).
+     buildPdfRoot 결과의 각 .pdf-page 를 개별 html2canvas 로 캡쳐 후
+     jsPDF.addImage + addPage 로 PDF blob 을 직접 조립한다. */
+  function renderPdfBlob(rootEl) {
+    var pages = rootEl.querySelectorAll('.pdf-page');
+    if (!pages.length) return Promise.reject(new Error('no .pdf-page elements'));
+    var jsPDFCtor = global.jspdf.jsPDF;
+    var pdf = new jsPDFCtor({
+      unit: 'pt', format: 'a4', orientation: 'portrait', compress: true
+    });
+    var pageW = pdf.internal.pageSize.getWidth();   // 595.28
+    var pageH = pdf.internal.pageSize.getHeight();  // 841.89
+    /* page 를 1개씩 순차 캡쳐 — 메모리 / 안정성 모두 page-by-page 가 유리.
+       Promise chain 으로 sequential 처리. */
+    var p = Promise.resolve();
+    for (var i = 0; i < pages.length; i++) {
+      (function (pageEl, idx) {
+        p = p.then(function () {
+          return global.html2canvas(pageEl, {
+            scale: 1.5,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#FFFFFF',
+            logging: false,
+            windowWidth: 794,
+            onclone: function (clonedDoc) {
+              try {
+                clonedDoc.documentElement.style.setProperty(
+                  'font-family',
+                  "'Pretendard',system-ui,-apple-system,sans-serif",
+                  'important');
+              } catch (e) { /* noop */ }
+            }
+          }).then(function (canvas) {
+            var imgData = canvas.toDataURL('image/jpeg', 0.92);
+            if (idx > 0) pdf.addPage('a4', 'portrait');
+            pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
+          });
+        });
+      })(pages[i], i);
+    }
+    return p.then(function () { return pdf.output('blob'); });
+  }
+
   function generate(opts) {
     opts = opts || {};
     var ds = $('dashboard-view');
@@ -817,54 +884,13 @@
     }
 
     showStatus(T('PDF 보고서 생성 중…'));
-    return Promise.all([ensureHtml2Pdf(), ensurePretendard()])
+    return Promise.all([ensureH2C(), ensureJsPDF(), ensurePretendard()])
       .then(function () { return buildPdfRoot(); })
       .then(function (built) {
         var filename = buildFilename(built.meta);
-        var pdfOpts = {
-          margin: 0,
-          filename: filename,
-          image: { type: 'jpeg', quality: 0.94 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: '#FFFFFF',
-            letterRendering: true,
-            logging: false,
-            windowWidth: 794,
-            onclone: function (clonedDoc) {
-              try {
-                clonedDoc.documentElement.style.setProperty(
-                  'font-family',
-                  "'Pretendard',system-ui,-apple-system,sans-serif",
-                  'important');
-                /* Danny 2026-05-27 §176 — 원본 #rd-pdf-root 은
-                   top:-99999px 로 뷰포트 위로 빠져 있다. cloned doc 에서는
-                   top 을 정상화해서 html2canvas 가 (0,0) 기준으로 캡쳐할 수
-                   있게 한다. opacity/z-index trick 은 더 이상 사용 안 함. */
-                var pdfRoot = clonedDoc.getElementById('rd-pdf-root');
-                if (pdfRoot) {
-                  pdfRoot.style.setProperty('position', 'static', 'important');
-                  pdfRoot.style.setProperty('left', 'auto', 'important');
-                  pdfRoot.style.setProperty('top', 'auto', 'important');
-                  pdfRoot.style.setProperty('transform', 'none', 'important');
-                  pdfRoot.style.setProperty('pointer-events', 'auto', 'important');
-                }
-              } catch (e) { /* noop */ }
-            }
-          },
-          jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait',
-                   compress: true, putOnlyUsedFonts: true },
-          pagebreak: { mode: ['css', 'legacy'], avoid: '.pdf-block' }
-        };
-
-        var worker = global.html2pdf().set(pdfOpts).from(built.root);
-
-        if (opts.share && navigator.canShare) {
-          // Web Share API 분기
-          return worker.outputPdf('blob').then(function (blob) {
-            cleanup(built.root);
+        return renderPdfBlob(built.root).then(function (blob) {
+          cleanup(built.root);
+          if (opts.share && navigator.canShare) {
             var file = new File([blob], filename, { type: 'application/pdf' });
             if (navigator.canShare({ files: [file] })) {
               return navigator.share({
@@ -881,30 +907,21 @@
                   return { shared: false, aborted: true, filename: filename,
                            totalPages: built.totalPages, blob: blob };
                 }
-                // Share 실패 → 다운로드 폴백
                 return downloadBlob(blob, filename).then(function () {
                   return { shared: false, downloaded: true, filename: filename,
                            totalPages: built.totalPages, blob: blob };
                 });
               });
-            } else {
-              return downloadBlob(blob, filename).then(function () {
-                return { shared: false, downloaded: true, filename: filename,
-                         totalPages: built.totalPages, blob: blob };
-              });
             }
-          });
-        }
-
-        // 다운로드 only — outputPdf 로 blob 받고 다운로드.
-        // (worker.save() 는 IE 호환 코드가 일부 모바일에서 트리거되지 않는 경우 있어 명시적 blob 사용)
-        return worker.outputPdf('blob').then(function (blob) {
-          cleanup(built.root);
+          }
           return downloadBlob(blob, filename).then(function () {
             showStatus(T('PDF 다운로드 완료'), 'ok');
             return { downloaded: true, filename: filename,
                      totalPages: built.totalPages, blob: blob };
           });
+        }).catch(function (err) {
+          cleanup(built.root);
+          throw err;
         });
       })
       .catch(function (err) {
@@ -953,10 +970,10 @@
   function selftest() {
     return new Promise(function (resolve) {
       var results = { pass: [], fail: [] };
-      // 1. 라이브러리 로드
-      ensureHtml2Pdf().then(function () {
-        results.pass.push('html2pdf loaded');
-      }).catch(function () { results.fail.push('html2pdf load failed'); })
+      // 1. 라이브러리 로드 — html2canvas + jsPDF (각각 따로)
+      Promise.all([ensureH2C(), ensureJsPDF()]).then(function () {
+        results.pass.push('html2canvas + jsPDF loaded');
+      }).catch(function () { results.fail.push('html2canvas/jsPDF load failed'); })
 
       // 2. 폰트 로드
       .then(function () { return ensurePretendard(); })
@@ -1005,7 +1022,7 @@
     _selftest: selftest,
     _buildPdfRoot: buildPdfRoot,   // 디버그용
     _ensure: function () {
-      return Promise.all([ensureHtml2Pdf(), ensurePretendard()]);
+      return Promise.all([ensureH2C(), ensureJsPDF(), ensurePretendard()]);
     }
   };
 })(typeof window !== 'undefined' ? window : globalThis);

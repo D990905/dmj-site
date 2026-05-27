@@ -383,14 +383,27 @@
       }
     };
 
+    /* Layer 1.5 — 속도 시계열 fill 을 그라데이션으로 강화 (Danny 2026-05-26).
+       chart context 로부터 canvas 의 chartArea 에 맞는 세로 그라데이션을
+       만든다. 색의 *의미* 는 그대로 (속도 라인 = navy, 영역 = sea blue 톤). */
+    function speedFillGradient(ctx) {
+      var chart = ctx.chart;
+      var area = chart && chart.chartArea;
+      if (!area) return THEME.fill;            /* 초기 렌더 폴백 */
+      var g = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      g.addColorStop(0,   'rgba(31,143,255,0.35)');
+      g.addColorStop(0.5, 'rgba(31,143,255,0.15)');
+      g.addColorStop(1,   'rgba(31,143,255,0.00)');
+      return g;
+    }
     inst.speed = new Chart(el.getContext('2d'), {
       type: 'line',
       data: {
         datasets: [{
           label: i18nT('속도 ({u})', {u: unit}), data: data, spanGaps: false,
-          borderColor: THEME.line, borderWidth: 1.4,
-          fill: true, backgroundColor: THEME.fill,
-          pointRadius: 0, tension: 0.25
+          borderColor: THEME.line, borderWidth: 1.8,
+          fill: true, backgroundColor: speedFillGradient,
+          pointRadius: 0, tension: 0.3
         }]
       },
       options: {
@@ -1531,10 +1544,30 @@
     /* 데이터셋 구성 — HR(좌축 y) + (옵션) 속도(우축 y1).
        HR 가 분석 주체이므로 stroke 가 강조되고, 속도는 배경 컨텍스트로
        더 얇고 옅게 그린다. */
+    /* Layer 1.5 — HR 트렌드 fill 그라데이션 (Danny 2026-05-26).
+       HR 라인은 strong stroke 유지, area 만 fill 그라데이션. */
+    function hrFillGradient(ctx) {
+      var chart = ctx.chart, area = chart && chart.chartArea;
+      if (!area) return 'rgba(192,57,43,0.10)';
+      var g = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      g.addColorStop(0,   'rgba(192,57,43,0.28)');
+      g.addColorStop(0.5, 'rgba(192,57,43,0.12)');
+      g.addColorStop(1,   'rgba(192,57,43,0.00)');
+      return g;
+    }
+    function speedFillGradient2(ctx) {
+      var chart = ctx.chart, area = chart && chart.chartArea;
+      if (!area) return hexA(THEME.line, 0.08);
+      var g = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      g.addColorStop(0,   'rgba(31,143,255,0.22)');
+      g.addColorStop(1,   'rgba(31,143,255,0.00)');
+      return g;
+    }
     var datasets = [{
       label: i18nT('심박수 (bpm)'), data: data, spanGaps: false,
-      borderColor: HR_LINE, borderWidth: 1.6,
-      fill: false, pointRadius: 0, tension: 0.25,
+      borderColor: HR_LINE, borderWidth: 2.0,
+      fill: true, backgroundColor: hrFillGradient,
+      pointRadius: 0, tension: 0.3,
       yAxisID: 'y', order: 1
     }];
     if (speedData) {
@@ -1542,9 +1575,9 @@
         label: i18nT('속도 ({u})', {u: speedUnit}),
         data: speedData, spanGaps: false,
         borderColor: hexA(THEME.line, 0.85),
-        backgroundColor: hexA(THEME.line, 0.08),
-        borderWidth: 1.1, fill: true,
-        pointRadius: 0, tension: 0.25,
+        backgroundColor: speedFillGradient2,
+        borderWidth: 1.3, fill: true,
+        pointRadius: 0, tension: 0.3,
         yAxisID: 'y1', order: 2
       });
     }

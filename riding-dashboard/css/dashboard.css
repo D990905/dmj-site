@@ -366,6 +366,8 @@ a { color:var(--sea-deep); }
 .stat__label {
   font-size:var(--fs-label); color:var(--text-mid); font-weight:600;
   letter-spacing:.01em;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; flex-wrap:wrap;
 }
 .stat__value {
   font-size:var(--fs-num-xl); font-weight:800; letter-spacing:-.025em;
@@ -377,16 +379,108 @@ a { color:var(--sea-deep); }
   font-size:var(--fs-foot); color:var(--text-dim);
   font-variant-numeric:tabular-nums;
 }
+/* Sparkline — KPI 타일 하단 미니 그라데이션 영역 차트 (Layer 1.5).
+   mockup 의 Customers Overview · Monthly sales 카드 패턴.
+   stat 타일이 sparkline 을 가진 경우만 표시. */
+.stat__spark {
+  display:block; width:100%; height:32px; margin-top:8px;
+  margin-bottom:-2px;
+  overflow:visible;
+}
+/* 트렌드 chip — KPI 라벨 옆 또는 보조 텍스트 옆에 작게.
+   ▲ +12% / ▼ −5% / = 0 — 부호로 톤 자동 결정. */
+.rd-chip {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:.62rem; font-weight:800; letter-spacing:.02em;
+  padding:2px 7px; border-radius:999px;
+  white-space:nowrap; line-height:1.3;
+  font-variant-numeric:tabular-nums;
+  background:var(--bg-sunk); color:var(--text-mid);
+}
+.rd-chip small {
+  font-size:.92em; font-weight:600; color:var(--text-dim);
+  margin-left:2px;
+}
+.rd-chip--up { background:rgba(39,174,96,.14); color:var(--good-ink); }
+.rd-chip--down { background:rgba(192,57,43,.12); color:var(--bad-ink); }
+.rd-chip--flat { background:var(--bg-hover); color:var(--text-mid); }
+/* dir override — '좋고 나쁨' 의미가 뒤집힌 지표(예: 이동시간 ↓ 가 좋음) */
+.rd-chip--good { background:rgba(39,174,96,.14); color:var(--good-ink); }
+.rd-chip--bad  { background:rgba(192,57,43,.12); color:var(--bad-ink); }
+
+/* stat 타일 — 미니 도넛 + 숫자 split 레이아웃 (Layer 1.5).
+   택킹/자이빙 성공률 등 % 지표용. */
+.stat--with-donut { padding-top:14px; }
+.stat__donutrow {
+  display:flex; align-items:center; justify-content:center;
+  gap:12px; margin-top:6px;
+}
+.stat__donutmeta {
+  display:flex; flex-direction:column; align-items:flex-start;
+  text-align:left; gap:2px;
+}
+.stat__value--donut { font-size:var(--fs-num-lg); line-height:1; }
 
 /* ---------- 섹션 헤더 ---------- */
 .section-head {
   display:flex; align-items:center; gap:10px; margin:24px 2px 12px;
+  position:relative;
 }
 .section-head__no {
   background:var(--navy); color:#fff; font-size:var(--fs-micro); font-weight:700;
   padding:4px 9px; border-radius:var(--radius-xs); letter-spacing:.02em;
 }
 .section-head h3 { font-size:var(--fs-section); letter-spacing:-.01em; }
+
+/* Layer 1.5 — 섹션별 색 정체성 (Danny 2026-05-26)
+   섹션 헤더 배지에 톤 색을 부여해 Speed / Maneuver / HR / Coach 가
+   각자 다른 chapter 임을 즉시 인식한다. mockup 의 페이지 컬러 다양성.
+   배지 색만 바꿀 뿐, 카드 본체는 그대로 — 시각 정보 변별력만 ↑. */
+.section-head--speed .section-head__no {
+  background:linear-gradient(135deg, #1F8FFF 0%, #1670CC 100%);
+}
+.section-head--maneuver .section-head__no {
+  background:linear-gradient(135deg, #EF7D00 0%, #C26800 100%);
+}
+.section-head--hr .section-head__no {
+  background:linear-gradient(135deg, #E14B5C 0%, #B5263F 100%);
+}
+.section-head--coach .section-head__no {
+  background:linear-gradient(135deg, #7A5FA8 0%, #5A3F88 100%);
+}
+.section-head--saved .section-head__no {
+  background:linear-gradient(135deg, #1FB6B6 0%, #128585 100%);
+}
+.section-head--summary .section-head__no {
+  background:linear-gradient(135deg, #0A2540 0%, #061A2E 100%);
+}
+/* 섹션 본문을 둘러싸는 zone wrapper — 옅은 파스텔 배경 + 좌측 색 띠.
+   섹션 헤더 + 그 뒤의 카드들을 묶어 시각적 chapter 로 인식. */
+.rd-zone {
+  position:relative;
+  margin:0 -2px 4px;
+  padding:6px 14px 2px 18px;
+  border-radius:14px;
+}
+.rd-zone--speed { background:linear-gradient(180deg, rgba(31,143,255,.05), rgba(31,143,255,0) 70%); }
+.rd-zone--maneuver { background:linear-gradient(180deg, rgba(239,125,0,.05), rgba(239,125,0,0) 70%); }
+.rd-zone--hr { background:linear-gradient(180deg, rgba(225,75,92,.05), rgba(225,75,92,0) 70%); }
+.rd-zone--coach { background:linear-gradient(180deg, rgba(122,95,168,.05), rgba(122,95,168,0) 70%); }
+.rd-zone--saved { background:linear-gradient(180deg, rgba(31,182,182,.05), rgba(31,182,182,0) 70%); }
+.rd-zone::before {
+  content:''; position:absolute; left:4px; top:30px; bottom:14px;
+  width:3px; border-radius:3px;
+  background:currentColor; opacity:.32;
+  pointer-events:none;
+}
+.rd-zone--speed::before    { color:#1F8FFF; }
+.rd-zone--maneuver::before { color:#EF7D00; }
+.rd-zone--hr::before       { color:#E14B5C; }
+.rd-zone--coach::before    { color:#7A5FA8; }
+.rd-zone--saved::before    { color:#1FB6B6; }
+/* zone 안 section-head 와 카드 보정 — zone 내부 패딩과 어울리게 */
+.rd-zone .section-head { margin-top:14px; margin-left:0; }
+.rd-zone .card:last-of-type { margin-bottom:8px; }
 
 /* ---------- 트랙 편집 (속도 시계열 통합 위젯) ---------- */
 .edit-hint {

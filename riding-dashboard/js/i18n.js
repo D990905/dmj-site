@@ -1699,6 +1699,24 @@
     '단무지공방': 'DMJ Gongbang',
     '주 메뉴': 'Main menu',
     '카톡 상담': 'KakaoTalk support',
+
+    /* === nav-auth 동적 주입 드롭다운 (계정 메뉴) — Danny 2026-05-26 검수 ===
+       nav-auth.js 가 로그인 후 동적으로 inject 하는 계정 드롭다운. 정적
+       HTML 에는 없어서 그 동안 누락. walker MutationObserver 가 잡아 번역. */
+    '마이페이지': 'My Page',
+    '프로필 · 장비 · 진단 결과': 'Profile · Gear · Diagnosis',
+    '라이딩 분석': 'Riding Analysis',
+    'GPX 세션 분석': 'GPX Session Analysis',
+    '스킬 진단': 'Skill Diagnosis',
+    '1분 셋업 진단': '1-min Setup Diagnosis',
+    '회원 등급': 'Membership Tier',
+    '현재 등급 · 혜택': 'Current tier · benefits',
+    '로그아웃': 'Logout',
+    '다음 30일 자동 로그인': 'Stay signed in for 30 days',
+
+    /* === 대시보드 본문 잔존 (Danny 2026-05-26 라이브 검수) === */
+    '평균 속도 · 최고 속도': 'Avg speed · Top speed',
+    '개 세션 합계': 'session total',
     '윙포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.':
       'Authorized 4-brand wingfoil / SUP curation. Consulting tailored to Korean rider spots.',
     '까지 — 일반 GPS 앱이 보여주지 않는\n         코치 등급 분석을 바로 확인할 수 있습니다.':
@@ -1769,6 +1787,10 @@
      숫자/시간 등이 섞인 런타임 문자열을 패턴 매칭으로 번역. PATTERNS 끝의
      en 문자열은 $1·$2 백참조로 캡처 그룹을 끼워 넣는다 (Phase 2-C). */
   var PATTERNS = [
+    /* career-tile 누적 횟수 단위 — '4 회' 같은 short label (Danny 2026-05-26) */
+    { ko: /^(\d+) 회$/, en: '$1 sessions' },
+    /* career-tile sub '4개 세션 합계' (number + 개 세션 합계) */
+    { ko: /^(\d+)개 세션 합계$/, en: '$1-session total' },
     { ko: /^GPS 포인트 ([\d,]+)개 전량 사용$/, en: 'GPS points: $1 (all used)' },
     { ko: /^편집 적용 ([\d,]+)개 분석$/, en: 'Edit applied — $1 points analyzed' },
     { ko: /^속도원: 기기 기록$/, en: 'Speed source: device record' },
