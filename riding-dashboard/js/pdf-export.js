@@ -239,24 +239,29 @@
   var STYLE_ID = 'rd-pdf-style';
   function injectPdfStyle() {
     if ($(STYLE_ID)) return;
-    /* #rd-pdf-root 위치 — Danny 2026-05-27 §174 (수정 §176) PDF 백지 fix.
+    /* #rd-pdf-root 위치 — Danny 2026-05-27 §178 final fix.
        히스토리:
-         v1 (broken): position:fixed; left:-10000px
-            → html2canvas#422 known bug, off-screen fixed = blank PDF.
-         v2 (still broken): position:absolute; left:0; top:0; opacity:0
-            → opacity:0 이 html2canvas 의 capture pipeline 에서 무시되지
-              않고 그대로 적용되어 PDF 가 876 bytes (거의 빈) 로 나옴.
-         v3 (this — Danny 2026-05-27 §176): position:absolute + top:-99999px.
-            요소는 fully visible (opacity:1, no z-index trick) 상태로
-            layout 을 정상적으로 잡지만, 뷰포트 위쪽으로 멀리 떨어져
-            사용자는 못 본다. 음수 LEFT 와 달리 음수 TOP 은 html2canvas
-            의 viewport-based capture 와 충돌 없이 정상 동작한다. */
+         v1: position:fixed; left:-10000px → html2canvas#422 blank PDF
+         v2: position:absolute; opacity:0 → opacity 가 capture pipeline 망가뜨림
+         v3: position:absolute; top:-99999px → 일부 페이지만 캡쳐돼 나머지 백지
+         v4 (this): position:absolute; top:0; left:0 (정상 viewport 위치)
+           + fullscreen 로딩 오버레이로 사용자 시야 가림.
+           html2canvas 가 정상 layout 컨텍스트에서 캡쳐 → 모든 페이지 OK.
+           PDF blob 준비되면 오버레이 → 미리보기 모달로 자연스럽게 전환. */
     var css = ""
-      + "#rd-pdf-root{position:absolute;left:0;top:-99999px;width:794px;"
-      +   "pointer-events:none;"
+      + "#rd-pdf-root{position:absolute;left:0;top:0;width:794px;"
+      +   "pointer-events:none;z-index:1;"
       +   "background:#FFFFFF;color:#0A2540;"
       +   "font-family:'Pretendard',system-ui,-apple-system,sans-serif;"
       +   "font-weight:400;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased}"
+      + "#rd-pdf-overlay{position:fixed;inset:0;z-index:99999;background:rgba(10,37,64,0.96);"
+      +   "display:flex;flex-direction:column;align-items:center;justify-content:center;"
+      +   "color:#FFF;font-family:'Pretendard',system-ui,sans-serif;gap:14px}"
+      + "#rd-pdf-overlay__spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,0.18);"
+      +   "border-top-color:#FFB800;border-radius:50%;animation:rdPdfSpin 0.9s linear infinite}"
+      + "@keyframes rdPdfSpin{to{transform:rotate(360deg)}}"
+      + "#rd-pdf-overlay__msg{font-size:16px;font-weight:600;letter-spacing:-0.01em}"
+      + "#rd-pdf-overlay__sub{font-size:12px;color:#A8B4C0;font-weight:400}"
       + "#rd-pdf-root *{box-sizing:border-box;line-height:1.45}"
       + ".pdf-page{position:relative;width:794px;min-height:1123px;padding:56px 56px 48px;"
       +   "page-break-after:always;break-after:page;background:#FFFFFF}"
@@ -875,6 +880,23 @@
     return p.then(function () { return pdf.output('blob'); });
   }
 
+  /* §178 — fullscreen 로딩 오버레이. PDF 가 생성되는 동안 사용자는 이 오버레이만
+     본다 (그 뒤에서 #rd-pdf-root 가 정상 layout 으로 그려지고 html2canvas 가 캡쳐). */
+  function showLoadingOverlay() {
+    if ($('rd-pdf-overlay')) return;
+    var div = document.createElement('div');
+    div.id = 'rd-pdf-overlay';
+    div.innerHTML =
+      '<div id="rd-pdf-overlay__spinner" aria-hidden="true"></div>' +
+      '<div id="rd-pdf-overlay__msg">' + esc(T('PDF 보고서 생성 중…')) + '</div>' +
+      '<div id="rd-pdf-overlay__sub">' + esc(T('차트와 지도를 캡쳐하고 있어요 · 최대 30초')) + '</div>';
+    document.body.appendChild(div);
+  }
+  function hideLoadingOverlay() {
+    var o = $('rd-pdf-overlay');
+    if (o && o.parentNode) o.parentNode.removeChild(o);
+  }
+
   function generate(opts) {
     opts = opts || {};
     var ds = $('dashboard-view');
@@ -884,12 +906,26 @@
     }
 
     showStatus(T('PDF 보고서 생성 중…'));
+    /* 로딩 오버레이 먼저 표시 — buildPdfRoot 가 body 에 큰 element 를
+       붙이기 때문에 사용자 시야를 즉시 가려야 한다. */
     return Promise.all([ensureH2C(), ensureJsPDF(), ensurePretendard()])
-      .then(function () { return buildPdfRoot(); })
+      .then(function () { showLoadingOverlay(); return buildPdfRoot(); })
       .then(function (built) {
         var filename = buildFilename(built.meta);
         return renderPdfBlob(built.root).then(function (blob) {
           cleanup(built.root);
+          hideLoadingOverlay();
+          /* §178 — preview 모드: 다운로드/공유 트리거 대신 미리보기 모달
+             을 띄워 사용자가 내용 확인 후 자기 buttons 으로 직접 다운로드/
+             공유. 기본 동작이 되어야 한다 (Danny 2026-05-27). */
+          if (opts.preview !== false && opts.download !== true && opts.share !== true) {
+            openPreview(blob, filename, built.totalPages, {
+              canShare: canShareFiles()
+            });
+            showStatus(T('PDF 미리보기 준비 완료'), 'ok');
+            return { previewed: true, filename: filename,
+                     totalPages: built.totalPages, blob: blob };
+          }
           if (opts.share && navigator.canShare) {
             var file = new File([blob], filename, { type: 'application/pdf' });
             if (navigator.canShare({ files: [file] })) {
@@ -921,6 +957,7 @@
           });
         }).catch(function (err) {
           cleanup(built.root);
+          hideLoadingOverlay();
           throw err;
         });
       })
@@ -928,12 +965,151 @@
         var msg = err && err.message ? err.message : String(err);
         showStatus(T('PDF 생성 실패') + ': ' + msg, 'error');
         cleanup($('rd-pdf-root'));
+        hideLoadingOverlay();
         throw err;
       });
   }
 
   function cleanup(node) {
     if (node && node.parentNode) node.parentNode.removeChild(node);
+  }
+
+  /* ============================================================
+   * §178 — PDF 미리보기 모달 (Danny 2026-05-27).
+   *   생성된 PDF blob 을 iframe 에 띄워 사용자가 다운로드/공유 전에
+   *   내용을 확인할 수 있게 한다. 모바일에서는 iframe 안 PDF 가 종종
+   *   안 보여서 '새 탭 열기' 폴백을 제공한다.
+   *   닫기/다운로드/공유 버튼 + ESC/바깥 클릭으로 닫기.
+   * ============================================================ */
+  var PREVIEW_STYLE_ID = 'rd-pdf-preview-style';
+  function ensurePreviewStyle() {
+    if ($(PREVIEW_STYLE_ID)) return;
+    var css =
+      '#rd-pdf-preview{position:fixed;inset:0;z-index:100000;display:flex;' +
+        'flex-direction:column;background:rgba(10,37,64,0.92);font-family:' +
+        "'Pretendard',system-ui,-apple-system,sans-serif}" +
+      '#rd-pdf-preview__head{flex:0 0 auto;display:flex;align-items:center;' +
+        'justify-content:space-between;padding:14px 20px;background:#0A2540;' +
+        'color:#FFF;border-bottom:1px solid #1F3A52}' +
+      '#rd-pdf-preview__title{font-size:15px;font-weight:600;letter-spacing:-0.01em}' +
+      '#rd-pdf-preview__meta{font-size:12px;color:#A8B4C0;margin-left:10px;font-weight:400}' +
+      '#rd-pdf-preview__body{flex:1 1 auto;background:#3C4654;overflow:hidden}' +
+      '#rd-pdf-preview__iframe{width:100%;height:100%;border:none;background:#FFF}' +
+      '#rd-pdf-preview__fallback{display:flex;align-items:center;justify-content:center;' +
+        'height:100%;color:#FFF;text-align:center;padding:24px;flex-direction:column;gap:12px}' +
+      '#rd-pdf-preview__foot{flex:0 0 auto;display:flex;gap:8px;justify-content:flex-end;' +
+        'padding:12px 20px;background:#0A2540;border-top:1px solid #1F3A52}' +
+      '.rd-pdf-pv-btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;' +
+        'border:1px solid transparent;cursor:pointer;font-family:inherit;letter-spacing:-0.01em}' +
+      '.rd-pdf-pv-btn--primary{background:#FFB800;color:#0A2540;border-color:#E0A100}' +
+      '.rd-pdf-pv-btn--primary:hover{background:#FFC526}' +
+      '.rd-pdf-pv-btn--ghost{background:transparent;color:#FFF;border-color:#3C4654}' +
+      '.rd-pdf-pv-btn--ghost:hover{background:rgba(255,255,255,0.08)}' +
+      '.rd-pdf-pv-btn--danger{background:transparent;color:#FF8B7E;border-color:#3C4654}' +
+      '.rd-pdf-pv-btn--danger:hover{background:rgba(255,139,126,0.08)}';
+    var s = document.createElement('style');
+    s.id = PREVIEW_STYLE_ID;
+    s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  function openPreview(blob, filename, totalPages, opts) {
+    opts = opts || {};
+    ensurePreviewStyle();
+    // 기존 모달이 있으면 정리
+    var prev = $('rd-pdf-preview');
+    if (prev) prev.parentNode.removeChild(prev);
+
+    var url = URL.createObjectURL(blob);
+    var sizeKB = Math.round(blob.size / 1024);
+    var modal = document.createElement('div');
+    modal.id = 'rd-pdf-preview';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', T('PDF 미리보기'));
+
+    var head = document.createElement('div');
+    head.id = 'rd-pdf-preview__head';
+    head.innerHTML =
+      '<div><span id="rd-pdf-preview__title">' + esc(T('PDF 미리보기')) + '</span>' +
+      '<span id="rd-pdf-preview__meta">' + esc(filename) + ' · ' +
+      totalPages + T('쪽') + ' · ' + sizeKB + ' KB</span></div>';
+
+    var body = document.createElement('div');
+    body.id = 'rd-pdf-preview__body';
+    var iframe = document.createElement('iframe');
+    iframe.id = 'rd-pdf-preview__iframe';
+    iframe.src = url;
+    iframe.title = T('PDF 미리보기');
+    body.appendChild(iframe);
+
+    /* 모바일 사파리 / iOS — iframe PDF 가 안 보일 수 있어 폴백 안내 */
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    var foot = document.createElement('div');
+    foot.id = 'rd-pdf-preview__foot';
+
+    var canShare = opts.canShare && navigator.canShare;
+    var shareBtnHtml = canShare
+      ? '<button class="rd-pdf-pv-btn rd-pdf-pv-btn--primary" data-act="share">📤 ' + esc(T('공유')) + '</button>'
+      : '';
+    var openBtnHtml = isMobile
+      ? '<button class="rd-pdf-pv-btn rd-pdf-pv-btn--ghost" data-act="open">🔗 ' + esc(T('새 탭')) + '</button>'
+      : '';
+    foot.innerHTML =
+      '<button class="rd-pdf-pv-btn rd-pdf-pv-btn--danger" data-act="close">✕ ' + esc(T('닫기')) + '</button>' +
+      openBtnHtml +
+      '<button class="rd-pdf-pv-btn rd-pdf-pv-btn--ghost" data-act="download">⬇ ' + esc(T('다운로드')) + '</button>' +
+      shareBtnHtml;
+
+    modal.appendChild(head);
+    modal.appendChild(body);
+    modal.appendChild(foot);
+    document.body.appendChild(modal);
+
+    /* ESC 로 닫기 + 메모리 누수 방지 (revokeObjectURL) */
+    function teardown() {
+      try { URL.revokeObjectURL(url); } catch (e) {}
+      if (modal.parentNode) modal.parentNode.removeChild(modal);
+      document.removeEventListener('keydown', onKey);
+    }
+    function onKey(ev) {
+      if (ev.key === 'Escape') { teardown(); }
+    }
+    document.addEventListener('keydown', onKey);
+
+    /* 버튼 동작 — 다운로드 / 공유 / 새 탭 / 닫기 */
+    foot.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-act]');
+      if (!b) return;
+      var act = b.getAttribute('data-act');
+      if (act === 'close') {
+        teardown();
+      } else if (act === 'download') {
+        downloadBlob(blob, filename);
+        showStatus(T('PDF 다운로드 완료'), 'ok');
+      } else if (act === 'open') {
+        global.open(url, '_blank');
+      } else if (act === 'share') {
+        var file = new File([blob], filename, { type: 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: T('라이딩 분석 보고서'),
+            text: T('단무지공방 라이딩 분석 보고서')
+          }).then(function () {
+            showStatus(T('PDF 공유 완료'), 'ok');
+            teardown();
+          }).catch(function (err) {
+            if (err && err.name !== 'AbortError') {
+              showStatus(T('PDF 공유 실패'), 'error');
+            }
+          });
+        }
+      }
+    });
+
+    return { teardown: teardown };
   }
 
   function downloadBlob(blob, filename) {

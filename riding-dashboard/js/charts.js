@@ -40,14 +40,35 @@
     else { Chart.defaults.color = THEME.text; Chart.defaults.borderColor = THEME.grid; }
   }
 
-  /* 속도·백분위 → 색 — 디자인 시스템의 상태색(5단계 앵커) 램프로 구동한다.
-     속도는 '클수록 좋음(higher)' 성과 지표라, 빠를수록 매우좋음(초록)·
-     느릴수록 매우나쁨(빨강) 쪽으로 5앵커 사이를 연속 보간한다. 속도 분포
-     파이와 지도 트랙이 이 한 램프를 공유한다 (사양: CHART-DESIGN-SYSTEM.md
-     §1 상태색). 색은 chart-theme.js 가 단일 소스 — 하드코딩하지 않는다. */
+  /* Layer 2.0 — 커스텀 canvas (폴라·바이올린·트림 핸들 등) 의 ctx.font
+     하드코딩을 한 군데로 모은 헬퍼 (Danny 2026-05-26). chart-theme.js
+     T.font.css() 가 단일 폰트-패밀리 + 사이즈 토큰을 만든다. 폴백은
+     단순 system-ui. 모든 캔버스가 동일 폰트 패밀리를 쓰게 한다. */
+  function cvFont(weight, size) {
+    if (T && T.font && T.font.css) return T.font.css(weight, size);
+    return (weight ? weight + ' ' : '') + size + 'px ' +
+      '-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo",' +
+      '"Malgun Gothic",system-ui,sans-serif';
+  }
+
+  /* 속도 분포 파이 색 — 단일 hue (sea blue) 진하기 진행으로 통일
+     (Danny 2026-05-26 Layer 2.0 — 라임·머스타드 짬뽕 시정).
+     이전: chart-theme statusAt() 5단계 빨강→노랑→초록 램프. 시각적으로
+     상태색의 다른 차트(VPS·성공률 도넛 등) 와 의미 혼동을 일으켜, 단일
+     sea blue hue 의 옅음→짙음 진행으로 변경한다. 의미는 동일 — 느릴수록
+     옅고, 빠를수록 짙다 (속도 분포 인코딩). 디자인 시스템 §1 상태색은
+     '성과(잘함/못함)' 인코딩 전용이라, 분포 인코딩은 hue 가 다른 게 옳다.
+     색은 chart-theme.js 의 sea blue(#1F8FFF) 단일 톤에서만 파생. */
   function speedColor(kt, maxKt) {
-    var g = maxKt > 0 ? Math.max(0, Math.min(1, kt / maxKt)) : 0;
-    return T ? T.statusAt(g) : 'rgb(242,194,14)';
+    var f = maxKt > 0 ? Math.max(0, Math.min(1, kt / maxKt)) : 0;
+    /* opacity 0.32 → 1.0 진행 + lightness 도 함께 (옅음→짙음) */
+    /* 시작색 #BDD9FF (연한 sea) → 끝색 #1F8FFF (짙은 sea) — sea blue 단일 hue */
+    var startR = 189, startG = 217, startB = 255;       /* #BDD9FF */
+    var endR   =  22, endG   = 112, endB   = 204;       /* #1670CC */
+    return 'rgb(' +
+      Math.round(startR + (endR - startR) * f) + ',' +
+      Math.round(startG + (endG - startG) * f) + ',' +
+      Math.round(startB + (endB - startB) * f) + ')';
   }
 
   /* 지도 트랙 선·범례 — 느림=빨강·중간=주황·빠름=초록. 밝은 OSM 타일
@@ -345,7 +366,7 @@
           ctx.setLineDash([]);
           if (ew > 64) {
             ctx.fillStyle = THEME.text;
-            ctx.font = '600 10px system-ui, sans-serif';
+            ctx.font = cvFont(600, 10);
             ctx.textAlign = 'center'; ctx.textBaseline = 'top';
             ctx.fillText(i18nT('제외 ✕ 클릭 해제'), x1 + ew / 2, ys.top + 4);
           }
@@ -589,7 +610,7 @@
     if (inst.trimMode) {
       var t = side === 'start' ? inst.trim.start : inst.trim.end;
       ctx.fillStyle = '#0A2540';
-      ctx.font = '600 10px system-ui, sans-serif';
+      ctx.font = cvFont(600, 10);
       ctx.textBaseline = 'top';
       ctx.textAlign = side === 'start' ? 'left' : 'right';
       var lx = side === 'start'
@@ -760,7 +781,7 @@
     }
     var xlab = inst.fmtX ? inst.fmtX(s.t) : mmss(s.t);
     var label = fmtLabel(s, xlab);
-    ctx.font = '600 11px system-ui, sans-serif';
+    ctx.font = cvFont(600, 11);
     var tw = ctx.measureText(label).width + 12;
     var lx = Math.min(Math.max(px - tw / 2, ch.chartArea.left),
                       ch.chartArea.right - tw);
@@ -931,7 +952,7 @@
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.fillStyle = 'rgba(222,70,57,0.95)';
-        ctx.font = '600 10px system-ui, sans-serif'; ctx.textAlign = 'center';
+        ctx.font = cvFont(600, 10); ctx.textAlign = 'center';
         ctx.fillText(i18nT('회전 정점'), px, c.scales.y.top + 11);
         ctx.restore();
       }
@@ -1176,7 +1197,7 @@
 
     /* --- 배경 격자 + Y 라벨 --- */
     var step = span > 120 ? 30 : (span > 60 ? 20 : (span > 24 ? 5 : (span > 10 ? 2 : 1)));
-    ctx.font = '10px system-ui, sans-serif';
+    ctx.font = cvFont(null, 10);
     ctx.textBaseline = 'middle';
     for (var gv = Math.ceil(lo / step) * step; gv <= hi + 1e-6; gv += step) {
       var gy = vy(gv);
@@ -1208,7 +1229,7 @@
         ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
       } else {
         ctx.fillStyle = THEME.text;
-        ctx.font = '11px system-ui, sans-serif'; ctx.textAlign = 'center';
+        ctx.font = cvFont(null, 11); ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(n ? i18nT('표본 부족 ({n})', {n: n}) : i18nT('데이터 없음'),
           cx + sign * halfMax / 2, padT + plotH / 2);
@@ -1232,7 +1253,7 @@
         if (val == null || isNaN(val) || val < lo || val > hi) return;
         var y = vy(val) + dy;
         var txt = fmtV(val);
-        ctx.font = '700 11px system-ui, sans-serif';
+        ctx.font = cvFont(700, 11);
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         var tw = ctx.measureText(txt).width + 10;
         var lx = cx + sign * halfMax * frac;
@@ -1252,13 +1273,13 @@
 
     /* --- 상단 P/S 라벨 · 하단 밀도 힌트 --- */
     ctx.textBaseline = 'alphabetic';
-    ctx.font = '700 12px system-ui, sans-serif';
+    ctx.font = cvFont(700, 12);
     ctx.textAlign = 'center';
     ctx.fillStyle = SIDE.port;
     ctx.fillText(i18nT('◀ 포트 (P)'), cx - plotW / 4, padT - 16);
     ctx.fillStyle = SIDE.starboard;
     ctx.fillText(i18nT('스타보드 (S) ▶'), cx + plotW / 4, padT - 16);
-    ctx.font = '10px system-ui, sans-serif';
+    ctx.font = cvFont(null, 10);
     ctx.fillStyle = 'rgba(92,111,126,0.75)';
     ctx.textAlign = 'left';
     ctx.fillText(i18nT('← 밀도'), padL, H - 9);
@@ -1356,7 +1377,7 @@
         if (!meta || !meta.data) return;
         var ctx = c.ctx;
         ctx.save();
-        ctx.font = '700 11px system-ui, -apple-system, sans-serif';
+        ctx.font = cvFont(700, 11);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         meta.data.forEach(function (arc, i) {
@@ -1489,7 +1510,7 @@
           band(z.loBpm, z.hiBpm, HR_ZONE_COLOR[z.key] || HR_ZONE_REST);
         });
         // 존 이름 라벨 (우측 가장자리)
-        ctx.font = '600 9px system-ui, sans-serif';
+        ctx.font = cvFont(600, 10);
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
         zoneData.zones.forEach(function (z) {
           var ym = ys.getPixelForValue((z.loBpm + z.hiBpm) / 2);
@@ -1532,7 +1553,7 @@
           /* 라벨이 들어갈 만큼 넓은 공백에만 '기록 공백' 표기 */
           if (x2 - x1 >= 46) {
             ctx.fillStyle = 'rgba(92,111,126,0.92)';
-            ctx.font = '600 9px system-ui, sans-serif';
+            ctx.font = cvFont(600, 10);
             ctx.textAlign = 'center'; ctx.textBaseline = 'top';
             ctx.fillText(i18nT('기록 공백'), xm, top + 4);
           }
@@ -1922,7 +1943,7 @@
       ctx.clearRect(0, 0, size, size);
 
       // 배경 링 + 라벨
-      ctx.font = '10px system-ui, sans-serif';
+      ctx.font = cvFont(null, 10);
       ctx.textBaseline = 'alphabetic';
       for (var v = ringStep; v <= ringMax; v += ringStep) {
         var rr = R * v / ringMax;
@@ -1942,7 +1963,7 @@
         });
       });
       ctx.fillStyle = 'rgba(92,111,126,0.9)';
-      ctx.font = '600 10px system-ui, sans-serif';
+      ctx.font = cvFont(600, 10);
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       [30, 60, 90, 120, 150].forEach(function (twa) {
         [-1, 1].forEach(function (sgn) {
@@ -1964,12 +1985,12 @@
 
       // 풍상/풍하 라벨
       ctx.fillStyle = THEME.textHi;
-      ctx.font = '600 11px system-ui, sans-serif';
+      ctx.font = cvFont(600, 11);
       ctx.textAlign = 'center';
       ctx.fillText(i18nT('▲ 풍상 0°'), cx, cy - R - 12);
       ctx.fillText(i18nT('▼ 풍하 180°'), cx, cy + R + 18);
       // 범례
-      ctx.font = '600 10px system-ui, sans-serif';
+      ctx.font = cvFont(600, 10);
       ctx.textAlign = 'left';
       ctx.fillStyle = SIDE.port; ctx.fillText(i18nT('━ 포트(P) 실측'), 8, 15);
       ctx.textAlign = 'right';
@@ -1979,7 +2000,7 @@
       ctx.fillText(i18nT('┈ 개인 베스트 타깃(기준)'), 8, size - 8);
       ctx.textAlign = 'right';
       ctx.fillStyle = 'rgba(92,111,126,0.7)';
-      ctx.font = '10px system-ui, sans-serif';
+      ctx.font = cvFont(null, 10);
       ctx.fillText(i18nT('반지름 = 속도 ({u})', {u: unit}), size - 8, size - 8);
 
       // 호버 툴팁
@@ -1990,7 +2011,7 @@
     function drawPolarTip(c, hp) {
       var txt = c.label + '  ·  TWA ' + Math.round(hp.twa) + '°  ·  ' +
         (hp.vMs * conv).toFixed(1) + ' ' + unit;
-      ctx.font = '600 11px system-ui, sans-serif';
+      ctx.font = cvFont(600, 11);
       var tw = ctx.measureText(txt).width + 14;
       var th = 20;
       var lx = Math.min(Math.max(hp.x - tw / 2, 4), size - tw - 4);

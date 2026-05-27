@@ -77,6 +77,16 @@
     if (h > 0) return h + 'hr ' + m + 'min';
     return m + 'min ' + ss + 'sec';
   }
+  /* KPI 타일·hero 전용 컴팩트 시간 표기 (Layer 2.0 — Danny 2026-05-26).
+     공백을 없애 큰 폰트가 줄바꿈되는 문제 해결. 라벨에 (min:sec) 표시가
+     있어 의미가 모호하지 않다. h:mm:ss · mm:ss 콜론 형식. */
+  function fmtDurCompact(s) {
+    s = Math.max(0, Math.round(s));
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60;
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+    if (h > 0) return h + ':' + pad(m) + ':' + pad(ss);
+    return m + ':' + pad(ss);
+  }
   function mmss(s) {
     s = Math.max(0, Math.round(s));
     return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
@@ -167,24 +177,21 @@
     $('new-file-btn').addEventListener('click', resetToIntro);
     $('save-session-btn').addEventListener('click', saveCurrentSession);
 
-    /* PDF 보고서 — 클릭 시 lazy load → 9 페이지 PDF 생성.
-       모바일 Web Share API 지원 시 버튼 라벨을 "공유" 로 자동 변경하고
-       navigator.share({files}) 로 OS 공유 시트를 띄운다.
-       (Danny 2026-05-26) */
+    /* PDF 보고서 — 클릭 시 lazy load → 9 페이지 PDF 생성 + 미리보기 모달.
+       §178 (Danny 2026-05-27): 즉시 다운로드/공유 대신 미리보기 모달
+       을 띄워 사용자가 내용 확인 후 모달 내 버튼으로 직접 다운로드/공유.
+       모바일 Web Share API 지원 시 모달의 '공유' 버튼이 자동 활성화된다. */
     var pdfBtn = $('pdf-export-btn');
     if (pdfBtn && window.RDPdfExport) {
-      var canShare = window.RDPdfExport.canShareFiles();
-      if (canShare) {
-        pdfBtn.textContent = '📤 PDF 공유';
-        pdfBtn.setAttribute('aria-label', 'PDF 보고서 공유');
-      }
+      pdfBtn.textContent = '📄 PDF 미리보기';
+      pdfBtn.setAttribute('aria-label', 'PDF 보고서 미리보기');
       pdfBtn.addEventListener('click', function () {
         if (pdfBtn.disabled) return;
         pdfBtn.disabled = true;
         var origText = pdfBtn.textContent;
         pdfBtn.textContent = (window.RDI18n && window.RDI18n.T)
           ? window.RDI18n.T('생성 중…') : '생성 중…';
-        window.RDPdfExport.generate({ share: canShare })
+        window.RDPdfExport.generate({ preview: true })
           .catch(function (e) { console.warn('PDF export failed:', e); })
           .then(function () {
             pdfBtn.disabled = false;
@@ -788,7 +795,7 @@
       kpis.push({
         icon:'timer',
         label:'이동 시간',
-        valueStr:fmtDur(sum.movingTimeSec),
+        valueStr:fmtDurCompact(sum.movingTimeSec),
         unit:''
       });
       kpis.push({
@@ -1161,24 +1168,23 @@
       (s.totalDistanceM / 1000).toFixed(2),
       null,
       { spark: sparkCum,
-        trend: prev ? deltaTrend(prev.distanceM / 1000, s.totalDistanceM / 1000) : null,
-        color: '#1F8FFF' });
+        trend: prev ? deltaTrend(prev.distanceM / 1000, s.totalDistanceM / 1000) : null });
     if (s.hasTime) {
-      html += statTile('이동 시간 (min:sec)', fmtDur(s.movingTimeSec),
-        '전체 ' + fmtDur(s.totalDurationSec),
+      /* Layer 2.0 — 시간 값은 컴팩트 콜론 포맷(mm:ss)으로 줄바꿈 방지.
+         Sparkline 색은 모든 타일 동일 sea blue (mockup 일관성 패턴). */
+      html += statTile('이동 시간 (min:sec)', fmtDurCompact(s.movingTimeSec),
+        '전체 ' + fmtDurCompact(s.totalDurationSec),
         { trend: prev ? deltaTrend(prev.movingTimeSec, s.movingTimeSec) : null });
       html += statTile('최고 속도 (' + u + ')', fmtSpeed(s.maxSpeedMs),
         '2초 구간 최고',
         { spark: sparkSpeed,
-          trend: prev ? deltaTrend(prev.maxSpeedMs, s.maxSpeedMs) : null,
-          color: '#EF7D00' });
+          trend: prev ? deltaTrend(prev.maxSpeedMs, s.maxSpeedMs) : null });
       html += statTile('평균 속도 (' + u + ')', fmtSpeed(s.avgSpeedMovingMs),
         '이동 중',
         { spark: sparkSpeed,
-          trend: prev ? deltaTrend(prev.avgSpeedMovingMs, s.avgSpeedMovingMs) : null,
-          color: '#1F8FFF' });
+          trend: prev ? deltaTrend(prev.avgSpeedMovingMs, s.avgSpeedMovingMs) : null });
       html += statTile((foiling ? '포일링' : '플레이닝') + ' 시간 (min:sec)',
-        fmtDur(s.activeTimeSec),
+        fmtDurCompact(s.activeTimeSec),
         Math.round(s.activeRatio * 100) + '% 비율');
     }
     html += statTile('풍향 (°)',

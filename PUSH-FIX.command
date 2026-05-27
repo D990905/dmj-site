@@ -33,7 +33,21 @@ retry_git "git add -A" || { echo "ABORT: git add failed"; read -n 1; exit 1; }
 
 echo ""
 echo "==> Committing..."
-git commit -m "§177 — PDF blank fix v4 — replace html2pdf bundle with standalone html2canvas + jsPDF
+git commit -m "§178 — PDF preview modal + render at top:0 with loading overlay
+
+§177 (html2pdf → standalone html2canvas+jsPDF) + §178:
+- PDF report button now opens a preview modal (iframe with PDF blob) instead
+  of immediate download/share. Modal has: 다운로드 / 공유 (if Web Share supported) /
+  새 탭 (mobile fallback) / 닫기 buttons. ESC key + button to close.
+- #rd-pdf-root no longer positioned off-screen — placed at normal top:0/left:0
+  position. During generation, a fullscreen loading overlay (spinner +
+  '차트와 지도를 캡쳐하고 있어요') covers user view while html2canvas captures
+  pages from a proper layout context. Fixes pages 2-9 going blank due to
+  off-screen rendering bugs in html2canvas.
+- App.js PDF button label changed from '📤 PDF 공유' to '📄 PDF 미리보기'
+  (preview-first UX, with download/share inside modal).
+
+§177 — replace html2pdf bundle with standalone html2canvas + jsPDF
 
 Root cause finally identified: html2pdf.js 0.10.1's bundled html2canvas
 returns blank canvases in modern Chrome (PDF output always ~3KB regardless

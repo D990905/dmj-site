@@ -421,6 +421,106 @@ a { color:var(--sea-deep); }
 }
 .stat__value--donut { font-size:var(--fs-num-lg); line-height:1; }
 
+/* ============================================================
+ * Layer 2.0 — 일관성 정리 패스 (Danny 2026-05-26)
+ * ------------------------------------------------------------
+ * 흩어진 typography·색·여백을 *덧칠 없이 통일*. 이 블록은 dashboard.css
+ * 끝에 두어 위쪽의 ad-hoc 선언을 모두 오버라이드한다.
+ *
+ * 1) value 노드는 4 사이즈만 — hero / xl / lg / md.
+ * 2) value 노드는 weight 800 + tracking -0.025em + tabular-nums + line-height 1.05 강제.
+ * 3) value 줄바꿈 금지 — white-space:nowrap (라벨에 단위 명시 가정).
+ * 4) 라벨·캡션은 3 사이즈만 — label / foot / micro.
+ *
+ * 리플레이 뷰어(.replay) 는 다크 전용 스코프라 이 블록 영향 X
+ * (선택자에서 .replay scope 미포함).
+ * ============================================================ */
+
+/* (1) 값 노드 공통 스타일 — 단일 mixin 효과. 사이즈는 별도 규칙으로. */
+.stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v,
+.stats-val,
+.vps-tile__score,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time {
+  font-weight:800;
+  letter-spacing:-.025em;
+  line-height:1.05;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
+/* (2) 사이즈 4 버킷 강제 */
+/* hero — VPS Overall 도넛 중앙 점수 (한 곳만) */
+.vps-tile--main .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-hero); }
+/* xl — 첫 인상 KPI (summary-strip 의 stat__value) */
+.stat-strip > .stat > .stat__value { font-size:var(--fs-num-xl); }
+.vps-tile .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-xl); }
+/* lg — 본문 KPI · 모든 보조 value 노드 */
+.stat-strip--inner > .stat > .stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v {
+  font-size:var(--fs-num-lg);
+}
+/* md — 표·인라인 value */
+.stats-val,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time {
+  font-size:var(--fs-num-md);
+}
+
+/* (3) max 라벨(/ 100) — VPS 도넛 max 텍스트 통일 */
+.vps-tile__max,
+.vps-tile__donutctr .vps-tile__max {
+  font-size:var(--fs-micro);
+  font-weight:700; color:var(--text-dim);
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+
+/* (4) NA score — 사이즈는 동일하게 (작아지지 않게) */
+.vps-score--na { font-size:inherit !important; }
+
+/* (5) 카드 제목 1 사이즈 */
+.card__head h3 { font-size:var(--fs-card); }
+/* (6) 라벨·캡션 3 사이즈만 */
+.stat__label, .metric__label, .career-tile__label,
+.dm__l, .savg-k, .wsrc__label, .vps-tile__label {
+  font-size:var(--fs-label);
+  font-weight:600;
+  color:var(--text-mid);
+  letter-spacing:0;
+}
+.stat__sub, .career-tile__sub, .wsrc-rec__note, .wsrc__note,
+.vps-tile__note {
+  font-size:var(--fs-foot);
+  color:var(--text-dim);
+  font-weight:500;
+}
+/* card hint·foot 통일 */
+.card__hint, .stats-note, .vps-foot, .mvc-foot, .mg-foot,
+.hr-eff-note, .hr-trend-note, .mv-list-note, .polar-note,
+.edit-hint {
+  font-size:var(--fs-foot);
+  color:var(--text-mid);
+  line-height:1.55;
+}
+/* badge·micro 단계 */
+.section-head__no, .card__hint b, .stats-dir, .mv-badge,
+.session-badge, .row-tag, .sweep-tag, .stats-unsplit-tier {
+  font-size:var(--fs-micro);
+}
+
+
 /* ---------- 섹션 헤더 ---------- */
 .section-head {
   display:flex; align-items:center; gap:10px; margin:24px 2px 12px;
@@ -2433,4 +2533,79 @@ input::placeholder { color:var(--text-dim); }
     animation:none !important;
   }
 }
+
+/* ============================================================
+ * Layer 2.0 — FINAL OVERRIDE PASS (Danny 2026-05-26)
+ * ------------------------------------------------------------
+ * 파일 끝 위치 — 위쪽에 산발적으로 흩어진 ad-hoc font-size 들을 *마지막에*
+ * 덮어쓰기로 통일. 위쪽의 동등 specificity 선언과 충돌 시 cascade 마지막
+ * 규칙(이 블록)이 이긴다. !important 는 사용 안 함 — 정상 cascade 로만
+ * 일관성 강제. 리플레이 뷰어(.replay) 는 스코프 격리되어 영향 X.
+ *
+ * 4 사이즈 토큰만 허용 — hero / xl / lg / md. 그 외 값 노드는 모두 lg 로.
+ * ============================================================ */
+
+/* (1) 모든 value 노드 — 공통 스타일 강제 */
+.stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v,
+.stats-val,
+.vps-tile__score,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time,
+.eff,
+.run-row__main strong,
+.bw-card__head,
+.mvc-mean {
+  font-weight:800;
+  letter-spacing:-.025em;
+  line-height:1.05;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
+/* (2) 사이즈 4 버킷 — 늦은 cascade 로 ad-hoc 사이즈 override */
+/* hero — VPS Overall 도넛 중앙 (한 곳만) */
+.vps-tile--main .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-hero); }
+.vps-tile--main .vps-tile__score { font-size:var(--fs-num-hero); }
+
+/* xl — 첫 인상 KPI (summary-strip 의 stat__value) + VPS 서브 도넛 */
+.stat-strip > .stat > .stat__value { font-size:var(--fs-num-xl); }
+.vps-tile .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-xl); }
+.vps-tile__score { font-size:var(--fs-num-xl); }
+
+/* lg — 본문 KPI · 모든 보조 value 노드 */
+.stat-strip--inner > .stat > .stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v {
+  font-size:var(--fs-num-lg);
+}
+
+/* md — 표·인라인 value */
+.stats-val,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time {
+  font-size:var(--fs-num-md);
+}
+
+/* (3) max / unit 라벨 — VPS / sub */
+.vps-tile__max,
+.vps-tile__donutctr .vps-tile__max {
+  font-size:var(--fs-micro);
+  font-weight:700; color:var(--text-dim);
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+
+/* (4) NA score — 사이즈 동일 유지 */
+.vps-score--na { font-size:inherit !important; }
+
 
