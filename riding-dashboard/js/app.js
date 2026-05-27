@@ -292,21 +292,33 @@
       renderManeuverTable();
     });
 
-    // 속도 시계열 X축 — 경과 시간 / 실제 시간 토글
-    $('time-axis-toggle').addEventListener('click', function (e) {
-      var b = e.target.closest('button'); if (!b) return;
-      state.timeAxisMode = b.getAttribute('data-tmode');
-      Array.prototype.forEach.call(this.children, function (c) {
-        c.classList.toggle('is-active', c === b);
+    // 속도/심박 시계열 X축 — 경과 시간 / 실제 시간 토글.
+    // 트랙편집 카드와 심박 추이 카드 두 곳에 동일한 토글 UI 가 있고,
+    // 둘 다 같은 state.timeAxisMode 를 갱신한 뒤 두 차트를 다시 그린다.
+    function setTimeAxisMode(mode) {
+      state.timeAxisMode = mode;
+      ['time-axis-toggle', 'hr-time-axis-toggle'].forEach(function (id) {
+        var box = $(id); if (!box) return;
+        Array.prototype.forEach.call(box.children, function (c) {
+          c.classList.toggle('is-active', c.getAttribute('data-tmode') === mode);
+        });
       });
       if (state.analysis) {
         renderSpeedChart();
-        // 심박 추이 차트도 같은 X축 표기를 따른다
         if (state.analysis.hr && state.analysis.hr.hasHR) renderHrZonesAndTrend();
       }
-    });
+    }
+    function bindTimeAxisToggle(id) {
+      var box = $(id); if (!box) return;
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        setTimeAxisMode(b.getAttribute('data-tmode'));
+      });
+    }
+    bindTimeAxisToggle('time-axis-toggle');
+    bindTimeAxisToggle('hr-time-axis-toggle');
 
-    // 심박수 — 최대 심박수 입력 → 존 분포·추이 배경 띠 재계산.
+    // 심박수 — 최대 심박수 입력 → 존 분포·추이 배경 띠·%HRmax 재계산.
     // 라이더 프로필에 저장돼 다음 세션에 자동 적용된다(재입력 회피).
     var hrMaxEl = $('hr-maxhr-input');
     if (hrMaxEl) {
@@ -314,7 +326,10 @@
         var v = parseInt($('hr-maxhr-input').value, 10);
         state.rider.maxHr = (isFinite(v) && v >= 100 && v <= 240) ? v : null;
         Storage.saveRider(state.rider);
-        if (state.analysis) renderHrZonesAndTrend();
+        if (state.analysis && state.analysis.hr && state.analysis.hr.hasHR) {
+          renderHrSummaryStrip(state.analysis.hr);
+          renderHrZonesAndTrend();
+        }
       }, 280));
     }
 
@@ -1181,6 +1196,15 @@
     }
     if (lo > 0 && Math.abs(S[lo - 1].t - t) < Math.abs(S[lo].t - t)) return lo - 1;
     return lo;
+  }
+  /* 차트 클릭 → 지도 시점 점프 (Danny 2026-05-27 §173).
+     커서 동기화 + 지도 자체를 해당 위치로 부드럽게 팬하여,
+     클릭이 단순 hover 가 아닌 명시적 '점프' 임을 시각적으로 확인시켜준다. */
+  function jumpMapToTime(fullT) {
+    syncCursor(fullT);
+    if (!state.fullSession) return;
+    var s = state.fullSession.samples[nearestFullByTime(fullT)];
+    if (s) Charts.panMapToLatLng(s.lat, s.lng);
   }
   /* 편집된 세션 기준 exclude 구간 (속도 차트 음영용) */
   function rebasedExcludes() {
@@ -3492,13 +3516,31 @@
     var box = $('hr-summary-strip');
     if (!box) return;
     var recTotal = (hr.recordedCount != null) ? hr.recordedCount : hr.count;
+    /* %HRmax — 라이더가 입력한 최대 심박수 기준 비율.
+       입력 없으면 세션 관측 최대(maxBpm)를 fallback 으로 쓰지만,
+       그 경우엔 '관측 기준' 임을 부수 설명에서 명시한다 (Danny 2026-05-27 §174). */
+    var maxHr = (state.rider && state.rider.maxHr) || hr.maxBpm;
+    var basisLabel = (state.rider && state.rider.maxHr)
+      ? '입력 최대 ' + maxHr + ' bpm'
+      : '관측 최대 ' + maxHr + ' bpm';
+    function pctOf(bpm) {
+      if (!bpm || !maxHr) return null;
+      return Math.round(bpm / maxHr * 100);
+    }
+    function withPct(sub, bpm) {
+      var p = pctOf(bpm);
+      return p != null ? sub + ' · ' + p + '% HRmax' : sub;
+    }
     box.innerHTML =
-      statTile('평균 심박 (bpm)', Math.round(hr.avgBpm), '세션 시간가중 평균') +
-      statTile('최고 심박 (bpm)', hr.maxBpm, '세션 관측 최대') +
-      statTile('최저 심박 (bpm)', hr.minBpm, '세션 관측 최소') +
+      statTile('평균 심박 (bpm)', Math.round(hr.avgBpm),
+        withPct('세션 시간가중 평균', hr.avgBpm)) +
+      statTile('최고 심박 (bpm)', hr.maxBpm,
+        withPct('세션 관측 최대', hr.maxBpm)) +
+      statTile('최저 심박 (bpm)', hr.minBpm,
+        withPct('세션 관측 최소', hr.minBpm)) +
       statTile('심박 기록률 (%)', Math.round(hr.coveragePct),
         '기록 포인트 ' + recTotal.toLocaleString() + '개 중 심박 ' +
-        hr.count.toLocaleString() + '개');
+        hr.count.toLocaleString() + '개 · 기준 ' + basisLabel);
   }
 
   /* 심박 존 분포 + 추이 차트(존 배경 띠) — 최대 심박수 입력이 바뀔
@@ -3519,7 +3561,9 @@
       }
     }
 
-    // 추이 차트 — HR 존 배경 띠 + 속도/지도 커서 동기화
+    // 추이 차트 — HR 존 배경 띠 + 속도 overlay (우축) + 클릭→지도 점프.
+    // 속도는 현재 단위 설정(kt/km/h)에 맞춰 변환된 값을 우축에 띄우고,
+    // 클릭하면 지도가 그 시점으로 panTo 한다 (Danny 2026-05-27 §173).
     var pad = 6;
     Charts.renderHrChart('hr-trend-chart', state.session, {
       fmtX: fmtTimeAxis,
@@ -3527,7 +3571,10 @@
       zones: zoneData,
       yMin: Math.max(0, hr.minBpm - pad),
       yMax: hr.maxBpm + pad,
-      onHover: function (fullT) { syncCursor(fullT); }
+      toSpeed: toSpeed,
+      speedUnitLabel: unitLabel(),
+      onHover: function (fullT) { syncCursor(fullT); },
+      onSeek: function (fullT) { jumpMapToTime(fullT); }
     });
 
     /* 기록 공백 안내 (Danny 2026-05-23 §D) — leg 가 2개 이상이면 추이

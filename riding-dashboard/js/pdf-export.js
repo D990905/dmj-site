@@ -216,8 +216,18 @@
   var STYLE_ID = 'rd-pdf-style';
   function injectPdfStyle() {
     if ($(STYLE_ID)) return;
+    /* #rd-pdf-root 위치 — Danny 2026-05-27 §174 PDF 백지 fix.
+       이전: position:fixed; left:-10000px → html2canvas 가 fixed +
+       off-screen 요소를 capture 할 때 빈 canvas 를 반환하는 알려진
+       버그(eKoopmans/html2pdf.js#422)로 PDF 가 백지로 나왔다.
+       해결: position:absolute 로 document flow 외부에 두되, left:0/top:0
+       에 배치 후 z-index:-9999 + opacity:0 으로 시각적으로만 가린다.
+       opacity:0 은 html2canvas 의 clone-and-render 파이프라인에서
+       무시되므로(cloned doc 의 inline style 로 override) PDF 출력에는
+       영향 없다. windowWidth:794 가 layout 의 컨텍스트를 잡아준다. */
     var css = ""
-      + "#rd-pdf-root{position:fixed;left:-10000px;top:0;width:794px;"
+      + "#rd-pdf-root{position:absolute;left:0;top:0;width:794px;"
+      +   "z-index:-9999;opacity:0;pointer-events:none;"
       +   "background:#FFFFFF;color:#0A2540;"
       +   "font-family:'Pretendard',system-ui,-apple-system,sans-serif;"
       +   "font-weight:400;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased}"
@@ -826,6 +836,22 @@
                   'font-family',
                   "'Pretendard',system-ui,-apple-system,sans-serif",
                   'important');
+                /* Danny 2026-05-27 §174 — 원본 #rd-pdf-root 은 opacity:0
+                   으로 화면에서 가려져 있다. cloned doc 에서는 opacity 를
+                   복원해야 html2canvas 가 실제 픽셀을 그릴 수 있다.
+                   transform/position 도 일반 흐름으로 복원 — fixed/translateX
+                   같은 hide 트릭이 cloned 에 누설되면 bounding rect 가
+                   여전히 off-screen 으로 잡혀 백지 PDF 가 되돌아온다. */
+                var pdfRoot = clonedDoc.getElementById('rd-pdf-root');
+                if (pdfRoot) {
+                  pdfRoot.style.setProperty('opacity', '1', 'important');
+                  pdfRoot.style.setProperty('position', 'static', 'important');
+                  pdfRoot.style.setProperty('left', 'auto', 'important');
+                  pdfRoot.style.setProperty('top', 'auto', 'important');
+                  pdfRoot.style.setProperty('z-index', 'auto', 'important');
+                  pdfRoot.style.setProperty('pointer-events', 'auto', 'important');
+                  pdfRoot.style.setProperty('transform', 'none', 'important');
+                }
               } catch (e) { /* noop */ }
             }
           },
