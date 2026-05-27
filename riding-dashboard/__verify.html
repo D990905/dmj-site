@@ -1,6 +1,34 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0A2540">

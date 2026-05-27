@@ -15,6 +15,34 @@
 <title>관리자 · 주문 진행 관리 | 단무지공방</title>
 <meta name="description" content="단무지공방 관리자 도구 — 주문 진행 stage 업데이트, 관리자 메시지 전송.">
 
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">

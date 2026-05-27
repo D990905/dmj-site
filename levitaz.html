@@ -6,6 +6,34 @@
 <meta name="theme-color" content="#0A2540">
 <title>Levitaz — Free Series · Boom Boards · R6 Race | 오스트리아 정밀 카본 포일 | 단무지공방</title>
 <meta name="description" content="Levitaz 오스트리아 정밀 카본 포일. Free Series Front Wing 4종 + Boom FS 보드 3종 + R6 Race 시리즈. CORE 티타늄 일체형 구조. 단무지공방 한국 정식 수입.">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
 <link rel="canonical" href="https://dmjgroup.kr/levitaz.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Levitaz | 단무지공방">

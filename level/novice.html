@@ -11,6 +11,34 @@
 <title>초급 — 테이크오프와 기본 라이딩 (곧 공개) | 단무지공방 컨설팅</title>
 <meta name="description" content="초급(Novice) 라이더 가이드 — 글라이딩을 마치고 테이크오프·첫 foiling 라이딩에 도전하는 단계. 곧 공개 예정. 그동안은 1:1 구매 상담을 이용해 주세요.">
 <meta name="robots" content="noindex,follow">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
 <link rel="canonical" href="https://dmjgroup.kr/level/novice.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="초급 라이더 컨설팅 (곧 공개) | 단무지공방">

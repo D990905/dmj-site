@@ -6,6 +6,34 @@
 <meta name="theme-color" content="#0A2540">
 <title>Takoon — Wing 3-tier · Board 여섯 모델 네 카테고리 큐레이션 | 단무지공방</title>
 <meta name="description" content="Takoon 2026 Wing V4 / V4 Pro / VX Pro V2 + 보드 6모델 (Cruise·Slide·Glide·Glide Midlength·Ultra Glide·Prosurf) 네 카테고리 (패러윙·윙포일·다운윈드·펌핑/서핑). 단무지공방 정식 수입.">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
 <link rel="canonical" href="https://dmjgroup.kr/takoon.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Takoon | 단무지공방">

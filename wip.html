@@ -6,6 +6,34 @@
 <meta name="theme-color" content="#2A3B4C">
 <title>Forward WIP — 스위스 워터스포츠 보호장비 (Impact Vest · Helmet · Wetsuit · Harness) | 단무지공방</title>
 <meta name="description" content="Forward WIP — 스위스 본사의 워터스포츠 안전장비 전문. Raley Impact Vest · Prowip 2.0 / Wipper 2.0 헬멧 · Waistfoil Harness 3.0. 프로 세일·윙·카이트 검증. 단무지공방 정식 수입.">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
 <link rel="canonical" href="https://dmjgroup.kr/wip.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Forward WIP | 단무지공방">

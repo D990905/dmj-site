@@ -796,6 +796,12 @@
     inst.cursorMarker.setTooltipContent(label || '');
     inst.cursorMarker.openTooltip();
   }
+  /* 지도를 해당 위경도로 부드럽게 팬 (차트 클릭 → 지도 점프용 — Danny 2026-05-27 §173).
+     panTo 의 기본 애니메이션을 이용해 자연스럽게 이동한다. */
+  function panMapToLatLng(lat, lng) {
+    if (!inst.map || lat == null) return;
+    try { inst.map.panTo([lat, lng], { animate: true, duration: 0.4 }); } catch (e) {}
+  }
   function hideCursor() {
     drawCrosshair(-1);
     drawHrCrosshair(-1);
@@ -1430,6 +1436,24 @@
       }
     });
 
+    /* 속도 overlay (Danny 2026-05-27 §173) — HR 차트에 우측 y축으로 속도
+       곡선을 겹쳐 그린다. opts.speedData 가 있을 때만 그리고, 우측 축은
+       속도 단위(kt/km/h)로 라벨링한다. 클릭 시 onSeek(t) 콜백으로 지도
+       해당 시점으로 점프시킨다. HR 곡선이 시각적으로 dominant 하도록
+       속도 곡선은 borderWidth/투명도를 낮춰 배경 역할로 둔다. */
+    var speedData = null;
+    if (opts.includeSpeed !== false) {
+      speedData = [];
+      var spdConv = opts.toSpeed || function (ms) { return ms; };
+      legs.forEach(function (leg, li) {
+        if (li > 0) speedData.push({ x: (S[leg.start].t + S[legs[li - 1].end].t) / 2, y: NaN });
+        for (var i2 = leg.start; i2 <= leg.end; i2++) {
+          speedData.push({ x: S[i2].t, y: +spdConv(S[i2].speed).toFixed(2) });
+        }
+      });
+    }
+    var speedUnit = opts.speedUnitLabel || 'kt';
+
     var zoneData = opts.zones || null;
     /* HR 존 배경 띠 — 곡선 뒤에 수평 색 띠. */
     var zonePlugin = {
@@ -1504,15 +1528,30 @@
       }
     };
 
+    /* 데이터셋 구성 — HR(좌축 y) + (옵션) 속도(우축 y1).
+       HR 가 분석 주체이므로 stroke 가 강조되고, 속도는 배경 컨텍스트로
+       더 얇고 옅게 그린다. */
+    var datasets = [{
+      label: i18nT('심박수 (bpm)'), data: data, spanGaps: false,
+      borderColor: HR_LINE, borderWidth: 1.6,
+      fill: false, pointRadius: 0, tension: 0.25,
+      yAxisID: 'y', order: 1
+    }];
+    if (speedData) {
+      datasets.push({
+        label: i18nT('속도 ({u})', {u: speedUnit}),
+        data: speedData, spanGaps: false,
+        borderColor: hexA(THEME.line, 0.85),
+        backgroundColor: hexA(THEME.line, 0.08),
+        borderWidth: 1.1, fill: true,
+        pointRadius: 0, tension: 0.25,
+        yAxisID: 'y1', order: 2
+      });
+    }
+
     inst.hr = new Chart(el.getContext('2d'), {
       type: 'line',
-      data: {
-        datasets: [{
-          label: i18nT('심박수 (bpm)'), data: data, spanGaps: false,
-          borderColor: HR_LINE, borderWidth: 1.6,
-          fill: false, pointRadius: 0, tension: 0.25
-        }]
-      },
+      data: { datasets: datasets },
       options: {
         responsive: true, maintainAspectRatio: false,
         parsing: false, normalized: true, animation: false,
@@ -1532,18 +1571,35 @@
             grid: { color: THEME.grid }
           },
           y: {
+            position: 'left',
             title: { display: true, text: i18nT('심박수 (bpm)') },
             suggestedMin: opts.yMin, suggestedMax: opts.yMax,
             grid: { color: THEME.grid }
-          }
+          },
+          y1: speedData ? {
+            position: 'right',
+            title: { display: true, text: i18nT('속도 ({u})', {u: speedUnit}) },
+            beginAtZero: true,
+            /* 좌·우축 grid 가 겹쳐 보이지 않도록 우축 grid 는 끈다 */
+            grid: { drawOnChartArea: false }
+          } : undefined
         },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         onResize: function () { sizeCrosshair(); },
         onHover: function (ev) {
+          /* 속도 overlay 가 있고 onSeek 콜백이 있으면 클릭 가능 — 포인터 변경 */
+          if (opts.onSeek) el.style.cursor = 'pointer';
           if (ev.x == null || !opts.onHover) return;
           var t = inst.hr.scales.x.getValueForPixel(ev.x);
           var off = (session.editApplied && session.editApplied.trimStart) || 0;
           opts.onHover(t + off, 'hrchart');
+        },
+        /* 클릭 → 지도가 그 시점으로 이동 (Danny 2026-05-27 §173). */
+        onClick: function (ev) {
+          if (!opts.onSeek || ev.x == null) return;
+          var t = inst.hr.scales.x.getValueForPixel(ev.x);
+          var off = (session.editApplied && session.editApplied.trimStart) || 0;
+          opts.onSeek(t + off);
         }
       },
       plugins: [zonePlugin, gapPlugin]
@@ -2091,6 +2147,7 @@
     renderProgression: renderProgression,
     setChartCursorByTime: setChartCursorByTime,
     setMapCursorLatLng: setMapCursorLatLng,
+    panMapToLatLng: panMapToLatLng,
     hideCursor: hideCursor,
     sizeCrosshair: sizeCrosshair,
     speedColor: speedColor,

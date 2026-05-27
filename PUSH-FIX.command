@@ -33,7 +33,13 @@ retry_git "git add -A" || { echo "ABORT: git add failed"; read -n 1; exit 1; }
 
 echo ""
 echo "==> Committing..."
-git commit -m "iOS Safari mobile menu hit-test hotfix + wind i18n + SPS color + cart icon + replay overlap" 2>&1 || echo "(maybe nothing to commit)"
+git commit -m "§172 — Stale Service Worker auto-cleanup injected into all site HTML (DO_NOT_REVERT)
+
+Adds inline cleanup script to <head> of 124 HTML files (4 fragments without <head>
+correctly skipped). On page load, unregisters any leftover service workers (e.g. the
+stale dmjgroup.kr/ind-script/sw.php from the previous domain owner) and clears caches,
+then does a one-time reload guarded by sessionStorage flag to avoid infinite loops.
+Fixes iOS Safari/Chrome users seeing scroll-only / dead-clicks behaviour." 2>&1 || echo "(maybe nothing to commit)"
 
 echo ""
 echo "==> Pushing to origin/main (with retry)..."

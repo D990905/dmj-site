@@ -7,6 +7,34 @@
 <meta name="color-scheme" content="light">
 <title>라이딩 통계 대시보드 — GPX 분석 (Phase 1)</title>
 <meta name="description" content="윙포일·세일링 GPX 트랙 분석 — 속도·택킹/자이빙 효율·VMG·TWA 폴라. 코치 등급 분석.">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <!-- 메인 사이트 헤더·내비 스타일 — dashboard.css 를 뒤에 두어 대시보드 본문 스타일이 우선한다 -->
 <link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526">
@@ -647,7 +675,14 @@
     <!-- 분석 3-1 · 세션 중 심박 추이 -->
     <div class="card" id="hr-trend-card" hidden>
       <div class="card__head"><h3>세션 중 심박 추이</h3>
-        <span class="card__hint">배경 띠 = 심박 존 · 속도 그래프·지도와 커서가 함께 움직입니다</span></div>
+        <div class="card__head-right">
+          <span class="card__hint">배경 띠 = 심박 존 · 우측 축 = 속도 · 그래프 클릭 시 지도가 그 시점으로 이동</span>
+          <div class="time-toggle" id="hr-time-axis-toggle" role="group" aria-label="X축 시간 표기">
+            <button type="button" data-tmode="elapsed" class="is-active">경과 시간</button>
+            <button type="button" data-tmode="clock">실제 시간</button>
+          </div>
+        </div>
+      </div>
       <div class="chart-box"><canvas id="hr-trend-chart"></canvas></div>
       <p class="hr-trend-note" id="hr-trend-gapnote" hidden></p>
     </div>
