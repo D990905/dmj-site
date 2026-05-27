@@ -1585,6 +1585,124 @@
       'safety and technique calls should defer to the rider or a qualified coach.',
     '주세요.': '',
     '라이딩보고서-': 'Riding-report-',
+
+    /* === final-pass standalone labels (Danny 2026-05-26) === */
+    '클릭하면 지도에 이 구간 트랙이 표시됩니다': 'Click to show this segment on the map',
+    '요약만 저장된 세션이라 다시 불러올 수 없습니다': 'Summary-only session — cannot be reloaded',
+    '요약만': 'Summary only',
+    '클릭하면 이 세션을 대시보드에 다시 불러옵니다': 'Click to reload this session on the dashboard',
+    '↻ 다시 보기': '↻ Reopen',
+    '삭제': 'Delete',
+    '클릭하면 이 기록을 세운 세션 분석으로 이동합니다': 'Click to jump to the session that set this record',
+    '요약만 저장된 세션이라 이동할 수 없습니다': 'Summary-only session — cannot navigate',
+    '잘림': 'trimmed',
+    '제외': 'Excluded',
+    '구간': 'segment',
+    '손실': 'Loss',
+    '노트': 'knots',
+    '— 참고로, 한 사이즈 작은': '— for reference, one size smaller',
+    '풍향': 'Wind direction',
+    '권장 추정값': 'Recommended estimate',
+    '추정값': 'Estimate',
+    '무항주 구역 폭': 'No-go zone width',
+    '그리드 정렬도': 'Grid alignment',
+    '추정 분산': 'Spread',
+    '풍상·풍하 판정 여유': 'Upwind / downwind margin',
+    '임계': 'Threshold',
+    '이상': 'or higher',
+    '편집됨': 'Edited',
+    '분석 길이': 'analyzed length',
+    '오늘의 세션 속도': 'Today’s session speed',
+
+    /* === index.html + mobile menu cleanup (Danny 2026-05-26) === */
+    '단무지공방 소개': 'About DMJ Gongbang',
+    '라이딩 통계 대시보드': 'Riding Stats Dashboard',
+    '윙포일·세일링 GPX 분석 · Phase 1': 'Wingfoil / sailing GPX analysis · Phase 1',
+    '라이딩 분석 완료': 'Riding analysis complete',
+    '아무 곳이나 누르면 대시보드로 이동합니다': 'Tap anywhere to open the dashboard',
+    '대시보드 바로 보기 →': 'View dashboard →',
+    '워치·GPS 앱에서 내보낸 트랙을 올리면 속도 분석과 함께': 'Upload a track exported from your watch / GPS app to see speed analysis together with',
+    '까지 — 일반 GPS 앱이 보여주지 않는': '— coach-grade analysis that ordinary GPS apps don’t show.',
+    'GPX 내보내기': 'GPX Export',
+    'Apple 건강 앱에는 GPX 내보내기가 없습니다.': 'Apple Health does not have GPX export.',
+    'Samsung Health 에서 운동 기록 내보내기를 사용하거나, GPX 를 지원하는\n             서드파티 트래킹 앱(예: 윙포일 GPS 앱)으로 기록하세요.': 'Use Samsung Health’s exercise-record export, or record with a third-party tracking app that supports GPX (e.g. a wingfoil GPS app).',
+    'Garmin Connect 웹 → 액티비티 열기 → 우측 상단 ⚙(톱니) →': 'Garmin Connect (web) → open activity → top-right ⚙ (gear) →',
+    '같은 앱으로 워크아웃을 GPX/FIT 로 내보내세요.': 'Export the workout as GPX / FIT from the same app.',
+    '또는': 'or',
+    '원본 내보내기': 'Export Original',
+    '심박만': 'HR only',
+    '양끝': 'Both ends',
+    '아직 저장된 세션이 없습니다. 위에서': 'No saved sessions yet. Tap',
+    '을 누르면\n        시즌별 성장 흐름과 개인 베스트가 여기에 쌓입니다.': 'above to build seasonal trends and personal-best records here.',
+    '(휴식·표류\n        등)이 만들어지고, 제외 구간을 누르면 해제됩니다. 편집은 실제 시간을 기준으로\n        하며 즉시 거리·속도·회전 분석에 반영됩니다.': '(rest / drift, etc.) become excluded segments; tap an excluded segment to remove the exclusion. Edits are time-based and immediately update distance · speed · maneuver analysis.',
+    '윙 사이즈는 Coach Danny what-if 분석의 필수 입력입니다.\n        풍속은 아래': 'Wing size is required for Coach Danny what-if analysis. Wind speed is entered in the',
+    '카드에서 입력합니다. 프론트 윙 면적 조언은 v2 범위입니다.': 'card below. Front-wing area advice is planned for v2.',
+    '제외 구간': 'Excluded segment',
+    '라이딩 오버랩': 'Riding overlay',
+    '을 드래그해 워밍업·이동 구간을 잘라내면 남은 트랙이\n        가로 폭을 꽉 채웁니다. 그래프 위를 가로로 드래그하면': 'to trim warm-up / transit sections; the remaining track fills the full width. Drag horizontally over the graph to add',
+    '위 회전 목록 또는 지도에서 회전을 선택하면 정점 ±10초 곡선이 표시됩니다.\n        여러 회전을 선택하면 겹쳐 그리고 평균 곡선을 함께 보여줍니다.': 'Select a maneuver from the list or map above to show the apex ±10s curve. Select multiple to overlay them with a mean curve.',
+    '윙': 'Wing',
+    '포일': 'Foil',
+    '보드': 'Board',
+    '안전장비': 'Safety gear',
+    '핸들': 'Handle',
+    '여성 라이더': 'Women riders',
+    '유소년·어린이': 'Junior / kids',
+    '가족 라이딩': 'Family riding',
+    'Levitaz': 'Levitaz',
+    'PPC': 'PPC',
+    'Takoon': 'Takoon',
+    'Forward WIP': 'Forward WIP',
+    '올림픽공인 하이드로포일/보드': 'Olympic-certified hydrofoil / board',
+    '하이퍼포먼스 윙': 'High-performance wing',
+    '부담없는 시작': 'Easy start',
+    '탑라이더들의 안전장비': 'Top-rider safety gear',
+    '핸들·붐·FDS 윙': 'Handle · boom · FDS wing',
+    'FW·Mast·Stab·세트': 'FW · Mast · Stab · set',
+    '입문 보드·중상급 셰이프': 'Entry boards · intermediate-advanced shapes',
+    '헬멧·임팩트 베스트·하니스': 'Helmet · impact vest · harness',
+    '평수면·속도': 'Flat water · speed',
+    '한국 일반 스팟': 'Typical Korean spots',
+    '파도·서핑': 'Waves · surf',
+    '다목적': 'Versatile',
+    '글라이딩 단계': 'Gliding phase',
+    '테이크오프·기본 라이딩': 'Take-off · basic riding',
+    'Jibe·tack 정복': 'Jibe / tack mastery',
+    '전문 분야 진입': 'Specialty entry',
+    'Race·대회': 'Race · competition',
+    '안전·작은 사이즈': 'Safety · small sizes',
+    '3-4 set 번들': '3–4 set bundle',
+    'Language / 언어': 'Language',
+    'Phase 2 예정': 'Phase 2 (planned)',
+    '검색 (Phase 2 예정)': 'Search (Phase 2 planned)',
+    '메뉴 닫기': 'Close menu',
+    '메뉴 열기': 'Open menu',
+    '속도 단위': 'Speed unit',
+    '속도 오버랩': 'Speed overlay',
+    '장바구니': 'Cart',
+
+    /* === Main-site header / trust-bar / nav labels (Danny 2026-05-26)
+       inSkipZone 에서 .site-header / .trust-bar 자동 skip 을 제거했으므로
+       이 라벨들도 EN 모드에서 영문 변환된다. */
+    '3회 올림픽 출전 코치 운영': '3× Olympic-experienced coach',
+    '네 브랜드 정식 수입': 'Authorized importer for 4 brands',
+    '당일 출고': 'Same-day shipping',
+    '1:1 카톡 컨설팅': '1:1 KakaoTalk consultation',
+    '브랜드': 'Brands',
+    '라이딩 스타일': 'Riding style',
+    '장비': 'Gear',
+    '실력 수준': 'Skill level',
+    '스마트 컨설팅 ↗': 'Smart Consult ↗',
+    '로그인': 'Login',
+    '공방': 'Gongbang',
+    '단무지공방 홈': 'DMJ Gongbang home',
+    '단무지공방': 'DMJ Gongbang',
+    '주 메뉴': 'Main menu',
+    '카톡 상담': 'KakaoTalk support',
+    '윙포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.':
+      'Authorized 4-brand wingfoil / SUP curation. Consulting tailored to Korean rider spots.',
+    '까지 — 일반 GPS 앱이 보여주지 않는\n         코치 등급 분석을 바로 확인할 수 있습니다.':
+      '— coach-grade analysis that ordinary GPS apps don’t show.',
   };
 
   /* ============================================================
@@ -1632,13 +1750,15 @@
    * 매칭 단위 = 텍스트노드의 trimmed 전체 (부분 매치 X — 충돌 방지).
    * 원문은 textNode._rdOrig / element._rdOrigAttrs 에 보존.
    * ============================================================ */
-  /* 메인 사이트 헤더·내비·트러스트바는 번역 범위 X (대시보드 영역만).
-     `.site-header`, `.trust-bar`, 또는 [data-rd-i18n-skip] 안쪽은 건너뛴다. */
+  /* 번역 범위 — 대시보드 페이지에서는 페이지 전체를 번역 대상으로 둔다
+     (헤더·트러스트바 포함). EN 모드에서 한글이 100% 사라지게 하려면 메인
+     사이트 헤더 라벨도 함께 번역해야 한다 (Danny 2026-05-26).
+     명시적으로 번역에서 제외하고 싶은 영역은 [data-rd-i18n-skip] 속성으로
+     opt-out 한다. 이전엔 .site-header / .trust-bar 를 자동 skip 했지만,
+     이 정책으로 EN 모드 polish 가 막혔다 — 자동 skip 제거. */
   function inSkipZone(node) {
     var el = node.nodeType === 1 ? node : node.parentElement;
     while (el && el !== document.body) {
-      if (el.classList && (el.classList.contains('site-header') ||
-          el.classList.contains('trust-bar'))) return true;
       if (el.hasAttribute && el.hasAttribute('data-rd-i18n-skip')) return true;
       el = el.parentElement;
     }

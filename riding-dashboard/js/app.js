@@ -955,12 +955,84 @@
      꼴이면 data-rd-num 을 부여해 카운트업 대상이 된다. 'min:sec' 같은
      비숫자 라벨은 자동으로 카운트업 제외된다.
      value 가 이미 문자열이면 그대로 두고, 안에 첫 숫자만 카운트업 대상으로
-     쓴다(예: '12.34 kt' → suffix=' kt', target=12.34). */
-  function statTile(label, value, sub) {
+     쓴다(예: '12.34 kt' → suffix=' kt', target=12.34).
+     2026-05-26 Layer 1.5: opts.spark — 시계열 배열을 받으면 미니 sparkline
+     SVG 를 타일 하단에 그린다. opts.trend — { delta, label, dir } chip 표시.
+     opts.color — sparkline 그라데이션 hex 색 (기본 sea). */
+  function statTile(label, value, sub, opts) {
     var valHtml = numHtml(value);
-    return '<div class="stat"><span class="stat__label">' + label + '</span>' +
+    var sparkHtml = (opts && opts.spark)
+      ? sparklineSvg(opts.spark, opts.color || '#1F8FFF') : '';
+    var trendHtml = (opts && opts.trend) ? trendChip(opts.trend) : '';
+    return '<div class="stat"><span class="stat__label">' + label +
+      (trendHtml ? trendHtml : '') + '</span>' +
       '<span class="stat__value">' + valHtml + '</span>' +
-      (sub ? '<span class="stat__sub">' + sub + '</span>' : '') + '</div>';
+      (sub ? '<span class="stat__sub">' + sub + '</span>' : '') +
+      sparkHtml +
+      '</div>';
+  }
+
+  /* sparklineSvg — 미니 영역(area) 그라데이션 차트.
+     values 배열을 viewBox 0..100 x 0..32 에 맞춰 정규화. 30 점이 넘어가면
+     균등 추출. 데이터 1개 이하면 빈 문자열. (Layer 1.5 — Danny 2026-05-26) */
+  function sparklineSvg(values, color) {
+    if (!values || values.length < 2) return '';
+    var n = values.length;
+    var STEP = Math.max(1, Math.floor(n / 64));
+    var pts = [];
+    for (var i = 0; i < n; i += STEP) pts.push(values[i]);
+    if (pts[pts.length - 1] !== values[n - 1]) pts.push(values[n - 1]);
+    var lo = Infinity, hi = -Infinity;
+    for (var j = 0; j < pts.length; j++) {
+      var v = pts[j];
+      if (v == null || !isFinite(v)) continue;
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    if (!isFinite(lo)) return '';
+    var span = hi - lo || 1;
+    var W = 100, H = 32;
+    var stepX = W / (pts.length - 1);
+    var d = '', area = '';
+    for (var k = 0; k < pts.length; k++) {
+      var x = (k * stepX).toFixed(2);
+      var y = (H - ((pts[k] - lo) / span) * (H - 4) - 2).toFixed(2);
+      d += (k === 0 ? 'M' : 'L') + x + ',' + y;
+      area += (k === 0 ? 'M' : 'L') + x + ',' + y;
+    }
+    area += 'L' + W + ',' + H + 'L0,' + H + 'Z';
+    var gradId = 'rd-spark-' + Math.random().toString(36).slice(2, 8);
+    return '<svg class="stat__spark" viewBox="0 0 ' + W + ' ' + H + '" ' +
+      'preserveAspectRatio="none" aria-hidden="true">' +
+      '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.32"/>' +
+      '<stop offset="100%" stop-color="' + color + '" stop-opacity="0"/>' +
+      '</linearGradient></defs>' +
+      '<path d="' + area + '" fill="url(#' + gradId + ')"/>' +
+      '<path d="' + d + '" fill="none" stroke="' + color +
+      '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '</svg>';
+  }
+
+  /* trendChip — KPI 라벨 옆에 작은 비교 chip.
+     trend: { delta, label, dir } — delta 부호로 ▲/▼/= 결정.
+     dir 가 'good'/'bad'/'neutral' 이면 색을 명시. (Layer 1.5) */
+  function trendChip(trend) {
+    if (!trend) return '';
+    var d = trend.delta;
+    var sign = '', cls = 'flat';
+    if (d != null && isFinite(d)) {
+      if (d > 0)      { sign = '▲ +'; cls = 'up'; }
+      else if (d < 0) { sign = '▼ −'; cls = 'down'; }
+      else            { sign = '='; cls = 'flat'; }
+    }
+    var dirCls = trend.dir ? ' rd-chip--' + trend.dir : '';
+    var num = (d == null || !isFinite(d)) ? '' :
+      Math.abs(d) >= 100 ? Math.round(Math.abs(d))
+      : Math.abs(d).toFixed(Math.abs(d) >= 10 ? 0 : 1);
+    var lab = trend.label ? ' <small>' + esc(trend.label) + '</small>' : '';
+    return ' <span class="rd-chip rd-chip--' + cls + dirCls + '">' +
+      sign + num + (trend.unit || '%') + lab + '</span>';
   }
 
   /* numHtml — 문자열 값을 받아 첫 숫자를 카운트업 가능한 span 으로 감싼다.
@@ -3941,28 +4013,82 @@
      라벨은 한국어 단일 단어(풍상·풍하·종합·택킹·자이빙)로 두고 EN 모드는
      i18n MAP 이 'Upwind' 등으로 치환한다. 점수에는 5단계 상태색 (number·
      progress bar) 을 inline style 로 입혀 카드 5장이 동일 척도로 보인다. */
+  /* ============================================================
+   * 도넛 SVG 헬퍼 (Layer 1.5 — Danny 2026-05-26)
+   * ------------------------------------------------------------
+   * 점수(0~100) 또는 임의 progress 를 원형 진행 표시로 그린다.
+   * - 배경 트랙(연한 톤) + 채워지는 진행 호(상태색 그라데이션) + 중앙 텍스트
+   * - mockup 의 도넛 패턴: Sales Statistics, Traffic Sources 카드
+   * - 색은 chart-theme 의 status 또는 sea 톤. 의미 변경 X.
+   * size = px 단위 원 지름. stroke = 두께.
+   * gradId 인자가 있으면 그라데이션 색 사용(없으면 단색).
+   * ============================================================ */
+  function donutSvg(value, max, color, opts) {
+    opts = opts || {};
+    var size = opts.size || 140;
+    var stroke = opts.stroke || 12;
+    var r = (size - stroke) / 2;
+    var cx = size / 2, cy = size / 2;
+    var circ = 2 * Math.PI * r;
+    var pct = Math.max(0, Math.min(1, (value || 0) / (max || 100)));
+    var dash = circ * pct;
+    var gradId = 'rd-donut-grad-' + Math.random().toString(36).slice(2, 8);
+    var trackColor = opts.trackColor || 'rgba(10,37,64,.06)';
+    /* 그라데이션 — 시작 색은 살짝 옅게, 끝은 진하게 (mockup soft tone) */
+    var c2 = opts.lightColor || color;
+    var grad =
+      '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0%" stop-color="' + c2 + '" stop-opacity="0.85"/>' +
+      '<stop offset="100%" stop-color="' + color + '" stop-opacity="1"/>' +
+      '</linearGradient></defs>';
+    return '<svg class="rd-donut" viewBox="0 0 ' + size + ' ' + size + '" ' +
+      'width="' + size + '" height="' + size + '" aria-hidden="true">' +
+      grad +
+      /* 배경 트랙 */
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" ' +
+      'fill="none" stroke="' + trackColor + '" stroke-width="' + stroke + '"/>' +
+      /* 진행 호 — 12시 방향에서 시계방향. transform 으로 -90° 회전 */
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" ' +
+      'fill="none" stroke="url(#' + gradId + ')" stroke-width="' + stroke + '" ' +
+      'stroke-linecap="round" ' +
+      'stroke-dasharray="' + circ.toFixed(2) + '" ' +
+      'stroke-dashoffset="' + (circ - dash).toFixed(2) + '" ' +
+      'transform="rotate(-90 ' + cx + ' ' + cy + ')" ' +
+      'style="transition:stroke-dashoffset .9s var(--ease-out)">' +
+      '</circle>' +
+      '</svg>';
+  }
+
   function vpsTile(label, seg, cmp, isMain) {
     var cls = 'vps-tile' + (isMain ? ' vps-tile--main' : '');
     var inner = '<span class="vps-tile__label">' + label + '</span>';
     if (!seg || seg.score == null) {
-      inner += '<div class="vps-tile__scorerow">' +
-        '<span class="vps-tile__score vps-score--na">—</span></div>' +
+      inner += '<div class="vps-tile__donutwrap">' +
+        donutSvg(0, 100, '#C7CFD8',
+          { size: isMain ? 150 : 110, stroke: isMain ? 14 : 11 }) +
+        '<div class="vps-tile__donutctr">' +
+        '<span class="vps-tile__score vps-score--na">—</span>' +
+        '<span class="vps-tile__max">산출 불가</span>' +
+        '</div></div>' +
         '<p class="vps-tile__note">' +
         esc(seg && seg.note ? seg.note : '산출 불가') + '</p>';
       return '<div class="' + cls + '">' + inner + '</div>';
     }
     var s = seg.score, tone = vpsTone(s);
-    var statColor = vpsStatusColor(s);
-    var numStyle = statColor ? ' style="color:' + statColor + '"' : '';
-    var barStyle = 'width:' + s + '%' +
-      (statColor ? ';background:' + statColor : '');
-    /* 점수 숫자에 data-rd-num 부여 → 카운트업 (2026-05-26 시각 폴리시) */
-    inner += '<div class="vps-tile__scorerow">' +
-      '<span class="vps-tile__score vps-score--' + tone + '"' + numStyle +
+    var statColor = vpsStatusColor(s) ||
+      (tone === 'hi' ? '#27AE60' : tone === 'mid' ? '#E0A100' : '#C0392B');
+    /* 도넛으로 진행 표시 — bar 대신 (Layer 1.5 — Danny 2026-05-26)
+       점수 숫자에 data-rd-num 부여 → 카운트업.
+       hi/mid/lo tone 마다 색 다르게. */
+    inner += '<div class="vps-tile__donutwrap">' +
+      donutSvg(s, 100, statColor,
+        { size: isMain ? 150 : 110, stroke: isMain ? 14 : 11 }) +
+      '<div class="vps-tile__donutctr">' +
+      '<span class="vps-tile__score vps-score--' + tone + '"' +
+      ' style="color:' + statColor + '"' +
       ' data-rd-num="' + s + '" data-rd-decimals="0">' + s + '</span>' +
-      '<span class="vps-tile__max">/ 100</span></div>' +
-      '<div class="vps-bar"><div class="vps-bar__fill vps-fill--' + tone +
-      '" style="' + barStyle + '"></div></div>';
+      '<span class="vps-tile__max">/ 100</span>' +
+      '</div></div>';
     /* 비교 델타 — 동일 풍속 영역대(밴드) 평균 대비 (Danny 2026-05-23
        §A-2·A-3). cmp.avg 가 있으면 델타를, 없으면(같은 풍속대 세션 없음)
        '비교 데이터 부족' 을 정직하게 표기한다 — 방향 카드 5장 전부. */

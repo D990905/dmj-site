@@ -831,10 +831,15 @@
   background: rgba(6, 26, 46, 0.45);
   z-index: 9998;
   opacity: 0;
+  /* 🚨 ROOT CAUSE FIX — 모바일에서 backdrop 이 display:block 으로 항상 펼쳐지는데
+     pointer-events 가 default(auto) 라서 chat 닫힌 상태에서도 페이지 전체 클릭을 흡수했음.
+     이걸 default 로 차단하고 chat open 시에만 활성화. (옥코치만 클릭 가능했던 버그) */
+  pointer-events: none;
   transition: opacity 0.22s ease;
 }
 .agent-deny-backdrop[data-open="true"] {
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* ============================================================

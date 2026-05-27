@@ -1277,9 +1277,9 @@ input::placeholder { color:var(--text-dim); }
    줄바꿈하되 넓은 화면에서는 5장이 한 줄에 들어간다). */
 .vps-grid { display:grid; gap:11px; grid-template-columns:repeat(2,1fr); }
 .vps-tile {
-  background:var(--bg-card-2); border-radius:12px; border:1px solid var(--border-soft);
-  padding:14px 14px 16px; display:flex; flex-direction:column; gap:8px;
-  text-align:center;
+  background:var(--bg-card-2); border-radius:14px; border:1px solid var(--border-soft);
+  padding:16px 12px 18px; display:flex; flex-direction:column; gap:10px;
+  text-align:center; align-items:center;
   transition:transform var(--t-base) var(--ease-out),
              box-shadow var(--t-base) var(--ease-out),
              border-color var(--t-fast) var(--ease-out);
@@ -1288,8 +1288,29 @@ input::placeholder { color:var(--text-dim); }
 .vps-tile--main {
   background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFD 100%);
   border-color:var(--border); box-shadow:var(--shadow);
+  padding:20px 14px 22px;
 }
 .vps-tile--main:hover { box-shadow:var(--shadow-hover); }
+
+/* 도넛 wrapper — SVG 진행 호 + 중앙 점수 텍스트 absolute 겹침
+   (Layer 1.5 — Sales Statistics mockup 패턴) */
+.vps-tile__donutwrap {
+  position:relative; display:inline-flex; align-items:center; justify-content:center;
+  margin:4px 0 6px;
+}
+.vps-tile__donutctr {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  pointer-events:none;
+}
+.vps-tile--main .vps-tile__donutctr .vps-tile__score { font-size:2.8rem; }
+.vps-tile .vps-tile__donutctr .vps-tile__score { font-size:1.85rem; line-height:1; }
+.vps-tile__donutctr .vps-tile__max {
+  font-size:.66rem; color:var(--text-dim); font-weight:700;
+  margin-top:2px; letter-spacing:.02em;
+}
+.vps-tile--main .vps-tile__donutctr .vps-tile__max { font-size:.74rem; }
+.rd-donut { display:block; }
 .vps-tile__label {
   font-size:.78rem; font-weight:700; color:var(--text-mid);
 }
