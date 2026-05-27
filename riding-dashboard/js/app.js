@@ -44,6 +44,10 @@
     editState: null, sessionSig: '', windPending: null,
     maneuverFilter: 'all', maneuverShowAll: false,
     timeAxisMode: 'elapsed',
+    /* 심박 추이 차트에 속도 곡선을 우축으로 겹쳐 보일지 — 기본 false
+       (심박만 보이는 깔끔한 뷰). 카드 헤더 '라이딩 오버랩' 토글로
+       on/off (Danny 2026-05-27 §175). */
+    hrShowSpeed: false,
     violinMetric: 'sog', violinWind: 'upwind', violinPop: 'all',
     /* 세션 비교 그래프 — 3분리 → 1통합 (Danny 2026-05-23 §C).
        progMetrics = 표시할 지표(중복 선택), progChartType = 막대/선. */
@@ -317,6 +321,34 @@
     }
     bindTimeAxisToggle('time-axis-toggle');
     bindTimeAxisToggle('hr-time-axis-toggle');
+
+    // 라이딩 오버랩 토글 — 심박만 ↔ 속도 우축 overlay (Danny 2026-05-27 §175)
+    function setHrOverlayMode(mode) {
+      state.hrShowSpeed = (mode === 'overlay');
+      var box = $('hr-overlay-toggle');
+      if (box) {
+        Array.prototype.forEach.call(box.children, function (c) {
+          c.classList.toggle('is-active', c.getAttribute('data-omode') === mode);
+        });
+      }
+      // hint 텍스트도 모드에 맞춰 갱신 — '우측 축 = 속도' 안내는 오버랩일 때만
+      var hint = $('hr-trend-hint');
+      if (hint) {
+        hint.textContent = state.hrShowSpeed
+          ? '배경 띠 = 심박 존 · 우측 축 = 속도 · 그래프 클릭 시 지도가 그 시점으로 이동'
+          : '배경 띠 = 심박 존 · 그래프 클릭 시 지도가 그 시점으로 이동';
+      }
+      if (state.analysis && state.analysis.hr && state.analysis.hr.hasHR) {
+        renderHrZonesAndTrend();
+      }
+    }
+    var overlayBox = $('hr-overlay-toggle');
+    if (overlayBox) {
+      overlayBox.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        setHrOverlayMode(b.getAttribute('data-omode'));
+      });
+    }
 
     // 심박수 — 최대 심박수 입력 → 존 분포·추이 배경 띠·%HRmax 재계산.
     // 라이더 프로필에 저장돼 다음 세션에 자동 적용된다(재입력 회피).
@@ -1197,14 +1229,29 @@
     if (lo > 0 && Math.abs(S[lo - 1].t - t) < Math.abs(S[lo].t - t)) return lo - 1;
     return lo;
   }
-  /* 차트 클릭 → 지도 시점 점프 (Danny 2026-05-27 §173).
-     커서 동기화 + 지도 자체를 해당 위치로 부드럽게 팬하여,
-     클릭이 단순 hover 가 아닌 명시적 '점프' 임을 시각적으로 확인시켜준다. */
+  /* 차트 클릭 → 지도 시점 점프 (Danny 2026-05-27 §173 + §175 보강).
+     커서 동기화 + 지도 자체를 해당 위치로 부드럽게 팬한다.
+     심박/속도 차트는 보통 지도 아래에 있어, 차트 클릭만으로는
+     사용자가 지도의 변화를 못 볼 수 있다. 클릭 시 지도가 뷰포트에
+     일부라도 보이지 않으면 부드럽게 스크롤해서 명시적으로 보여준다
+     (사용자가 이미 지도를 보고 있으면 스크롤 안 함). */
   function jumpMapToTime(fullT) {
     syncCursor(fullT);
     if (!state.fullSession) return;
     var s = state.fullSession.samples[nearestFullByTime(fullT)];
-    if (s) Charts.panMapToLatLng(s.lat, s.lng);
+    if (!s) return;
+    Charts.panMapToLatLng(s.lat, s.lng);
+    /* 지도 카드가 뷰포트에 충분히 보이지 않으면 스크롤 — */
+    var mapCard = document.querySelector('.card--map');
+    if (mapCard) {
+      var r = mapCard.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var visibleH = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      var minVisible = Math.min(r.height, vh * 0.35);
+      if (visibleH < minVisible) {
+        mapCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
   }
   /* 편집된 세션 기준 exclude 구간 (속도 차트 음영용) */
   function rebasedExcludes() {
@@ -3571,6 +3618,9 @@
       zones: zoneData,
       yMin: Math.max(0, hr.minBpm - pad),
       yMax: hr.maxBpm + pad,
+      /* §175 — '라이딩 오버랩' 토글로 속도 곡선 표시 여부 결정.
+         기본 OFF (심박만 — 깔끔한 뷰). 사용자가 토글 ON 시 우축 속도 overlay. */
+      includeSpeed: state.hrShowSpeed,
       toSpeed: toSpeed,
       speedUnitLabel: unitLabel(),
       onHover: function (fullT) { syncCursor(fullT); },
