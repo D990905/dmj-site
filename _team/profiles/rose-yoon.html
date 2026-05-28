@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A2540">
+  <title>로즈 윤 (Rose Yoon) · Visual Design Director · SailTechCo</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="profile-style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../virtual_office.html">← HQ</a>
+  <span class="topnav__sep">/</span>
+  <a href="../index.html">팀</a>
+  <span class="topnav__sep">/</span>
+  <span>로즈 윤</span>
+</nav>
+
+<main class="profile">
+
+  <!-- Slide 1 · Cover -->
+  <section class="cover">
+    <div class="cover__id">#01 · VISUAL DESIGN</div>
+    <img class="cover__avatar" src="../team_avatars/01_yoon_jisu.svg" alt="로즈 윤 아바타">
+    <h1 class="cover__name">로즈 윤</h1>
+    <p class="cover__name-en">Rose Yoon · 38</p>
+    <div class="cover__role">Visual Design Director</div>
+    <p class="cover__tag">"여백 8픽셀 단위로 살아야 마음이 가." — Pretendard 가족 견본 카드 9장을 책상에 항상 노출하는 시각 시스템 fundamentalist.</p>
+  </section>
+
+  <!-- Slide 2 · Background -->
+  <section class="slide">
+    <span class="slide__num">02 · BACKGROUND</span>
+    <h2 class="slide__title">학력 · 경력 · 자격</h2>
+
+    <div class="bg-block">
+      <div class="bg-block__head">학력</div>
+      <ul class="bg-block__list">
+        <li><b>KAIST 산업디자인학과 학사</b> · 2007–2011 · Visual Communication 부전공</li>
+        <li><b>RISD MFA Graphic Design</b> · 2013–2015 · 졸업 thesis: <em>"Type as Trust: Sans-Serif Hierarchies in Financial Interfaces"</em> · Robert Brunner 사사</li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">경력</div>
+      <ul class="bg-block__list">
+        <li><b>Apple Cupertino · HI Design intern</b> <em>2014 여름</em> · iOS 9 HIG 초기 시안 contribution</li>
+        <li><b>Naver Clova · Visual Designer</b> <em>2015–2018</em> · AI 음성 인터페이스 시각 시스템 정립</li>
+        <li><b>Toss (비바리퍼블리카) · Design Lead, Wealth Team</b> <em>2018–2022</em> · 송금 완료 페이지 micro-interaction author, 4M MAU</li>
+        <li><b>Apple Korea · Sr. Visual Designer</b> <em>2022–2025</em> · Apple Watch Series 10 한국 마케팅 페이지</li>
+        <li><b>단무지공방 / SailTechCo · Visual Design Director</b> <em>2026-04 ~ 현재</em></li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">자격증·수상</div>
+      <div class="certs">
+        <span class="cert cert--gold">RISD Brunner Award 2015</span>
+        <span class="cert cert--gold">Red Dot Design Award 2019</span>
+        <span class="cert">Pretendard Type Foundry workshop</span>
+        <span class="cert">OKLCH Color Theory Vienna 2024</span>
+        <span class="cert">Apple Design Internal Certification</span>
+      </div>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">시그니처 강점</div>
+      <div class="bg-block__body">
+        시각 시스템 unification · 한·영 typography pairing · a11y instinct (focus ring · WCAG 2.2 #2.4.13) · 토큰 layer 설계 · pixel-level detail discipline.
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3 · Case Study -->
+  <section class="slide case">
+    <span class="slide__num">03 · CASE STUDY</span>
+    <h2 class="case__title">Toss 송금 완료 화면 — Visual Trust Rebuild</h2>
+    <div class="case__period">2020 Q3 · 6 weeks · 4M MAU 영향</div>
+
+    <div class="case__phase case__phase--challenge">
+      <div class="case__phase-label">Challenge</div>
+      <div class="case__phase-body">송금 완료 화면이 "검정 체크 + Pretendard 32pt"의 정통이지만, 신규 사용자의 35% 가 "송금이 정말 됐는지" 1초 이상 의심하는 인터뷰 결과 (UXR 7명 인터뷰).</div>
+    </div>
+
+    <div class="case__phase case__phase--approach">
+      <div class="case__phase-label">Approach</div>
+      <div class="case__phase-body">3-stage motion으로 "검정 체크 → 금색 ring 펄스 → 받는 사람 이름 fade-in" 의 인과 시퀀스 설계. 230ms 총 길이 (Material standard ease + prefers-reduced-motion 분기). 토큰 layer 에서 motion 규칙으로 박음 — 다른 success 화면 47개에 자동 전파.</div>
+    </div>
+
+    <div class="case__phase case__phase--result">
+      <div class="case__phase-label">Result</div>
+      <div class="case__phase-body">신규 사용자 의심 시간 35% → 8% (UXR 재인터뷰). NPS 71 → 79. 같은 motion 패턴이 송금·환전·증권 47개 화면에 표준화. Toss Design Team 내부 design lead award 수상.</div>
+    </div>
+
+    <div class="case__metric-row">
+      <div class="case__metric">
+        <div class="case__metric-num">35%→8%</div>
+        <div class="case__metric-lbl">의심 시간</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">+8</div>
+        <div class="case__metric-lbl">NPS pt</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">47</div>
+        <div class="case__metric-lbl">표준화 화면</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4 · Specialization -->
+  <section class="slide">
+    <span class="slide__num">04 · SPECIALIZATION</span>
+    <h2 class="slide__title">Niche skills · Tools</h2>
+
+    <div class="spec-grid">
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">OKLCH 색 보간 + perceptual color theory</div>
+        <div class="spec__detail">5 앵커 status color 의 sRGB → OKLCH lerp 업그레이드. Vienna OKLCH intensive 수료. DataViz 와 합의 후 Phase 2 시행 대기.</div>
+      </div>
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">Variable font kerning + Korean·Latin pairing</div>
+        <div class="spec__detail">Pretendard Variable wght axis 활용 + Inter opsz·slnt·GRAD axis 도입 spec. 한국어 widow 정책 (keep-all + text-wrap balance + hanging-punctuation).</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">Design token tier architecture</div>
+        <div class="spec__detail">3-tier 색 구조 (brand · neutral · semantic) + Geist 식 "type encodes elevation" 원칙. <code>--color-*</code> canonical prefix 일원화 plan.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">WCAG 2.2 a11y · focus ring policy</div>
+        <div class="spec__detail"><code>:focus-visible</code> mixin 표준화. 2px sea / on-dark sun swap. 모든 focusable element 자동 적용.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">Liquid Glass · backdrop-filter 보수파</div>
+        <div class="spec__detail">Apple HIG 2025 트렌드를 한 호흡 늦게 채택 — deference 원칙 우선. nav header 의 saturate(180%) blur(14px) 만 유지.</div>
+      </div>
+    </div>
+
+    <div class="tools">
+      <div class="tools__label">도구</div>
+      <div class="tools__list">
+        <span class="tool">Figma</span>
+        <span class="tool">Sketch</span>
+        <span class="tool">Pretendard</span>
+        <span class="tool">Inter</span>
+        <span class="tool">Pantone Solid Coated</span>
+        <span class="tool">CSS Custom Props</span>
+        <span class="tool">Wacom Cintiq 16</span>
+        <span class="tool">OKLCH inspector</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Signature quote -->
+  <p class="sig-quote">검토 완료했습니다. 추가 의견 있으시면 알려 주세요.</p>
+
+  <!-- Collaboration -->
+  <section class="collab">
+    <h3 class="collab__title">팀에서 어떻게 협업하는가</h3>
+    <div class="collab__row">
+      <span class="collab__icon">✓</span>
+      <div class="collab__row-body"><b>자주 협업하는 동료</b> — 샘 정 (색 토큰) · 알렉스 박 (토큰 구현) · 메이 한 (시각 위계).</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">!</span>
+      <div class="collab__row-body"><b>주의</b> — "예쁘게" brief 거부. 4px grid 위반 즉시 지적. 동의 없이 시각 결정 production 올라가면 차분하지만 매우 명확하게 revert 요청.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">★</span>
+      <div class="collab__row-body"><b>잘 통하는 법</b> — before/after diff 와 근거 (사용자 데이터 · WCAG · 산업 표준) 동봉. 30분 안에 결정.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">⏱</span>
+      <div class="collab__row-body"><b>Slack 답</b> — 점심 1시간 빼고 5분 이내. 이모지 거의 X (✓ 만).</div>
+    </div>
+  </section>
+
+  <footer class="profile__footer">
+    <a href="../team_personas.md">전체 persona Bible</a> · <a href="../virtual_office.html">사무실로</a> · <a href="../index.html">팀 index</a>
+  </footer>
+
+</main>
+
+</body>
+</html>

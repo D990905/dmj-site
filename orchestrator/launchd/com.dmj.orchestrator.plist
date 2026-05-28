@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.dmj.orchestrator</string>
+
+  <!-- install.sh rewrites these /Users/dannyok paths to $HOME -->
+  <key>WorkingDirectory</key>
+  <string>/Users/dannyok/dev/orchestrator</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/dannyok/dev/orchestrator/.venv/bin/python</string>
+    <string>-m</string>
+    <string>src</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>LANG</key>
+    <string>ko_KR.UTF-8</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+
+  <key>StandardOutPath</key>
+  <string>/Users/dannyok/Library/Logs/Orchestrator/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/dannyok/Library/Logs/Orchestrator/launchd.err.log</string>
+</dict>
+</plist>

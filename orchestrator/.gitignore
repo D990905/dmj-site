@@ -1,0 +1,10 @@
+.env
+*.pyc
+__pycache__/
+.venv/
+venv/
+*.log
+usage.json
+.orchestrator/heartbeat.json
+.orchestrator/*.lock
+.DS_Store

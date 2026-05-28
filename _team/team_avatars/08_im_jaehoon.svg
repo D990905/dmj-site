@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="왕 정 Wang Jung - Senior Mobile App Engineer">
+  <title>왕 정 (Wang Jung) — Senior Mobile App Engineer</title>
+  <defs>
+    <clipPath id="c8"><circle cx="80" cy="80" r="78"/></clipPath>
+  </defs>
+  <g clip-path="url(#c8)">
+    <rect width="160" height="160" fill="#E4E8EE"/>
+    <rect width="160" height="20" y="140" fill="#CCD3DC"/>
+    <!-- body — Acne white shirt + indigo overshirt -->
+    <path d="M26 160 C 36 126, 58 120, 80 120 C 102 120, 124 126, 134 160 Z" fill="#324A6E"/>
+    <!-- white shirt collar peeking -->
+    <path d="M68 130 L 80 138 L 92 130 L 90 142 L 80 150 L 70 142 Z" fill="#F8F9FB"/>
+    <!-- Apple Watch on wrist hint (subtle on shoulder area) -->
+    <rect x="20" y="150" width="6" height="8" fill="#1A1A1A" rx="1"/>
+    <!-- neck -->
+    <rect x="73" y="108" width="14" height="18" fill="#EDC59F"/>
+    <!-- head -->
+    <ellipse cx="80" cy="86" rx="25" ry="29" fill="#F2D0B0"/>
+    <!-- hair — slightly long curly black, side-swept -->
+    <path d="M55 78 C 54 56, 68 46, 80 46 C 96 46, 108 56, 106 78 L 102 80 L 95 64 Q 80 58, 65 68 L 60 80 Z" fill="#1A1A1A"/>
+    <!-- side-swept fringe -->
+    <path d="M62 60 Q 72 58 88 64 Q 96 68 100 76 L 94 70 Q 80 64 70 70 Z" fill="#0F0F0F"/>
+    <!-- curly tufts on top -->
+    <circle cx="72" cy="54" r="3" fill="#1A1A1A"/>
+    <circle cx="82" cy="50" r="3.5" fill="#1A1A1A"/>
+    <circle cx="92" cy="56" r="3" fill="#1A1A1A"/>
+    <!-- ears -->
+    <ellipse cx="55" cy="88" rx="3" ry="5" fill="#EDC59F"/>
+    <ellipse cx="105" cy="88" rx="3" ry="5" fill="#EDC59F"/>
+    <!-- eyebrows — clean -->
+    <rect x="66" y="83" width="9" height="1.6" fill="#1A1A1A" rx="0.5"/>
+    <rect x="85" y="83" width="9" height="1.6" fill="#1A1A1A" rx="0.5"/>
+    <!-- no glasses — eyes visible directly -->
+    <ellipse cx="71" cy="90" rx="2.5" ry="2" fill="#FFFFFF"/>
+    <ellipse cx="89" cy="90" rx="2.5" ry="2" fill="#FFFFFF"/>
+    <circle cx="71" cy="90" r="1.5" fill="#1A1A1A"/>
+    <circle cx="89" cy="90" r="1.5" fill="#1A1A1A"/>
+    <circle cx="71.5" cy="89.5" r="0.5" fill="#FFFFFF"/>
+    <circle cx="89.5" cy="89.5" r="0.5" fill="#FFFFFF"/>
+    <!-- nose -->
+    <path d="M80 93 L 77 100 L 82 100" fill="none" stroke="#C9A180" stroke-width="0.8" stroke-linecap="round"/>
+    <!-- mouth — subtle smile, dry humor -->
+    <path d="M74 107 Q 80 109 86 106" fill="none" stroke="#8B5C4A" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <circle cx="80" cy="80" r="78" fill="none" stroke="#0A2540" stroke-width="1.5"/>
+  <!-- prop badge — phone + watch -->
+  <g transform="translate(118,118)">
+    <circle r="20" fill="#FFFFFF" stroke="#0A2540" stroke-width="1.2"/>
+    <!-- phone -->
+    <rect x="-10" y="-11" width="11" height="20" rx="2" fill="#1A1A1A"/>
+    <rect x="-9" y="-9" width="9" height="15" fill="#1F8FFF"/>
+    <circle cx="-4.5" cy="7" r="0.8" fill="#FFFFFF"/>
+    <!-- watch -->
+    <rect x="3" y="-4" width="9" height="11" rx="2.5" fill="#1A1A1A"/>
+    <rect x="4" y="-3" width="7" height="9" rx="1.5" fill="#1FA055"/>
+    <line x1="3" y1="-5" x2="12" y2="-5" stroke="#5C6F7E" stroke-width="0.8"/>
+    <line x1="3" y1="8" x2="12" y2="8" stroke="#5C6F7E" stroke-width="0.8"/>
+  </g>
+</svg>

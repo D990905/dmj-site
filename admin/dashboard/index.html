@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SailTech">
+<meta name="description" content="SailTech Orchestrator Dashboard — 8 expert fleet 작업 가시화">
+<title>SailTech Orchestrator</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+<link rel="stylesheet" href="styles.css">
+<script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <div class="topbar-left">
+    <span class="brand" aria-label="SailTech"><span class="brand-mark">⚓</span><span class="brand-text">SailTech</span></span>
+    <span class="env-tag">prototype</span>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" id="filterBtn" aria-label="filter">⚙</button>
+    <button class="icon-btn" id="refreshBtn" aria-label="refresh">↻</button>
+    <button class="icon-btn notif" id="notifBtn" aria-label="notifications">
+      <span class="dot-badge" id="notifDot">3</span>
+    </button>
+    <div class="avatar" title="Danny">D</div>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="canvas-wrap" id="canvasWrap">
+    <div id="cy" role="img" aria-label="orchestrator mindmap"></div>
+
+    <div class="legend" aria-hidden="true">
+      <span><i class="lg-dot c-green"></i>완료</span>
+      <span><i class="lg-dot c-yellow"></i>진행</span>
+      <span><i class="lg-dot c-red"></i>차단</span>
+      <span><i class="lg-dot c-gray"></i>대기</span>
+      <span><i class="lg-dot c-blue"></i>승인대기</span>
+    </div>
+
+    <div class="canvas-controls">
+      <button class="ctrl-btn" id="fitBtn" aria-label="fit">⊡</button>
+      <button class="ctrl-btn" id="zoomInBtn" aria-label="zoom in">＋</button>
+      <button class="ctrl-btn" id="zoomOutBtn" aria-label="zoom out">−</button>
+    </div>
+
+    <div class="status-bar">
+      <span><b id="statTotal">0</b> tasks</span>
+      <span><b id="statRun">0</b> 진행</span>
+      <span><b id="statBlock">0</b> 차단</span>
+      <span><b id="statApprove">0</b> 승인대기</span>
+      <span class="status-meta" id="lastSync">—</span>
+    </div>
+  </section>
+
+  <aside class="side-panel" id="sidePanel" aria-hidden="true">
+    <div class="panel-header">
+      <div>
+        <div class="panel-eyebrow" id="panelEyebrow">SELECTION</div>
+        <div class="panel-title" id="selectedTitle">노드 선택</div>
+      </div>
+      <button class="close-btn" id="closePanel" aria-label="close">×</button>
+    </div>
+    <div class="panel-body" id="panelBody">
+      <p class="hint">중앙 mindmap 에서 expert 또는 task 노드를 탭하면 상세가 여기 표시됩니다.</p>
+    </div>
+  </aside>
+
+  <button class="fab" id="newDirectiveBtn" aria-label="new directive" title="새 지시 (Phase 3)">＋</button>
+
+  <div class="bottom-sheet" id="bottomSheet" aria-hidden="true">
+    <button class="sheet-handle" id="sheetHandle" aria-label="toggle approval queue"></button>
+    <div class="sheet-header">
+      <span class="sheet-title">승인 큐</span>
+      <span class="badge" id="approvalCount">0</span>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</main>
+
+<script src="data.sample.js"></script>
+<script src="app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW register failed', err));
+  });
+}
+</script>
+</body>
+</html>

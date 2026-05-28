@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A2540">
+  <title>SailTechCo HQ · 가상 사무실 · 단무지공방</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* ─── Tokens (subset of site brand) ─────────────────────────── */
+    :root {
+      --color-navy: #0A2540;
+      --color-navy-deep: #061A2E;
+      --color-sea: #1F8FFF;
+      --color-sea-dark: #1670CC;
+      --color-sun: #FFB800;
+      --color-sun-dark: #E0A100;
+      --color-white: #FFFFFF;
+      --color-mist: #F5F7FA;
+      --color-fog: #E5EAF0;
+      --color-stone: #C7CFD8;
+      --color-slate: #5C6F7E;
+      --color-charcoal: #2A3B4C;
+
+      --radius-sm: 4px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+
+      --shadow-sm: 0 1px 2px rgba(10, 37, 64, 0.06);
+      --shadow-md: 0 2px 8px rgba(10, 37, 64, 0.08);
+      --shadow-lg: 0 12px 32px rgba(10, 37, 64, 0.12);
+
+      --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+        system-ui, 'Apple SD Gothic Neo', sans-serif;
+      --font-mono: ui-monospace, 'JetBrains Mono', 'SF Mono', monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      background: linear-gradient(180deg, #F0F4FA 0%, #E5EBF3 100%);
+      color: var(--color-navy);
+      -webkit-font-smoothing: antialiased;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* ─── Container — mobile portrait ───────────────────────────── */
+    .hq {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 16px 12px 32px;
+    }
+
+    /* ─── Header ────────────────────────────────────────────────── */
+    .hq__header {
+      text-align: center;
+      padding: 16px 0 18px;
+    }
+    .hq__eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: var(--color-sea-dark);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .hq__title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+      color: var(--color-navy);
+    }
+    .hq__sub {
+      font-size: 12px;
+      color: var(--color-slate);
+      margin-top: 6px;
+    }
+    .hq__sub b { color: var(--color-navy); font-weight: 600; }
+
+    /* ─── Floor plan ────────────────────────────────────────────── */
+    .floor {
+      background: var(--color-white);
+      border: 1px solid var(--color-fog);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 14px 12px 16px;
+      position: relative;
+    }
+    .floor::before {
+      content: '평면도 · floor plan';
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      background: var(--color-white);
+      padding: 0 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-slate);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Top zone — CEO + David Oak + Coach Cho ────────────────── */
+    .toprow {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .toprow--3col {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .room {
+      border: 1.5px solid var(--color-stone);
+      border-radius: var(--radius-md);
+      padding: 8px 8px 6px;
+      background: var(--color-mist);
+      position: relative;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 200ms cubic-bezier(0.4,0,0.2,1),
+                  box-shadow 200ms cubic-bezier(0.4,0,0.2,1);
+      cursor: pointer;
+    }
+    .room:hover, .room:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      outline: none;
+    }
+    .room:focus-visible {
+      outline: 2px solid var(--color-sea);
+      outline-offset: 2px;
+    }
+    .room--ceo {
+      background: linear-gradient(135deg, #FFF8E1 0%, #FFEFC4 100%);
+      border-color: var(--color-sun);
+    }
+    .room--cos {
+      background: linear-gradient(135deg, #F0EEE5 0%, #E5DDC8 100%);
+      border-color: #B89A60;
+    }
+    .room--cho {
+      background: linear-gradient(135deg, #E8F1FB 0%, #D6E5F5 100%);
+      border-color: var(--color-sea);
+    }
+    .room__label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--color-charcoal);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .room__person {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .room__avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .room__avatar--img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .room__name {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--color-navy);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .room__role {
+      font-size: 9px;
+      color: var(--color-slate);
+      margin-top: 1px;
+      line-height: 1.2;
+    }
+    .room--cho .room__avatar {
+      background: var(--color-sea);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .room--ceo .room__avatar {
+      background: var(--color-sun);
+      color: var(--color-navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .badge--remote {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      background: var(--color-sea);
+      color: #fff;
+      padding: 1px 5px;
+      border-radius: 8px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* ─── Meeting room (center) ─────────────────────────────────── */
+    .meeting {
+      background: radial-gradient(ellipse at center, #FFFFFF 0%, #F0F4FA 100%);
+      border: 2px solid var(--color-navy);
+      border-radius: 80px / 50px;
+      padding: 16px 12px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .meeting__label {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-navy);
+      margin-bottom: 8px;
+    }
+    .meeting__table {
+      width: 100%;
+      height: 56px;
+      background: linear-gradient(180deg, #C7CFD8 0%, #A4B0BE 100%);
+      border-radius: 50%;
+      box-shadow: inset 0 -3px 6px rgba(0,0,0,0.12), 0 2px 4px rgba(10,37,64,0.1);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .meeting__chair-grid {
+      position: absolute;
+      inset: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .meeting__chair {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--color-charcoal);
+    }
+    .meeting__sub {
+      text-align: center;
+      font-size: 9px;
+      color: var(--color-slate);
+      margin-top: 6px;
+      font-family: var(--font-mono);
+    }
+
+    /* ─── Desks grid — 8 specialists ────────────────────────────── */
+    .desks {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .desk {
+      background: var(--color-white);
+      border: 1px solid var(--color-fog);
+      border-radius: var(--radius-md);
+      padding: 8px 8px 8px 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 200ms cubic-bezier(0.4,0,0.2,1),
+                  box-shadow 200ms cubic-bezier(0.4,0,0.2,1),
+                  border-color 200ms;
+      cursor: pointer;
+      text-align: left;
+      position: relative;
+      min-height: 56px;
+    }
+    .desk:hover, .desk:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-sea);
+      outline: none;
+    }
+    .desk:focus-visible {
+      outline: 2px solid var(--color-sea);
+      outline-offset: 2px;
+    }
+    .desk__avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .desk__info { flex: 1; min-width: 0; }
+    .desk__name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-navy);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .desk__role {
+      font-size: 9.5px;
+      color: var(--color-slate);
+      margin-top: 1px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+    .desk__domain {
+      position: absolute;
+      top: -6px;
+      right: 6px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      background: var(--color-navy);
+      color: var(--color-sun);
+      padding: 1px 5px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    /* domain-specific subtle background tint on desk */
+    .desk--visual    { background: linear-gradient(135deg, #FFFFFF 60%, #EEF2F7 100%); }
+    .desk--dataviz   { background: linear-gradient(135deg, #FFFFFF 60%, #E8F1FB 100%); }
+    .desk--sports    { background: linear-gradient(135deg, #FFFFFF 60%, #EFF0E6 100%); }
+    .desk--frontend  { background: linear-gradient(135deg, #FFFFFF 60%, #ECEEF1 100%); }
+    .desk--ux        { background: linear-gradient(135deg, #FFFFFF 60%, #F8EDE3 100%); }
+    .desk--marketing { background: linear-gradient(135deg, #FFFFFF 60%, #FFF5DC 100%); }
+    .desk--hardware  { background: linear-gradient(135deg, #FFFFFF 60%, #E8EBED 100%); }
+    .desk--mobile    { background: linear-gradient(135deg, #FFFFFF 60%, #E4E8EE 100%); }
+
+    /* ─── Cafe / lounge strip ───────────────────────────────────── */
+    .cafe {
+      background: linear-gradient(90deg, #FFEFC4 0%, #FFF8E1 50%, #E5F1E8 100%);
+      border: 1px solid var(--color-sun);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--color-charcoal);
+    }
+    .cafe__icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .cafe__label {
+      flex: 1;
+      font-weight: 600;
+    }
+    .cafe__hint {
+      font-size: 9px;
+      color: var(--color-slate);
+      font-family: var(--font-mono);
+    }
+
+    /* ─── Persona detail overlay (CSS-only via :target) ─────────── */
+    .detail {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 37, 64, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .detail:target { display: flex; }
+
+    .detail__card {
+      background: var(--color-white);
+      border-radius: var(--radius-lg);
+      max-width: 360px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: pop 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes pop {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .detail__header {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--color-fog);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .detail__avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .detail__name {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    .detail__role {
+      font-size: 11px;
+      color: var(--color-slate);
+      margin-top: 2px;
+    }
+    .detail__close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--color-fog);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-navy);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .detail__body {
+      padding: 14px 18px 18px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--color-charcoal);
+    }
+    .detail__body dt {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-sea-dark);
+      margin-top: 12px;
+    }
+    .detail__body dt:first-child { margin-top: 0; }
+    .detail__body dd {
+      margin: 4px 0 0;
+      font-size: 12px;
+    }
+    .detail__quote {
+      font-style: italic;
+      color: var(--color-slate);
+      border-left: 3px solid var(--color-sun);
+      padding: 4px 10px;
+      margin: 12px 0 0;
+      font-size: 11.5px;
+    }
+
+    /* ─── Footer mini ───────────────────────────────────────────── */
+    .hq__footer {
+      text-align: center;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-fog);
+      font-size: 10px;
+      color: var(--color-slate);
+      line-height: 1.6;
+    }
+    .hq__footer code {
+      font-family: var(--font-mono);
+      background: var(--color-fog);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9.5px;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Slightly larger viewport tweak */
+    @media (min-width: 480px) {
+      .hq { padding: 20px; }
+      .desk__name { font-size: 13px; }
+      .desk__role { font-size: 10.5px; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="hq">
+
+  <header class="hq__header">
+    <div class="hq__eyebrow">SailTechCo HQ · 성수동 본사</div>
+    <h1 class="hq__title">가상 운영팀 사무실</h1>
+    <p class="hq__sub">
+      8 전문가 + <b>옥덕필 Danny</b> CEO + <b>조수철</b> 자문 + <b>데이빗 옥</b> Chief of Staff
+      <br><span style="font-size:10px">데스크를 탭하면 portfolio 페이지가 열립니다</span>
+    </p>
+  </header>
+
+  <section class="floor" aria-label="사무실 평면도">
+
+    <!-- ─── Top row: CEO + David Oak (CoS) + Coach Cho ─── -->
+    <div class="toprow toprow--3col">
+      <a class="room room--ceo" href="profiles/danny-ok.html" aria-label="옥덕필 Danny CEO 사무실">
+        <div class="room__label">CEO · 의장</div>
+        <div class="room__person">
+          <div class="room__avatar">D</div>
+          <div>
+            <div class="room__name">옥덕필 Danny</div>
+            <div class="room__role">CEO · 윙포일 14년차</div>
+          </div>
+        </div>
+      </a>
+      <a class="room room--cos" href="profiles/david-oak.html" aria-label="데이빗 옥 Chief of Staff 사무실">
+        <div class="room__label">Chief of Staff</div>
+        <div class="room__person">
+          <img class="room__avatar room__avatar--img" src="team_avatars/09_david_oak.svg" alt="데이빗 옥 아바타">
+          <div>
+            <div class="room__name">데이빗 옥</div>
+            <div class="room__role">Orchestrator</div>
+          </div>
+        </div>
+      </a>
+      <a class="room room--cho" href="profiles/coach-cho.html" aria-label="조수철 Coach Cho 자문 화상 자리">
+        <div class="room__label">Advisor</div>
+        <div class="room__person">
+          <div class="room__avatar">C</div>
+          <div>
+            <div class="room__name">조수철<span class="badge--remote">화상</span></div>
+            <div class="room__role">Performance Advisor</div>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- ─── Meeting room ─── -->
+    <div class="meeting" aria-label="회의실">
+      <div class="meeting__label">◇ 회의실 · Round Table ◇</div>
+      <div class="meeting__table">
+        <div class="meeting__chair-grid" aria-hidden="true">
+          <span class="meeting__chair"></span>
+          <span class="meeting__chair"></span>
+          <span class="meeting__chair"></span>
+          <span class="meeting__chair"></span>
+          <span class="meeting__chair"></span>
+          <span class="meeting__chair"></span>
+          <span class="meeting__chair"></span>
+          <span class="meeting__chair"></span>
+        </div>
+      </div>
+      <div class="meeting__sub">8 chairs · Mon 09:00 · Wed 14:00 · Fri 17:00</div>
+    </div>
+
+    <!-- ─── 8 desks ─── -->
+    <div class="desks" aria-label="전문가 자리">
+
+      <a class="desk desk--visual" href="profiles/rose-yoon.html" aria-label="로즈 윤 디렉터 자리">
+        <span class="desk__domain">#1</span>
+        <img class="desk__avatar" src="team_avatars/01_yoon_jisu.svg" alt="로즈 윤 아바타">
+        <div class="desk__info">
+          <div class="desk__name">로즈 윤</div>
+          <div class="desk__role">Visual Design Director</div>
+        </div>
+      </a>
+
+      <a class="desk desk--dataviz" href="profiles/sam-jung.html" aria-label="샘 정 스페셜리스트 자리">
+        <span class="desk__domain">#2</span>
+        <img class="desk__avatar" src="team_avatars/02_park_serin.svg" alt="샘 정 아바타">
+        <div class="desk__info">
+          <div class="desk__name">샘 정</div>
+          <div class="desk__role">DataViz Specialist</div>
+        </div>
+      </a>
+
+      <a class="desk desk--sports" href="profiles/timo-kang.html" aria-label="티모 강 박사 자리">
+        <span class="desk__domain">#3</span>
+        <img class="desk__avatar" src="team_avatars/03_lee_taekyung.svg" alt="티모 강 아바타">
+        <div class="desk__info">
+          <div class="desk__name">티모 강 박사</div>
+          <div class="desk__role">Sports Science Researcher</div>
+        </div>
+      </a>
+
+      <a class="desk desk--frontend" href="profiles/alex-park.html" aria-label="알렉스 박 엔지니어 자리">
+        <span class="desk__domain">#4</span>
+        <img class="desk__avatar" src="team_avatars/04_kang_minjae.svg" alt="알렉스 박 아바타">
+        <div class="desk__info">
+          <div class="desk__name">알렉스 박</div>
+          <div class="desk__role">Frontend Engineer (Web)</div>
+        </div>
+      </a>
+
+      <a class="desk desk--ux" href="profiles/may-han.html" aria-label="메이 한 디렉터 자리">
+        <span class="desk__domain">#5</span>
+        <img class="desk__avatar" src="team_avatars/05_han_jiyoung.svg" alt="메이 한 아바타">
+        <div class="desk__info">
+          <div class="desk__name">메이 한</div>
+          <div class="desk__role">UX Research Director</div>
+        </div>
+      </a>
+
+      <a class="desk desk--marketing" href="profiles/ken-choi.html" aria-label="캔 최 매니저 자리">
+        <span class="desk__domain">#6</span>
+        <img class="desk__avatar" src="team_avatars/06_noh_ajin.svg" alt="캔 최 아바타">
+        <div class="desk__info">
+          <div class="desk__name">캔 최</div>
+          <div class="desk__role">Marketing &amp; Social</div>
+        </div>
+      </a>
+
+      <a class="desk desk--hardware" href="profiles/hiro-goo.html" aria-label="히로 구 리드 자리">
+        <span class="desk__domain">#7</span>
+        <img class="desk__avatar" src="team_avatars/07_seo_junhyuk.svg" alt="히로 구 아바타">
+        <div class="desk__info">
+          <div class="desk__name">히로 구</div>
+          <div class="desk__role">Hardware &amp; Embedded Lead</div>
+        </div>
+      </a>
+
+      <a class="desk desk--mobile" href="profiles/wang-jung.html" aria-label="왕 정 엔지니어 자리">
+        <span class="desk__domain">#8</span>
+        <img class="desk__avatar" src="team_avatars/08_im_jaehoon.svg" alt="왕 정 아바타">
+        <div class="desk__info">
+          <div class="desk__name">왕 정</div>
+          <div class="desk__role">Mobile App &amp; Integration</div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- ─── Cafe / lounge ─── -->
+    <div class="cafe" aria-label="카페 / 휴게실">
+      <span class="cafe__icon" aria-hidden="true">☕</span>
+      <span class="cafe__label">카페 · 휴게실 · 단무지 김밥 자판기</span>
+      <span class="cafe__hint">11:00–14:00 점심</span>
+    </div>
+
+  </section>
+
+  <footer class="hq__footer">
+    팀 운영 protocol → <code>meeting_protocol.md</code><br>
+    dispatch 호명 가이드 → <code>dispatch_template.md</code><br>
+    persona 상세 → <code>team_personas.md</code>
+  </footer>
+
+</main>
+
+<!-- ─── Persona detail overlays (CSS-only via :target) ─── -->
+
+<div class="detail" id="p1">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/01_yoon_jisu.svg" alt="">
+      <div>
+        <h2 class="detail__name">윤지수 디렉터</h2>
+        <p class="detail__role">Visual Design Director · 38세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>KAIST 산업디자인 → RISD MFA Graphic Design</dd>
+        <dt>경력</dt>
+        <dd>Apple HI Design 인턴 → Naver Clova → Toss Design Lead → Apple Korea Sr. Visual Designer</dd>
+        <dt>강점</dt>
+        <dd>시각 시스템 unification · typography · a11y instinct</dd>
+        <dt>주의</dt>
+        <dd>"예쁘게" brief 거부. 4px grid 위반에 민감. 인라인 스타일 산재 싫음</dd>
+        <dt>톤</dt>
+        <dd>한국어 존댓말 짧고 단정. 이모지 거의 X. ✓ 정도</dd>
+      </dl>
+      <p class="detail__quote">"여백 8픽셀 단위로 살아야 마음이 가."</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail" id="p2">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/02_park_serin.svg" alt="">
+      <div>
+        <h2 class="detail__name">박세린 스페셜리스트</h2>
+        <p class="detail__role">DataViz Specialist · 32세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>서울대 수학 → CMU HCI MS</dd>
+        <dt>경력</dt>
+        <dd>Tableau Research → Datadog → Observable → Stripe Dashboard</dd>
+        <dt>강점</dt>
+        <dd>차트 system thinking · OKLCH · library 비교 framework</dd>
+        <dt>주의</dt>
+        <dd>y축 잘린 막대그래프 즉시 reject. 한 화면 차트 3+ 거부. WCAG AA 미만 색 X</dd>
+        <dt>톤</dt>
+        <dd>친근한 존댓말. 📊📈 자주. Slack 1분 답</dd>
+      </dl>
+      <p class="detail__quote">"0부터 시작 안 한 막대그래프는 사기."</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail" id="p3">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/03_lee_taekyung.svg" alt="">
+      <div>
+        <h2 class="detail__name">이태경 박사</h2>
+        <p class="detail__role">Sports Science Researcher · 41세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>서울대 체육 → 연세대 운동생리 MS → Loughborough Sports Biomech PhD</dd>
+        <dt>경력</dt>
+        <dd>KASS Sr. Researcher → Trek Bicycle 자문 → Lululemon Performance Science</dd>
+        <dt>강점</dt>
+        <dd>알고리즘 정합성 audit · §181-C calibration · 학술 reproducibility</dd>
+        <dt>주의</dt>
+        <dd>DOI/ISBN 출처 강박. "대략" 단어 X. estimate vs measured 엄격 분리</dd>
+        <dt>톤</dt>
+        <dd>정중한 존댓말 · 학술적. "Banister 1991 의 TRIMP 와 부합합니다."</dd>
+      </dl>
+      <p class="detail__quote">"근거 없는 주장은 의견이지 fact 가 아닙니다."</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail" id="p4">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/04_kang_minjae.svg" alt="">
+      <div>
+        <h2 class="detail__name">강민재 엔지니어</h2>
+        <p class="detail__role">Senior Frontend Engineer (Web) · 31세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>KAIST 전산학부 학·석사</dd>
+        <dt>경력</dt>
+        <dd>Toss Frontend → Vercel Korea DevRel → Linear web app</dd>
+        <dt>강점</dt>
+        <dd>iOS hit-test bug 추적 · CI/CD plan · Lighthouse routine</dd>
+        <dt>주의</dt>
+        <dd>60fps 미달 분노. framework 강요 X. 성능 회귀 즉시 revert 요청</dd>
+        <dt>톤</dt>
+        <dd>짧고 efficient. "이거 hit-test 문제네요." 🐛🚀⚡</dd>
+      </dl>
+      <p class="detail__quote">"Framework 도입은 cost — vanilla 로 안 되는 경우만."</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail" id="p5">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/05_han_jiyoung.svg" alt="">
+      <div>
+        <h2 class="detail__name">한지영 디렉터</h2>
+        <p class="detail__role">UX Research Director · 36세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>이화여대 심리학 → CMU HCI MS</dd>
+        <dt>경력</dt>
+        <dd>Google Korea UX → Toss Bank Lead UXR → Nike Design Lab Tokyo</dd>
+        <dt>강점</dt>
+        <dd>Heuristic audit · 경쟁사 분해 · onboarding flow · empathy</dd>
+        <dt>주의</dt>
+        <dd>사용자 안 만나고 결정 X. 직감 기반 결정에 부드럽게 push back</dd>
+        <dt>톤</dt>
+        <dd>따뜻한 존댓말 · paraphrase. 😊🙏💭✨</dd>
+      </dl>
+      <p class="detail__quote">"유저 5명 안 만나면 어떤 디자인 결정도 못 합니다."</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail" id="p6">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/06_noh_ajin.svg" alt="">
+      <div>
+        <h2 class="detail__name">노아진 매니저</h2>
+        <p class="detail__role">Marketing &amp; Social · 29세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>연세대 신문방송 → Buffer Lab · Patagonia Storytelling 부트캠프</dd>
+        <dt>경력</dt>
+        <dd>우아한형제들 Brand → Buffer Lab 한국 → Patagonia Korea Brand Storyteller</dd>
+        <dt>강점</dt>
+        <dd>brand voice 설계 · 5채널 콘텐츠 cadence · photography style</dd>
+        <dt>주의</dt>
+        <dd>"최고/유일무이" 과장 카피 X. fabricated 통계 X. authentic only</dd>
+        <dt>톤</dt>
+        <dd>친근 존댓말 + ㅋㅋ. 🌊🤙✨🔥📸. Slack 즉답</dd>
+      </dl>
+      <p class="detail__quote">"한 주에 콘텐츠 23편 만들어본 적 있어요."</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail" id="p7">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/07_seo_junhyuk.svg" alt="">
+      <div>
+        <h2 class="detail__name">서준혁 리드</h2>
+        <p class="detail__role">Hardware &amp; Embedded Lead · 39세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>POSTECH 전자공학 학·석사 → ETH Zürich EE PhD (wearable IMU sensor fusion)</dd>
+        <dt>경력</dt>
+        <dd>LG 전자 IoT → Garmin Forerunner 펌웨어 → Samsung Galaxy Watch Hardware</dd>
+        <dt>강점</dt>
+        <dd>부품 trade-off matrix · IMU sensor fusion · KC/CE/FCC 인증 path</dd>
+        <dt>주의</dt>
+        <dd>비현실적 timeline X. 비표준 BLE UUID X. datasheet 없는 부품 X</dd>
+        <dt>톤</dt>
+        <dd>정중·무뚝뚝 존댓말. "datasheet 보내드릴게요." ⚡🔌</dd>
+      </dl>
+      <p class="detail__quote">"이건 추정값 ±30%, 이건 측정값 ±2%. 절대 섞지 않습니다."</p>
+    </div>
+  </div>
+</div>
+
+<div class="detail" id="p8">
+  <div class="detail__card">
+    <a href="#" class="detail__close" aria-label="닫기">✕</a>
+    <div class="detail__header">
+      <img class="detail__avatar" src="team_avatars/08_im_jaehoon.svg" alt="">
+      <div>
+        <h2 class="detail__name">임재훈 엔지니어</h2>
+        <p class="detail__role">Senior Mobile App Engineer · 33세</p>
+      </div>
+    </div>
+    <div class="detail__body">
+      <dl>
+        <dt>학력</dt>
+        <dd>KAIST 전산학부 → Stanford CS MS (CGT track)</dd>
+        <dt>경력</dt>
+        <dd>Apple HealthKit team → Strava iOS Lead → Toss Mobile Architect</dd>
+        <dt>강점</dt>
+        <dd>13 디바이스 BLE GATT audit · HealthKit/WorkoutKit · Apple 심사 path</dd>
+        <dt>주의</dt>
+        <dd>HIG 위반 디자인 부드럽게 거절. 비표준 UUID X. Capacitor 비호환 X</dd>
+        <dt>톤</dt>
+        <dd>정중 존댓말 + dry humor. "버그가 feature 일 가능성도 있죠." 📱⌚🔋</dd>
+      </dl>
+      <p class="detail__quote">"Yeah, that's a CoreBluetooth race condition."</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

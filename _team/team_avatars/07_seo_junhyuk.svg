@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="히로 구 Hiro Goo - Hardware and Embedded Lead">
+  <title>히로 구 (Hiro Goo) — Hardware &amp; Embedded Lead Engineer</title>
+  <defs>
+    <clipPath id="c7"><circle cx="80" cy="80" r="78"/></clipPath>
+  </defs>
+  <g clip-path="url(#c7)">
+    <rect width="160" height="160" fill="#E8EBED"/>
+    <rect width="160" height="20" y="140" fill="#CFD4D8"/>
+    <!-- body — Carhartt-style work jacket navy -->
+    <path d="M26 160 C 36 126, 58 120, 80 120 C 102 120, 124 126, 134 160 Z" fill="#1F2D40"/>
+    <!-- chest pocket flap -->
+    <rect x="65" y="135" width="14" height="8" fill="#0F1A2A" stroke="#3A4659" stroke-width="0.5"/>
+    <line x1="80" y1="125" x2="80" y2="160" stroke="#FFB800" stroke-width="0.5" stroke-dasharray="2 2"/>
+    <!-- neck -->
+    <rect x="73" y="108" width="14" height="18" fill="#E5B58A"/>
+    <!-- head -->
+    <ellipse cx="80" cy="86" rx="25" ry="29" fill="#E5B58A"/>
+    <!-- hair — very short, salt-and-pepper -->
+    <path d="M58 76 C 58 60, 70 50, 80 50 C 95 50, 102 60, 102 76 L 96 70 Q 88 64 80 64 Q 72 64 64 70 Z" fill="#4A4540"/>
+    <!-- gray streaks on temple -->
+    <rect x="58" y="70" width="3" height="8" fill="#9B9590" rx="1"/>
+    <rect x="99" y="70" width="3" height="8" fill="#9B9590" rx="1"/>
+    <!-- ears -->
+    <ellipse cx="55" cy="88" rx="3" ry="5" fill="#E5B58A"/>
+    <ellipse cx="105" cy="88" rx="3" ry="5" fill="#E5B58A"/>
+    <!-- eyebrows — strong, straight -->
+    <rect x="65" y="82" width="10" height="2" fill="#3A3530"/>
+    <rect x="85" y="82" width="10" height="2" fill="#3A3530"/>
+    <!-- square thick-frame glasses -->
+    <rect x="63" y="86" width="14" height="9" fill="none" stroke="#1A1A1A" stroke-width="1.6" rx="1"/>
+    <rect x="83" y="86" width="14" height="9" fill="none" stroke="#1A1A1A" stroke-width="1.6" rx="1"/>
+    <line x1="77" y1="90" x2="83" y2="90" stroke="#1A1A1A" stroke-width="1.6"/>
+    <!-- eyes — focused, measured -->
+    <circle cx="70" cy="90" r="1.4" fill="#1A1A1A"/>
+    <circle cx="90" cy="90" r="1.4" fill="#1A1A1A"/>
+    <!-- nose -->
+    <path d="M80 94 L 77 101 L 83 101" fill="none" stroke="#A8825F" stroke-width="0.8" stroke-linecap="round"/>
+    <!-- mouth — serious, slight downturn-neutral -->
+    <line x1="74" y1="108" x2="86" y2="108" stroke="#7A4838" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- subtle 5 o'clock shadow -->
+    <ellipse cx="80" cy="113" rx="18" ry="4" fill="#7A6E62" opacity="0.22"/>
+  </g>
+  <circle cx="80" cy="80" r="78" fill="none" stroke="#0A2540" stroke-width="1.5"/>
+  <!-- prop badge — PCB / circuit -->
+  <g transform="translate(118,118)">
+    <circle r="20" fill="#FFFFFF" stroke="#0A2540" stroke-width="1.2"/>
+    <rect x="-12" y="-12" width="24" height="24" fill="#1FA055" stroke="#0F4F2B" stroke-width="0.6" rx="1"/>
+    <!-- traces -->
+    <path d="M-10 -6 L -2 -6 L -2 0 L 6 0 L 6 6" fill="none" stroke="#FFB800" stroke-width="0.6"/>
+    <path d="M-10 6 L -4 6 L -4 -3 L 4 -3 L 4 -10" fill="none" stroke="#FFB800" stroke-width="0.6"/>
+    <!-- chip -->
+    <rect x="-4" y="-5" width="8" height="10" fill="#1A1A1A"/>
+    <!-- pads -->
+    <circle cx="-8" cy="-8" r="1" fill="#FFD700"/>
+    <circle cx="8" cy="-8" r="1" fill="#FFD700"/>
+    <circle cx="-8" cy="8" r="1" fill="#FFD700"/>
+    <circle cx="8" cy="8" r="1" fill="#FFD700"/>
+  </g>
+</svg>

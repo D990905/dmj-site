@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="로즈 윤 Rose Yoon - Visual Design Director">
+  <title>로즈 윤 (Rose Yoon) — Visual Design Director</title>
+  <defs>
+    <clipPath id="c1"><circle cx="80" cy="80" r="78"/></clipPath>
+  </defs>
+  <g clip-path="url(#c1)">
+    <!-- bg -->
+    <rect width="160" height="160" fill="#EEF2F7"/>
+    <rect width="160" height="20" y="140" fill="#DDE4EC"/>
+    <!-- body / blazer -->
+    <path d="M30 160 C 40 130, 60 122, 80 122 C 100 122, 120 130, 130 160 Z" fill="#1A1A1A"/>
+    <!-- white shirt collar -->
+    <path d="M70 132 L 80 138 L 90 132 L 88 142 L 80 148 L 72 142 Z" fill="#F8F9FB"/>
+    <!-- neck -->
+    <rect x="73" y="108" width="14" height="20" fill="#EDC59F"/>
+    <!-- head -->
+    <ellipse cx="80" cy="86" rx="26" ry="30" fill="#F2D0B0"/>
+    <!-- hair (sharp bob, side parted) -->
+    <path d="M55 70 C 56 56, 70 50, 80 50 C 92 50, 106 56, 107 76 L 107 92 L 100 92 L 96 70 L 80 64 L 64 72 L 60 96 L 55 96 Z" fill="#1A1A1A"/>
+    <path d="M55 70 C 55 64, 64 56, 76 56 L 80 68 L 64 72 L 60 96 L 55 96 Z" fill="#0F0F0F"/>
+    <!-- ears -->
+    <ellipse cx="55" cy="88" rx="3" ry="5" fill="#EDC59F"/>
+    <!-- eyebrows -->
+    <rect x="66" y="82" width="9" height="1.6" fill="#1A1A1A"/>
+    <rect x="85" y="82" width="9" height="1.6" fill="#1A1A1A"/>
+    <!-- Lindberg-style rimless thin glasses -->
+    <circle cx="71" cy="89" r="6" fill="none" stroke="#2A3B4C" stroke-width="0.8"/>
+    <circle cx="89" cy="89" r="6" fill="none" stroke="#2A3B4C" stroke-width="0.8"/>
+    <line x1="77" y1="89" x2="83" y2="89" stroke="#2A3B4C" stroke-width="0.8"/>
+    <!-- eyes -->
+    <circle cx="71" cy="89" r="1.5" fill="#1A1A1A"/>
+    <circle cx="89" cy="89" r="1.5" fill="#1A1A1A"/>
+    <!-- nose -->
+    <path d="M80 92 L 78 99 L 82 99" fill="none" stroke="#C9A180" stroke-width="0.8" stroke-linecap="round"/>
+    <!-- mouth — neutral, calm -->
+    <path d="M75 106 Q 80 108 85 106" fill="none" stroke="#8B5C4A" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <!-- ring border -->
+  <circle cx="80" cy="80" r="78" fill="none" stroke="#0A2540" stroke-width="1.5"/>
+  <!-- prop badge — design swatches (3 squares) -->
+  <g transform="translate(118,118)">
+    <circle r="20" fill="#FFFFFF" stroke="#0A2540" stroke-width="1.2"/>
+    <rect x="-10" y="-8" width="6" height="6" fill="#0A2540"/>
+    <rect x="-3" y="-8" width="6" height="6" fill="#1F8FFF"/>
+    <rect x="4" y="-8" width="6" height="6" fill="#FFB800"/>
+    <rect x="-10" y="0" width="6" height="6" fill="#5C6F7E"/>
+    <rect x="-3" y="0" width="6" height="6" fill="#E5EAF0"/>
+    <rect x="4" y="0" width="6" height="6" fill="#FFFFFF" stroke="#C7CFD8" stroke-width="0.5"/>
+  </g>
+</svg>

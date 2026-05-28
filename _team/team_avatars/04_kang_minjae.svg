@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="알렉스 박 Alex Park - Frontend Engineer Web">
+  <title>알렉스 박 (Alex Park) — Frontend Engineer (Web)</title>
+  <defs>
+    <clipPath id="c4"><circle cx="80" cy="80" r="78"/></clipPath>
+  </defs>
+  <g clip-path="url(#c4)">
+    <rect width="160" height="160" fill="#ECEEF1"/>
+    <rect width="160" height="20" y="140" fill="#D4D8DE"/>
+    <!-- body — dark grey hoodie -->
+    <path d="M26 160 C 36 126, 58 120, 80 120 C 102 120, 124 126, 134 160 Z" fill="#3A3F44"/>
+    <!-- hoodie collar v -->
+    <path d="M72 124 L 80 138 L 88 124 L 86 122 L 80 130 L 74 122 Z" fill="#2A2F33"/>
+    <!-- drawstring -->
+    <line x1="76" y1="130" x2="76" y2="142" stroke="#1A1A1A" stroke-width="1"/>
+    <line x1="84" y1="130" x2="84" y2="142" stroke="#1A1A1A" stroke-width="1"/>
+    <!-- neck -->
+    <rect x="73" y="108" width="14" height="18" fill="#EDC59F"/>
+    <!-- head -->
+    <ellipse cx="80" cy="86" rx="25" ry="29" fill="#F2D0B0"/>
+    <!-- hair — curly black -->
+    <path d="M55 75 C 55 56, 70 48, 80 48 C 95 48, 105 56, 106 78 L 100 78 L 96 70 Q 87 64 80 64 Q 70 64 64 70 L 60 78 Z" fill="#1A1A1A"/>
+    <!-- curly tufts -->
+    <circle cx="62" cy="62" r="3" fill="#1A1A1A"/>
+    <circle cx="70" cy="55" r="3.5" fill="#1A1A1A"/>
+    <circle cx="80" cy="52" r="4" fill="#1A1A1A"/>
+    <circle cx="90" cy="55" r="3.5" fill="#1A1A1A"/>
+    <circle cx="98" cy="62" r="3" fill="#1A1A1A"/>
+    <!-- ears -->
+    <ellipse cx="55" cy="88" rx="3" ry="5" fill="#EDC59F"/>
+    <ellipse cx="105" cy="88" rx="3" ry="5" fill="#EDC59F"/>
+    <!-- eyebrows -->
+    <rect x="66" y="82" width="9" height="1.6" fill="#1A1A1A"/>
+    <rect x="85" y="82" width="9" height="1.6" fill="#1A1A1A"/>
+    <!-- Persol round glasses w/ stronger frame -->
+    <circle cx="71" cy="89" r="7" fill="none" stroke="#1A1A1A" stroke-width="1.6"/>
+    <circle cx="89" cy="89" r="7" fill="none" stroke="#1A1A1A" stroke-width="1.6"/>
+    <line x1="78" y1="89" x2="82" y2="89" stroke="#1A1A1A" stroke-width="1.6"/>
+    <!-- eyes - focused -->
+    <circle cx="71" cy="89" r="1.5" fill="#1A1A1A"/>
+    <circle cx="89" cy="89" r="1.5" fill="#1A1A1A"/>
+    <!-- subtle screen-glow reflection in lenses -->
+    <rect x="68" y="86" width="3" height="1" fill="#1F8FFF" opacity="0.5"/>
+    <rect x="86" y="86" width="3" height="1" fill="#1F8FFF" opacity="0.5"/>
+    <!-- nose -->
+    <path d="M80 92 L 77 99 L 82 99" fill="none" stroke="#C9A180" stroke-width="0.8" stroke-linecap="round"/>
+    <!-- mouth — slightly amused -->
+    <path d="M75 107 Q 79 110 86 107" fill="none" stroke="#8B5C4A" stroke-width="1.2" stroke-linecap="round"/>
+  </g>
+  <circle cx="80" cy="80" r="78" fill="none" stroke="#0A2540" stroke-width="1.5"/>
+  <!-- prop badge — code brackets -->
+  <g transform="translate(118,118)">
+    <circle r="20" fill="#FFFFFF" stroke="#0A2540" stroke-width="1.2"/>
+    <text x="0" y="6" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="16" font-weight="700" fill="#0A2540">&lt;/&gt;</text>
+    <text x="0" y="14" text-anchor="middle" font-family="ui-monospace, monospace" font-size="4.2" fill="#1F8FFF">60fps</text>
+  </g>
+</svg>
