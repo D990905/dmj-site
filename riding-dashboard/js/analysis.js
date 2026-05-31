@@ -2789,6 +2789,92 @@
   }
 
   /* ============================================================
+   * 9-D-2c) estimateRaceLoad — Race format 별 TRIMP 추정
+   *
+   * Event-Aware Periodization (sports_science_event_periodization_system.md §9-2).
+   * RACE_FORMAT_LIBRARY (race-formats.js) lookup + skill·wind modifier 적용.
+   *
+   * 입력:
+   *   formatKey — 'slalom_medium' 등 RACE_FORMAT_LIBRARY key
+   *   athlete   — { skill: '중급', weightKg: 70 }
+   *   wind      — 'light'|'medium'|'strong'|'heavy' or numeric kt
+   *
+   * 출력:
+   *   { format, durationMin, avgHr, maxHr, z5_percent, TRIMP_estimate, ...}
+   *
+   * References:
+   *   · iQFOiL Class Official Paris 2024 — race format spec
+   *   · IWSA WingFoil Racing — competition rules
+   *   · Vogiatzis 2002/2004 — windsurfing HR physiology
+   * ============================================================ */
+  function estimateRaceLoad(formatKey, athlete, wind) {
+    athlete = athlete || {};
+    var RF = (typeof require !== 'undefined' && typeof module !== 'undefined')
+      ? require('./race-formats.js')
+      : global.RDRaceFormats;
+    if (!RF || !RF.getFormat) {
+      return { error: 'race_formats_unavailable' };
+    }
+    var fmt = RF.getFormat(formatKey);
+    if (!fmt) {
+      return { error: 'unknown_format', formatKey: formatKey };
+    }
+    var skillMod = RF.getSkillModifier(athlete.skill);
+    var windMod = RF.getWindModifier(wind || 'medium');
+    var trimp = fmt.TRIMP_baseline * skillMod.TRIMP_multiplier * windMod.TRIMP_multiplier;
+    var avgHrAdjusted = fmt.avgHr + skillMod.hr_offset;
+    return {
+      format: formatKey,
+      description: fmt.description,
+      durationMin: fmt.duration_min,
+      avgHr: avgHrAdjusted,
+      maxHr: fmt.maxHr,
+      z5_percent: fmt.z5_percent,
+      TRIMP_estimate: Math.round(trimp * 10) / 10,
+      TRIMP_baseline: fmt.TRIMP_baseline,
+      skill: athlete.skill || '중급',
+      skill_modifier: skillMod.TRIMP_multiplier,
+      wind: typeof wind === 'string' ? wind : 'numeric→' + wind,
+      wind_modifier: windMod.TRIMP_multiplier,
+      ref: fmt.ref
+    };
+  }
+
+  /* === estimateCompetitionLoad ===
+     일별 race schedule 입력 → 일별 + total TRIMP 산출.
+     입력: schedule = [{ day: 1, races: ['slalom_medium', 'slalom_medium', 'course_standard'], wind: 'medium' }, ...]
+     출력: { days: [...], total_TRIMP } */
+  function estimateCompetitionLoad(schedule, athlete) {
+    if (!Array.isArray(schedule) || !schedule.length) {
+      return { days: [], total_TRIMP: 0 };
+    }
+    var days = schedule.map(function (d) {
+      var dayWind = d.wind || 'medium';
+      var raceLoads = (d.races || []).map(function (fmt) {
+        return estimateRaceLoad(fmt, athlete, dayWind);
+      }).filter(function (r) { return !r.error; });
+      var dayTRIMP = raceLoads.reduce(function (s, r) { return s + r.TRIMP_estimate; }, 0);
+      var dayMin = raceLoads.reduce(function (s, r) { return s + r.durationMin; }, 0);
+      return {
+        day: d.day,
+        race_count: raceLoads.length,
+        race_minutes: dayMin,
+        TRIMP: Math.round(dayTRIMP * 10) / 10,
+        wind: dayWind,
+        races: raceLoads
+      };
+    });
+    var total = days.reduce(function (s, d) { return s + d.TRIMP; }, 0);
+    return {
+      days: days,
+      total_TRIMP: Math.round(total * 10) / 10,
+      total_days: days.length,
+      total_races: days.reduce(function (s, d) { return s + d.race_count; }, 0),
+      avg_daily_TRIMP: Math.round((total / days.length) * 10) / 10
+    };
+  }
+
+  /* ============================================================
    * 9-D-3) HRV — RMSSD / SDNN / pNN50 (Task Force 1996)
    *
    * Heart Rate Variability time-domain metrics.
@@ -3302,6 +3388,8 @@
     analyzeHr: analyzeHr,
     computeTRIMP: computeTRIMP,
     computeWorkload: computeWorkload,
+    estimateRaceLoad: estimateRaceLoad,
+    estimateCompetitionLoad: estimateCompetitionLoad,
     computeHRV: computeHRV,
     computeHrZones: computeHrZones,
     computeHrEfficiency: computeHrEfficiency,
