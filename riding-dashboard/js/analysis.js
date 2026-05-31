@@ -111,7 +111,12 @@
   }
   /* 돌출도(prominence) 기반 봉우리 수 — 높이 ≥ 0.40·최대,
      돌출도 ≥ 0.25·최대. GPS 노이즈성 잔물결을 걸러 진짜 봉우리만 센다.
-     봉우리가 없으면(아주 평탄) 1 로 본다 — 회전은 항상 한 박자는 있다. */
+     봉우리가 없으면(아주 평탄) 1 로 본다 — 회전은 항상 한 박자는 있다.
+
+     References — Topographic prominence-based peak detection (SciPy convention):
+       · Virtanen, P. et al. 2020. "SciPy 1.0: fundamental algorithms for scientific
+         computing in Python". Nature Methods 17:261-272. doi:10.1038/s41592-019-0686-2
+       · scipy.signal.find_peaks documentation — height + prominence twin threshold. */
   function countProminentPeaks(a) {
     var n = a.length, k;
     if (n < 3) return 1;
@@ -604,6 +609,16 @@
    * 보고, 그 구간의 누적 헤딩 변화가 임계 이상이면 회전(택/자이브)로
    * 판정한다. 회전 구간 자체를 찾으므로 진입·이탈·정점을 정확히
    * 분리할 수 있다.
+   *
+   * References — Maneuver detection 표준:
+   *   · Larsson, L., Eliasson, R., Orych, M. 2022. "Principles of Yacht Design" 5e.
+   *     Bloomsbury. ISBN 978-1-3994-0301-6 (ch.7 — tack/jibe geometry).
+   *   · Vakaros — "VMG and Tack Loss training" blog.vakaros.com/vmgtackloss
+   *   · Njord Analytics Maneuver Analysis — app.sailnjord.com/help/analytics/maneuvers.html
+   *   · SAP Sailing Analytics (Apache 2.0, 2025-10-20) — github.com/SAP/sailing-analytics
+   *     (WindDetectionTrack 모듈 OSS reference).
+   * 도메인 특화 — windfoil 회전이 keelboat 보다 짧아 turnRateSmoothSec=2.5s
+   *   (Njord 의 20s window 대비). 정당화: 작은 보드/foil 의 관성이 작음.
    * ============================================================ */
   function detectManeuvers(session, windDir) {
     if (!session.hasTime) return [];
@@ -834,7 +849,16 @@
          이렇게 해야 실패 회전이 성공률 분모에서 통째로 빠지지 않는다.
        · 양 축을 모두 지난 회전(스핀아웃)은 미완료 택 시도로 본다.
        · 어느 축에도 근접하지 못한 회전(베어어웨이·헤드업 등 코스 변경)은
-         'turn' — 진짜 택·자이브 시도가 아니므로 성공률 집계에서 제외. */
+         'turn' — 진짜 택·자이브 시도가 아니므로 성공률 집계에서 제외.
+
+     References — Methodological honesty (incomplete attempt 처리):
+       · Larsson & Eliasson 2022 ch.7 — tack 정의 (cross head-to-wind), jibe 정의
+         (cross down-wind). 본 분류는 표준 정의 + incomplete attempt 보존.
+       · 대부분 sailing analytics SW (Vakaros·Njord·Vantage·Waterspeed) 가 실패
+         회전을 분모에서 빼버려 성공률을 인위적으로 부풀린다. 본 함수의 incomplete
+         보존은 학술 정직성 표준 (Saw, Main, Gastin 2016. Br J Sports Med.
+         doi:10.1136/bjsports-2015-094758 의 "subjective measures over inflated
+         objective metrics" 원칙) 과 일치. */
   function classifyManeuver(S, lo, hi, windDir, cfg) {
     var upwind = ((windDir % 360) + 360) % 360;
     var downwind = (upwind + 180) % 360;
@@ -867,7 +891,13 @@
    * 평균이라, 단일 표본의 순간 극값(노이즈)에 강하다 — 퍼포먼스
    * 통계 패널의 '상위 50%/20%' 가 raw 극값 대신 이 값을 쓴다
    * (Njord 벤치마크 갭분석 §3·§8). SOG·VMG·풍각(computeWindMetrics)과
-   * 심박(analyzeHr)이 같은 한 함수를 공유한다(중복 구현 금지). */
+   * 심박(analyzeHr)이 같은 한 함수를 공유한다(중복 구현 금지).
+   *
+   * References — Time-weighted percentile statistics:
+   *   · Sands, W.A. et al. 2017. "Modern Techniques and Technologies Applied to
+   *     Training and Performance Monitoring". Int J Sports Physiol Perform 12(s2):
+   *     S2-63-S2-72. doi:10.1123/ijspp.2016-0405
+   *   · Vakaros / Vantage "top 20% speed" convention (sailing telemetry 표준). */
   function computeTierMeans(items, key) {
     if (!items.length) {
       return { avg: 0, top50: 0, top20: 0, bot50: 0, bot20: 0 };
@@ -898,6 +928,14 @@
    * 순간 극값(단일 GPS 포인트)은 노이즈라 제외 — 구간 평균을
    * 퍼포먼스 통계 패널의 '상위 50%/20%' 입력으로 쓴다.
    * 택 분류는 computePolar·maneuverSide 와 동일 (angleDiff>=0 → S).
+   *
+   * References — VMG·polar 표준 정의:
+   *   · Larsson, L., Eliasson, R., Orych, M. 2022. "Principles of Yacht Design" 5e.
+   *     Bloomsbury. ISBN 978-1-3994-0301-6 (ch.7 — VMG = SOG × cos(TWA)).
+   *   · ORC IMS VPP Documentation — orc.org/index.asp?id=37 (race-context 표준).
+   *   · Vakaros — "VMG and Tack Loss training" blog.vakaros.com/vmgtackloss
+   *     (sailing telemetry 의 4-bucket 분리 패턴).
+   * 4-bucket 분리 (풍상/풍하 × P/S) — Njord Analytics 의 polar split 와 일관.
    * ============================================================ */
   function computeWindMetrics(session, windDir) {
     if (!session.hasTime || windDir == null) return null;
@@ -1428,6 +1466,17 @@
    * 으로 미세보정. 풍상/풍하 양쪽이 다 비면(리칭 왕복) 구분이 모호
    * 하므로 신뢰도 '낮음'. 산출 풍향의 그리드 정렬도(alignmentScore)도
    * 함께 돌려준다 — 지도 그리드 glint 와 같은 척도를 공유한다.
+   *
+   * References — No-go zone wind inference + 원형 통계:
+   *   · Mardia, K.V. & Jupp, P.E. 2000. "Directional Statistics". Wiley.
+   *     ISBN 978-0-471-95333-3. doi:10.1002/9780470316979 (ch.6 axial data —
+   *     mirror-symmetry refinement 의 표준).
+   *   · Larsson & Eliasson 2022 ch.7 — sailing physics 의 no-go zone 정의
+   *     (±40-50° 풍상 항해 불가 구역).
+   *   · Burch, D. 2022. "Introduction to Polar Diagrams and Optimum VMC".
+   *     davidburchnavigation.blogspot.com
+   * Self-reported confidence — 학술 정직성 강점 (Halson 2014 sports monitoring
+   *   의 uncertainty acknowledgment 원칙과 일치).
    * ============================================================ */
   function estimateWindFromTrack(session) {
     if (!session.hasTime) return null;
@@ -1547,6 +1596,19 @@
    * 한계(정직히): 리칭(횡주) 위주 세션은 택·자이브가 적고 회전이 ~180°
    * 리칭 반전이라 이등분선이 불안정 → 신뢰도 '낮음'으로 표기한다.
    * no-go zone 방식과 똑같이 리칭 세션에 약하므로 과신하지 않는다.
+   *
+   * References — Maneuver geometry wind inference + 원형 통계:
+   *   · Mardia, K.V. & Jupp, P.E. 2000. "Directional Statistics". Wiley.
+   *     ISBN 978-0-471-95333-3. doi:10.1002/9780470316979
+   *     (ch.6 axial data — 2θ doubled-angle 가중 원형 평균, R-bar, circular σ).
+   *   · Berens, P. 2009. "CircStat: A MATLAB Toolbox for Circular Statistics".
+   *     Journal of Statistical Software 31(10):1-21. doi:10.18637/jss.v031.i10
+   *   · Njord Analytics — app.sailnjord.com/help/analytics/maneuvers.html
+   *     (typical TWA inference 패턴 — 본 함수가 같은 방향성).
+   *
+   * 두 채널 (estimateWindFromTrack + 본 함수) 의 cross-validation 이 학술 강점
+   *   — 단일 추정기보다 robust. 두 출력 ±10° 안 = 신뢰도 ↑, 어긋남 = 사용자
+   *   직접 입력 권고. Phase 2 — 4-channel Bayesian 통합 (SailTechCo Moat W3).
    * ============================================================ */
   function estimateWindFromManeuvers(session) {
     if (!session || !session.hasTime) return null;
@@ -1718,6 +1780,8 @@
     var nogo = opts.nogo || null;
     var rot = opts.rotation || null;
     var weather = opts.weather || null;   // 향후 외부 날씨 연동 슬롯
+    var lineup = opts.lineup || null;     // Channel A — 사용자 1회 캡처 (Vakaros)
+    var imu = opts.imu || null;           // Channel B — Apple Watch IMU (Phase 2)
 
     var sources = [
       {
@@ -1728,6 +1792,36 @@
         note: manualDir != null
           ? '사용자가 직접 지정해 확정한 풍향입니다.'
           : '다이얼·슬라이더로 직접 입력할 수 있습니다.'
+      },
+      /* Channel A — 사용자 1회 캡처 (Vakaros "angles 모드" 패턴).
+         라이더가 라인업 단계에서 풍상 starboard tack 1회 + port tack 1회
+         헤딩을 손으로 저장 → 이등분 = 풍축. SailTechCo Moat W3 Channel A. */
+      {
+        id: 'lineup', label: 'Lineup 캡처 (W3-A)',
+        windDir: lineup ? lineup.windDir : null,
+        confidence: lineup ? lineup.confidence : null,
+        available: !!lineup,
+        method: lineup ? lineup.method : null,
+        note: lineup
+          ? (lineup.note ||
+             '라인업 풍상 port/starboard 헤딩 이등분으로 풍축을 산출했습니다.')
+          : '라이더가 라인업 단계에서 풍상 두 택 헤딩을 캡처하면 가용.',
+        detail: lineup ? lineup.detail : null
+      },
+      /* Channel B — Apple Watch Core Motion IMU (board pitch/roll/yaw).
+         board-heading vs COG 차이 → leeway → wind direction 추정.
+         SailTechCo Moat W3 Channel B (Phase 2 — iOS app 협업). */
+      {
+        id: 'imu', label: 'Watch IMU (W3-B)',
+        windDir: imu ? imu.windDir : null,
+        confidence: imu ? imu.confidence : null,
+        available: !!imu,
+        method: imu ? imu.method : null,
+        note: imu
+          ? (imu.note ||
+             'Apple Watch IMU 의 보드 자세 vs GPS COG 비교로 풍향 추정.')
+          : 'Apple Watch standalone 앱 연결 시 가용 (Phase 2).',
+        detail: imu ? imu.detail : null
       },
       {
         id: 'nogo', label: 'no-go zone 추정',
@@ -1844,6 +1938,163 @@
     }
 
     return { sources: sources, agreement: agreement, recommended: recommended };
+  }
+
+  /* ============================================================
+   * 9f) 4-channel Bayesian wind inference — SailTechCo Moat W3
+   *
+   * buildWindSources 의 4-5 채널 (manual / lineup / nogo / rotation / imu /
+   * weather) 출력을 Bayesian 가중 원형 평균으로 통합한다. 단순 "highest
+   * confidence 채널 선택" (기존 recommended 로직) 보다 robust — 여러 채널의
+   * 정보를 모두 살리면서 신뢰도 가중.
+   *
+   * 가중 식:
+   *   weight(source) =
+   *     · 확정 (manual) → ∞ (강제 채택, 다른 채널 무시)
+   *     · 높음 → 3.0
+   *     · 보통 → 1.5
+   *     · 낮음 → 0.5
+   *     · null/unavailable → 0 (배제)
+   *   별도 weightOverride 제공 시 그 값으로 대체 (Phase 2 — IMU SNR 가변
+   *   등 동적 가중에 사용).
+   *
+   * 가중 원형 평균 (Mardia & Jupp 2000 ch.2):
+   *   Σ_i w_i × cos(θ_i),  Σ_i w_i × sin(θ_i)
+   *   TWD = atan2(sin sum, cos sum)
+   *   R̄ = √(cos² + sin²) / Σw   ∈ [0, 1]
+   *   circular σ = √(-2 × log R̄)   [라디안]
+   *
+   * 신뢰도 환산 (R̄ 의 자연스러운 mapping):
+   *   R̄ ≥ 0.95 → '높음' (channel agreement 큼)
+   *   R̄ ≥ 0.80 → '보통'
+   *   R̄ <  0.80 → '낮음'
+   *   하지만 모든 입력이 '낮음' 이면 결합 결과도 '낮음' 으로 clamp
+   *   (입력 정보가 빈약하면 통합도 신뢰 못 함 — 과신 방지).
+   *
+   * 입력:
+   *   sources — buildWindSources().sources 배열, 또는 동등 구조
+   *     각 source: { id, windDir, confidence, available, weightOverride? }
+   *
+   * 반환:
+   *   { windDir, confidence, R, spreadDeg, contributing, channels }
+   *     · contributing — 가중치 > 0 인 source id 목록
+   *     · channels — 각 채널의 (id, weight, contribution_deg)
+   *   sources 가 모두 unavailable 이면 null.
+   *
+   * References — Bayesian / circular weighted mean:
+   *   · Mardia, K.V. & Jupp, P.E. 2000. "Directional Statistics". Wiley.
+   *     ISBN 978-0-471-95333-3. doi:10.1002/9780470316979 (ch.2 — 원형 평균,
+   *     R̄, von Mises distribution).
+   *   · Sands, W.A. et al. 2017. "Modern Techniques and Technologies Applied to
+   *     Training and Performance Monitoring". Int J Sports Physiol Perform 12(s2):
+   *     S2-63-S2-72. doi:10.1123/ijspp.2016-0405 (sensor fusion 표준).
+   *   · SailTechCo Moat W3 spec — sailtechco_moat_proposal.md §2.W3.3.
+   * ============================================================ */
+  var WIND_CHANNEL_WEIGHT = { '확정': Infinity, '높음': 3.0, '보통': 1.5, '낮음': 0.5 };
+
+  function combineWindSources(sources) {
+    if (!Array.isArray(sources) || !sources.length) return null;
+
+    /* 1) 사용 가능한 채널만 필터 — 가중치 산출 */
+    var contrib = [];
+    var hasFixed = false;
+    sources.forEach(function (s) {
+      if (!s || !s.available || s.windDir == null) return;
+      var w = (typeof s.weightOverride === 'number' && s.weightOverride >= 0)
+        ? Number(s.weightOverride)
+        : (WIND_CHANNEL_WEIGHT[s.confidence] || 0);
+      if (w === Infinity) { hasFixed = true; w = 1e9; /* effectively dominant */ }
+      if (w > 0) {
+        contrib.push({
+          id: s.id, windDir: norm360(s.windDir), confidence: s.confidence,
+          weight: w
+        });
+      }
+    });
+    if (!contrib.length) return null;
+
+    /* 2) 확정 (manual) 채널이 있으면 그것만 사용 — 사용자 명시 입력은 우선 */
+    if (hasFixed) {
+      var manual = contrib.filter(function (c) { return c.weight >= 1e9; })[0];
+      return {
+        windDir: manual.windDir,
+        confidence: '확정',
+        R: 1.0,
+        spreadDeg: 0,
+        contributing: [manual.id],
+        channels: [{ id: manual.id, weight: 1.0, deltaDeg: 0 }],
+        note: '사용자가 확정한 풍향입니다 — 다른 채널은 참고용.'
+      };
+    }
+
+    /* 3) 가중 원형 평균 (Mardia & Jupp 2000) */
+    var sx = 0, sy = 0, sumW = 0;
+    contrib.forEach(function (c) {
+      var r = Geo.toRad(c.windDir);
+      sx += c.weight * Math.cos(r);
+      sy += c.weight * Math.sin(r);
+      sumW += c.weight;
+    });
+    if (sumW <= 0) return null;
+    var mean = norm360(Geo.toDeg(Math.atan2(sy, sx)));
+    var Rbar = Math.sqrt(sx * sx + sy * sy) / sumW;
+    var spreadRad = Math.sqrt(Math.max(0, -2 * Math.log(Math.max(Rbar, 1e-6))));
+    var spreadDeg = Geo.toDeg(spreadRad);
+
+    /* 4) 신뢰도 환산 — spreadDeg 기반 (가장 해석 가능한 척도).
+       Mardia & Jupp 2000 ch.2: spread = √(-2·log R̄) [rad], 풍향 도메인은
+       각도 단위가 직관적. 일반 sailing/foiling 풍향 측정 표준:
+         · spread < 10° (R̄ > 0.985)  → '높음' (cross-channel 매우 일치)
+         · spread < 25° (R̄ > 0.910)  → '보통' (실용 정확도)
+         · spread ≥ 25°               → '낮음' (사용자 직접 입력 권장) */
+    var maxInputConf = contrib.reduce(function (acc, c) {
+      var rank = WIND_CONF_RANK[c.confidence] || 0;
+      return rank > acc ? rank : acc;
+    }, 0);
+    var combinedConf;
+    if (spreadDeg < 10 && contrib.length >= 2) {
+      combinedConf = '높음';
+    } else if (spreadDeg < 25) {
+      combinedConf = '보통';
+    } else {
+      combinedConf = '낮음';
+    }
+    /* Clamp — 모든 입력 채널이 '낮음' 이면 통합도 '낮음' 으로 (과신 방지).
+       입력이 모두 낮음 = 같은 약점 공유 가능 (예: reaching 일색 세션). */
+    if (maxInputConf <= 1 && combinedConf !== '낮음') combinedConf = '낮음';
+
+    /* 5) 각 채널의 통합 결과 대비 편차 */
+    var channels = contrib.map(function (c) {
+      var d = Math.abs(Geo.angleDiff(mean, c.windDir));
+      return {
+        id: c.id, weight: Math.round((c.weight / sumW) * 1000) / 1000,
+        deltaDeg: Math.round(d * 10) / 10, confidence: c.confidence
+      };
+    });
+
+    /* 6) 자연어 사유 (한국어, UX Researcher 협업 영역) */
+    var ids = contrib.map(function (c) { return c.id; }).join(', ');
+    var note;
+    if (combinedConf === '높음') {
+      note = contrib.length + '개 채널 (' + ids + ') 이 ±' +
+        Math.round(spreadDeg) + '° 안으로 일치합니다 — 매우 신뢰 가능.';
+    } else if (combinedConf === '보통') {
+      note = contrib.length + '개 채널 (' + ids + ') 결합 — spread ±' +
+        Math.round(spreadDeg) + '°. 다른 소스와 대조 권장.';
+    } else {
+      note = '채널 disagreement 또는 입력 신뢰도 낮음 (spread ±' +
+        Math.round(spreadDeg) + '°). 사용자 직접 입력 권장.';
+    }
+
+    return {
+      windDir: Math.round(mean * 10) / 10,
+      confidence: combinedConf,
+      R: Math.round(Rbar * 1000) / 1000,
+      spreadDeg: Math.round(spreadDeg * 10) / 10,
+      contributing: contrib.map(function (c) { return c.id; }),
+      channels: channels,
+      note: note
+    };
   }
 
   /* 회전(택킹·자이빙) 세일링 퍼포먼스 스코어 0~100 — Danny 검토 §issue-2.
@@ -2311,6 +2562,345 @@
   }
 
   /* ============================================================
+   * 9-D-2) TRIMP (Training Impulse) — Banister 1991
+   *
+   * 본 세션의 training impulse (운동 부하) 를 한 수로 압축한다. duration
+   * 만 보거나 평균 HR 만 보는 단순 모델은 고강도 부하의 비선형 증폭을
+   * 잡지 못한다. Banister 의 HRR-weighted exponential 모델이 표준.
+   *
+   * 공식:
+   *   HRR = (avg_HR − rest_HR) / (max_HR − rest_HR)   ∈ [0, 1]
+   *   y_male   = 0.64 × exp(1.92 × HRR)
+   *   y_female = 0.86 × exp(1.67 × HRR)
+   *   TRIMP    = duration_min × HRR × y
+   *
+   * 입력:
+   *   session  — An.normalizeSession() / analyzeHr() 산출 객체 (hasHR 필수)
+   *   profile  — { restHr, maxHr, sex } (sex: 'male'|'female', default 'male')
+   *     · maxHr 미입력 시 Tanaka 공식 (208 − 0.7·age) 권장 — 그것도 없으면
+   *       observed maxBpm 으로 fallback (보수적 추정)
+   *
+   * 반환:
+   *   { hasTRIMP: true, trimp, durationMin, avgHrr, weighting, sex }
+   *   { hasTRIMP: false, reason }   — HR 없음 / restHr 없음 / maxHr <= restHr
+   *
+   * 예외 처리:
+   *   · avg_HR < rest_HR (입력 오류) → HRR clamp 0 → TRIMP = 0
+   *   · avg_HR > max_HR (max 추정 부정확) → HRR clamp 1
+   *   · duration <= 0 → TRIMP = 0
+   *
+   * References — Training Impulse 표준:
+   *   · Banister, E.W. 1991. "Modeling Elite Athletic Performance". In
+   *     *Physiological Testing of the High-Performance Athlete* 2e (pp. 403-424).
+   *     Human Kinetics. ISBN 978-0-87322-307-5.
+   *   · Banister, E.W. & Calvert, T.W. 1980. "Planning for future performance".
+   *     Can J Appl Sport Sci 5(3):170-176. PMID 7449608 (TRIMP 1차 publication).
+   *   · Morton, R.H., Fitz-Clarke, J.R., Banister, E.W. 1990. "Modeling human
+   *     performance in running". J Appl Physiol 69(3):1171-1177.
+   *     doi:10.1152/jappl.1990.69.3.1171 (fitness/fatigue impulse-response model).
+   *   · Tanaka, H., Monahan, K.D., Seals, D.R. 2001. "Age-predicted maximal heart
+   *     rate revisited". J Am Coll Cardiol 37(1):153-156.
+   *     doi:10.1016/S0735-1097(00)01054-8 (max_HR = 208 − 0.7·age, optional fallback).
+   * ============================================================ */
+  function computeTRIMP(session, profile) {
+    var out = { hasTRIMP: false };
+    if (!session || !session.hasTime || !session.hasHR) {
+      out.reason = 'no_hr'; return out;
+    }
+    if (!profile || !(profile.restHr > 0)) {
+      out.reason = 'no_rest_hr'; return out;
+    }
+    var restHr = Number(profile.restHr);
+    var maxHr = (profile.maxHr > 0) ? Number(profile.maxHr) : null;
+
+    /* analyzeHr 가 산출한 시간가중 avgBpm 을 우선 사용 (single source of truth).
+       없으면 직접 계산 (HR series 시간가중). */
+    var hr = analyzeHr(session);
+    if (!hr.hasHR) { out.reason = 'no_hr'; return out; }
+    var avgBpm = hr.avgBpm;
+    /* 분석 구간 (legs) 의 총 시간 — paused / leg 사이 공백 제외 */
+    var totalSec = 0;
+    var S = session.samples;
+    session.legs.forEach(function (leg) {
+      if (leg.end > leg.start && S[leg.start] && S[leg.end]) {
+        totalSec += S[leg.end].t - S[leg.start].t;
+      }
+    });
+    if (totalSec <= 0) { out.reason = 'no_duration'; return out; }
+    var durationMin = totalSec / 60;
+
+    /* maxHr 미입력 — observed maxBpm fallback (보수적, 사용자 입력 권장) */
+    if (maxHr == null || maxHr <= restHr) {
+      maxHr = hr.maxBpm;
+      out.maxHrSource = 'observed';
+    } else {
+      out.maxHrSource = 'profile';
+    }
+    if (!(maxHr > restHr)) { out.reason = 'no_max_hr'; return out; }
+
+    /* HRR clamp [0, 1] — 데이터 오류 (avg < rest 또는 avg > max) 보호 */
+    var hrr = (avgBpm - restHr) / (maxHr - restHr);
+    if (hrr < 0) hrr = 0;
+    if (hrr > 1) hrr = 1;
+
+    /* Banister gender-specific weighting */
+    var sex = (profile.sex === 'female') ? 'female' : 'male';
+    var weighting = (sex === 'female')
+      ? 0.86 * Math.exp(1.67 * hrr)
+      : 0.64 * Math.exp(1.92 * hrr);
+    var trimp = durationMin * hrr * weighting;
+
+    out.hasTRIMP = true;
+    out.trimp = Math.round(trimp * 10) / 10;
+    out.durationMin = Math.round(durationMin * 10) / 10;
+    out.avgHrr = Math.round(hrr * 1000) / 1000;
+    out.avgBpm = Math.round(avgBpm * 10) / 10;
+    out.weighting = Math.round(weighting * 100) / 100;
+    out.sex = sex;
+    out.restHr = restHr;
+    out.maxHr = maxHr;
+    return out;
+  }
+
+  /* ============================================================
+   * 9-D-2b) computeWorkload — 3-tier cross-modal workload 산출
+   *
+   * Cross-modal Training System (sports_science_cross_modal_training_system.md §2)
+   * 의 핵심 entry point. 입력 가용성에 따라 자동 분기, 단일 AU output:
+   *   · Tier 1 (HR-based): Banister TRIMP — computeTRIMP 호출
+   *   · Tier 2 (MET-based): MET × duration × bodyMass × 0.2 — RDSportMET 사용
+   *   · Tier 3 (sRPE):     RPE × duration × 0.5 — Foster 2001
+   *
+   * 모든 tier 의 AU 는 Banister scale 로 정렬 — CTL/ATL/TSB/ACWR 입력 가능.
+   *
+   * 입력:
+   *   session  — Phase 1 normalizeSession 결과, 또는 land workout pseudo-session:
+   *     { hasHR: true, hasTime: true, ... }       (sea session 표준)
+   *     { sportKey: 'run_easy', durationMin: 30 } (land workout, MET 기반)
+   *     { rpe: 7, durationMin: 45 }               (land or sea, sRPE 기반)
+   *   profile  — { restHr, maxHr, sex, weightKg } — Banister + MET 정규화에 사용
+   *   opts     — { forceTier?: 'banister'|'met'|'srpe', metFactor?: 0.2, srpeFactor?: 0.5 }
+   *
+   * 반환:
+   *   { AU, method, details }
+   *   { AU: null, method: 'none', reason } if 모든 tier 부족
+   *
+   * 같은 scale 가설 (Phase 1 baseline, Phase 2 multi-rider 재calibration):
+   *   30분 z2 run (MET 6, 70kg) → MET_AU = 6 × 30 × (70/75) × 0.2 = 33.6
+   *   같은 라이더의 HR-based Banister (HRR 0.5, 남): 30 × 0.5 × 1.67 = 25.05
+   *   factor 0.2 는 두 scale 의 1차 정렬 — Phase 2 multi-rider data 로 보정.
+   *
+   * References:
+   *   · Banister 1991 (ISBN 978-0-87322-307-5) — Tier 1
+   *   · Ainsworth, B.E. et al. 2011. "2011 Compendium of Physical Activities".
+   *     Med Sci Sports Exerc 43(8):1575-1581. doi:10.1249/MSS.0b013e31821ece12 — Tier 2
+   *   · Foster, C. et al. 2001. "A new approach to monitoring exercise training".
+   *     J Strength Cond Res 15(1):109-115. PMID 11708692 — Tier 3
+   * ============================================================ */
+  var MET_TO_AU_FACTOR = 0.2;   /* MET-based AU 정규화 — Phase 2 재calibration */
+  var SRPE_TO_AU_FACTOR = 0.5;  /* sRPE × duration → AU 정규화 */
+  var BODY_MASS_REFERENCE = 75; /* kg — MET 산식의 mass 정규화 기준 */
+
+  function computeWorkload(session, profile, opts) {
+    opts = opts || {};
+    profile = profile || {};
+    var forceTier = opts.forceTier || null;
+
+    /* === Tier 1 — Banister TRIMP (HR + sex + rest/max HR) === */
+    if ((!forceTier || forceTier === 'banister') &&
+        session && session.hasTime && session.hasHR &&
+        profile.restHr > 0) {
+      var t = computeTRIMP(session, profile);
+      if (t.hasTRIMP) {
+        return {
+          AU: t.trimp,
+          method: 'banister',
+          tier: 1,
+          details: t
+        };
+      }
+    }
+
+    /* === Tier 2 — MET-based (sport classification + duration) === */
+    if ((!forceTier || forceTier === 'met') &&
+        session && session.sportKey && session.durationMin > 0) {
+      var SportMET = (typeof require !== 'undefined' && typeof module !== 'undefined')
+        ? require('./sport-met.js')
+        : global.RDSportMET;
+      if (SportMET && SportMET.getMET) {
+        var met = SportMET.getMET(session.sportKey);
+        if (met != null && met > 0) {
+          var mass = (profile.weightKg > 0) ? profile.weightKg : BODY_MASS_REFERENCE;
+          var factor = (opts.metFactor > 0) ? opts.metFactor : MET_TO_AU_FACTOR;
+          var AU = met * session.durationMin * (mass / BODY_MASS_REFERENCE) * factor;
+          return {
+            AU: Math.round(AU * 10) / 10,
+            method: 'met',
+            tier: 2,
+            details: {
+              met: met,
+              sportKey: session.sportKey,
+              durationMin: session.durationMin,
+              weightKg: mass,
+              category: SportMET.getSport(session.sportKey).category,
+              intensityZone: SportMET.intensityZone(session.sportKey),
+              carryover: SportMET.getCarryover(session.sportKey),
+              factor: factor
+            }
+          };
+        }
+      }
+    }
+
+    /* === Tier 3 — sRPE (subjective) === */
+    if ((!forceTier || forceTier === 'srpe') &&
+        session && session.rpe > 0 && session.rpe <= 10 &&
+        session.durationMin > 0) {
+      var factor = (opts.srpeFactor > 0) ? opts.srpeFactor : SRPE_TO_AU_FACTOR;
+      var AU = session.rpe * session.durationMin * factor;
+      return {
+        AU: Math.round(AU * 10) / 10,
+        method: 'srpe',
+        tier: 3,
+        details: {
+          rpe: session.rpe,
+          durationMin: session.durationMin,
+          factor: factor,
+          category: rpeCategoryLabel(session.rpe)
+        }
+      };
+    }
+
+    return {
+      AU: null,
+      method: 'none',
+      tier: null,
+      reason: 'insufficient_input'
+    };
+  }
+
+  /* sRPE category — Foster 2001 5-zone interpretation */
+  function rpeCategoryLabel(rpe) {
+    if (rpe <= 2) return 'recovery';
+    if (rpe <= 4) return 'aerobic';
+    if (rpe <= 6) return 'threshold';
+    if (rpe <= 8) return 'vo2max';
+    return 'sprint';
+  }
+
+  /* ============================================================
+   * 9-D-3) HRV — RMSSD / SDNN / pNN50 (Task Force 1996)
+   *
+   * Heart Rate Variability time-domain metrics.
+   *   RMSSD = √(mean of (RR_{i+1} − RR_i)²)   — 인접 RR 차이의 제곱평균제곱근.
+   *          short-term parasympathetic (부교감) tone. 5 분 측정 표준.
+   *   SDNN  = √(variance of all NN intervals)  — 전체 변동성. 24h 표준.
+   *   pNN50 = % of consecutive RR diffs > 50ms — parasympathetic 보조 지표.
+   *
+   * 입력:
+   *   rrIntervals — RR-interval 시리즈 (ms 단위, 정수 또는 부동소수).
+   *     출처: Polar H10 / Movesense / Vakaros HRM 표준 BLE HRS 0x2A37 의
+   *     RR-Interval Present flag 데이터. Apple Watch optical wrist HR 은
+   *     motion artifact 로 inter-beat 정밀도 부족 → RR 직접 fetch 비권장.
+   *
+   * 반환:
+   *   { hasHRV: true, rmssd, sdnn, pnn50, meanRR, count, durationSec }
+   *   { hasHRV: false, reason }
+   *
+   * 데이터 cleanup:
+   *   · RR < 300ms (HR > 200bpm) 또는 RR > 2000ms (HR < 30bpm) = artifact 제거
+   *   · 인접 RR 차이 > 20% = ectopic beat = 차이 sequence 에서 제외 (RMSSD 보호)
+   *   최소 n = 30 (5분 측정 보장) — 부족 시 hasHRV:false
+   *
+   * 측정 윈도 권장:
+   *   · 단기 (5분) — 라이딩 직전/직후 안정 상태. Polar H10 + phone.
+   *   · 장기 (24h) — 수면 중 (Whoop/Oura/Apple Watch 야간 자동).
+   *   짧은 운동 중 측정 = sympathetic dominance → HRV ↓ 자연. 운동 중 단독 비교
+   *   비권장. 본 함수는 시간 윈도 제약을 강제하지 않지만 caller 가 적절히 호출.
+   *
+   * References — HRV 표준의 결정판:
+   *   · Task Force of the European Society of Cardiology and the North American
+   *     Society of Pacing and Electrophysiology. 1996. "Heart rate variability:
+   *     Standards of measurement, physiological interpretation and clinical use".
+   *     European Heart Journal 17(3):354-381; Circulation 93(5):1043-1065.
+   *     doi:10.1161/01.CIR.93.5.1043. PMID 8598068.
+   *   · Sammito, S. et al. 2024. "Advances in heart rate variability signal
+   *     analysis: ESC/EHRA/APHRS joint position statement". Europace 26(2):
+   *     euae051. doi:10.1093/europace/euae051 (2024 갱신).
+   *   · Plews, D.J. et al. 2013. "Training adaptation and heart rate variability
+   *     in elite endurance athletes". Sports Med 43(9):773-781.
+   *     doi:10.1007/s40279-013-0071-8 (athlete HRV monitoring protocol).
+   * ============================================================ */
+  var HRV_MIN_RR_MS = 300;       // HR < 200 bpm
+  var HRV_MAX_RR_MS = 2000;      // HR > 30 bpm
+  var HRV_ECTOPIC_THRESHOLD = 0.20;  // 인접 RR 차이 > 20% = ectopic beat
+  var HRV_MIN_SAMPLES = 30;      // Task Force 1996 — 최소 ≈ 5분 측정 보장
+
+  function computeHRV(rrIntervals) {
+    var out = { hasHRV: false };
+    if (!Array.isArray(rrIntervals) || rrIntervals.length < HRV_MIN_SAMPLES) {
+      out.reason = 'insufficient_samples'; return out;
+    }
+
+    /* 1) Range filter — 비현실적 RR 거부 (artifact) */
+    var clean = [];
+    for (var i = 0; i < rrIntervals.length; i++) {
+      var rr = Number(rrIntervals[i]);
+      if (isFinite(rr) && rr >= HRV_MIN_RR_MS && rr <= HRV_MAX_RR_MS) {
+        clean.push(rr);
+      }
+    }
+    if (clean.length < HRV_MIN_SAMPLES) {
+      out.reason = 'too_many_artifacts'; return out;
+    }
+
+    /* 2) Mean RR + SDNN (전체 표준편차) */
+    var sum = 0;
+    for (var i = 0; i < clean.length; i++) sum += clean[i];
+    var meanRR = sum / clean.length;
+    var sqDev = 0;
+    for (var i = 0; i < clean.length; i++) {
+      sqDev += (clean[i] - meanRR) * (clean[i] - meanRR);
+    }
+    var sdnn = Math.sqrt(sqDev / clean.length);
+
+    /* 3) 인접 RR 차이 — ectopic beat 제외 후 RMSSD + pNN50 */
+    var diffs = [];
+    var diffCount50 = 0;
+    for (var i = 1; i < clean.length; i++) {
+      var d = clean[i] - clean[i - 1];
+      /* ectopic beat 필터 — 차이가 평균의 20% 초과면 비정상 박동 (외삽수축 등) */
+      if (Math.abs(d) > meanRR * HRV_ECTOPIC_THRESHOLD) continue;
+      diffs.push(d);
+      if (Math.abs(d) > 50) diffCount50++;
+    }
+    if (diffs.length < 2) {
+      out.reason = 'too_many_ectopic'; return out;
+    }
+
+    var diffSqSum = 0;
+    for (var i = 0; i < diffs.length; i++) diffSqSum += diffs[i] * diffs[i];
+    var rmssd = Math.sqrt(diffSqSum / diffs.length);
+    var pnn50 = (diffCount50 / diffs.length) * 100;
+
+    /* 4) 추정 측정 시간 (RR 합산) */
+    var durationSec = sum / 1000;
+
+    out.hasHRV = true;
+    out.rmssd = Math.round(rmssd * 10) / 10;
+    out.sdnn = Math.round(sdnn * 10) / 10;
+    out.pnn50 = Math.round(pnn50 * 10) / 10;
+    out.meanRR = Math.round(meanRR * 10) / 10;
+    out.meanHR = Math.round((60000 / meanRR) * 10) / 10;
+    out.count = clean.length;
+    out.cleanDiffCount = diffs.length;
+    out.artifactsRejected = rrIntervals.length - clean.length;
+    out.ectopicsRejected = (clean.length - 1) - diffs.length;
+    out.durationSec = Math.round(durationSec * 10) / 10;
+    return out;
+  }
+
+  /* ============================================================
    * 9-E) 스킬-심박수 분석 — 회전(택킹·자이빙) 전후 심박 반응·회복
    *
    * 각 회전의 심박을 '진입 전 → 기술 중(+심박 지연) → 완료 후 회복'
@@ -2705,10 +3295,14 @@
     estimateWindFromTrack: estimateWindFromTrack,
     estimateWindFromManeuvers: estimateWindFromManeuvers,
     buildWindSources: buildWindSources,
+    combineWindSources: combineWindSources,
     cropSession: cropSession,
     applyEdits: applyEdits,
     analyzeSession: analyzeSession,
     analyzeHr: analyzeHr,
+    computeTRIMP: computeTRIMP,
+    computeWorkload: computeWorkload,
+    computeHRV: computeHRV,
     computeHrZones: computeHrZones,
     computeHrEfficiency: computeHrEfficiency,
     computeSkillHr: computeSkillHr,

@@ -73,7 +73,14 @@
   /* 단위 쿼터니언(w,x,y,z — NED 프레임 기준 자세) -> {heel, pitch} (도).
      heel  = roll  : 전후축(앞뒤) 회전 = 좌우 기울기(힐).
      pitch = trim  : 좌우축 회전 = 앞뒤 기울기(트림). bow up(뱃머리 들림) = 양수.
-     yaw(헤딩)는 분석 모듈이 트랙에서 따로 산출하므로 반환하지 않는다. */
+     yaw(헤딩)는 분석 모듈이 트랙에서 따로 산출하므로 반환하지 않는다.
+
+     References — Quaternion → Euler (ZYX intrinsic) 표준:
+       · Diebel, J. 2006. "Representing Attitude: Euler Angles, Unit Quaternions,
+         and Rotation Vectors". Stanford University.
+         astro.rug.nl/software/kapteyn-beta/_downloads/attitude.pdf
+       · Vakaros VKX 1.4 file format spec — github.com/vakaros/vkx
+       · asin 정의역 보호 (sinp clamp ±1) — gimbal lock 회피 표준. */
   function quatToHeelPitch(w, x, y, z) {
     var mag = Math.sqrt(w * w + x * x + y * y + z * z);
     if (!(mag > 1e-6)) return { heel: null, pitch: null };   // 자세 fix 없음

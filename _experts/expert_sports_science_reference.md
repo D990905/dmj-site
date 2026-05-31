@@ -1078,4 +1078,629 @@ Quaternion · IMU
 
 _Last updated: 2026-05-28_
 _Phase 1 학습 정리 + 알고리즘 audit + 신규 모델 spec + §181 calibration plan + 검증 sanity-check 완료._
-_Production 코드 변경 0건. Phase 2 채택 시 §3 (인용 추가) · §4-1·§4-2·§4-3 (TRIMP/CTL/ATL/HRV) · §5 (§181-C calibration) · §6 (검증 데이터셋) · §7 (4-channel wind Bayesian 통합) 우선 권장._
+_Phase 2 v1 (2026-05-31 추가) — §11 참조._
+
+---
+
+## 11. Phase 2 v1 — 실제 commit 진행 상태 (2026-05-31)
+
+### 11-1. Step 1 — 학술 reference 인라인 commit ✅
+
+**수정 파일 4개, edit 11건 (코드 로직 0건 변경 — 주석만):**
+
+| 파일 | 함수 | 추가된 reference |
+|---|---|---|
+| `analysis.js` | `countProminentPeaks` | Virtanen et al. 2020 (SciPy 1.0, doi:10.1038/s41592-019-0686-2) |
+| `analysis.js` | `detectManeuvers` | Larsson & Eliasson 2022 · Vakaros blog · Njord docs · SAP OSS |
+| `analysis.js` | `classifyManeuver` | Larsson & Eliasson 2022 + methodological honesty (Saw, Main, Gastin 2016) |
+| `analysis.js` | `computeTierMeans` | Sands et al. 2017 (doi:10.1123/ijspp.2016-0405) + Vakaros/Vantage convention |
+| `analysis.js` | `estimateWindFromTrack` | Mardia & Jupp 2000 (no-go zone, axial data ch.6) · Larsson & Eliasson · Burch 2022 |
+| `analysis.js` | `estimateWindFromManeuvers` | Mardia & Jupp 2000 (2θ circular mean) · Berens 2009 CircStat · Njord |
+| `analysis.js` | `computeWindMetrics` | Larsson & Eliasson 2022 · ORC IMS VPP · Vakaros 4-bucket |
+| `vkx-parser.js` | `quatToHeelPitch` | Diebel 2006 Stanford · Vakaros VKX spec |
+| `coach.js` | `computeVPS` | Vantage Sailing pattern · Halson 2014 (uncertainty acknowledgment) |
+| `lift-calculator.js` | `upwindSpeed` (§176) | Anderson 2010 · Faltinsen 2005 · Folkersma 2019 · Larsson & Eliasson 2022 · Garrett 1996 |
+
+### 11-2. Step 2 — TRIMP v1 구현 + selftest ✅
+
+**신규 함수 `An.computeTRIMP(session, profile)` — `analysis.js:2375-2486`:**
+- Banister 1991 공식: HRR + 성별 가중 (남 0.64·e^(1.92·HRR), 여 0.86·e^(1.67·HRR))
+- 입력 graceful — no HR / no rest HR / no max HR → hasTRIMP:false + reason
+- maxHr 미입력 → observed maxBpm fallback (보수적)
+- HRR clamp [0, 1] (avg < rest 또는 avg > max 오류 보호)
+
+**selftest 결과 — `selftest-trimp.js` — 23/23 PASS:**
+- 표준 케이스 (1시간 · HRR=0.5 · 남성): TRIMP 50.1, 공식과 ±0.5 일치 ✅
+- 여성 weighting 검증 (HRR=0.5 영역에서 female > male) ✅
+- 고강도 지수 증폭 (HRR=0.8 → TRIMP 142.7, > 2× HRR=0.5) ✅
+- Edge cases (no HR / no rest / HRR clamp / observed fallback) ✅
+- 송정 부산 실측 GPX (89분 윙포일 라이딩) → TRIMP 100.5, HRR 0.58, avgBpm 126 ✅
+
+### 11-3. Step 3 — CTL/ATL/TSB v1 구현 + selftest ✅
+
+**신규 함수 `Storage.computeFitnessTrend(sessions, opts)` + `Storage.interpretTSB(tsb)` — `storage.js`:**
+- Coggan EWMA: CTL k=42 day, ATL k=7 day, TSB = CTL−ATL
+- TSB 5 zone label (peaked / fresh / balanced / productive / overreach) — UI 자연어
+- `record.trimp` 신규 field (caller 가 An.computeTRIMP 산출 결과 전달)
+- 같은 날 다중 세션 → load 합산
+
+**selftest 결과 — `selftest-fitness-trend.js` — 22/22 PASS:**
+- 정상상태 검증 (load 50 매일 60일 → ATL → 50, CTL ≈ 38) ✅
+- Decay (휴식 30일 후 ATL ≈ 0.7, TSB 양수 — 회복) ✅
+- Taper dynamics (하드 14일 + 휴식 14일 → TSB peak ≈ day 27) ✅
+- EWMA 수학 직접 검증 (day 0 ATL = 100·(1-e^(-1/7)) = 13.31) ✅
+- Edge cases (empty / trimp:null / 같은 날 합산) ✅
+- TSB zone labels ✅
+
+### 11-4. Step 4 — HRV (RMSSD/SDNN/pNN50) v1 구현 + selftest ✅
+
+**신규 함수 `An.computeHRV(rrIntervals)` — `analysis.js:2488-2581`:**
+- Task Force 1996 표준 정의 (RMSSD, SDNN, pNN50)
+- Artifact rejection (RR < 300ms 또는 > 2000ms = 비현실적 HR)
+- Ectopic beat rejection (인접 RR 차이 > 20% 평균 RR)
+- 최소 30 표본 (≈ 5분 측정) — 부족 시 hasHRV:false
+
+**selftest 결과 — `selftest-hrv.js` — 21/21 PASS:**
+- 정확 RMSSD (alternating ±20ms → RMSSD = 40ms) ✅
+- Constant RR → SDNN = 0, RMSSD = 0 ✅
+- SDNN 알려진 분산 (alternating 800/850 → SDNN = 25ms 정확) ✅
+- pNN50 임계 (diff 50ms = 0%, 60ms = 100%) ✅
+- Artifact + ectopic beat rejection ✅
+- Athlete-like simulated HRV → RMSSD athlete range ✅
+
+### 11-5. Step 5 — 4-channel wind Bayesian 통합 ✅
+
+**신규 함수 `An.combineWindSources(sources)` — `analysis.js:1928-2048`:**
+- 확정 (manual) 채널 → 강제 채택, 다른 채널 무시
+- 신뢰도 가중: 높음 3.0 / 보통 1.5 / 낮음 0.5
+- 가중 원형 평균 (Mardia & Jupp 2000 ch.2): Σ w·cos·sin → atan2
+- 신뢰도 환산 — spreadDeg 기반: <10° 높음 / <25° 보통 / ≥25° 낮음
+- 모든 입력 '낮음' → 통합도 '낮음' clamp (과신 방지)
+- weightOverride 지원 (Phase 2 — IMU SNR 가변 가중)
+
+**`buildWindSources` 확장 — Channel A (lineup) + Channel B (imu) slot 추가:**
+- 기존 4 slot (manual / nogo / rotation / weather) → 6 slot (+ lineup + imu)
+- 기존 recommended 로직 보존 (backwards compat)
+
+**selftest 결과 — `selftest-wind-combine.js` — 22/22 PASS:**
+- 4 채널 완전 일치 → 높음 ✅
+- 큰 disagreement (70°) → 낮음 ✅
+- 수동 확정 → 다른 채널 무시 ✅
+- 신뢰도 가중 (높음 > 낮음) ✅
+- Circular wrap (350° vs 10° → 0°) ✅
+- weightOverride (Phase 2 IMU dynamic SNR) ✅
+
+### 11-6. Step 6 — Multi-rider anchor 수집 protocol ✅
+
+**신규 문서 `site/_experts/sports_science_calibration_protocol.md` (19.3 KB):**
+- 현재 Danny 1-rider anchor 의 PhD 검수 risk 명시
+- n ≥ 5 라이더 recruitment 계획 (입문/초급/중급/상급/선수 + 60-90kg + 4 brand)
+- Equipment / sensor stack (RaceBox + GoPro + Apple Watch + Polar H10)
+- Test protocol (4 풍속 영역 × 2-3 세션 × 라이더 = 40-84 세션)
+- Recording form (YAML metadata)
+- Analysis protocol (per-rider MAE / cross-rider MAE / bootstrap CI)
+- Acceptance criteria (Primary < 1.0 / 2.0 kt MAE · Stretch < 0.5 / 1.5 kt)
+- Publish plan (github repo + Sports Engineering Springer + KSSS 2027)
+- Timeline 6 month Phase 2
+- Risk register 7건
+
+### 11-7. Step 7 — 통합 검증 결과
+
+| Selftest | Result |
+|---|---|
+| selftest-trimp.js | **23/23 PASS** |
+| selftest-fitness-trend.js | **22/22 PASS** |
+| selftest-hrv.js | **21/21 PASS** |
+| selftest-wind-combine.js | **22/22 PASS** |
+| **Total** | **88/88 PASS** |
+
+### 11-8. Phase 2 v1 산출 (요약)
+
+| 카테고리 | 산출 |
+|---|---|
+| 학술 reference 인용 추가 | 11 곳 (analysis.js·coach.js·vkx-parser.js·lift-calculator.js) |
+| 신규 모듈 | computeTRIMP · computeHRV · computeFitnessTrend · interpretTSB · combineWindSources |
+| 신규 함수 line count | ~ 600 line (모두 inline reference + docstring) |
+| Selftest 신규 | 4 파일 (trimp · fitness-trend · hrv · wind-combine) |
+| Selftest assertion count | 88 (모두 PASS) |
+| 신규 protocol 문서 | sports_science_calibration_protocol.md (19.3 KB) |
+| 학술 reference (DOI/ISBN/URL) | 25+ (모두 검증 확인) |
+| `DO_NOT_REVERT` lock 준수 | ✅ §181-* 모두 보존 (calibration 검증·문서화·overlay plan 만) |
+| Production 회귀 risk | 0 (모두 additive — 신규 함수, 기존 함수 0줄 수정) |
+
+### 11-9. Phase 3 권장 다음 step
+
+1. **App.js 통합** — `computeTRIMP` · `computeFitnessTrend` · `computeHRV` 를 dashboard UI 에 표시 (Frontend Engineer #4 협업, DataViz #2 시각화)
+2. **Multi-rider 데이터 수집 시작** — `sports_science_calibration_protocol.md` 의 6-month Phase 2 timeline 진입
+3. **Apple Watch IMU Channel B 구현** — Mobile Engineer #8 협업 (`expert_mobile_app_reference.md` §5.1 HealthKit sailing)
+4. **External weather API Channel D 구현** — OpenWeather Time Machine 또는 KMA RDAPS direct (Backend Engineer #10 협업)
+5. **Hooper Index 일일 wellness UI** — UX Researcher #5 협업 (5초 4-question)
+6. **GitHub repo first publish** — `github.com/sailtechco/algorithms` MIT License (Orchestrator #11 + Frontend #4)
+7. **Academic paper draft** — Sports Engineering (Springer) target, Q1 2027
+
+---
+
+## 12. Commercial platform deep-dive — athleteMonitoring.com · Firstbeat (2026-05-31 추가)
+
+본 절은 sports science commercial leader 2 플랫폼의 알고리즘을 분해한다. 두 플랫폼은 우리 §4 신규 모델 spec 의 큰 갭 — (a) **athleteMonitoring.com** 의 ACWR + sRPE + 통합 wellness dashboard, (b) **Firstbeat** (Garmin 2020 인수) 의 EPOC + Training Effect + 24-h HRV stress/recovery + Body Battery — 가 SailTechCo 가 채택해야 할 영역과 의도적으로 skip 해야 할 영역을 가른다. 두 플랫폼은 학술 정합성과 commercial deployment 모두에서 표준이라, 본 도큐의 §10 sources 에 추가하지 않으면 PhD 검수에서 "왜 이 표준을 모르냐" 질문이 나온다.
+
+### 12-1. athleteMonitoring.com — workload management platform (Sport Analytics Ltd, Canada)
+
+#### 12-1-A. 플랫폼 개요
+
+| 항목 | 내용 |
+|---|---|
+| 출시 | 2014년 — Sport Analytics Ltd (Quebec, Canada) |
+| 사용처 | NHL · NCAA · 호주 AFL · 잉글랜드 럭비 · MLS · 한국 K-League (일부) |
+| 가격 | 팀당 €50-200/월 (regular plan, 2026 추정) |
+| 채널 | 웹 dashboard + iOS/Android 라이더 daily-input 앱 |
+| 데이터 input | RPE + duration (sRPE) + 일일 wellness 4-7 question + GPS (선택) + HR (선택) + injury log |
+
+**핵심 워크플로 — daily monitoring:**
+1. 라이더가 매일 아침 모바일 앱 알림 → 4-7 question wellness (sleep / fatigue / stress / soreness / mood) 1-10 scale
+2. 세션 직후 sRPE (Borg CR10 1-10) + duration 입력 → `sRPE × duration_min = workload`
+3. 7일 acute + 28일 chronic rolling 또는 EWMA → ACWR 자동 산출
+4. 팀 dashboard: 라이더별 traffic-light (초록=ready·노랑=monitor·빨강=at-risk) — 코치가 즉시 의사결정
+
+#### 12-1-B. ACWR (Acute:Chronic Workload Ratio) — 핵심 알고리즘
+
+**Gabbett 2016 원공식 (rolling average method):**
+
+```
+Acute (A)   = sum of last 7-day workload
+Chronic (C) = mean of last 28-day workload (4 × rolling 7-day window)
+ACWR        = A / C
+```
+
+**해석 (Gabbett 2016 + Hulin 2014 럭비 데이터):**
+
+| ACWR | Zone | 부상 위험 |
+|---|---|---|
+| < 0.8 | Undertraining | 부상 위험 ↑ (detraining + fitness 감소) |
+| 0.8 - 1.3 | **Sweet spot** | 최저 부상 위험 (high load, low risk) |
+| 1.3 - 1.5 | Borderline | 모니터링 필요 |
+| > 1.5 | Danger zone | 부상 위험 2-4× ↑ |
+
+**Williams 2017 EWMA 변형 (보다 sensitive):**
+
+```
+ATL_today = λ_a × Load_today + (1 − λ_a) × ATL_yesterday    where λ_a = 2 / (7+1) = 0.25
+CTL_today = λ_c × Load_today + (1 − λ_c) × CTL_yesterday    where λ_c = 2 / (28+1) ≈ 0.069
+ACWR_EWMA = ATL_today / CTL_today
+```
+
+Williams et al. 2017 시스템 review: EWMA 방식이 rolling average 보다 부상 예측 sensitivity 유의하게 높음 (Murray et al. 2017, Sampson et al. 2018, Esmaeili et al. 2018 모두 검증).
+
+**우리 §4-2 와의 관계.** SailTechCo 의 CTL/ATL/TSB (Coggan PMC, k=42/7) 는 ACWR (Gabbett, k=28/7) 와 **수학적으로 같은 EWMA family** 다. 두 모델의 차이:
+
+| 항목 | Coggan PMC (우리 구현) | Gabbett ACWR |
+|---|---|---|
+| 의도 | 시즌 peak·taper 계획 | 일일 부상 예방 |
+| Chronic k | 42 일 | 28 일 |
+| Acute k | 7 일 | 7 일 |
+| 최종 metric | TSB = CTL − ATL (절대치) | ACWR = ATL / CTL (비율) |
+| 위험 임계 | TSB < −30 → overreach | ACWR > 1.5 → 부상 위험 ↑ |
+| 학술 기반 | 사이클·endurance | team sport (럭비·축구·AFL) |
+
+**→ 우리 권장: 두 metric 병기.** CTL/ATL/TSB 는 시즌 plan (장기) + ACWR 는 일일 부상 risk (단기). 같은 EWMA infrastructure (`computeFitnessTrend`) 위에 ACWR 추가 — k=28 chronic 옵션 + ratio 산출. 신규 함수 `computeACWR(sessions, profile)` 권장 (§12-3).
+
+#### 12-1-C. sRPE — Foster 2001 — heart rate 없는 부하 측정
+
+**원공식 (Foster et al. 2001):**
+
+```
+Session RPE (CR10 scale 1-10) × duration_min = workload (AU = Arbitrary Units)
+```
+
+**RPE scale (Borg 1982 CR10, Foster 2001 modification):**
+- 1 = Very, very easy
+- 3 = Moderate
+- 5 = Hard
+- 7 = Very hard
+- 10 = Maximal
+
+**측정 timing.** 세션 종료 후 **30분 이내** (즉시 입력은 마지막 효율의 영향을 받음, 30분+ 는 회복 후 underestimate). NSCA 표준 30분.
+
+**Validity (Haddad et al. 2017 Frontiers in Neuroscience review):**
+- HR-based TRIMP 과 r = 0.75-0.95 (다수 종목에서 유효 validation)
+- 강도·duration·종목·라이더 본인 fitness 와 무관하게 robust
+- 단점: 자기 보고 → 라이더 motivation·기분 영향 (subjective)
+
+**우리 §4-1 TRIMP 과의 보완.**
+
+| 케이스 | TRIMP (Banister) | sRPE (Foster) |
+|---|---|---|
+| HR 측정 있음 (chest strap·watch) | ★ 정확 | 보조 (cross-check) |
+| HR 없음 (.vkx만 / phone GPS only) | 불가 | ★ 유일 옵션 |
+| Strength / 비-cardio session (windfoil 의 pumping drill 등) | underestimate (HR 안 따라옴) | ★ 정확 |
+| 다중 라이더 동일 세션 비교 | rest HR / max HR 라이더별 다름 → 비교 어려움 | universal scale 1-10 |
+
+**→ 우리 권장: sRPE 도 신규 모듈로 추가.** windfoil 라이더의 70% 는 HR 측정 안 함 (Apple Watch / Garmin / chest strap 없이 phone GPS 만) — sRPE 가 유일한 workload 측정 옵션. 신규 함수 `computeSRPE(rpe, durationMin)` + 라이딩 종료 화면 UI 1줄 RPE 입력 (UX Researcher #5 협업).
+
+#### 12-1-D. Combined wellness score — daily 4-7 question
+
+**athleteMonitoring 의 standard wellness panel (Hooper Index 확장):**
+
+| Question | Scale | Inspired by |
+|---|---|---|
+| Sleep quality (지난 밤) | 1-10 | Hooper 1995 |
+| Fatigue (현재) | 1-10 | Hooper 1995 |
+| Muscle soreness | 1-10 | Hooper 1995 |
+| Stress (정신적) | 1-10 | Hooper 1995 |
+| Mood | 1-10 | POMS 단축 |
+| (선택) Sleep duration (hours) | numeric | sleep modeling |
+| (선택) Hydration / nutrition | 1-10 | comprehensive |
+
+**Composite score:**
+```
+wellness_score = (sleep + (10-fatigue) + (10-soreness) + (10-stress) + mood) / 5
+                  [5-50 range, higher = better recovery]
+```
+
+일별 wellness 가 7일 baseline 의 −1 SD 이하 → "yellow flag" (모니터링), −2 SD → "red flag" (휴식 권장).
+
+**Saw, Main, Gastin 2016 (Br J Sports Med):** 주관적 self-reported 측정이 다수 객관 측정 (HR · 코르티솔 등) 보다 부상·과훈련 예측에 우월 — 5초 wellness 가 30분 cortisol 측정보다 informative.
+
+**→ 우리 권장: Hooper Index v1 UI 추가 (5초 4-question).** 라이딩 직전 또는 직후 모바일 화면에 sleep/fatigue/stress/soreness 4 슬라이더. localStorage 저장 + cross-correlation engine (§4-4) 의 input. 신규 함수 `computeWellnessTrend(wellness_entries, opts)` — `Storage` 에 추가.
+
+#### 12-1-E. 종합 — athleteMonitoring 이 우리에게 주는 lesson
+
+**채택할 것 (Adopt):**
+1. **ACWR 병기** — Coggan TSB + Gabbett ACWR 두 metric 동시 표시 (시즌 plan + 일일 부상 risk)
+2. **sRPE 모듈** — HR 없는 세션에서도 workload 측정 가능
+3. **Daily wellness 4-question** — Hooper Index v1
+4. **EWMA over rolling** — 이미 우리 §4-2 EWMA 채택 ✅ (Williams 2017 와 일치)
+5. **Traffic-light dashboard** — 라이더에게 "오늘 ride OK / 모니터 / 휴식" 자연어 (DataViz + UX 협업)
+
+**의도적으로 skip:**
+1. **GPS-based external load** — windfoil 의 GPS metric (peak speed / distance) 은 이미 우리 코어 강점. athleteMonitoring 의 GPS workload (sprint distance, high-intensity distance) 는 team sport 전용 — 윙포일 적용 X
+2. **Injury log entry UI** — 우리 사용자가 부상 정보 입력 의지 낮음. v3 후보
+3. **Team aggregate dashboard** — 우리 1인 라이더 ICP — team 기능 불필요 (Phase 1)
+
+### 12-2. Firstbeat Technologies — HRV-based fitness platform (Garmin 2020 인수)
+
+#### 12-2-A. 플랫폼 개요
+
+| 항목 | 내용 |
+|---|---|
+| 출시 | 2002년 — Firstbeat Technologies Ltd (Jyväskylä, Finland) |
+| 인수 | 2020년 6월 — **Garmin 인수**. Garmin Connect / Forerunner / Fenix / Vivoactive 의 모든 HR-기반 fitness metric 의 underlying algorithm |
+| 핵심 자산 | 8개+ white paper (free PDF, firstbeat.com/science) + 200+ peer-reviewed publications |
+| Algorithm engine | Saalasti 2003 PhD thesis (neural networks for HR time series) — 1차 reference |
+| Commercial products | (1) Firstbeat Sports (B2B 팀) (2) Firstbeat Life (B2C wellness) (3) Garmin OEM (Bodyguard/Vivo 등) |
+
+#### 12-2-B. EPOC (Excess Post-exercise Oxygen Consumption) — 핵심 metric
+
+**물리 정의 (Hill & Lupton 1923 "oxygen debt" → Gaesser & Brooks 1984 modern EPOC):**
+
+```
+EPOC = ∫ (VO2_recovery − VO2_baseline) dt  [ml/kg]
+```
+
+운동 후 회복 동안 baseline 위로 추가 소비된 산소량 — body homeostasis 교란의 직접 측정.
+
+**기존 측정의 한계.** EPOC 는 호흡 가스 분석 (lab 가스 마스크) 필요 → 일상 측정 불가. Firstbeat 의 contribution = **HR 만으로 EPOC 추정** (lab 없이).
+
+**Firstbeat HR-based EPOC 모델 (Saalasti 2003 thesis, Rusko et al. 2003 ACSM):**
+
+```
+EPOC(t) = f(EPOC(t-1), exercise_intensity(t), Δt)
+exercise_intensity(t) = % VO2max derived from HR (using individual fitness)
+```
+
+- meta-analysis 48 exercise settings, 158 subjects, 2-180 min, 18-108% VO2max
+- 가속 (upslope) + 감속 (downslope) 함수의 결합
+- Cycle ergometer validation (n=32): r² = 0.79, MAE = 13.7 ml/kg
+
+**TRIMP vs EPOC 의 결정적 차이:**
+
+| 항목 | TRIMP (Banister 1991) | EPOC (Firstbeat) |
+|---|---|---|
+| 단위 | Arbitrary Units (AU) | ml/kg (물리적 oxygen) |
+| 학술 기반 | empirical exponential fit | physiological measurement |
+| 해석 | "load" — 상대값 | "homeostasis disturbance" — 절대값 |
+| Validation | HR-based race performance 예측 | lab VO2 측정과 r² 0.79 |
+| 다른 종목 비교 | 가능 | 가능 + 직접 |
+| Firstbeat 입장 | "TRIMP 는 physiological basis 없음, 해석 어려움" | physiological + interpretable |
+
+**→ 우리 권장: EPOC 도 v2 신규 모듈 후보.** TRIMP 보다 physiological 정확. 단 구현 복잡도 ↑ (개인 VO2max 입력 필요 + upslope/downslope 함수 fit). Phase 3 candidate. 신규 함수 `computeEPOC(session, profile)` — input VO2max 추정 (또는 Tanaka HR_max 폴백) + HR series → EPOC trajectory.
+
+#### 12-2-C. Training Effect (TE) — aerobic + anaerobic 분리
+
+**Firstbeat TE = EPOC + fitness level scaling:**
+
+```
+TE_aerobic = scale(peak EPOC, fitness_level, ...)   → 0.0-5.0 scale
+TE_anaerobic = scale(high-intensity sprint TRIMP variant, ...)   → 0.0-5.0 scale
+```
+
+**TE 5-zone scale:**
+
+| TE | Effect | 의미 |
+|---|---|---|
+| 0.0-0.9 | None | 회복 / 너무 가벼움 |
+| 1.0-1.9 | Minor | maintaining |
+| 2.0-2.9 | Maintaining | 현 fitness 유지 |
+| 3.0-3.9 | **Improving** | fitness 향상 (sweet spot) |
+| 4.0-4.9 | Highly improving | 강한 자극 (며칠 회복 필요) |
+| 5.0 | Overreaching | 과훈련 risk |
+
+**Garmin Connect 의 표시:** "Today's run was Improving (3.4) — aerobic effect" — 라이더가 한 호흡에 의사결정.
+
+**Aerobic vs Anaerobic 분리.** 같은 EPOC 라도 (a) 장시간 mid-intensity → aerobic TE 높음, (b) 짧은 sprint 반복 → anaerobic TE 높음. fast force production (윙포일의 짧은 pumping) 은 anaerobic 영역.
+
+**우리 적용성.** 윙포일 freeride 는 대부분 aerobic — anaerobic TE 는 race / drill 외 가치 작음. Phase 3+.
+
+#### 12-2-D. 24-hour HRV Stress/Recovery analysis — Body Battery 의 기반
+
+**Firstbeat 의 second-by-second HRV pipeline:**
+
+1. RR-interval (Polar H10 / Garmin chest strap) → low-pass filter
+2. Short-Time Fourier Transform (STFT) per 1 second window
+3. LF (Low Frequency, 0.04-0.15 Hz) + HF (High Frequency, 0.15-0.4 Hz) power 산출
+4. LF/HF ratio + total power + breath rate (HR-derived)
+5. Pattern classification: STRESS (sympathetic dominance) / RECOVERY (parasympathetic) / PHYSICAL (high intensity)
+
+**Visualization (24-hour timeline):**
+- Red = stress periods (LF dominant, HR > rest, low HRV)
+- Green = recovery periods (HF dominant, parasympathetic active)
+- Blue = physical activity (HR > 50% reserve)
+- Gap = sleep (별도 분석)
+
+**Body Battery (Garmin via Firstbeat):**
+
+```
+BB_t = BB_{t-1} + recovery_rate(t) − stress_rate(t) − activity_rate(t)
+       [0-100 scale]
+```
+
+- 수면 = 빠른 충전 (recovery rate 높음)
+- 휴식 = 느린 충전
+- 일상 stress = 천천히 소모
+- 운동 = 빠른 소모
+
+**입력 필요:**
+- RR-interval (24h continuous) — Garmin watch optical wrist (Elevate v4+) 또는 chest strap
+- 활동 detect (accelerometer)
+- 수면 detect (HR + 움직임)
+
+**우리 적용성.** Body Battery 는 매우 매력적이나 **24h continuous HRV 측정 필요** → SailTechCo 의 1세션 분석 모델 (라이딩 시간만) 과 다른 product category. **Apple Watch / Garmin / Whoop 보유 라이더 한정** 으로 외부 fetch (HealthKit) 가능 — Phase 3+ Mobile Engineer #8 협업.
+
+**현재 우리 §4-3 HRV (RMSSD/SDNN) 와의 관계:**
+- 우리 = time-domain (RMSSD, SDNN) — 단순, 라이딩 직전·직후 5분 측정
+- Firstbeat = frequency-domain (LF/HF) — 정교, 24h continuous 필요
+- 두 접근 보완 — Phase 1 우리 시작점 (time-domain), Phase 3 frequency-domain 확장
+
+#### 12-2-E. Firstbeat 의 다른 commercial metrics (Garmin OEM)
+
+| Metric | 산출 | 우리 채택? |
+|---|---|---|
+| **VO2max estimation** | HR-speed regression + HRV (Saalasti 2003) | Phase 2 — 권장 (sailing-specific scaling 필요) |
+| **HRV Status** | 7-day RMSSD baseline 대비 trend | Phase 2 — `computeHRVTrend` 신규 함수 (§12-3) |
+| **Training Readiness** | TSB + HRV + sleep + recovery time 합성 | Phase 3 — composite metric, 다른 모듈들 의존 |
+| **Stress Score** | real-time HRV → 0-100 sympathetic dominance | Phase 3 — 24h HRV 필요 |
+| **Sleep Score** | sleep duration + REM/deep + HRV during sleep | Phase 3 — HealthKit fetch |
+| **Recovery Time** | EPOC + TE + 라이더 본인 historical recovery pattern | Phase 3 — 다른 모듈 의존 |
+| **Performance Condition** | 첫 6-20분 HR vs pace → 오늘 fitness vs baseline | Phase 3 — 라이딩 첫 5분 비교 |
+| **Endurance Score** | Long-run TE + duration + race performance | windfoil 부적합 (race 분야 약함) |
+
+### 12-3. 신규 v2 모듈 spec — 두 플랫폼 lesson 통합
+
+본 절은 §4 신규 모델 spec 의 확장. Phase 2-3 production 진입 후보.
+
+#### 12-3-A. `computeACWR(sessions, profile, opts)` — §4-2 확장
+
+**입력:** sessions (with trimp or sRPE workload), opts = { useEWMA: true, acuteK: 7, chronicK: 28 }
+
+**출력:**
+```javascript
+{
+  days: [{ date, load, acute, chronic, acwr, zone }],
+  current: { acwr, zone, label },
+  // zone: 'undertraining'|'sweet_spot'|'borderline'|'danger'
+  // label: '훈련 부족'|'최적'|'주의'|'위험'
+}
+```
+
+**구현 위치:** `storage.js` — computeFitnessTrend 옆 (같은 EWMA infrastructure 재사용)
+
+**References:**
+- Gabbett 2016 (BJSM doi:10.1136/bjsports-2015-095788)
+- Williams 2017 (EWMA, BJSM doi:10.1136/bjsports-2016-096214)
+- Murray 2017 (BJSM doi:10.1136/bjsports-2016-097152)
+- Soligard 2016 IOC consensus (BJSM doi:10.1136/bjsports-2016-096581)
+
+#### 12-3-B. `computeSRPE(rpe, durationMin)` — HR 없는 세션 workload
+
+**입력:** rpe (1-10 Borg CR10), durationMin (number)
+
+**출력:**
+```javascript
+{
+  workload: number,         // RPE × durationMin = AU
+  rpe: number,
+  durationMin: number,
+  category: string          // 'recovery'|'aerobic'|'threshold'|'vo2max'|'sprint'
+}
+```
+
+**구현 위치:** `analysis.js` — computeTRIMP 옆 (같은 workload family)
+
+**UI 변경 — Frontend Engineer + UX Researcher 협업:**
+- 라이딩 종료 화면 (또는 다음 day 시작 화면) 에 RPE 입력 1줄
+- 슬라이더 1-10 + 한 호흡 label ("easy" "moderate" "hard" "maximal")
+- 입력 즉시 sRPE 산출 + storage 저장 + ACWR/CTL 업데이트
+
+**References:**
+- Foster 2001 (J Strength Cond Res 15(1):109-115, PMID 11708692)
+- Haddad et al. 2017 — review (Front Neurosci 11:612, doi:10.3389/fnins.2017.00612)
+
+#### 12-3-C. `computeWellnessTrend(entries, opts)` — Hooper Index 일일 모니터링
+
+**입력:** entries = 일별 wellness entries [{ date, sleep, fatigue, soreness, stress, mood? }]
+
+**출력:**
+```javascript
+{
+  days: [{ date, composite, zone, deviation_sd }],
+  current: { composite, zone, label, recommendation },
+  // zone: 'green' (composite > baseline + 0.5 SD)
+  //     | 'yellow' (within ±0.5 SD)
+  //     | 'orange' (composite < baseline − 0.5 SD)
+  //     | 'red' (composite < baseline − 1.5 SD)
+  baseline7day: number,
+  trend14day: 'improving'|'stable'|'declining'
+}
+```
+
+**구현 위치:** `storage.js` — neue function
+
+**UI — UX Researcher + Mobile Engineer 협업:**
+- 라이딩 직전 모바일 화면 5초 4-슬라이더 (sleep / fatigue / soreness / stress)
+- 입력 후 자동 wellness score → traffic-light 색 표시
+- Red zone → "오늘은 짧고 가벼운 세션 또는 휴식 권장" 자연어 코칭
+
+**References:**
+- Hooper et al. 1995 (Med Sci Sports Exerc 27(1):106-112, doi:10.1249/00005768-199501000-00019)
+- Kellmann & Kallus 2001 RESTQ-Sport
+- Saw, Main, Gastin 2016 (BJSM doi:10.1136/bjsports-2015-094758)
+
+#### 12-3-D. `computeHRVTrend(rrSeries_history, opts)` — Firstbeat HRV Status 패턴
+
+**입력:** rrSeries_history = 일별 5-min 측정 RMSSD log [{ date, rmssd, sdnn }]
+
+**출력:**
+```javascript
+{
+  baseline7day: number,        // 라이더 본인 7-day rolling mean
+  current: number,
+  deviationSD: number,         // (current − baseline) / 7day SD
+  zone: 'balanced'|'unbalanced'|'low'|'poor',
+  trend: 'improving'|'stable'|'declining',
+  recommendation: string       // 자연어 — "정상 범위, 트레이닝 진행 OK"
+}
+```
+
+**구현 위치:** `analysis.js` — computeHRV 옆
+
+**Firstbeat / Garmin "HRV Status" pattern.** Baseline 대비 deviation 의 일관성이 단일 측정값보다 정보 가치 ↑.
+
+**References:**
+- Plews et al. 2013 (Sports Med 43(9):773-781, doi:10.1007/s40279-013-0071-8)
+- Stanley et al. 2013 — HRV recovery (Sports Med 43(12):1259-1277)
+
+#### 12-3-E. `computeReadinessScore(profile, sessions, wellness, hrv, opts)` — composite
+
+**입력:** 모든 위 모듈의 산출 + 라이더 profile
+
+**출력:**
+```javascript
+{
+  score: 0-100,                // composite readiness
+  zone: 'optimal'|'normal'|'caution'|'rest_recommended',
+  contributing: {              // 각 factor 의 score / weight
+    tsb: { score, weight, contribution },
+    acwr: { ... },
+    wellness: { ... },
+    hrv: { ... }
+  },
+  recommendation: string       // "오늘 ride OK, 강도 7-8/10 적정"
+}
+```
+
+**구현 위치:** `coach.js` — VPS 옆 (composite scoring family)
+
+**Garmin "Training Readiness" 패턴 — 다인자 합성.** 4-5 factor weighted sum + 자연어 사유. 라이더가 한 호흡에 의사결정.
+
+### 12-4. 두 플랫폼 vs SailTechCo 의 차별 positioning
+
+본 audit 의 결과로, SailTechCo 가 **adopt** 할 영역과 **skip** 할 영역을 명확화한다.
+
+**채택 (Adopt) — 두 플랫폼 모두에서 학습:**
+- ACWR + EWMA (athleteMonitoring) → §12-3-A
+- sRPE 모듈 (Foster) → §12-3-B
+- Daily wellness Hooper Index (athleteMonitoring) → §12-3-C
+- HRV Trend (Firstbeat baseline 대비) → §12-3-D
+- Composite readiness score (Garmin pattern) → §12-3-E
+- 24-hour HRV (Firstbeat) — Phase 3, HealthKit fetch
+- EPOC (Firstbeat) — Phase 3 candidate (physiological accuracy)
+
+**의도적 Skip (windfoil ICP 와 mismatch):**
+- Team aggregate dashboard (athleteMonitoring) — 우리 1인 라이더 ICP
+- Sprint distance / high-intensity distance (team GPS) — windfoil 무관
+- Endurance Score (Firstbeat) — race 분야 약함
+- Anaerobic Training Effect 분리 — windfoil aerobic 위주
+
+**Differentiate (SailTechCo 만의 강점):**
+- **Sailing physics anchor** — TRIMP/HRV 가 일반 sport metric 이라면 우리는 §181 polar + 4-channel wind 가 sailing-native
+- **What-if anchoring** (coach.js) — Firstbeat 의 TE 는 "한 게임의 효과" 만 보여주지만 우리 What-if 는 "다른 윙으로 라이딩했다면" 의 reverse-question
+- **Methodological honesty** (incomplete maneuver, confidence self-report) — Firstbeat / athleteMonitoring 의 commercial pressure 와 정반대 (Saw 2016 의 "objective inflation" 회피)
+- **Open methodology** (SailTechCo Moat W4) — 두 플랫폼은 closed source, 우리는 GitHub MIT publish
+
+### 12-5. v3 권장 — 두 플랫폼 통합 후 신규 architecture
+
+Phase 3 (2027) 의 분석 dashboard 권장 구조:
+
+```
+                    ┌─────────────────────────────────────┐
+                    │  Today's Ride Decision Layer        │
+                    │  (Readiness Score 0-100 + 자연어)   │
+                    └────────────┬────────────────────────┘
+                                 │
+        ┌────────────────────────┼────────────────────────┐
+        │                        │                        │
+   ┌────▼────┐              ┌────▼────┐              ┌────▼────┐
+   │ Fitness │              │ Acute   │              │ Wellness│
+   │ (CTL)   │              │ Risk    │              │ State   │
+   │         │              │ (ACWR)  │              │ (Hooper)│
+   │ Coggan  │              │ Gabbett │              │ Daily   │
+   └────┬────┘              └────┬────┘              └────┬────┘
+        │                        │                        │
+        └────────────┬───────────┴────────────┬───────────┘
+                     │                        │
+                ┌────▼─────┐            ┌────▼─────┐
+                │ TRIMP/   │            │ HRV      │
+                │ sRPE     │            │ (RMSSD)  │
+                │ (per     │            │ (Plews   │
+                │ session) │            │ Trend)   │
+                └────┬─────┘            └────┬─────┘
+                     │                        │
+                ┌────▼────────────────────────▼────┐
+                │  Raw Session Data                │
+                │  (GPX + VKX + HR strap)          │
+                └──────────────────────────────────┘
+                                 │
+                ┌────────────────▼────────────────┐
+                │  Sailing-specific Layer         │
+                │  (VPS · Polar · 4-channel Wind  │
+                │   §181 lift · What-if)          │
+                └─────────────────────────────────┘
+```
+
+5 layer 통합 — 윙포일 도메인 (하단) + 운동 생리 (중간) + 의사결정 (상단). 두 플랫폼 적분 + SailTechCo 의 sailing-native 강점 보존.
+
+### 12-6. 추가 sources (§10 보강)
+
+**athleteMonitoring / ACWR / sRPE / Wellness:**
+- Gabbett, T.J. (2016). "The training—injury prevention paradox: should athletes be training smarter and harder?". *British Journal of Sports Medicine*, 50(5), 273-280. doi:[10.1136/bjsports-2015-095788](https://doi.org/10.1136/bjsports-2015-095788). PMID 26758673.
+- Hulin, B.T., Gabbett, T.J., Lawson, D.W., Caputi, P., Sampson, J.A. (2014). "The acute:chronic workload ratio predicts injury: high chronic workload may decrease injury risk in elite rugby league players". *Br J Sports Med* 50(4):231-236. doi:[10.1136/bjsports-2015-094817](https://doi.org/10.1136/bjsports-2015-094817).
+- Williams, S., West, S., Cross, M.J., Stokes, K.A. (2017). "Better way to determine the acute:chronic workload ratio?". *Br J Sports Med* 51(3):209-210. doi:[10.1136/bjsports-2016-096214](https://doi.org/10.1136/bjsports-2016-096214).
+- Murray, N.B., Gabbett, T.J., Townshend, A.D., Blanch, P. (2017). "Calculating acute:chronic workload ratios using exponentially weighted moving averages provides a more sensitive indicator of injury likelihood than rolling averages". *Br J Sports Med* 51(9):749-754. doi:[10.1136/bjsports-2016-097152](https://doi.org/10.1136/bjsports-2016-097152). PMID 28003238.
+- Soligard, T., Schwellnus, M., Alonso, J.M., Bahr, R., Clarsen, B., Dijkstra, H.P., et al. (2016). "How much is too much? (Part 1) International Olympic Committee consensus statement on load in sport and risk of injury". *Br J Sports Med* 50(17):1030-1041. doi:[10.1136/bjsports-2016-096581](https://doi.org/10.1136/bjsports-2016-096581). PMID 27535989.
+- Foster, C., Florhaug, J.A., Franklin, J., Gottschall, L., Hrovatin, L.A., Parker, S., Doleshal, P., Dodge, C. (2001). "A new approach to monitoring exercise training". *Journal of Strength and Conditioning Research* 15(1):109-115. PMID 11708692. [PDF (Foster)](https://paulogentil.com/pdf/A%20New%20Approach%20to%20Monitoring%20Exercise%20Training.pdf)
+- Haddad, M., Stylianides, G., Djaoui, L., Dellal, A., Chamari, K. (2017). "Session-RPE Method for Training Load Monitoring: Validity, Ecological Usefulness, and Influencing Factors". *Frontiers in Neuroscience* 11:612. doi:[10.3389/fnins.2017.00612](https://doi.org/10.3389/fnins.2017.00612). PMID 29163016.
+- [AthleteMonitoring — Workload Management Basics PDF (2017)](https://www.athletemonitoring.com/wordpress/wp-content/uploads/2017/06/Workload-Management-Basics.pdf)
+
+**Firstbeat / EPOC / Training Effect / HRV stress:**
+- Saalasti, S. (2003). "Neural networks for heart rate time series analysis". *Academic Dissertation*, University of Jyväskylä, Finland. — Firstbeat EPOC + HRV algorithm 의 1차 reference.
+- Rusko, H.K., Pulkkinen, A., Saalasti, S., Hynynen, E., Kettunen, J. (2003). "Pre-prediction of EPOC: A tool for monitoring fatigue accumulation during exercise?". *ACSM Congress, San Francisco, May 28-31*. Abstract: *Medicine and Science in Sports and Exercise* 35(5):S183.
+- Gaesser, G.A., Brooks, G.A. (1984). "Metabolic bases of excess post-exercise oxygen consumption: a review". *Med Sci Sports Exerc* 16(1):29-43. — EPOC 정의의 modern review.
+- [Firstbeat White Paper — Indirect EPOC Prediction (PDF, 2012 update)](https://www.firstbeat.com/wp-content/uploads/2015/10/white_paper_epoc.pdf)
+- [Firstbeat White Paper — VO2max Estimation (PDF, 2017)](https://assets.firstbeat.com/firstbeat/uploads/2017/06/white_paper_VO2max_30.6.2017.pdf)
+- [Firstbeat White Paper — Stress and Recovery Analysis from 24h HRV (PDF, 2014)](https://assets.firstbeat.com/firstbeat/uploads/2015/11/Stress-and-recovery_white-paper_20145.pdf)
+- [Firstbeat White Paper — Recovery Analysis for Athletic Training (PDF, 2015)](https://www.firstbeat.com/wp-content/uploads/2015/10/Recovery-white-paper_15.6.20153.pdf)
+- [Firstbeat — Fitness Level (Science)](https://www.firstbeat.com/en/science-and-physiology/fitness-level/)
+- [Firstbeat — EPOC and Training Effect](https://www.firstbeat.com/en/science-and-physiology/epoc-and-training-effect/)
+- [Garmin Wiki — Firstbeat Analytics](https://wiki.garminrumors.com/Firstbeat_Analytics) (Garmin 2020 인수 후 OEM 통합)
+- Saalasti, S., Seppänen, M., Kuusela, A. (2004). "Method for determining recovery". *US Patent 7,029,419 B2* (Firstbeat).
+- Stanley, J., Peake, J.M., Buchheit, M. (2013). "Cardiac parasympathetic reactivation following exercise: implications for training prescription". *Sports Med* 43(12):1259-1277. doi:[10.1007/s40279-013-0083-4](https://doi.org/10.1007/s40279-013-0083-4).

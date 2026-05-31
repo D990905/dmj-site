@@ -950,7 +950,25 @@
      보드 부력 (board volume) 무시 — intentional (Danny 2026-05-19 명시).
        cruise 영역 (foil 위 떠 있음) 에서 보드 부력은 V_b 결정에 영향 X.
        보드 사이즈는 takeoff 영역 (calculate() 함수) 에서만 영향.
-       추후 board induced drag (wetted area) 모델링이 필요하면 별도 task. */
+       추후 board induced drag (wetted area) 모델링이 필요하면 별도 task.
+
+     References — Upwind polar physics 표준:
+       · Anderson, J.D. 2010. "Fundamentals of Aerodynamics" 6e. McGraw-Hill.
+         ISBN 978-1-259-12991-9 (ch.5 — induced drag CD = CD0 + CL²/(π·e·AR),
+         L/D_max = √(π·e·AR/CD0)/2, thrust coefficient sin β − cos β/(L/D)).
+       · Faltinsen, O.M. 2005. "Hydrodynamics of High-Speed Marine Vehicles".
+         Cambridge University Press. doi:10.1017/CBO9780511546068. ISBN
+         978-0-521-84568-7 (ch.6 hydrofoil vessel — clean foil L/D_max 도출).
+       · Folkersma, M., Schmehl, R., Viré, A. 2019. "Boundary layer transition
+         modeling on leading edge inflatable kite airfoils". Wind Energy
+         22(7):908-921. doi:10.1002/we.2329 (LEI wing CD0=0.098, e=0.42 출처).
+       · Larsson, L., Eliasson, R., Orych, M. 2022. "Principles of Yacht Design"
+         5e. Bloomsbury. ISBN 978-1-3994-0301-6 (ch.7 apparent wind cosine rule,
+         heel-out lateral force cap H_max = M·g·tan θ_heel).
+       · Garrett, R. 1996. "The Symmetry of Sailing". Sheridan House.
+         ISBN 978-1-57409-000-5 (sailing physics vector 해석 기본서).
+     Calibration anchors (§181-C·D·E) — Danny ground truth, 단일 라이더.
+       Multi-rider 일반화 검증은 expert_sports_science_reference.md §5 plan. */
   function upwindSpeed(p) {
     var V_t_kt = Number(p.v_wind_kt);
     var m = Number(p.m_rider_kg);

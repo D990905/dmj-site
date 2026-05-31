@@ -194,6 +194,17 @@
    * @param rider        { weightKg, skill, wingM2, foilAR }
    * @param windDir      확정 풍향(도) — null 이면 산출 불가
    * @param windSpeedKt  풍속(kt) — null/0 이면 산출 불가
+   *
+   * References — Performance scoring framework:
+   *   · 70/30 (속도/회전) 가중 — Vantage Sailing 의 합성 점수 패턴 ("Vantage
+   *     Performance Score" — vantage-sailing.com/technology, 정확한 가중 식은
+   *     비공개).
+   *   · 풍상 속도 점수 anchor: 계산기 upwindSpeed (§176/§181 물리 모델)
+   *     예측치 대비 실측 VMG 비율 → 0-100 환산. 100점 = "예측 가능치 도달".
+   *   · 자기 정직성 — Halson 2014 (Sports Med 44 Suppl 2:139-147,
+   *     doi:10.1007/s40279-014-0253-z) "uncertainty acknowledgment" 원칙:
+   *     속도 점수 산출 불가 시 segment VPS = null 으로 두고 회전 점수 단독
+   *     으로 호명하지 않는다 (assumption inflation 방지).
    * ============================================================ */
   function computeVPS(analysis, rider, windDir, windSpeedKt) {
     var missing = [];
@@ -1174,6 +1185,172 @@
     return { tests: tests, passed: passed, failed: failed };
   }
 
+  /* ============================================================
+   * Recovery Decision Tree (sports_science_cross_modal_training_system.md §4)
+   *
+   * 4 factor (TSB · ACWR · HRV deviation · Hooper composite) + days since rest
+   * → 4-zone action (full_ride / moderate / active_recovery / rest) + 자연어 사유.
+   *
+   * 입력:
+   *   state = {
+   *     tsb: -50..30 (Coggan, storage.computeFitnessTrend.current.TSB)
+   *     acwr: 0.5..2.0 (Gabbett, storage.computeACWR — 향후)
+   *     hrvDeviationSD: -3..3 (storage.computeHRVTrend — 향후)
+   *     hooperComposite: 5-50 (storage.computeWellnessTrend — 향후)
+   *     daysSinceRest: 0-14+ (storage 누적)
+   *   }
+   *   (모든 필드 optional — 없으면 그 factor 무시)
+   *
+   * 반환:
+   *   {
+   *     action: 'full_ride'|'moderate'|'active_recovery'|'rest',
+   *     label: '🟢 풀 세션 OK' 등,
+   *     primary_reason: 자연어 1줄,
+   *     recommendation: 자연어 권고 (2-3줄),
+   *     contributing_factors: [{factor, value, flag, note}],
+   *     flag_count: { red, orange, yellow, green },
+   *     next_check: '내일 아침 wellness'
+   *   }
+   *
+   * Decision algorithm — flag count 기반:
+   *   red ≥ 2          → rest
+   *   red ≥ 1 OR orange ≥ 2 → active_recovery
+   *   orange ≥ 1 OR yellow ≥ 3 → moderate
+   *   else             → full_ride
+   *
+   * References:
+   *   · Halson, S.L. 2014. "Monitoring training load to understand fatigue in
+   *     athletes". Sports Med 44(Suppl 2):139-147.
+   *     doi:10.1007/s40279-014-0253-z. PMID 25200666.
+   *   · Saw, A.E., Main, L.C., Gastin, P.B. 2016. "Monitoring the athlete
+   *     training response: subjective self-reported measures trump commonly used
+   *     objective measures". Br J Sports Med 50(5):281-291.
+   *     doi:10.1136/bjsports-2015-094758.
+   *   · Soligard, T. et al. 2016. IOC consensus on load.
+   *     Br J Sports Med 50(17):1030-1041. doi:10.1136/bjsports-2016-096581.
+   *   · Plews, D.J. et al. 2013. HRV training adaptation.
+   *     Sports Med 43(9):773-781. doi:10.1007/s40279-013-0071-8.
+   * ============================================================ */
+  function decideRecoveryAction(state) {
+    state = state || {};
+    var flags = { red: 0, orange: 0, yellow: 0, green: 0 };
+    var factors = [];
+
+    function record(factor, value, flag, note) {
+      flags[flag]++;
+      factors.push({ factor: factor, value: value, flag: flag, note: note });
+    }
+
+    /* --- TSB (Coggan PMC) --- */
+    if (state.tsb != null && isFinite(state.tsb)) {
+      if (state.tsb < -30) record('TSB', state.tsb, 'red', '과훈련 risk — 회복 필요');
+      else if (state.tsb < -15) record('TSB', state.tsb, 'orange', '피로 누적 — 강도 조절');
+      else if (state.tsb < 0) record('TSB', state.tsb, 'yellow', '훈련 부하 적정');
+      else if (state.tsb < 25) record('TSB', state.tsb, 'green', '컨디션 양호');
+      else record('TSB', state.tsb, 'green', '피크 — 레이스 준비 완료');
+    }
+
+    /* --- ACWR (Gabbett) --- */
+    if (state.acwr != null && isFinite(state.acwr)) {
+      if (state.acwr > 1.5 || state.acwr < 0.6) {
+        record('ACWR', state.acwr, 'red',
+          state.acwr > 1.5 ? '부상 위험 zone (>1.5)' : '훈련 부족 zone (<0.6)');
+      } else if (state.acwr > 1.3 || state.acwr < 0.8) {
+        record('ACWR', state.acwr, 'orange',
+          state.acwr > 1.3 ? '부하 ↑ borderline' : '훈련 부족 borderline');
+      } else if (state.acwr > 1.2 || state.acwr < 0.9) {
+        record('ACWR', state.acwr, 'yellow', '모니터링 영역');
+      } else {
+        record('ACWR', state.acwr, 'green', 'sweet spot (0.9-1.2)');
+      }
+    }
+
+    /* --- HRV deviation (Plews 2013) --- */
+    if (state.hrvDeviationSD != null && isFinite(state.hrvDeviationSD)) {
+      if (state.hrvDeviationSD < -2) {
+        record('HRV', state.hrvDeviationSD, 'red',
+          'parasympathetic withdrawal — 과훈련 또는 질병 signal');
+      } else if (state.hrvDeviationSD < -1) {
+        record('HRV', state.hrvDeviationSD, 'orange', '회복 부족');
+      } else if (state.hrvDeviationSD < -0.5) {
+        record('HRV', state.hrvDeviationSD, 'yellow', '회복 약간 부족');
+      } else {
+        record('HRV', state.hrvDeviationSD, 'green', 'baseline 정상');
+      }
+    }
+
+    /* --- Hooper Index (subjective wellness) --- */
+    if (state.hooperComposite != null && isFinite(state.hooperComposite)) {
+      if (state.hooperComposite < 20) {
+        record('Hooper', state.hooperComposite, 'red', '주관적 상태 매우 나쁨');
+      } else if (state.hooperComposite < 30) {
+        record('Hooper', state.hooperComposite, 'orange', '주관적 피로 ↑');
+      } else if (state.hooperComposite < 38) {
+        record('Hooper', state.hooperComposite, 'yellow', '주관적 상태 보통');
+      } else {
+        record('Hooper', state.hooperComposite, 'green', '주관적 상태 양호');
+      }
+    }
+
+    /* --- Days since rest --- */
+    if (state.daysSinceRest != null && isFinite(state.daysSinceRest)) {
+      if (state.daysSinceRest > 10) {
+        record('rest_gap', state.daysSinceRest, 'red',
+          state.daysSinceRest + '일 연속 — 휴식일 필수');
+      } else if (state.daysSinceRest > 7) {
+        record('rest_gap', state.daysSinceRest, 'orange', '7일 이상 연속 훈련');
+      }
+    }
+
+    /* --- Final decision --- */
+    var action, label, recommendation, primary_reason;
+    var top = factors.find(function (f) { return f.flag === 'red'; })
+           || factors.find(function (f) { return f.flag === 'orange'; })
+           || factors.find(function (f) { return f.flag === 'yellow'; })
+           || factors[0];
+
+    if (flags.red >= 2) {
+      action = 'rest';
+      label = '🔴 완전 휴식 권장';
+      recommendation = '오늘은 라이딩 X. 수면 우선, 가벼운 산책 외 운동 금지. 내일 아침 wellness 재진단.';
+      primary_reason = '복수 red flag — ' +
+        factors.filter(function (f) { return f.flag === 'red'; })
+               .map(function (f) { return f.factor; }).join(' + ') + ' 모두 위험 zone.';
+    } else if (flags.red >= 1 || flags.orange >= 2) {
+      action = 'active_recovery';
+      label = '🟠 active recovery';
+      recommendation = '라이딩 X 또는 z1 30분 light cruise. 육상 mobility / yoga 30분 권장. ' +
+                       '내일 wellness check 후 강도 결정.';
+      primary_reason = top
+        ? (top.factor + ' = ' + top.value + ' ' + top.flag + ' — ' + top.note)
+        : '회복 우선 권장.';
+    } else if (flags.orange >= 1 || flags.yellow >= 3) {
+      action = 'moderate';
+      label = '🟡 적정 강도';
+      recommendation = '오늘 라이딩 OK 단 강도 조절. z2 80% / z3 20% 유지. ' +
+                       '강풍 시 짧은 burst 만, 풍상-풍하 cycle 사이 cruise 5분 휴식.';
+      primary_reason = top
+        ? (top.factor + ' = ' + top.value + ' — ' + top.note)
+        : '훈련 균형 유지.';
+    } else {
+      action = 'full_ride';
+      label = '🟢 풀 세션 OK';
+      recommendation = '오늘 라이딩 OK — full intensity. 풍속 좋으면 z3-z4 push. ' +
+                       '회전 quality 와 distance best 도전 권장.';
+      primary_reason = '모든 factor green flag — peak readiness.';
+    }
+
+    return {
+      action: action,
+      label: label,
+      primary_reason: primary_reason,
+      recommendation: recommendation,
+      contributing_factors: factors,
+      flag_count: flags,
+      next_check: 'tomorrow morning Hooper after sleep'
+    };
+  }
+
   var Coach = {
     VPS: VPS,
     WHATIF: WHATIF,
@@ -1182,6 +1359,7 @@
     computeVPS: computeVPS,
     computeWhatIf: computeWhatIf,
     computeTurnCoaching: computeTurnCoaching,
+    decideRecoveryAction: decideRecoveryAction,
     measuredUpwindVmgKt: measuredUpwindVmgKt,
     upwindSpeedScore: upwindSpeedScore,
     downwindSpeedScore: downwindSpeedScore,
