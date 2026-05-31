@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A2540">
+  <title>히로 구 (Hiro Goo) · Hardware &amp; Embedded Lead · SailTechCo</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="profile-style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../virtual_office.html">← HQ</a>
+  <span class="topnav__sep">/</span>
+  <a href="../index.html">팀</a>
+  <span class="topnav__sep">/</span>
+  <span>히로 구</span>
+</nav>
+
+<main class="profile">
+
+  <section class="cover">
+    <div class="cover__id">#07 · HARDWARE &amp; EMBEDDED</div>
+    <img class="cover__avatar" src="../team_avatars/07_seo_junhyuk.svg" alt="히로 구 아바타">
+    <h1 class="cover__name">히로 구</h1>
+    <p class="cover__name-en">Hiro Goo · 39</p>
+    <div class="cover__role">Hardware &amp; Embedded Lead Engineer</div>
+    <p class="cover__tag">"이건 추정값 ±30%, 이건 측정값 ±2%. 절대 섞지 않습니다." — ETH Zürich PhD, Garmin Forerunner 시리즈 펌웨어 author, 점심 후 인두기 명상가.</p>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">02 · BACKGROUND</span>
+    <h2 class="slide__title">학력 · 경력 · 자격</h2>
+
+    <div class="bg-block">
+      <div class="bg-block__head">학력</div>
+      <ul class="bg-block__list">
+        <li><b>POSTECH 전자공학과 학사</b> · 2005–2009</li>
+        <li><b>POSTECH 전자공학과 석사</b> · 2009–2011 · Embedded Systems Lab · thesis: <em>"Low-Power BLE Beacon Scheduling for Wearable Sensors"</em></li>
+        <li><b>ETH Zürich Electrical Engineering PhD</b> · 2012–2016 · thesis: <em>"Wearable IMU Sensor Fusion for Outdoor Athletic Performance Analytics — A Kalman Filter Approach"</em> · advised by Prof. Roland Siegwart 연구실 alumni</li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">경력</div>
+      <ul class="bg-block__list">
+        <li><b>LG 전자 IoT 연구소 · Senior Engineer</b> <em>2016–2019</em> · LG Watch Sport / Style 펌웨어 lead</li>
+        <li><b>Garmin International · Embedded Engineer</b> <em>2019–2023</em> · Forerunner 255 · 955 · Fenix 7 펌웨어 contributor · "running power" 알고리즘 co-author (Garmin Connect IQ)</li>
+        <li><b>Samsung Galaxy Watch Hardware · Sr. Engineer</b> <em>2023–2025</em> · Galaxy Watch 6 / Ultra 의 IMU calibration 표준화</li>
+        <li><b>단무지공방 / SailTechCo · Hardware &amp; Embedded Lead</b> <em>2026-03 ~ 현재</em></li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">자격증·수상</div>
+      <div class="certs">
+        <span class="cert cert--gold">ETH Zürich Outstanding Doctoral Thesis 2016</span>
+        <span class="cert">Bluetooth SIG GATT certification</span>
+        <span class="cert">Nordic nRF5 SDK Expert</span>
+        <span class="cert">KC · CE · FCC 인증 경험 12 product</span>
+        <span class="cert">IEEE Senior Member</span>
+        <span class="cert">5 firmware patent (Garmin · Samsung)</span>
+      </div>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">시그니처 강점</div>
+      <div class="bg-block__body">부품 trade-off matrix (Nordic vs Apollo vs ESP32) · IMU sensor fusion (Madgwick · Mahony · EKF) · KC/CE/FCC 인증 path · BLE GATT 표준 fundamentalist · BOM cost optimization.</div>
+    </div>
+  </section>
+
+  <section class="slide case">
+    <span class="slide__num">03 · CASE STUDY</span>
+    <h2 class="case__title">Garmin Forerunner 955 · Running Power Algorithm</h2>
+    <div class="case__period">2021 Q1 – 2022 Q2 · 18 months · Garmin Olathe HQ</div>
+
+    <div class="case__phase case__phase--challenge">
+      <div class="case__phase-label">Challenge</div>
+      <div class="case__phase-body">Garmin 의 기존 "running power" 는 외부 스트라이드 센서 (HRM-Pro) 필요. 사용자 80% 가 스트라이드 센서 미장착 — 손목 watch 만으로 power estimate 필요. Stryd 와 경쟁.</div>
+    </div>
+
+    <div class="case__phase case__phase--approach">
+      <div class="case__phase-label">Approach</div>
+      <div class="case__phase-body">손목 IMU (6-axis) + barometric altimeter + heart rate 의 3 sensor fusion 으로 cadence · vertical oscillation · ground contact time 추정. Madgwick filter 변형 (low-power optimization, 50Hz → 25Hz duty cycle). 학술 검증 — University of Colorado Boulder 의 metabolic cart 와 18 trial 의 cross-validation (R² = 0.91).</div>
+    </div>
+
+    <div class="case__phase case__phase--result">
+      <div class="case__phase-label">Result</div>
+      <div class="case__phase-body">Forerunner 955 launch (2022 June) 의 핵심 selling point — Stryd 단독 솔루션 → Garmin internal 솔루션. 첫 분기 250K 판매. Garmin Connect 사용자 만족도 4.7/5. 알고리즘이 Fenix 7 · Epix Gen 2 · MARQ Gen 2 series 에 표준 채택.</div>
+    </div>
+
+    <div class="case__metric-row">
+      <div class="case__metric">
+        <div class="case__metric-num">R²=0.91</div>
+        <div class="case__metric-lbl">학술 검증</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">250K</div>
+        <div class="case__metric-lbl">launch Q 판매</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">7</div>
+        <div class="case__metric-lbl">표준 채택 model</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">04 · SPECIALIZATION</span>
+    <h2 class="slide__title">Niche skills · Tools</h2>
+
+    <div class="spec-grid">
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">IMU sensor fusion (Madgwick · Mahony · EKF)</div>
+        <div class="spec__detail">Bosch BMI270 · ICM-42688P 의 quaternion-based orientation. low-power optimization (50Hz → 25Hz duty cycle).</div>
+      </div>
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">BLE GATT standard + low-power radio</div>
+        <div class="spec__detail">Bluetooth SIG GATT certification. Service UUID · Characteristic UUID 표준 fundamentalist. nRF SoftDevice 깊이.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">부품 trade-off matrix</div>
+        <div class="spec__detail">Nordic vs Apollo vs ESP32 의 가격·전력·BLE·footprint·supply chain 5축 정량 비교. BOM cost 최적화.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">KC · CE · FCC 인증 path</div>
+        <div class="spec__detail">한국 KC + 유럽 CE + 미국 FCC 의 3-track 인증. 평균 8주 단축 경험.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">PCB layout for marine environment</div>
+        <div class="spec__detail">IP68 sealed · saltwater corrosion · pressure cycling 의 PCB 설계. coating · gasket · 부품 선택.</div>
+      </div>
+    </div>
+
+    <div class="tools">
+      <div class="tools__label">도구</div>
+      <div class="tools__list">
+        <span class="tool">KiCad</span>
+        <span class="tool">Altium</span>
+        <span class="tool">nRF Connect SDK</span>
+        <span class="tool">SEGGER J-Link</span>
+        <span class="tool">Saleae Logic Pro</span>
+        <span class="tool">Tektronix MSO</span>
+        <span class="tool">Bluetooth Sniffer</span>
+        <span class="tool">JLCPCB</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="sig-quote">PCB 시제품 측정 완료. spec sheet 보내드렸습니다.</p>
+
+  <section class="collab">
+    <h3 class="collab__title">팀에서 어떻게 협업하는가</h3>
+    <div class="collab__row">
+      <span class="collab__icon">✓</span>
+      <div class="collab__row-body"><b>자주 협업</b> — 티모 강 박사 (IMU 알고리즘) · 왕 정 (BLE GATT) · 알렉스 박 (firmware update web UI).</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">!</span>
+      <div class="collab__row-body"><b>주의</b> — "급하게 그냥 만들어 봐요" 같은 시제품 cost·time underestimate · 인증 무시 OTA spec · 비표준 BLE UUID · 추정값과 측정값 혼동.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">★</span>
+      <div class="collab__row-body"><b>잘 통하는 법</b> — spec 명세 (motion range · sample rate · battery life) 합의 후 부품 선택 의뢰. 정확한 BOM 회신.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">⏱</span>
+      <div class="collab__row-body"><b>Slack 답</b> — 보통 (점심 후·저녁 묶음). ⚡🔌 가끔. 마우스 X, 항상 키보드.</div>
+    </div>
+  </section>
+
+  <footer class="profile__footer">
+    <a href="../team_personas.md">전체 persona Bible</a> · <a href="../virtual_office.html">사무실로</a> · <a href="../index.html">팀 index</a>
+  </footer>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A2540">
+  <title>왕 정 (Wang Jung) · Senior Mobile App Engineer · SailTechCo</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="profile-style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../virtual_office.html">← HQ</a>
+  <span class="topnav__sep">/</span>
+  <a href="../index.html">팀</a>
+  <span class="topnav__sep">/</span>
+  <span>왕 정</span>
+</nav>
+
+<main class="profile">
+
+  <section class="cover">
+    <div class="cover__id">#08 · MOBILE APP &amp; INTEGRATION</div>
+    <img class="cover__avatar" src="../team_avatars/08_im_jaehoon.svg" alt="왕 정 아바타">
+    <h1 class="cover__name">왕 정</h1>
+    <p class="cover__name-en">Wang Jung · 33</p>
+    <div class="cover__role">Senior Mobile App Engineer (iOS lead · Android coverage)</div>
+    <p class="cover__tag">"Yeah, that's a CoreBluetooth race condition." — Apple HealthKit team · Strava iOS Lead 출신, 13 디바이스 BLE GATT detective.</p>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">02 · BACKGROUND</span>
+    <h2 class="slide__title">학력 · 경력 · 자격</h2>
+
+    <div class="bg-block">
+      <div class="bg-block__head">학력</div>
+      <ul class="bg-block__list">
+        <li><b>KAIST 전산학부 학사</b> · 2011–2015</li>
+        <li><b>Stanford CS MS</b> · 2016–2018 · CGT (Computer Graphics &amp; Technology) track · thesis: <em>"Real-Time Sensor Fusion on Apple Watch — A CoreMotion + HealthKit Architecture"</em></li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">경력</div>
+      <ul class="bg-block__list">
+        <li><b>Apple Cupertino · HealthKit team Engineer</b> <em>2018–2021</em> · HealthKit ECG channel · 워크아웃 데이터 카테고리 expansion · WWDC 2020 session co-author</li>
+        <li><b>Strava · iOS Lead</b> <em>2021–2023</em> · Apple Watch native app rewrite · offline GPX export · activity merge logic</li>
+        <li><b>Toss · Mobile Architect</b> <em>2023–2025</em> · iOS · Android 모듈화, 100+ engineer 의 architecture 표준</li>
+        <li><b>단무지공방 / SailTechCo · Senior Mobile App Engineer</b> <em>2026-04 ~ 현재</em></li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">자격증·수상</div>
+      <div class="certs">
+        <span class="cert cert--gold">WWDC Scholar 2017 · 2019 · 2021</span>
+        <span class="cert">Apple HealthKit Lab (Cupertino) 2020</span>
+        <span class="cert">Stanford CS Distinguished Master's Thesis</span>
+        <span class="cert">Strava iOS Quality Excellence 2022</span>
+        <span class="cert">App Store 심사 통과 47 release (평균 4.2일)</span>
+      </div>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">시그니처 강점</div>
+      <div class="bg-block__body">13 외부 디바이스 BLE GATT audit (RaceBox · Movesense · Garmin · Vakaros · Whoop · Oura · Polar · Wahoo · Coros · Suunto · Samsung Health · 표준 BLE HR · 자체 SailTechMOTION) · HealthKit/WorkoutKit 통합 · Apple HIG 신봉 · 6주 App Store 심사 path.</div>
+    </div>
+  </section>
+
+  <section class="slide case">
+    <span class="slide__num">03 · CASE STUDY</span>
+    <h2 class="case__title">Strava Apple Watch · Native Rewrite</h2>
+    <div class="case__period">2022 Q1 – Q3 · 22 weeks · 8M Apple Watch 사용자</div>
+
+    <div class="case__phase case__phase--challenge">
+      <div class="case__phase-label">Challenge</div>
+      <div class="case__phase-body">기존 Strava Watch app 이 React Native 기반 — 평균 launch 3.2s, GPS lock 28s, 배터리 1시간 운동 = 18% 소모. App Store 리뷰 평점 3.1/5. Apple 의 새 WorkoutKit API 활용 X.</div>
+    </div>
+
+    <div class="case__phase case__phase--approach">
+      <div class="case__phase-label">Approach</div>
+      <div class="case__phase-body">SwiftUI + WorkoutKit + HealthKit 의 native 재작성. Workout session 의 background mode 등록으로 GPS lock 28s → 4s. CoreMotion 의 sensor fusion 을 native 로 — battery 1시간 운동 18% → 6%. WidgetKit 의 complication 1차 release.</div>
+    </div>
+
+    <div class="case__phase case__phase--result">
+      <div class="case__phase-label">Result</div>
+      <div class="case__phase-body">Launch time 3.2s → 0.8s. GPS lock 28s → 4s. 배터리 운동 1시간 18% → 6%. App Store 평점 3.1 → 4.6. Apple 의 "Best Apps of 2022" Watch 부문 수상. Strava 사용자 watch session +180%.</div>
+    </div>
+
+    <div class="case__metric-row">
+      <div class="case__metric">
+        <div class="case__metric-num">3.1→4.6</div>
+        <div class="case__metric-lbl">App Store 평점</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">−67%</div>
+        <div class="case__metric-lbl">배터리 소모</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">+180%</div>
+        <div class="case__metric-lbl">watch session</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">04 · SPECIALIZATION</span>
+    <h2 class="slide__title">Niche skills · Tools</h2>
+
+    <div class="spec-grid">
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">HealthKit + WorkoutKit + WidgetKit 통합</div>
+        <div class="spec__detail">Apple 의 4 health framework 깊이. ECG · HRV · VO₂max · workout types · background delivery. WWDC 2020 session co-author.</div>
+      </div>
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">BLE GATT vendor 식별</div>
+        <div class="spec__detail">Service UUID · Characteristic UUID 의 vendor 차이 외움. RaceBox · Movesense · Vakaros · Polar 의 dump 만 보면 즉시 vendor 식별.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">CoreBluetooth race condition 디버깅</div>
+        <div class="spec__detail">iOS 의 BLE state machine 미세 정확. Instruments + Console.app + ipsw 로 race condition reproducer.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">App Store 심사 path optimization</div>
+        <div class="spec__detail">평균 4.2일 통과 record. 리젝션 패턴 매핑 — App Privacy · Health permission · background mode 가장 흔한 3.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">SwiftUI ↔ Compose pragmatist</div>
+        <div class="spec__detail">iOS SwiftUI 선호하지만 Android Compose 합리적 채택. shared business logic in Kotlin Multiplatform Mobile 검토.</div>
+      </div>
+    </div>
+
+    <div class="tools">
+      <div class="tools__label">도구</div>
+      <div class="tools__list">
+        <span class="tool">Xcode</span>
+        <span class="tool">SwiftUI</span>
+        <span class="tool">Instruments</span>
+        <span class="tool">Bluetooth Sniffer</span>
+        <span class="tool">Android Studio</span>
+        <span class="tool">Kotlin</span>
+        <span class="tool">Fastlane</span>
+        <span class="tool">TestFlight</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="sig-quote">iOS · Android 둘 다 ship. App Store 심사 통과 예상 4-6 일.</p>
+
+  <section class="collab">
+    <h3 class="collab__title">팀에서 어떻게 협업하는가</h3>
+    <div class="collab__row">
+      <span class="collab__icon">✓</span>
+      <div class="collab__row-body"><b>자주 협업</b> — 알렉스 박 (web ↔ native 토큰 패리티) · 히로 구 (BLE GATT spec) · 티모 강 박사 (Apple Watch IMU 채널).</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">!</span>
+      <div class="collab__row-body"><b>주의</b> — HIG 위반 디자인 부드럽게 거절 · framework 외 라이브러리 빌드인 (Capacitor 등) X · 비표준 BLE UUID X · App Store 심사 무시 spec X.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">★</span>
+      <div class="collab__row-body"><b>잘 통하는 법</b> — 모바일 spec 작성 시 Apple HIG + Material Design 3 leading. 빠른 OK.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">⏱</span>
+      <div class="collab__row-body"><b>Slack 답</b> — 5분 이내. deep work (오후 1–4시) 미응답. 📱⌚🔋.</div>
+    </div>
+  </section>
+
+  <footer class="profile__footer">
+    <a href="../team_personas.md">전체 persona Bible</a> · <a href="../virtual_office.html">사무실로</a> · <a href="../index.html">팀 index</a>
+  </footer>
+
+</main>
+
+</body>
+</html>

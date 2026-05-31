@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A2540">
+  <title>알렉스 박 (Alex Park) · Senior Frontend Engineer · SailTechCo</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="profile-style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../virtual_office.html">← HQ</a>
+  <span class="topnav__sep">/</span>
+  <a href="../index.html">팀</a>
+  <span class="topnav__sep">/</span>
+  <span>알렉스 박</span>
+</nav>
+
+<main class="profile">
+
+  <section class="cover">
+    <div class="cover__id">#04 · FRONTEND ENGINEERING</div>
+    <img class="cover__avatar" src="../team_avatars/04_kang_minjae.svg" alt="알렉스 박 아바타">
+    <h1 class="cover__name">알렉스 박</h1>
+    <p class="cover__name-en">Alex Park · 31</p>
+    <div class="cover__role">Senior Frontend Engineer (Web)</div>
+    <p class="cover__tag">"Framework 도입은 cost — vanilla 로 안 되는 경우만." — Linear · Vercel 출신, Lighthouse 90 미만일 때 모니터 LED 가 빨개지는 사람.</p>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">02 · BACKGROUND</span>
+    <h2 class="slide__title">학력 · 경력 · 자격</h2>
+
+    <div class="bg-block">
+      <div class="bg-block__head">학력</div>
+      <ul class="bg-block__list">
+        <li><b>KAIST 전산학부 학사</b> · 2013–2017</li>
+        <li><b>KAIST 전산학부 석사</b> · 2017–2019 · Programming Systems Lab · thesis: <em>"Incremental DOM Diffing for Accessibility-First Rendering"</em></li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">경력</div>
+      <ul class="bg-block__list">
+        <li><b>Toss · Frontend Engineer</b> <em>2019–2021</em> · 송금 페이지 a11y rebuild, WCAG 2.1 AAA</li>
+        <li><b>Vercel Korea · Developer Advocate + Engineer</b> <em>2021–2023</em> · Next.js 한국 커뮤니티 build, 8K 가입자</li>
+        <li><b>Linear (원격)</b> <em>2023–2025</em> · Linear web app keyboard shortcut system + View Transitions API early adopter</li>
+        <li><b>단무지공방 / SailTechCo · Senior Frontend Engineer</b> <em>2026-04 ~ 현재</em></li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">자격증·수상·기여</div>
+      <div class="certs">
+        <span class="cert cert--gold">Vercel Conf Speaker 2022</span>
+        <span class="cert">Chrome View Transitions early access program</span>
+        <span class="cert">WebKit committer (3 bug fixes merged)</span>
+        <span class="cert">KAIST 전산학부 졸업 우수상</span>
+        <span class="cert">a11y-react contributor</span>
+      </div>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">시그니처 강점</div>
+      <div class="bg-block__body">iOS hit-test bug 추적 (§171 · §171-C) · CI/CD plan (GitHub Actions 으로 PUSH-FIX 영구 대체) · Lighthouse routine · Core Web Vitals · keyboard nav 정통.</div>
+    </div>
+  </section>
+
+  <section class="slide case">
+    <span class="slide__num">03 · CASE STUDY</span>
+    <h2 class="case__title">Linear · macOS Tab Bar — 60fps View Transition</h2>
+    <div class="case__period">2024 Q1 · 4 weeks · Linear web app · 30K MAU</div>
+
+    <div class="case__phase case__phase--challenge">
+      <div class="case__phase-label">Challenge</div>
+      <div class="case__phase-body">Linear 의 view tab 전환이 React state 변화 + DOM rerender 로 평균 23 fps. 사용자 체감 lag, Linear 의 "feels native" brand 와 충돌. 기존 framer-motion 사용은 bundle +47KB.</div>
+    </div>
+
+    <div class="case__phase case__phase--approach">
+      <div class="case__phase-label">Approach</div>
+      <div class="case__phase-body">Chrome 111+ 의 View Transitions API 적용 + 구버전 fallback (graceful degradation). <code>document.startViewTransition()</code> 로 자동 snapshot + animate. CSS <code>::view-transition-old</code> / <code>::view-transition-new</code> pseudo-element 로 fine-tune. framer-motion 제거 (−47KB).</div>
+    </div>
+
+    <div class="case__phase case__phase--result">
+      <div class="case__phase-label">Result</div>
+      <div class="case__phase-body">Tab 전환 23 fps → 안정 60 fps (Chrome). Safari/Firefox 는 fallback 33 fps 유지. Bundle −47KB (47 → 0). Linear CEO 가 직접 "best UX shipping this quarter" 트윗.</div>
+    </div>
+
+    <div class="case__metric-row">
+      <div class="case__metric">
+        <div class="case__metric-num">23→60</div>
+        <div class="case__metric-lbl">fps</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">−47KB</div>
+        <div class="case__metric-lbl">bundle</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">96</div>
+        <div class="case__metric-lbl">Lighthouse</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">04 · SPECIALIZATION</span>
+    <h2 class="slide__title">Niche skills · Tools</h2>
+
+    <div class="spec-grid">
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">View Transitions API + spring motion</div>
+        <div class="spec__detail">Chrome 111+ 의 spec early adopter. CSS-only fluid transitions, framework 의존 X.</div>
+      </div>
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">iOS Safari hit-test reproducer</div>
+        <div class="spec__detail">WebKit Bugzilla MCVE author. §171·§171-C 같은 잠재 버그 reproducible 한 정확한 케이스로 fix.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">Vanilla JS architecture</div>
+        <div class="spec__detail">128 page 정적 사이트의 모듈화. JSDoc type annotation. Astro 도입 plan 보유.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">A11y by default · keyboard nav</div>
+        <div class="spec__detail">focus-visible · prefers-reduced-motion · ARIA · skip-link · screen reader 본능적 구현.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">CI/CD · GitHub Actions</div>
+        <div class="spec__detail">PUSH-FIX 의 영구 대체. Lighthouse CI · bundle size budget · visual regression.</div>
+      </div>
+    </div>
+
+    <div class="tools">
+      <div class="tools__label">도구</div>
+      <div class="tools__list">
+        <span class="tool">vanilla JS</span>
+        <span class="tool">Astro</span>
+        <span class="tool">Vite</span>
+        <span class="tool">Lighthouse CI</span>
+        <span class="tool">WebPageTest</span>
+        <span class="tool">Chrome DevTools</span>
+        <span class="tool">HHKB Hybrid</span>
+        <span class="tool">JSDoc</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="sig-quote">Lighthouse 96/100. PR #122 머지 가능합니다 🚀</p>
+
+  <section class="collab">
+    <h3 class="collab__title">팀에서 어떻게 협업하는가</h3>
+    <div class="collab__row">
+      <span class="collab__icon">✓</span>
+      <div class="collab__row-body"><b>자주 협업</b> — 로즈 윤 (토큰 구현) · 샘 정 (차트 lib) · 왕 정 (web ↔ native 토큰 패리티).</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">!</span>
+      <div class="collab__row-body"><b>주의</b> — framework 강요 X · "잠깐 한 줄만 추가" (성능 회귀) · 인라인 스타일 산재 · a11y 무시.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">★</span>
+      <div class="collab__row-body"><b>잘 통하는 법</b> — PR 에 measure (Lighthouse · bundle · LCP) 동봉. 30분 내 review.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">⏱</span>
+      <div class="collab__row-body"><b>Slack 답</b> — 3–5분. 단 deep work (오전 10–12시) 에는 미응답. 🐛🚀⚡.</div>
+    </div>
+  </section>
+
+  <footer class="profile__footer">
+    <a href="../team_personas.md">전체 persona Bible</a> · <a href="../virtual_office.html">사무실로</a> · <a href="../index.html">팀 index</a>
+  </footer>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0A2540">
+  <title>샘 정 (Sam Jung) · DataViz Specialist · SailTechCo</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="profile-style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../virtual_office.html">← HQ</a>
+  <span class="topnav__sep">/</span>
+  <a href="../index.html">팀</a>
+  <span class="topnav__sep">/</span>
+  <span>샘 정</span>
+</nav>
+
+<main class="profile">
+
+  <section class="cover">
+    <div class="cover__id">#02 · DATA VISUALIZATION</div>
+    <img class="cover__avatar" src="../team_avatars/02_park_serin.svg" alt="샘 정 아바타">
+    <h1 class="cover__name">샘 정</h1>
+    <p class="cover__name-en">Sam Jung · 32</p>
+    <div class="cover__role">DataViz Specialist</div>
+    <p class="cover__tag">"0 부터 시작 안 한 막대그래프는 사기." — Tufte 4종 책꽂이 + Observable Plot 한국 evangelist 출신, 한 화면 차트 3개 룰 fundamentalist.</p>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">02 · BACKGROUND</span>
+    <h2 class="slide__title">학력 · 경력 · 자격</h2>
+
+    <div class="bg-block">
+      <div class="bg-block__head">학력</div>
+      <ul class="bg-block__list">
+        <li><b>서울대 수학과 학사</b> · 2013–2017 · 통계수학 전공</li>
+        <li><b>CMU (Carnegie Mellon) HCI MS</b> · 2018–2020 · Data Visualization track · 졸업 thesis: <em>"Perceptually Uniform Categorical Encoding for High-Density Sports Telemetry"</em> · advised by Prof. Jeff Bigham</li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">경력</div>
+      <ul class="bg-block__list">
+        <li><b>Tableau Research intern</b> <em>2019 여름</em> · perceptual color encoding paper co-author</li>
+        <li><b>Datadog · Senior Data Viz Engineer</b> <em>2020–2022</em> · APM 모니터링 차트 시스템 build-out, 12K customer 영향</li>
+        <li><b>Observable</b> <em>2022–2024</em> · Plot v0.6 line chart 모듈 contributor, 한국 evangelist</li>
+        <li><b>Stripe · Dashboard Data Viz</b> <em>2024–2025</em> · payments analytics dashboard rebuild</li>
+        <li><b>단무지공방 / SailTechCo · DataViz Specialist</b> <em>2026-04 ~ 현재</em></li>
+      </ul>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">자격증·수상</div>
+      <div class="certs">
+        <span class="cert cert--gold">Tableau Research Best Paper Honorable Mention 2020</span>
+        <span class="cert">D3.js Conf 2021 speaker</span>
+        <span class="cert">Observable Plot Summit 2023 keynote</span>
+        <span class="cert">CMU HCI Distinguished Thesis 2020</span>
+      </div>
+    </div>
+
+    <div class="bg-block">
+      <div class="bg-block__head">시그니처 강점</div>
+      <div class="bg-block__body">차트 system thinking · OKLCH · 라이브러리 비교 framework (Chart.js vs canvas vs D3 vs deck.gl) · 데이터 정직성 audit · Tufte lie-factor 정량화.</div>
+    </div>
+  </section>
+
+  <section class="slide case">
+    <span class="slide__num">03 · CASE STUDY</span>
+    <h2 class="case__title">Datadog APM Throughput 차트 — Color Encoding Rebuild</h2>
+    <div class="case__period">2021 Q2 · 8 weeks · 12K customer · 4M req/min</div>
+
+    <div class="case__phase case__phase--challenge">
+      <div class="case__phase-label">Challenge</div>
+      <div class="case__phase-body">기존 throughput 차트가 무지개색 (rainbow) 으로 7 서비스 구분 — colorblind 사용자 21% 가 "어느 서비스가 무엇인지 못 함" 인터뷰 결과. 차트 1개로 한 결정 못 함.</div>
+    </div>
+
+    <div class="case__phase case__phase--approach">
+      <div class="case__phase-label">Approach</div>
+      <div class="case__phase-body">Okabe-Ito 변형 8색 + categorical encoding 의 perceptual-uniform 보장. ColorBrewer 의 categorical-7 palette 채택 + WCAG AA 검증. legend 를 차트 옆 → 차트 안 직접 라벨링으로 (Tufte data-ink ratio 개선).</div>
+    </div>
+
+    <div class="case__phase case__phase--result">
+      <div class="case__phase-label">Result</div>
+      <div class="case__phase-body">colorblind 사용자 식별 오류 21% → 3%. 차트 인지 시간 평균 4.2s → 1.8s. Datadog Design 가족 32 차트에 같은 encoding 표준화. 내부 Engineering Excellence Award 수상.</div>
+    </div>
+
+    <div class="case__metric-row">
+      <div class="case__metric">
+        <div class="case__metric-num">21%→3%</div>
+        <div class="case__metric-lbl">식별 오류</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">−57%</div>
+        <div class="case__metric-lbl">인지 시간</div>
+      </div>
+      <div class="case__metric">
+        <div class="case__metric-num">32</div>
+        <div class="case__metric-lbl">표준화 차트</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <span class="slide__num">04 · SPECIALIZATION</span>
+    <h2 class="slide__title">Niche skills · Tools</h2>
+
+    <div class="spec-grid">
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">OKLCH perceptual color interpolation</div>
+        <div class="spec__detail">sRGB lerp → OKLCH lerp 업그레이드. 5 앵커 status color 의 perceptually smooth 보간. <code>color-mix(in oklch, ...)</code> 표준 활용.</div>
+      </div>
+      <div class="spec spec--depth-deep">
+        <div class="spec__name">Tufte lie-factor 정량화</div>
+        <div class="spec__detail">차트 데이터 정직성을 lie-factor 단일 metric 으로 quantify. y-axis 잘림·3D 왜곡·dual-y misalignment 자동 감지.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">Library trade-off framework</div>
+        <div class="spec__detail">Chart.js vs canvas vs D3 vs deck.gl 의 LOC·perf·interaction power·learning curve 5축 정량 비교.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">Colorblind-safe palette design</div>
+        <div class="spec__detail">Okabe-Ito 변형 · viridis sequential · ColorBrewer divergent. WCAG 2.2 AA 검증 routine.</div>
+      </div>
+      <div class="spec">
+        <div class="spec__name">Real-time streaming viz</div>
+        <div class="spec__detail">Observable Plot incremental rendering. 1Hz–100Hz telemetry 의 frame-budget 관리 (16.7ms).</div>
+      </div>
+    </div>
+
+    <div class="tools">
+      <div class="tools__label">도구</div>
+      <div class="tools__list">
+        <span class="tool">Observable Plot</span>
+        <span class="tool">D3.js</span>
+        <span class="tool">Chart.js</span>
+        <span class="tool">Vega-Lite</span>
+        <span class="tool">Figma</span>
+        <span class="tool">R ggplot2</span>
+        <span class="tool">ColorBrewer</span>
+        <span class="tool">OKLCH inspector</span>
+      </div>
+    </div>
+  </section>
+
+  <p class="sig-quote">차트 업데이트 완료 — 한 번 봐주세요 📊~</p>
+
+  <section class="collab">
+    <h3 class="collab__title">팀에서 어떻게 협업하는가</h3>
+    <div class="collab__row">
+      <span class="collab__icon">✓</span>
+      <div class="collab__row-body"><b>자주 협업</b> — 로즈 윤 (색 토큰) · 티모 강 박사 (지표 의미) · 알렉스 박 (차트 구현).</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">!</span>
+      <div class="collab__row-body"><b>주의</b> — y축 잘림·3D 파이·rainbow color·차트 4+개 즉시 reject. WCAG AA 미만 색 X.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">★</span>
+      <div class="collab__row-body"><b>잘 통하는 법</b> — 차트 만들기 전 "어떤 변수, 어떤 비교, 어떤 결정?" 3 질문 답하기. 30분 내 prototype.</div>
+    </div>
+    <div class="collab__row">
+      <span class="collab__icon">⏱</span>
+      <div class="collab__row-body"><b>Slack 답</b> — 1 분 이내. 📊📈📉 자주.</div>
+    </div>
+  </section>
+
+  <footer class="profile__footer">
+    <a href="../team_personas.md">전체 persona Bible</a> · <a href="../virtual_office.html">사무실로</a> · <a href="../index.html">팀 index</a>
+  </footer>
+
+</main>
+
+</body>
+</html>

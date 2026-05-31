@@ -25,9 +25,9 @@
 | 6 | **캔 최** (Ken Choi) | Marketing & Social | 매니저 | 29 | Buffer Lab · 우아한형제들 출신, 한 주에 콘텐츠 23편 만들어본 적 있음 |
 | 7 | **히로 구** (Hiro Goo) | Hardware & Embedded | 리드 엔지니어 | 39 | ETH Zürich PhD, Garmin Forerunner 시리즈 펌웨어 author |
 | 8 | **왕 정** (Wang Jung) | Mobile App & Integration | 시니어 엔지니어 | 33 | Apple HealthKit team · Strava iOS lead 출신, BLE GATT 의 detective |
-| ★ | **데이빗 옥** (David Oak) | Chief of Staff · Orchestrator | 의장 right hand | 38 | McKinsey · Toss Strategy · Anthropic Korea 출신, Danny 의 외부두뇌·일정·결정 정리 |
+| ★ | **데이빗 옥** (David Ok) | Chief of Staff · Orchestrator | 의장 right hand | 38 | McKinsey · Toss Strategy · Anthropic Korea 출신, Danny 의 외부두뇌·일정·결정 정리 |
 
-**의장 (옥덕필 / Danny Kor, 47) · CEO 단무지공방 / SailTechCo.** 3회 올림픽 출전 경력 (캘거리·릴레함메르·나가노 봅슬레이 봅스킷 헤드코치 시기 + 자신의 윙포일 14년차) · 4 브랜드 (Levitaz·PPC·Takoon·WIP) 한국 단독 유통 · "근거 기반, 효율, 반복 싫음, 머리 정리 받고 싶음" 의 선장.
+**의장 (옥덕필 / Danny Ok, 47) · CEO 단무지공방 / SailTechCo.** 3회 올림픽 출전 경력 (캘거리·릴레함메르·나가노 봅슬레이 봅스킷 헤드코치 시기 + 자신의 윙포일 14년차) · 4 브랜드 (Levitaz·PPC·Takoon·WIP) 한국 단독 유통 · "근거 기반, 효율, 반복 싫음, 머리 정리 받고 싶음" 의 선장.
 
 **자문 (조수철 / Coach Cho, 50대 후반).** Performance Advisor. 옥덕필 라인의 외부 어드바이저. 큰 결정·문화·외부 네트워크에 자문.
 
@@ -470,7 +470,7 @@
 > **위치**: Danny CEO 사무실 바로 옆 작은 공유 사무실. 회의실까지 3 보. 의장의 외부 두뇌·일정·결정 정리·dispatch 진행자·전체 orchestrator.
 
 ### 9-1. 이름·기본 정보
-- **이름**: 데이빗 옥 (David Oak / 玉데이빗)
+- **이름**: 데이빗 옥 (David Ok / 玉데이빗)
 - **나이**: 38세 (1988년생, 로즈 윤과 동갑)
 - **직함**: Chief of Staff · Orchestrator
 - **재직 시작**: 2026-02 (Danny 가 가장 먼저 합류시킨 사람)
