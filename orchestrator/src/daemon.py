@@ -19,6 +19,8 @@ from .config import Config, load as load_config
 from .log import event, setup as setup_log
 from .notify import notify
 
+# state_projection 은 옵션 — full mode 또는 ENABLE_STATE_PROJECTION=true 시 활성
+
 
 async def deploy_loop(cfg: Config, log, stop: asyncio.Event) -> None:
     if not cfg.auto_deploy_repos:
@@ -44,6 +46,35 @@ async def heartbeat_loop(cfg: Config, log, stop: asyncio.Event) -> None:
             await asyncio.wait_for(stop.wait(), timeout=60)
         except asyncio.TimeoutError:
             pass
+
+
+async def _state_projection_coro(cfg: Config, log, stop: asyncio.Event) -> None:
+    """state projection coroutine — Phase 1 sprint deliverable.
+
+    Issues 폴링 → state.json 빌드 → diff 시 commit + push + localhost:8765 노출.
+    GitHub Token 필요. ENABLE_STATE_PROJECTION=true 시 시작.
+    """
+    if not cfg.github_token or not cfg.github_repo:
+        log.warning("state_projection: GITHUB_TOKEN + GITHUB_REPO 필요, skip")
+        return
+    if not cfg.auto_deploy_repos:
+        log.warning("state_projection: AUTO_DEPLOY_REPOS 필요 (commit 대상), skip")
+        return
+    from . import state_projection
+    from . import queue as queue_mod
+
+    queue = queue_mod.GitHubIssuesQueue(
+        cfg.github_token, cfg.github_owner, cfg.github_repo_name)
+    publisher = state_projection.StatePublisher(
+        repo_root=cfg.auto_deploy_repos[0],
+        publish_path=cfg.state_publish_path,
+        http_port=cfg.state_http_port,
+        log=log,
+    )
+    try:
+        await state_projection.state_projection_loop(cfg, queue, publisher, log, stop)
+    finally:
+        await queue.aclose()
 
 
 async def directive_loop(cfg: Config, log, stop: asyncio.Event) -> None:
@@ -129,6 +160,8 @@ async def main() -> int:
     coros = [deploy_loop(cfg, log, stop), heartbeat_loop(cfg, log, stop)]
     if cfg.enable_directive_loop:
         coros.append(directive_loop(cfg, log, stop))
+    if cfg.enable_state_projection:
+        coros.append(_state_projection_coro(cfg, log, stop))
 
     try:
         await asyncio.gather(*coros)

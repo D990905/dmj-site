@@ -72,6 +72,9 @@ class Config:
     log_dir: Path
 
     enable_directive_loop: bool         # OFF for deploy-only deployment
+    enable_state_projection: bool       # Phase 1 sprint 산출물 (state.json dual publish)
+    state_http_port: int                # 0 = disabled, 8765 default dev
+    state_publish_path: str             # repo-relative path
 
     @property
     def github_owner(self) -> str | None:
@@ -129,4 +132,8 @@ def load() -> Config:
         log_dir=Path(opt("LOG_DIR",
                          str(Path.home() / "Library" / "Logs" / "Orchestrator"))).expanduser(),
         enable_directive_loop=enable_directive,
+        enable_state_projection=opt("ENABLE_STATE_PROJECTION", "false").lower() in ("1", "true", "yes"),
+        state_http_port=int(opt("STATE_HTTP_PORT", "8765")),
+        state_publish_path=opt("STATE_PUBLISH_PATH",
+                               "site/admin/dashboard/dashboard-state.json"),
     )

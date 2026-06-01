@@ -1,12 +1,18 @@
 #!/bin/bash
-# auto_push.command — PUSH-FIX.command 의 진화 버전
+# auto_push.command v0.3 — 페르소나 영역 자동 보호 (의장 원칙 2026-06-01)
 # 더블클릭 OK / 터미널 OK / launchd 호출 OK
 #
-# 기존 PUSH-FIX 대비 개선:
+# v0.3 변경 (의장 원칙: "페르소나 영역 무수정 + 페르소나 독립 진행 조력"):
+#   - AUTO_PUSH_ALLOW_PATHS 환경변수 도입 (default: orchestrator/, _team/infra/)
+#   - 인프라 자동 push 는 자기 영역만. 페르소나 영역 (riding-dashboard/, admin/,
+#     _experts/, _team/dispatches/, 사이트 root html 등) 자동 push X.
+#   - 페르소나는 자기 sandbox 에서 본인 영역 명시 push (또는 자기 auto_push helper).
+#
+# 기존 PUSH-FIX 대비 개선 (v0.1~v0.2):
 #   1. iCloud placeholder (.icloud) 강제 다운로드 (brctl download)
 #   2. .git/index.lock + .git/HEAD.lock + .git/refs/*.lock 모두 정리
 #   3. 동시 실행 방지 lockfile (/tmp/orchestrator-push.lock)
-#   4. EWOULDBLOCK / EBUSY / "Resource deadlock avoided" 에 대한 exponential backoff
+#   4. EWOULDBLOCK / EBUSY / "Resource deadlock avoided" exponential backoff
 #   5. push 실패 시 pull --rebase 자동 fallback
 #   6. HEAD 무결성 사전 체크
 #   7. Commit message 자동 생성 (변경 파일 요약 + 타임스탬프)
@@ -143,11 +149,32 @@ generate_commit_message() {
   fi
 }
 
-# --- Stage changes ---
+# --- Stage changes (페르소나 영역 자동 보호 — v0.3) ---
 echo ""
-echo "==> Staging changes..."
-retry_git "git add" git add -A
+echo "==> Staging changes (인프라 영역만)..."
+
+# AUTO_PUSH_ALLOW_PATHS 환경변수 또는 default
+DEFAULT_ALLOW="orchestrator/ _team/infra/"
+ALLOW_LIST="${AUTO_PUSH_ALLOW_PATHS:-$DEFAULT_ALLOW}"
+# 공백 또는 콤마 분리
+IFS=$', \n' read -r -a ALLOW_PATHS <<< "$ALLOW_LIST"
+echo "    allow: ${ALLOW_PATHS[*]}"
+
+# 각 path 별 add (-A 로 untracked 도 잡고 페르소나 영역은 자동 skip)
+for p in "${ALLOW_PATHS[@]}"; do
+  [ -z "$p" ] && continue
+  if [ -e "$p" ]; then
+    retry_git "git add $p" git add -A -- "$p"
+  fi
+done
+
 STAGED=$(git diff --cached --name-only | wc -l | tr -d ' ')
+
+# 페르소나 영역 변경이 있으면 알림 (자동 push X, 알림만)
+PERSONA_CHANGES=$(git diff --name-only -- ':!orchestrator/' ':!_team/infra/' 2>/dev/null | wc -l | tr -d ' ')
+if [ "$PERSONA_CHANGES" -gt 0 ]; then
+  echo "    ℹ️  페르소나 영역 변경 $PERSONA_CHANGES 파일 (자동 push X — 페르소나 본인 책임)."
+fi
 if [ "$STAGED" -eq 0 ]; then
   echo "==> Nothing to commit. Checking if local is ahead of origin..."
   AHEAD=$(git rev-list --count @{u}..HEAD 2>/dev/null || echo "0")
