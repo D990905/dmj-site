@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a18">
+  <title>SailTechCo 운영팀 — 실시간</title>
+  <link rel="manifest" href="/admin/dashboard/manifest.json">
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif; margin: 0; background: #f8f8f6; color: #1a1a18; font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 20px 16px 80px; }
+    @media (min-width: 768px) { .container { padding: 24px 28px 80px; } }
+    header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 0.5px solid #e0ddd3; flex-wrap: wrap; }
+    header h1 { margin: 0; font-size: 20px; font-weight: 500; }
+    @media (min-width: 768px) { header h1 { font-size: 22px; } }
+    .last-sync { font-size: 12px; color: #888780; margin-top: 4px; }
+    button { font: inherit; font-size: 13px; padding: 8px 14px; border: 0.5px solid #b4b2a9; border-radius: 8px; background: #ffffff; color: #1a1a18; cursor: pointer; transition: background .15s; min-height: 36px; }
+    button:hover { background: #f1efe8; }
+    button:active { transform: scale(0.98); }
+    button.primary { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+    button.primary:hover { background: #2c2c2a; }
+    h2 { margin: 28px 0 12px; font-size: 16px; font-weight: 500; color: #1a1a18; }
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 8px; }
+    @media (min-width: 640px) { .metrics { grid-template-columns: repeat(4, 1fr); gap: 12px; } }
+    .metric { background: #f1efe8; border-radius: 8px; padding: 12px 14px; }
+    .metric-label { font-size: 12px; color: #5f5e5a; margin: 0; }
+    .metric-value { font-size: 22px; font-weight: 500; margin: 4px 0 0; }
+    @media (min-width: 768px) { .metric-value { font-size: 24px; } }
+    .metric-value.ok { color: #0f6e56; font-size: 15px; }
+    .actions { display: flex; gap: 8px; margin: 16px 0 8px; flex-wrap: wrap; }
+    .persona-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+    @media (min-width: 768px) { .persona-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); } }
+    .card { background: #ffffff; border: 0.5px solid #e0ddd3; border-radius: 8px; padding: 12px 14px; }
+    .persona { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot.active { background: #1d9e75; }
+    .dot.idle { background: #b4b2a9; }
+    .persona-name { font-size: 13px; font-weight: 500; }
+    .persona-meta { margin-left: 16px; font-size: 11px; color: #888780; margin-top: 3px; }
+    .msg-list, .issue-list { display: flex; flex-direction: column; gap: 8px; }
+    .msg, .issue-row { background: #ffffff; border: 0.5px solid #e0ddd3; border-radius: 8px; padding: 12px 14px; }
+    .msg-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .msg-from { font-size: 13px; font-weight: 500; }
+    .msg-time { font-size: 11px; color: #888780; }
+    .msg-re { font-size: 13px; color: #444441; margin-bottom: 6px; }
+    .msg-body { font-size: 12px; color: #444441; white-space: pre-wrap; line-height: 1.55; word-break: break-word; }
+    .issue-link { text-decoration: none; color: inherit; -webkit-tap-highlight-color: transparent; }
+    .issue-link:hover .issue-row { background: #f8f8f6; }
+    .issue-title { font-size: 13px; font-weight: 500; }
+    .chip { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 6px; background: #f1efe8; color: #5f5e5a; margin-right: 4px; margin-bottom: 4px; }
+    .empty { font-size: 13px; color: #888780; padding: 8px 0; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>SailTechCo 운영팀</h1>
+      <p class="last-sync" id="last-sync">갱신 중...</p>
+    </div>
+    <button class="primary" id="refresh">새로고침</button>
+  </header>
+
+  <div class="metrics">
+    <div class="metric"><p class="metric-label">새 메시지 (1h)</p><p class="metric-value" id="m-msg">—</p></div>
+    <div class="metric"><p class="metric-label">진행 중 지시</p><p class="metric-value" id="m-pending">—</p></div>
+    <div class="metric"><p class="metric-label">완료 (24h)</p><p class="metric-value" id="m-done">—</p></div>
+    <div class="metric"><p class="metric-label">시스템</p><p class="metric-value ok" id="m-sys">정상</p></div>
+  </div>
+
+  <div class="actions">
+    <button id="new-directive">+ 새 지시 작성</button>
+    <button id="open-broadcast">broadcast template</button>
+    <button id="open-channel">공유 채널 열기</button>
+  </div>
+
+  <h2>페르소나 활동</h2>
+  <div class="persona-grid" id="personas"><p class="empty">로딩 중...</p></div>
+
+  <h2>공유 채널 — 최근 메시지</h2>
+  <div class="msg-list" id="msgs"><p class="empty">로딩 중...</p></div>
+
+  <h2>지시 큐 (GitHub Issues)</h2>
+  <div class="issue-list" id="issues"><p class="empty">로딩 중...</p></div>
+</div>
+
+<script>
+const REPO = 'D990905/dmj-site';
+const RAW_BASE = 'https://raw.githubusercontent.com/' + REPO + '/main';
+const API_BASE = 'https://api.github.com/repos/' + REPO;
+const PERSONAS = [
+  {slug:'pm', name:'PM', domain:'PM'},
+  {slug:'research', name:'메이 한', domain:'UX Research'},
+  {slug:'design', name:'로즈 윤', domain:'Visual Design'},
+  {slug:'frontend', name:'알렉스 박', domain:'Frontend'},
+  {slug:'datascience', name:'샘 정', domain:'DataViz'},
+  {slug:'hardware', name:'히로 구', domain:'Hardware'},
+  {slug:'mobile', name:'왕 정', domain:'Mobile'},
+  {slug:'dashboard', name:'#9 Dashboard', domain:'UI infra'},
+  {slug:'backend', name:'#10 Backend', domain:'Backend infra'},
+  {slug:'orchestrator', name:'#11 Daemon', domain:'Orchestrator'},
+  {slug:'sports', name:'티모 강', domain:'Sports Science'},
+  {slug:'marketing', name:'캔 최', domain:'Marketing'},
+];
+
+function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function parseKstDate(iso) { if (!iso) return null; if (iso.includes('KST')) return new Date(iso.replace(' KST', '+09:00').replace(' ', 'T')); return new Date(iso); }
+function fmtRel(iso) { const d = parseKstDate(iso); if (!d || isNaN(d.getTime())) return ''; const diff = (Date.now() - d.getTime()) / 1000; if (diff < 60) return Math.round(diff) + '초 전'; if (diff < 3600) return Math.round(diff/60) + '분 전'; if (diff < 86400) return Math.round(diff/3600) + '시간 전'; return Math.round(diff/86400) + '일 전'; }
+
+function parseMessages(md) {
+  if (!md) return [];
+  const entries = [];
+  const blocks = md.split(/\n---\n+/);
+  for (const block of blocks) {
+    const m = block.match(/##\s+\[Sent\s+([^\]]+)\]\s*From:\s*([^·\n]+)·\s*To:\s*([^·\n]+)·\s*Re:\s*([^\n]+)/);
+    if (!m) continue;
+    let body = block.substring(block.indexOf(m[0]) + m[0].length).trim();
+    body = body.replace(/\n—[^\n]*$/g, '').trim();
+    entries.push({ sentAt: m[1].trim(), from: m[2].trim(), to: m[3].trim(), re: m[4].trim(), body: body.length > 320 ? body.substring(0,320) + '…' : body });
+  }
+  return entries.reverse();
+}
+
+function renderMessages(entries) {
+  const el = document.getElementById('msgs');
+  if (!entries.length) { el.innerHTML = '<p class="empty">메시지 없음 — 페르소나가 messages.md 에 append 하면 표시</p>'; return; }
+  el.innerHTML = entries.slice(0, 10).map(e => `
+    <div class="msg">
+      <div class="msg-head"><span class="msg-from">${escapeHtml(e.from)} → ${escapeHtml(e.to)}</span><span class="msg-time">${escapeHtml(e.sentAt)}</span></div>
+      <div class="msg-re">${escapeHtml(e.re)}</div>
+      <div class="msg-body">${escapeHtml(e.body)}</div>
+    </div>`).join('');
+}
+
+function renderPersonas(entries) {
+  const lastByKey = {};
+  for (const e of entries) {
+    const k = (e.from||'').toLowerCase();
+    PERSONAS.forEach(p => { if (k.includes(p.slug) || k.includes(p.name.toLowerCase().replace(/\s/g,''))) { if (!lastByKey[p.slug]) lastByKey[p.slug] = e.sentAt; } });
+  }
+  const el = document.getElementById('personas');
+  el.innerHTML = PERSONAS.map(p => {
+    const last = lastByKey[p.slug] || null;
+    const active = last && (Date.now() - parseKstDate(last).getTime() < 3600000);
+    return `<div class="card persona-row" style="display:block;">
+      <div class="persona"><span class="dot ${active ? 'active' : 'idle'}"></span><span class="persona-name">${escapeHtml(p.name)}</span></div>
+      <p class="persona-meta">${escapeHtml(p.domain)} · ${last ? fmtRel(last) : '활동 없음'}</p>
+    </div>`;
+  }).join('');
+}
+
+function renderIssues(issues) {
+  const el = document.getElementById('issues');
+  const active = (issues||[]).filter(i => i.state==='open').slice(0, 6);
+  if (!active.length) { el.innerHTML = '<p class="empty">활성 지시 없음</p>'; return; }
+  el.innerHTML = active.map(i => {
+    const chips = (i.labels||[]).map(l=>l.name).filter(n=>n!=='directive').slice(0,4).map(n=>`<span class="chip">${escapeHtml(n)}</span>`).join('');
+    return `<a class="issue-link" href="${escapeHtml(i.html_url)}" target="_blank" rel="noopener">
+      <div class="issue-row">
+        <div class="msg-head"><span class="issue-title">#${i.number} · ${escapeHtml(i.title)}</span><span class="msg-time">${fmtRel(i.updated_at)}</span></div>
+        <div>${chips}</div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+function updateMetrics(entries, issues) {
+  const now = Date.now();
+  const newMsgs = entries.filter(e => { const t = parseKstDate(e.sentAt); return t && (now - t.getTime() < 3600000); }).length;
+  const pending = (issues||[]).filter(i=>i.state==='open').length;
+  const done24 = (issues||[]).filter(i=>i.state==='closed' && (now - new Date(i.closed_at||i.updated_at).getTime() < 86400000)).length;
+  document.getElementById('m-msg').textContent = newMsgs;
+  document.getElementById('m-pending').textContent = pending;
+  document.getElementById('m-done').textContent = done24;
+}
+
+async function refresh() {
+  document.getElementById('last-sync').textContent = '갱신 중...';
+  try {
+    const cb = '?t=' + Date.now();
+    const [mdR, isR] = await Promise.all([
+      fetch(RAW_BASE + '/_team/sync/messages.md' + cb).then(r => r.ok ? r.text() : null).catch(()=>null),
+      fetch(API_BASE + '/issues?state=all&labels=directive&per_page=20&sort=updated').then(r => r.ok ? r.json() : []).catch(()=>[]),
+    ]);
+    const entries = parseMessages(mdR);
+    renderMessages(entries);
+    renderPersonas(entries);
+    renderIssues(isR);
+    updateMetrics(entries, isR);
+    document.getElementById('last-sync').textContent = '마지막 갱신: ' + new Date().toLocaleTimeString('ko-KR') + ' · 30초 auto';
+  } catch (e) {
+    document.getElementById('last-sync').textContent = '갱신 실패';
+  }
+}
+
+document.getElementById('refresh').addEventListener('click', refresh);
+document.getElementById('new-directive').addEventListener('click', () => {
+  const ts = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const body = '```json\n{\n  "directive_id": "dir_' + ts + '_001",\n  "specialist": "general",\n  "prompt": "",\n  "priority": "p1"\n}\n```';
+  window.open('https://github.com/' + REPO + '/issues/new?labels=directive,pending&title=&body=' + encodeURIComponent(body), '_blank');
+});
+document.getElementById('open-broadcast').addEventListener('click', () => window.open('https://github.com/' + REPO + '/blob/main/_team/sync/BROADCAST_TEMPLATE.md', '_blank'));
+document.getElementById('open-channel').addEventListener('click', () => window.open('https://github.com/' + REPO + '/blob/main/_team/sync/messages.md', '_blank'));
+
+refresh();
+setInterval(refresh, 30000);
+</script>
+</body>
+</html>
