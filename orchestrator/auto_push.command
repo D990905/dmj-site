@@ -1,5 +1,6 @@
 #!/bin/bash
-# auto_push.command v0.3 — 페르소나 영역 자동 보호 (의장 원칙 2026-06-01)
+# auto_push.command v0.4 — _team/sync/ 추가 (인프라 누락 fix)
+# v0.3 → v0.4: DEFAULT_ALLOW 에 _team/sync/ 추가. 공유 채널이 누락됐던 인프라 실수 수정.
 # 더블클릭 OK / 터미널 OK / launchd 호출 OK
 #
 # v0.3 변경 (의장 원칙: "페르소나 영역 무수정 + 페르소나 독립 진행 조력"):
@@ -153,8 +154,8 @@ generate_commit_message() {
 echo ""
 echo "==> Staging changes (인프라 영역만)..."
 
-# AUTO_PUSH_ALLOW_PATHS 환경변수 또는 default
-DEFAULT_ALLOW="orchestrator/ _team/infra/"
+# AUTO_PUSH_ALLOW_PATHS 환경변수 또는 default (인프라 영역만)
+DEFAULT_ALLOW="orchestrator/ _team/infra/ _team/sync/"
 ALLOW_LIST="${AUTO_PUSH_ALLOW_PATHS:-$DEFAULT_ALLOW}"
 # 공백 또는 콤마 분리
 IFS=$', \n' read -r -a ALLOW_PATHS <<< "$ALLOW_LIST"
