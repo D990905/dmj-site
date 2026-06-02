@@ -1192,6 +1192,278 @@
     }[c]));
   }
 
+  // ============================================================
+  // Control Loop — Chat panel (Mobile Dashboard Control Loop MVP)
+  // ============================================================
+  // - persona list (15 from data.experts)
+  // - thread per persona (sample / real messages.json polling)
+  // - compose form → GitHub Issues API (Phase 2; Phase 1 stub)
+  // - URL token auth: ?t=SECRET (matched at boot; no token = denied gate)
+  // ============================================================
+
+  const REPO_OWNER_NAME = 'D990905/dmj-site';
+  const MESSAGES_URL =
+    (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+      ? 'http://localhost:8765/messages'
+      : './dashboard-messages.json';
+  const MESSAGES_POLL_MS = 30000;
+
+  let chatOpen = false;
+  let chatSelectedSlug = null;
+  let messagesCache = null; // shape: { generated_at, threads: { '<slug>': [{author, status, body, ts, issue_url}] } }
+  let messagesTimer = null;
+
+  function getChatBadgeEl() { return document.getElementById('chatBadge'); }
+  function getChatToggleBtn() { return document.getElementById('chatToggleBtn'); }
+
+  function chatPanel() { return document.getElementById('chatPanel'); }
+  function openChatPanel() {
+    chatPanel().classList.add('open');
+    chatPanel().setAttribute('aria-hidden', 'false');
+    chatOpen = true;
+    if (!chatSelectedSlug) renderChatPersonas();
+  }
+  function closeChatPanel() {
+    chatPanel().classList.remove('open');
+    chatPanel().setAttribute('aria-hidden', 'true');
+    chatOpen = false;
+  }
+
+  function renderChatPersonas() {
+    const wrap = document.getElementById('chatPersonas');
+    if (!wrap || !data || !data.experts) return;
+    const threads = (messagesCache && messagesCache.threads) || {};
+    wrap.innerHTML = data.experts.map(e => {
+      const list = threads[e.id] || [];
+      const unread = list.filter(m => !m.read).length;
+      const lastMsg = list[list.length - 1];
+      const meta = lastMsg
+        ? `${lastMsg.author || ''} · ${formatRelTime(lastMsg.ts) || ''}`
+        : (e.domain || e.role || '');
+      return `
+        <button class="chat-persona" data-slug="${e.id}" type="button">
+          <span class="chat-persona__icon">${e.icon}</span>
+          <span style="flex:1;min-width:0">
+            <div class="chat-persona__name">${escapeHtml(e.label)}</div>
+            <div class="chat-persona__meta">${escapeHtml(meta)}</div>
+          </span>
+          <span class="chat-persona__count ${unread > 0 ? '' : 'zero'}">${unread || (list.length || 0)}</span>
+        </button>`;
+    }).join('');
+    wrap.querySelectorAll('[data-slug]').forEach(btn => {
+      btn.addEventListener('click', () => openThread(btn.getAttribute('data-slug')));
+    });
+    // Show personas; hide thread
+    document.getElementById('chatPersonas').hidden = false;
+    document.getElementById('chatThread').hidden = true;
+    document.getElementById('chatPanelBack').hidden = true;
+    document.getElementById('chatPanelSub').textContent = `${data.experts.length} personas`;
+  }
+
+  function openThread(slug) {
+    chatSelectedSlug = slug;
+    const expert = data.experts.find(e => e.id === slug);
+    if (!expert) return;
+    document.getElementById('chatPanelSub').textContent = `${expert.icon} ${expert.label}`;
+    document.getElementById('chatPersonas').hidden = true;
+    document.getElementById('chatThread').hidden = false;
+    document.getElementById('chatPanelBack').hidden = false;
+    renderChatMessages(slug);
+  }
+
+  function renderChatMessages(slug) {
+    const wrap = document.getElementById('chatMessages');
+    const threads = (messagesCache && messagesCache.threads) || {};
+    const list = threads[slug] || [];
+    if (list.length === 0) {
+      wrap.innerHTML = `<div class="chat-msg from-system">대화 기록 없음. 첫 directive 를 보내보세요.</div>`;
+    } else {
+      wrap.innerHTML = list.map(m => renderChatMessage(m)).join('');
+      // mark read
+      list.forEach(m => m.read = true);
+    }
+    wrap.scrollTop = wrap.scrollHeight;
+    updateChatBadge();
+  }
+  function renderChatMessage(m) {
+    const fromDanny = (m.author === 'danny' || m.author === 'Danny' || m.author === '옥대표님');
+    const cls = fromDanny ? 'from-danny' : (m.author === 'system' ? 'from-system' : 'from-persona');
+    const status = m.status ? `<div class="chat-msg__status s-${escapeHtml(m.status)}">${escapeHtml(m.status)}</div>` : '';
+    const head = (cls !== 'from-system')
+      ? `<div class="chat-msg__head"><span class="chat-msg__author">${escapeHtml(m.author||'')}</span><span>${formatRelTime(m.ts)||''}</span>${m.issue_url?` · <a href="${escapeHtml(m.issue_url)}" target="_blank" rel="noopener">issue ↗</a>`:''}</div>`
+      : '';
+    return `<div class="chat-msg ${cls}">${head}${status}<div class="chat-msg__body">${escapeHtml(m.body||'')}</div></div>`;
+  }
+  function formatRelTime(ts) {
+    if (!ts) return '';
+    const t = new Date(ts).getTime();
+    if (!t || isNaN(t)) return '';
+    const delta = Math.floor((Date.now() - t) / 1000);
+    if (delta < 60) return `${delta}s 전`;
+    if (delta < 3600) return `${Math.floor(delta/60)}분 전`;
+    if (delta < 86400) return `${Math.floor(delta/3600)}시간 전`;
+    return `${Math.floor(delta/86400)}일 전`;
+  }
+  function updateChatBadge() {
+    const threads = (messagesCache && messagesCache.threads) || {};
+    let unread = 0;
+    Object.values(threads).forEach(list => unread += list.filter(m => !m.read).length);
+    const badge = getChatBadgeEl();
+    if (!badge) return;
+    if (unread > 0) { badge.textContent = unread; badge.hidden = false; }
+    else { badge.hidden = true; }
+  }
+
+  async function fetchMessages() {
+    try {
+      const res = await fetch(MESSAGES_URL, { cache: 'no-cache' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+      if (json && json.threads && typeof json.threads === 'object') {
+        // preserve read flags from cache
+        const prev = messagesCache && messagesCache.threads ? messagesCache.threads : {};
+        Object.keys(json.threads).forEach(slug => {
+          const prevList = prev[slug] || [];
+          const prevById = {};
+          prevList.forEach(m => { if (m.id) prevById[m.id] = m; });
+          json.threads[slug].forEach(m => {
+            if (m.id && prevById[m.id] && prevById[m.id].read) m.read = true;
+          });
+        });
+        messagesCache = json;
+      }
+    } catch (e) {
+      // First load: provide a tiny fallback so UI demonstrates structure
+      if (!messagesCache) {
+        messagesCache = buildSampleMessages();
+      }
+    }
+    if (chatOpen) {
+      if (chatSelectedSlug) renderChatMessages(chatSelectedSlug);
+      else renderChatPersonas();
+    }
+    updateChatBadge();
+  }
+  function buildSampleMessages() {
+    // Phase 1 demo seed — real messages will come from daemon-built dashboard-messages.json
+    const now = Date.now();
+    return {
+      generated_at: new Date(now).toISOString(),
+      threads: {
+        '01-pm': [
+          { id: 'pm-1', author: '옥대표님', body: 'Phase 2 백로그 정리 부탁드립니다.', ts: new Date(now-3600e3).toISOString() },
+          { id: 'pm-2', author: 'PM', status: 'run', body: '진행 중 — 24h 안 1차 정리 올리겠습니다.', ts: new Date(now-1800e3).toISOString(), issue_url: 'https://github.com/D990905/dmj-site/issues/101' }
+        ],
+        '04-frontend': [
+          { id: 'fe-1', author: '옥대표님', body: '라이딩 리플레이 뷰어 폴리시 확인 부탁.', ts: new Date(now-7200e3).toISOString() },
+          { id: 'fe-2', author: '알렉스 박', status: 'run', body: '§182 audit 6 항목 작업 중. push paste 1 action 대기.', ts: new Date(now-600e3).toISOString(), issue_url: 'https://github.com/D990905/dmj-site/issues/110' }
+        ],
+        '11-orchestrator': [
+          { id: 'inf-1', author: '인프라 #11', status: 'approve', body: 'CI iCloud-lock 재시도 패치 (max 8→12) — 승인 요청.', ts: new Date(now-2400e3).toISOString(), issue_url: 'https://github.com/D990905/dmj-site/issues/161' }
+        ]
+      }
+    };
+  }
+
+  // Compose: stub → GitHub Issues API direct (Phase 2 — needs PAT in URL hash)
+  function chatComposeSubmit(ev) {
+    ev.preventDefault();
+    const form = ev.target;
+    const fd = new FormData(form);
+    const body = (fd.get('body') || '').trim();
+    const priority = fd.get('priority') || '2';
+    if (!body || !chatSelectedSlug) return;
+    const slug = chatSelectedSlug;
+    const title = body.split('\n')[0].slice(0, 80);
+    const pat = window.__authPat;
+    if (pat) {
+      // Phase 2: POST to GitHub API (real-time)
+      postGithubIssueOrComment({ slug, title, body, priority, pat })
+        .then(() => {
+          form.reset();
+          fetchMessages(); // immediate refresh
+        })
+        .catch(err => {
+          alert('전송 실패: ' + (err && err.message || err));
+        });
+    } else {
+      // Phase 1 fallback: open GitHub issues/new in new tab (same as +새지시 form)
+      const PRIORITY_TO_SCHEMA = { '1': 'p3', '2': 'p2', '3': 'p1', '4': 'p0' };
+      const pl = PRIORITY_TO_SCHEMA[priority] || 'p2';
+      const labels = ['directive', 'pending', slug, `priority:${pl}`].join(',');
+      const qs = new URLSearchParams({ title, body, labels });
+      window.open(`https://github.com/${REPO_OWNER_NAME}/issues/new?${qs.toString()}`, '_blank', 'noopener');
+      form.reset();
+    }
+  }
+  async function postGithubIssueOrComment({ slug, title, body, priority, pat }) {
+    // Phase 2 path — kept minimal; daemon will reconcile.
+    const PRIORITY_TO_SCHEMA = { '1': 'p3', '2': 'p2', '3': 'p1', '4': 'p0' };
+    const url = `https://api.github.com/repos/${REPO_OWNER_NAME}/issues`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': 'Bearer ' + pat,
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      body: JSON.stringify({
+        title, body,
+        labels: ['directive', 'pending', slug, `priority:${PRIORITY_TO_SCHEMA[priority] || 'p2'}`]
+      })
+    });
+    if (!res.ok) throw new Error('GitHub API ' + res.status);
+    return res.json();
+  }
+
+  // ---------- Wire ----------
+  document.getElementById('chatToggleBtn').addEventListener('click', () => {
+    chatOpen ? closeChatPanel() : openChatPanel();
+  });
+  document.getElementById('chatPanelClose').addEventListener('click', closeChatPanel);
+  document.getElementById('chatPanelBack').addEventListener('click', () => {
+    chatSelectedSlug = null;
+    renderChatPersonas();
+  });
+  document.getElementById('chatCompose').addEventListener('submit', chatComposeSubmit);
+
+  // ---------- Token auth gate ----------
+  (function authGate() {
+    // Token in URL hash (not query) — hash never sent to server. Persists across reloads via copy/paste.
+    // Format: #t=<secret>[&pat=<github_pat>]
+    const hash = location.hash.replace(/^#/, '');
+    const params = new URLSearchParams(hash);
+    const token = params.get('t');
+    const pat = params.get('pat');
+    if (pat) window.__authPat = pat; // available to chatComposeSubmit
+    const EXPECTED = '__SAILTECH_TOKEN__'; // sentinel — replaced at deploy (Phase 2)
+    // If sentinel is unchanged, gate is disabled (current Phase 1: open dashboard).
+    if (EXPECTED === '__SAILTECH_TOKEN__') return;
+    if (token === EXPECTED) return;
+    // Render gate
+    const gate = document.createElement('div');
+    gate.className = 'auth-gate';
+    gate.innerHTML = `
+      <div class="auth-gate__card">
+        <h2 class="auth-gate__title">🔒 SailTech Control</h2>
+        <p class="auth-gate__sub">접근 토큰이 필요합니다.<br>URL 끝에 <code>#t=YOUR_TOKEN</code> 을 추가해서 다시 열어주세요.</p>
+        <input type="password" id="authTokenInput" placeholder="token" style="width:100%;background:var(--bg-elev2);border:1px solid var(--line);border-radius:8px;padding:9px 11px;color:var(--text);font:inherit;font-size:14px;margin-bottom:10px"/>
+        <button class="btn btn-primary" id="authTokenSubmit" style="width:100%">접속</button>
+        <p class="auth-gate__hint">토큰은 hash 에만 저장됨 (서버 전송 X · 브라우저 메모리 only)</p>
+      </div>`;
+    document.body.appendChild(gate);
+    document.getElementById('authTokenSubmit').addEventListener('click', () => {
+      const v = document.getElementById('authTokenInput').value.trim();
+      if (!v) return;
+      location.hash = 't=' + encodeURIComponent(v) + (pat ? '&pat=' + encodeURIComponent(pat) : '');
+      location.reload();
+    });
+  })();
+
+  // Start polling messages
+  fetchMessages();
+  messagesTimer = setInterval(fetchMessages, MESSAGES_POLL_MS);
+
   // expose for debugging
   window.__cy = cy;
 })();

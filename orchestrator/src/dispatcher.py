@@ -60,9 +60,11 @@ def _commits_since(repo: Path, base_sha: str | None) -> list[str]:
         return []
 
 
-async def dispatch(directive: Directive, *, workspace: Path, api_key: str,
+async def dispatch(directive: Directive, *, workspace: Path, api_key: str | None,
                    default_max_budget_usd: float, default_max_turns: int,
                    log: logging.Logger) -> Status:
+    """β path (CoS directive 2026-06-02 14:08): api_key=None → SDK 가 Claude Code CLI 인증 상속.
+    옥대표님 `claude login` (Pro/Max OAuth) 후 ANTHROPIC_API_KEY 미설정 시 작동 시도."""
     # Lazy SDK import — config can validate without SDK installed
     from claude_agent_sdk import (
         query, ClaudeAgentOptions,
@@ -74,6 +76,14 @@ async def dispatch(directive: Directive, *, workspace: Path, api_key: str,
     cwd.mkdir(parents=True, exist_ok=True)
     base_sha = _git_head(cwd)
 
+    # β path: api_key None 시 ENV 에서 ANTHROPIC_API_KEY 제외 → SDK 가 CLI 인증 (claude login) 상속 시도.
+    if api_key:
+        env_dict = {"ANTHROPIC_API_KEY": api_key, **os.environ}
+    else:
+        # remove ANTHROPIC_API_KEY from inherited env so SDK falls through to CLI auth
+        env_dict = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
+        log.info("dispatch β path: api_key None — CLI 인증 상속 시도 (claude login)")
+
     options = ClaudeAgentOptions(
         system_prompt=SPECIALIST_PROMPTS.get(directive.specialist,
                                              SPECIALIST_PROMPTS["general"]),
@@ -82,7 +92,7 @@ async def dispatch(directive: Directive, *, workspace: Path, api_key: str,
         max_turns=directive.max_turns or default_max_turns,
         max_budget_usd=directive.max_budget_usd or default_max_budget_usd,
         cwd=str(cwd),
-        env={"ANTHROPIC_API_KEY": api_key, **os.environ},
+        env=env_dict,
     )
 
     status = Status(

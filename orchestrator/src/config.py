@@ -100,8 +100,8 @@ def load() -> Config:
     github_repo = _resolve("GITHUB_REPO", dotenv)
 
     if enable_directive:
+        # β path (CoS directive 2026-06-02 14:08): ANTHROPIC_API_KEY 선택적 (CLI 인증 상속 시도).
         missing = [k for k, v in (
-            ("ANTHROPIC_API_KEY", anthropic),
             ("GITHUB_TOKEN", github_token),
             ("GITHUB_REPO", github_repo),
         ) if not v]
@@ -110,6 +110,8 @@ def load() -> Config:
                 f"Directive loop enabled but missing: {', '.join(missing)}. "
                 f"Set via macOS Keychain or {ENV_PATH}."
             )
+        if not anthropic:
+            print(f"[config] ANTHROPIC_API_KEY 없음 — β path: CLI 인증 상속 시도 (claude login 필요).")
 
     auto_repos = tuple(
         Path(p.strip()).expanduser()

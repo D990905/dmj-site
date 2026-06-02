@@ -22,6 +22,7 @@
     <span class="env-tag">prototype</span>
   </div>
   <div class="topbar-right">
+    <button class="icon-btn" id="chatToggleBtn" aria-label="chat panel" title="대화">💬<span class="dot-badge" id="chatBadge" hidden>0</span></button>
     <button class="icon-btn" id="filterBtn" aria-label="filter">⚙</button>
     <button class="icon-btn" id="refreshBtn" aria-label="refresh">↻</button>
     <button class="icon-btn notif" id="notifBtn" aria-label="notifications">
@@ -92,6 +93,41 @@
   </aside>
 
   <button class="fab" id="newDirectiveBtn" aria-label="new directive" title="새 지시 (Phase 3)">＋</button>
+
+  <!-- Control Loop — Chat panel (slide-in right on desktop, full-screen on mobile) -->
+  <aside class="chat-panel" id="chatPanel" aria-hidden="true" aria-label="persona 대화">
+    <header class="chat-panel__head">
+      <button class="chat-panel__close" id="chatPanelClose" aria-label="close">×</button>
+      <div class="chat-panel__title">
+        <span class="chat-panel__title-main">대화</span>
+        <span class="chat-panel__title-sub" id="chatPanelSub">persona 선택</span>
+      </div>
+      <button class="chat-panel__back" id="chatPanelBack" aria-label="back" hidden>‹</button>
+    </header>
+    <div class="chat-panel__body">
+      <nav class="chat-panel__personas" id="chatPersonas" aria-label="persona list">
+        <!-- runtime injected by renderChatPersonas() -->
+      </nav>
+      <section class="chat-panel__thread" id="chatThread" aria-label="message thread" hidden>
+        <div class="chat-panel__messages" id="chatMessages"></div>
+        <form class="chat-panel__compose" id="chatCompose" autocomplete="off">
+          <textarea name="body" rows="2" placeholder="메시지 또는 directive 입력 — Enter 전송, Shift+Enter 줄바꿈"></textarea>
+          <div class="chat-panel__compose-row">
+            <label class="chat-panel__priority">
+              priority
+              <select name="priority">
+                <option value="2" selected>P2 보통</option>
+                <option value="3">P3 높음</option>
+                <option value="4">P4 긴급</option>
+                <option value="1">P1 낮음</option>
+              </select>
+            </label>
+            <button type="submit" class="btn btn-primary" id="chatSendBtn">전송</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </aside>
 
   <div class="bottom-sheet" id="bottomSheet" aria-hidden="true">
     <button class="sheet-handle" id="sheetHandle" aria-label="toggle approval queue"></button>

@@ -3,9 +3,9 @@ dispatch_id: D-2026-06-02-006
 task: dashboard-marketing-color-check
 owner: 샘 정 (Sam Jung) — DataViz Specialist #2
 sender: 캔 최 (Ken Choi) · authority = 데이빗 옥 CoS 6/2 13:01 chain unblock
-status: open · estimate 회신 대기
-estimate: TBD (Sam 측 산출)
-due: 2026-06-05 (금)
+status: **hold** (parent D-004 hold 유지 by 데이빗 CoS 13:02:30·13:04:00 channel directive — #9 surface architecture spec publish 대기) → estimate 회신 보류
+estimate: TBD (Sam 측 산출 — #9 spec link 받은 후)
+due: 2026-06-05 (금) → revisit after #9 spec ETA
 created: 2026-06-02
 last_update: 2026-06-02
 linked: [D-2026-06-01-004 (parent spec), D-2026-06-02-005 (Alex impl)]

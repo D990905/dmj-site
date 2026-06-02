@@ -256,8 +256,8 @@ class HeartbeatStatus:
 
 @dataclass
 class DashboardState:
-    """state.json top-level. schema_v0.md §1."""
-    schema_version: str = "v0.1"
+    """state.json top-level. schema_v0.md §1 + v0.2 messages_recent (CoS 명령 2026-06-02)."""
+    schema_version: str = "v0.2"
     last_updated_at: str = ""
     directives: list[DirectiveCard] = None  # type: ignore
     personas: dict[str, PersonaState] = None  # type: ignore  (key = agents.slug)
@@ -265,6 +265,8 @@ class DashboardState:
     recent_decisions: list[RecentDecision] = None  # type: ignore
     cost: CostSnapshot = None  # type: ignore
     heartbeat: HeartbeatStatus = None  # type: ignore
+    messages_recent: list[dict] = None  # type: ignore  (v0.2 — PAT-free source from messages.md)
+    standup_recent: list[dict] = None  # type: ignore  (v0.2 — standup_YYYY-MM-DD.md entries)
 
     def __post_init__(self):
         if self.directives is None: self.directives = []
@@ -273,6 +275,8 @@ class DashboardState:
         if self.recent_decisions is None: self.recent_decisions = []
         if self.cost is None: self.cost = CostSnapshot()
         if self.heartbeat is None: self.heartbeat = HeartbeatStatus()
+        if self.messages_recent is None: self.messages_recent = []
+        if self.standup_recent is None: self.standup_recent = []
 
     def to_json(self) -> str:
         from dataclasses import asdict
@@ -287,8 +291,63 @@ class DashboardState:
 # 2. Builder — Issues + (Phase B) Supabase → DashboardState
 # ════════════════════════════════════════════════════════════════════
 
+def _read_messages_md(repo_root: Path, limit: int = 20) -> list[dict]:
+    """v0.2 — PAT-free source. Reads site/_team/sync/messages.md directly.
+    Returns last `limit` entries reversed (newest first)."""
+    msg_path = repo_root / "_team" / "sync" / "messages.md"
+    if not msg_path.exists():
+        return []
+    try:
+        text = msg_path.read_text(encoding="utf-8")
+    except Exception:
+        return []
+    import re
+    entries = []
+    blocks = re.split(r"\n---\n+", text)
+    for block in blocks:
+        m = re.search(r"##\s+\[Sent\s+([^\]]+)\]\s*From:\s*([^·\n]+)·\s*To:\s*([^·\n]+)·\s*Re:\s*([^\n]+)", block)
+        if not m:
+            continue
+        body_start = m.end()
+        body = block[body_start:].strip()
+        body = re.sub(r"\n—[^\n]*$", "", body, flags=re.MULTILINE).strip()
+        entries.append({
+            "sent_at": m.group(1).strip(),
+            "from": m.group(2).strip(),
+            "to": m.group(3).strip(),
+            "re": m.group(4).strip(),
+            "body_excerpt": body[:320] + ("…" if len(body) > 320 else ""),
+        })
+    return list(reversed(entries))[:limit]
+
+
+def _read_standup_md(repo_root: Path, date_iso: str | None = None) -> list[dict]:
+    """v0.2 — PAT-free source. Reads site/_team/sync/standup_YYYY-MM-DD.md."""
+    from datetime import datetime, timezone
+    if date_iso is None:
+        date_iso = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d")
+    standup_path = repo_root / "_team" / "sync" / f"standup_{date_iso}.md"
+    if not standup_path.exists():
+        return []
+    try:
+        text = standup_path.read_text(encoding="utf-8")
+    except Exception:
+        return []
+    import re
+    entries = []
+    for line in text.splitlines():
+        m = re.match(r"^-\s+\*\*([^*]+)\*\*[^—]*—\s*(.*?)(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})", line)
+        if m:
+            entries.append({
+                "persona": m.group(1).strip(),
+                "summary_excerpt": m.group(2)[:400] + ("…" if len(m.group(2)) > 400 else ""),
+                "reported_at": m.group(3).strip(),
+            })
+    return entries
+
+
 async def build_state(queue, github_repo: str, etag_cache: Path,
-                      log: logging.Logger) -> DashboardState:
+                      log: logging.Logger, repo_root: Path | None = None) -> DashboardState:
     """Phase 1 — Issues 폴링 결과를 schema_v0.1 구조로 정규화.
 
     schema_v0.md §3-1 builder 규칙 1:1.
@@ -304,17 +363,32 @@ async def build_state(queue, github_repo: str, etag_cache: Path,
     """
     from datetime import datetime, timezone
     state = DashboardState(
-        schema_version="v0.1",
+        schema_version="v0.2",
         last_updated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
 
-    # ── ETag load + fetch ─────────────────────────────────────────
+    # v0.2 — PAT-free messages.md + standup md source (CoS directive 2026-06-02 13:16)
+    if repo_root is not None:
+        try:
+            state.messages_recent = _read_messages_md(repo_root, limit=30)
+            state.standup_recent = _read_standup_md(repo_root)
+            log.info("state_projection v0.2: messages=%d, standup=%d entries",
+                     len(state.messages_recent), len(state.standup_recent))
+        except Exception:
+            log.exception("state_projection v0.2: local md read failed")
+
+    # ── ETag load + fetch (GitHub Issues, PAT optional) ─────────────
+    if queue is None:
+        # PAT-free mode: skip Issues API, use only local md
+        log.info("state_projection: PAT-free mode (no queue) — messages/standup only")
+        return state
+
     prev_etag = _read_etag(etag_cache)
     try:
         issues, new_etag = await queue.fetch_all_directives(etag=prev_etag)
     except Exception:
-        log.exception("state_projection: fetch_all_directives failed")
-        return state    # 빈 state 반환 → publisher 가 fingerprint diff 보고 commit 안 함
+        log.exception("state_projection: fetch_all_directives failed (continuing with local md only)")
+        return state    # local md 만으로도 state 반환
 
     if new_etag and new_etag != prev_etag:
         _write_etag(etag_cache, new_etag)
