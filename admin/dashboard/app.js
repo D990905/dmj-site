@@ -73,18 +73,27 @@
   function transformV0(s) {
     const hub = { id: 'hub', label: 'SailTech\n· dmjgroup ·', kind: 'hub' };
 
-    const experts = Object.entries(s.personas || {}).map(([slug, p]) => ({
-      id: slug,
-      label: p.display_name || p.role || slug,
-      short: (p.role || slug).slice(0, 6).toUpperCase(),
-      icon: ROLE_ICON[p.role] || '👤',
-      role: p.role,
-      domain: p.domain,
-      agentStatus: p.status,
-      lastActiveAt: p.last_active_at,
-      idleMinutes: p.idle_minutes,
-      currentTask: p.current_task
-    }));
+    const mobileNow = isMobileViewport();
+    const experts = Object.entries(s.personas || {}).map(([slug, p]) => {
+      const fullName = p.display_name || p.role || slug;
+      const icon = ROLE_ICON[p.role] || '👤';
+      // Mobile: icon only (full name in side panel + dropdown).
+      // Desktop: icon + display_name.
+      const nodeLabel = mobileNow ? icon : `${icon} ${fullName}`;
+      return {
+        id: slug,
+        label: fullName,         // canonical (dropdown, panels)
+        nodeLabel,               // cytoscape 의 mindmap 표시 only
+        short: (p.role || slug).slice(0, 6).toUpperCase(),
+        icon,
+        role: p.role,
+        domain: p.domain,
+        agentStatus: p.status,
+        lastActiveAt: p.last_active_at,
+        idleMinutes: p.idle_minutes,
+        currentTask: p.current_task
+      };
+    });
 
     // experts must include hub-only fallback if 0
     const expertIds = new Set(experts.map(e => e.id));
@@ -192,7 +201,7 @@
     // Experts
     data.experts.forEach(e => {
       els.push({
-        data: { id: e.id, label: `${e.icon} ${e.label}`, kind: 'expert', short: e.short }
+        data: { id: e.id, label: e.nodeLabel || `${e.icon} ${e.label}`, kind: 'expert', short: e.short }
       });
       els.push({
         data: { id: `eg_${e.id}`, source: data.hub.id, target: e.id, kind: 'spine' }
@@ -253,7 +262,7 @@
           'padding': '10px'
         }
       },
-      // experts
+      // experts (desktop default; mobile override applied after init via isMobileViewport)
       {
         selector: 'node[kind = "expert"]',
         style: {
@@ -269,6 +278,23 @@
           'font-weight': 600,
           'width': 116, 'height': 40,
           'padding': '6px'
+        }
+      },
+      // experts on mobile: smaller circle, icon-only label
+      {
+        selector: 'node[kind = "expert"].mobile-compact',
+        style: {
+          'shape': 'ellipse',
+          'background-color': '#121829',
+          'border-color': '#3b82f6',
+          'border-width': 1.5,
+          'label': 'data(label)',
+          'color': '#e8ecf4',
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'font-size': 16,    // emoji-friendly
+          'width': 40, 'height': 40,
+          'padding': '0px'
         }
       },
       // tasks
@@ -350,9 +376,11 @@
     const w = cy.width(), h = cy.height();
     const cx = w / 2, cy0 = h / 2;
     const mobile = w < 640;
-    // Mobile: push tasks outward + tighten expert ring for more arc room.
-    const expertR = Math.min(w, h) * (mobile ? 0.24 : 0.28);
-    const taskR   = Math.min(w, h) * (mobile ? 0.55 : 0.46);
+    // Toggle .mobile-compact on expert nodes (smaller circle + icon-only label).
+    cy.nodes('[kind = "expert"]').toggleClass('mobile-compact', mobile);
+    // Mobile: experts = 40px ellipses; more arc room. Push tasks outward.
+    const expertR = Math.min(w, h) * (mobile ? 0.26 : 0.28);
+    const taskR   = Math.min(w, h) * (mobile ? 0.58 : 0.46);
 
     cy.getElementById(data.hub.id).position({ x: cx, y: cy0 });
 
@@ -391,16 +419,23 @@
   }
   layoutRadial();
 
-  // Resize: re-truncate labels (viewport boundary 변경 시) + 재배치.
-  // Mobile ↔ desktop 회전·창 크기 변경 후에도 labelFull 보존, label 재계산.
+  // Resize: re-truncate task labels + recompute expert nodeLabel (icon-only on mobile) + 재배치.
   let resizeTimer = null;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
+      const mobileNow = isMobileViewport();
+      // task labels
       data.tasks.forEach(t => {
         if (t.labelFull) t.label = truncateForViewport(t.labelFull);
         const n = cy.getElementById(t.id);
         if (n && n.length) n.data('label', t.label);
+      });
+      // expert labels (icon-only on mobile, icon + name on desktop)
+      data.experts.forEach(e => {
+        e.nodeLabel = mobileNow ? e.icon : `${e.icon} ${e.label}`;
+        const n = cy.getElementById(e.id);
+        if (n && n.length) n.data('label', e.nodeLabel);
       });
       layoutRadial();
     }, 120);
