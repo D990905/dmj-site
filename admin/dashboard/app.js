@@ -498,27 +498,87 @@
     return `<span class="pill"><i class="lg-dot" style="background:${s.color}"></i>${s.label}</span>`;
   }
 
+  // PR 4 — Persona triggers + standby (data.sample.js 의 persona enrichment 미존재 시 fallback)
+  // Visual Designer (Rose, 2026-06-02) 의 brand_color_spec §3-1 매핑 기반.
+  const PERSONA_TRIGGERS = {
+    '03-design':           ['@로즈 윤', '@visual', '@design', '@design-token', '@a11y', '@dashboard', '@component'],
+    '06-data-science':     ['@샘 정', '@dataviz', '@chart', '@chart-theme', '@oklch'],
+    '12-riding-analytics': ['@티모 강', '@sports-science', '@trimp', '@ctl-atl-tsb', '@hrv', '@calibration'],
+    '04-frontend':         ['@알렉스 박', '@frontend', '@web', '@css', '@ios', '@a11y', '@astro', '@performance'],
+    '02-research':         ['@메이 한', '@ux', '@heuristic', '@onboarding', '@nielsen'],
+    '15-marketing':        ['@캔 최', '@marketing', '@brand-voice', '@social', '@content'],
+    '08-mobile-eng':       ['@왕 정', '@mobile', '@ble', '@healthkit', '@store', '@ota'],
+    '11-orchestrator':     ['@데이빗', '@orchestrator', '@dispatch', '@daemon']
+  };
+  const AGENT_STATUS_LABEL = { active: '활동 중', idle: '대기', offline: '오프라인' };
+
   function renderExpertPanel(expert) {
     const tasks = data.tasks.filter(t => t.parent === expert.id);
     const counts = tasks.reduce((acc, t) => { acc[t.status] = (acc[t.status]||0)+1; return acc; }, {});
     const order = ['run','approve','block','wait','done'];
+    const triggers = PERSONA_TRIGGERS[expert.id] || [];
+    const standby = expert.standby || []; // schema 미존재 시 빈 배열
+    const commits = expert.commits || []; // schema 미존재 시 빈 배열
+    const agentStatus = expert.agentStatus || 'idle';
+    const statusDot = ({ active: 's-active', idle: 's-idle', offline: 's-offline' })[agentStatus] || 's-idle';
+    const idleMin = typeof expert.idleMinutes === 'number' ? expert.idleMinutes : null;
 
     panelEyebrow.textContent = 'EXPERT';
-    panelTitle.textContent = `${expert.icon} ${expert.label}`;
+    panelTitle.innerHTML = `<span class="persona-mono" data-persona="${escapeHtml(expert.id)}">${escapeHtml((expert.short||'?').charAt(0))}</span>${expert.icon || ''} ${escapeHtml(expert.label)}`;
     panelBody.innerHTML = `
-      <dl class="detail-grid">
-        <dt>fleet</dt><dd>${expert.short}</dd>
-        <dt>tasks</dt><dd>${tasks.length}</dd>
-        <dt>상태</dt><dd>${order.filter(k => counts[k]).map(k => `${STATUS[k].label} ${counts[k]}`).join(' · ') || '—'}</dd>
-      </dl>
-      <div style="font-size:11px;color:var(--text-faint);margin-bottom:6px;letter-spacing:.5px">TASKS</div>
-      <ul class="task-list">
-        ${tasks.map(t => `
-          <li data-task-id="${t.id}">
-            <span class="ti-status" style="background:${STATUS[t.status].color}"></span>
-            <span>${escapeHtml(t.label)}</span>
-          </li>`).join('')}
-      </ul>
+      <div class="panel-meta">
+        <span class="panel-meta__item"><span class="panel-meta__dot ${statusDot}"></span>${AGENT_STATUS_LABEL[agentStatus] || agentStatus}</span>
+        ${idleMin !== null ? `<span class="panel-meta__item">idle ${idleMin}분</span>` : ''}
+        <span class="panel-meta__item">${expert.domain || expert.role || ''}</span>
+      </div>
+
+      <div class="panel-current">
+        <span class="panel-current__label">현재 task</span>
+        ${expert.currentTask
+          ? `${escapeHtml(expert.currentTask.title || expert.currentTask.id || '—')}`
+          : `<span class="panel-current__none">대기 중 — 활성 task 없음</span>`}
+      </div>
+
+      ${triggers.length ? `
+      <div class="panel-section">
+        <h4 class="panel-section__title">Trigger keyword</h4>
+        <ul class="panel-triggers">
+          ${triggers.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+        </ul>
+      </div>` : ''}
+
+      ${standby.length ? `
+      <div class="panel-section">
+        <h4 class="panel-section__title">Standby (즉시 dispatch 가능)</h4>
+        <ol class="panel-standby">
+          ${standby.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+        </ol>
+      </div>` : ''}
+
+      <div class="panel-section">
+        <h4 class="panel-section__title">Tasks (${tasks.length})</h4>
+        <dl class="detail-grid">
+          <dt>fleet</dt><dd>${escapeHtml(expert.short || '')}</dd>
+          <dt>상태</dt><dd>${order.filter(k => counts[k]).map(k => `${STATUS[k].label} ${counts[k]}`).join(' · ') || '—'}</dd>
+        </dl>
+        <ul class="task-list">
+          ${tasks.map(t => `
+            <li data-task-id="${t.id}">
+              <span class="ti-status" style="background:${STATUS[t.status].color}"></span>
+              <span>${escapeHtml(t.labelFull || t.label)}</span>
+            </li>`).join('')}
+        </ul>
+      </div>
+
+      ${commits.length ? `
+      <div class="panel-section">
+        <h4 class="panel-section__title">최근 commit</h4>
+        <ul class="panel-commits">
+          ${commits.slice(0, 5).map(c => `
+            <li><a href="https://github.com/D990905/dmj-site/commit/${escapeHtml(c.sha || '')}" target="_blank" rel="noopener">${escapeHtml((c.sha || '').substring(0,7))}</a></li>
+          `).join('')}
+        </ul>
+      </div>` : ''}
     `;
     panelBody.querySelectorAll('li[data-task-id]').forEach(li => {
       li.addEventListener('click', () => {
@@ -526,10 +586,6 @@
         const n = cy.getElementById(tid);
         if (n) { cy.elements().unselect(); n.select(); focusNode(n); renderTaskPanel(tid); }
       });
-    });
-    // expert side panel — show full task labels (labelFull)
-    panelBody.querySelectorAll('li[data-task-id] > span:last-child').forEach((span, i) => {
-      if (tasks[i] && tasks[i].labelFull) span.textContent = tasks[i].labelFull;
     });
   }
 
@@ -866,12 +922,176 @@
     return `${REPO_ISSUES_NEW}?${qs.toString()}`;
   }
 
+  // ============================================================
+  // PR 1-3 — Visual Designer (Rose) contributions, 2026-06-02
+  // γ 채택 후속 — visual_designer_pr_dashboard_contributions.md spec.
+  // PR 4 (PersonaDetailPanel) 는 renderExpertPanel() 안에 enrich.
+  // ============================================================
+
+  // ---------- PR 1: Decision Feed ----------
+  function formatDecisionTime(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '—';
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${mm}-${dd} ${hh}:${mi}`;
+  }
+  const DECISION_ICON = { approve: '✓', reject: '✗', hold: '◐' };
+  const DECISION_ICON_CLASS = { approve: '', reject: ' decision-feed__icon--reject', hold: ' decision-feed__icon--hold' };
+  function renderDecisions() {
+    const listEl = document.getElementById('decisionList');
+    const countEl = document.getElementById('decisionCount');
+    if (!listEl) return;
+    const decisions = Array.isArray(data.recentDecisions) ? data.recentDecisions : [];
+
+    if (decisions.length === 0) {
+      listEl.innerHTML = '<li class="decision-feed__empty">결정 기록 없음</li>';
+      if (countEl) countEl.textContent = '0';
+      return;
+    }
+
+    // recent 5, 시간 역순
+    const recent = decisions
+      .slice()
+      .sort((a, b) => new Date(b.decided_at || 0) - new Date(a.decided_at || 0))
+      .slice(0, 5);
+
+    listEl.innerHTML = recent.map(d => {
+      const verdict = d.decision || 'approve';
+      const icon = DECISION_ICON[verdict] || '·';
+      const iconCls = DECISION_ICON_CLASS[verdict] || '';
+      const text = d.question || d.text || '결정 기록';
+      const actorLabel = d.decided_by_email
+        ? (d.decided_by_email.split('@')[0] || d.decided_by_email)
+        : (d.actor_label || '대표님');
+      return `
+        <li class="decision-feed__item">
+          <time class="decision-feed__time" datetime="${escapeHtml(d.decided_at || '')}">${escapeHtml(formatDecisionTime(d.decided_at))}</time>
+          <span class="decision-feed__icon${iconCls}" aria-hidden="true">${icon}</span>
+          <span class="decision-feed__text">${escapeHtml(text)}</span>
+          <span class="decision-feed__actor">${escapeHtml(actorLabel)}</span>
+        </li>`;
+    }).join('');
+
+    if (countEl) countEl.textContent = String(decisions.length);
+  }
+
+  // ---------- PR 2: Priority Lane ----------
+  // 정렬 logic — active state (run + block) 우선, 그 다음 priority 큰 순, 그 다음 approve, 그 다음 wait.
+  // task.priority 는 PRIORITY_MAP 후 int (p0=4, p1=3, p2=2, p3=1).
+  // labelFull 우선 (truncate 보다 풀 텍스트), assignee 는 첫 글자.
+  const STATE_DOT_CLASS = { run: 's-run', done: 's-done', block: 's-block', wait: 's-wait', approve: 's-approve' };
+  const STATE_SORT_RANK = { run: 0, block: 1, approve: 2, wait: 3, done: 4 };
+  function renderPriority() {
+    const listEl = document.getElementById('priorityList');
+    if (!listEl) return;
+
+    const tasks = (data.tasks || []).slice().filter(t => t.status !== 'done');
+    if (tasks.length === 0) {
+      listEl.innerHTML = '<li class="priority-lane__empty">우선순위 task 없음</li>';
+      return;
+    }
+
+    tasks.sort((a, b) => {
+      // 1) state rank
+      const ra = STATE_SORT_RANK[a.status] !== undefined ? STATE_SORT_RANK[a.status] : 9;
+      const rb = STATE_SORT_RANK[b.status] !== undefined ? STATE_SORT_RANK[b.status] : 9;
+      if (ra !== rb) return ra - rb;
+      // 2) priority 큰 순 (4 → 1)
+      const pa = a.priority || 0, pb = b.priority || 0;
+      if (pa !== pb) return pb - pa;
+      // 3) updatedAt 최신 우선
+      return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+    });
+
+    const top3 = tasks.slice(0, 3);
+    const ranks = ['①', '②', '③'];
+
+    listEl.innerHTML = top3.map((t, i) => {
+      const expert = data.experts.find(e => e.id === t.parent);
+      const expertMono = expert ? (expert.short || '?').charAt(0) : '?';
+      const stateLabel = (STATUS[t.status] || STATUS.wait).label;
+      return `
+        <li class="priority-lane__item" data-task-id="${escapeHtml(t.id)}" data-state="${escapeHtml(t.status)}" tabindex="0" role="button">
+          <span class="priority-lane__rank">${ranks[i]}</span>
+          <span class="priority-lane__title-text" title="${escapeHtml(t.labelFull || t.label)}">${escapeHtml(t.labelFull || t.label)}</span>
+          <span class="priority-lane__assignee" data-persona="${escapeHtml(t.parent || '')}">${escapeHtml(expertMono)}</span>
+          <span class="priority-lane__state ${STATE_DOT_CLASS[t.status] || 's-wait'}" aria-label="${stateLabel}"></span>
+        </li>`;
+    }).join('');
+
+    // click → focus on graph + open side panel
+    listEl.querySelectorAll('li[data-task-id]').forEach(li => {
+      const tid = li.getAttribute('data-task-id');
+      const goto = () => {
+        const n = cy.getElementById(tid);
+        if (n && n.length) {
+          cy.elements().unselect(); n.select(); focusNode(n);
+          renderTaskPanel(tid); openSidePanel();
+        }
+      };
+      li.addEventListener('click', goto);
+      li.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goto(); }
+      });
+    });
+  }
+
+  // ---------- PR 3: David Offline Banner ----------
+  // daemon offline 또는 mode != 'full' 시 노출. sessionStorage 로 dismiss 가능.
+  function updateDavidBanner() {
+    const banner = document.getElementById('davidBanner');
+    if (!banner) return;
+
+    // 사용자가 이 세션에서 close 했으면 숨김 유지
+    let dismissed = false;
+    try { dismissed = sessionStorage.getItem('davidBannerDismissed') === '1'; } catch (e) {}
+    if (dismissed) { banner.hidden = true; return; }
+
+    const hb = data.heartbeat || {};
+    // offline 판단: daemon 죽었거나, full mode 가 아닌 deploy-only mode (= directive_loop 미가동)
+    const directiveLoopInactive = hb.mode && hb.mode !== 'full';
+    const daemonDown = !hb.daemon_alive;
+    const isOffline = daemonDown || directiveLoopInactive;
+
+    banner.hidden = !isOffline;
+    if (isOffline) {
+      const etaEl = banner.querySelector('[data-eta]');
+      if (etaEl) etaEl.textContent = hb.eta_iso ? formatDecisionTime(hb.eta_iso) : '?';
+      // 사유 텍스트 정교화
+      const textEl = banner.querySelector('.david-banner__text');
+      if (textEl) {
+        textEl.textContent = daemonDown
+          ? 'David offline · daemon down · manual dispatch active'
+          : `David offline · ${hb.mode || 'deploy-only'} mode · manual dispatch active`;
+      }
+    }
+  }
+
+  // banner close button
+  document.getElementById('davidBannerClose')?.addEventListener('click', () => {
+    const banner = document.getElementById('davidBanner');
+    if (banner) banner.hidden = true;
+    try { sessionStorage.setItem('davidBannerDismissed', '1'); } catch (e) {}
+  });
+
+  // ---------- Initial render (PR 1-3) ----------
+  renderDecisions();
+  renderPriority();
+  updateDavidBanner();
+
   // ---------- Initial state fetch + polling ----------
   function rerender() {
     cy.elements().remove();
     cy.add(buildElements());
     layoutRadial();
     renderApprovals();
+    renderDecisions();
+    renderPriority();
+    updateDavidBanner();
   }
   (async function init() {
     const fetched = await fetchState();

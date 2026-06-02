@@ -429,6 +429,291 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .fallback ol { margin: 6px 0 8px 18px; padding: 0; color: var(--text-dim); }
 .fallback p { margin: 0 0 4px; }
 
+/* ============================================================
+ * PR 1-4 — Visual Designer (Rose) contributions, 2026-06-02
+ * γ 채택 후속 — visual_designer_pr_dashboard_contributions.md spec.
+ * 신규 토큰 0 건, 시스템 A 토큰 (--bg-elev/--c-yellow/--accent 등) 100% 재사용.
+ * Persona avatar gradient 만 예외 (brand_color_spec §3-1 인라인 hex).
+ * ============================================================ */
+
+/* ---------------- PR 3: David Offline Banner ---------------- */
+.david-banner {
+  position: fixed;
+  top: calc(var(--topbar-h) + var(--safe-top));
+  left: 0; right: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px;
+  background: var(--bg-elev2);
+  border-bottom: 2px solid var(--c-yellow);
+  color: var(--text-dim);
+  font-size: 12px;
+  z-index: 40;
+}
+.david-banner__icon { font-size: 14px; }
+.david-banner__text { color: var(--text); font-weight: 500; }
+.david-banner__eta {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+}
+.david-banner__close {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-dim);
+  border-radius: 6px;
+  font-size: 18px; line-height: 1;
+}
+.david-banner__close:hover { background: var(--bg-elev); color: var(--text); }
+/* banner 노출 시 layout offset */
+.david-banner:not([hidden]) ~ .layout {
+  top: calc(var(--topbar-h) + var(--safe-top) + 36px);
+}
+
+/* ---------------- PR 2: Priority Lane ---------------- */
+.priority-lane {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 260px;
+  max-width: calc(100vw - 20px);
+  padding: 10px 12px;
+  background: rgba(18, 24, 41, 0.78);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 8;
+  font-size: 13px;
+}
+.priority-lane__title {
+  margin: 0 0 6px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+.priority-lane__list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.priority-lane__item {
+  display: grid;
+  grid-template-columns: 22px 1fr 22px 8px;
+  gap: 8px; align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.priority-lane__item:last-child { border-bottom: 0; }
+.priority-lane__item:hover { background: var(--bg-elev2); }
+.priority-lane__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.priority-lane__rank {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 14px; color: var(--accent-2);
+  font-weight: 700;
+}
+.priority-lane__title-text {
+  color: var(--text);
+  font-size: 12.5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.priority-lane__assignee {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--bg-elev2);
+  color: var(--text);
+  font-size: 11px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.priority-lane__state {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block;
+}
+.priority-lane__state.s-run    { background: var(--c-yellow); }
+.priority-lane__state.s-done   { background: var(--c-green); }
+.priority-lane__state.s-block  { background: var(--c-red); }
+.priority-lane__state.s-wait   { background: var(--c-gray); }
+.priority-lane__state.s-approve{ background: var(--c-blue); }
+.priority-lane__empty {
+  font-size: 12px; color: var(--text-faint);
+  padding: 4px 0;
+}
+@media (max-width: 640px) {
+  .priority-lane {
+    width: 200px;
+    top: 8px; right: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .priority-lane__title-text { font-size: 11.5px; }
+}
+
+/* ---------------- PR 1: Decision Feed ---------------- */
+.decision-feed {
+  background: var(--bg-elev);
+  border-top: 1px solid var(--line);
+  padding: 12px 14px;
+}
+.decision-feed__head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.decision-feed__title {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-dim);
+  margin: 0;
+}
+.decision-feed__count {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--bg-elev2);
+  color: var(--text-dim);
+}
+.decision-feed__list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 0;
+}
+.decision-feed__item {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 8px; align-items: baseline;
+  font-size: 12px; line-height: 1.45;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.decision-feed__item:last-child { border-bottom: 0; }
+.decision-feed__time {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px; color: var(--text-faint);
+  white-space: nowrap;
+}
+.decision-feed__icon { color: var(--c-green); font-size: 11px; }
+.decision-feed__icon--reject { color: var(--c-red); }
+.decision-feed__icon--hold   { color: var(--c-gray); }
+.decision-feed__text { color: var(--text); }
+.decision-feed__actor {
+  font-size: 10px; color: var(--text-dim);
+  background: var(--bg-elev2);
+  padding: 1px 5px; border-radius: 4px;
+  white-space: nowrap;
+}
+.decision-feed__empty {
+  font-size: 12px; color: var(--text-faint);
+  padding: 6px 0; text-align: center;
+}
+
+/* ---------------- PR 4: Persona Detail Panel (panel-body enrichment) ---------------- */
+.panel-current {
+  margin: 4px 0 14px;
+  padding: 10px 12px;
+  background: var(--bg-elev2);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+.panel-current__label {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 4px;
+}
+.panel-current__none {
+  color: var(--text-faint);
+  font-style: italic;
+}
+.panel-section {
+  margin-top: 14px;
+}
+.panel-section__title {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-dim);
+  margin: 0 0 6px;
+}
+.panel-triggers {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  list-style: none; padding: 0; margin: 0;
+}
+.panel-triggers li {
+  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  padding: 3px 7px;
+  background: var(--bg-elev2);
+  color: var(--text-dim);
+  border-radius: 6px;
+}
+.panel-standby {
+  list-style: decimal inside;
+  padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.panel-standby li {
+  font-size: 12.5px; color: var(--text);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+.panel-standby li:last-child { border-bottom: 0; }
+.panel-commits {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  list-style: none; padding: 0; margin: 0;
+}
+.panel-commits li a {
+  display: inline-block;
+  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  padding: 2px 6px;
+  background: var(--bg-elev2);
+  color: var(--accent-2);
+  border-radius: 4px;
+  text-decoration: none;
+}
+.panel-commits li a:hover { background: var(--bg-elev); color: var(--accent); }
+.panel-meta {
+  display: flex; gap: 12px;
+  font-size: 11px; color: var(--text-dim);
+  margin-top: 8px;
+}
+.panel-meta__item {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.panel-meta__dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  display: inline-block;
+}
+.panel-meta__dot.s-active  { background: var(--c-green); }
+.panel-meta__dot.s-idle    { background: var(--c-gray); }
+.panel-meta__dot.s-offline { background: var(--c-red); opacity: 0.6; }
+
+/* Persona avatar gradient (brand_color_spec §3-1 매핑) */
+.persona-mono {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-weight: 800; font-size: 14px;
+  color: white;
+  vertical-align: middle;
+  margin-right: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+.persona-mono[data-persona="03-design"]          { background: linear-gradient(135deg, #0A2540, #1F8FFF); }
+.persona-mono[data-persona="06-data-science"]    { background: linear-gradient(135deg, #1F8FFF, #1FB6B6); }
+.persona-mono[data-persona="12-riding-analytics"]{ background: linear-gradient(135deg, #1FB6B6, #1FA055); }
+.persona-mono[data-persona="04-frontend"]        { background: linear-gradient(135deg, #5C6F7E, #2A3B4C); }
+.persona-mono[data-persona="02-research"]        { background: linear-gradient(135deg, #7A5FA8, #5C6F7E); }
+.persona-mono[data-persona="15-marketing"]       { background: linear-gradient(135deg, #FFB800, #EF7D00); color: #0A2540; }
+.persona-mono[data-persona="08-mobile-eng"]      { background: linear-gradient(135deg, #1670CC, #0A2540); }
+.persona-mono[data-persona="11-orchestrator"]    { background: linear-gradient(135deg, #C7CFD8, #5C6F7E); opacity: 0.55; }
+
 /* ---------------- Reduced motion ---------------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }

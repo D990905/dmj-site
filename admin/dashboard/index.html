@@ -31,6 +31,14 @@
   </div>
 </header>
 
+<!-- PR 3 — DavidOfflineBanner (조건부, daemon offline 시 노출) -->
+<div class="david-banner" id="davidBanner" role="status" aria-live="polite" hidden>
+  <span class="david-banner__icon" aria-hidden="true">⏳</span>
+  <span class="david-banner__text">David offline · manual dispatch active</span>
+  <span class="david-banner__eta">복구 ETA: <span data-eta>—</span></span>
+  <button class="david-banner__close" type="button" id="davidBannerClose" aria-label="배너 일시 숨김">×</button>
+</div>
+
 <main class="layout">
   <section class="canvas-wrap" id="canvasWrap">
     <div id="cy" role="img" aria-label="orchestrator mindmap"></div>
@@ -48,6 +56,14 @@
       <button class="ctrl-btn" id="zoomInBtn" aria-label="zoom in">＋</button>
       <button class="ctrl-btn" id="zoomOutBtn" aria-label="zoom out">−</button>
     </div>
+
+    <!-- PR 2 — PriorityLane (대표님 ①②③ 우선순위) -->
+    <aside class="priority-lane" id="priorityLane" aria-label="대표님 우선순위">
+      <h3 class="priority-lane__title">우선순위</h3>
+      <ol class="priority-lane__list" id="priorityList" role="list">
+        <!-- runtime injected by renderPriority() -->
+      </ol>
+    </aside>
 
     <div class="status-bar">
       <span><b id="statTotal">0</b> directives</span>
@@ -84,6 +100,17 @@
       <span class="badge" id="approvalCount">0</span>
     </div>
     <div class="sheet-body" id="sheetBody"></div>
+
+    <!-- PR 1 — DecisionFeed (최근 결정 5건, bottom-sheet 의 두 번째 section) -->
+    <section class="decision-feed" id="decisionFeed" aria-label="최근 결정">
+      <header class="decision-feed__head">
+        <h3 class="decision-feed__title">최근 결정</h3>
+        <span class="decision-feed__count" id="decisionCount">0</span>
+      </header>
+      <ol class="decision-feed__list" id="decisionList" role="list">
+        <!-- runtime injected by renderDecisions() -->
+      </ol>
+    </section>
   </div>
 </main>
 
