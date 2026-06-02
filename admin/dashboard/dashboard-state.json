@@ -1,6 +1,6 @@
 {
   "schema_version": "v0.2",
-  "last_updated_at": "2026-06-02T12:46:39+00:00",
+  "last_updated_at": "2026-06-02T13:20:51+00:00",
   "directives": [
     {
       "directive_id": "su-03-design",
@@ -16,14 +16,27 @@
       "turns": null
     },
     {
-      "directive_id": "su-02-research",
-      "title": "🎯 **focus**: PR 4 PersonaPanel a11y 검증 standby (Rose 12:45 라…",
-      "prompt_excerpt": "🎯 **focus**: PR 4 PersonaPanel a11y 검증 standby (Rose 12:45 라이브 push 완료, 검증 window 열림). **progress** ✓ Phase 1 reference doc 작성 완료 (`expert_ux_researcher_reference.md` 703줄 · 64KB · push 대기) · 채널 catch",
+      "directive_id": "su-06-data-science",
+      "title": "🎯 **focus**: CoS Sequential 직렬화 + WIP limit 3 채택. Sports sci…",
+      "prompt_excerpt": "🎯 **focus**: CoS Sequential 직렬화 + WIP limit 3 채택. Sports science chart system chain (티모→본인→로즈→알렉스) 본인 차례 = 티모 ACWR band 임계 confirm 대기 (티모 today ①②). 그 동안 standby work — 기존 차트 lie factor / data-ink rat",
+      "status": "in_progress",
+      "priority": "p2",
+      "target_agent_slug": "06-data-science",
+      "created_at": "2026-06-02 13:21:21",
+      "updated_at": "2026-06-02 13:21:21",
+      "issue_url": "",
+      "cost_usd": null,
+      "turns": null
+    },
+    {
+      "directive_id": "su-12-riding-analytics",
+      "title": "🎯 **focus**: 어제 12:34~12:51 chain (샘 정 · 히로 구 · 메이 한) 3 pend…",
+      "prompt_excerpt": "🎯 **focus**: 어제 12:34~12:51 chain (샘 정 · 히로 구 · 메이 한) 3 pending 본인 영역 단독 확정 → 샘 정 chart system 마지막 block 해제 + 히로 구 EVT chain confirm + 메이 한 cross-review 대기. **progress** ✓ 누적 4 spec doc (233 KB) · 6 모",
       "status": "blocked",
       "priority": "p2",
-      "target_agent_slug": "02-research",
-      "created_at": "2026-06-02 12:58:00",
-      "updated_at": "2026-06-02 12:58:00",
+      "target_agent_slug": "12-riding-analytics",
+      "created_at": "2026-06-02 13:01:27",
+      "updated_at": "2026-06-02 13:01:27",
       "issue_url": "",
       "cost_usd": null,
       "turns": null
@@ -42,6 +55,19 @@
       "turns": null
     },
     {
+      "directive_id": "su-02-research",
+      "title": "🎯 **focus**: PR 4 PersonaPanel a11y 검증 standby (Rose 12:45 라…",
+      "prompt_excerpt": "🎯 **focus**: PR 4 PersonaPanel a11y 검증 standby (Rose 12:45 라이브 push 완료, 검증 window 열림). **progress** ✓ Phase 1 reference doc 작성 완료 (`expert_ux_researcher_reference.md` 703줄 · 64KB · push 대기) · 채널 catch",
+      "status": "blocked",
+      "priority": "p2",
+      "target_agent_slug": "02-research",
+      "created_at": "2026-06-02 12:58:00",
+      "updated_at": "2026-06-02 12:58:00",
+      "issue_url": "",
+      "cost_usd": null,
+      "turns": null
+    },
+    {
       "directive_id": "su-15-marketing",
       "title": "🎯 **focus**: ① 6/3 (수) dmjgroup.kr 정식 launch 카피·brand voice …",
       "prompt_excerpt": "🎯 **focus**: ① 6/3 (수) dmjgroup.kr 정식 launch 카피·brand voice catchup, ② 6/6-7 (토·일) 울산 진하 대회 (150 라이더 집결) D-day 캠페인 plan, ③ D-2026-06-01-004 `#9 Dashboard Marketing tile spec` (T1 D-day · T2 KPI 5장 · T",
@@ -50,19 +76,6 @@
       "target_agent_slug": "15-marketing",
       "created_at": "2026-06-02 13:01:00",
       "updated_at": "2026-06-02 13:01:00",
-      "issue_url": "",
-      "cost_usd": null,
-      "turns": null
-    },
-    {
-      "directive_id": "su-09-devops",
-      "title": "🎯 **focus**: Phase 1 모바일 layout 종결 + state-only daemon 활성 pa…",
-      "prompt_excerpt": "🎯 **focus**: Phase 1 모바일 layout 종결 + state-only daemon 활성 path 의장 결정 채택 직후 #11 작성 대기. **progress** ✓ ① Phase 1 모바일 layout 3 차 폴리시 라이브 (`admin/dashboard/*` push 12:13 → 12:21 KST 의장 iPhone 실사 검증 통과): l",
-      "status": "in_progress",
-      "priority": "p2",
-      "target_agent_slug": "09-devops",
-      "created_at": "2026-06-02 13:03:00",
-      "updated_at": "2026-06-02 13:03:00",
       "issue_url": "",
       "cost_usd": null,
       "turns": null
@@ -94,6 +107,19 @@
       "turns": null
     },
     {
+      "directive_id": "su-09-devops",
+      "title": "🎯 **focus**: Phase 1 모바일 layout 종결 + state-only daemon 활성 pa…",
+      "prompt_excerpt": "🎯 **focus**: Phase 1 모바일 layout 종결 + state-only daemon 활성 path 의장 결정 채택 직후 #11 작성 대기. **progress** ✓ ① Phase 1 모바일 layout 3 차 폴리시 라이브 (`admin/dashboard/*` push 12:13 → 12:21 KST 의장 iPhone 실사 검증 통과): l",
+      "status": "in_progress",
+      "priority": "p2",
+      "target_agent_slug": "09-devops",
+      "created_at": "2026-06-02 13:03:00",
+      "updated_at": "2026-06-02 13:03:00",
+      "issue_url": "",
+      "cost_usd": null,
+      "turns": null
+    },
+    {
       "directive_id": "su-11-orchestrator",
       "title": "🎯 **focus**: silent default 모드 — 옥대표님 명시 명령 시만 action. 호칭 옥대…",
       "prompt_excerpt": "🎯 **focus**: silent default 모드 — 옥대표님 명시 명령 시만 action. 호칭 옥대표님 directive 본 entry 부터 즉시 적용. **progress** ✓ 어제 인프라 셋업 (daemon launchd deploy-only · `auto_push.command` v0.4 페르소나 영역 보호 whitelist `orchest",
@@ -102,32 +128,6 @@
       "target_agent_slug": "11-orchestrator",
       "created_at": "2026-06-02 13:01:30",
       "updated_at": "2026-06-02 13:01:30",
-      "issue_url": "",
-      "cost_usd": null,
-      "turns": null
-    },
-    {
-      "directive_id": "su-06-data-science",
-      "title": "🎯 **focus**: CoS Sequential 직렬화 + WIP limit 3 채택. Sports sci…",
-      "prompt_excerpt": "🎯 **focus**: CoS Sequential 직렬화 + WIP limit 3 채택. Sports science chart system chain (티모→본인→로즈→알렉스) 본인 차례 = 티모 ACWR band 임계 confirm 대기 (티모 today ①②). 그 동안 standby work — 기존 차트 lie factor / data-ink rat",
-      "status": "in_progress",
-      "priority": "p2",
-      "target_agent_slug": "06-data-science",
-      "created_at": "2026-06-02 13:21:21",
-      "updated_at": "2026-06-02 13:21:21",
-      "issue_url": "",
-      "cost_usd": null,
-      "turns": null
-    },
-    {
-      "directive_id": "su-12-riding-analytics",
-      "title": "🎯 **focus**: 어제 12:34~12:51 chain (샘 정 · 히로 구 · 메이 한) 3 pend…",
-      "prompt_excerpt": "🎯 **focus**: 어제 12:34~12:51 chain (샘 정 · 히로 구 · 메이 한) 3 pending 본인 영역 단독 확정 → 샘 정 chart system 마지막 block 해제 + 히로 구 EVT chain confirm + 메이 한 cross-review 대기. **progress** ✓ 누적 4 spec doc (233 KB) · 6 모",
-      "status": "blocked",
-      "priority": "p2",
-      "target_agent_slug": "12-riding-analytics",
-      "created_at": "2026-06-02 13:01:27",
-      "updated_at": "2026-06-02 13:01:27",
       "issue_url": "",
       "cost_usd": null,
       "turns": null
@@ -149,19 +149,34 @@
       "last_active_at": "2026-06-02 12:57:20",
       "idle_minutes": 0
     },
-    "02-research": {
-      "display_name": "메이 한",
-      "role": "research",
-      "domain": "UX Research",
+    "06-data-science": {
+      "display_name": "샘 정",
+      "role": "data_science",
+      "domain": "DataViz / Data Science",
+      "status": "active",
+      "current_task": {
+        "id": "su-06-data-science",
+        "title": "🎯 **focus**: CoS Sequential 직렬화 + WIP limit 3 채택. Sports sci…",
+        "status": "in_progress",
+        "directive_id": "su-06-data-science",
+        "updated_at": "2026-06-02 13:21:21"
+      },
+      "last_active_at": "2026-06-02 13:21:21",
+      "idle_minutes": 0
+    },
+    "12-riding-analytics": {
+      "display_name": "티모 강",
+      "role": "riding_analytics",
+      "domain": "Sports Science / Riding",
       "status": "blocked",
       "current_task": {
-        "id": "su-02-research",
-        "title": "🎯 **focus**: PR 4 PersonaPanel a11y 검증 standby (Rose 12:45 라…",
+        "id": "su-12-riding-analytics",
+        "title": "🎯 **focus**: 어제 12:34~12:51 chain (샘 정 · 히로 구 · 메이 한) 3 pend…",
         "status": "blocked",
-        "directive_id": "su-02-research",
-        "updated_at": "2026-06-02 12:58:00"
+        "directive_id": "su-12-riding-analytics",
+        "updated_at": "2026-06-02 13:01:27"
       },
-      "last_active_at": "2026-06-02 12:58:00",
+      "last_active_at": "2026-06-02 13:01:27",
       "idle_minutes": 0
     },
     "04-frontend": {
@@ -179,6 +194,21 @@
       "last_active_at": "2026-06-02 13:00:00",
       "idle_minutes": 0
     },
+    "02-research": {
+      "display_name": "메이 한",
+      "role": "research",
+      "domain": "UX Research",
+      "status": "blocked",
+      "current_task": {
+        "id": "su-02-research",
+        "title": "🎯 **focus**: PR 4 PersonaPanel a11y 검증 standby (Rose 12:45 라…",
+        "status": "blocked",
+        "directive_id": "su-02-research",
+        "updated_at": "2026-06-02 12:58:00"
+      },
+      "last_active_at": "2026-06-02 12:58:00",
+      "idle_minutes": 0
+    },
     "15-marketing": {
       "display_name": "캔 최",
       "role": "marketing",
@@ -192,21 +222,6 @@
         "updated_at": "2026-06-02 13:01:00"
       },
       "last_active_at": "2026-06-02 13:01:00",
-      "idle_minutes": 0
-    },
-    "09-devops": {
-      "display_name": "인프라 #9",
-      "role": "devops",
-      "domain": "DevOps / Infrastructure",
-      "status": "active",
-      "current_task": {
-        "id": "su-09-devops",
-        "title": "🎯 **focus**: Phase 1 모바일 layout 종결 + state-only daemon 활성 pa…",
-        "status": "in_progress",
-        "directive_id": "su-09-devops",
-        "updated_at": "2026-06-02 13:03:00"
-      },
-      "last_active_at": "2026-06-02 13:03:00",
       "idle_minutes": 0
     },
     "13-hardware": {
@@ -239,6 +254,30 @@
       "last_active_at": "2026-06-02 13:02:00",
       "idle_minutes": 0
     },
+    "09-devops": {
+      "display_name": "인프라 #9",
+      "role": "devops",
+      "domain": "DevOps / Infrastructure",
+      "status": "active",
+      "current_task": {
+        "id": "su-09-devops",
+        "title": "🎯 **focus**: Phase 1 모바일 layout 종결 + state-only daemon 활성 pa…",
+        "status": "in_progress",
+        "directive_id": "su-09-devops",
+        "updated_at": "2026-06-02 13:03:00"
+      },
+      "last_active_at": "2026-06-02 13:03:00",
+      "idle_minutes": 0
+    },
+    "10-backend": {
+      "display_name": "인프라 #10",
+      "role": "backend",
+      "domain": "Backend Eng",
+      "status": "idle",
+      "current_task": null,
+      "last_active_at": "2026-06-02T13:20:51+00:00",
+      "idle_minutes": 0
+    },
     "11-orchestrator": {
       "display_name": "인프라 #11",
       "role": "orchestrator",
@@ -253,36 +292,6 @@
       },
       "last_active_at": "2026-06-02 13:01:30",
       "idle_minutes": 0
-    },
-    "06-data-science": {
-      "display_name": "샘 정",
-      "role": "data_science",
-      "domain": "DataViz / Data Science",
-      "status": "active",
-      "current_task": {
-        "id": "su-06-data-science",
-        "title": "🎯 **focus**: CoS Sequential 직렬화 + WIP limit 3 채택. Sports sci…",
-        "status": "in_progress",
-        "directive_id": "su-06-data-science",
-        "updated_at": "2026-06-02 13:21:21"
-      },
-      "last_active_at": "2026-06-02 13:21:21",
-      "idle_minutes": 0
-    },
-    "12-riding-analytics": {
-      "display_name": "티모 강",
-      "role": "riding_analytics",
-      "domain": "Sports Science / Riding",
-      "status": "blocked",
-      "current_task": {
-        "id": "su-12-riding-analytics",
-        "title": "🎯 **focus**: 어제 12:34~12:51 chain (샘 정 · 히로 구 · 메이 한) 3 pend…",
-        "status": "blocked",
-        "directive_id": "su-12-riding-analytics",
-        "updated_at": "2026-06-02 13:01:27"
-      },
-      "last_active_at": "2026-06-02 13:01:27",
-      "idle_minutes": 0
     }
   },
   "pending_approvals": [],
@@ -296,7 +305,7 @@
   },
   "heartbeat": {
     "daemon_alive": true,
-    "last_heartbeat_at": "2026-06-02T12:46:39+00:00",
+    "last_heartbeat_at": "2026-06-02T13:20:51+00:00",
     "stale_seconds": 0,
     "mode": "state-only"
   },

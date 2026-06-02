@@ -351,19 +351,21 @@ def _read_standup_md(repo_root: Path, date_iso: str | None = None) -> list[dict]
 # standup_recent → personas{}/directives[] 그래프 노드. source="standup" (SQL 아님).
 # #11 사후 ack 후 본인 영역으로 흡수 또는 정정 예정 (messages.md TAKEOVER entry 참조).
 # ════════════════════════════════════════════════════════════════════
-_STANDUP_PERSONA_SLUG: dict[str, tuple[str, str]] = {
-    "로즈 윤":    ("03-design",          "design"),
-    "메이 한":    ("02-research",        "research"),
-    "알렉스 박":  ("04-frontend",        "frontend"),
-    "캔 최":      ("15-marketing",       "marketing"),
-    "샘 정":      ("06-data-science",    "data_science"),
-    "티모 강":    ("12-riding-analytics","riding_analytics"),
-    "왕 정":      ("08-mobile-eng",      "mobile_eng"),
-    "히로 구":    ("13-hardware",        "hardware"),
-    "인프라 #9":  ("09-devops",          "devops"),
-    "인프라 #11": ("11-orchestrator",    "orchestrator"),
-    "데이빗 옥":  ("01-pm",              "pm"),
-}
+# 정식 11명 로스터 (8 페르소나 + 인프라 #9·#10·#11). 미보고도 노드로 표시.
+_TEAM_ROSTER: list[tuple[str, str, str]] = [
+    # (slug, role, display_name == standup 보고 이름)
+    ("03-design",           "design",           "로즈 윤"),
+    ("06-data-science",     "data_science",     "샘 정"),
+    ("12-riding-analytics", "riding_analytics", "티모 강"),
+    ("04-frontend",         "frontend",         "알렉스 박"),
+    ("02-research",         "research",         "메이 한"),
+    ("15-marketing",        "marketing",        "캔 최"),
+    ("13-hardware",         "hardware",         "히로 구"),
+    ("08-mobile-eng",       "mobile_eng",       "왕 정"),
+    ("09-devops",           "devops",           "인프라 #9"),
+    ("10-backend",          "backend",          "인프라 #10"),
+    ("11-orchestrator",     "orchestrator",     "인프라 #11"),
+]
 
 
 def _build_state_from_standup(state: "DashboardState", log: logging.Logger) -> None:
@@ -372,15 +374,23 @@ def _build_state_from_standup(state: "DashboardState", log: logging.Logger) -> N
     PAT/GitHub Issues 없이 비용 0 으로 "누가 어느 영역을 잡고 있나" 가시화.
     estimate/measured 분리 원칙: 이 노드는 standup 재구성(source=standup)이지 SQL state 아님.
     """
+    # standup 보고 이름 → entry 인덱싱
+    reported_by: dict[str, dict] = {}
     for e in state.standup_recent:
-        name = (e.get("persona") or "").strip()
-        slug_role = _STANDUP_PERSONA_SLUG.get(name)
-        if not slug_role:
+        nm = (e.get("persona") or "").strip()
+        if nm:
+            reported_by[nm] = e
+    for slug, role, name in _TEAM_ROSTER:
+        e = reported_by.get(name)
+        if e is None:
+            # 오늘 점호 미보고 — idle 노드로 결손 가시화 (예: #10 Backend)
+            state.personas[slug] = PersonaState(
+                display_name=name, role=role, domain=role_to_domain(role),
+                status="idle", last_active_at=state.last_updated_at,
+                idle_minutes=0, current_task=None)
             continue
-        slug, role = slug_role
         summary = (e.get("summary_excerpt") or "").strip()
-        reported = e.get("reported_at") or state.last_updated_at
-        # blocker 신호 — '옥대표님/대표님 대기' 또는 'approve' 언급 시 blocked
+        rep_at = e.get("reported_at") or state.last_updated_at
         is_blocked = ("blocker" in summary and
                       ("옥대표님" in summary or "대표님" in summary
                        or "approve" in summary or "대기" in summary))
@@ -389,23 +399,22 @@ def _build_state_from_standup(state: "DashboardState", log: logging.Logger) -> N
         state.personas[slug] = PersonaState(
             display_name=name, role=role, domain=role_to_domain(role),
             status=("blocked" if is_blocked else "active"),
-            last_active_at=reported, idle_minutes=0,
+            last_active_at=rep_at, idle_minutes=0,
             current_task=CurrentTask(
                 id=did, title=title,
                 status=("blocked" if is_blocked else "in_progress"),
-                directive_id=did, updated_at=reported),
+                directive_id=did, updated_at=rep_at),
         )
         state.directives.append(DirectiveCard(
             directive_id=did, title=title, prompt_excerpt=summary[:200],
             status=("blocked" if is_blocked else "in_progress"), priority="p2",
-            target_agent_slug=slug, created_at=reported, updated_at=reported,
-            issue_url="",   # standup-derived — no GitHub issue
-        ))
+            target_agent_slug=slug, created_at=rep_at, updated_at=rep_at,
+            issue_url=""))
     state.heartbeat = HeartbeatStatus(
         daemon_alive=True, last_heartbeat_at=state.last_updated_at,
         stale_seconds=0, mode="state-only")
-    log.info("state_projection: standup-derived — %d persona(s), %d directive(s)",
-             len(state.personas), len(state.directives))
+    log.info("state_projection: roster — %d persona(s) / %d reported / %d directive(s)",
+             len(state.personas), len(reported_by), len(state.directives))
 
 
 async def build_state(queue, github_repo: str, etag_cache: Path,
