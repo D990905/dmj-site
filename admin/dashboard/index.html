@@ -50,11 +50,15 @@
     </div>
 
     <div class="status-bar">
-      <span><b id="statTotal">0</b> tasks</span>
+      <span><b id="statTotal">0</b> directives</span>
       <span><b id="statRun">0</b> 진행</span>
       <span><b id="statBlock">0</b> 차단</span>
       <span><b id="statApprove">0</b> 승인대기</span>
-      <span class="status-meta" id="lastSync">—</span>
+      <span class="status-cost" title="오늘 사용 / 월 cap"><b id="statCostDay">$0</b> · <span id="statCostMonth">$0/$0</span></span>
+      <span class="status-meta">
+        <i id="daemonDot" class="dmn-dot dmn-down" title="daemon 상태"></i>
+        <span id="lastSync">—</span>
+      </span>
     </div>
   </section>
 
