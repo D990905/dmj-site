@@ -374,48 +374,74 @@
   // ---------- Radial layout (deterministic, mobile-friendly) ----------
   function layoutRadial() {
     const w = cy.width(), h = cy.height();
-    const cx = w / 2, cy0 = h / 2;
     const mobile = w < 640;
-    // Toggle .mobile-compact on expert nodes (smaller circle + icon-only label).
     cy.nodes('[kind = "expert"]').toggleClass('mobile-compact', mobile);
-    // Mobile: experts = 40px ellipses; more arc room. Push tasks outward.
-    const expertR = Math.min(w, h) * (mobile ? 0.26 : 0.28);
-    const taskR   = Math.min(w, h) * (mobile ? 0.58 : 0.46);
 
-    cy.getElementById(data.hub.id).position({ x: cx, y: cy0 });
+    // Layout — circle on desktop, vertical OVAL on mobile.
+    // Mobile reason: screen is ~1:2 (390×800). Using min(w,h) wastes ~50% vertical space.
+    // Reserve UI gutters (topbar + legend top, FAB + sheet + status bar bottom).
+    let expertRX, expertRY, taskRX, taskRY, layoutCX, layoutCY;
+    if (mobile) {
+      const padTop = 70;   // topbar + legend
+      const padBot = 130;  // status-bar + sheet handle + FAB margin
+      const padX   = 24;   // side gutter
+      const usableW = Math.max(200, w - 2 * padX);
+      const usableH = Math.max(300, h - padTop - padBot);
+      // Tall oval: RY > RX
+      expertRX = usableW * 0.34;
+      expertRY = usableH * 0.30;
+      taskRX   = usableW * 0.50;
+      taskRY   = usableH * 0.44;
+      layoutCX = w / 2;
+      layoutCY = padTop + usableH / 2;
+    } else {
+      const R = Math.min(w, h);
+      expertRX = expertRY = R * 0.28;
+      taskRX   = taskRY   = R * 0.46;
+      layoutCX = w / 2;
+      layoutCY = h / 2;
+    }
+
+    cy.getElementById(data.hub.id).position({ x: layoutCX, y: layoutCY });
 
     const N = data.experts.length;
     data.experts.forEach((e, i) => {
-      const angle = (-Math.PI / 2) + (i * (2 * Math.PI / N)); // start at top
-      const ex = cx + expertR * Math.cos(angle);
-      const ey = cy0 + expertR * Math.sin(angle);
+      const angle = (-Math.PI / 2) + (i * (2 * Math.PI / N)); // top, clockwise
+      const ex = layoutCX + expertRX * Math.cos(angle);
+      const ey = layoutCY + expertRY * Math.sin(angle);
       cy.getElementById(e.id).position({ x: ex, y: ey });
 
-      // place tasks for this expert in an arc outside the expert ring.
-      // Mobile: spread wider, more aggressive label angular positioning to reduce overlap.
+      // Task arc — wider spread on mobile to avoid label collisions on the
+      // narrower X-axis of the oval.
       const childTasks = data.tasks.filter(t => t.parent === e.id);
       const arcSpreadCap = mobile ? 0.85 : 0.55;
       const arcSpreadStep = mobile ? 0.18 : 0.10;
       const arcSpread = Math.min(arcSpreadCap, 0.10 + childTasks.length * arcSpreadStep);
+
       childTasks.forEach((t, j) => {
         const tCount = childTasks.length;
         const offset = tCount === 1 ? 0 : (j / (tCount - 1) - 0.5) * 2 * arcSpread;
         const a = angle + offset;
-        const tx = cx + taskR * Math.cos(a);
-        const ty = cy0 + taskR * Math.sin(a);
+        const tx = layoutCX + taskRX * Math.cos(a);
+        const ty = layoutCY + taskRY * Math.sin(a);
         const n = cy.getElementById(t.id);
         n.position({ x: tx, y: ty });
-        // Position label OUTWARD from center (radial offset) so labels don't
-        // crowd the inter-node space. Margin scales with angle.
-        const labelDist = mobile ? 14 : 12;
-        n.data('labelOffsetX', Math.cos(a) * labelDist);
-        n.data('labelOffsetY', Math.sin(a) * labelDist);
-        // Above hub vertical center → label above; below → label below.
-        n.data('labelValign', Math.sin(a) < -0.15 ? 'top' : 'bottom');
+
+        // Outward label direction = unit vector from layout center to node.
+        // (Geometric "from-center" direction — close enough for oval too.)
+        const vx = tx - layoutCX;
+        const vy = ty - layoutCY;
+        const vmag = Math.hypot(vx, vy) || 1;
+        const ux = vx / vmag, uy = vy / vmag;
+        const labelDist = mobile ? 16 : 12;
+        n.data('labelOffsetX', ux * labelDist);
+        n.data('labelOffsetY', uy * labelDist);
+        n.data('labelValign', uy < -0.15 ? 'top' : 'bottom');
       });
     });
 
-    cy.fit(cy.elements(), 40);
+    // Fit margin: mobile = smaller, oval is already sized.
+    cy.fit(cy.elements(), mobile ? 20 : 40);
   }
   layoutRadial();
 
