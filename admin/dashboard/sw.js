@@ -5,7 +5,7 @@
    - everything else: network-first w/ cache fallback
    Versioned cache so bumping CACHE_VERSION invalidates old assets.
 */
-const CACHE_VERSION = 'sailtech-orchestrator-v1';
+const CACHE_VERSION = 'sailtech-orchestrator-v3-oval'; // bumped: mobile oval layout
 const APP_SHELL = [
   './',
   './index.html',

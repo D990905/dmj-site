@@ -411,19 +411,28 @@
       const ey = layoutCY + expertRY * Math.sin(angle);
       cy.getElementById(e.id).position({ x: ex, y: ey });
 
-      // Task arc — wider spread on mobile to avoid label collisions on the
-      // narrower X-axis of the oval.
+      // Task arc — cap at half-distance to neighbor expert minus margin,
+      // so an expert with many tasks never invades the next expert's territory.
+      // (Earlier overlap: adjacent experts with 1+2 task counts collided
+      // because spread 0.46rad > inter-expert 0.42rad.)
       const childTasks = data.tasks.filter(t => t.parent === e.id);
-      const arcSpreadCap = mobile ? 0.85 : 0.55;
-      const arcSpreadStep = mobile ? 0.18 : 0.10;
-      const arcSpread = Math.min(arcSpreadCap, 0.10 + childTasks.length * arcSpreadStep);
+      const interExpertAngle = (2 * Math.PI) / N;
+      const SAFE_MARGIN = 0.06; // ~3.5° each side
+      const safeArcSpread = Math.max(0.05, (interExpertAngle / 2) - SAFE_MARGIN);
+      const arcSpread = Math.min(safeArcSpread, 0.08 + childTasks.length * 0.05);
 
       childTasks.forEach((t, j) => {
         const tCount = childTasks.length;
         const offset = tCount === 1 ? 0 : (j / (tCount - 1) - 0.5) * 2 * arcSpread;
         const a = angle + offset;
-        const tx = layoutCX + taskRX * Math.cos(a);
-        const ty = layoutCY + taskRY * Math.sin(a);
+        // Multi-child experts: monotonic radial offset per index so EVERY task
+        // sits at a different distance from hub — labels separate radially.
+        // j=0 closest in (0.85), last j farthest out (1.15). Linear ramp.
+        const radialMult = (tCount > 1)
+          ? 0.85 + (j / (tCount - 1)) * 0.30  // 0.85 → 1.15 across children
+          : 1;
+        const tx = layoutCX + taskRX * radialMult * Math.cos(a);
+        const ty = layoutCY + taskRY * radialMult * Math.sin(a);
         const n = cy.getElementById(t.id);
         n.position({ x: tx, y: ty });
 
