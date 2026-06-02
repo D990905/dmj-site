@@ -3,12 +3,12 @@
 | 항목 | 내용 |
 |---|---|
 | 문서 유형 | Phase 1 학습 정리 + 현재 코드 audit + 아키텍처 v2 제안 + 성능 baseline + 모바일 hardening list + CI/CD plan |
-| 작성 | Frontend Engineer (Web) (전문가 #4) · 2026-05-27 |
+| 작성 | Frontend Engineer (Web) — 알렉스 박 (Alex Park, #4) · v1.0 2026-05-27 · v1.1 2026-06-02 (revision: Orchestrator #11 align) |
 | 대상 | `site/` 전체 (HTML 129개 · `assets/css/style.css` 8528 lines · `assets/css/agent-deny.css` 911 lines · `assets/js/*.js` 9건 · `riding-dashboard/js/*.js` 14건 + selftest 12개) |
 | 범위 | Phase 1 — production 코드 무수정. audit + 권장 + 측정 plan + Phase 2 시작 청사진 |
 | 근거 | 코드 직접 열람 (Read·Grep) + WebSearch (Core Web Vitals 2026 · WCAG 2.2 · iOS 26 · Astro 5 / Next 15 · Vite 8 · PWA iOS) + 다른 expert 문서 (`expert_dataviz_reference.md`·`expert_hardware_embedded_reference.md`) |
 | Co-owners | Visual Designer (디자인 토큰·diff) · Data Visualization (chart-theme·viz lib) · UX Researcher (interaction·flow) · Sports Science (analysis.js 정합성) · Mobile App Engineer (Capacitor/native 공유 검토) · Backend (Phase 12 Supabase API 인터페이스) |
-| 제약 | GitHub Pages 정적 호스팅 (D990905/dmj-site · `dmjgroup.kr` CNAME) · Phase 1 = audit/plan only · DO_NOT_REVERT §141 §145-G §148 §169-K §171 §171-B §171-C §172 §173 §174 §175 §177 §178 §179 §181 lock 항목 존중 |
+| 제약 | GitHub Pages 정적 호스팅 (D990905/dmj-site · `dmjgroup.kr` CNAME) · Phase 1 = audit/plan only · DO_NOT_REVERT §141 §145-G §148 §169-K §171 §171-B §171-C §172 §173 §174 §175 §177 §178 §179 §181 §182-A §182-B lock 항목 존중 |
 
 > **읽는 법.** §0 은 한 페이지 TL;DR. §1 은 Phase 1 학습 정리(현재 web platform 의 결정 기준)로, 외부 문헌·standard·spec 인용을 모두 한 군데로 모았다. §2 는 현재 코드 audit — 카드별로 한 영역씩 평가한다. §3 은 아키텍처 v2 — vanilla 유지 vs Astro 5 vs Next 15 의 의사결정 framework. §4 는 성능 baseline 측정 plan + 목표 score. §5 는 iOS hit-test 류 잠재 모바일 버그 enumeration. §6 은 CI/CD plan — `PUSH-FIX.command` 의 GitHub Actions 영구 대체. §7 은 전문가 협업 인터페이스. §8 은 의사결정 가이드. Phase 1 production 코드 변경은 X — 본 문서는 청사진이다.
 
@@ -28,11 +28,15 @@
 
 **Phase 1 권장 우선순위 5 (production 변경 X · plan only):**
 
-1. **CI/CD 자동 배포** (§6) — `.github/workflows/deploy.yml` 추가. push 즉시 `actions/deploy-pages@v4` 로 release. `PUSH-FIX.command` 의 iCloud lock retry · `git push` 수동 절차는 완전 폐기 가능 — local 에서 `git push` 만 하면 그 다음은 GitHub 가. 1회 설정으로 영구. **즉시 시행 가능 · production 코드 무변경**.
+1. **Push 자동화 — 2 layer 분리** (§6 v1.1 revision) — Orchestrator (#11) 의 `auto_push.command` + launchd daemon 이 **local→remote push** 의 영구 답 (PUSH-FIX.command 대체). 그 위에 본인 작성 `.github/workflows/deploy.yml` 은 **remote→live deploy** 의 자동화 (Phase 1 = branch publishing 자동 사용으로 deploy.yml 도 optional, Phase 2 Astro build step 도입 시 필수). **즉시 시행: Orchestrator §0 Step 1-2 (auto_push.command + launchd deploy-only)**.
 2. **Performance baseline 측정** (§4) — 6 페이지(index·find-my-gear·levitaz·calculator·riding-dashboard·products/levitaz/fw-790) 에서 PageSpeed Insights · Lighthouse · WebPageTest mobile run 측정. LCP/INP/CLS 의 75 percentile 을 표로 고정. 측정 plan 만 — 실제 측정은 Phase 2 첫 시간.
 3. **모바일 hardening pass** (§5) — §171-C 가 해결한 SVG hit-test 패턴을 동일하게 적용해야 할 후보 5건을 코드 위치까지 enumerate. 패치 자체는 Phase 2.
 4. **CSS layer 도입 plan** (§3-4) — 8528 line `style.css` 의 점진적 분리. `@layer reset, tokens, base, layout, components, utilities, overrides` 7-layer 도입. Phase 2 에 PostCSS + cascade layers 도입하고 새 컴포넌트부터 layer 명시. 기존 selector 는 그대로 유지(회귀 X).
-5. **Component fragment 추출 plan** — `nav` / `footer` / `<head>` 가 128 페이지에 중복. Phase 2 Astro 도입 시점이 자연스러운 정리 timing. 그 전까지는 build-step-less 한 단순 SSI 또는 HTML `<template>` + tiny include script 도 옵션. 단 **Phase 1 에서 절대로 시도 X** — 회귀 위험 너무 큼.
+5. **Component fragment 추출 plan** — `nav` / `footer` / `<head>` 가 129 페이지에 중복. Phase 2 Astro 도입 시점이 자연스러운 정리 timing. 그 전까지는 build-step-less 한 단순 SSI 또는 HTML `<template>` + tiny include script 도 옵션. 단 **Phase 1 에서 절대로 시도 X** — 회귀 위험 너무 큼.
+
+> **v1.1 revision note (2026-06-02)** — Orchestrator (#11) Phase 1 spec (`_experts/expert_orchestrator_daemon_reference.md`) align. 변경 3건: (a) §0·§6 의 CI/CD 우선순위 = orchestrator `auto_push.command` 가 PUSH-FIX 직접 대체, `.github/workflows/deploy.yml` 는 Phase 2 build step 동반 도입. (b) §3-1 의 dashboard Phase 1 = Supabase 도입 없음, GitHub Issues + Pages-served `.orchestrator/status/*.json` 만 (Supabase 는 Phase 2 sprint 2 마이그). (c) §6 신규 §6-6 = #4 ↔ #11 dashboard contract (Open Q 2 답 — Pages 노출 OK, cost 필드 공개 무해).
+
+> **v1.2 revision (2026-06-02 후반)** — Phase 2 sprint 1 fix 2건 실행 (의장 GO 신호 12:XX). §182-A `.kakao-fab` SVG hit-test fix (style.css:1793 직후 6줄) + §182-B `nav__cart-badge` aria-live (10 HTML 페이지 sed). audit evidence = `_experts/frontend_mobile_hardening_audit_2026-06-02.md`. 회귀 영구 차단 — DO_NOT_REVERT §182-A·§182-B 신규 lock. **129 페이지 추정 → 실제 10 페이지** (cart badge HTML 은 nav header 전체 포함 페이지만 — policy / product 상세는 simplified nav).
 
 ---
 
@@ -329,7 +333,9 @@ LCP / INP / CLS 각 지표별 예측 (실제 측정 Phase 2):
 
 ### 3-1. 결정 — Astro 5 incremental migration
 
-**Phase 2 시작점:** Astro 5 + Vite 8 (Rolldown) + GitHub Actions Pages deploy. 기존 vanilla 와 공존 — 한 페이지씩 옮긴다.
+**Phase 2 시작점:** Astro 5 + Vite 8 (Rolldown) + GitHub Actions Pages deploy + Orchestrator (#11) `auto_push.command` push 자동화 layer. 기존 vanilla 와 공존 — 한 페이지씩 옮긴다.
+
+**Dashboard 인프라 분리 (v1.1 revision):** Phase 2 sprint 1 의 dashboard MVP 는 **Supabase 없이** 구축. Orchestrator §6-2 contract 채택 — daemon 이 `site/.orchestrator/status/*.json` 에 write, GitHub Pages 가 자동 노출, dashboard 가 fetch (인증 X · CORS X · rate-limit X). Supabase 마이그는 Phase 2 sprint 2 — Orchestrator §5 의 `Queue` / `StatusSink` Protocol 한 줄 변경.
 
 **왜 Astro?** §1-1 의 framework 비교 표 종합:
 
@@ -541,9 +547,13 @@ button > svg, button svg * {
 
 ---
 
-## 6. CI/CD plan — GitHub Actions 자동 배포 (PUSH-FIX.command 영구 대체)
+## 6. CI/CD plan — 2-layer 자동화 (PUSH-FIX.command 영구 대체) · v1.1 revision
+
+> **v1.1 (2026-06-02):** Orchestrator (#11) Phase 1 spec (`_experts/expert_orchestrator_daemon_reference.md`) align. 본 §6 의 핵심 수정 — local→remote push 자동화의 owner 는 Orchestrator daemon (`auto_push.command` + launchd). `.github/workflows/deploy.yml` 는 remote→live deploy 의 companion layer 로 재배치. PUSH-FIX.command 직접 대체자 = Orchestrator, GitHub Actions = Phase 2 Astro build step 진입 시 필수.
 
 ### 6-1. 현재 상태
+
+> **v1.1 정정 (2026-06-02)** — `.github/workflows/static.yml` 가 **이미 존재**한다 (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v5`, `path: '.'`). 즉 push → GitHub Pages 자동 deploy 는 **이미 작동 중**. PUSH-FIX.command 의 한계는 deploy 자동화 부재가 아니라 **local→remote push 자체의 iCloud lock 회피·retry**. 본 §6 v1.0 (`deploy.yml` 신규 추가 권장) 은 잘못된 분석 — 정정. Phase 2 build step 도입 시점에 `static.yml` 의 `path: '.'` 를 `path: ./dist` 로 1줄 수정 + `npm run build` step 추가만 필요.
 
 `PUSH-FIX.command` (site/PUSH-FIX.command) 는 다음을 수행:
 1. `cd $(dirname "$0")` — site/ 로 이동.
@@ -673,21 +683,64 @@ git add -A && git commit -m "..." && git push origin main
 
 이 workflow 자체는 **Phase 1 production 코드 변경에 해당하지 않는다** — `.github/workflows/` 은 새 파일 추가일 뿐, site 의 HTML/CSS/JS 어떤 것도 변경 X. 따라서 Phase 1 제약(production 변경 X) 위배 아님. 즉시 시행 권장.
 
-**Step 1 — repo 설정** (GitHub web UI):
-1. https://github.com/D990905/dmj-site → Settings → Pages.
-2. **Source**: "GitHub Actions" 선택 (기존 "Branch publishing" 에서 전환).
-3. Save.
+**v1.1 순서 수정** — Orchestrator §0 step 1-2 가 먼저, GitHub Actions 는 그 다음:
 
-**Step 2 — workflow 파일 추가:**
-- `mkdir -p .github/workflows && touch .github/workflows/deploy.yml`
-- 위 §6-2 YAML 붙여넣기.
-- `git add .github && git commit -m "ci: GitHub Actions Pages deploy (§ frontend-engineer plan)" && git push`.
+**Step 1 — Orchestrator `auto_push.command` 받기:**
+- Orchestrator (#11) 의 Phase 1 산출 — `site/orchestrator/auto_push.command` 또는 `~/dev/orchestrator/auto_push.command` 위치.
+- 더블클릭 1회로 PUSH-FIX 직접 대체. iCloud lock 회피·exponential backoff·pull-rebase 자동 fallback.
 
-**Step 3 — 첫 deploy 확인:**
-- GitHub Actions tab 에서 workflow run 결과 확인.
-- https://dmjgroup.kr 에서 변경 반영 확인.
+**Step 2 — launchd deploy-only daemon (선택, 15분):**
+- Orchestrator §0 step 2 — Anthropic API key 불필요, $0. 30초 polling 으로 push 자동.
+- 더블클릭조차 X — git commit 만 하면 그 후 자동.
 
-**Step 4 — PUSH-FIX.command 유지·점진 폐기.**
+**Step 3 — GitHub Actions deploy.yml (Phase 2 build step 진입 시):**
+- Phase 1 (vanilla, 빌드 X): branch publishing 자동 사용 가능, deploy.yml 불필요.
+- Phase 2 (Astro build): deploy.yml 필수. `npm run build` → `./dist` → `actions/deploy-pages@v4`.
+- Step:
+  1. https://github.com/D990905/dmj-site → Settings → Pages → Source = "GitHub Actions".
+  2. `mkdir -p .github/workflows && touch .github/workflows/deploy.yml` (위 §6-2 YAML).
+  3. `auto_push.command` 더블클릭 또는 daemon 자동 push.
+  4. GitHub Actions tab 에서 첫 deploy 확인.
+
+**Step 4 — pr-check.yml + Lighthouse CI** (Phase 2 sprint 2):
+- `.github/workflows/pr-check.yml` (HTML validity + broken link).
+- PR-별 자동 검증 → 회귀 알람.
+
+**Step 5 — PUSH-FIX.command 유지·점진 폐기:**
+- Phase 1 = Orchestrator `auto_push.command` 도입 후 즉시 safety net 으로 유지.
+- Phase 2 종료 = `_archive/` 로 이동.
+
+### 6-6. Dashboard MVP — #4 ↔ #11 contract (v1.1 신규)
+
+**합의 완료 항목** (Orchestrator §6-2 의 Open Q 2 답):
+
+| 항목 | 결정 |
+|---|---|
+| Dashboard 위치 | Phase 1 = `site/ops/index.html` (mainsite 안), Phase 3 = `ops.dmjgroup.kr` 서브도메인 별도 repo |
+| Directive 큐 | GitHub Issues + label `directive` (영구) |
+| Status 출력 | `site/.orchestrator/status/{directive_id}.json` (daemon write) + Issue comment |
+| Dashboard 읽기 | client-side `fetch('/.orchestrator/status/...')` — 인증 X, CORS X, rate-limit X |
+| 보안 | cost 필드 공개 무해 (월 cap $50 = 미미). prompt 본문은 Issue 안에만, status JSON 은 metadata 만 |
+| robots.txt | `Disallow: /.orchestrator/` (검색엔진 색인 차단, 사람은 URL 직접 접근 OK) |
+
+**Dashboard MVP first view** (Phase 2 sprint 1 deliverable):
+
+1. Pending decisions (Danny 결정 대기) — David Ok 부재 mitigation.
+2. Active directives (orchestrator daemon 진행 중) — cost · turns · ETA.
+3. Production health (dmjgroup.kr LCP · INP · CLS · uptime · CI status).
+4. 8 experts current focus — `_team/profiles/*.html` + 최근 commit / dispatch.
+5. This week's #decisions — `_team/dispatches/*.md` + GitHub Discussions.
+
+**구현 stack** (Phase 1 = Phase 2 sprint 1 MVP):
+- Astro 5 page 1개 (`src/pages/ops.astro`) + 4 client island.
+- GitHub Issues REST API client-side fetch (unauthenticated, 60/hr rate-limit OK).
+- `.orchestrator/status/*.json` fetch (인증 X · rate-limit X).
+- Supabase 미도입.
+
+**Phase 2 sprint 2 추가** (Supabase 마이그):
+- Orchestrator daemon dual-write → `SupabaseRowSink`.
+- Astro island 가 Supabase Realtime client 추가 → push update.
+- dashboard 의 GitHub Issues fetch 는 그대로 유지 (영구 hybrid #10 model B = "role-split").
 
 ---
 

@@ -1351,6 +1351,89 @@
     };
   }
 
+  /* ============================================================
+   * generateDailyNotification — 단무지 design 의 1줄 알림 generator
+   *
+   * Event-Aware Periodization (sports_science_event_periodization_system.md §5).
+   * Plan + recovery + weather → 한국어 자연어 알림 (push 메시지 본문).
+   *
+   * 단무지 톤 — 짧고 명확, 존댓말, 격려, 이모지 0-1개.
+   *
+   * 입력:
+   *   plan      = buildPeriodizationPlan().weeks[N].days[M] (오늘 plan)
+   *   recovery  = decideRecoveryAction() output (action zone + reason)
+   *   weather   = { wind_kt, forecast_6hr } (선택)
+   *
+   * 출력:
+   *   {
+   *     title: '🎯 오늘의 plan',
+   *     body: '...',
+   *     priority: 'high'|'normal',
+   *     suggested_action: 'open_today_screen'
+   *   }
+   * ============================================================ */
+  function generateDailyNotification(plan, recovery, weather) {
+    plan = plan || {};
+    recovery = recovery || {};
+    weather = weather || {};
+
+    var title, body;
+    var target = plan.target_AU || 0;
+    var actionZone = recovery.action || 'full_ride';
+    var wind = weather.wind_kt;
+    var planType = plan.type || 'moderate';
+
+    /* === Title === */
+    if (target < 5) {
+      title = '🌙 오늘 휴식일';
+    } else if (planType === 'race') {
+      title = '🏁 오늘 경기';
+    } else if (recovery.action === 'rest') {
+      title = '🔴 완전 휴식 권고';
+    } else if (recovery.action === 'active_recovery') {
+      title = '🟠 active recovery';
+    } else {
+      title = '🎯 오늘 ' + Math.round(target) + ' AU';
+    }
+
+    /* === Body — 단무지 톤 (1-2 문장) === */
+    if (target < 5) {
+      body = '계획된 휴식일입니다. 충분한 수면과 회복 우선해 주세요.';
+    } else if (planType === 'race') {
+      body = '경기일입니다. 30분 전 warm-up, 경기 후 30분 안에 CHO + 단백질, 자기 전 카제인 40g.';
+    } else if (recovery.action === 'rest') {
+      body = recovery.primary_reason + ' 오늘은 휴식하시고 내일 다시 평가하겠습니다.';
+    } else if (recovery.action === 'active_recovery') {
+      body = '회복 신호 — 라이딩 X 또는 z1 30분 light. ' +
+             (target ? '계획 ' + Math.round(target) + ' AU 중 30-40% 정도만.' : '');
+    } else if (typeof wind === 'number' && wind < 8) {
+      body = '풍속 ' + wind + 'kt — 라이딩 어려움. ' +
+             'Land workout ' + Math.round(target) + ' AU 로 보충 권장.';
+    } else if (planType === 'high_intensity') {
+      body = (plan.phase || 'training') + ' phase — race-specific 강도. ' +
+             'Target ' + Math.round(target) + ' AU. 컨디션 ' + actionZone + '.';
+    } else {
+      body = (plan.phase || 'training') + ' phase, target ' + Math.round(target) + ' AU. ' +
+             '컨디션 양호 — 계획대로 진행하세요.';
+    }
+
+    var priority = (recovery.action === 'rest' || recovery.action === 'active_recovery'
+                   || planType === 'race') ? 'high' : 'normal';
+
+    return {
+      title: title,
+      body: body,
+      priority: priority,
+      suggested_action: 'open_today_screen',
+      meta: {
+        target_AU: target,
+        phase: plan.phase,
+        recovery_zone: actionZone,
+        wind_kt: wind
+      }
+    };
+  }
+
   var Coach = {
     VPS: VPS,
     WHATIF: WHATIF,
@@ -1360,6 +1443,7 @@
     computeWhatIf: computeWhatIf,
     computeTurnCoaching: computeTurnCoaching,
     decideRecoveryAction: decideRecoveryAction,
+    generateDailyNotification: generateDailyNotification,
     measuredUpwindVmgKt: measuredUpwindVmgKt,
     upwindSpeedScore: upwindSpeedScore,
     downwindSpeedScore: downwindSpeedScore,

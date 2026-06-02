@@ -1,0 +1,74 @@
+# .github/workflows/pr-check.yml
+# PR 자동 검증 — HTML validity + 깨진 link check
+# By 알렉스 박 (Alex Park, #4 Frontend Engineer) · 2026-06-02 · Phase 2 sprint 1
+# Companion to static.yml (deploy) — pr-check.yml = 변경 가드.
+#
+# Phase 2 sprint 2 추가 예정:
+#   - Lighthouse CI (treosh/lighthouse-ci-action@v11) — LCP/INP/CLS 회귀 알람
+#   - axe-core a11y check (Playwright)
+#   - Astro build smoke test (Astro migration 시점)
+
+name: PR checks
+
+on:
+  pull_request:
+    branches: [main]
+  # main push 시에도 동일 검증 (단일 안전망)
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  html-validity:
+    name: HTML validity check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: HTML5 validator
+        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
+        with:
+          root: site/
+          # 일부 페이지가 inline event handler (onerror=) 보유 — Phase 2 정리 예정
+          # 본인 reference §2-1 약점 #5 참조
+          # ignore 패턴은 Phase 2 sprint 2 에 추가 (현재는 fail-soft 로 두지 않음 — 회귀 알람 명시)
+          # log_level: WARNING — error 만 fail, warning 은 통과
+          log_level: WARNING
+
+  link-check:
+    name: Broken link check (internal)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Hyperlink check
+        # untitaker/hyperlink — 정적 사이트 internal link 만 검증 (외부 fetch X · 빠름)
+        uses: untitaker/hyperlink@0.1.32
+        with:
+          args: site/ --check-anchors --sources site/
+
+  ci-summary:
+    name: PR check summary
+    runs-on: ubuntu-latest
+    needs: [html-validity, link-check]
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "## PR check 결과" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| HTML validity | ${{ needs.html-validity.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Link check | ${{ needs.link-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Phase 2 sprint 2 추가 예정 — Lighthouse CI · axe a11y · Astro build smoke test" >> $GITHUB_STEP_SUMMARY

@@ -811,6 +811,223 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
   };
 }
 
+  /* ============================================================
+   * buildPeriodizationPlan — 역공학 12-week build-up plan
+   *
+   * Event-Aware Periodization (Component B) 핵심 entry.
+   * Race date + event_total_TRIMP + athlete → daily target AU list.
+   *
+   * Algorithm (Issurin ATR + Bompa volume curve + Bosquet taper):
+   *   1. 12-week (or weeks_to_event) plan with phases:
+   *      A1·A2·A3 (Accumulation, 3 weeks) → Recovery 1 (-40%)
+   *      → T1·T2·T3 (Transformation, 3 weeks) → Recovery 2 (-40%)
+   *      → R1·R2 (Realization, 2 weeks) → Taper 1·2 (2 weeks, -40~-60%)
+   *      → Competition week
+   *   2. Weekly AU = event_total × phase_percent_table
+   *   3. Daily AU = weekly × Bompa micro-cycle distribution (Mon-Sun)
+   *   4. Taper micro-cycle 별도 (Tue/Wed/Fri intensity 유지)
+   *
+   * 입력:
+   *   target = {
+   *     event_total_TRIMP: 900 (Number — estimateCompetitionLoad 결과),
+   *     race_date: 'YYYY-MM-DD',
+   *     athlete_skill: '중급'
+   *   }
+   *   athlete = { weightKg }
+   *   opts = { weeks_to_event?: 12, start_date?: today }
+   *
+   * 출력:
+   *   {
+   *     weeks: [{ week_offset, phase, label, weekly_AU, daily_avg, days: [{date, day_of_week, target_AU, phase_note}] }, ...],
+   *     summary: { total_AU, weeks_count, taper_start, race_date },
+   *     rationale: string (한국어)
+   *   }
+   *
+   * References:
+   *   · Issurin 2008 — Block Periodization (ATR)
+   *   · Bosquet 2007 — Tapering meta-analysis (doi:10.1249/mss.0b013e31806010e0)
+   *   · Bompa 2018 — Periodization 6e (ISBN 978-1-4925-4480-2)
+   *   · sports_science_event_periodization_system.md §4
+   * ============================================================ */
+
+  /* Phase 별 weekly AU 가중치 (event 평균일 부하 = 1.0 reference).
+     Sum 0.144 = 12-week total ≈ event 대비 1.44× (전체 chronic 형성 + race).
+     하지만 individual phase 는 event_avg 보다 작음 (race 가 peak). */
+  var PERIODIZATION_PHASES = [
+    /* week_offset: −12 ~ −1, then 0 = race week */
+    { week_offset: -12, phase: 'A1',       label: 'Accumulation 1 — 베이스 aerobic',          weekly_pct: 0.112, intensity: 'LIT 80%' },
+    { week_offset: -11, phase: 'A2',       label: 'Accumulation 2 — 볼륨 build',              weekly_pct: 0.134, intensity: 'LIT 80%' },
+    { week_offset: -10, phase: 'A3',       label: 'Accumulation 3 — 볼륨 peak',               weekly_pct: 0.154, intensity: 'LIT 75%' },
+    { week_offset:  -9, phase: 'Recovery1', label: 'Deload 1 (-40%) — super-compensation',    weekly_pct: 0.084, intensity: 'LIT 90%' },
+    { week_offset:  -8, phase: 'T1',       label: 'Transformation 1 — race-specific intro',  weekly_pct: 0.154, intensity: 'mixed' },
+    { week_offset:  -7, phase: 'T2',       label: 'Transformation 2 — slalom + course',      weekly_pct: 0.174, intensity: 'mixed' },
+    { week_offset:  -6, phase: 'T3',       label: 'Transformation 3 — peak load',             weekly_pct: 0.196, intensity: 'mixed' },
+    { week_offset:  -5, phase: 'Recovery2', label: 'Deload 2 (-40%) + tune-up race',         weekly_pct: 0.098, intensity: 'mixed' },
+    { week_offset:  -4, phase: 'R1',       label: 'Realization 1 — peak specificity',        weekly_pct: 0.182, intensity: 'HIT 25%' },
+    { week_offset:  -3, phase: 'R2',       label: 'Realization 2 — volume ↓ 시작',            weekly_pct: 0.154, intensity: 'HIT 25%' },
+    { week_offset:  -2, phase: 'Taper1',   label: 'Taper 1 (-40% volume, intensity 유지)',   weekly_pct: 0.098, intensity: 'race-pace short' },
+    { week_offset:  -1, phase: 'Taper2',   label: 'Taper 2 (-55%, peak ready)',              weekly_pct: 0.062, intensity: 'short sharp' },
+    { week_offset:   0, phase: 'Race',     label: 'COMPETITION — execute',                    weekly_pct: 1.000, intensity: 'race' }
+  ];
+
+  /* Bompa weekly micro-cycle (Mon=0 ~ Sun=6) — daily AU 분배.
+     평균 chronic block 적용. Taper week 는 별도 pattern. */
+  var WEEKLY_MICROCYCLE = {
+    standard: [0.08, 0.15, 0.21, 0.11, 0.15, 0.22, 0.08],  /* Mon-Sun */
+    taper1:   [0.00, 0.20, 0.30, 0.10, 0.25, 0.15, 0.00],  /* race-pace Tue/Wed/Fri */
+    taper2:   [0.00, 0.25, 0.25, 0.00, 0.30, 0.20, 0.00],  /* shorter, race-day Sat */
+    recovery: [0.10, 0.15, 0.18, 0.10, 0.15, 0.20, 0.12],  /* deload — more even */
+    race:     [0.20, 0.20, 0.20, 0.20, 0.20, 0.00, 0.00]   /* 5-day comp, weekend off */
+  };
+
+  function buildPeriodizationPlan(target, athlete, opts) {
+    opts = opts || {};
+    target = target || {};
+    var totalAU = Number(target.event_total_TRIMP) || 0;
+    if (totalAU <= 0) return { error: 'invalid_event_TRIMP' };
+    var raceDate = new Date(target.race_date);
+    if (isNaN(raceDate.getTime())) return { error: 'invalid_race_date' };
+
+    var weeksToEvent = (opts.weeks_to_event > 0) ? Number(opts.weeks_to_event) : 12;
+    /* 12 주 미만이면 phase 압축 (taper 는 무조건 보존, accumulation 단축) */
+    var phases = PERIODIZATION_PHASES.filter(function (p) {
+      return p.week_offset >= -weeksToEvent;
+    });
+
+    var weeks = phases.map(function (p) {
+      var weekStart = new Date(raceDate);
+      weekStart.setUTCDate(weekStart.getUTCDate() + p.week_offset * 7);
+      /* Sunday of that week = race day for week 0, otherwise Mon */
+      var dayOfWeekRace = raceDate.getUTCDay();  /* 0 (Sun) ~ 6 (Sat) */
+      /* Align week start to Monday */
+      var raceDOW_mondayBased = (dayOfWeekRace + 6) % 7;  /* 0 (Mon) ~ 6 (Sun) */
+      var weekStartMon = new Date(weekStart);
+      weekStartMon.setUTCDate(weekStartMon.getUTCDate() - raceDOW_mondayBased);
+
+      var weeklyAU = totalAU * p.weekly_pct;
+      var microcycle = (p.phase === 'Taper1') ? WEEKLY_MICROCYCLE.taper1
+                     : (p.phase === 'Taper2') ? WEEKLY_MICROCYCLE.taper2
+                     : (p.phase === 'Race')   ? WEEKLY_MICROCYCLE.race
+                     : (p.phase === 'Recovery1' || p.phase === 'Recovery2')
+                     ? WEEKLY_MICROCYCLE.recovery
+                     : WEEKLY_MICROCYCLE.standard;
+      var dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      var days = microcycle.map(function (frac, i) {
+        var dayDate = new Date(weekStartMon);
+        dayDate.setUTCDate(dayDate.getUTCDate() + i);
+        var au = weeklyAU * frac;
+        return {
+          date: dayDate.toISOString().slice(0, 10),
+          day_of_week: dayLabels[i],
+          target_AU: Math.round(au * 10) / 10,
+          /* type 추천 — sea uses skill_weighted weeks_offset */
+          type: (au < 5) ? 'rest'
+              : (p.phase === 'Race') ? 'race'
+              : (p.phase === 'Recovery1' || p.phase === 'Recovery2') ? 'recovery_or_easy'
+              : (p.intensity.indexOf('HIT') >= 0 && (i === 2 || i === 5)) ? 'high_intensity'
+              : 'moderate'
+        };
+      });
+
+      return {
+        week_offset: p.week_offset,
+        phase: p.phase,
+        label: p.label,
+        intensity: p.intensity,
+        weekly_AU: Math.round(weeklyAU * 10) / 10,
+        daily_avg: Math.round((weeklyAU / 7) * 10) / 10,
+        days: days,
+        week_start: weekStartMon.toISOString().slice(0, 10)
+      };
+    });
+
+    /* Summary */
+    var taperStart = (phases.find(function (p) { return p.phase === 'Taper1'; }) || {}).week_offset;
+    var sumAU = weeks.reduce(function (s, w) { return s + w.weekly_AU; }, 0);
+
+    var rationale =
+      '목표 race ' + target.race_date + ' (' + (target.athlete_skill || '중급') + ' 등급, ' +
+      'event total ' + totalAU.toFixed(0) + ' AU). ' +
+      weeksToEvent + '-week plan: A1-A3 (3wk accumulation) → Recovery → T1-T3 (3wk transformation) ' +
+      '→ Recovery → R1-R2 (2wk realization) → Taper (2wk, Bosquet 2007 protocol).';
+
+    return {
+      weeks: weeks,
+      summary: {
+        race_date: target.race_date,
+        weeks_count: weeksToEvent,
+        total_planned_AU: Math.round(sumAU * 10) / 10,
+        event_TRIMP: totalAU,
+        taper_start_week_offset: taperStart,
+        athlete_skill: target.athlete_skill || '중급'
+      },
+      rationale: rationale
+    };
+  }
+
+  /* ============================================================
+   * dailyPlanCheck — actual vs planned + adjustment 추천
+   *
+   * 입력:
+   *   plan_today  = { target_AU, day_of_week, phase, type }
+   *   actual_AU   = number (오늘 누적 실 AU)
+   *
+   * 출력:
+   *   { planned_AU, actual_AU, compliance_pct, flag, zone, adjustment_recommendation, message }
+   *
+   * Compliance zones:
+   *   green:  0.80-1.20 (정상 이행)
+   *   yellow: 0.60-0.80 or 1.20-1.50 (under or over)
+   *   red:    <0.60 or >1.50 (큰 deviation)
+   * ============================================================ */
+  function dailyPlanCheck(plan_today, actual_AU) {
+    plan_today = plan_today || {};
+    var planned = Number(plan_today.target_AU) || 0;
+    var actual = Number(actual_AU) || 0;
+    var ratio = (planned > 0) ? (actual / planned) : 0;
+
+    var flag, zone, msg, adj;
+    if (planned <= 0) {
+      flag = 'green'; zone = 'rest_day';
+      msg = '오늘 rest day plan — 휴식 우선.';
+      adj = null;
+    } else if (ratio >= 0.80 && ratio <= 1.20) {
+      flag = 'green'; zone = 'on_track';
+      msg = '오늘 ' + Math.round(ratio * 100) + '% 이행 ✓ 잘 하셨습니다.';
+      adj = null;
+    } else if (ratio < 0.60) {
+      flag = 'red'; zone = 'under';
+      msg = '오늘 ' + Math.round(ratio * 100) + '% 만 이행. 부족 ' +
+            Math.round(planned - actual) + ' AU.';
+      adj = 'tomorrow +15% (catch-up)';
+    } else if (ratio < 0.80) {
+      flag = 'yellow'; zone = 'slight_under';
+      msg = '오늘 ' + Math.round(ratio * 100) + '% 이행 — 약간 부족.';
+      adj = 'tomorrow +5-10%';
+    } else if (ratio > 1.50) {
+      flag = 'red'; zone = 'over';
+      msg = '오늘 ' + Math.round(ratio * 100) + '% 이행 — 과부하. 피로 누적 risk.';
+      adj = 'tomorrow -20% (회복 우선)';
+    } else if (ratio > 1.20) {
+      flag = 'yellow'; zone = 'slight_over';
+      msg = '오늘 ' + Math.round(ratio * 100) + '% 이행 — 약간 over.';
+      adj = 'tomorrow -10%';
+    }
+
+    return {
+      planned_AU: planned,
+      actual_AU: actual,
+      compliance_pct: Math.round(ratio * 100),
+      compliance_ratio: Math.round(ratio * 1000) / 1000,
+      flag: flag,
+      zone: zone,
+      message: msg,
+      adjustment_recommendation: adj,
+      phase: plan_today.phase || null,
+      day_of_week: plan_today.day_of_week || null
+    };
+  }
+
   var Storage = {
     saveSession: saveSession,
     listSessions: listSessions,
@@ -830,7 +1047,11 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     computeFitnessTrend: computeFitnessTrend,
     interpretTSB: interpretTSB,
     suggestLandWorkout: suggestLandWorkout,
-    EXERCISE_LIBRARY: EXERCISE_LIBRARY
+    EXERCISE_LIBRARY: EXERCISE_LIBRARY,
+    buildPeriodizationPlan: buildPeriodizationPlan,
+    dailyPlanCheck: dailyPlanCheck,
+    PERIODIZATION_PHASES: PERIODIZATION_PHASES,
+    WEEKLY_MICROCYCLE: WEEKLY_MICROCYCLE
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = Storage;
   else global.RDStorage = Storage;

@@ -1078,6 +1078,88 @@
     try { sessionStorage.setItem('davidBannerDismissed', '1'); } catch (e) {}
   });
 
+  // ---------- D Avatar → 옥대표님 PersonaPanel (CoS β 채택, 2026-06-02 12:55) ----------
+  // PR 4 PersonaDetailPanel 패턴 재사용 — 대표님 본인의 standby + fleet 진행 + 비용 + 최근 결정.
+  function showDannyPanel() {
+    const pending = (data.approvalQueue || []).length;
+    const totalDir = (data.tasks || []).length;
+    const running = (data.tasks || []).filter(t => t.status === 'run').length;
+    const blocked = (data.tasks || []).filter(t => t.status === 'block').length;
+    const done = (data.tasks || []).filter(t => t.status === 'done').length;
+    const c = data.cost || {};
+    const recent = (data.recentDecisions || [])
+      .slice()
+      .sort((a, b) => new Date(b.decided_at || 0) - new Date(a.decided_at || 0))
+      .slice(0, 5);
+
+    panelEyebrow.textContent = 'CEO';
+    panelTitle.innerHTML = `<span class="persona-mono persona-mono--danny">D</span>옥대표님 — Danny Ok`;
+
+    panelBody.innerHTML = `
+      <div class="panel-meta">
+        <span class="panel-meta__item"><span class="panel-meta__dot s-active"></span>활동 중</span>
+        <span class="panel-meta__item">운동생리학 PhD · NSCA-CSCS</span>
+        <span class="panel-meta__item">단무지공방 · SailTechCo CEO</span>
+      </div>
+
+      <div class="panel-current">
+        <span class="panel-current__label">오늘 결정 대기</span>
+        ${pending > 0
+          ? `<strong>${pending} 건</strong> · 승인 큐 (bottom-sheet 펼치기)`
+          : `<span class="panel-current__none">대기 결정 없음 — 모든 dispatch 자율 진행 중</span>`}
+      </div>
+
+      <div class="panel-section">
+        <h4 class="panel-section__title">Fleet 진행</h4>
+        <dl class="detail-grid">
+          <dt>전체</dt><dd>${totalDir} directives</dd>
+          <dt>진행 중</dt><dd>${running}</dd>
+          <dt>차단</dt><dd>${blocked}</dd>
+          <dt>승인 대기</dt><dd>${pending}</dd>
+          <dt>완료</dt><dd>${done}</dd>
+        </dl>
+      </div>
+
+      <div class="panel-section">
+        <h4 class="panel-section__title">오늘 비용</h4>
+        <dl class="detail-grid">
+          <dt>day</dt><dd>$${(typeof c.day_total_usd === 'number' ? c.day_total_usd : 0).toFixed(2)}</dd>
+          <dt>month</dt><dd>$${(typeof c.month_total_usd === 'number' ? c.month_total_usd : 0).toFixed(2)} / $${(typeof c.month_cap_usd === 'number' ? c.month_cap_usd : 50).toFixed(0)}</dd>
+          <dt>remaining</dt><dd>$${(typeof c.month_remaining_usd === 'number' ? c.month_remaining_usd : 0).toFixed(2)}</dd>
+        </dl>
+      </div>
+
+      ${recent.length ? `
+      <div class="panel-section">
+        <h4 class="panel-section__title">최근 결정 (대표님)</h4>
+        <ul class="panel-standby">
+          ${recent.map(d => `
+            <li>${escapeHtml(d.question || d.text || '결정 기록')}
+              <span style="color:var(--text-faint);font-size:10px;margin-left:4px">${escapeHtml(formatDecisionTime(d.decided_at))}</span>
+            </li>`).join('')}
+        </ul>
+      </div>` : ''}
+
+      <div class="panel-section">
+        <h4 class="panel-section__title">Trigger keyword</h4>
+        <ul class="panel-triggers">
+          <li>@옥대표님</li>
+          <li>@대표님</li>
+          <li>@Danny</li>
+          <li>@CEO</li>
+        </ul>
+      </div>
+    `;
+
+    openSidePanel();
+  }
+
+  // D avatar click handler (mobile + desktop)
+  document.getElementById('dannyAvatar')?.addEventListener('click', showDannyPanel);
+  document.getElementById('dannyAvatar')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showDannyPanel(); }
+  });
+
   // ---------- Initial render (PR 1-3) ----------
   renderDecisions();
   renderPriority();

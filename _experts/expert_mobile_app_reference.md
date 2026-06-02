@@ -122,6 +122,8 @@
 
 ### 2.4 Danny 의 "Garmin 개발자 등록·앱" 발언 — 정합성 분석
 
+> **⏳ Verification pending — Danny desktop access 대기 (CoS David Ok 승인 2026-06-02).** 본 절은 (A) 가정 하에 v1.0 출판, Danny 의 `developer.garmin.com` dashboard 확인 후 v1.0.1 minor bump 로 정합. Phase 2 진입 timeline 영향이나 즉시 critical 아님.
+
 **관찰 사실:**
 
 1. `BLEManager.swift` 의 Garmin 처리는 **표준 BLE HRS (0x180D/0x2A37) 단일 경로 만** 존재 (line 22–26).

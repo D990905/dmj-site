@@ -1792,6 +1792,21 @@ a.persona__pack:focus-visible,
 .kakao-fab:hover { transform: scale(1.06); box-shadow: 0 12px 32px rgba(255,184,0,0.5); }
 .kakao-fab svg { width: 26px; height: 26px; }
 
+/* §182-A — kakao-fab iOS Safari hit-test fix (Danny 2026-06-02, Alex Park #4)
+   §171-C 와 동일 패턴이지만 site-header scope 밖이라 별도 적용 필요.
+   SVG path 가 hit-target 으로 잡혀 href="#contact" 가 trigger 안 되는 버그.
+   pointer-events: none on svg + svg * → 부모 <a> 가 클릭 수신.
+   touch-action: manipulation → 300ms tap delay 제거.
+   -webkit-tap-highlight-color → iOS 탭 회색 박스 통제.
+   audit evidence: _experts/frontend_mobile_hardening_audit_2026-06-02.md §1
+   DO_NOT_REVERT §182-A — 회귀 영구 X. */
+.kakao-fab > svg,
+.kakao-fab svg * { pointer-events: none; }
+.kakao-fab {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(10, 37, 64, 0.10);
+}
+
 /* ── Reveal on scroll ──────────────────────────────────────────────────── */
 .reveal {
   opacity: 0;

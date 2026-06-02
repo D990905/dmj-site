@@ -20,3 +20,8 @@ assets/images/products/*/_raw/
 **/*.jpg.new
 **/.test
 **/test2.txt
+
+# sed -i.bak artifacts — iCloud mount 가 .bak 파일 즉시 삭제 불가 (Operation not permitted)
+# 본인 cleanup 가능 시 rm 권장, 그 전까지 deploy 차단 (Alex Park #4 · 2026-06-02)
+**/*.bak
+**/*.html.bak

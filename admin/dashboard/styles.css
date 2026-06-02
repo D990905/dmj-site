@@ -82,10 +82,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  /* hotfix 2026-06-02 12:55 — D avatar = 옥대표님 PersonaPanel trigger (CoS β 채택).
+     gradient = brand triplet (navy → sea → sun) 의 통합 — 대표님이 모든 brand 의 root. */
+  background: linear-gradient(135deg, #0A2540 0%, #1F8FFF 50%, #FFB800 100%);
   color: white; font-weight: 700; font-size: 13px;
   display: inline-flex; align-items: center; justify-content: center;
   margin-left: 4px;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.avatar:hover { transform: scale(1.05); box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.20); }
+.avatar:focus-visible { outline: 2px solid var(--c-yellow); outline-offset: 2px; }
+
+/* Danny persona-mono (panel-title 안에 표시) — brand triplet 통합 gradient */
+.persona-mono--danny {
+  background: linear-gradient(135deg, #0A2540 0%, #1F8FFF 50%, #FFB800 100%) !important;
+  color: white !important;
+  opacity: 1 !important;
 }
 
 /* ---------------- Layout ---------------- */
@@ -338,7 +354,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .bottom-sheet { max-height: 50vh; }
   .canvas-controls { bottom: 80px; }
   .status-bar { bottom: 24px; }
-  .fab { bottom: 88px; }
+  /* hotfix 2026-06-02 12:50 — FAB bottom 88 → 160. status-bar(24+~60h≈84) + canvas-controls(80+~136h≈216) 와 명확 분리.
+     status-bar 위에 띄워서 우하단 thumb-reach 정통 모바일 패턴 유지. */
+  .fab { bottom: 160px; }
 }
 
 /* ---------------- "+새지시" modal ---------------- */
@@ -447,7 +465,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   border-bottom: 2px solid var(--c-yellow);
   color: var(--text-dim);
   font-size: 12px;
-  z-index: 40;
+  z-index: 100; /* hotfix 2026-06-02 12:50 — side-panel(60)·bottom-sheet·modal 위로 보장. close × 항상 클릭 가능. */
 }
 .david-banner__icon { font-size: 14px; }
 .david-banner__text { color: var(--text); font-weight: 500; }

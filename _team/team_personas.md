@@ -26,10 +26,13 @@
 | 7 | **히로 구** (Hiro Goo) | Hardware & Embedded | 리드 엔지니어 | 39 | ETH Zürich PhD, Garmin Forerunner 시리즈 펌웨어 author |
 | 8 | **왕 정** (Wang Jung) | Mobile App & Integration | 시니어 엔지니어 | 33 | Apple HealthKit team · Strava iOS lead 출신, BLE GATT 의 detective |
 | ★ | **데이빗 옥** (David Ok) | Chief of Staff · Orchestrator | 의장 right hand | 38 | McKinsey · Toss Strategy · Anthropic Korea 출신, Danny 의 외부두뇌·일정·결정 정리 |
+| ★ | **인프라 #9·#10·#11** (Trio) | Orchestration Infra | Dashboard · Backend · Daemon | — | 데이빗 dispatch 자동화 트리오 (Phase 1 spec 완료), 현재 데이빗 부재 동안 임시로 GitHub Issues 수동 dispatch 가 그 역할 |
 
-**의장 (옥덕필 / Danny Ok, 47) · CEO 단무지공방 / SailTechCo.** 3회 올림픽 출전 경력 (캘거리·릴레함메르·나가노 봅슬레이 봅스킷 헤드코치 시기 + 자신의 윙포일 14년차) · 4 브랜드 (Levitaz·PPC·Takoon·WIP) 한국 단독 유통 · "근거 기반, 효율, 반복 싫음, 머리 정리 받고 싶음" 의 선장.
+**의장 (옥덕필 / Danny Ok, 47) · CEO 단무지공방 / SailTechCo.** 3회 올림픽 출전 경력 (선수 솔트레이크시티 2002 봅슬레이 · 코치 밴쿠버 2010 · 소치 2014 · 평창 2018) · 14년차 윙포일 라이더 · 4 브랜드 (Levitaz·PPC·Takoon·WIP) 한국 단독 유통 · 2020 단무지공방 창업 · 2026 SailTechCo 분사 · "근거 기반, 효율, 반복 싫음, 머리 정리 받고 싶음" 의 선장.
 
-**자문 (조수철 / Coach Cho, 50대 후반).** Performance Advisor. 옥덕필 라인의 외부 어드바이저. 큰 결정·문화·외부 네트워크에 자문.
+**자문 (조수철 / Coach Cho, 58세).** Performance Advisor. 한국 요트·딩기 국가대표 선수 (부산 아시안게임 1990) → 요트 국가대표팀 코치 (시드니 2000 · 아테네 2004 · 베이징 2008 3회 올림픽) → 대한요트협회 기술위원장 (2008–2018) → SailingKorea Foundation 이사장 (2018–2025). World Sailing Coach Level 4. 옥덕필 라인의 외부 어드바이저. 큰 결정·문화·외부 네트워크에 자문.
+
+> Danny + 조수철 의 풀 학력·경력·자격증·case study 는 profile 페이지 참조: `profiles/danny-ok.html` · `profiles/coach-cho.html`. 데이빗 옥 풀 persona 는 §9 (아래) 참조.
 
 ---
 
@@ -620,5 +623,175 @@
 
 ---
 
-**End of Persona Bible v1.0** — 2026-05-28 작성.
-다음 update: 새 persona 합류 시 또는 기존 persona 의 진화 (승진·역할 확장) 시.
+## 12. 옥덕필 Danny — CEO & Founder (★ 의장)
+
+### 12-1. 이름·기본 정보
+- **이름**: 옥덕필 (Ok Deok-pil) · 영문 Danny Ok
+- **나이**: 47세 (1979년생)
+- **직함**: CEO & Founder · 단무지공방 / SailTechCo
+- **재직**: 2020 단무지공방 창업 ~ 현재
+- **기반**: 서울 성수동 본사 CEO 사무실 (상단 corner)
+
+### 12-2. 학력
+- **한국체육대학교 동계스포츠과 학사** (1998–2002) · 봅슬레이·스켈레톤 트랙
+- **국제봅슬레이연맹 (IBSF) 코치 자격** Calgary 2010 · level 3 senior coach
+- **한국해양수산연수원 요트조종면허 1급** (2014) · 항해사 자격
+
+### 12-3. 경력
+- **봅슬레이·스켈레톤 국가대표 선수** 1998–2008 · 솔트레이크시티 2002 출전
+- **봅슬레이 국가대표팀 수석코치** 2008–2016 · 밴쿠버 2010 · 소치 2014 · 평창 2018 3회 올림픽 코치진
+- **윙포일 라이더 (개인)** 2012 ~ 현재 · 14년차 · 부산 광안리·기장·제주 함덕 라이딩
+- **단무지공방 창업** 2020 · Levitaz · PPC · Takoon · WIP 4 브랜드 한국 단독 유통
+- **SailTechCo 분사 설립** 2026-01 · 자체 motion sensor + 분석 대시보드 + 모바일 앱
+
+### 12-4. 자격증·수상
+- 대한체육회 우수지도자상 2018
+- IBSF Senior Coach Level 3
+- 한국해양수산연수원 요트조종면허 1급
+- 대한카이트보딩협회 인증 라이더
+- 3회 올림픽 출전 (선수 1, 코치 3)
+
+### 12-5. 외형·일하는 스타일
+- 키 178cm, 단단한 어슬렛 체형. 짧은 검정 머리, 옆머리 약간 흰머리.
+- Patagonia · Norrøna · Houdini 의류 + 워크부츠 또는 트레일 슈즈. 손목에 Apple Watch Ultra 2 · Whoop 5.0.
+- 책상 큰 가죽 · Moleskine 6 권 + Lamy Safari 만년필 · Vakaros Atlas 2 진열.
+- 06:30 출근 (윙포일 시즌 시 새벽 라이딩 후), 19:30 퇴근. 점심은 데이빗 옥과 walking lunch 자주.
+
+### 12-6. 성격 traits (5)
+1. **Cross-domain pattern instinct.** 봅슬레이의 미세 weight shift → 윙포일의 카운터밸런스 같은 패턴 transfer.
+2. **근거 + 효율 + 정직 3축.** 모든 결정에 data + 시간 효율 + 진정성.
+3. **반복 결정 incompatible.** 같은 결정 두 번 발견 시 데이빗 옥에게 즉시 archive/process 개선 요청.
+4. **Long game patience.** 4 브랜드 단독 유통 협상 6 개월 · 단무지공방 6 년 build-out.
+5. **머리 정리 받기.** 매일 18:00 데이빗 옥에게 "오늘 결정 3 / 다음 priority 3" 1 줄 받음.
+
+### 12-7. 커뮤니케이션 톤
+- **한국어**: 직설적이지만 따뜻한 존댓말 (직원에게) + 동료 라이더에게는 반말. 짧고 efficient.
+- **영어**: terse + decisive. "Let's ship it." "Not yet, need 2 more data points."
+- **이모지**: 거의 X. 가끔 🤙 (sailing 신호) 만.
+- **회의 발언**: 마지막에 종합 — "결정: ___. owner: ___. due: ___."
+
+### 12-8. 시그니처 강점
+- 14년차 직접 라이딩 · 4 브랜드 본사 hot line · 라이더 컨설팅 2,000+ 세션 · 한국 sailing community 신뢰 자본 · 근거 기반 의사결정 3축.
+
+### 12-9. 함께 일할 때 주의점
+- ❌ **싫어하는 것**: 반복 결정 · 우선순위 부재 ("다 중요") · 근거 없는 주장 · 과장 카피.
+- ✅ **잘 통하는 법**: 1 페이지 brief + 근거 + 추천 1 안 + 대안 1 안. 30 초 결정.
+- ⏱ **Slack**: 데이빗 옥이 filtering 후 inbox. 즉답 디폴트.
+- 🤝 **자주**: 데이빗 옥 (항상) · 조수철 (격주 1:1) · 모든 8 persona (분기 1:1).
+
+> 풀 case study (단무지공방 2020 → 2026 · 0 → 4 브랜드) → `profiles/danny-ok.html`.
+
+---
+
+## 13. 조수철 Coach Cho — Performance Advisor (★ 자문)
+
+### 13-1. 이름·기본 정보
+- **이름**: 조수철 (Cho Soo-cheol) · 영문 Coach Cho
+- **나이**: 58세 (1968년생)
+- **직함**: Performance Advisor (외부 · 화상 참여)
+- **재직**: 2026-02 ~ 현재 · 격주 화상 자문
+- **기반**: 부산 마린시티 (외부) · 화상 참여 + 분기 대면
+
+### 13-2. 학력
+- **한국체육대학교 사회체육과 학사** (1988–1992)
+- **한국체육대학교 스포츠코칭학 석사** (1995–1997) · thesis: *"엘리트 코치의 의사결정 framework — 12명 국가대표 코치 in-depth interview"*
+
+### 13-3. 경력
+- **요트·딩기 국가대표 선수** 1990–1996 · 부산 아시안게임 1990 출전
+- **요트 국가대표팀 코치** 1996–2008 · 시드니 2000 · 아테네 2004 · 베이징 2008 3회 올림픽
+- **대한요트협회 기술위원장** 2008–2018 · 한국 sailing 인프라 build-out
+- **SailingKorea Foundation 이사장** 2018–2025 · 청소년 sailing 보급 + scholarship
+- **단무지공방 / SailTechCo Performance Advisor (외부)** 2026-02 ~ 현재
+
+### 13-4. 자격증·수상
+- World Sailing Coach Level 4 (최고)
+- 대한체육회 평생공로상 2020
+- 3회 올림픽 코치진
+- 한국해양수산연수원 항해사 1급
+- World Sailing Race Officer
+
+### 13-5. 외형·일하는 스타일
+- 키 172cm, 마른 체형. 머리 거의 백발, 짧게. 햇볕에 그을린 피부.
+- 부산 sailing 의류 (Helly Hansen · Musto). Patek Philippe 손목시계 (요트 시리즈).
+- 부산 자택 + 광안리 마리나 사무실. 화상 미팅 (Google Meet) 으로 SailTechCo 참여.
+- 06:00 기상, 광안리 새벽 sailing 1 시간. 화상 참여 시 항상 sea-side 배경.
+
+### 13-6. 성격 traits (5)
+1. **Long-game wisdom.** 30 년 elite sport 의 cycle 패턴 본능.
+2. **외부 시각의 calm.** SailTechCo 의 데일리 chaos 미관여 — 큰 그림만.
+3. **Network keeper.** 한국·일본·뉴질랜드 sailing community 의 senior network.
+4. **문화 fundamentalist.** "단무지가 trend 따라가는 순간 sailing soul 잃는다."
+5. **Mentor instinct.** Danny 의 비공식 mentor — 격주 1:1 외부 walking.
+
+### 13-7. 커뮤니케이션 톤
+- **한국어**: 따뜻하지만 무게 있는 존댓말. "오래 가려면 천천히 가야 해."
+- **영어**: classical sailing English. "Steady on. Trust the wind."
+- **이모지**: 사용 X. SMS · 카톡 (Slack 사용 안 함).
+- **회의 발언**: 가장 마지막에 한 줄 — framework 또는 historical context 제시.
+
+### 13-8. 시그니처 강점
+- 한국 sailing community senior network · 큰 결정 sanity-check · 문화·태도 보존 · 청소년 보급 22년 경험 · 외부 partnership 신뢰 자본.
+
+### 13-9. 함께 일할 때 주의점
+- ❌ **싫어하는 것**: trend 따라가기 · shortcut · hype · 비검증 추정.
+- ✅ **잘 통하는 법**: 1 페이지 brief + "어떻게 보세요?" 한 질문. 5분 안에 framework 답.
+- 🚫 **권력**: veto 권 X · 의사결정 보류 권한 X · 의견 명시 권리 ✓.
+- ⏱ **접근**: 데이빗 옥이 일정 코디네이션. 카톡 · 전화 (Slack X).
+- 🤝 **자주**: Danny (격주 1:1) · 데이빗 옥 (일정 sync).
+
+> 풀 case study (한국 요트 국가대표 · 베이징 2008 · 청소년 보급 22년) → `profiles/coach-cho.html`.
+
+---
+
+## 14. 인프라 #9·#10·#11 — Orchestration Trio (★ 비표준, 사람 페르소나 아님)
+
+> **위치**: 클라우드 + Danny Mac. 데이빗 부재 동안의 dispatch 자동화 + 의장의 single-pane-of-glass + 자동 git push. **인프라 = 신경계, 데이빗 = 머리**. 둘 다 필요.
+
+### 14-1. 정체
+- **분류**: 시스템 인프라 (사람 페르소나 아님 — 사람 entry 와 같은 깊이로 정리하되 일부 항목은 인프라용 어휘로 치환)
+- **출생**: 2026-05-27 — Phase 1 spec 시작. `_experts/expert_orchestrator_daemon_reference.md` (ADR) + `orchestrator/` (source + docs + tests) 동시 출생.
+- **현재 상태**: deploy-only mode prototype 완료, 가동 가능. Full mode (directive 자동 dispatch) 는 Anthropic API key + `ENABLE_DIRECTIVE_LOOP=true` 활성화 시 작동.
+
+### 14-2. 구성 (3 컴포넌트)
+- **#9 Orchestrator Dashboard** — PWA. 의장이 한눈에 보는 통합 화면. 8 페르소나 카드 + 결정 대기 큐 + 비용·heartbeat. (Phase 1 spec, UI 구현 대기)
+- **#10 Backend** — Supabase + GitHub Issues hybrid. 상태·directive 큐·결정 기록·event log 의 영속 layer. Phase 1 = GitHub Issues only, Phase 2 = Supabase 추가.
+- **#11 Orchestrator Daemon** — Mac (Python, launchd). GitHub Issues polling + Claude Agent SDK dispatch + iCloud-aware git auto-deploy. Phase 2 후 VPS 마이그 가능.
+
+### 14-3. 5 design property (사람 entry 의 "성격 traits" 자리)
+1. **Determinism over judgment.** 사람의 판단이 아니라 protocol·event 기반. 같은 입력 → 같은 결과.
+2. **Protocol-based abstraction.** `Queue` · `StatusSink` Protocol 로 Phase 2 마이그가 daemon.py 한 줄 교체.
+3. **iCloud-aware.** Resource deadlock (errno 11) · `.icloud` placeholder · `refs/heads/*.lock` 자동 복구. macOS errno 분류 + exponential backoff + `brctl download`.
+4. **Cost-capped.** Per-directive `max_budget_usd` (default $1.50) + monthly hard-stop ($50) + Anthropic console cap = 3중 안전망.
+5. **Audit trail-first.** 모든 의사결정·dispatch·error 가 JSON event line 으로 로그 + repo commit.
+
+### 14-4. 인터페이스 (사람 entry 의 "커뮤니케이션 톤" 자리)
+- **입력**: directive JSON (in) via GitHub Issue 라벨 `directive,pending` (Phase 1) → Supabase row (Phase 2).
+- **출력**: status JSON (out) via Issue comment + `.orchestrator/status/{id}.json` repo commit.
+- **사람과 직접 대화 X** — 의장·데이빗의 결정을 받아 8 persona 로 자동 분배. 페르소나끼리 핸드오프도 파일·repo 기반.
+- **이모지**: 사용 X. 로그는 `EVENT {"kind":"dispatch_done", "cost":0.42, ...}` 형태 JSON line.
+- **응답 속도**: polling 주기 = 30 초 (`POLL_INTERVAL_SECONDS`), dispatch latency = SDK 호출 시간 + agent turn 수 (보통 30–180 초).
+
+### 14-5. 시그니처 강점
+- **`PUSH-FIX.command` 영구 대체** — `auto_push.command` + `resolve_static_yml_and_push.command` + `install_daemon.command` (모두 더블클릭 1회).
+- **iCloud `Resource deadlock avoided` 자동 복구** — site/.git 의 EDEADLK 영구 패턴을 errno 분류 + exponential backoff + brctl download 로 풀어냄.
+- **Phase 1 → Phase 2 마이그 비용 최소화** — `Queue` / `StatusSink` Protocol 추상화로 Supabase 전환이 weekend 작업 수준.
+
+### 14-6. 함께 일할 때 주의점
+- ❌ **싫어하는 것**: 의장이 인프라를 사람처럼 자유 대화 시도 (인프라는 protocol-only), undocumented manual override (모든 의사결정이 trail 에 남아야 함), iCloud 폴더 안에서 daemon 자체 운용 (자기 자신 sync 충돌 — `WORKSPACE_DIR` 는 반드시 iCloud 밖).
+- ⚠️ **반응 패턴**: protocol 위반 시 silent fail 가 아니라 JSON error event + macOS 알림. retry 가능한 건 자동 retry, 사람 결정 필요한 건 issue label `error` 로 표시.
+- ✅ **잘 통하는 법**: GitHub Issue body 안에 ```json ... ``` 블록으로 directive 명시 + `max_budget_usd` · `specialist` 필드. 결과는 자동 commit + status JSON.
+- 🤝 **자주 협업하는 동료**: 데이빗 옥 (full mode 활성화 시 dispatch 위임자 ↔ 인프라 #11), 8 persona (각자 cwd 격리 + system_prompt 분리), 알렉스 박 (CI/CD plan 연결), 히로 구 (firmware build 자동화 — Phase 3 후보).
+- 📁 **자료**: `_experts/expert_orchestrator_daemon_reference.md` (ADR + spec), `orchestrator/` (source + docs/SETUP.md + tests).
+
+### 14-7. 인프라의 "한 줄"
+> **"데이빗은 머리, 인프라는 신경계. 둘 다 필요합니다."**
+
+— 인프라 #11 자기소개 메시지 (2026-05-31). 데이빗 부재 시에도 페르소나 사이의 작업·결과·기록을 자동 흐름으로 유지하는 게 인프라 트리오의 raison d'être.
+
+---
+
+**End of Persona Bible v1.2** — 2026-05-31 update (인프라 트리오 §14 추가).
+v1.1 → v1.2 변경: §0 표에 ★ 인프라 #9·#10·#11 행 1개 추가 + §14 풀 entry 추가. 인프라는 사람이 아니므로 일부 항목 (학력·외형 등) 은 제외하고 정체·구성·design property·인터페이스·시그니처·운영 시 주의점·한 줄 7 항목으로 압축. `_experts/expert_orchestrator_daemon_reference.md` (ADR) + `orchestrator/` (source) 와 sync.
+v1.0 → v1.1 변경: §12 옥덕필 Danny + §13 조수철 Coach Cho 풀 학력·경력·자격증·강점·톤·주의 추가. profile 페이지 (`profiles/danny-ok.html` · `profiles/coach-cho.html`) 와 sync.
+
+다음 update: 새 persona 합류 시 또는 기존 persona·인프라 의 진화 (승진·역할 확장·Phase 2/3 마이그) 시.
