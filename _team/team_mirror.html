@@ -135,25 +135,25 @@ function robot(o){
     <rect x="32" y="54" width="16" height="8" rx="3" fill="${c}" opacity="0.5"/>
   </svg>`;
 }
-const COS=[{type:"p",name:"데이빗 옥",role:"팀 지휘·지시 전달",att:"work",now:"작전실 거울 개선",next:"—",assignable:false,
+const COS=[{type:"p",name:"데이빗 옥",role:"팀 지휘·지시 전달",att:"work",now:"QA 총괄·회원시스템 검토",next:"회원 로그인 연결",assignable:false,
   av:{bg:"#fdf3da",skin:"#e8c4a0",skinD:"#d4ad88",hair:"side",hairCol:"#2a2a2a",gray:true,glasses:"metal",shirt:"#2d3e5e"}}];
 const INFRA=[
- {type:"r",name:"인프라 #9",role:"대시보드 운영",att:"work",now:"화면 배치 정리 완료",next:"실데이터 연결",av:{col:"#2aa39a",bg:"#e4f4f2"}},
- {type:"r",name:"인프라 #10",role:"서버·데이터 관리",att:"off",now:"—",next:"—",av:{col:"#8a93a3",bg:"#eef0f3"}},
+ {type:"r",name:"인프라 #9",role:"대시보드 운영",att:"work",now:"거울 갱신·대시보드 운영",next:"실데이터 연결",av:{col:"#2aa39a",bg:"#e4f4f2"}},
+ {type:"r",name:"인프라 #10",role:"서버·데이터 관리",att:"work",now:"Supabase 점검 완료(95%)",next:"Kakao OAuth·로그인 연결",av:{col:"#8a93a3",bg:"#eef0f3"}},
  {type:"r",name:"인프라 #11",role:"자동화 총괄",att:"standby",now:"대기 모드",next:"옥대표님 명령 대기",av:{col:"#7c5cc4",bg:"#efe9f8"}},
 ];
 const EXPERTS=[
- {type:"p",name:"로즈 윤",role:"화면 디자인",att:"block",now:"대시보드 수정 마무리",next:"신규 지표 화면 디자인",frown:true,
+ {type:"p",name:"로즈 윤",role:"화면 디자인",att:"work",now:"디자인 일관성 QA 완료",next:"색·폰트 토큰 통일",
    av:{bg:"#eceef2",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#191919",glasses:"rimless",shirt:"#2b3340"}},
- {type:"p",name:"샘 정",role:"데이터 그래프",att:"work",now:"차트 시스템 정리",next:"운동 지표 차트(티모 확정 후)",
+ {type:"p",name:"샘 정",role:"데이터 그래프",att:"work",now:"계산기 그래프 QA 완료",next:"차트 통일·색 신호 보강",
    av:{bg:"#f3efe6",skin:"#f0d3bd",skinD:"#dcb89e",hair:"pony",hairCol:"#6b4a2f",glasses:"round",shirt:"#3a5168"}},
- {type:"p",name:"티모 강",role:"운동·라이딩 분석",att:"block",now:"훈련 부하 지표 확정",next:"동료 검토 받기",frown:true,
+ {type:"p",name:"티모 강",role:"운동·라이딩 분석",att:"work",now:"계산 알고리즘 QA 완료",next:"근거 보강(승인 후)",
    av:{bg:"#e9f0ec",skin:"#d6a378",skinD:"#c08e62",hair:"curlyShort",hairCol:"#7d7d7d",gray:true,glasses:"round",shirt:"#3a5f4a"}},
- {type:"p",name:"알렉스 박",role:"웹사이트 화면",att:"work",now:"화면 작업 마무리·오류검사 정비",next:"다음 단계 준비",
+ {type:"p",name:"알렉스 박",role:"웹사이트 화면",att:"work",now:"모바일 P0·담기버튼 38개",next:"회원 Supabase 연결",
    av:{bg:"#ecedef",skin:"#eac6a4",skinD:"#d6b08c",hair:"curlyShort",hairCol:"#171717",glasses:"round",shirt:"#262626"}},
- {type:"p",name:"메이 한",role:"사용 편의 연구",att:"block",now:"화면 사용성 점검 준비",next:"연구 문서 정리",frown:true,
+ {type:"p",name:"메이 한",role:"사용 편의 연구",att:"work",now:"UX QA 완료 15건",next:"구매흐름 개선",
    av:{bg:"#f3ece8",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#5a3d28",glasses:"none",shirt:"#c08560"}},
- {type:"p",name:"캔 최",role:"마케팅·홍보",att:"work",now:"6/3 오픈 홍보 + 울산 대회 준비",next:"옥대표님 승인 받기",
+ {type:"p",name:"캔 최",role:"마케팅·홍보",att:"work",now:"카톡 통일·콘텐츠 QA",next:"론칭 게시 카피",
    av:{bg:"#eaf1ea",skin:"#e6b88e",skinD:"#d1a173",hair:"short",hairCol:"#161616",cap:"#1a1f2b",glasses:"big",shirt:"#4f6f4f"}},
  {type:"p",name:"히로 구",role:"센서·기기 개발",att:"standby",now:"다음 단계(EVT) 대기",next:"장비 규격 확정",
    av:{bg:"#edeef0",skin:"#deb288",skinD:"#c89c70",hair:"short",hairCol:"#565656",gray:true,glasses:"square",shirt:"#444b4a"}},
