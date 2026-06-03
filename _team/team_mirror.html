@@ -60,6 +60,22 @@ footer{margin-top:12px;font-size:11px;color:#9aa1ac;text-align:center;}
   .seat svg{width:48px;height:48px;}
   .detail{display:none;}
 }
+.seat { cursor:pointer; }
+.tap-hint { font-size:9.5px; color:#aab0ba; margin-top:5px; text-align:center; }
+@media (max-width:540px){ .tap-hint{ display:none; } }
+.modal { position:fixed; inset:0; background:rgba(15,20,30,.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+.modal[hidden] { display:none; }
+.modal-card { background:#fff; border-radius:16px; max-width:380px; width:100%; padding:20px 18px; position:relative; box-shadow:0 12px 40px rgba(0,0,0,.22); }
+.modal-close { position:absolute; top:11px; right:14px; border:none; background:none; font-size:22px; color:#9aa1ac; cursor:pointer; line-height:1; }
+.modal-name { font-weight:800; font-size:16px; margin-bottom:12px; padding-right:24px; color:#1a1f2b; }
+.m-row { display:flex; flex-direction:column; gap:2px; padding:9px 0; border-top:1px solid #eef0f2; }
+.m-k { font-size:11px; font-weight:800; color:#9aa1ac; }
+.m-v { font-size:13.5px; color:#1a1f2b; line-height:1.45; }
+.m-hi .m-v { color:#1d4ed8; font-weight:700; }
+.m-learn { background:#fffbe9; margin:6px -8px 0; padding:9px 10px; border-radius:9px; border-top:none; }
+.m-learn .m-v { color:#9a6700; }
+.m-assign { margin-top:14px; width:100%; padding:11px; border:none; border-radius:10px; background:#1d4ed8; color:#fff; font-weight:700; font-size:13px; cursor:pointer; }
+.m-assign:active { transform:translateY(1px); }
 </style>
 </head>
 <body>
@@ -135,45 +151,47 @@ function robot(o){
     <rect x="32" y="54" width="16" height="8" rx="3" fill="${c}" opacity="0.5"/>
   </svg>`;
 }
-const COS=[{type:"p",name:"데이빗 옥",role:"팀 지휘·지시 전달",att:"work",now:"QA 총괄·회원시스템 검토",next:"회원 로그인 연결",assignable:false,
+const COS=[{type:"p",name:"데이빗 옥",role:"팀 지휘·지시 전달",att:"work",now:"아티팩트 거울 개선",done:"회원 로그인 연결·사이트 QA 총괄",next:"hero·about 검수 + 도메인 인증 안내",learn:"멀티에이전트 오케스트레이션 패턴",assignable:false,
   av:{bg:"#fdf3da",skin:"#e8c4a0",skinD:"#d4ad88",hair:"side",hairCol:"#2a2a2a",gray:true,glasses:"metal",shirt:"#2d3e5e"}}];
 const INFRA=[
- {type:"r",name:"인프라 #9",role:"대시보드 운영",att:"work",now:"거울 갱신·대시보드 운영",next:"실데이터 연결",av:{col:"#2aa39a",bg:"#e4f4f2"}},
- {type:"r",name:"인프라 #10",role:"서버·데이터 관리",att:"work",now:"Supabase 점검 완료(95%)",next:"Kakao OAuth·로그인 연결",av:{col:"#8a93a3",bg:"#eef0f3"}},
- {type:"r",name:"인프라 #11",role:"자동화 총괄",att:"standby",now:"대기 모드",next:"옥대표님 명령 대기",av:{col:"#7c5cc4",bg:"#efe9f8"}},
+ {type:"r",name:"인프라 #9",role:"대시보드 운영",att:"work",now:"거울 갱신·운영",done:"모바일 layout 종결·거울 라이브",next:"실데이터 자동 연결",learn:"실시간 상태 투영(state projection) 최적화",av:{col:"#2aa39a",bg:"#e4f4f2"}},
+ {type:"r",name:"인프라 #10",role:"서버·데이터 관리",att:"work",now:"Supabase 점검",done:"DB 스키마·SMTP·인증 점검(95%)",next:"Kakao OAuth 연결",learn:"RLS 행 보안 정책 심화",av:{col:"#8a93a3",bg:"#eef0f3"}},
+ {type:"r",name:"인프라 #11",role:"자동화 총괄",att:"standby",now:"대기 모드",done:"daemon·자동화 셋업",next:"옥대표님 명령 대기",learn:"이벤트 기반 워크플로우 설계",av:{col:"#7c5cc4",bg:"#efe9f8"}},
 ];
 const EXPERTS=[
- {type:"p",name:"로즈 윤",role:"화면 디자인",att:"work",now:"디자인 일관성 QA 완료",next:"색·폰트 토큰 통일",
+ {type:"p",name:"로즈 윤",role:"화면 디자인",att:"work",now:"디자인 QA",done:"디자인 일관성 QA·nav 간격 기준",next:"색·폰트 토큰 통일",learn:"W3C 디자인 토큰 시스템",
    av:{bg:"#eceef2",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#191919",glasses:"rimless",shirt:"#2b3340"}},
- {type:"p",name:"샘 정",role:"데이터 그래프",att:"work",now:"계산기 그래프 QA 완료",next:"차트 통일·색 신호 보강",
+ {type:"p",name:"샘 정",role:"데이터 그래프",att:"work",now:"그래프 QA",done:"계산기 그래프 QA",next:"차트 통일·색 신호 보강",learn:"Tufte 데이터 시각화 원칙",
    av:{bg:"#f3efe6",skin:"#f0d3bd",skinD:"#dcb89e",hair:"pony",hairCol:"#6b4a2f",glasses:"round",shirt:"#3a5168"}},
- {type:"p",name:"티모 강",role:"운동·라이딩 분석",att:"work",now:"계산 알고리즘 QA 완료",next:"근거 보강(승인 후)",
+ {type:"p",name:"티모 강",role:"운동·라이딩 분석",att:"work",now:"알고리즘 QA",done:"리프팅 계산 알고리즘 QA",next:"lock값 근거 보강(승인 후)",learn:"ACWR 부상예방 최신 연구",
    av:{bg:"#e9f0ec",skin:"#d6a378",skinD:"#c08e62",hair:"curlyShort",hairCol:"#7d7d7d",gray:true,glasses:"round",shirt:"#3a5f4a"}},
- {type:"p",name:"알렉스 박",role:"웹사이트 화면",att:"work",now:"모바일 P0·담기버튼 38개",next:"회원 Supabase 연결",
+ {type:"p",name:"알렉스 박",role:"웹사이트 화면",att:"work",now:"프론트 마무리",done:"모바일 P0·담기버튼 38·hero·nav·깨진링크",next:"회원 Supabase 마감",learn:"Core Web Vitals 성능 최적화",
    av:{bg:"#ecedef",skin:"#eac6a4",skinD:"#d6b08c",hair:"curlyShort",hairCol:"#171717",glasses:"round",shirt:"#262626"}},
- {type:"p",name:"메이 한",role:"사용 편의 연구",att:"work",now:"UX QA 완료 15건",next:"구매흐름 개선",
+ {type:"p",name:"메이 한",role:"사용 편의 연구",att:"work",now:"UX 점검",done:"UX QA 15건",next:"구매흐름 개선",learn:"모바일 결제 흐름 UX 패턴",
    av:{bg:"#f3ece8",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#5a3d28",glasses:"none",shirt:"#c08560"}},
- {type:"p",name:"캔 최",role:"마케팅·홍보",att:"work",now:"카톡 통일·콘텐츠 QA",next:"론칭 게시 카피",
+ {type:"p",name:"캔 최",role:"마케팅·홍보",att:"work",now:"콘텐츠 QA",done:"카톡 통일·콘텐츠 QA·about 카피",next:"6/3 론칭 게시 카피",learn:"인스타 릴스 알고리즘 트렌드",
    av:{bg:"#eaf1ea",skin:"#e6b88e",skinD:"#d1a173",hair:"short",hairCol:"#161616",cap:"#1a1f2b",glasses:"big",shirt:"#4f6f4f"}},
- {type:"p",name:"히로 구",role:"센서·기기 개발",att:"standby",now:"다음 단계(EVT) 대기",next:"장비 규격 확정",
+ {type:"p",name:"히로 구",role:"센서·기기 개발",att:"standby",now:"EVT 전 대기",done:"하드웨어 reference v1",next:"장비 규격 확정",learn:"BLE GATT 저전력 설계",
    av:{bg:"#edeef0",skin:"#deb288",skinD:"#c89c70",hair:"short",hairCol:"#565656",gray:true,glasses:"square",shirt:"#444b4a"}},
- {type:"p",name:"왕 정",role:"휴대폰 앱",att:"work",now:"앱 설계 문서 완료",next:"옥대표님 확인 3건",
+ {type:"p",name:"왕 정",role:"휴대폰 앱",att:"work",now:"앱 설계 완료",done:"모바일 앱 설계 문서",next:"옥대표님 verify 3건",learn:"HealthKit 워크아웃 API",
    av:{bg:"#ecedf1",skin:"#eac6a4",skinD:"#d6b08c",hair:"longCurly",hairCol:"#171717",glasses:"none",shirt:"#2b2b2b"}},
 ];
 const LABEL={work:"근무 중",block:"막힘",standby:"대기 중",off:"미출근"};
 function avatar(p){ return p.type==="r"? robot({...p.av,name:p.name}) : person({...p.av,name:p.name}); }
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 function seat(p){
-  const a=p.assignable===false?"false":"true";
   const cls="seat "+p.att+(p.assignable===false?" cos":"");
-  return `<div class="${cls}" data-assignable="${a}" data-name="${p.name}">
+  return `<div class="${cls}" tabindex="0" role="button" aria-label="${esc(p.name)} 상세 보기"
+      data-name="${esc(p.name)}" data-role="${esc(p.role)}" data-now="${esc(p.now)}" data-done="${esc(p.done)}" data-next="${esc(p.next)}" data-learn="${esc(p.learn)}" data-assignable="${p.assignable===false?'false':'true'}">
     ${avatar(p)}
     <div class="nm">${p.name}</div>
     <div class="ro">${p.role}</div>
     <div class="att ${p.att}">${LABEL[p.att]}</div>
     <div class="detail">
-      <div class="ln"><b>진행</b><span>${p.now||"—"}</span></div>
-      <div class="ln"><b>다음</b><span>${p.next||"—"}</span></div>
+      <div class="ln"><b>지금</b><span>${p.now||"—"}</span></div>
+      <div class="ln"><b>최근완료</b><span>${p.done||"—"}</span></div>
     </div>
+    <div class="tap-hint">탭 → 다음·학습 ▾</div>
   </div>`;
 }
 function rows(arr,n){const r=[];for(let i=0;i<arr.length;i+=n)r.push(arr.slice(i,i+n));return r;}
@@ -192,12 +210,42 @@ function render(){
   h+=`<div class="divider"></div><div class="deck-label">전문가 8</div>`;
   rows(EXPERTS,3).forEach(r=>{const rc=r.length===3?"three":(r.length===2?"two":"one");h+=`<div class="seats ${rc}" style="margin-bottom:9px">${r.map(seat).join("")}</div>`;});
   document.getElementById("room").innerHTML=h;
-  document.querySelectorAll('.seat[data-assignable="true"]').forEach(el=>el.addEventListener("click",()=>{
-    const name=el.getAttribute("data-name"); let m="";
-    try{m=window.prompt(name+"에게 지시할 내용:","");}catch(e){}
-    if(m&&m.trim()&&typeof sendPrompt==="function") sendPrompt("데이빗, "+name+"에게 다음을 지시해줘: "+m.trim());
-  }));
+  document.querySelectorAll('.seat').forEach(el=>{
+    const open=()=>openModal(el.dataset);
+    el.addEventListener("click",open);
+    el.addEventListener("keydown",e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+  });
 }
+function ensureModal(){
+  if(document.getElementById('modal'))return;
+  const m=document.createElement('div');
+  m.id='modal'; m.className='modal'; m.hidden=true;
+  m.innerHTML='<div class="modal-card" role="dialog" aria-modal="true">'
+    +'<button class="modal-close" aria-label="닫기">×</button>'
+    +'<div class="modal-name" id="m-name"></div>'
+    +'<div class="m-row"><span class="m-k">지금</span><span class="m-v" id="m-now"></span></div>'
+    +'<div class="m-row"><span class="m-k">최근 완료</span><span class="m-v" id="m-done"></span></div>'
+    +'<div class="m-row m-hi"><span class="m-k">다음 진행 방향</span><span class="m-v" id="m-next"></span></div>'
+    +'<div class="m-row m-learn"><span class="m-k">📚 오늘의 자율 학습</span><span class="m-v" id="m-learn"></span></div>'
+    +'<button class="m-assign" id="m-assign">이 사람에게 지시하기</button>'
+    +'</div>';
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m||e.target.classList.contains('modal-close'))closeModal();});
+}
+function openModal(d){
+  ensureModal();
+  document.getElementById('m-name').textContent=d.name+(d.role?'  ·  '+d.role:'');
+  document.getElementById('m-now').textContent=d.now||'—';
+  document.getElementById('m-done').textContent=d.done||'—';
+  document.getElementById('m-next').textContent=d.next||'—';
+  document.getElementById('m-learn').textContent=d.learn||'—';
+  const a=document.getElementById('m-assign');
+  if(d.assignable==='false'){a.style.display='none';}
+  else{a.style.display='';a.onclick=()=>{let m='';try{m=window.prompt(d.name+'에게 지시할 내용:','');}catch(e){} if(m&&m.trim()&&typeof sendPrompt==='function'){sendPrompt('데이빗, '+d.name+'에게 다음을 지시해줘: '+m.trim());}closeModal();};}
+  document.getElementById('modal').hidden=false;
+}
+function closeModal(){const m=document.getElementById('modal');if(m)m.hidden=true;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 render();
 </script>
 </body>

@@ -4481,6 +4481,33 @@ p {
   object-position: center 40%;
   display: block;
 }
+/* §183 (Danny 2026-06-03): 옥대표 세로 라이딩샷 — 인물(머리·상체) 보존 크롭.
+   가로 cinematic frame에 세로 사진을 cover 할 때 인물 우측·상단 치우침 보정 +
+   채도·대비 약간 ↑ (역광 보정). 데스크탑/모바일 object-position 분리. */
+.hero__cine-image--danny {
+  /* 인물(헬멧 머리 + 팔 + 상체) = vertical 22~58%, head 우상단 ~60% 가로.
+     데스크탑은 가로 cinematic → 세로 좁은 band 만 보이므로 인물 중심(약 32%)에 맞춤. */
+  object-position: 60% 32%;
+  filter: saturate(1.12) contrast(1.06) brightness(1.02);
+}
+@media (min-width: 1280px) {
+  /* 21:9 = band 더 좁음 → 머리·어깨에 더 바짝 */
+  .hero__cine-image--danny { object-position: 60% 30%; }
+}
+@media (max-width: 768px) {
+  /* 모바일 90vh = 사진 비율(0.56)과 거의 동일 → 거의 전체 노출, 살짝 상단 */
+  .hero__cine-image--danny { object-position: 58% 26%; }
+}
+/* §183 (Danny 2026-06-03): about.html 시상식 실적 banner — 모바일 stack. */
+@media (max-width: 768px) {
+  .about-achievement {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+  }
+  .about-achievement > div {
+    padding: 24px 24px 28px !important;
+  }
+}
 .hero__cine-overlay {
   position: absolute; inset: 0;
   background: linear-gradient(

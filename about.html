@@ -309,9 +309,10 @@
     <div class="grid grid-2 reveal" style="gap:32px;max-width:1080px;margin-left:auto;margin-right:auto">
       <!-- 옥덕필 박사 -->
       <article class="value-card" style="padding:32px">
-        <div style="width:100%;aspect-ratio:4/3;border-radius:14px;background:linear-gradient(135deg,var(--color-navy),var(--color-sea-dark));display:flex;align-items:center;justify-content:center;margin-bottom:24px" aria-label="옥덕필 박사 사진 자리">
-          <span style="font-family:var(--font-sans-en);font-size:3rem;font-weight:900;color:rgba(255,255,255,0.85);letter-spacing:-0.04em">옥덕필</span>
-        </div>
+        <!-- §183 (Danny 2026-06-03): 옥덕필 박사 라이딩샷 실사진 — 세로 사진 → 4/3 box object-position 상단 보존. -->
+        <img src="assets/images/about/danny-riding-portrait.jpg" alt="옥덕필 박사 윙포일 라이딩"
+             loading="lazy" decoding="async"
+             style="width:100%;aspect-ratio:4/3;border-radius:14px;object-fit:cover;object-position:center 22%;margin-bottom:24px;display:block">
         <span class="pill pill--accent" style="margin-bottom:12px">운동생리학박사 · 퍼포먼스 컨설팅</span>
         <h3 class="t-h2" style="margin:0 0 12px">옥덕필 박사</h3>
         <p style="color:var(--text-secondary);font-size:1rem;line-height:1.75;margin:0 0 16px">
@@ -336,6 +337,20 @@
           포뮬러 카이트와 윙포일은 같은 하이드로포일 플랫폼을 공유합니다. 그 cross-platform 감각으로 단무지공방의 레이스·상급 셋업 컨설팅에 현장 라이더의 시선을 더합니다.
         </p>
       </article>
+    </div>
+
+    <!-- §183 (Danny 2026-06-03): 시상식 1위 사진 — 실적·신뢰 banner. 운영진 grid 아래. -->
+    <div class="reveal about-achievement" style="max-width:1080px;margin:48px auto 0;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:center;background:var(--color-navy);border-radius:18px;overflow:hidden">
+      <img src="assets/images/about/danny-masters-cup-win.jpg" alt="옥덕필 박사 윙포일 대회 시상식 1위"
+           loading="lazy" decoding="async"
+           style="width:100%;height:100%;min-height:260px;object-fit:cover;object-position:center;display:block">
+      <div style="padding:32px 36px 32px 8px;color:#fff">
+        <span class="pill pill--accent" style="margin-bottom:14px">현장에서 증명한 실적</span>
+        <h3 class="t-h2" style="margin:0 0 12px;color:#fff">물 위에서 검증된 신뢰</h3>
+        <p style="color:rgba(255,255,255,0.82);font-size:1rem;line-height:1.75;margin:0">
+          책상 위 스펙이 아니라, 시상대 위에서 증명한 퍼포먼스입니다. 단무지공방의 큐레이션은 직접 경쟁하고 우승해 본 사람의 눈으로 설계됩니다.
+        </p>
+      </div>
     </div>
   </div>
 </section>
