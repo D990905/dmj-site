@@ -43,7 +43,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
 
@@ -371,7 +371,7 @@
       </div>
 
       <p class="calc-disclaimer">
-        <b>물리 모델</b> — CL: 저AR(<5)=1.15·중AR=1.0·고AR(>8)=0.85 / 펌핑 스킬: 마스터수준 ×0.95 (v_min 아래로 펌핑으로 부상) · 보통수준 ×1.05 · 거의 못함 ×1.15 (v_min 위 안정 부상 필요) / Gear mass = 위 입력값 (default 10kg) / ρ_water: 바다 1025 · 민물 1000 (kg/m³) / Surface: flat×1.00·choppy×1.05·swell×0.95·mixed×1.00 (swell-assist).
+        <b>물리 모델</b> — CL: 저AR(&lt;5)=1.15·중AR=1.0·고AR(&gt;8)=0.85 / 펌핑 스킬: 마스터수준 ×0.95 (v_min 아래로 펌핑으로 부상) · 보통수준 ×1.05 · 거의 못함 ×1.15 (v_min 위 안정 부상 필요) / Gear mass = 위 입력값 (default 10kg) / ρ_water: 바다 1025 · 민물 1000 (kg/m³) / Surface: flat×1.00·choppy×1.05·swell×0.95·mixed×1.00 (swell-assist).
       </p>
     </form>
   </section>
@@ -570,7 +570,7 @@
           <p class="wso-curve__caption" id="wso-heelcurve-caption"></p>
         </div>
 
-        <p class="wso-vlimit-caption">
+        <div class="wso-vlimit-caption">
           <b>풍상 진행 속도</b> = 해당 윙·포일·스킬·풍속 조합에서, 스킬별 풍상 진행 각도로 풍상을 올라갈 때
           도달 가능한 <span class="term" title="Speed Over Ground — GPS 기준 보드의 절대 진행 속도">보드 속도(SOG)</span>입니다.
           <strong>윙이 끌어주는 힘 = 포일이 받는 저항</strong> 의 균형점을 물리 모델로 계산합니다.
@@ -585,7 +585,7 @@
           T = 0.5·ρ·V_app²·A·C_L·[sin β − cos β/(L/D_eff)],  D_foil = M·g/(L/D_foil_eff),
           heel cap: C_L ≤ 2·M·g·tan(θ_heel)/(ρ·V_app²·A·cos β)
           </span></details>
-        </p>
+        </div>
 
         <!-- §180-B (Danny 2026-05-17) — VMG 어드바이저: 한국어 친화 표현 -->
         <div class="wso-advisor" id="wso-advisor" style="margin:0 0 16px;padding:14px 16px;border-radius:12px;background:linear-gradient(180deg,#f0f9ff 0%,#e0f2fe 100%);border:1px solid #7dd3fc">
