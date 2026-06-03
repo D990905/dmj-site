@@ -203,6 +203,22 @@
           <a href="https://pf.kakao.com/_VITZX/chat" class="btn btn--accent btn--lg" target="_blank" rel="noopener">카톡 1:1 상담</a>
           <a href="../../find-my-gear.html" class="btn btn--ghost btn--lg">1분 진단 →</a>
         </div>
+        <!-- §171-B v4 (Danny 2026-06-03) — 제품 상세 "장바구니 담기". matrix.js delegated handler + cart.js 연동. DO_NOT_REVERT §171-B v4 -->
+        <div class="pd-buy">
+          <label class="sr-only" for="pd-buy-size">사이즈 선택</label>
+          <select class="pd-buy__size" id="pd-buy-size" data-buy-size>
+            <option value="3.0">3.0 m²</option>
+            <option value="3.5">3.5 m²</option>
+            <option value="4.0">4.0 m²</option>
+            <option value="4.5">4.5 m²</option>
+            <option value="5.0" selected>5.0 m²</option>
+            <option value="5.5">5.5 m²</option>
+            <option value="6.0">6.0 m²</option>
+            <option value="7.0">7.0 m²</option>
+          </select>
+          <button type="button" class="btn btn--secondary btn--lg pd-buy__addcart" data-cart-add data-cart-state="out" data-sku="ppc-m1" data-size="5.0" aria-label="장바구니에 담기">장바구니 담기</button>
+          <p class="pd-buy__note">회원 전용 · 장바구니에서 견적 요청까지 진행됩니다.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -520,6 +536,32 @@
     </div>
   </div>
 </footer>
+  <!-- §171-B v4 (Danny 2026-06-03) — 제품 상세 장바구니. supabase-auth(DMJAuth) + cart.js(DMJCart) + matrix.js(delegated [data-cart-add] handler + getPrice). DO_NOT_REVERT §171-B v4 -->
+  <script src="../../assets/js/supabase-auth.js?v=supabase-180-20260527"></script>
+  <script src="../../assets/js/cart.js"></script>
+  <script src="../../assets/js/matrix.js"></script>
+  <script>
+  (function () {
+    var sel = document.querySelector('[data-buy-size]');
+    var btn = document.querySelector('.pd-buy__addcart[data-cart-add]');
+    if (sel && btn) {
+      sel.addEventListener('change', function () {
+        btn.setAttribute('data-size', sel.value);
+        if (window.DMJCart) {
+          var sku = btn.getAttribute('data-sku');
+          var inCart = false;
+          try {
+            inCart = window.DMJCart.getItems().some(function (it) {
+              return it && it.sku === sku && (it.size || '') === sel.value;
+            });
+          } catch (e) { inCart = false; }
+          if (inCart) { btn.classList.add('mtx-item__addcart--in'); btn.setAttribute('data-cart-state','in'); btn.textContent='✓ 담김'; }
+          else { btn.classList.remove('mtx-item__addcart--in'); btn.setAttribute('data-cart-state','out'); btn.textContent='장바구니 담기'; }
+        }
+      });
+    }
+  })();
+  </script>
   <script src="../../assets/js/nav-auth.js" defer></script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="../../assets/css/agent-deny.css">

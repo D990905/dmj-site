@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>단무지그룹 팀 거울</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif; background:#f6f7f9; color:#1a1f2b; line-height:1.4; padding:16px; -webkit-font-smoothing:antialiased; }
+.wrap { max-width: 800px; margin:0 auto; }
+h1 { font-size:19px; font-weight:800; }
+h1 .stamp { color:#c79a16; }
+.sub { color:#6b7280; font-size:12px; margin-top:2px; }
+.summary { display:flex; flex-wrap:wrap; gap:7px; margin:11px 0 6px; }
+.chip { font-size:12px; font-weight:600; padding:4px 10px; border-radius:999px; background:#eceef1; color:#374151; border:1px solid #e2e5ea; }
+.chip b{font-weight:800;}
+.chip.work{background:#e9f8ee;color:#166534;border-color:#cdeed8;}
+.chip.block{background:#fdeaea;color:#b3261e;border-color:#f6d2d0;}
+.chip.standby{background:#fff6e5;color:#9a6700;border-color:#f3e0b3;}
+.chip.off{background:#eef0f2;color:#6b7280;border-color:#e2e5ea;}
+.hint{font-size:12px;color:#4b5563;background:#fffbe9;border:1px solid #f3e6b3;border-radius:10px;padding:8px 11px;margin:8px 0 14px;}
+.hint b{color:#1a1f2b;}
+.board{text-align:center;font-size:11px;font-weight:800;letter-spacing:.12em;color:#cfe3d6;background:linear-gradient(#1f3a2e,#24493a);border-radius:8px;padding:7px;margin-bottom:14px;}
+.deck-label{font-size:10.5px;font-weight:800;letter-spacing:.09em;color:#9aa1ac;text-transform:uppercase;text-align:center;margin:0 0 7px;}
+.seats{display:grid;gap:9px;justify-content:center;}
+.seats.one{grid-template-columns:minmax(180px,230px);}
+.seats.three{grid-template-columns:repeat(3,minmax(110px,170px));}
+.seats.two{grid-template-columns:repeat(2,minmax(110px,170px));}
+.seat{background:#fff;border:1px solid #e6e8ec;border-radius:13px;padding:11px 9px 10px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.seat[data-assignable="false"]{cursor:default;}
+.seat:active{transform:translateY(1px);}
+.seat.work{border-top:3px solid #22c55e;}
+.seat.block{border-top:3px solid #ef4444;}
+.seat.standby{border-top:3px solid #f0b429;}
+.seat.off{border-top:3px solid #c2c7cf;}
+.seat.cos{background:#fffaf0;border:1.5px solid #e6c558;}
+.seat svg{width:62px;height:62px;border-radius:50%;}
+.seat .nm{font-weight:800;font-size:13px;margin-top:2px;}
+.seat .ro{font-size:11px;color:#5b6470;}
+.att{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;margin-top:1px;}
+.att.work{background:#e9f8ee;color:#166534;}
+.att.block{background:#fdeaea;color:#b3261e;}
+.att.standby{background:#fff6e5;color:#9a6700;}
+.att.off{background:#eef0f2;color:#6b7280;}
+.detail{margin-top:5px;width:100%;text-align:left;border-top:1px dashed #ececf0;padding-top:5px;}
+.detail .ln{font-size:10.5px;color:#374151;margin-top:2px;display:flex;gap:4px;}
+.detail .ln b{color:#9aa1ac;font-weight:800;flex:0 0 auto;}
+.detail .ln span{overflow:hidden;text-overflow:ellipsis;}
+.divider{height:1px;background:#e6e8ec;margin:13px 0;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:14px 0 4px;font-size:11.5px;color:#6b7280;}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.dot{width:9px;height:9px;border-radius:999px;display:inline-block;}
+.dot.work{background:#22c55e;}.dot.block{background:#ef4444;}.dot.standby{background:#f0b429;}.dot.off{background:#c2c7cf;}
+footer{margin-top:12px;font-size:11px;color:#9aa1ac;text-align:center;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+@media (max-width:540px){
+  .seats.three{grid-template-columns:repeat(3,1fr);gap:6px;}
+  .seat{padding:9px 5px 8px;}
+  .seat svg{width:48px;height:48px;}
+  .detail{display:none;}
+}
+</style>
+</head>
+<body>
+<h2 class="sr-only">단무지그룹 작전실 — 12명 좌석. 앞 데이빗(CoS), 인프라 3, 전문가 8(3·3·2). 출근/진행/대기 상태와 담당·진행중·다음 업무.</h2>
+<div class="wrap">
+  <h1><span class="stamp">單武智</span> 단무지그룹 작전실</h1>
+  <div class="sub" id="meta">교실 배치 · 출근/진행/대기 실시간 · 2026-06-02 KST</div>
+  <div class="summary" id="summary"></div>
+  <div class="hint">카드를 <b>탭</b>하면 그 사람에게 지시할 수 있습니다. 채팅에서 <b>데이빗</b>에게 바로 말해도 됩니다.</div>
+  <div class="board">— 단무지그룹 작전실 —</div>
+  <div id="room"></div>
+  <div class="legend">
+    <span><i class="dot work"></i> 근무 중</span>
+    <span><i class="dot block"></i> 막힘(대기)</span>
+    <span><i class="dot standby"></i> 대기 중</span>
+    <span><i class="dot off"></i> 미출근</span>
+  </div>
+  <footer>앞줄 데이빗(CoS) · 둘째 줄 인프라(시스템) · 뒷줄 전문가 8명 (3·3·2). 아바타는 인물 특징 반영 일러스트.</footer>
+</div>
+<script>
+// ---- SVG 사람 아바타 (Persona Bible 외형 특징 반영) ----
+function hair(style, col){
+  switch(style){
+    case "bob": return `<path d="M22 34 Q22 14 40 14 Q58 14 58 34 L58 30 Q58 40 54 44 L54 26 Q48 20 40 20 Q32 20 26 26 L26 44 Q22 40 22 30 Z" fill="${col}"/>`;
+    case "pony": return `<path d="M24 32 Q24 15 40 15 Q56 15 56 32 L56 27 Q50 21 40 21 Q30 21 24 27 Z" fill="${col}"/><path d="M55 30 Q66 34 62 50 Q60 42 54 40 Z" fill="${col}"/>`;
+    case "curlyShort": return `<path d="M24 30 Q22 14 40 13 Q58 14 56 30 Q54 22 48 21 Q52 25 46 25 Q48 19 40 19 Q32 19 34 25 Q28 25 32 21 Q26 22 24 30 Z" fill="${col}"/>`;
+    case "side": return `<path d="M23 32 Q23 15 40 14 Q57 15 57 32 L57 28 Q54 21 36 22 Q30 23 27 30 Z" fill="${col}"/>`;
+    case "longCurly": return `<path d="M22 38 Q20 14 40 13 Q60 14 58 38 L57 34 Q58 24 50 22 Q54 26 48 25 Q50 20 40 20 Q30 20 30 26 Q24 26 26 34 Z" fill="${col}"/>`;
+    case "short": return `<path d="M25 30 Q26 16 40 15 Q54 16 55 30 Q52 23 40 23 Q28 23 25 30 Z" fill="${col}"/>`;
+    default: return "";
+  }
+}
+function glasses(type){
+  if(type==="none") return "";
+  const lens = (extra)=>`<circle cx="32" cy="40" r="6.5" fill="none" ${extra}/><circle cx="48" cy="40" r="6.5" fill="none" ${extra}/><line x1="38.5" y1="40" x2="41.5" y2="40" stroke="#444" stroke-width="1.4"/>`;
+  if(type==="round") return lens('stroke="#222" stroke-width="2"');
+  if(type==="rimless") return `<circle cx="32" cy="40" r="6" fill="none" stroke="#9aa1ac" stroke-width="1"/><circle cx="48" cy="40" r="6" fill="none" stroke="#9aa1ac" stroke-width="1"/>`;
+  if(type==="metal") return lens('stroke="#b08d57" stroke-width="1.6"');
+  if(type==="big") return `<circle cx="31" cy="40" r="8" fill="none" stroke="#222" stroke-width="2.2"/><circle cx="49" cy="40" r="8" fill="none" stroke="#222" stroke-width="2.2"/><line x1="39" y1="40" x2="41" y2="40" stroke="#222" stroke-width="1.6"/>`;
+  if(type==="square") return `<rect x="25.5" y="35" width="13" height="10" rx="2" fill="none" stroke="#222" stroke-width="2"/><rect x="41.5" y="35" width="13" height="10" rx="2" fill="none" stroke="#222" stroke-width="2"/><line x1="38.5" y1="40" x2="41.5" y2="40" stroke="#222" stroke-width="1.4"/>`;
+  return "";
+}
+function person(o){
+  const bg=o.bg||"#eef1f5", skin=o.skin||"#eccaa8", sd=o.skinD||"#d9b290", shirt=o.shirt||"#3a4a63";
+  const gray = o.gray? `<path d="M26 22 Q33 17 40 18 L38 22 Q33 20 28 24 Z" fill="#cfd3d8" opacity="0.85"/>`:"";
+  const cap = o.cap? `<path d="M22 28 Q40 10 58 28 Z" fill="${o.cap}"/><rect x="20" y="27" width="42" height="4.5" rx="2.2" fill="${o.cap}"/><path d="M40 27 h16 q3 0 3 3 v0 q0 2 -3 2 h-6 Z" fill="${o.cap}" opacity="0.85"/>`:"";
+  return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${o.name}">
+    <circle cx="40" cy="40" r="40" fill="${bg}"/>
+    <path d="M16 80 Q16 60 40 59 Q64 60 64 80 Z" fill="${shirt}"/>
+    <rect x="35" y="50" width="10" height="11" rx="4" fill="${sd}"/>
+    <ellipse cx="40" cy="40" rx="16" ry="19" fill="${skin}"/>
+    <circle cx="24.5" cy="42" r="3.3" fill="${skin}"/><circle cx="55.5" cy="42" r="3.3" fill="${skin}"/>
+    ${o.cap?"":hair(o.hair, o.hairCol)}
+    ${o.cap?"":gray}
+    <ellipse cx="33" cy="41" rx="1.7" ry="2.2" fill="#3a2e28"/><ellipse cx="47" cy="41" rx="1.7" ry="2.2" fill="#3a2e28"/>
+    <path d="M29 35 q3 -1.5 6 0" stroke="#5a4a3e" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path d="M45 35 q3 -1.5 6 0" stroke="#5a4a3e" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path d="M38.5 44 q1.5 1.5 3 0" stroke="${sd}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <path d="${o.frown?'M35 50 q5 -2.5 10 0':'M35 49 q5 3 10 0'}" stroke="#9a5a4a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    ${cap}
+    ${glasses(o.glasses)}
+  </svg>`;
+}
+function robot(o){
+  const c=o.col||"#7a8aa0";
+  return `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${o.name}">
+    <circle cx="40" cy="40" r="40" fill="${o.bg||'#eef1f5'}"/>
+    <line x1="40" y1="14" x2="40" y2="22" stroke="${c}" stroke-width="2.5"/><circle cx="40" cy="13" r="3" fill="${c}"/>
+    <rect x="24" y="24" width="32" height="30" rx="8" fill="#fff" stroke="${c}" stroke-width="2.5"/>
+    <rect x="29" y="31" width="22" height="13" rx="3" fill="${c}" opacity="0.18"/>
+    <circle cx="35" cy="37" r="3" fill="${c}"/><circle cx="45" cy="37" r="3" fill="${c}"/>
+    <path d="M34 48 q6 3 12 0" stroke="${c}" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <rect x="32" y="54" width="16" height="8" rx="3" fill="${c}" opacity="0.5"/>
+  </svg>`;
+}
+const COS=[{type:"p",name:"데이빗 옥",role:"팀 지휘·지시 전달",att:"work",now:"작전실 거울 개선",next:"—",assignable:false,
+  av:{bg:"#fdf3da",skin:"#e8c4a0",skinD:"#d4ad88",hair:"side",hairCol:"#2a2a2a",gray:true,glasses:"metal",shirt:"#2d3e5e"}}];
+const INFRA=[
+ {type:"r",name:"인프라 #9",role:"대시보드 운영",att:"work",now:"화면 배치 정리 완료",next:"실데이터 연결",av:{col:"#2aa39a",bg:"#e4f4f2"}},
+ {type:"r",name:"인프라 #10",role:"서버·데이터 관리",att:"off",now:"—",next:"—",av:{col:"#8a93a3",bg:"#eef0f3"}},
+ {type:"r",name:"인프라 #11",role:"자동화 총괄",att:"standby",now:"대기 모드",next:"옥대표님 명령 대기",av:{col:"#7c5cc4",bg:"#efe9f8"}},
+];
+const EXPERTS=[
+ {type:"p",name:"로즈 윤",role:"화면 디자인",att:"block",now:"대시보드 수정 마무리",next:"신규 지표 화면 디자인",frown:true,
+   av:{bg:"#eceef2",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#191919",glasses:"rimless",shirt:"#2b3340"}},
+ {type:"p",name:"샘 정",role:"데이터 그래프",att:"work",now:"차트 시스템 정리",next:"운동 지표 차트(티모 확정 후)",
+   av:{bg:"#f3efe6",skin:"#f0d3bd",skinD:"#dcb89e",hair:"pony",hairCol:"#6b4a2f",glasses:"round",shirt:"#3a5168"}},
+ {type:"p",name:"티모 강",role:"운동·라이딩 분석",att:"block",now:"훈련 부하 지표 확정",next:"동료 검토 받기",frown:true,
+   av:{bg:"#e9f0ec",skin:"#d6a378",skinD:"#c08e62",hair:"curlyShort",hairCol:"#7d7d7d",gray:true,glasses:"round",shirt:"#3a5f4a"}},
+ {type:"p",name:"알렉스 박",role:"웹사이트 화면",att:"work",now:"화면 작업 마무리·오류검사 정비",next:"다음 단계 준비",
+   av:{bg:"#ecedef",skin:"#eac6a4",skinD:"#d6b08c",hair:"curlyShort",hairCol:"#171717",glasses:"round",shirt:"#262626"}},
+ {type:"p",name:"메이 한",role:"사용 편의 연구",att:"block",now:"화면 사용성 점검 준비",next:"연구 문서 정리",frown:true,
+   av:{bg:"#f3ece8",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#5a3d28",glasses:"none",shirt:"#c08560"}},
+ {type:"p",name:"캔 최",role:"마케팅·홍보",att:"work",now:"6/3 오픈 홍보 + 울산 대회 준비",next:"옥대표님 승인 받기",
+   av:{bg:"#eaf1ea",skin:"#e6b88e",skinD:"#d1a173",hair:"short",hairCol:"#161616",cap:"#1a1f2b",glasses:"big",shirt:"#4f6f4f"}},
+ {type:"p",name:"히로 구",role:"센서·기기 개발",att:"standby",now:"다음 단계(EVT) 대기",next:"장비 규격 확정",
+   av:{bg:"#edeef0",skin:"#deb288",skinD:"#c89c70",hair:"short",hairCol:"#565656",gray:true,glasses:"square",shirt:"#444b4a"}},
+ {type:"p",name:"왕 정",role:"휴대폰 앱",att:"work",now:"앱 설계 문서 완료",next:"옥대표님 확인 3건",
+   av:{bg:"#ecedf1",skin:"#eac6a4",skinD:"#d6b08c",hair:"longCurly",hairCol:"#171717",glasses:"none",shirt:"#2b2b2b"}},
+];
+const LABEL={work:"근무 중",block:"막힘",standby:"대기 중",off:"미출근"};
+function avatar(p){ return p.type==="r"? robot({...p.av,name:p.name}) : person({...p.av,name:p.name}); }
+function seat(p){
+  const a=p.assignable===false?"false":"true";
+  const cls="seat "+p.att+(p.assignable===false?" cos":"");
+  return `<div class="${cls}" data-assignable="${a}" data-name="${p.name}">
+    ${avatar(p)}
+    <div class="nm">${p.name}</div>
+    <div class="ro">${p.role}</div>
+    <div class="att ${p.att}">${LABEL[p.att]}</div>
+    <div class="detail">
+      <div class="ln"><b>진행</b><span>${p.now||"—"}</span></div>
+      <div class="ln"><b>다음</b><span>${p.next||"—"}</span></div>
+    </div>
+  </div>`;
+}
+function rows(arr,n){const r=[];for(let i=0;i<arr.length;i+=n)r.push(arr.slice(i,i+n));return r;}
+function render(){
+  const all=[...COS,...INFRA,...EXPERTS];
+  const c={work:0,block:0,standby:0,off:0}; all.forEach(p=>c[p.att]++);
+  document.getElementById("summary").innerHTML=
+    `<span class="chip"><b>${all.length}</b>명</span>`+
+    `<span class="chip work"><b>${c.work}</b> 근무</span>`+
+    `<span class="chip block"><b>${c.block}</b> 막힘</span>`+
+    `<span class="chip standby"><b>${c.standby}</b> 대기</span>`+
+    `<span class="chip off"><b>${c.off}</b> 미출근</span>`;
+  let h="";
+  h+=`<div class="deck-label">CoS · 작전 지휘</div><div class="seats one">${COS.map(seat).join("")}</div>`;
+  h+=`<div class="divider"></div><div class="deck-label">인프라 (시스템)</div><div class="seats three">${INFRA.map(seat).join("")}</div>`;
+  h+=`<div class="divider"></div><div class="deck-label">전문가 8</div>`;
+  rows(EXPERTS,3).forEach(r=>{const rc=r.length===3?"three":(r.length===2?"two":"one");h+=`<div class="seats ${rc}" style="margin-bottom:9px">${r.map(seat).join("")}</div>`;});
+  document.getElementById("room").innerHTML=h;
+  document.querySelectorAll('.seat[data-assignable="true"]').forEach(el=>el.addEventListener("click",()=>{
+    const name=el.getAttribute("data-name"); let m="";
+    try{m=window.prompt(name+"에게 지시할 내용:","");}catch(e){}
+    if(m&&m.trim()&&typeof sendPrompt==="function") sendPrompt("데이빗, "+name+"에게 다음을 지시해줘: "+m.trim());
+  }));
+}
+render();
+</script>
+</body>
+</html>

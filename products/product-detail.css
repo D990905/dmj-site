@@ -180,6 +180,53 @@
   margin-top: var(--space-6);
 }
 
+/* ── §171-B v4 (제품 상세 "장바구니 담기" — Danny 2026-06-03) ──────────
+   find-my-gear matrix "+ 장바구니" 패턴을 제품 상세 CTA 영역으로 확장.
+   data-cart-add + data-sku + data-size 데이터 속성은 matrix.js delegated
+   handler 가 처리 (cart.js DMJCart.add). 비로그인 = login.html?redirect=cart.html.
+   기존 카톡 1:1 상담 CTA 는 병행 유지 (제거 X). DO_NOT_REVERT §171-B v4. */
+.pd-buy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--space-4);
+  width: 100%;
+}
+.pd-buy__size {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border, rgba(10, 37, 64, 0.18));
+  background: #fff;
+  min-width: 120px;
+  cursor: pointer;
+}
+.pd-buy__addcart {
+  /* btn btn--accent btn--lg 스타일을 그대로 받되, 담김 상태(mtx-item__addcart--in)
+     클래스가 추가돼도 CTA 사이즈/배경 유지 (specificity 보강). */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pd-buy__addcart.mtx-item__addcart--in {
+  background: #1f6e44;
+  border-color: #1f6e44;
+  color: #fff;
+}
+.pd-buy__addcart.mtx-item__addcart--in:hover {
+  background: #18583a;
+}
+.pd-buy__note {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
 /* ── TELEMETRY (race-car dashboard) ───────────────────────── */
 .telemetry {
   background: linear-gradient(135deg, #0a2540 0%, #061a2e 100%);

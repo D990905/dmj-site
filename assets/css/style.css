@@ -2904,6 +2904,10 @@ select {
 .perf-mini--takoon-entry .perf-mini__axis-fill  { background: linear-gradient(180deg, #5BB4FF 0%, #1670CC 100%); }
 .perf-mini--takoon-mid .perf-mini__axis-fill    { background: linear-gradient(180deg, #FFB800 0%, #C8800A 100%); }
 .perf-mini--takoon-adv .perf-mini__axis-fill    { background: linear-gradient(180deg, #FF7F2A 0%, #B24F0F 100%); }
+/* P0 모바일 폴백 — 5열 강제가 좁은 화면에서 붕괴 → 3열 wrap (5축 모두 2행으로 보존) */
+@media (max-width: 540px) {
+  .perf-mini { grid-template-columns: repeat(3, 1fr); }
+}
 
 /* ── Coming Soon 카드 (Takoon Double Skin Wing) ─────────────────────────── */
 .sku-card--coming-soon {
@@ -3844,6 +3848,12 @@ select {
   .image-strip__cell::after { font-size: 9px; padding: 4px 9px; }
   .image-strip__item:nth-child(3) { grid-column: span 2; }
   .image-strip__item:nth-child(3) .image-strip__cell { aspect-ratio: 16 / 7; }
+}
+/* P0 모바일 폴백 — 640px 2열에서 ≤540px 1열 전환 (3번째 셀 span 2 리셋) */
+@media (max-width: 540px) {
+  .image-strip__grid { grid-template-columns: 1fr; }
+  .image-strip__cell:nth-child(3) { grid-column: auto; }
+  .image-strip__item:nth-child(3) { grid-column: auto; }
 }
 /* DO_NOT_REVERT §153 — Danny 컨설팅 talking point 캡션 (flat-speed.html 적용). __item wrapper 도입 — image-strip__cell 직속 grid 사용처 (wave/hybrid/choppy-freeride) 와 backward compatible */
 .image-strip__item { display: flex; flex-direction: column; gap: 10px; }

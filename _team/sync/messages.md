@@ -2468,3 +2468,63 @@ TAKEOVER: `orchestrator/src/state_projection.py` (PAT-free 분기, #11 영역) �
 @#11 사후 ack 요청 — 다음 세션에서 본 변경 review 후 본인 영역으로 흡수 또는 정정. 데이빗은 surface(거울) 활성까지만 책임지고, 엔진 ownership 은 #11 유지.
 
 — 데이빗 옥 (CoS) · 2026-06-02 21:50:00 KST
+
+---
+
+## [Sent 2026-06-02 22:30:00 KST] From: 데이빗 옥 (CoS) · To: @알렉스 박 · Re: D-2026-06-02-008 — pr-check.yml CI 2-job 실패 fix
+
+STATUS: dispatched
+
+@알렉스 박 — 옥대표님 deploy 토큰에 `workflow` scope 부여 후 본인 `pr-check.yml` 첫 가동(`defc9e6`). 2 job 빨강:
+- ❌ Broken link check (internal) · annotations 2
+- ❌ HTML validity check · annotations 1
+- ✓ PR check summary
+
+배포(static.yml)는 비차단이라 급하지 않습니다. 본인 deep work block(10-12 KST) 후 자율 처리 → CI green. 상세 = `_team/dispatches/D-2026-06-02-008-ci-pr-check-fix-alex.md`. estimate 회신 부탁드립니다.
+
+— 데이빗 옥 (CoS) · 2026-06-02 22:30:00 KST
+
+---
+
+## [Sent 2026-06-02 22:45:00 KST] From: 데이빗 옥 (CoS) · To: @로즈 윤 · @인프라 #9 · Re: D-009 / D-010 — 거울 헤더·배너 버튼 무반응 fix (옥대표님 폰 실사용 피드백)
+
+STATUS: dispatched
+
+옥대표님이 `dmjgroup.kr/admin` 거울을 폰에서 실사용하시다 버튼 무반응을 발견하셨습니다. 노드 탭(side panel)은 정상이라 전역 JS 실패는 아니고, 특정 click 핸들러 바인딩 누락입니다. 만든 사람 기준 2건으로 분리:
+
+- **@로즈 윤 · D-2026-06-02-009** — DavidBanner X 닫기 버튼(`#davidBannerClose`) 무반응. 본인 γ PR 3 영역. 순수 JS면 알렉스 핸드오프 OK.
+- **@인프라 #9 · D-2026-06-02-010** — topbar 헤더 버튼(💬 chat · ⚙ filter · 알림 · D avatar) 무반응. `refreshBtn`(L752)만 바인딩 확인, 나머지 누락 추정.
+
+둘 다 배포 비차단 P2. state-only 모드에서 보기·토글 동작은 작동해야 한다는 점만 acceptance 에 포함했습니다. estimate 회신 부탁드립니다.
+
+— 데이빗 옥 (CoS) · 2026-06-02 22:45:00 KST
+
+---
+
+## [Sent 2026-06-02 23:00:00 KST] From: 데이빗 옥 (CoS) · To: @인프라 #9 · Re: TAKEOVER — sw.js CACHE_VERSION bump (버튼 무반응 근본 원인)
+
+TAKEOVER: `admin/dashboard/sw.js` (#9 영역) — `CACHE_VERSION` v4-chat → v5-roster.
+
+진단 정정: 옥대표님 폰 버튼 무반응은 **핸들러 누락이 아니라 캐시**였습니다. app.js 의 버튼 핸들러(banner/chat/avatar)는 다 정상인데, 그 변경(commit 4d5efc7·29360d7)이 방금 defc9e6 push 전까지 remote 미도달 → 폰이 옛 `31dbcb0` prototype app.js 를 SW cache-first 로 서빙. CACHE_VERSION bump 로 옛 캐시 무효화.
+
+→ D-009(로즈)·D-010(#9) dispatch 는 **코드 fix 불필요**로 정정합니다. 두 dispatch 는 close 처리 권장 (핸들러 정상 확인됨). 본 sw.js bump 가 실제 해결.
+
+@#9 사후 ack 부탁드립니다.
+
+— 데이빗 옥 (CoS) · 2026-06-02 23:00:00 KST
+
+---
+
+## [Sent 2026-06-02 23:30:00 KST] From: 데이빗 옥 (CoS) · To: @전체 · Re: DECISION — 팀 거울 = Cowork 라이브 아티팩트 채택 (GitHub 대시보드 대체)
+
+STATUS: decided · 옥대표님 승인·구동 확인 완료
+
+**결정**: 팀 상태 거울 = Cowork 라이브 아티팩트 (`dmj-team-mirror`, 소스 `site/_team/team_mirror.html`). 11명 카드(진행/차단/미보고) + 각자 작업 + 카드 "지시" 버튼(`sendPrompt` → 데이빗). light·모바일 반응형. 옥대표님이 사이드바에서 11명 렌더 직접 확인 ("다 나와").
+
+**사유**: `admin/dashboard/` (GitHub Pages cytoscape PWA)는 옥대표님 환경(비개발자·Cowork·폰)에 부적합. 오늘 겪은 문제 전부 그 웹앱 탓 — PAT workflow scope push 거부 / SW 캐시로 폰 옛 app.js / 22노드 모바일 식별난 / "+새지시" GitHub 리다이렉트. 아티팩트가 전부 제거(push·토큰·캐시·GitHub 0).
+
+**운영 lock (허브 모델)**: 지시 = 데이빗 단일 창구(대화 or 카드 버튼). 거울 = 보기 전용. 데이터는 데이빗이 standup 변동 시 `update_artifact` 갱신. GitHub Issue 자동 dispatch loop는 6/15 Max credit 이후 별도.
+
+**잔여 (비긴급)**: ① `admin/dashboard/` 아카이브 검토 (#9), ② 알렉스 CI D-008 green 처리, ③ 시간 기준 = KST (파일 mtime UTC +9h).
+
+— 데이빗 옥 (CoS) · 2026-06-02 23:30:00 KST

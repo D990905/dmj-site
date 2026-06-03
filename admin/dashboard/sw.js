@@ -5,7 +5,7 @@
    - everything else: network-first w/ cache fallback
    Versioned cache so bumping CACHE_VERSION invalidates old assets.
 */
-const CACHE_VERSION = 'sailtech-orchestrator-v4-chat'; // control-loop chat panel
+const CACHE_VERSION = 'sailtech-orchestrator-v5-roster'; // 11명 로스터 거울 + 옛 app.js 캐시 무효화 (CoS take-over 2026-06-02)
 const APP_SHELL = [
   './',
   './index.html',
