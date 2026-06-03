@@ -5019,6 +5019,18 @@ p {
   font-weight: 400;
   color: var(--color-stone);
 }
+/* 가격 잘림 fix (데이빗 2026-06-03): 카드 내부 grid/flex min-width:auto blowout 으로
+   콘텐츠(332px)가 카드폭(287px)보다 넓어져 우측 가격(₩)이 잘리던 문제.
+   shrink 가능하게 풀어 이름은 wrap, 가격은 nowrap 우측 고정 유지. */
+.mtx-card__body { grid-template-columns: minmax(0, 1fr); }
+.mtx-row { min-width: 0; }
+.mtx-row > * { min-width: 0; }
+.mtx-row__val, .mtx-row__items { min-width: 0; }
+.mtx-item { min-width: 0; }
+.mtx-item__name { min-width: 0; overflow-wrap: anywhere; }
+/* 좁은 매트릭스 카드 안에서만 accessory 260px min 을 0 으로 완화 (§171 v5 기본 규칙 불변,
+   .mtx-card 컨텍스트 한정 override). 이름 wrap 은 4937~4941 에서 이미 처리. */
+.mtx-card .mtx-row__items--accessory { grid-template-columns: minmax(0, 1fr); }
 
 /* ---- Foil alternative ("또는 …") ---- */
 .mtx-row__alt {

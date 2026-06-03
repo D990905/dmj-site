@@ -26,9 +26,21 @@
   //   원래대로 로그인 dropdown 안에서만 노출된다. (코드 삭제 X — 플래그 토글만.)
   var RIDING_DASHBOARD_REQUIRES_LOGIN = false;
 
-  // ---- Auth state detection (no auth-shim.js dependency) ----
+  // ---- Auth state detection ----
+  // §179 Supabase 전환 (데이빗 2026-06-03): 라이브 인증은 supabase-auth.js (window.DMJAuth,
+  // sync 캐시 dmj_user_cache) 로 이동. 옛 dmj_session/dmj_users 키는 더 이상 채워지지 않아
+  // nav 가 로그인 상태를 못 잡던 회귀 fix. DMJAuth → dmj_user_cache → 옛 키 순으로 fallback.
   function getSession() {
     try {
+      if (window.DMJAuth && typeof window.DMJAuth.isLoggedIn === 'function' && window.DMJAuth.isLoggedIn()) {
+        var u = window.DMJAuth.currentUser && window.DMJAuth.currentUser();
+        if (u && u.email) return { email: u.email };
+      }
+      var cache = localStorage.getItem('dmj_user_cache');
+      if (cache) {
+        var cu = JSON.parse(cache);
+        if (cu && cu.email) return { email: cu.email };
+      }
       var raw = localStorage.getItem('dmj_session');
       if (!raw) return null;
       var s = JSON.parse(raw);
@@ -37,6 +49,16 @@
     } catch (e) { return null; }
   }
   function getUser(email) {
+    // Supabase 프로필 (live) — nickname/avatarBase64 포함
+    try {
+      if (window.DMJAuth && typeof window.DMJAuth.currentUser === 'function') {
+        var u = window.DMJAuth.currentUser();
+        if (u && u.email && (!email || String(u.email).toLowerCase() === String(email).toLowerCase())) return u;
+      }
+      var cache = localStorage.getItem('dmj_user_cache');
+      if (cache) { var cu = JSON.parse(cache); if (cu && cu.email) return cu; }
+    } catch (e) {}
+    // 옛 localStorage shim fallback
     if (!email) return null;
     try {
       var raw = localStorage.getItem('dmj_users');
@@ -152,6 +174,18 @@
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function (e) {
         e.preventDefault();
+        // §179 Supabase 로그아웃 (데이빗 2026-06-03) — DMJAuth.logout() 우선, 옛 키도 정리.
+        try {
+          if (window.DMJAuth && typeof window.DMJAuth.logout === 'function') {
+            var r = window.DMJAuth.logout();
+            if (r && typeof r.then === 'function') {
+              r.then(function(){ location.href = prefix + 'index.html'; })
+               .catch(function(){ location.href = prefix + 'index.html'; });
+              try { localStorage.removeItem('dmj_session'); } catch (_) {}
+              return;
+            }
+          }
+        } catch (_) {}
         try { localStorage.removeItem('dmj_session'); } catch (_) {}
         // Hard reload to refresh nav across the page
         location.href = prefix + 'index.html';
@@ -329,4 +363,11 @@
   } else {
     init();
   }
+
+  // §179 (데이빗 2026-06-03) — Supabase 세션은 async 로 해소됨. nav 첫 렌더 시점엔
+  // 아직 로그인 상태를 모를 수 있으므로, supabase-auth.js 가 쏘는 'dmj-auth-change'
+  // 이벤트에 nav 를 다시 그린다 (로그인/로그아웃 즉시 반영).
+  window.addEventListener('dmj-auth-change', function () {
+    try { renderDesktopNav(); renderMobileNav(); } catch (e) {}
+  });
 })();
