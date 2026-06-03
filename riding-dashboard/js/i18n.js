@@ -2041,7 +2041,10 @@
       /* 768px 미만: 컨테이너 gutter 1.25rem 에 우측 정렬. 헤더 높이 72px 유지 → 수직 중앙 동일. */
       '@media (max-width:767px){.rd-langtoggle{right:1.25rem}}' +
       '@media (max-width:540px){.rd-langtoggle{top:24px}' +
-        '.rd-langtoggle__btn{padding:5px 10px;min-width:46px;font-size:11px}}';
+        '.rd-langtoggle__btn{padding:5px 10px;min-width:46px;font-size:11px}}' +
+      /* 리플레이(영어 전용 몰입 모드) 열림 시 전역 토글 숨김 — ✕ 닫기 버튼과
+         겹침 방지 (데이빗 2026-06-03). */
+      'body.rd-replay-active .rd-langtoggle{display:none!important}';
     var s = document.createElement('style');
     s.id = 'rd-i18n-style';
     s.textContent = css;

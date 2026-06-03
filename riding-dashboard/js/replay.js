@@ -434,12 +434,16 @@
     return meta;
   }
 
-  /* 파일명에서 촬영 일시 추출 — VID_20260519_153045 / 2026-05-19 15.30.45
-     등 흔한 형식. 로컬 시각으로 해석해 epoch(ms) 반환, 없으면 null. */
+  /* 파일명에서 촬영 일시 추출 — 구분자 무관 포맷 인식 (데이빗 2026-06-03).
+     YYYY MM DD HH MM SS 사이에 어떤 구분자(- _ . : / 공백 · 등)가 오든, 또는
+     아예 없든(20260519153045) 인식한다. 각 자리 사이 \D?(비숫자 0~1개)로 허용해
+     "시·분·초 포맷이 달라도" 자동 인식. 흔한 예: VID_20260519_153045 /
+     2026-05-19 15.30.45 / 2026.05.19_15:30:45 / 20260519T153045.
+     로컬 시각으로 해석해 epoch(ms) 반환, 없으면 null. */
   function parseFilenameDate(name) {
     if (!name) return null;
     var m = String(name).match(
-      /(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})[ _tT-]?(\d{2})[-_.:]?(\d{2})[-_.:]?(\d{2})/);
+      /(20\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})\D?(\d{2})/);
     if (!m) return null;
     var y = +m[1], mo = +m[2], d = +m[3], h = +m[4], mi = +m[5], se = +m[6];
     if (mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59 || se > 59) return null;
@@ -2756,6 +2760,15 @@
       relayout();
     }, 180);
     global.addEventListener('resize', R.resizeHandler);
+    /* 페이지 이탈·탭 닫기·백그라운드 전환 시 대기 중인 동기화 저장 flush
+       (데이빗 2026-06-03 — close() 가 안 불리는 경로의 저장 유실 방지). */
+    R.pagehideHandler = function () {
+      if (!clipSaveTimer) return;     // 대기 중인 저장이 있을 때만 flush (빈 map 삭제 회피)
+      clearTimeout(clipSaveTimer); clipSaveTimer = null;
+      try { saveClipStarts(); } catch (e) {}
+    };
+    global.addEventListener('pagehide', R.pagehideHandler);
+    global.addEventListener('visibilitychange', R.pagehideHandler);
   }
 
   /* ============================================================
@@ -2828,6 +2841,9 @@
     var view = buildOverlay();
     view.hidden = false;
     document.body.style.overflow = 'hidden';
+    /* 리플레이는 영어 전용 몰입 모드 — 전역 KO/EN 토글이 ✕ 닫기 버튼과 겹쳐
+       숨긴다 (데이빗 2026-06-03). close() 에서 클래스 제거. */
+    document.body.classList.add('rd-replay-active');
 
     R.scrub = el('replay-scrub');
     R.clockEl = el('replay-clock');
@@ -2862,9 +2878,19 @@
   function close() {
     if (!R) return;
     if (R.raf) { try { global.cancelAnimationFrame(R.raf); } catch (e) {} }
-    if (clipSaveTimer) { clearTimeout(clipSaveTimer); clipSaveTimer = null; }
+    /* 동기화 저장 flush (데이빗 2026-06-03) — 디바운스(400ms) 저장이 대기 중인데
+       리플레이를 닫으면 옛 코드는 타이머만 취소해 저장이 통째로 유실됐다.
+       그래서 "한 번 맞춘 영상도 다시 넣으면 또 맞춰야" 하던 회귀. 닫기 전 즉시 저장. */
+    if (clipSaveTimer) {
+      clearTimeout(clipSaveTimer); clipSaveTimer = null;
+      try { saveClipStarts(); } catch (e) {}
+    }
     if (R.keyHandler) document.removeEventListener('keydown', R.keyHandler);
     if (R.resizeHandler) global.removeEventListener('resize', R.resizeHandler);
+    if (R.pagehideHandler) {
+      global.removeEventListener('pagehide', R.pagehideHandler);
+      global.removeEventListener('visibilitychange', R.pagehideHandler);
+    }
     if (R.map) { try { R.map.remove(); } catch (e) {} R.map = null; }
     if (R.video) {
       try { R.video.pause(); } catch (e) {}
@@ -2881,6 +2907,7 @@
     var view = el('replay-view');
     if (view) view.hidden = true;
     document.body.style.overflow = '';
+    document.body.classList.remove('rd-replay-active');   // 전역 KO/EN 토글 복원
     R = null;
     try { onClose(); } catch (e) {}
   }
