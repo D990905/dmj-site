@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<meta name="format-detection" content="telephone=no">
+
+<title>단무지공방 — 윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션 | Levitaz · PPC · Takoon · WIP</title>
+<meta name="description" content="한국 라이더를 위한 윙·포일·SUP 네 가지 브랜드 큐레이션. Levitaz, PPC, Takoon, WIP 정식 수입. 입문부터 프로까지, 현장에서 검증된 장비.">
+<meta name="keywords" content="단무지공방, 윙포일, 포일, SUP, 정식수입, Levitaz, PPC, Takoon, WIP, 카본 포일, 웻수트">
+<meta name="author" content="단무지공방">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
+<link rel="canonical" href="https://dmjgroup.kr/">
+
+<!-- Open Graph / SNS -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="단무지공방">
+<meta property="og:title" content="단무지공방 — 윙·포일·SUP 네 가지 브랜드 큐레이션">
+<meta property="og:description" content="Levitaz · PPC · Takoon · WIP — 한국 라이더의 모든 순간을 위한 정식 수입 통합 스토어">
+<meta property="og:url" content="https://dmjgroup.kr/">
+<meta property="og:image" content="https://dmjgroup.kr/assets/images/og-default.jpg">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="단무지공방 — 윙·포일·SUP">
+<meta name="twitter:description" content="네 가지 브랜드 × 라이더 맞춤 큐레이션. 입문부터 프로까지.">
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet">
+
+<!-- Site CSS -->
+<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
+
+<!-- Structured Data: Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "단무지공방",
+  "alternateName": "DMJ·공방",
+  "url": "https://dmjgroup.kr",
+  "logo": "https://dmjgroup.kr/assets/images/logo.png",
+  "description": "윙포일·SUP 네 가지 브랜드 정식 수입 큐레이션 스토어",
+  "address": { "@type": "PostalAddress", "addressCountry": "KR" },
+  "brand": [
+    {"@type":"Brand","name":"Levitaz"},
+    {"@type":"Brand","name":"PPC"},
+    {"@type":"Brand","name":"Takoon"},
+    {"@type":"Brand","name":"WIP"}
+  ]
+}
+</script>
+</head>
+<body>
+
+<!-- ========== Trust Bar ========== -->
+<div class="trust-bar" role="region" aria-label="신뢰 정보">
+  <div class="container">
+    <div class="trust-bar__inner">
+      <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
+      <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
+      <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Header ========== -->
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="/" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 스마트 컨설팅 (CTA) -->
+        <a href="find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <!-- DO_NOT_REVERT §171-B — cart icon. badge auto-updates via cart.js. -->
+        <a href="cart.html" class="nav__link nav__cart" role="menuitem" aria-label="장바구니">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="nav__cart-badge" data-cart-badge aria-live="polite" aria-atomic="true" hidden>0</span>
+        </a>
+        <a href="login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button type="button" class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button type="button" class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== Mobile Menu ========== -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button type="button" class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="levitaz.html">Levitaz <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="ppc.html">PPC <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="takoon.html">Takoon <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="wip.html">Forward WIP <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+
+    <li class="mobile-menu__heading">라이딩 스타일</li>
+    <li><a href="style/flat-speed.html">Flat·Speed <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="style/choppy-freeride.html">Choppy·Freeride <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="style/wave.html">Wave <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="style/hybrid.html">Hybrid <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="levitaz.html">Levitaz <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="ppc.html">PPC <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="takoon.html">Takoon <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="wip.html">Forward WIP <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="level/beginner.html">입문 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a href="level/novice.html">초급 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="level/intermediate.html">중급 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="level/advanced.html">상급 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="level/pro.html">선수 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li hidden><a href="women/index.html" style="color:var(--color-sun);font-weight:600">여성 라이더 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li hidden><a href="junior/index.html" style="color:var(--color-sun);font-weight:600">유소년·어린이 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li hidden><a href="family/index.html" style="color:var(--color-sun);font-weight:600">가족 라이딩 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+  </ul>
+
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. Levitaz·PPC·Takoon·Forward WIP를 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+<!-- ========== Hero (Cinematic full-width — Danny 2026-05-06 #13) ========== -->
+<section class="hero hero--cinematic" id="home">
+  <!-- Full-bleed background: image (or <video> when MP4 file is dropped at assets/videos/hero.mp4) -->
+  <div class="hero__cine-bg" aria-hidden="true">
+    <!-- TODO: Drop hero MP4 file at assets/videos/hero-loop.mp4 (16:9 cinematic, ~10s loop, muted)
+         When file exists, this <picture> can be replaced with:
+         <video class="hero__cine-video" autoplay muted loop playsinline poster="...">
+           <source src="assets/videos/hero-loop.mp4" type="video/mp4">
+         </video>
+         For now, using high-res lifestyle image as static cinematic backdrop. -->
+    <picture>
+      <source srcset="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.webp" type="image/webp">
+      <source srcset="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg" type="image/jpeg">
+      <img class="hero__cine-image" src="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg"
+           alt="Sean Herbert PPC 윙 라이딩 — Brazil 2025"
+           loading="eager" decoding="async" fetchpriority="high">
+    </picture>
+    <div class="hero__cine-overlay"></div>
+  </div>
+  <div class="container">
+    <div class="hero__inner hero__inner--cine">
+      <div class="hero__text">
+        <span class="hero__eyebrow"><span class="dot"></span>Consultation Frame v1 · 64 시나리오 매트릭스</span>
+        <h1 class="hero__title">당신의 라이딩을<br><em>컨설팅합니다.</em></h1>
+        <p class="hero__lead">
+          <strong>대한민국 최초의 아시안게임 금메달리스트 · 올림픽 3회 연속 단독 출전 · 3개국 윈드서핑 국가대표팀 코치</strong>를 역임한 <strong>옥덕필 운동생리학박사</strong>와 <strong>국가대표 포뮬러 카이트 조수철 선수</strong>가 함께 운영하는 <strong>윙포일 퍼포먼스 컨설팅서비스 단무지공방</strong>.
+          체중·레벨·스타일·<strong>성별·연령</strong>별로 Levitaz · PPC · Takoon · WIP <strong>네 브랜드</strong> 장비를 큐레이션해 드립니다
+        </p>
+        <div class="hero__ctas">
+          <a href="find-my-gear.html" class="btn btn--accent btn--lg">
+            1분 만에 내 장비 찾기
+            <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#consultation" class="btn btn--ghost-light btn--lg">
+            레벨별 가이드 보기 →
+          </a>
+        </div>
+
+        <div class="hero__quick-tags" aria-label="키워드">
+          <span class="hero__quick-tag">입문·초급</span>
+          <span class="hero__quick-tag">중급</span>
+          <span class="hero__quick-tag">상급</span>
+          <span class="hero__quick-tag">선수</span>
+          <span class="hero__quick-tag">여성 라이더</span>
+          <span class="hero__quick-tag">유소년·어린이</span>
+          <span class="hero__quick-tag">가족 라이딩</span>
+        </div>
+
+        <!-- §119 (Danny 2026-05-09): 통계 박스 순서 = 3회 / 3개국 / 4 / 64 (오름차순).
+             큰 숫자 라벨은 영문 숫자 사용 (시각 hierarchy). 본문 카피의 "네 브랜드" spell-out 정책(§50)은 유지.
+             정정 절대 금지 — DO_NOT_REVERT §119 참조. -->
+        <dl class="hero__meta">
+          <div class="hero__meta-item">
+            <span class="num">3회</span>
+            <span class="label">올림픽 단독 출전</span>
+          </div>
+          <div class="hero__meta-item">
+            <span class="num">3개국</span>
+            <span class="label">국가대표팀 코칭</span>
+          </div>
+          <div class="hero__meta-item">
+            <span class="num">4</span>
+            <span class="label">정식 수입 브랜드</span>
+          </div>
+          <div class="hero__meta-item">
+            <span class="num">64</span>
+            <span class="label">레벨·체중·스타일 매트릭스</span>
+          </div>
+        </dl>
+      </div>
+
+      <!--
+        Right-side visual hidden in cinematic mode — image is now the full-bleed
+        backdrop. This block kept for fallback / future restoration if needed.
+      -->
+      <div class="hero__visual hero__visual--video" style="display:none" aria-hidden="true">
+        <img class="hero__video-thumb" loading="lazy"
+             src="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg"
+             srcset="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg 640w, assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg 480w"
+             sizes="(max-width: 1023px) 480px, 640px"
+             onerror="this.onerror=null;this.removeAttribute('srcset');this.src='assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg';"
+             alt="Sean Herbert PPC 윙 라이딩 — Brazil 2025 단무지공방 큐레이션">
+        <div class="hero__video-poster" aria-hidden="true"></div>
+        <div class="hero__video-overlay" aria-hidden="true"></div>
+        <a class="hero__video-cta" href="https://www.youtube.com/watch?v=LbcT5kpHdlA" target="_blank" rel="noopener noreferrer" aria-label="PPC M2 Performance Wing 영상 YouTube에서 보기">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <span>YouTube에서 보기</span>
+        </a>
+        <div class="hero__video-badges" aria-hidden="true">
+          <span class="hero__video-badge hero__video-badge--brand hero__visual-mark--levitaz" title="Levitaz">L</span>
+          <span class="hero__video-badge hero__video-badge--brand hero__visual-mark--ppc" title="PPC">P</span>
+          <span class="hero__video-badge hero__video-badge--brand hero__visual-mark--takoon" title="Takoon">T</span>
+          <span class="hero__video-badge hero__video-badge--brand hero__visual-mark--wip" title="WIP">W</span>
+        </div>
+        <span class="hero__video-tag">DMJ · 네 브랜드 큐레이션</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true">
+    <span>SCROLL</span>
+    <span class="hero__scroll-line"></span>
+  </div>
+</section>
+
+<!-- ========== 단무지 철학 — Danny 검수 대기 항목 ==========
+     Source: Danny 직접 워딩 "단순하고 무식하게 그러나 지혜롭게"
+     초안 — 카피 변경 가능. 검수 후 finalize.
+     ────────────────────────────────────────────────────────── -->
+<section class="section section--mist" id="philosophy"
+         style="background-image:linear-gradient(180deg, rgba(244,247,250,0.92) 0%, rgba(244,247,250,1) 100%), url('assets/images/products/levitaz/_hero/cover-freeseries-web.jpg'); background-size:cover; background-position:center">
+  <div class="container">
+    <div class="reveal" style="max-width:760px;margin:0 auto;text-align:center">
+      <!-- 단무지 한자 정체성 박스 — 單(단순함) 武(거침없음) 智(지혜로움) — DO_NOT_REVERT §122 -->
+      <div class="philosophy-hanja" aria-label="단무지 한자 정체성 단·무·지">
+        <div class="philosophy-hanja__char">
+          <span class="hanja" aria-hidden="true">單</span>
+          <span class="hanja-meaning">단순함</span>
+        </div>
+        <div class="philosophy-hanja__char">
+          <span class="hanja" aria-hidden="true">武</span>
+          <span class="hanja-meaning">거침없음</span>
+        </div>
+        <div class="philosophy-hanja__char">
+          <span class="hanja" aria-hidden="true">智</span>
+          <span class="hanja-meaning">지혜로움</span>
+        </div>
+      </div>
+
+      <span class="section-head__eyebrow" style="display:inline-block;margin-bottom:16px;color:var(--color-sea-dark)">컨설팅 철학</span>
+      <h2 class="section-head__title" style="margin-bottom:24px;letter-spacing:-0.025em">
+        단순하고 무식하게,<br><em style="font-style:normal;color:var(--color-sea)">그러나 지혜롭게</em>
+      </h2>
+      <p style="font-size:1.0625rem;line-height:1.75;color:var(--color-charcoal);margin:0 0 16px;max-width:56ch;margin-left:auto;margin-right:auto">
+        라이딩 셋업은 복잡할 이유가 없습니다. 전문 퍼포먼스 어드바이저의 추천은 거침없고 간결합니다. 하지만 그 한 줄 추천 뒤에는 라이더 체중·바람·컨디션·실력 단계까지 짚는 충분한 고민이 있습니다.
+      </p>
+      <p style="font-size:1.0625rem;line-height:1.75;color:var(--color-charcoal);margin:0;max-width:56ch;margin-left:auto;margin-right:auto;font-weight:600">
+        단순한 결론, 유연한 사고. 그것이 전문 퍼포먼스 어드바이저가 컨설팅하는 방식입니다.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Sport Tiles (4 categories: Wing/Foil/SUP/Accessory) ========== -->
+<!-- Consultation Hub — Level + Style + Quiz -->
+<section class="section" id="consultation" style="background:linear-gradient(180deg, #fff 0%, var(--color-mist) 100%)">
+  <div class="container">
+    <div class="section-head section-head--center reveal" style="margin-bottom:48px">
+      <span class="section-head__eyebrow">Consultation Frame · v1</span>
+      <h2 class="section-head__title">레벨 · 체중 · 스타일 — 64 시나리오 큐레이션</h2>
+      <p class="section-head__lead">전문 퍼포먼스 어드바이저가 한국의 다양한 스팟에서 검증한 네 가지 브랜드 셋업을 16 × 4 = 64 시나리오로 매핑했습니다. 본인 조합을 찾아보세요</p>
+    </div>
+
+    <!-- Find My Gear CTA -->
+    <div class="reveal" style="background:linear-gradient(135deg, var(--color-navy), var(--color-sea-dark));border-radius:24px;padding:48px;color:#fff;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:center;margin-bottom:64px">
+      <div>
+        <span style="display:inline-block;background:rgba(255,184,0,0.18);color:var(--color-sun);font-size:0.6875rem;font-weight:700;padding:6px 14px;border-radius:999px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px">★ 추천 · Find My Gear</span>
+        <h3 style="font-size:clamp(1.5rem,2.5vw + 0.75rem,2.25rem);font-weight:800;line-height:1.15;letter-spacing:-0.025em;margin:0 0 16px">1분 만에 내 셋업을 알려드립니다</h3>
+        <p style="font-size:1.0625rem;line-height:1.65;color:rgba(255,255,255,0.78);margin:0 0 24px;max-width:48ch">
+          레벨·체중·스타일 3가지만 답하면 64-시나리오 매트릭스가 본인에게 맞는 윙·포일·board·accessory 큐레이션을 즉시 보여줍니다.
+        </p>
+        <a href="find-my-gear.html" class="btn btn--accent btn--lg">
+          1분 퀴즈 시작 →
+        </a>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:var(--font-sans-en);font-size:6rem;font-weight:900;line-height:1;color:var(--color-sun);letter-spacing:-0.05em">64</div>
+        <div style="font-size:0.875rem;color:rgba(255,255,255,0.6);margin-top:8px">시나리오</div>
+        <div style="margin-top:24px;font-size:0.8125rem;color:rgba(255,255,255,0.5)">4 레벨 × 4 체중 × 4 스타일</div>
+      </div>
+    </div>
+
+    <!-- Level grid -->
+    <div class="reveal" style="margin-bottom:48px">
+      <h3 style="font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 24px;color:var(--color-navy)">레벨별 컨설팅</h3>
+      <div class="grid-4cols"><!-- DO_NOT_REVERT §163: 4 카드 정확 4-col lock -->
+        <a href="level/beginner.html" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;display:block;transition:all 180ms ease;color:var(--color-navy)" onmouseover="this.style.borderColor='var(--color-sea)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+          <span style="display:inline-block;background:rgba(42,140,92,0.10);color:#2A8C5C;font-size:0.6875rem;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Beginner</span>
+          <h4 style="font-size:1.25rem;font-weight:700;margin:0 0 8px">입문·초급</h4>
+          <p style="font-size:0.875rem;color:var(--color-slate);line-height:1.5;margin:0">첫 시즌·첫 셋업, beach launching과 first flight까지</p>
+        </a>
+        <a href="level/intermediate.html" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;display:block;transition:all 180ms ease;color:var(--color-navy)" onmouseover="this.style.borderColor='var(--color-sea)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+          <span style="display:inline-block;background:rgba(31,143,255,0.10);color:var(--color-sea-dark);font-size:0.6875rem;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Intermediate</span>
+          <h4 style="font-size:1.25rem;font-weight:700;margin:0 0 8px">중급</h4>
+          <p style="font-size:0.875rem;color:var(--color-slate);line-height:1.5;margin:0">Jibe·tack 정복, 모든 기본 스킬에 자신감을 더하자</p>
+        </a>
+        <a href="level/advanced.html" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;display:block;transition:all 180ms ease;color:var(--color-navy)" onmouseover="this.style.borderColor='var(--color-sea)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+          <span style="display:inline-block;background:rgba(10,37,64,0.08);color:var(--color-navy);font-size:0.6875rem;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Advanced</span>
+          <h4 style="font-size:1.25rem;font-weight:700;margin:0 0 8px">상급</h4>
+          <p style="font-size:0.875rem;color:var(--color-slate);line-height:1.5;margin:0">전문 분야 진입, wave·downwind·race wing</p>
+        </a>
+        <a href="level/pro.html" style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;display:block;transition:all 180ms ease;color:var(--color-navy)" onmouseover="this.style.borderColor='var(--color-sea)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+          <span style="display:inline-block;background:rgba(192,48,48,0.10);color:#C03030;font-size:0.6875rem;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px">Pro</span>
+          <h4 style="font-size:1.25rem;font-weight:700;margin:0 0 8px">선수</h4>
+          <p style="font-size:0.875rem;color:var(--color-slate);line-height:1.5;margin:0">선수처럼 함께 경쟁하며 성장하는 스타일이라면</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Style grid -->
+    <div class="reveal" id="styles">
+      <h3 style="font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;margin:0 0 24px;color:var(--color-navy)">스타일별 컨설팅</h3>
+      <div class="grid-4cols"><!-- DO_NOT_REVERT §163: 4 카드 정확 4-col lock -->
+        <a href="style/flat-speed.html" style="background:linear-gradient(135deg,#1F8FFF,#5BB4FF);border-radius:14px;padding:24px;display:block;transition:transform 180ms ease;color:#fff" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <span style="font-family:var(--font-sans-en);font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.8)">Style</span>
+          <h4 style="font-size:1.375rem;font-weight:800;margin:8px 0 8px">Flat·Speed</h4>
+          <p style="font-size:0.875rem;line-height:1.5;margin:0;color:rgba(255,255,255,0.85)">평수면·속도, calm 컨디션</p>
+        </a>
+        <a href="style/choppy-freeride.html" style="background:linear-gradient(135deg,var(--color-navy),var(--color-charcoal));border-radius:14px;padding:24px;display:block;transition:transform 180ms ease;color:#fff" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <span style="font-family:var(--font-sans-en);font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.8)">Style · 표준</span>
+          <h4 style="font-size:1.375rem;font-weight:800;margin:8px 0 8px">Choppy·Freeride</h4>
+          <p style="font-size:0.875rem;line-height:1.5;margin:0;color:rgba(255,255,255,0.85)">한국 일반 spot</p>
+        </a>
+        <a href="style/wave.html" style="background:linear-gradient(135deg,#2A8C5C,#3FB87E);border-radius:14px;padding:24px;display:block;transition:transform 180ms ease;color:#fff" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <span style="font-family:var(--font-sans-en);font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.8)">Style</span>
+          <h4 style="font-size:1.375rem;font-weight:800;margin:8px 0 8px">Wave</h4>
+          <p style="font-size:0.875rem;line-height:1.5;margin:0;color:rgba(255,255,255,0.85)">파도 라이딩, wave-prime 컨디션</p>
+        </a>
+        <a href="style/hybrid.html" style="background:linear-gradient(135deg,#B26B00,#FFB800);border-radius:14px;padding:24px;display:block;transition:transform 180ms ease;color:#fff" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <span style="font-family:var(--font-sans-en);font-size:0.6875rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.8)">Style</span>
+          <h4 style="font-size:1.375rem;font-weight:800;margin:8px 0 8px">Hybrid</h4>
+          <p style="font-size:0.875rem;line-height:1.5;margin:0;color:rgba(255,255,255,0.85)">다목적, 여러 spot mix</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="section section--tight section--bg-image" id="sports"
+         style="background-image:url('assets/images/products/ppc/lifestyle/foiling-action-1.jpg')">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">Sport-First</span>
+      <h2 class="section-head__title">무엇이 필요한가요?</h2>
+      <p class="section-head__lead">종목 단위로 빠르게 검색하세요. 브랜드는 그 다음 결정입니다.</p>
+    </div>
+
+    <div class="sport-grid sport-grid--four reveal">
+      <a href="#brands" class="sport-tile">
+        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 22 16 4l12 18z"/><path d="M16 4v18"/>
+        </svg>
+        <span class="sport-tile__name">윙포일</span>
+        <span class="sport-tile__count">Wingfoil</span>
+      </a>
+      <a href="#brands" class="sport-tile">
+        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="16" cy="20" rx="11" ry="3"/><path d="M16 20V6"/><path d="M9 9h14"/>
+        </svg>
+        <span class="sport-tile__name">포일</span>
+        <span class="sport-tile__count">Hydrofoil · Pump · Downwind</span>
+      </a>
+      <a href="#brands" class="sport-tile">
+        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="16" cy="20" rx="11" ry="4"/><path d="M16 4v16M11 8l5-4 5 4"/>
+        </svg>
+        <span class="sport-tile__name">SUP</span>
+        <span class="sport-tile__count">Stand Up Paddle</span>
+      </a>
+      <a href="#brands" class="sport-tile">
+        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="6" width="16" height="20" rx="3"/><path d="M12 6V4M20 6V4M8 12h16"/>
+        </svg>
+        <span class="sport-tile__name">액세서리</span>
+        <span class="sport-tile__count">Wetsuit · Helmet · Impact</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ========== 4 Brand Hub ========== -->
+<section class="section" id="brands">
+  <div class="container">
+    <div class="section-head section-head--split reveal">
+      <div>
+        <span class="section-head__eyebrow">네 브랜드 · 한 큐레이션</span>
+        <h2 class="section-head__title">입문부터 선수까지,<br>한 곳에서 모두</h2>
+        <p class="section-head__lead">단무지 전문 퍼포먼스 어드바이저가 직접 현장에서 테스트한 네 브랜드만 엄선했습니다.</p>
+      </div>
+      <div class="section-head__side">
+        <div class="section-head__stat">
+          <span class="section-head__stat-num">4</span>
+          <span class="section-head__stat-label">브랜드</span>
+        </div>
+        <div class="section-head__stat">
+          <span class="section-head__stat-num">4</span>
+          <span class="section-head__stat-label">종목</span>
+        </div>
+        <div class="section-head__stat">
+          <span class="section-head__stat-num">15+</span>
+          <span class="section-head__stat-label">스팟 검증</span>
+        </div>
+        <div class="section-head__stat">
+          <span class="section-head__stat-num">1년</span>
+          <span class="section-head__stat-label">무상 보증</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-grid">
+      <a href="levitaz.html" class="brand-card reveal" data-delay="1">
+        <!-- DO_NOT_REVERT §35 + Phase 9 (2026-05-10): Levitaz 카드 = R6 V1 race foil 공식 product shot. 어두운 generic 카본 fabric 이미지 (cover-freeseries-web.jpg 물방울 추상) 회귀 영구 금지. 출처: levitaz.com 공식 (정식 수입 partner, brand 자산 사용 권한 확보). Phase 2 Cafe24 launch 전 로컬 캐시 예정. -->
+        <div class="brand-card__visual brand-card__visual--levitaz brand-card__visual--has-image"><img src="https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_v1000x1000px_2024.jpg" alt="Levitaz R6 Race 카본 포일" loading="lazy" decoding="async" onerror="this.style.display='none'" />
+          <div class="brand-card__decor" aria-hidden="true">
+            <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="100" rx="80" ry="14" fill="rgba(255,255,255,0.10)"/>
+              <path d="M100 100 L100 50" stroke="rgba(255,255,255,0.16)" stroke-width="2"/>
+              <path d="M85 70 L115 70" stroke="rgba(255,255,255,0.14)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="brand-card__body">
+          <h3 class="brand-card__name">Levitaz</h3>
+          <p class="brand-card__copy">오스트리아 정밀 카본. CORE 티타늄 일체형 구조로 포일의 느낌이 발로 바로 전달됩니다. <span class="nowrap">Free Series</span> + <span class="nowrap">R6 Race</span></p>
+          <span class="brand-card__cta">브랜드 둘러보기 <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a href="ppc.html" class="brand-card reveal" data-delay="2">
+        <div class="brand-card__visual brand-card__visual--ppc brand-card__visual--has-image"><img src="assets/images/products/ppc/m1/hero.jpg" alt="PPC M1 Wing" loading="lazy" decoding="async" onerror="this.style.display='none'" />
+          <div class="brand-card__decor" aria-hidden="true">
+            <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+              <path d="M40 120 L100 30 L160 120 Z" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+              <line x1="100" y1="30" x2="100" y2="120" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
+              <line x1="60" y1="60" x2="140" y2="60" stroke="rgba(255,255,255,0.10)" stroke-width="1" stroke-dasharray="3 3"/>
+            </svg>
+          </div>
+        </div>
+        <div class="brand-card__body">
+          <h3 class="brand-card__name">PPC</h3>
+          <p class="brand-card__copy">입문 M2 → 중급 M1-X → 상급 M1 → 선수 FDS. 4단계로 명확히 갈라지는 PPC 큐레이션. 6개월 보증</p>
+          <span class="brand-card__cta">브랜드 둘러보기 <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a href="takoon.html" class="brand-card reveal" data-delay="3">
+        <div class="brand-card__visual brand-card__visual--takoon brand-card__visual--has-image"><img src="https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-V4-Pro---Image-06_updated.png" alt="Takoon Wing V4 Pro" loading="lazy" decoding="async" onerror="this.style.display='none'" />
+        </div>
+        <div class="brand-card__body">
+          <h3 class="brand-card__name">Takoon</h3>
+          <p class="brand-card__copy">2026 Wing V4 Pro 65 g/m² quadruple ripstop. Glide·Comet 보드 다중 사이즈로 Wing/SUP 포일 자유롭게. 글로벌 마켓에서 가장 가성비가 뛰어난 숨은 보물 브랜드</p>
+          <span class="brand-card__cta">브랜드 둘러보기 <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+
+      <a href="wip.html" class="brand-card reveal" data-delay="4">
+        <div class="brand-card__visual brand-card__visual--wip brand-card__visual--has-image"><img src="https://cdn.shopify.com/s/files/1/0279/4022/5124/products/7.PROWIP2.0HELMET-MATRED.jpg" alt="Forward WIP ProWIP 2.0 Helmet" loading="lazy" decoding="async" onerror="this.style.display='none'" />
+          <div class="brand-card__decor" aria-hidden="true">
+            <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="80" r="40" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+              <path d="M70 80 Q100 40 130 80" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+              <line x1="100" y1="40" x2="100" y2="120" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+        <div class="brand-card__body">
+          <h3 class="brand-card__name">Forward WIP</h3>
+          <p class="brand-card__copy">올림픽선수들과 프로선수들이 가장 신뢰하는 워터스포츠 안전장비. 세일·윙·카이트 모든 하이드로포일 종목의 동반자</p>
+          <span class="brand-card__cta">브랜드 둘러보기 <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Cross-brand inquiry strip -->
+    <div class="cta-strip reveal" style="margin-top:48px">
+      <div>
+        <span class="cta-strip__text">한 셋업으로 네 가지 브랜드 매칭, 어느 조합이 본인 컨디션에 맞는지?</span>
+        <span class="cta-strip__sub">단무지 전문 퍼포먼스 어드바이저가 라이더 체중·레벨·컨디션에 맞춰 추천해 드립니다</span>
+      </div>
+      <a href="#contact" class="btn btn--primary">카톡 채널 상담 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Modular Cross-Platform USP ========== -->
+<section class="section modular-usp" id="modular-usp" style="background:linear-gradient(180deg,#fff 0%,var(--color-mist) 100%)">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">Modular System · Levitaz</span>
+      <h2 class="section-head__title">마스트 1개로 <span class="nowrap">Freeride</span> + <span class="nowrap">Race</span> 둘 다</h2>
+      <p class="section-head__lead">Levitaz <span class="nowrap">Free&nbsp;Series</span>와 <span class="nowrap">R6&nbsp;Race</span>는 마스트·fuselage 결합부가 동일한 mating geometry. 단무지공방은 cross-platform 단위로 셋업을 컨설팅합니다.</p>
+    </div>
+
+    <div class="grid grid-2 reveal" style="margin-top:32px;gap:24px;max-width:1080px;margin-left:auto;margin-right:auto">
+      <div style="padding:28px;border:1px solid var(--border);border-radius:16px;background:#fff">
+        <span style="display:inline-block;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;color:var(--color-sea);text-transform:uppercase;margin-bottom:12px">시나리오 A</span>
+        <h3 class="t-h3" style="margin:0 0 12px;font-size:1.125rem">Race 보드에 freeride wing 셋업</h3>
+        <p style="font-size:0.9375rem;color:var(--text-secondary);margin:0;line-height:1.7"><span class="nowrap">Turtle box</span> 마운트의 Race 보드에 <span class="nowrap">R6 마스트</span> + <span class="nowrap">Free&nbsp;Series</span> wing 조합. <span class="nowrap">Formula Kite</span> 라이더가 wing 다양화로 freeride day까지 커버합니다.</p>
+      </div>
+      <div style="padding:28px;border:1px solid var(--border);border-radius:16px;background:#fff">
+        <span style="display:inline-block;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;color:var(--color-sea);text-transform:uppercase;margin-bottom:12px">시나리오 B</span>
+        <h3 class="t-h3" style="margin:0 0 12px;font-size:1.125rem">R6 풀셋 부담 없이 cross-set-up</h3>
+        <p style="font-size:0.9375rem;color:var(--text-secondary);margin:0;line-height:1.7"><span class="nowrap">R6 마스트</span>의 안정성과 <span class="nowrap">Free&nbsp;Series</span> wing 4종(<span class="nowrap">FW&nbsp;540 / 680 / 790 / 900</span>)의 다양성을 동시에. 풀셋 한 번에 안 사도 Race 마스트 + freeride wing으로 양면 활용이 가능합니다.</p>
+      </div>
+    </div>
+
+    <div class="cta-strip reveal" style="margin-top:32px">
+      <div>
+        <span class="cta-strip__text">한국 리테일 어디에도 없는 모듈러 advisory</span>
+        <span class="cta-strip__sub">단무지공방 cross-platform 컨설팅 — Free Series 라이더의 Race 입문 path까지 같이 설계합니다</span>
+      </div>
+      <a href="find-my-gear.html" class="btn btn--primary">1분 진단 시작 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Persona Funnel ========== -->
+<section class="section section--mist" id="persona">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">레벨별 추천</span>
+      <h2 class="section-head__title">초보자도, 숙련자도, 고수들도</h2>
+      <p class="section-head__lead">라이더 레벨로 시작하세요. 전문 퍼포먼스 어드바이저가 네 가지 브랜드를 가로질러 가장 잘 맞는 <span class="nowrap">set-up</span>을 추천합니다.</p>
+      <span class="cons-matrix__wind-baseline" role="note" style="margin-top:14px">💨 <span><strong>모든 카드 = 중풍 11-16 kt 기준</strong></span> <span class="cons-matrix__wind-baseline__sep">·</span> <span>미풍 ≤10kt → 윙 ↑1 / 강풍 ≥17kt → 윙 ↓1</span></span>
+    </div>
+
+    <div class="persona-grid persona-grid--four">
+      <article class="persona reveal" data-delay="1">
+        <div class="persona__num">01 · BEGINNER</div>
+        <span class="wind-baseline-pill" title="모든 추천 카드는 중풍 11-16kt 기준 — 본인 spot에 맞춰 ±1 사이즈 조정"><span class="wind-baseline-pill__label">기준 풍속</span>중풍 11-16 kt</span>
+        <h3 class="persona__title">처음 시작하는 입문·초급</h3>
+        <p class="persona__sub">강습을 막 마치고 첫 풀세트 구입을 고민 중. 안정감과 합리적 가격이 핵심</p>
+        <ul class="persona__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Takoon Wing V4 (4.0–5.0m²)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Takoon Cruise 110L 또는 Glide Midlength 100–110L</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Takoon Foil Starter 1600cm² 또는 Levitaz FW 900 (900cm²) + Mast 84cm + Stab 180</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>WIP Wing Impact Vest 50N + Entry Wetsuit</li>
+        </ul>
+        <div class="wind-baseline-note" role="note"><span class="wind-baseline-note__row"><strong>미풍 ≤10 kt</strong> — 윙 한 사이즈 ↑ 권장</span><span class="wind-baseline-note__row"><strong>강풍 ≥17 kt</strong> — 윙 한 사이즈 ↓ 권장</span></div>
+        <a class="persona__pack persona__pack--cta" href="#contact" data-level="beginner" aria-label="입문 풀세트 견적 요청 — 카톡 상담으로 이동"><strong>입문 풀세트 견적 요청 →</strong>한 세트로 첫 시즌 부담 없이 시작</a>
+      </article>
+
+      <article class="persona reveal" data-delay="2" style="border-color:var(--color-sea);box-shadow:var(--shadow-md)">
+        <div class="persona__num">02 · INTERMEDIATE · 추천</div>
+        <span class="wind-baseline-pill" title="모든 추천 카드는 중풍 11-16kt 기준 — 본인 spot에 맞춰 ±1 사이즈 조정"><span class="wind-baseline-pill__label">기준 풍속</span>중풍 11-16 kt</span>
+        <h3 class="persona__title">한국 표준 — 중급 라이더</h3>
+        <p class="persona__sub">한 셋업으로 다양한 컨디션 커버하고 싶은 실용주의자. 어떤 컨디션에서나</p>
+        <ul class="persona__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Free Series FW 790 (790cm²) 또는 FW 900 (900cm²)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Mast 84cm + Stab 180 (Choppy·Wave는 Takoon Flow 800–900cm² 또는 Flare 850–950cm² + Carbon HR 16mm)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Boom FS 83L 또는 Takoon Glide Midlength 95–110L</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>WIP Wing Impact Vest 50N + 3/2mm Wetsuit</li>
+        </ul>
+        <div class="wind-baseline-note" role="note"><span class="wind-baseline-note__row"><strong>미풍 ≤10 kt</strong> — 윙 한 사이즈 ↑ 권장</span><span class="wind-baseline-note__row"><strong>강풍 ≥17 kt</strong> — 윙 한 사이즈 ↓ 권장</span></div>
+        <a class="persona__pack persona__pack--cta" href="#contact" data-level="intermediate" aria-label="중급 풀세트 견적 요청 — 카톡 상담으로 이동"><strong>중급 풀세트 견적 요청 →</strong>대부분의 컨디션을 커버하는 표준 셋업</a>
+      </article>
+
+      <article class="persona reveal" data-delay="3">
+        <div class="persona__num">03 · ADVANCED</div>
+        <span class="wind-baseline-pill" title="모든 추천 카드는 중풍 11-16kt 기준 — 본인 spot에 맞춰 ±1 사이즈 조정"><span class="wind-baseline-pill__label">기준 풍속</span>중풍 11-16 kt</span>
+        <h3 class="persona__title">강풍·다운윈드 상급</h3>
+        <p class="persona__sub">정밀 응답성과 일관된 성능 추구. 5년 이상 사용할 마지막 업그레이드</p>
+        <ul class="persona__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Free Series FW 540 (540cm²) 또는 FW 680 (680cm²)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Mast 96cm + Stab 180 (Choppy·Wave는 Takoon Flash 530–680cm² 또는 Swell 900cm² + Carbon HM 16mm)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Boom FS 63L 또는 FS 95L (다목적 cross-over)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>WIP X-OVER race-grade Helmet + Kompact 50N 2.0 (slim 라이프자켓) + Waistfoil Harness 3.0</li>
+        </ul>
+        <div class="wind-baseline-note" role="note"><span class="wind-baseline-note__row"><strong>미풍 ≤10 kt</strong> — 윙 한 사이즈 ↑ 권장</span><span class="wind-baseline-note__row"><strong>강풍 ≥17 kt</strong> — 윙 한 사이즈 ↓ 권장</span></div>
+        <a class="persona__pack persona__pack--cta" href="#contact" data-level="advanced" aria-label="상급 풀 시스템 견적 요청 — 카톡 상담으로 이동"><strong>풀 시스템 견적 요청 →</strong>한 시스템으로 wingfoil·prone·SUP·downwind 모두</a>
+      </article>
+
+      <article class="persona reveal" data-delay="4" style="border-color:#C03030">
+        <div class="persona__num" style="color:#C03030">04 · PRO · 선수</div>
+        <span class="wind-baseline-pill" title="모든 추천 카드는 중풍 11-16kt 기준 — 본인 spot에 맞춰 ±1 사이즈 조정"><span class="wind-baseline-pill__label">기준 풍속</span>중풍 11-16 kt</span>
+        <h3 class="persona__title">국가대표·국제 대회 라이더</h3>
+        <p class="persona__sub">선수처럼 함께 경쟁하며 성장하는 스타일이라면. Race wing + cross-platform 마스트 셋업</p>
+        <ul class="persona__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>PPC Sonic FDS Wing (Full Dual Skin race wing)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz R6 풀세트 (R6 Front Wing + Mast + Stab + Fuselage) — Wingfoil race + Kite race cross-platform 호환</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Boom FS 63L 또는 R6 race board (Turtle box mount)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>WIP X-OVER race-grade Helmet + Kompact 50N 2.0 (slim 라이프자켓) + Waistfoil Harness 3.0</li>
+        </ul>
+        <div class="wind-baseline-note" role="note"><span class="wind-baseline-note__row"><strong>미풍 ≤10 kt</strong> — 윙 한 사이즈 ↑ 권장</span><span class="wind-baseline-note__row"><strong>강풍 ≥17 kt</strong> — 윙 한 사이즈 ↓ 권장</span></div>
+        <a class="persona__pack persona__pack--cta" href="#contact" data-level="pro" aria-label="선수 풀 시스템 견적 요청 — 카톡 상담으로 이동"><strong>선수 풀 시스템 견적 요청 →</strong>국가대표·국제 대회 라이더 대상 1:1 컨설팅</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Performance 5축 시그니처 ========== -->
+<section class="section section--dark" id="signature">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow t-eyebrow--white">Signature</span>
+      <h2 class="section-head__title">Performance 5축 — 단무지 표준</h2>
+      <p class="section-head__lead">스킬·스피드·글라이드·조작성·안정성. 5축으로 본인에게 맞는 장비를 한눈에.</p>
+    </div>
+
+    <div class="perf">
+      <div class="perf__chart-wrap reveal" data-delay="1"
+           data-perf-chart
+           data-values="6,7,9,5,8"
+           data-labels="Skill,Speed,Glide,Maneuver,Stability"></div>
+
+      <div class="reveal" data-delay="2">
+        <div class="pill pill--accent" style="margin-bottom:16px">예시 · Levitaz FW 790</div>
+        <h3 class="t-h2 t-on-dark" style="margin:0 0 16px">긴 글라이딩, 부드러운 컨트롤, 여유로운 라이딩</h3>
+        <p class="t-on-dark-mute" style="margin:0 0 24px;font-size:1.0625rem;line-height:1.65;max-width:48ch">
+          모든 제품 페이지 표준 시그니처. Performance 5축 — 라이더가 카탈로그에서 본인 레벨에 맞는 장비를
+          사양 표 없이도 한눈에 비교할 수 있습니다.
+        </p>
+
+        <ul class="perf-axes">
+          <li>
+            <div class="perf-axes__label"><b>Skill</b><small>난이도</small></div>
+            <div class="perf-axes__bar" data-value="6"></div>
+            <span class="perf-axes__num">6/10</span>
+          </li>
+          <li>
+            <div class="perf-axes__label"><b>Speed</b><small>탑엔드 속도</small></div>
+            <div class="perf-axes__bar" data-value="7"></div>
+            <span class="perf-axes__num">7/10</span>
+          </li>
+          <li>
+            <div class="perf-axes__label"><b>Glide</b><small>활공력</small></div>
+            <div class="perf-axes__bar" data-value="9"></div>
+            <span class="perf-axes__num">9/10</span>
+          </li>
+          <li>
+            <div class="perf-axes__label"><b>Maneuver</b><small>조작성</small></div>
+            <div class="perf-axes__bar" data-value="5"></div>
+            <span class="perf-axes__num">5/10</span>
+          </li>
+          <li>
+            <div class="perf-axes__label"><b>Stability</b><small>안정성</small></div>
+            <div class="perf-axes__bar" data-value="8"></div>
+            <span class="perf-axes__num">8/10</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Description Philosophy ========== -->
+<section class="section">
+  <div class="container container--narrow">
+    <div class="rule-strip reveal" style="margin-bottom:48px">DMJ Description Philosophy</div>
+
+    <div class="reveal">
+      <h2 class="t-h1" style="margin:0 0 24px;text-align:center">설계철학 · 재료·공법 · 라이더 체감</h2>
+      <p class="t-lead" style="text-align:center;max-width:62ch;margin:0 auto 16px">
+        단무지의 모든 제품설명은 Why·How·Feel 3-stack 구조.
+      </p>
+      <p class="t-lead" style="text-align:center;max-width:62ch;margin:0 auto 64px">
+        스펙 숫자만이 아니라 왜 만들어졌는지·어떻게 만들어졌는지·라이더가 무엇을 느끼는지
+        모두 풀어 씁니다.
+      </p>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="reveal value-card" data-delay="1">
+        <span class="value-card__num">01</span>
+        <div class="pill" style="margin-bottom:8px">Why · 설계철학</div>
+        <h3 class="t-h3" style="margin:0 0 8px">왜 만들어졌는지</h3>
+        <p style="color:var(--text-secondary);font-size:0.9375rem;line-height:1.65;margin:0">
+          본사 R&amp;D 인용 + 어떤 라이더 문제를 해결하는지 2~3 문장. 스펙보다 먼저 의도를 풀어 씁니다.
+        </p>
+      </div>
+      <div class="reveal value-card" data-delay="2">
+        <span class="value-card__num">02</span>
+        <div class="pill" style="margin-bottom:8px">How · 재료·공법</div>
+        <h3 class="t-h3" style="margin:0 0 8px">어떻게 만들었는지</h3>
+        <p style="color:var(--text-secondary);font-size:0.9375rem;line-height:1.65;margin:0">
+          비전문가도 이해 가능한 한국어로. "고탄성 prepreg 카본 + 발수 폼 코어 — 강성과 진동 흡수를 동시에."
+        </p>
+      </div>
+      <div class="reveal value-card" data-delay="3">
+        <span class="value-card__num">03</span>
+        <div class="pill" style="margin-bottom:8px">Feel · 라이더 체감</div>
+        <h3 class="t-h3" style="margin:0 0 8px">라이더가 받는 결과</h3>
+        <p style="color:var(--text-secondary);font-size:0.9375rem;line-height:1.65;margin:0">
+          결과 형용사 3 + 짧은 카피. "<b>견고하다. 민첩하다. 꾸준하다.</b> 한 번 타보면 이유를 알게 됩니다."
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Launch Alert Form ========== -->
+<section class="section" id="launch-alert">
+  <div class="container">
+    <div class="launch reveal">
+      <div class="launch__inner">
+        <div>
+          <span class="t-eyebrow" style="color:var(--color-sun);margin-bottom:16px;display:inline-block">Phase 2 · 2026 Launch</span>
+          <h2 class="launch__title">정식 launch 시,<br><em>가장 먼저 알려드릴게요.</em></h2>
+          <p class="launch__lead">
+            현재 dmjgroup.kr는 Phase 1 컨셉 미리보기입니다. Cafe24 본격 e-commerce launch 시
+            가장 먼저 알림 받고, 사전 등록자 전용 혜택을 받아보세요.
+          </p>
+          <ul class="launch__benefits">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>네 가지 브랜드 정식 입고 일정 가장 먼저 안내</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>사전 등록자 전용 launch 할인 코드</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>라이딩 가이드 PDF 무료</li>
+          </ul>
+        </div>
+
+        <form class="launch-form" data-launch-form data-endpoint="mailto" novalidate>
+          <label for="launch-email" class="launch-form__label">Email Address</label>
+          <div class="launch-form__row">
+            <input id="launch-email" name="email" type="email" required
+                   placeholder="rider@example.com"
+                   class="launch-form__input" autocomplete="email">
+            <button type="submit" class="btn btn--accent btn--lg">런치 알림 신청</button>
+          </div>
+          <input type="text" name="name" placeholder="이름 (선택)"
+                 class="launch-form__input" style="margin-top:12px" autocomplete="name">
+
+          <label class="launch-form__check">
+            <input type="checkbox" name="consent" required>
+            <span>
+              <a href="policy/privacy.html">개인정보 수집·이용</a>에 동의합니다.
+              수집 항목: 이메일, 이름(선택). 보유: launch 후 1년. 거부 시 알림 신청 불가.
+            </span>
+          </label>
+
+          <div class="launch-form__msg" data-form-msg role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Differentiation ========== -->
+<section class="section section--mist">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">왜 단무지인가</span>
+      <h2 class="section-head__title">Single-brand site와<br>다른 4가지</h2>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="value-card">
+        <span class="value-card__num">01</span>
+        <h3 class="t-h3" style="margin:0 0 8px">입문~상급 + 액세서리, 한 site에서</h3>
+        <p style="color:var(--text-secondary);margin:0;line-height:1.65">
+          Takoon 입문 → PPC 중급 → Levitaz 상급, WIP는 hardware와 cross-sell. 단무지 한 창구에서 라이더 평생 사이클을 cover합니다.
+        </p>
+      </div>
+      <div class="value-card">
+        <span class="value-card__num">02</span>
+        <h3 class="t-h3" style="margin:0 0 8px">라이더 맞춤 큐레이션</h3>
+        <p style="color:var(--text-secondary);margin:0;line-height:1.65">
+          본사 카탈로그를 그대로 가져오지 않습니다. 현장에서 직접 테스트한 SKU만 큐레이션합니다.
+        </p>
+      </div>
+      <div class="value-card">
+        <span class="value-card__num">03</span>
+        <h3 class="t-h3" style="margin:0 0 8px">단일 채널 AS</h3>
+        <p style="color:var(--text-secondary);margin:0;line-height:1.65">
+          네 가지 브랜드 모두 단무지공방이 직접 한국에서 운영합니다. 본사로 보내야 하는 절차 없이, 한국 카톡 한 창구에서 빠르게 응대합니다.
+        </p>
+      </div>
+      <div class="value-card">
+        <span class="value-card__num">04</span>
+        <h3 class="t-h3" style="margin:0 0 8px">Cross-brand 호환 정보</h3>
+        <p style="color:var(--text-secondary);margin:0;line-height:1.65">
+          "이 Levitaz mast와 호환되는 PPC board", "WIP wetsuit과 어울리는 Takoon 풀세트" — single-brand site는 알려주지 않는 정보.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Contact CTA ========== -->
+<section class="section section--darker" id="contact">
+  <div class="container container--narrow" style="text-align:center">
+    <div class="reveal">
+      <span class="t-eyebrow t-eyebrow--white">Let's Talk</span>
+      <h2 class="t-display t-on-dark" style="margin:24px 0">바로 상담이<br>가장 빠릅니다</h2>
+      <p class="t-on-dark-mute" style="font-size:1.125rem;max-width:48ch;margin:0 auto 40px;line-height:1.65">
+        네 가지 브랜드 큐레이션 추천부터 입문 풀세트 견적까지. 카톡 또는 이메일로 단무지 전문 퍼포먼스 어드바이저에게 직접 문의하세요.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="btn btn--accent btn--lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          카톡 채널로 문의
+        </a>
+        <a href="mailto:danmujigroup@gmail.com" class="btn btn--ghost-light btn--lg">
+          danmujigroup@gmail.com
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== Footer ========== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="skill-assessment.html">스킬 진단 (Phase B)</a></li>
+          <li><a href="membership.html">회원 등급 안내</a></li>
+          <li><a href="glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="calculator.html">Lift Calculator</a></li>
+          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="level/beginner.html">입문 가이드</a></li><li><a href="level/novice.html">초급 가이드</a></li>
+          <li><a href="level/intermediate.html">중급 가이드</a></li>
+          <li><a href="level/advanced.html">상급 가이드</a></li>
+          <li><a href="level/pro.html">선수 가이드</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="levitaz.html">Levitaz</a></li>
+          <li><a href="ppc.html">PPC</a></li>
+          <li><a href="takoon.html">Takoon</a></li>
+          <li><a href="wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="policy/shipping.html">배송 정책</a></li>
+          <li><a href="policy/refund.html">환불 정책</a></li>
+          <li><a href="policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="policy/privacy.html">개인정보처리방침</a>
+        <a href="policy/terms.html">이용약관</a>
+        <a href="policy/refund.html">환불정책</a>
+        <a href="policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ========== KakaoTalk Floating Button ========== -->
+<a href="#contact" class="kakao-fab" aria-label="카톡 상담">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</a>
+
+<script src="assets/js/main.js" defer></script>
+  <!-- §171-B cart system — auth-shim + cart.js for nav badge. -->
+  <script src="assets/js/supabase-auth.js?v=supabase-180-20260527" defer></script>
+  <script src="assets/js/cart.js" defer></script>
+  <script src="assets/js/nav-auth.js" defer></script>
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <script src="assets/js/agent-deny.js" defer></script>
+</body>
+</html>

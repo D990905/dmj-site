@@ -69,6 +69,7 @@
   --space-2:   0.5rem;   /* 8 */
   --space-3:   0.75rem;  /* 12 */
   --space-4:   1rem;     /* 16 */
+  --space-5:   1.25rem;  /* 20 — Danny 2026-06-03: nav__primary gap. 이전 미정의로 gap 무효화 → 8px 잔존 버그 fix */
   --space-6:   1.5rem;   /* 24 */
   --space-8:   2rem;     /* 32 */
   --space-12:  3rem;     /* 48 */
@@ -4036,7 +4037,20 @@ select {
    Phase 9 — Nav restructure additions
    ========================================================== */
 .nav__sub--wide { min-width: 340px; }
-.nav__primary { gap: var(--space-5); }
+/* Danny 2026-06-03 — nav 항목 간격 여유 확보(②) + 장바구니 아이콘 항상 노출(①).
+   이전: --space-5 미정의로 gap 무효 → 8px 잔존. index.html(항목 8개·라이딩분석 주입 포함)에서
+   행이 컨테이너를 넘쳐 우측 cart/login 이 잘려 보이지 않던 원인. min-width:0 + cart flex-shrink:0
+   로 다른 링크가 먼저 줄고 장바구니는 항상 표시되도록 보장. */
+.nav__primary { gap: var(--space-5); min-width: 0; flex-wrap: nowrap; }
+/* 작은 데스크탑(1024~1180px)에서 8개 항목 + 넓힌 gap 이 컨테이너를 넘칠 때,
+   일반 링크는 패딩을 조금 줄여 한 줄에 들어오게 하고 장바구니는 절대 줄지/잘리지 않게 한다. */
+.nav__primary .nav__has-sub,
+.nav__primary > .nav__link { flex-shrink: 1; white-space: nowrap; }
+.nav__primary .nav__cart { flex-shrink: 0; }
+@media (min-width: 1024px) and (max-width: 1180px) {
+  .nav__primary { gap: var(--space-3); }
+  .nav__primary .nav__link { padding-left: 0.55rem; padding-right: 0.55rem; }
+}
 
 .mobile-menu__heading {
   padding: 18px 24px 6px;

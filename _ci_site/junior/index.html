@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<title>유소년·어린이 라이더 가이드 | 단무지공방</title>
+<meta name="description" content="다음 세대 라이더의 안전한 첫 시즌. 13-17세·8-12세 연령별 추천 장비, WIP impact vest·helmet 안전 장비, 부모님 1:1 컨설팅. 직접 sales 차단·강습 partnership 우선">
+<link rel="canonical" href="https://dmjgroup.kr/junior/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="유소년·어린이 라이더 가이드 | 단무지공방">
+<meta property="og:description" content="안전이 우선입니다 — WIP 안전 장비·작은 사이즈·부모 컨설팅">
+<meta property="og:locale" content="ko_KR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=mobile-tap-fix-20260526">
+
+<style>
+  .demo-hero {
+    position: relative;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(31,143,255,0.32), transparent 55%),
+      radial-gradient(ellipse at 80% 70%, rgba(42,140,92,0.25), transparent 60%),
+      linear-gradient(135deg, var(--color-navy) 0%, #0F2A4F 100%);
+    color: #fff;
+    padding: 140px 0 88px;
+    overflow: hidden;
+  }
+  /* §180 (2026-05-21) — 유소년 hero 사진 적용. DO_NOT_REVERT */
+  .demo-hero__bg-image {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    z-index: 0; pointer-events: none;
+  }
+  .demo-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(6,26,46,0.55) 0%, rgba(8,28,52,0.84) 100%);
+    z-index: 1; pointer-events: none;
+  }
+  .demo-hero .container { position: relative; z-index: 2; }
+  .demo-hero__crumb { font-size: 0.8125rem; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+  .demo-hero__crumb a { color: rgba(255,255,255,0.6); text-decoration: none; }
+  .demo-hero__crumb a:hover { color: #fff; }
+  .demo-hero__crumb .sep { margin: 0 8px; opacity: 0.5; }
+  .demo-hero__eyebrow {
+    display: inline-block; font-family: var(--font-sans-en);
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.18em;
+    color: #5BB4FF; padding: 6px 14px;
+    background: rgba(31,143,255,0.18); border: 1px solid rgba(31,143,255,0.42);
+    border-radius: 999px; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .demo-hero__title {
+    font-size: clamp(2rem, 4vw + 1rem, 3.5rem); font-weight: 800;
+    line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 20px;
+  }
+  .demo-hero__title em { font-style: normal; color: #5BB4FF; }
+  .demo-hero__lead {
+    font-size: 1.125rem; line-height: 1.65;
+    color: rgba(255,255,255,0.78); max-width: 56ch; margin: 0 0 32px;
+  }
+  .demo-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .demo-section { padding: 80px 0; }
+  .demo-section--mist { background: var(--color-mist); }
+  .demo-section__head { max-width: 64ch; margin-bottom: 48px; }
+  .demo-section__eyebrow {
+    font-family: var(--font-sans-en);
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.16em;
+    color: var(--color-sea); text-transform: uppercase; margin-bottom: 12px;
+    display: block;
+  }
+  .demo-section__title {
+    font-size: clamp(1.5rem, 2.5vw + 0.75rem, 2.25rem);
+    font-weight: 800; line-height: 1.18; letter-spacing: -0.025em;
+    color: var(--color-navy); margin: 0 0 16px;
+  }
+  .demo-section__lead {
+    font-size: 1.0625rem; line-height: 1.7;
+    color: var(--color-slate); margin: 0;
+  }
+
+  /* Safety priority callout */
+  .safety-banner {
+    background: linear-gradient(135deg, #C03030, #8B1F1F);
+    color: #fff;
+    padding: 36px 32px; border-radius: 16px;
+    display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
+    margin-bottom: 48px;
+  }
+  @media (max-width: 760px) {
+    .safety-banner { grid-template-columns: 1fr; padding: 28px 24px; }
+  }
+  .safety-banner__icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .safety-banner__title {
+    font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 6px;
+  }
+  .safety-banner__body {
+    font-size: 0.9375rem; line-height: 1.65;
+    color: rgba(255,255,255,0.92); margin: 0;
+  }
+
+  .age-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  @media (max-width: 760px) { .age-grid { grid-template-columns: 1fr; } }
+  .age-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 24px;
+    position: relative;
+  }
+  .age-card--restricted { border-color: rgba(192,48,48,0.32); background: rgba(192,48,48,0.04); }
+  .age-card__age {
+    font-family: var(--font-sans-en); font-weight: 900;
+    font-size: 0.875rem; color: var(--color-sun);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 8px;
+  }
+  .age-card--restricted .age-card__age { color: #C03030; }
+  .age-card__title {
+    font-size: 1.1875rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 12px;
+  }
+  .age-card__list {
+    list-style: none; padding: 0; margin: 0 0 16px;
+  }
+  .age-card__list li {
+    font-size: 0.875rem; line-height: 1.55;
+    color: var(--color-slate); padding-left: 18px; position: relative;
+    margin-bottom: 6px;
+  }
+  .age-card__list li::before {
+    content: "•"; position: absolute; left: 4px; top: 0;
+    color: var(--color-sea);
+  }
+  .age-card--restricted .age-card__list li::before { color: #C03030; }
+  .age-card__note {
+    font-size: 0.8125rem; line-height: 1.5;
+    color: var(--color-charcoal);
+    padding: 10px 14px; background: var(--color-mist);
+    border-radius: 8px; margin: 0;
+  }
+  .age-card--restricted .age-card__note { background: rgba(192,48,48,0.08); color: #8B1F1F; }
+
+  .gear-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .gear-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .gear-card__cat {
+    font-family: var(--font-sans-en); font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--color-sea); margin-bottom: 8px; display: block;
+  }
+  .gear-card__name { font-size: 1.0625rem; font-weight: 700; color: var(--color-navy); margin: 0 0 6px; }
+  .gear-card__why { font-size: 0.875rem; line-height: 1.55; color: var(--color-slate); margin: 0 0 12px; }
+  .gear-card__sizes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .gear-card__size {
+    background: rgba(31,143,255,0.10); color: var(--color-sea-dark);
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+
+  .demo-cta {
+    background: linear-gradient(135deg, var(--color-navy), #0F2A4F);
+    color: #fff;
+    border-radius: 24px; padding: 56px 48px;
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: center;
+  }
+  @media (max-width: 760px) {
+    .demo-cta { grid-template-columns: 1fr; padding: 40px 28px; }
+  }
+  .demo-cta__title {
+    font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2rem);
+    font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; line-height: 1.18;
+  }
+  .demo-cta__lead {
+    font-size: 1rem; line-height: 1.65;
+    color: rgba(255,255,255,0.78); margin: 0 0 24px;
+  }
+
+  .faq-list { display: grid; gap: 12px; }
+  .faq-item {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px;
+  }
+  .faq-item__q {
+    font-size: 1rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .faq-item__a {
+    font-size: 0.9375rem; line-height: 1.65;
+    color: var(--color-slate); margin: 0;
+  }
+  .faq-item__a strong { color: var(--color-navy); }
+
+  .placeholder-card {
+    border: 2px dashed rgba(31,143,255,0.32);
+    background: rgba(31,143,255,0.04);
+    border-radius: 14px; padding: 40px 28px; text-align: center;
+  }
+  .placeholder-card__tag {
+    display: inline-block;
+    background: rgba(31,143,255,0.12); color: var(--color-sea-dark);
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .placeholder-card__title { font-size: 1.125rem; font-weight: 700; color: var(--color-navy); margin: 0 0 6px; }
+  .placeholder-card__sub { font-size: 0.9375rem; line-height: 1.55; color: var(--color-slate); margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- Trust bar -->
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>3회 올림픽 출전 코치 운영</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>WIP Junior 안전 장비 정식 수입</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>부모 1:1 컨설팅 무료</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>강습 partnership</span>
+</div></div></div>
+
+<!-- Header -->
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="../index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="../takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="../style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="../style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="../find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="../genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="../genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="../genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="../level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="../level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="../level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="../women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="../junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="../family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 스마트 컨설팅 (CTA) -->
+        <a href="../find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <a href="../login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button type="button" class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button type="button" class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== Mobile Menu ========== -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button type="button" class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="../find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="../login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">라이딩 스타일</li>
+    <li><a href="../style/flat-speed.html">Flat·Speed</a></li>
+    <li><a href="../style/choppy-freeride.html">Choppy·Freeride</a></li>
+    <li><a href="../style/wave.html">Wave</a></li>
+    <li><a href="../style/hybrid.html">Hybrid</a></li>
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="../level/beginner.html">입문</a></li><li><a href="../level/novice.html">초급</a></li>
+    <li><a href="../level/intermediate.html">중급</a></li>
+    <li><a href="../level/advanced.html">상급</a></li>
+    <li><a href="../level/pro.html">선수</a></li>
+    <li hidden><a href="../women/index.html">여성 라이더</a></li>
+    <li hidden><a href="../junior/index.html">유소년·어린이</a></li>
+    <li hidden><a href="../family/index.html">가족 라이딩</a></li>
+  </ul>
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+
+<!-- Hero -->
+<section class="demo-hero">
+  <img class="demo-hero__bg-image" src="../assets/images/junior/junior-hero.jpg" alt="빨강·파랑 윙과 보드를 들고 해변에 선 유소년 라이더 — 단무지공방 유소년·어린이 가이드" loading="eager" onerror="this.style.opacity=0" />
+  <div class="container">
+    <nav class="demo-hero__crumb"><a href="../index.html">단무지공방</a><span class="sep">/</span><a href="../index.html#consultation">컨설팅</a><span class="sep">/</span><span style="color:#fff">유소년·어린이</span></nav>
+    <span class="demo-hero__eyebrow">Junior · Child · Safety First</span>
+    <h1 class="demo-hero__title">다음 세대 라이더<br><em>안전한 첫 시즌</em></h1>
+    <p class="demo-hero__lead">단무지공방은 13-17세 유소년과 8-12세 어린이 라이더의 안전한 입문을 함께합니다. 안전 장비 — WIP impact vest·helmet — 우선, 강습·인솔자 동반 권장, 부모님 1:1 컨설팅 무료</p>
+    <div class="demo-hero__ctas">
+      <a href="../consult.html" class="btn btn--accent btn--lg">부모 1:1 구매 상담하기</a>
+      <a href="../wip.html" class="btn btn--ghost-light btn--lg">WIP 안전 장비 보기 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Section 0: Safety Priority -->
+<section class="demo-section">
+  <div class="container">
+    <div class="safety-banner" role="alert">
+      <div class="safety-banner__icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      </div>
+      <div>
+        <h2 class="safety-banner__title">안전 장비가 모든 결정의 출발점</h2>
+        <p class="safety-banner__body">유소년·어린이 라이딩에서 전문 퍼포먼스 어드바이저가 가장 먼저 확인하는 것은 윙·포일·board가 아니라 안전 장비입니다. <strong>WIP Forward Impact Vest (XS/S Junior)</strong> · <strong>WIP Pro Helmet</strong> · 적절한 두께의 웻슈트 — 이 3가지 없이는 어떤 라이딩도 시작하지 않습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 1: Why junior + parent FAQ -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">For Parents</span>
+      <h2 class="demo-section__title">자녀의 윙·포일 — 부모님이 가장 자주 묻는 질문</h2>
+      <p class="demo-section__lead">자녀의 첫 시즌을 준비하는 부모님들이 1:1 컨설팅으로 가장 자주 보내주시는 질문 7가지. 추가 궁금증은 1:1로 직접 답변드립니다.</p>
+    </div>
+    <div class="faq-list">
+      <article class="faq-item">
+        <h3 class="faq-item__q">몇 살부터 시작할 수 있나요?</h3>
+        <p class="faq-item__a">국제적으로 일반적인 안전 권장은 <strong>최소 8세 이상</strong>이며, 신체 조건·수영 능력·이전 워터스포츠 경험에 따라 개인차가 큽니다. 전문 퍼포먼스 어드바이저는 <strong>8-12세는 1:1 컨설팅·강습 동반</strong>, 13세 이상은 단계별 progression 지원을 권장합니다.</p>
+      </article>
+      <article class="faq-item">
+        <h3 class="faq-item__q">자녀에게 어떤 안전 장비가 필수인가요?</h3>
+        <p class="faq-item__a"><strong>impact vest (필수)</strong> · <strong>helmet (필수)</strong> · 적절한 두께 wetsuit (시즌별) · 휘슬·whistle. 3-2mm shorty는 여름·초가을, 4-3mm full은 가을·봄, 5-4mm full + 모자·장갑은 겨울 외 시즌. 전문 퍼포먼스 어드바이저가 라이딩 환경에 맞춰 정확히 가이드합니다.</p>
+      </article>
+      <article class="faq-item">
+        <h3 class="faq-item__q">강습 없이 시작해도 되나요?</h3>
+        <p class="faq-item__a">아닙니다. <strong>전문 퍼포먼스 어드바이저는 8-17세 모든 라이더에게 인솔자·강습 동반을 권장합니다.</strong> 한국 윈드/카이트 강습 협회 등록 강사와의 partnership을 통해 자녀 안전·progression을 함께 지원합니다.</p>
+      </article>
+      <article class="faq-item">
+        <h3 class="faq-item__q">자녀 체중·신장이 작아 장비를 못 쓰나요?</h3>
+        <p class="faq-item__a">아닙니다. wing 2.5-3.5m² · 짧은 mast (Levitaz 76cm) · 작은 board (Takoon Cruise 4'8") 라인업이 있어 <strong>25-55kg 체중 범위</strong>까지 cover합니다. 정확한 사이즈는 1:1 컨설팅에서 자녀 체중·신장 기준으로 산출</p>
+      </article>
+      <article class="faq-item">
+        <h3 class="faq-item__q">대회·경기 출전이 가능한가요?</h3>
+        <p class="faq-item__a">국내·국제 대회 youth division (15세 이상)이 점차 확대되고 있습니다. 전문 퍼포먼스 어드바이저는 <strong>유망 youth 라이더의 협회 등록·대회 출전 지원</strong>도 1:1로 컨설팅합니다. 옥덕필 수석코치 (3회 올림픽 출전)의 직접 코칭 가능</p>
+      </article>
+      <article class="faq-item">
+        <h3 class="faq-item__q">자녀가 무서워 하는데 어떻게 해야 하나요?</h3>
+        <p class="faq-item__a">두려움은 정당합니다 — 무시하지 마세요. <strong>impact vest 착용으로 부력·충격 보호 → 트레이너 포일 → 짧은 mast → 작은 wing</strong> 순서로 단계 천천히. 자녀의 페이스 존중이 long-term 즐거움의 시작입니다.</p>
+      </article>
+      <article class="faq-item">
+        <h3 class="faq-item__q">예산 가이드는?</h3>
+        <p class="faq-item__a">시작 풀세트 (안전 장비 + wing + foil + board) 기준 <strong>중·소형 사이즈는 일반 성인 셋업 대비 10-20% 낮은 가격</strong>으로 가능합니다. 정확한 가격·재고·견적은 <a href="../consult.html">1:1 구매 상담</a> (가입 불필요)</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Section 2: Age tiers -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">3-tier By Age</span>
+      <h2 class="demo-section__title">연령·체중별 추천 path</h2>
+      <p class="demo-section__lead">3 tier — 8세 미만 (강습·체험 only) / 8-12세 (어린이, 1:1 컨설팅 only) / 13-17세 (유소년). 직접 sales 차단 정책은 자녀의 안전과 progression 페이스를 위한 것입니다.</p>
+    </div>
+    <div class="age-grid">
+      <article class="age-card age-card--restricted">
+        <span class="age-card__age">Tier 1 · Restricted</span>
+        <h3 class="age-card__title">8세 미만</h3>
+        <ul class="age-card__list">
+          <li>장비 sales 진행 X</li>
+          <li>강습·체험 partnership만</li>
+          <li>SUP·서핑 등 진입 워터스포츠 권장</li>
+          <li>윙·포일 입문은 8세 이후 검토</li>
+        </ul>
+        <p class="age-card__note">8세 미만은 발달 단계와 안전성을 고려하여 전문 퍼포먼스 어드바이저가 직접 라이딩 시작을 권장하지 않습니다. 강습 partnership으로 워터스포츠 즐거움을 먼저 경험하세요.</p>
+      </article>
+      <article class="age-card age-card--restricted">
+        <span class="age-card__age">Tier 2 · Child · 1:1 only</span>
+        <h3 class="age-card__title">8-12세 어린이</h3>
+        <ul class="age-card__list">
+          <li>체중 25-40kg 범위</li>
+          <li>직접 sales 차단 — 부모 1:1 컨설팅 only</li>
+          <li>강습·인솔자 동반 필수</li>
+          <li>안전 장비 (vest·helmet) 절대 우선</li>
+          <li>트레이너 포일·짧은 mast</li>
+        </ul>
+        <p class="age-card__note">12세 미만 자녀의 신체조건·체력·진행 속도가 progression 페이스를 결정합니다. <a href="../consult.html">1:1 구매 상담</a>으로 시작하세요.</p>
+      </article>
+      <article class="age-card">
+        <span class="age-card__age">Tier 3 · Youth</span>
+        <h3 class="age-card__title">13-17세 유소년</h3>
+        <ul class="age-card__list">
+          <li>체중 40-55kg 범위 default</li>
+          <li>Wing 2.5-3.5m² (PPC M2 small / Takoon V4 small)</li>
+          <li>Foil Levitaz FW 790 + Mast 76cm</li>
+          <li>Board Takoon Cruise 4'8"</li>
+          <li>WIP impact vest XS/S + helmet 필수</li>
+        </ul>
+        <p class="age-card__note">강습 동반 권장. 협회 등록 강사 partnership. 대회 youth division 출전 지원 가능</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Section 3: Recommended Equipment -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Curated Equipment</span>
+      <h2 class="demo-section__title">유소년 라이더 친화 네 브랜드 셋업</h2>
+      <p class="demo-section__lead">Tier 3 (13-17세) 기준 추천. 정확한 사이즈는 자녀 체중·신장·spot 기반으로 1:1 컨설팅에서 확정합니다.</p>
+    </div>
+    <div class="gear-grid">
+      <article class="gear-card">
+        <span class="gear-card__cat">Wing · Forgiveness</span>
+        <h3 class="gear-card__name">PPC M2 (small sizes)</h3>
+        <p class="gear-card__why">학습 곡선 가장 완화. 유소년 첫 wing의 표준</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">2.8 m²</span>
+          <span class="gear-card__size">3.0 m²</span>
+          <span class="gear-card__size">3.5 m²</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Wing · 가성비</span>
+        <h3 class="gear-card__name">Takoon V4 (small sizes)</h3>
+        <p class="gear-card__why">2026 V4 — 65 g/m² ripstop. 가벼움·forgiveness. 한국 light wind 최적</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">2.8 m²</span>
+          <span class="gear-card__size">3.5 m²</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Foil · Front Wing</span>
+        <h3 class="gear-card__name">Levitaz FW 790 (entry mid)</h3>
+        <p class="gear-card__why">큰 lift·낮은 stall speed. 가벼운 라이더에게 최적의 stable lift</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">FW 790</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Mast · Short</span>
+        <h3 class="gear-card__name">Levitaz Mast 76cm</h3>
+        <p class="gear-card__why">짧은 mast — 입문기 안전·반응 우선. 첫 fall 부드럽게</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">76 cm</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Board · Small</span>
+        <h3 class="gear-card__name">Takoon Cruise 4'8" / 5'0"</h3>
+        <p class="gear-card__why">작은 사이즈. 25-55kg 체중 범위 적합. simple shape + 큰 volume buffer</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">4'8" / 60L</span>
+          <span class="gear-card__size">5'0" / 70L</span>
+        </div>
+      </article>
+      <article class="gear-card" style="border-color:#C03030;border-width:2px">
+        <span class="gear-card__cat" style="color:#C03030">Safety · 필수</span>
+        <h3 class="gear-card__name">WIP Forward Impact Vest</h3>
+        <p class="gear-card__why">XS/S Junior 사이즈 정식 수입. 부력 + 충격 보호. <strong style="color:#C03030">없이 라이딩 X.</strong></p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">XS Junior</span>
+          <span class="gear-card__size">S</span>
+        </div>
+      </article>
+      <article class="gear-card" style="border-color:#C03030;border-width:2px">
+        <span class="gear-card__cat" style="color:#C03030">Safety · 필수</span>
+        <h3 class="gear-card__name">WIP Pro Helmet</h3>
+        <p class="gear-card__why">CE EN1385 인증. Junior fit. Foil edge·board 충격 보호</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">XS</span>
+          <span class="gear-card__size">S</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Wetsuit</span>
+        <h3 class="gear-card__name">WIP Junior Wetsuit</h3>
+        <p class="gear-card__why">3/2mm shorty (여름·초가을) / 4/3mm full (가을·봄). Junior 사이즈 별도 라인</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">10Y</span>
+          <span class="gear-card__size">12Y</span>
+          <span class="gear-card__size">14Y</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Section 4: 1:1 Parent CTA -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-cta">
+      <div>
+        <span style="display:inline-block;background:rgba(255,184,0,0.18);color:var(--color-sun);font-size:0.6875rem;font-weight:700;padding:6px 14px;border-radius:999px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px">★ 추천 · 부모 1:1 컨설팅</span>
+        <h3 class="demo-cta__title">자녀 안전·progression — 함께 설계합니다.</h3>
+        <p class="demo-cta__lead">자녀의 연령·체중·신장·이전 워터스포츠 경험·라이딩 spot을 카톡으로 알려주시면, 전문 퍼포먼스 어드바이저가 안전 장비 사이즈·강습 partnership·1년 시즌 단위 progression 로드맵을 1:1로 추천합니다. 무료, 가입 불필요</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="../consult.html" class="btn btn--accent btn--lg">1:1 구매 상담하기</a>
+          <a href="../wip.html" class="btn btn--ghost-light btn--lg">WIP 안전 장비 →</a>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-sans-en);font-size:5rem;font-weight:900;color:#5BB4FF;line-height:1;letter-spacing:-0.05em;text-align:center">8+</div>
+        <div style="font-size:0.8125rem;color:rgba(255,255,255,0.6);text-align:center;margin-top:8px">최소 권장 시작 연령</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 5: Lesson Partnership Placeholder -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Coming Soon</span>
+      <h2 class="demo-section__title">강습 partnership 네트워크</h2>
+      <p class="demo-section__lead">한국 윈드/카이트/SUP 협회 등록 강사 partnership을 통해 자녀의 안전한 첫 시즌을 지원합니다. 전국 강습소 partnership 확장 중</p>
+    </div>
+    <div class="grid-3cols"><!-- DO_NOT_REVERT §163: 3 placeholder 카드 (강습 partnership) -->
+      <div class="placeholder-card">
+        <span class="placeholder-card__tag">Phase 6 · 예정</span>
+        <h4 class="placeholder-card__title">연안 spot 강습</h4>
+        <p class="placeholder-card__sub">Protected bay 강습. 8-17세 라이더 친화 spot</p>
+      </div>
+      <div class="placeholder-card">
+        <span class="placeholder-card__tag">Phase 6 · 예정</span>
+        <h4 class="placeholder-card__title">내수면·호수 강습</h4>
+        <p class="placeholder-card__sub">Flat·protected 컨디션. 첫 시즌 입문에 최적</p>
+      </div>
+      <div class="placeholder-card">
+        <span class="placeholder-card__tag">Phase 6 · 예정</span>
+        <h4 class="placeholder-card__title">남해안 강습</h4>
+        <p class="placeholder-card__sub">Protected spot. 시즌 단위 가족 프로그램</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="../membership.html">회원 등급 안내</a></li>
+          <li><a href="../glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="../calculator.html">Lift Calculator</a></li>
+          <li><a href="../find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="../level/beginner.html">입문 가이드</a></li><li><a href="../level/novice.html">초급 가이드</a></li>
+          <li><a href="../level/intermediate.html">중급 가이드</a></li>
+          <li><a href="../level/advanced.html">상급 가이드</a></li>
+          <li><a href="../level/pro.html">선수 가이드</a></li>
+          <li><a href="../premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="../levitaz.html">Levitaz</a></li>
+          <li><a href="../ppc.html">PPC</a></li>
+          <li><a href="../takoon.html">Takoon</a></li>
+          <li><a href="../wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="../products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="../policy/shipping.html">배송 정책</a></li>
+          <li><a href="../policy/refund.html">환불 정책</a></li>
+          <li><a href="../policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="../policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="../policy/privacy.html">개인정보처리방침</a>
+        <a href="../policy/terms.html">이용약관</a>
+        <a href="../policy/refund.html">환불정책</a>
+        <a href="../policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="kakao-fab" aria-label="카톡 상담">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</a>
+
+<script src="../assets/js/main.js" defer></script>
+  <script src="../assets/js/nav-auth.js" defer></script>
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="../assets/css/agent-deny.css">
+  <script src="../assets/js/agent-deny.js" defer></script>
+</body>
+</html>

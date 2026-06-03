@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2A3B4C">
+<title>Forward WIP — 스위스 워터스포츠 보호장비 (Impact Vest · Helmet · Wetsuit · Harness) | 단무지공방</title>
+<meta name="description" content="Forward WIP — 스위스 본사의 워터스포츠 안전장비 전문. Raley Impact Vest · Prowip 2.0 / Wipper 2.0 헬멧 · Waistfoil Harness 3.0. 프로 세일·윙·카이트 검증. 단무지공방 정식 수입.">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
+<link rel="canonical" href="https://dmjgroup.kr/wip.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Forward WIP | 단무지공방">
+<meta property="og:description" content="스위스 워터스포츠 안전장비. Impact Vest · Helmet · Wetsuit · Harness. 모든 디시플린의 동반자.">
+<meta property="og:locale" content="ko_KR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
+</head>
+<body>
+
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담</span>
+</div></div></div>
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="/" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 스마트 컨설팅 (CTA) -->
+        <a href="find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <a href="login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button type="button" class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button type="button" class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button type="button" class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="levitaz.html">Levitaz <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="ppc.html">PPC <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="takoon.html">Takoon <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="wip.html">Forward WIP <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="https://www.forward-wip.com/catalog/" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:6px">└ Forward WIP 본사 카탈로그 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></li>
+
+    <li class="mobile-menu__heading">라이딩 스타일</li>
+    <li><a href="style/flat-speed.html">Flat·Speed <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="style/choppy-freeride.html">Choppy·Freeride <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="style/wave.html">Wave <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="style/hybrid.html">Hybrid <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="levitaz.html">Levitaz <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="ppc.html">PPC <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="takoon.html">Takoon <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="wip.html">Forward WIP <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="level/beginner.html">입문 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a href="level/novice.html">초급 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="level/intermediate.html">중급 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="level/advanced.html">상급 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="level/pro.html">선수 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li hidden><a href="women/index.html" style="color:var(--color-sun);font-weight:600">여성 라이더 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li hidden><a href="junior/index.html" style="color:var(--color-sun);font-weight:600">유소년·어린이 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li hidden><a href="family/index.html" style="color:var(--color-sun);font-weight:600">가족 라이딩 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+  </ul>
+
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. Levitaz·PPC·Takoon·Forward WIP를 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+<section class="brand-hero brand-hero--wip">
+  <div class="container">
+    <div class="brand-hero__layout">
+      <div class="brand-hero__inner">
+        <nav class="brand-hero__crumb"><a href="index.html">단무지공방</a><span>/</span><a href="index.html#brands">Brand</a><span>/</span><span style="color:#fff">WIP</span></nav>
+        <h1 class="brand-hero__name">FORWARD WIP</h1>
+        <p class="brand-hero__tagline">스위스 워터스포츠 안전장비<br>프로 세일·윙·카이트 검증</p>
+        <p class="brand-hero__lead">스위스 본사가 프로 세일링·포일링 환경에서 개발한 안전장비 전문 brand. Raley Impact Vest · Prowip 2.0 헬멧 · Waistfoil Harness 3.0 · UV Quickdry 라인 — 윙·포일·카이트·세일 종목 통합에 모두 사용. 보호력과 활동성을 동시에 만족.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap"><a href="#lineup" class="btn btn--accent btn--lg">WIP 라인업</a><a href="index.html#contact" class="btn btn--ghost-light btn--lg">단무지에 문의</a><!-- DO_NOT_REVERT §160 — 본사 카탈로그 외부 링크. 자체 catalog 페이지 구축 회귀 영구 금지 --><a href="https://www.forward-wip.com/catalog/" target="_blank" rel="noopener noreferrer" class="btn btn--ghost-light btn--lg" aria-label="Forward WIP 본사 카탈로그 새 탭에서 열기">본사 카탈로그 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-left:4px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></div>
+        <dl class="brand-hero__meta">
+          <div><dt>원산</dt><dd>스위스 · Pro 검증</dd></div>
+          <div><dt>전문</dt><dd>임팩트 · 헬멧 · 하네스 · UV</dd></div>
+          <div><dt>호환</dt><dd>네 가지 브랜드 hardware 동반자</dd></div>
+        </dl>
+      </div>
+
+      <div class="brand-hero__visual" aria-hidden="true">
+        <div class="brand-hero__visual-ring"></div>
+        <div class="brand-hero__visual-ring brand-hero__visual-ring--2"></div>
+        <div class="brand-hero__visual-ring brand-hero__visual-ring--3"></div>
+        <div class="brand-hero__visual-orbit-dot"></div>
+        <div class="brand-hero__monogram-xl">W</div>
+        <svg viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+          <!-- Helmet silhouette -->
+          <g transform="translate(240, 290)" opacity="0.7">
+            <path d="M-60 0 Q-60 -60 0 -60 Q60 -60 60 0 L60 20 Q60 30 50 30 L-50 30 Q-60 30 -60 20 Z" fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.32)" stroke-width="2"/>
+            <line x1="-30" y1="-30" x2="-50" y2="0" stroke="rgba(255,255,255,0.20)" stroke-width="1"/>
+            <line x1="30" y1="-30" x2="50" y2="0" stroke="rgba(255,255,255,0.20)" stroke-width="1"/>
+          </g>
+        </svg>
+        <!-- DO_NOT_REVERT §145-C (Danny 2026-05-12): "스위스 엔지니어링 보호장비" badge 영구 삭제. -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Brand Story · Video (Phase 10) -->
+<!-- Click-to-play poster (2026-05): error 153 fallback. iframe은 user click시 main.js가 inject. -->
+<section class="section section--mist" id="brand-video">
+  <div class="container container--narrow">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">Brand Story · Video</span>
+      <h2 class="section-head__title">Forward WIP을 영상으로</h2>
+      <p class="section-head__lead">'눈에 안 띄지만 없으면 안 되는 brand' — 안전이 곧 progression이라는 단무지 철학과 정확히 맞물립니다.</p>
+    </div>
+    <div class="brand-video-wrap reveal">
+      <a class="video-link-card" href="https://www.youtube.com/watch?v=jYYALh_9ozQ" target="_blank" rel="noopener noreferrer" aria-label="Forward WIP Your Guardian Angel 영상 — YouTube에서 새 탭 열기" style="display:block;position:relative;border-radius:16px;overflow:hidden;background:#000;text-decoration:none">
+        <img class="video-link-card__thumb" loading="lazy"
+             src="https://i.ytimg.com/vi/jYYALh_9ozQ/maxresdefault.jpg"
+             onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/jYYALh_9ozQ/hqdefault.jpg';"
+             alt="Forward WIP YOUR GUARDIAN ANGEL 썸네일"
+             style="width:100%;display:block;opacity:.92">
+        <span class="video-link-card__overlay" aria-hidden="true" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.45) 100%)">
+          <svg viewBox="0 0 68 48" xmlns="http://www.w3.org/2000/svg" width="84" height="60"><path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#CC0000" fill-opacity="0.92"/><polygon points="45,24 27,14 27,34" fill="#FFFFFF"/></svg>
+        </span>
+        <span class="video-link-card__label" style="position:absolute;left:16px;bottom:16px;color:#fff;background:rgba(0,0,0,.55);padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.02em">YouTube에서 보기 ↗</span>
+      </a>
+    </div>
+    <p class="brand-video-caption reveal">
+      영상 속 <strong>harness · impact vest</strong> — 윙포일 등 통증 한 방에 해결, 본격 라이더의 첫 액세서리 1순위.
+      스위스 R&amp;D + 프로 세일러 피드백이 만든 진짜 프로 사양.
+      Levitaz·PPC·Takoon hardware를 사면 자연스럽게 따라오는 "당연한 짝".
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="story reveal">
+      <span class="t-eyebrow" style="display:block;text-align:center;margin-bottom:24px">Brand Story · 전문 퍼포먼스 어드바이저의 시각</span>
+      <p>
+        Forward WIP는 스위스 본사가 프로 세일링·포일링 현장에서 개발한 워터스포츠 안전장비 전문 brand입니다.
+        근대 워터스포츠가 다루는 극한의 속도와 충격 — 그 환경을 견디도록 엔지니어링된 장비로,
+        경기 세일러·윙 포일러·카이트 포일러까지 전 세계 프로가 신뢰하는 라인업.
+        윙·포일·SUP·서핑·카이트 종목 통합 모두 커버하는 통합 안전장비.
+      </p>
+      <p>
+        라인업은 크게 네 카테고리: <strong>Impact Vest</strong> (Raley · 50N · Wing) ·
+        <strong>Helmet</strong> (Prowip 2.0 · Wipper 2.0 · Cool Cap Bump Shell) ·
+        <strong>Harness</strong> (Waistfoil Harness 3.0) ·
+        <strong>UV / Wetsuit</strong> (Hooded UV Quickdry · Hooded UV Rashguard · Tech Hoodie).
+        Levitaz·PPC·Takoon hardware 구매자에게 가장 자연스럽게 cross-sell되는 보호장비.
+      </p>
+      <blockquote>
+        "<strong>안전장비는 옵션이 아니라 필수.</strong> Forward WIP은 프로 환경에서 검증된 사양 — 네 가지 브랜드 hardware 구매자 모두에게 cross-sell되는 부상 없이 오래 타기 위한 선택입니다."
+        <cite>전문 퍼포먼스 어드바이저 — 안전 우선 큐레이션</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- Forward WIP HQ Brand Voice (본사 4 카테고리 카피 — 한국어 의역) -->
+<section class="section" id="hq-brand-voice">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">Forward WIP HQ · Brand Voice</span>
+      <h2 class="section-head__title">"Innovative Protective Gear for Water Sports"</h2>
+      <p class="section-head__lead">forward-wip.com 메인 페이지 4 카테고리 카피 — 한국어로 자연스럽게 풀어쓴 의역</p>
+    </div>
+    <div class="brand-identity-grid"><!-- DO_NOT_REVERT §163: 4 brand voice 카드 4-col lock -->
+      <div style="padding:24px;border-radius:14px;background:linear-gradient(135deg,#0A2540 0%,#1670CC 100%);color:#fff">
+        <h3 style="font-size:0.95rem;font-weight:800;margin:0 0 10px;letter-spacing:0.04em;text-transform:uppercase;opacity:0.9">SURF</h3>
+        <p style="font-size:1.15rem;font-weight:700;line-height:1.45;margin:0">파도 위와 아래에서</p>
+        <p style="font-size:0.85em;color:rgba(255,255,255,0.7);margin:8px 0 0;font-style:italic">"Over and under the Waves"</p>
+      </div>
+      <div style="padding:24px;border-radius:14px;background:linear-gradient(135deg,#1670CC,#5BB4FF);color:#fff">
+        <h3 style="font-size:0.95rem;font-weight:800;margin:0 0 10px;letter-spacing:0.04em;text-transform:uppercase;opacity:0.9">BOARDSPORTS</h3>
+        <p style="font-size:1.15rem;font-weight:700;line-height:1.45;margin:0">윙 · 패러윙 · 윈드서핑 · 카이트 · 다운윈드 — 종목 통합 보호</p>
+        <p style="font-size:0.85em;color:rgba(255,255,255,0.7);margin:8px 0 0;font-style:italic">"Wing - Para Wing - Windsurf - Kite - DownWind"</p>
+      </div>
+      <div style="padding:24px;border-radius:14px;background:linear-gradient(135deg,#0A2540,#2A3B4C);color:#fff">
+        <h3 style="font-size:0.95rem;font-weight:800;margin:0 0 10px;letter-spacing:0.04em;text-transform:uppercase;opacity:0.9">SAILING</h3>
+        <p style="font-size:1.15rem;font-weight:700;line-height:1.45;margin:0">SailGP·Olympics부터 Fast boats·Offshore까지</p>
+        <p style="font-size:0.85em;color:rgba(255,255,255,0.7);margin:8px 0 0;font-style:italic">"SailGP & Olympics to Fast boats & Offshore"</p>
+      </div>
+      <div style="padding:24px;border-radius:14px;background:linear-gradient(135deg,#7D4F00,#C9A227);color:#fff">
+        <h3 style="font-size:0.95rem;font-weight:800;margin:0 0 10px;letter-spacing:0.04em;text-transform:uppercase;opacity:0.9">RESCUE</h3>
+        <p style="font-size:1.15rem;font-weight:700;line-height:1.45;margin:0">모든 위대한 어드벤처의 뒤에서</p>
+        <p style="font-size:0.85em;color:rgba(255,255,255,0.85);margin:8px 0 0;font-style:italic">"Behind every Great Adventure"</p>
+      </div>
+    </div>
+    <p style="text-align:center;line-height:1.8;color:var(--text-primary);max-width:800px;margin:32px auto 0">Forward WIP은 4 영역 — 서핑·보드스포츠·세일링·구조 — 모두에 같은 안전 기준을 적용하는 본사. SailGP·Olympics 공식 partner이자 프로 세일러·라이더가 검증해온 brand. 단무지공방은 한국 라이더의 기후·안전 기준에 맞는 라인 — 헬멧·임팩트 베스트·하네스·웻수트 — 를 선별해 정식 수입합니다.</p>
+    <p style="text-align:center;font-size:0.85em;color:var(--text-secondary);margin-top:18px">출처: <a href="https://www.forward-wip.com/" target="_blank" rel="noopener">forward-wip.com</a> · 단무지공방 한국 정식 수입 partner</p>
+  </div>
+</section>
+
+<section class="section section--mist" id="lineup">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">Forward WIP · SS26 · 한국 라인업</span>
+      <h2 class="section-head__title">단무지공방 한국 정식 수입 라인업</h2>
+      <p class="section-head__lead">아래 네 카드는 한국 라이더가 가장 많이 찾는 핵심 카테고리. 본사 491 SKU 전 카탈로그 모두 한국에서 구매 가능합니다.</p>
+      <p style="font-size:12px;color:var(--color-mute);margin-top:8px;letter-spacing:0.04em">※ 제품 사진은 Forward WIP 본사 공식 이미지. 단무지 자체 촬영본은 순차 갱신.</p>
+    </div>
+
+    <div class="sku-grid">
+      <!-- Raley Impact Vest -->
+      <article class="sku-card sku-card--linkable reveal" data-delay="1" style="border-color:var(--color-sea)" data-href="products/wip/impact-vest.html">
+        <div class="sku-card__visual sku-card__visual--enhanced" style="background:linear-gradient(135deg,#e8eef4 0%,#fff 100%)">
+          <span class="sku-card__corner-tag sku-card__corner-tag--sea">★ Impact Vest</span>
+          <div class="sku-illustration sku-illustration--has-image"><img src="https://cdn.shopify.com/s/files/1/0279/4022/5124/products/kompact.jpg" alt="Forward WIP Kompact Vest 2.0 — EN ISO 12402-5 50N 인증 슬림 임팩트 베스트" loading="lazy" decoding="async" onerror="this.style.display='none'" /></div>
+        </div>
+        <div class="sku-card__body">
+          <span class="sku-card__cat" style="color:var(--color-sea)">★ Foil 라이더 표준 · BODY SAFETY 라인</span>
+          <h3 class="sku-card__name">Impact Vest 라인</h3>
+          <p class="sku-card__char">수상 스포츠 임팩트 베스트의 표준. EN ISO 12402-5 50N 인증으로 안전과 동작성 양쪽을 잡았어요. 라인업 — Kompact 50N 2.0 (S/M/L) · Wing Impact Vest 50N (S/M/L) · Raley Black Camo (S/M/L) · Hydration Bag 1.5L · VHF Pouch</p>
+          <dl class="spec-list">
+            <dt>Type</dt><dd>Impact + Buoyancy</dd>
+            <dt>Use</dt><dd>Foil · Wing · Kite</dd>
+            <dt>Fit</dt><dd>Slim · 활동성 우선</dd>
+          </dl>
+          <div class="sku-card__price">
+            <span class="sku-card__price-num">₩310,000–606,000<small>모델·사이즈별</small></span>
+            <a class="sku-card__more sku-card__more--link" href="products/wip/impact-vest.html" aria-label="자세히 보기">상세 →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Helmet line — WIFLEX PRO 2.0 (entry·mid tier) -->
+      <article class="sku-card sku-card--linkable reveal" data-delay="2" data-href="products/wip/helmet.html">
+        <div class="sku-card__visual sku-card__visual--enhanced">
+          <span class="sku-card__corner-tag">Compact</span>
+          <div class="sku-illustration sku-illustration--has-image"><img src="https://www.forward-wip.com/wp-content/uploads/2024/01/1.WIFLEX-PR-HIGH-VIZ.jpg" alt="Forward WIP WIFLEX PRO 2.0 헬멧 — Yellow High Vis" loading="lazy" decoding="async" onerror="this.style.display='none'" /></div>
+        </div>
+        <div class="sku-card__body">
+          <span class="sku-card__cat">Helmet · 입문·중급</span>
+          <h3 class="sku-card__name">WIFLEX PRO 2.0 (Compact Performance)</h3>
+          <p class="sku-card__char">Compact Performance 올라운드 워터 헬멧. Multi-impact EPP core + polycarbonate microshell — 다회 충격 흡수. EN1385 04/2012 인증. 입문·중급 라이더의 첫 헬멧 가성비 1순위</p>
+          <dl class="spec-list">
+            <dt>인증</dt><dd>CE NF 1385 04/2012</dd>
+            <dt>재질</dt><dd>EPP core + PC microshell</dd>
+            <dt>컬러·사이즈</dt><dd>3 컬러 × S-M·M-L·L-XL</dd>
+          </dl>
+          <div class="sku-card__price">
+            <span class="sku-card__price-num">₩250,000</span>
+            <a class="sku-card__more sku-card__more--link" href="products/wip/helmet.html" aria-label="자세히 보기">상세 →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Helmet line — X-OVER (race·premium tier) -->
+      <article class="sku-card sku-card--linkable reveal" data-delay="3" data-href="products/wip/helmet-xover.html">
+        <div class="sku-card__visual sku-card__visual--enhanced">
+          <span class="sku-card__corner-tag">Race</span>
+          <div class="sku-illustration sku-illustration--has-image"><img src="https://www.forward-wip.com/wp-content/uploads/2021/02/1.X-OVER-HIGH-VIZ.jpg" alt="Forward WIP X-OVER Helmet — Yellow High Viz" loading="lazy" decoding="async" onerror="this.style.display='none'" /></div>
+        </div>
+        <div class="sku-card__body">
+          <span class="sku-card__cat">Helmet · 상급·선수 race</span>
+          <h3 class="sku-card__name">X-OVER Helmet (Aerodynamic Race)</h3>
+          <p class="sku-card__char">America's Cup·SailGP 세일러, 카이트포일·윙포일·윈드서핑 최상급 라이더가 선택한 race-grade 헬멧. Aerodynamic shell + Visor Ready + EN1385 + EN1077B 듀얼 인증</p>
+          <dl class="spec-list">
+            <dt>인증</dt><dd>EN1385 + EN1077B</dd>
+            <dt>특징</dt><dd>Aerodynamic · Visor Ready</dd>
+            <dt>컬러</dt><dd>4종 + Eco Cork 한정</dd>
+          </dl>
+          <div class="sku-card__price">
+            <span class="sku-card__price-num">₩380,000</span>
+            <a class="sku-card__more sku-card__more--link" href="products/wip/helmet-xover.html" aria-label="자세히 보기">상세 →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Harness line -->
+      <article class="sku-card sku-card--linkable reveal" data-delay="4" data-href="products/wip/harness.html">
+        <div class="sku-card__visual sku-card__visual--enhanced">
+          <span class="sku-card__corner-tag">Harness · Wing</span>
+          <div class="sku-illustration"></div>
+        </div>
+        <div class="sku-card__body">
+          <span class="sku-card__cat">Harness · HARNESSES 라인</span>
+          <h3 class="sku-card__name">Waistfoil Harness 3.0 · Wing Wind Pro</h3>
+          <p class="sku-card__char">라인업 — Waistfoil Harness 3.0 (S-M·L-XL), Wing Wind Pro Harness. 윙포일·SUP 라이더 등 통증 한 방에. 1시간+ 라이딩 시 차이 확실</p>
+          <dl class="spec-list">
+            <dt>Type</dt><dd>Waistfoil · Wind Pro</dd>
+            <dt>Best seller</dt><dd>Waistfoil Harness 3.0 (S-M·L-XL)</dd>
+            <dt>Use</dt><dd>Wing·Foil 전용 · 장시간 세션</dd>
+          </dl>
+          <div class="sku-card__price">
+            <span class="sku-card__price-num">₩540,000–580,000<small>모델·사이즈별</small></span>
+            <a class="sku-card__more sku-card__more--link" href="products/wip/harness.html" aria-label="자세히 보기">상세 →</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- UV / Tech / Wetsuit -->
+      <article class="sku-card reveal" data-delay="4">
+        <div class="sku-card__visual sku-card__visual--enhanced" style="background:linear-gradient(135deg,#fff5d6 0%,#fff 100%)">
+          <span class="sku-card__corner-tag" style="background:#FFB800;color:#0A2540">UV · Wetsuit</span>
+          <div class="sku-illustration sku-illustration--has-image"><img src="https://cdn.shopify.com/s/files/1/0279/4022/5124/products/longsleeverash.jpg" alt="Forward WIP UV Rashguard · Wetsuit · Tech Tops" loading="lazy" decoding="async" onerror="this.style.display='none'" /></div>
+        </div>
+        <div class="sku-card__body">
+          <span class="sku-card__cat" style="color:var(--color-sun-dark)">Wetsuit · Tech Tops · 봄·가을·겨울 라인</span>
+          <h3 class="sku-card__name">Wetsuit · Rashguard · Tech Tops</h3>
+          <p class="sku-card__char">슈트 라인 (Steamer MK3·Hybrid Semi Dry·Steamy·Steam·Neo Long John M/L) + 테크 톱 라인 (Race Parka·Flex Smock·3DS Neo Top·Flow Vortex Rashguard·Hooded UV·Quickdry Tee). 봄·가을·겨울 한국 4계절 cover</p>
+          <dl class="spec-list">
+            <dt>Wetsuit</dt><dd>3/2mm · 4/3mm · Hybrid Semi Dry</dd>
+            <dt>Tech Top</dt><dd>Rashguard · Smock · Parka · UV Hood</dd>
+            <dt>Season</dt><dd>봄·여름·가을·겨울</dd>
+          </dl>
+          <div class="sku-card__price">
+            <span class="sku-card__price-num">₩210,000–1,853,000<small>모델·사이즈별</small></span>
+            <span class="sku-card__more">상세 →</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+  </div>
+</section>
+
+<!-- SS26 한국 라인업 -->
+<section class="section" id="ss26-ordered-lineup">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow">Forward WIP · SS26 · 한국 라인업</span>
+      <h2 class="section-head__title">5 카테고리 한국 라인업</h2>
+      <p class="section-head__lead">스위스 본사 491 SKU 전 카탈로그 한국 정식 수입. 카테고리별 라인업과 한국 판매가를 한눈에 확인하세요.</p>
+    </div>
+
+    <div class="grid-4cols" style="margin-top:30px"><!-- DO_NOT_REVERT §163: 4 카테고리 카드 + 5번째는 grid-column:1/-1 spans full -->
+      <!-- HEAD SAFETY -->
+      <div class="reveal" style="background:#fff;border:1px solid var(--border);border-left:4px solid #d44;border-radius:12px;padding:18px 20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><strong style="font-size:15px;color:var(--color-navy)">HEAD SAFETY · 헬멧</strong><span style="font-size:12px;color:var(--color-mute)">전 사이즈·color 라인</span></div>
+        <ul style="font-size:13px;line-height:1.7;color:var(--text-secondary);margin:0;padding-left:18px">
+          <li>X-OVER NEW Yellow High Vis</li>
+          <li>X-OVER VISOR EVO Orange Neon</li>
+          <li>ProWIP 2.0 Stealth Black (M-L·S-M)</li>
+          <li>ProWIP 2.0 Mat White (M-L·S-M)</li>
+          <li>ProWIP 2.0 Mat Red (M-L)</li>
+          <li>WiFlex Pro 2.0 High Vis (M-L·S-M)</li>
+          <li>WiFlex Pro 2.0 Sunset Fading (M-L)</li>
+          <li>WiFlex Pro 2.0 Black Camo (M-L·S-M)</li>
+          <li>Cool Cap Bump Shell Black Camo / Sunset Fading</li>
+          <li>Surf Bob Bump Shell Heather Grey</li>
+          <li>Surf Bob Bump Shell Black Camo / Sunset Fading</li>
+          <li>Surf Cap Bump Shell Heather Grey (S-M·L-XL)</li>
+          <li>Surf Cap Bump Shell Black S-M</li>
+        </ul>
+      </div>
+
+      <!-- BODY SAFETY -->
+      <div class="reveal" style="background:#fff;border:1px solid var(--border);border-left:4px solid var(--color-sea);border-radius:12px;padding:18px 20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><strong style="font-size:15px;color:var(--color-navy)">BODY SAFETY · 임팩트 베스트</strong><span style="font-size:12px;color:var(--color-mute)">전 사이즈 라인</span></div>
+        <ul style="font-size:13px;line-height:1.7;color:var(--text-secondary);margin:0;padding-left:18px">
+          <li>Wing Impact Vest 50N Black (S·M·L)</li>
+          <li>Raley Impact Vest Black Camo (S·M·L)</li>
+          <li>Kompact Vest 50N 2.0 Black (S·M·L)</li>
+          <li>Hydration Bag 1.5L</li>
+          <li>VHF Vest Pouch Black</li>
+        </ul>
+      </div>
+
+      <!-- WETSUITS -->
+      <div class="reveal" style="background:#fff;border:1px solid var(--border);border-left:4px solid #2e5a87;border-radius:12px;padding:18px 20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><strong style="font-size:15px;color:var(--color-navy)">WETSUITS · 슈트</strong><span style="font-size:12px;color:var(--color-mute)">봄·가을·겨울 라인</span></div>
+        <ul style="font-size:13px;line-height:1.7;color:var(--text-secondary);margin:0;padding-left:18px">
+          <li>Steamer MK3 (M)</li>
+          <li>Steamy LS Black Camo (M)</li>
+          <li>Steamy (M)</li>
+          <li>Steam (M)</li>
+          <li>Hybrid Semi Dry Black (M)</li>
+          <li>Neo Long John MK2 Black (M·L)</li>
+          <li>Neo Long John WOMEN MK2 (S)</li>
+          <li>Summer Neo Long John MK2 Grey (M·L)</li>
+          <li>Summer Neo Long John WOMEN MK2 (S)</li>
+        </ul>
+      </div>
+
+      <!-- HARNESSES -->
+      <div class="reveal" style="background:#fff;border:1px solid var(--border);border-left:4px solid #9b59b6;border-radius:12px;padding:18px 20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><strong style="font-size:15px;color:var(--color-navy)">HARNESSES · 하니스</strong><span style="font-size:12px;color:var(--color-mute)">윙·포일 전용 라인</span></div>
+        <ul style="font-size:13px;line-height:1.7;color:var(--text-secondary);margin:0;padding-left:18px">
+          <li>Waistfoil Harness 3.0 (S-M)</li>
+          <li>Waistfoil Harness 3.0 (L-XL)</li>
+          <li>Wing Wind Pro Harness (S-M)</li>
+        </ul>
+      </div>
+
+      <!-- 기타 — TECH TOPS · R4R · LIFESTYLE · EYEWEAR · TECH PANTS · FOOTWEAR · BAGS (7 sub-category 통합) -->
+      <div class="reveal" style="background:#fff;border:1px solid var(--border);border-left:4px solid var(--color-mute);border-radius:12px;padding:18px 20px;grid-column:1 / -1">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px"><strong style="font-size:15px;color:var(--color-navy)">기타 · 7 sub-카테고리 통합</strong><span style="font-size:12px;color:var(--color-mute)">테크 톱·리쉬·라이프스타일·고글·팬츠·신발·백</span></div>
+        <div class="grid-4cols"><!-- DO_NOT_REVERT §163: 7 sub-category — 4-col (4+3 패턴 명확) -->
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--color-sea);letter-spacing:0.04em;margin-bottom:6px">TECH TOPS · 테크 톱</div>
+            <ul style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);margin:0;padding-left:16px">
+              <li>Race Parka (L)</li>
+              <li>Flex Smock Spray Top MK2 (M·L)</li>
+              <li>3DS Neo Top · 3DS Neo Top WOMEN</li>
+              <li>Flow Vortex Rashguard (M·L·XL)</li>
+              <li>Hooded UV Rashguard Long Sleeve Light Grey (S·M·L)</li>
+              <li>Quickdry T-Shirt Long 3.0 (M·L)</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--color-sea);letter-spacing:0.04em;margin-bottom:6px">R4R · 리쉬·리프트</div>
+            <ul style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);margin:0;padding-left:16px">
+              <li>Wing Board Leash with Dampener NEW</li>
+              <li>Wing Board Leash</li>
+              <li>Wing Board Leash Dampener</li>
+              <li>Wing Leash</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--color-sea);letter-spacing:0.04em;margin-bottom:6px">LIFESTYLE · 라이프스타일</div>
+            <ul style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);margin:0;padding-left:16px">
+              <li>Puffer Jacket (M)</li>
+              <li>Tech Hoodie Heather Grey (M·L)</li>
+              <li>Poncho Flip Over 2.0 Pink (S-M) · Black (L-XL)</li>
+              <li>Dry Sailing Short 2.0 Black (M)</li>
+              <li>Light Sailing Short 2.0 Grey (M)</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--color-sea);letter-spacing:0.04em;margin-bottom:6px">EYEWEAR · 고글</div>
+            <ul style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);margin:0;padding-left:16px">
+              <li>Flying Mask 2.0 (L-XL)</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--color-sea);letter-spacing:0.04em;margin-bottom:6px">TECH PANTS · 테크 팬츠</div>
+            <ul style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);margin:0;padding-left:16px">
+              <li>Coastal Racing Salopette (M)</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--color-sea);letter-spacing:0.04em;margin-bottom:6px">FOOTWEAR · 신발</div>
+            <ul style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);margin:0;padding-left:16px">
+              <li>WIPSneaker (42.7 / US9)</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--color-sea);letter-spacing:0.04em;margin-bottom:6px">BAGS · 백</div>
+            <ul style="font-size:12.5px;line-height:1.65;color:var(--text-secondary);margin:0;padding-left:16px">
+              <li>Gearpack 100L</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:30px;padding:18px 24px;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;font-size:0.875rem;color:#166534;text-align:center">
+      <strong style="font-size:15px">5 카테고리 한국 라인업</strong> · SS26 시즌 정식 수입. 사이즈·color 견적 또는 추가 SKU 문의 — 카톡 채널 또는 danmujigroup@gmail.com.
+    </div>
+  </div>
+</section>
+
+<section class="section section--dark">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <span class="section-head__eyebrow t-eyebrow--white">Performance Signature</span>
+      <h2 class="section-head__title">WIP Pro Helmet — 보호의 5축</h2>
+      <p class="section-head__lead">Foil 라이더 필수 안전장비. 충격 분산력과 활동성을 동시에 — 한 번 한 번이 라이더의 다음 시즌입니다.</p>
+    </div>
+    <div class="perf">
+      <!-- DO_NOT_REVERT §148: Safety 카테고리 5축 — Comfort/Protection/Mobility/Lightness/Ventilation
+           ❌ Foil 5축 (Skill/Speed/Glide/Maneuver/Stability) 회귀 영구 금지 (Danny 2026-05-12 스크린샷 c23de445)
+           Lightness·Ventilation 값은 Pro Helmet (PROWIP 2.0) preliminary — Danny 검수 후 정확치 적용 -->
+      <div class="perf__chart-wrap reveal" data-delay="1" data-perf-chart
+           data-perf-category="safety"
+           data-values="9,10,9,8,9"></div>
+      <div class="reveal" data-delay="2">
+        <div class="pill pill--dark" style="margin-bottom:16px">WIP · Pro Helmet</div>
+        <h3 class="t-h2 t-on-dark" style="margin:0 0 16px">가볍다. 활동적이다. 보호한다</h3>
+        <p class="t-on-dark-mute" style="margin:0 0 24px;font-size:1.0625rem;line-height:1.65;max-width:48ch">
+          안전장비 카테고리는 Foil 라이딩의 Skill·Speed·Glide 대신 보호력·착용감·통기성을 평가합니다.
+          하드웨어와 함께 가는 보호장비 — 부상 없이 오래 타는 라이더의 선택.
+        </p>
+        <ul class="perf-axes">
+          <li><div class="perf-axes__label"><b>Comfort</b><small>착용감</small></div><div class="perf-axes__bar" data-value="9"></div><span class="perf-axes__num">9/10</span></li>
+          <li><div class="perf-axes__label"><b>Protection</b><small>보호력</small></div><div class="perf-axes__bar" data-value="10"></div><span class="perf-axes__num">10/10</span></li>
+          <li><div class="perf-axes__label"><b>Mobility</b><small>활동성</small></div><div class="perf-axes__bar" data-value="9"></div><span class="perf-axes__num">9/10</span></li>
+          <li><div class="perf-axes__label"><b>Lightness</b><small>경량성</small></div><div class="perf-axes__bar" data-value="8"></div><span class="perf-axes__num">8/10</span></li>
+          <li><div class="perf-axes__label"><b>Ventilation</b><small>통기성</small></div><div class="perf-axes__bar" data-value="9"></div><span class="perf-axes__num">9/10</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Size chart entry banner -->
+<section class="section section--tight" id="size-chart-cta" style="background:linear-gradient(135deg,var(--color-mist) 0%,#fff 100%);border-top:1px solid var(--color-line);border-bottom:1px solid var(--color-line)">
+  <div class="container" style="text-align:center">
+    <div class="reveal" style="max-width:720px;margin:0 auto">
+      <span style="display:inline-block;background:var(--color-navy);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;letter-spacing:.05em;margin-bottom:14px">📐 SIZE CHART</span>
+      <h2 style="font-size:clamp(22px,3vw,30px);margin:0 0 12px;color:var(--color-deep-sea);word-break:keep-all">"내 사이즈 어떻게 고르지?" — 본사 공식 차트로 결정하세요</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;margin:0 0 22px;word-break:keep-all">헬멧·임팩트 베스트·웻수트·하니스·부티 — Forward WIP 전 카테고리 본사 공식 사이즈 매트릭스. 한국 라이더 fitting 가이드 + 측정 팁 포함.</p>
+      <a href="products/wip/size-chart.html" style="display:inline-block;background:var(--color-deep-sea);color:#fff;padding:12px 26px;border-radius:999px;font-weight:600;text-decoration:none">📐 WIP 사이즈 차트 →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section--darker">
+  <div class="container container--narrow" style="text-align:center">
+    <div class="reveal">
+      <span class="t-eyebrow t-eyebrow--white">Inquire</span>
+      <h2 class="t-display t-on-dark" style="margin:24px 0">Hardware와 함께,<br>WIP 보호 풀세트</h2>
+      <p class="t-on-dark-mute" style="font-size:1.125rem;max-width:48ch;margin:0 auto 40px;line-height:1.65">Levitaz·PPC·Takoon 어떤 brand의 hardware를 타시든 — WIP 보호장비는 네 가지 브랜드 모두와 cross-sell 가능합니다.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="btn btn--accent btn--lg">카톡 상담</a>
+        <a href="mailto:danmujigroup@gmail.com?subject=WIP%20%EB%AC%B8%EC%9D%98" class="btn btn--ghost-light btn--lg">danmujigroup@gmail.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="membership.html">회원 등급 안내</a></li>
+          <li><a href="glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="calculator.html">Lift Calculator</a></li>
+          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="level/beginner.html">입문 가이드</a></li><li><a href="level/novice.html">초급 가이드</a></li>
+          <li><a href="level/intermediate.html">중급 가이드</a></li>
+          <li><a href="level/advanced.html">상급 가이드</a></li>
+          <li><a href="level/pro.html">선수 가이드</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="levitaz.html">Levitaz</a></li>
+          <li><a href="ppc.html">PPC</a></li>
+          <li><a href="takoon.html">Takoon</a></li>
+          <li><a href="wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="policy/shipping.html">배송 정책</a></li>
+          <li><a href="policy/refund.html">환불 정책</a></li>
+          <li><a href="policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="policy/privacy.html">개인정보처리방침</a>
+        <a href="policy/terms.html">이용약관</a>
+        <a href="policy/refund.html">환불정책</a>
+        <a href="policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="index.html#contact" class="kakao-fab" aria-label="카톡 상담"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>
+
+<script src="assets/js/main.js" defer></script>
+  <script src="assets/js/nav-auth.js" defer></script>
+<!-- PHASE_11_COMPARE_INJECTED -->
+<!-- Phase 11 — Brand Comparison Table -->
+<section class="section section--mist" id="compare-wip">
+  <div class="container">
+    <h2 class="section-head section-head--center">Forward WIP 라인업 가로 비교</h2>
+    <p class="section-sub section-sub--center">선수관리사이트 스타일 — 가격·스킬·체중·풍속·핵심 attribute 한눈에 비교. 모델명 클릭 시 detail page로 이동합니다.</p>
+    
+        <div class="compare-section reveal">
+          <h3 class="compare-section__title">Safety</h3>
+          <div class="compare-wrap">
+            <table class="compare-table compare-table--brand">
+              <thead>
+                <tr>
+                  <th>모델</th>
+                  <th>가격</th>
+                  <th>스킬</th>
+                  <th>체중</th>
+                  <th>풍속</th>
+                  <th>보호력</th>
+                  <th>착용감</th>
+                  <th>내구성</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+            <tr>
+              <th scope="row"><a href="products/wip/helmet.html" class="compare-row__link">WIFLEX PRO 2.0</a></th>
+              <td>₩250,000</td>
+              <td>입문·중급</td>
+              <td>전 체중대</td>
+              <td>—</td>
+              <td><span class="mini-stars" aria-label="4 of 5">★★★★☆</span></td>
+              <td><span class="mini-stars">★★★★☆</span></td>
+              <td><span class="mini-stars">★★★★☆</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="products/wip/helmet-xover.html" class="compare-row__link">X-OVER Helmet</a></th>
+              <td>₩380,000</td>
+              <td>상급·선수</td>
+              <td>전 체중대</td>
+              <td>—</td>
+              <td><span class="mini-stars" aria-label="5 of 5">★★★★★</span></td>
+              <td><span class="mini-stars">★★★★☆</span></td>
+              <td><span class="mini-stars">★★★★☆</span></td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="products/wip/impact-vest.html" class="compare-row__link">Kompact Vest 50N 2.0</a></th>
+              <td>₩360,000</td>
+              <td>상급·선수</td>
+              <td>전 체중대</td>
+              <td>—</td>
+              <td><span class="mini-stars" aria-label="5 of 5">★★★★★</span></td>
+              <td><span class="mini-stars">★★★★☆</span></td>
+              <td><span class="mini-stars">★★★★☆</span></td>
+            </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="compare-section reveal">
+          <h3 class="compare-section__title">Comfort</h3>
+          <div class="compare-wrap">
+            <table class="compare-table compare-table--brand">
+              <thead>
+                <tr>
+                  <th>모델</th>
+                  <th>가격</th>
+                  <th>스킬</th>
+                  <th>체중</th>
+                  <th>풍속</th>
+                  <th>보호력</th>
+                  <th>착용감</th>
+                  <th>내구성</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+            <tr>
+              <th scope="row"><a href="wip.html#harness" class="compare-row__link">Waistfoil Harness 3.0</a></th>
+              <td>₩580,000</td>
+              <td>중급~선수</td>
+              <td>전 체중대</td>
+              <td>—</td>
+              <td><span class="mini-stars" aria-label="2 of 5">★★☆☆☆</span></td>
+              <td><span class="mini-stars">★★★★★</span></td>
+              <td><span class="mini-stars">★★★★☆</span></td>
+            </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+  </div>
+</section>
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <script src="assets/js/agent-deny.js" defer></script>
+</body>
+</html>

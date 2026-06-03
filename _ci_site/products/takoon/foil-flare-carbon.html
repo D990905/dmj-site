@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Foil Flare Carbon — Takoon 상세 | 단무지공방</title>
+<meta name="description" content="Takoon Foil Flare Carbon. Carving 전용 포일 카본 풀세트 — Flare front wing 8 사이즈 (550~1400) + 카본 마스트. 단무지공방 한국 정식 수입." />
+<meta property="og:title" content="Foil Flare Carbon — Takoon 상세 | 단무지공방" />
+<meta property="og:description" content="Takoon Foil Flare Carbon. Carving 전용 포일 카본 풀세트 — Flare front wing 8 사이즈 (550~1400) + 카본 마스트. 단무지공방 한국 정식 수입." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet" href="../../assets/css/style.css?v=mobile-tap-fix-20260526" />
+<link rel="stylesheet" href="../product-detail.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">본문 바로가기</a>
+
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담</span>
+</div></div></div>
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="../../index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <div class="nav__has-sub" role="none">
+          <a href="../../index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="../../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="../../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="../../takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="../../wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="../../index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="../../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="../../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="../../style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="../../style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="../../find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="../../genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="../../genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="../../genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="../../wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="../../index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="../../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="../../level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="../../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="../../level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="../../level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="../../women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="../../junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="../../family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <a href="../../find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <a href="../../login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button type="button" class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button type="button" class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="product-detail">
+  <section class="pd-hero">
+    <div class="container pd-hero__grid">
+      <div class="pd-hero__visual">
+        <div class="pd-hero__image-wrap" data-brand="takoon">
+          <img src="https://cdn.shopify.com/s/files/1/2503/9576/files/Foil-Flare-Carbon-Set.png" alt="Foil Flare Carbon 제품 사진" class="pd-hero__image" loading="eager" decoding="async" onerror="this.classList.add('pd-hero__image--err')" />
+          <span class="pd-hero__brand-mark" data-brand="takoon">Takoon</span>
+        </div>
+        <ol class="pd-hero__crumbs">
+          <li><a href="../../index.html">단무지공방</a></li>
+          <li><a href="../../takoon.html">Takoon</a></li>
+          <li>Foil Flare Carbon</li>
+        </ol>
+      </div>
+      <div class="pd-hero__copy">
+        <span class="pd-hero__category">포일 세트</span>
+        <h1 class="pd-hero__title">Foil Flare Carbon</h1>
+        <p class="pd-hero__tagline">Carving 전용 포일 — 카본 마스트로 sharp한 응답</p>
+        <div class="pd-hero__cta">
+          <a href="https://pf.kakao.com/_VITZX/chat" class="btn btn--accent btn--lg" target="_blank" rel="noopener">카톡 1:1 상담</a>
+          <a href="../../find-my-gear.html" class="btn btn--ghost btn--lg">1분 진단 →</a>
+        </div>
+        <!-- §171-B v4 (Danny 2026-06-03) — 제품 상세 "장바구니 담기". matrix.js delegated handler + cart.js 연동. DO_NOT_REVERT §171-B v4 -->
+        <div class="pd-buy">
+          <button type="button" class="btn btn--secondary btn--lg pd-buy__addcart" data-cart-add data-cart-state="out" data-sku="tkn-flare-carbon" data-size="" aria-label="장바구니에 담기">장바구니 담기</button>
+          <p class="pd-buy__note">회원 전용 · 장바구니에서 견적 요청까지 진행됩니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 본사 공식 설명 (Takoon HQ source · 한국어 의역) -->
+  <section class="section section--tight" id="hq-copy">
+    <div class="container">
+      <h2 class="section-head section-head--center">본사 공식 설명</h2>
+      <p class="section-sub section-sub--center">takoon.com Foil Flare Carbon 페이지 카피 — 한국 라이더 톤으로 풀어쓴 의역</p>
+      <div style="max-width:900px;margin:0 auto">
+        <p style="font-size:1.15rem;font-weight:700;color:var(--color-deep-sea);text-align:center;line-height:1.55">Carving을 위한 포일을 카본 마스트로 — 더 빠른 응답, 더 짧은 latency</p>
+        <p style="line-height:1.75;color:var(--text-primary);margin-top:18px">Flare 포일은 carving을 위해 특별히 개발됐습니다. 회전 감각이 단순히 즐거운 수준을 넘어 sensational한 영역에 들어섭니다 — 하나의 턴에서 다음 턴으로의 전환이 부드럽고 힘이 들지 않습니다. 윙포일과 서프 포일 양쪽을 위해 설계된 Flare는 Takoon 라인업 중 가장 매뉴버성이 뛰어난 포일이며, Carbon 버전은 알루미늄 세트 대비 마스트 강성과 반응성이 한 단계 올라간 구성입니다.</p>
+        <p style="line-height:1.75;color:var(--text-primary);margin-top:14px">Pre-preg 카본 마스트는 즉각적인 입력 전달과 정밀한 핸들링을 제공합니다. 파도 속에서, 그리고 상급 freeride 매뉴버에서 라이더의 잠재력을 한층 더 풀어내는 구성 — 파도 전문 라이더에게 권장하는 메인 세트입니다.</p>
+        <h3 style="font-size:1.05rem;font-weight:700;color:var(--color-deep-sea);margin:24px 0 12px">라인업 (Front Wing 8 사이즈)</h3>
+        <ul style="line-height:1.85;color:var(--text-primary);padding-left:20px">
+          <li><strong>550·650·750·850·950·1050·1200·1400 cm²</strong> — 가장 넓은 사이즈 폭으로 다양한 라이더·컨디션 cover</li>
+          <li><strong>Aspect Ratio ~8.3</strong> — 중간 AR로 carving·tight turn 응답성 극대화</li>
+          <li><strong>작은 사이즈 (550·650)</strong> — 강풍·라이트 라이더용 라이브한 캐릭터</li>
+          <li><strong>큰 사이즈 (1200·1400)</strong> — 라이트 윈드·헤비 라이더용 endurance</li>
+        </ul>
+        <h3 style="font-size:1.05rem;font-weight:700;color:var(--color-deep-sea);margin:24px 0 12px">세트 구성 (Carbon)</h3>
+        <ul style="line-height:1.85;color:var(--text-primary);padding-left:20px">
+          <li><strong>카본 마스트</strong> — pre-preg 카본 구조. 높은 강성·짧은 latency·정밀한 카빙 입력</li>
+          <li><strong>V3 알루미늄 fuselage</strong> — sacrificial anode 적용. 포일 내구성 최적화 (V3 카본 fuselage 선택 시 무게 감소·강성 증가)</li>
+          <li><strong>프리미엄 보호 커버</strong> — front wing·마스트·fuselage·stab 전용 커버 포함</li>
+          <li><strong>하드웨어 키트</strong> — M8 × 25mm 볼트, wing cover 내장 파우치에 보관</li>
+        </ul>
+        <h3 style="font-size:1.05rem;font-weight:700;color:var(--color-deep-sea);margin:24px 0 12px">권장 페어링</h3>
+        <ul style="line-height:1.85;color:var(--text-primary);padding-left:20px">
+          <li><strong>Carve stabilizer</strong> — Flare는 carving 중심 포일 — 잠재력을 완전히 끌어내려면 Carve stab이 필수</li>
+          <li><strong>Carve 190</strong> — 80kg 이상 라이더</li>
+          <li><strong>Carve 160</strong> — 그보다 가벼운 라이더</li>
+        </ul>
+        <h3 style="font-size:1.05rem;font-weight:700;color:var(--color-deep-sea);margin:24px 0 12px">Flare vs Flow — 어느 쪽을 선택할까</h3>
+        <p style="line-height:1.75;color:var(--text-primary)"><strong>Flare</strong>는 공격적인 파도 라이딩을 위해 만들어졌습니다. 매우 tight하게 회전, 즉각 반응하면서도 강한 글라이드와 펌핑 효율을 유지합니다. 파워풀한 파도에서 sharp·radical 매뉴버를 잇기에 우수합니다.</p>
+        <p style="line-height:1.75;color:var(--text-primary);margin-top:14px"><strong>Flow</strong>는 더 높은 AR (~10.7)로 글라이드와 lift 지속력에 강점이 있어 다운윈드·라이트 윈드 freeride에 적합합니다.</p>
+        <p style="line-height:1.75;color:var(--text-primary);margin-top:14px">선택 기준 — 파도 중심·radical 매뉴버 = Flare. 글라이드·다운윈드·endurance = Flow.</p>
+        <h3 style="font-size:1.05rem;font-weight:700;color:var(--color-deep-sea);margin:24px 0 12px">Carbon vs Aluminium — 같은 Flare, 다른 마스트</h3>
+        <p style="line-height:1.75;color:var(--text-primary)"><strong>Carbon</strong>은 마스트 강성과 응답성을 한 단계 끌어올린 구성으로, 파워풀한 파도와 radical 매뉴버 추구하는 상급 라이더에게 적합합니다. <strong>Aluminium</strong>은 같은 front wing 셰이프에 알루미늄 마스트로 입문·중급 라이더가 부담 없이 시작할 수 있는 진입점입니다.</p>
+      </div>
+      <!-- DO_NOT_REVERT §145-AG: takoon.com 비-CDN 캐러셀 figure 제거 (미확인 view). 작동 hero = cdn.shopify.com -->
+      <p style="text-align:center;font-size:0.85em;color:var(--text-secondary);margin-top:24px">출처: <a href="https://takoon.com/en-int/products/foil-flare-carbon" target="_blank" rel="noopener">takoon.com</a> · 본사 공식 product page · 단무지공방 한국 정식 수입 partner</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-head section-head--center">Set 구성 가격</h2>
+      <p class="section-sub section-sub--center">포일 풀세트 (front wing + stab + fuselage + 카본 마스트). ₩ = 단무지공방 한국 정식 수입가.</p>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <caption class="spec-table__caption">Foil Flare Carbon — 사이즈/SKU/가격</caption>
+          <thead><tr><th scope="col">사이즈</th><th scope="col">SKU</th><th scope="col">한국가</th><th scope="col">재고</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">1 SET</th><td>—</td><td>₩3,090,000<sup>*</sup></td><td>재고</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--mist">
+    <div class="container">
+      <h2 class="section-head section-head--center">이 제품이 적합한 라이더</h2>
+      <p class="section-sub section-sub--center">스킬·체중·종목별 핏</p>
+      <ul class="feature-list">
+        <li class="feature-item"><h4 class="feature-item__title">파도 중심 상급 라이더</h4><p class="feature-item__body">Flare 8 사이즈 라인업 + 카본 마스트 — radical 카빙 추구</p></li>
+        <li class="feature-item"><h4 class="feature-item__title">윙포일·서프포일 dual</h4><p class="feature-item__body">중간 AR ~8.3 — 매뉴버성과 글라이드 균형</p></li>
+        <li class="feature-item"><h4 class="feature-item__title">50–110kg</h4><p class="feature-item__body">front wing 사이즈 매칭으로 경량부터 헤비 라이더까지 cover</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="pd-cta">
+        <h2 class="pd-cta__title">결정이 어려우면 — 전문 퍼포먼스 어드바이저에게 물어보세요</h2>
+        <p class="pd-cta__body">옥덕필 코치가 라이딩 스타일·체중·spot·풍속 패턴 분석해서 best fit 추천합니다. 평균 응답 시간 8분.</p>
+        <div class="pd-cta__actions">
+          <a href="https://pf.kakao.com/_VITZX/chat" class="btn btn--accent btn--lg" target="_blank" rel="noopener">카톡 1:1 상담 — 8분 응답</a>
+          <a href="../../find-my-gear.html" class="btn btn--secondary btn--lg">1분 진단 시작 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="../../membership.html">회원 등급 안내</a></li>
+          <li><a href="../../glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="../../calculator.html">Lift Calculator</a></li>
+          <li><a href="../../find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="../../level/beginner.html">입문 가이드</a></li><li><a href="../../level/novice.html">초급 가이드</a></li>
+          <li><a href="../../level/intermediate.html">중급 가이드</a></li>
+          <li><a href="../../level/advanced.html">상급 가이드</a></li>
+          <li><a href="../../level/pro.html">선수 가이드</a></li>
+          <li><a href="../../premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="../../levitaz.html">Levitaz</a></li>
+          <li><a href="../../ppc.html">PPC</a></li>
+          <li><a href="../../takoon.html">Takoon</a></li>
+          <li><a href="../../wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="../../products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="../../policy/shipping.html">배송 정책</a></li>
+          <li><a href="../../policy/refund.html">환불 정책</a></li>
+          <li><a href="../../policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="../../policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="../../policy/privacy.html">개인정보처리방침</a>
+        <a href="../../policy/terms.html">이용약관</a>
+        <a href="../../policy/refund.html">환불정책</a>
+        <a href="../../policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+  <!-- §171-B v4 (Danny 2026-06-03) — 제품 상세 장바구니. supabase-auth(DMJAuth) + cart.js(DMJCart) + matrix.js(delegated [data-cart-add] handler + getPrice). DO_NOT_REVERT §171-B v4 -->
+  <script src="../../assets/js/supabase-auth.js?v=supabase-180-20260527"></script>
+  <script src="../../assets/js/cart.js"></script>
+  <script src="../../assets/js/matrix.js"></script>
+  <script>
+  (function () {
+    var sel = document.querySelector('[data-buy-size]');
+    var btn = document.querySelector('.pd-buy__addcart[data-cart-add]');
+    if (sel && btn) {
+      sel.addEventListener('change', function () {
+        btn.setAttribute('data-size', sel.value);
+        if (window.DMJCart) {
+          var sku = btn.getAttribute('data-sku');
+          var inCart = false;
+          try {
+            inCart = window.DMJCart.getItems().some(function (it) {
+              return it && it.sku === sku && (it.size || '') === sel.value;
+            });
+          } catch (e) { inCart = false; }
+          if (inCart) { btn.classList.add('mtx-item__addcart--in'); btn.setAttribute('data-cart-state','in'); btn.textContent='✓ 담김'; }
+          else { btn.classList.remove('mtx-item__addcart--in'); btn.setAttribute('data-cart-state','out'); btn.textContent='장바구니 담기'; }
+        }
+      });
+    }
+  })();
+  </script>
+  <script src="../../assets/js/nav-auth.js" defer></script>
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="../../assets/css/agent-deny.css">
+  <script src="../../assets/js/agent-deny.js" defer></script>
+</body>
+</html>

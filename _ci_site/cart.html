@@ -1,0 +1,471 @@
+<!-- DO_NOT_REVERT §171-B v2 (Danny 2026-05-13) — Cart 페이지 spec lock.
+     로그인 enforce + 운송비 카테고리별 (§171 canonical) + 관부가세 1.188 안내.
+     사업자 정보 (144-55-01008) = quote.html 에서 노출. cart.html = 장바구니 + 합계 + CTA.
+     §171-B v2: products.json fetch 실패 시 graceful fallback (PRODUCTS = {} + cart render 계속).
+     §145-G v5: nav 6-item canonical (profile.html 와 동기).
+     변경 시 Danny 명시 승인 필수. -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<meta name="robots" content="noindex,nofollow">
+<title>장바구니 | 단무지공방</title>
+<meta name="description" content="단무지공방 장바구니. 견적 요청 시 1영업일 이내 회신.">
+
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
+</head>
+<body>
+
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
+</div></div></div>
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+      <!-- DO_NOT_REVERT §145-G v5 — Danny 2026-05-13: cart.html nav 6-item canonical 복원.
+           이전 abbreviated (홈/스마트컨설팅/장바구니/로그인 4 항목) 회귀 영구 X. profile.html / skill-assessment.html 와 동기. -->
+      <div class="nav__primary" role="menubar">
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <div class="nav__has-sub" role="none">
+          <a href="index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <a href="find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <!-- DO_NOT_REVERT §171-B — cart icon (current page, active). -->
+        <a href="cart.html" class="nav__link nav__cart nav__cart--active" role="menuitem" aria-label="장바구니" aria-current="page">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="nav__cart-badge" data-cart-badge aria-live="polite" aria-atomic="true" hidden>0</span>
+        </a>
+        <a href="login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button type="button" class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button type="button" class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="cart.html" style="color:var(--color-sun);font-weight:700">장바구니 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="profile.html">마이 페이지 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="membership.html">회원 등급 안내 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="levitaz.html">Levitaz</a></li>
+    <li><a href="ppc.html">PPC</a></li>
+    <li><a href="takoon.html">Takoon</a></li>
+    <li><a href="wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="level/beginner.html">입문</a></li>
+    <li><a href="level/novice.html">초급</a></li>
+    <li><a href="level/intermediate.html">중급</a></li>
+    <li><a href="level/advanced.html">상급</a></li>
+    <li><a href="level/pro.html">선수</a></li>
+  </ul>
+</div>
+
+<main class="cart-page">
+  <div class="container">
+    <header class="cart-page__header">
+      <h1 class="cart-page__title">장바구니</h1>
+    </header>
+
+    <!-- Logged out banner -->
+    <section class="cart-card cart-auth-banner" id="cart-auth-banner" hidden>
+      <div class="cart-auth-banner__body">
+        <h2 class="cart-auth-banner__title">장바구니는 회원 전용입니다</h2>
+        <p class="cart-auth-banner__lead">로그인 후 이용해주세요. 회원가입 시 단무지 등급 (10% 할인) 부터 시작합니다.</p>
+        <div class="cart-auth-banner__actions">
+          <a href="login.html?redirect=cart.html" class="btn btn--primary">로그인</a>
+          <a href="signup.html?redirect=cart.html" class="btn btn--ghost">회원가입</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Empty state -->
+    <section class="cart-card cart-empty" id="cart-empty" hidden>
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <h2 class="cart-empty__title">장바구니가 비어 있습니다</h2>
+      <p class="cart-empty__lead">Find My Gear 퀴즈로 맞춤 추천을 받거나, 카톡으로 바로 상담해주세요.</p>
+      <!-- DO_NOT_REVERT (Danny 2026-05-26) — 견적 제출 시 cart 가 자동으로 비워지므로(quote.html:532 DMJCart.clear),
+           최근 견적·주문이 있으면 마이페이지 진행 timeline 으로 안내한다. -->
+      <div id="cart-empty-recent" class="cart-empty-recent" hidden></div>
+      <div class="cart-empty__actions">
+        <a href="find-my-gear.html" class="btn btn--primary">Find My Gear 추천 받기</a>
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="btn btn--ghost">카톡으로 상담하기</a>
+      </div>
+    </section>
+
+    <!-- Cart contents -->
+    <div id="cart-contents" hidden>
+      <!-- DO_NOT_REVERT §171 v7 — Danny 2026-05-13: 계속 쇼핑하기 button (상단 + 하단).
+           click = history.back() / fallback find-my-gear.html. 사용자 흐름 복귀 affordance. -->
+      <div class="cart-continue-shopping cart-continue-shopping--top">
+        <button type="button" class="btn btn--ghost btn--sm" id="cart-continue-top">← 계속 쇼핑하기</button>
+      </div>
+      <section class="cart-card">
+        <h2 class="cart-card__title">담은 상품 <small id="cart-count-badge"></small></h2>
+        <div id="cart-items"></div>
+      </section>
+
+      <section class="cart-card cart-summary">
+        <h2 class="cart-card__title">결제 예상 금액</h2>
+        <div class="cart-summary__row">
+          <span>상품 합계</span>
+          <span id="sum-items" class="cart-summary__amt">₩0</span>
+        </div>
+        <div class="cart-summary__sub">
+          <div class="cart-summary__row cart-summary__row--head">
+            <span>운송비 (카테고리별)</span>
+            <span id="sum-ship" class="cart-summary__amt">₩0</span>
+          </div>
+          <ul class="cart-summary__ship-list" id="sum-ship-list"></ul>
+        </div>
+        <div class="cart-summary__row cart-summary__row--total">
+          <span>합계</span>
+          <span id="sum-total" class="cart-summary__amt">₩0</span>
+        </div>
+        <div class="cart-summary__actions cart-summary__actions--with-continue">
+          <button type="button" class="btn btn--ghost" id="cart-continue-bottom">← 계속 쇼핑하기</button>
+          <a href="quote.html" class="btn btn--primary cart-cta" id="cart-cta">구매견적요청하기</a>
+          <button type="button" class="btn btn--ghost" id="cart-clear-btn">장바구니 비우기</button>
+        </div>
+        <p class="cart-summary__fineprint">견적요청 후 단무지공방 운영팀이 1영업일 이내 카톡 또는 이메일로 회신드립니다.</p>
+      </section>
+    </div>
+
+    <!-- §171-B v2 — Error state 블록 영구 제거. 데이터 fetch 실패 시 graceful fallback (PRODUCTS = {})
+         로 render 계속 진행. 가격 lookup 실패한 item 은 "가격 안내 받기" placeholder 표시. -->
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__bottom">
+      <p>© 2026 단무지공방 · 사업자등록번호 144-55-01008</p>
+      <p><a href="policy/terms.html">이용약관</a> · <a href="policy/privacy.html">개인정보처리방침</a> · <a href="policy/shipping.html">배송 정책</a> · <a href="policy/refund.html">환불 정책</a></p>
+    </div>
+  </div>
+</footer>
+
+<!-- DO_NOT_REVERT §171-B v3 (Danny 2026-05-13) — load order locked.
+     products.js (inline DMJ_PRODUCTS_INLINE) → matrix.js (DMJMatrix.getPrice for PRICE_OVERRIDES fallback) → cart.js. -->
+<script src="assets/js/supabase-auth.js?v=supabase-180-20260527"></script>
+<script src="data/products.js"></script>
+<script src="assets/js/matrix.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/nav-auth.js" defer></script>
+<script>
+// §171-B cart.html — bootstrap + render
+(function () {
+  'use strict';
+
+  var PRODUCTS = null;
+
+  function fmtKRW(n) {
+    if (n == null || isNaN(n)) return '₩-';
+    return '₩' + Math.round(Number(n)).toLocaleString('ko-KR');
+  }
+
+  function getProductInfo(sku) {
+    if (!PRODUCTS) return null;
+    return window.DMJCart.getProduct(PRODUCTS, sku);
+  }
+
+  function ensureAuthShim(cb) {
+    if (window.DMJAuth && window.DMJCart) return cb();
+    setTimeout(function () { ensureAuthShim(cb); }, 30);
+  }
+
+  // DO_NOT_REVERT §171-B v3 — inline-first product loader.
+  // Prefer window.DMJ_PRODUCTS_INLINE (loaded from data/products.js) so cart works on file:// origin.
+  // Fallback to fetch() if inline not present (defensive — should never happen given load order).
+  function loadProducts() {
+    if (window.DMJ_PRODUCTS_INLINE) {
+      return Promise.resolve(window.DMJ_PRODUCTS_INLINE);
+    }
+    return fetch('data/products.json').then(function (r) {
+      if (!r.ok) throw new Error('products.json HTTP ' + r.status);
+      return r.json();
+    });
+  }
+
+  function renderItem(item) {
+    var p = getProductInfo(item.sku);
+    var name = p ? (p.brand + ' ' + p.model) : item.sku;
+    var sizeLabel = item.size ? ('<span class="cart-item__size">' + escapeHtml(item.size) + '</span>') : '';
+    var unit = window.DMJCart.lookupPrice(PRODUCTS, item.sku, item.size);
+    var subtotal = unit != null ? unit * item.qty : null;
+    var cat = window.DMJCart.classifyItem(p, item.sku);
+    var unitTxt = unit != null ? fmtKRW(unit) : '<span class="cart-item__price--tbd">가격 안내 받기</span>';
+    var subTxt = subtotal != null ? fmtKRW(subtotal) : '—';
+
+    return '<div class="cart-item" data-sku="' + escapeAttr(item.sku) + '" data-size="' + escapeAttr(item.size || '') + '">' +
+      '<div class="cart-item__cat" title="' + escapeAttr(cat.label) + '">' + escapeHtml(cat.label) + '</div>' +
+      '<div class="cart-item__main">' +
+        '<div class="cart-item__name"><strong>' + escapeHtml(name) + '</strong> ' + sizeLabel + '</div>' +
+        '<div class="cart-item__unit">단가 ' + unitTxt + '</div>' +
+      '</div>' +
+      '<div class="cart-item__qty">' +
+        '<button type="button" class="cart-qty-btn" data-act="dec" aria-label="수량 감소">−</button>' +
+        '<input type="number" class="cart-qty-input" value="' + item.qty + '" min="1" max="20" aria-label="수량">' +
+        '<button type="button" class="cart-qty-btn" data-act="inc" aria-label="수량 증가">+</button>' +
+      '</div>' +
+      '<div class="cart-item__sub">' + subTxt + '</div>' +
+      '<button type="button" class="cart-item__remove" data-act="remove" aria-label="제거">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>' +
+      '</button>' +
+    '</div>';
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  function render() {
+    var loggedIn = window.DMJCart.isLoggedIn();
+    var items = window.DMJCart.getItems();
+
+    var banner = document.getElementById('cart-auth-banner');
+    var empty = document.getElementById('cart-empty');
+    var contents = document.getElementById('cart-contents');
+
+    banner.hidden = true; empty.hidden = true; contents.hidden = true;
+
+    if (!loggedIn) { banner.hidden = false; return; }
+    if (!items.length) {
+      empty.hidden = false;
+      // §174-A (Danny 2026-05-26) — 견적 제출이 cart 를 비우는 의도된 동작이라,
+      // 사용자가 "내가 담은 게 사라졌나?" 로 오인하지 않도록 최근 주문(orders) 가 있으면
+      // 마이페이지 진행 timeline 으로 가는 banner 를 띄운다. 데이터 손실 X — 상태 이동.
+      try {
+        var rawOrders = window.DMJAuth && window.DMJAuth.getUserData
+          ? window.DMJAuth.getUserData('orders') : null;
+        var orders = rawOrders ? JSON.parse(rawOrders) : [];
+        if (Array.isArray(orders) && orders.length) {
+          var active = orders.filter(function (o) {
+            var s = Number(o.currentStage) || 0;
+            return s >= 1 && s <= 7;
+          });
+          var recentEl = document.getElementById('cart-empty-recent');
+          if (recentEl && active.length) {
+            var n = active.length;
+            var latest = active[active.length - 1];
+            var itemN = (latest.items || []).length;
+            var totalKRW = latest.totalKRW || 0;
+            var totalTxt = totalKRW > 0
+              ? '₩' + totalKRW.toLocaleString('ko-KR') : '';
+            recentEl.innerHTML =
+              '<div class="cart-empty-recent__card">' +
+                '<div class="cart-empty-recent__head">' +
+                  '<strong>진행 중인 견적·주문 ' + n + '건</strong>' +
+                  '<span class="cart-empty-recent__sub">최근 ' + itemN +
+                    ' SKU' + (totalTxt ? ' · ' + totalTxt : '') + '</span>' +
+                '</div>' +
+                '<p class="cart-empty-recent__lead">' +
+                  '견적을 제출하면 장바구니가 자동으로 비워지고, 항목은 ' +
+                  '<strong>마이페이지 → 주문 진행</strong>에서 단계별로 추적됩니다.' +
+                '</p>' +
+                '<div class="cart-empty-recent__actions">' +
+                  '<a href="profile.html#orders" class="btn btn--primary">마이페이지에서 진행 보기 →</a>' +
+                  '<a href="consult.html" class="btn btn--ghost">관리자에게 문의</a>' +
+                '</div>' +
+              '</div>';
+            recentEl.hidden = false;
+          }
+        }
+      } catch (e) { console.warn('[cart] recent orders banner failed', e); }
+      return;
+    }
+
+    contents.hidden = false;
+    document.getElementById('cart-count-badge').textContent = '· ' + window.DMJCart.getCount() + '개';
+
+    var html = items.map(renderItem).join('');
+    var wrap = document.getElementById('cart-items');
+    wrap.innerHTML = html;
+
+    // Wire row controls
+    wrap.querySelectorAll('.cart-item').forEach(function (row) {
+      var sku = row.getAttribute('data-sku');
+      var size = row.getAttribute('data-size') || null;
+      row.querySelector('[data-act="inc"]').addEventListener('click', function () {
+        var input = row.querySelector('.cart-qty-input');
+        window.DMJCart.setQty(sku, Number(input.value) + 1, size);
+      });
+      row.querySelector('[data-act="dec"]').addEventListener('click', function () {
+        var input = row.querySelector('.cart-qty-input');
+        var next = Number(input.value) - 1;
+        if (next <= 0) {
+          if (confirm('이 상품을 장바구니에서 제거할까요?')) window.DMJCart.remove(sku, size);
+        } else {
+          window.DMJCart.setQty(sku, next, size);
+        }
+      });
+      row.querySelector('.cart-qty-input').addEventListener('change', function (e) {
+        var v = Math.max(0, Math.min(20, Number(e.target.value) || 1));
+        window.DMJCart.setQty(sku, v, size);
+      });
+      row.querySelector('[data-act="remove"]').addEventListener('click', function () {
+        window.DMJCart.remove(sku, size);
+      });
+    });
+
+    // Totals
+    var sub = window.DMJCart.getSubtotal(PRODUCTS);
+    var ship = window.DMJCart.computeShipping(items, PRODUCTS);
+    var total = sub + ship.total;
+    document.getElementById('sum-items').textContent = fmtKRW(sub);
+    document.getElementById('sum-ship').textContent = fmtKRW(ship.total);
+    document.getElementById('sum-total').textContent = fmtKRW(total);
+
+    var sl = document.getElementById('sum-ship-list');
+    sl.innerHTML = ship.breakdown.map(function (b) {
+      var qtyTxt = b.qty > 1 ? ' × ' + b.qty : '';
+      return '<li><span>' + escapeHtml(b.label) + qtyTxt + '</span><span>' + fmtKRW(b.subtotal) + '</span></li>';
+    }).join('');
+  }
+
+  // §171-B v2 — fetch 실패 시 graceful fallback. PRODUCTS = {} 로 두고 render 계속.
+  // 가격 lookup 실패한 item 은 renderItem 에서 "가격 안내 받기" placeholder 표시.
+  // 운송비 계산은 DMJCart.classifyItem (SKU heuristic) 으로 PRODUCTS 없이도 동작.
+  ensureAuthShim(function () {
+    loadProducts().then(function (data) {
+      PRODUCTS = data;
+    }).catch(function (e) {
+      console.warn('[cart.html] products load failed, using fallback', e);
+      PRODUCTS = {}; // empty fallback — render 계속 진행
+    }).then(function () {
+      // DO_NOT_REVERT §171-B v3 — debug log for SKU lookup diagnosis (Danny DevTools).
+      try {
+        console.info('[cart.html] PRODUCTS loaded:', PRODUCTS ? Object.keys(PRODUCTS) : null);
+        console.info('[cart.html] cart items:', window.DMJCart.getItems());
+        window.DMJCart.getItems().forEach(function (item) {
+          var p = window.DMJCart.getProduct(PRODUCTS, item.sku);
+          var price = window.DMJCart.lookupPrice(PRODUCTS, item.sku, item.size);
+          console.info('  ', item.sku, item.size || '(no size)', '→',
+            p ? (p.brand + ' ' + p.model) : 'NOT FOUND',
+            '· ₩' + (price != null ? price : 'null'));
+        });
+      } catch (logErr) { /* swallow log failures */ }
+      render();
+      document.addEventListener('dmj:cart:change', render);
+      var clearBtn = document.getElementById('cart-clear-btn');
+      if (clearBtn) clearBtn.addEventListener('click', function () {
+        if (confirm('장바구니를 비우시겠어요?')) window.DMJCart.clear();
+      });
+      // §171 v8 — Danny 2026-05-15: 계속 쇼핑하기 = 장비 브라우징으로 이동.
+      // find-my-gear 퀴즈 Q1 로 떨어지던 문제 정정 — index.html 제품/브랜드 섹션으로 일관 이동.
+      function continueShoppingClick() {
+        location.href = 'index.html#brands';
+      }
+      var topBtn = document.getElementById('cart-continue-top');
+      var botBtn = document.getElementById('cart-continue-bottom');
+      if (topBtn) topBtn.addEventListener('click', continueShoppingClick);
+      if (botBtn) botBtn.addEventListener('click', continueShoppingClick);
+    });
+  });
+})();
+</script>
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <script src="assets/js/agent-deny.js" defer></script>
+</body>
+</html>

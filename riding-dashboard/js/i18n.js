@@ -2026,8 +2026,10 @@
   function injectStyle() {
     if (document.getElementById('rd-i18n-style')) return;
     var css =
-      '.rd-langtoggle{position:fixed;top:8px;right:8px;z-index:9999;' +
-        'display:inline-flex;background:#FFFFFFE6;border:1px solid #C7CFD8;' +
+      /* Danny 2026-06-03(③): 우상단 토글을 site-header(높이 72px·sticky) 의 nav 링크와
+         같은 라인·수직 가운데로 정렬. top:23px = (72-26)/2, right=컨테이너 gutter(데스크탑 2rem). */
+      '.rd-langtoggle{position:fixed;top:23px;right:2rem;z-index:9999;' +
+        'display:inline-flex;align-items:center;background:#FFFFFFE6;border:1px solid #C7CFD8;' +
         'border-radius:999px;padding:2px;box-shadow:0 2px 8px rgba(10,37,64,0.08);' +
         'font:600 12px system-ui,-apple-system,sans-serif;backdrop-filter:blur(6px)}' +
       '.rd-langtoggle__btn{appearance:none;border:0;background:transparent;' +
@@ -2036,7 +2038,9 @@
       '.rd-langtoggle__btn:hover{color:#0A2540}' +
       '.rd-langtoggle__btn.is-on{background:#0A2540;color:#FFFFFF;' +
         'box-shadow:0 1px 3px rgba(10,37,64,0.18)}' +
-      '@media (max-width:540px){.rd-langtoggle{top:6px;right:6px}' +
+      /* 768px 미만: 컨테이너 gutter 1.25rem 에 우측 정렬. 헤더 높이 72px 유지 → 수직 중앙 동일. */
+      '@media (max-width:767px){.rd-langtoggle{right:1.25rem}}' +
+      '@media (max-width:540px){.rd-langtoggle{top:24px}' +
         '.rd-langtoggle__btn{padding:5px 10px;min-width:46px;font-size:11px}}';
     var s = document.createElement('style');
     s.id = 'rd-i18n-style';

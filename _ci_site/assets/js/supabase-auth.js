@@ -1,0 +1,554 @@
+// ============================================================================
+// §180 (Danny 2026-05-27) — Phase 12 Supabase + Kakao OAuth Migration
+//   기존 auth-shim.js (localStorage 임시 인증) 를 Supabase Auth 로 교체.
+//   window.DMJAuth API 100% 호환 — 21개 사용처 코드 수정 없음.
+//
+// 아키텍처
+//   - Auth: Supabase Auth + Kakao OAuth provider
+//   - User Profile: public.profiles (auth.users 1:1 확장)
+//   - Per-user 데이터:
+//       cart → public.cart_items (별도 정형 테이블)
+//       나머지 8종 (skill_assessment_v1, self_assessment_v1, fmg_history,
+//                  land_phase, water_stage, consult_history, quotes_history,
+//                  orders) → public.user_data (suffix + jsonb)
+//   - Sync 정책: write-through (localStorage 캐시 + 백그라운드 Supabase upsert)
+//                read = localStorage (sync), write = both
+//                cross-device sync = login 시 pullUserDataFromCloud()
+//
+// 호환성
+//   - currentUser()/isLoggedIn()/currentUserId() — sync 반환 (캐시)
+//   - signup/login/logout/updateUser — async (기존 API 와 동일)
+//   - getUserData/setUserData — sync (localStorage 캐시 layer)
+//   - hashPassword — legacy stub (Supabase 가 서버측 hash)
+//
+// DO_NOT_REVERT §180 — auth-shim.js 폐기, 이 파일이 단일 진입점.
+// ============================================================================
+
+(function () {
+  'use strict';
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 1) Supabase client bootstrap
+  // ─────────────────────────────────────────────────────────────────────
+  var SUPABASE_URL = 'https://uzwennkeoeihqyvnxech.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_Xt5qEA_0Ar1HWWuecR4AAQ_9qxooFY1';
+  var SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+
+  var USER_NS_PREFIX = 'dmj_user_';   // localStorage 캐시 prefix
+  var ANON_NS_PREFIX = 'dmj_anon_';   // 비로그인 fallback
+  var USER_CACHE_KEY = 'dmj_user_cache';  // currentUser sync access 용
+
+  // user_data 테이블로 가는 suffix 목록 (cart 는 별도 cart_items)
+  var USER_DATA_SUFFIXES = [
+    'skill_assessment_v1',
+    'self_assessment_v1',
+    'fmg_history',
+    'land_phase',
+    'water_stage',
+    'consult_history',
+    'quotes_history',
+    'orders'
+  ];
+
+  var sb = null;             // Supabase client (lazy init)
+  var cachedSession = null;
+  var cachedProfile = null;
+  var clientReady = null;    // Promise
+
+  function loadSDK() {
+    return new Promise(function (resolve, reject) {
+      if (window.supabase && window.supabase.createClient) return resolve(window.supabase);
+      var s = document.createElement('script');
+      s.src = SDK_URL;
+      s.onload = function () { resolve(window.supabase); };
+      s.onerror = function () { reject(new Error('Supabase SDK load failed')); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function ensureClient() {
+    if (clientReady) return clientReady;
+    clientReady = loadSDK().then(function (supabase) {
+      sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,   // OAuth callback 시 URL 파싱
+          storageKey: 'dmj_sb_auth'
+        }
+      });
+
+      // 세션 변경 listener — OAuth callback / token refresh / 다른 탭 로그인
+      sb.auth.onAuthStateChange(function (event, session) {
+        cachedSession = session;
+        if (session) {
+          refreshProfile().then(function () {
+            if (event === 'SIGNED_IN') {
+              // OAuth 로그인 또는 첫 진입 — cloud 데이터 pull
+              pullUserDataFromCloud().catch(function () {});
+            }
+          });
+        } else {
+          cachedProfile = null;
+          try { localStorage.removeItem(USER_CACHE_KEY); } catch (e) {}
+        }
+        // legacy nav-auth.js 등이 listen 가능
+        try {
+          window.dispatchEvent(new CustomEvent('dmj-auth-change', {
+            detail: { event: event, isLoggedIn: !!session }
+          }));
+        } catch (e) {}
+      });
+
+      // boot — 기존 세션 복원
+      return sb.auth.getSession().then(function (res) {
+        cachedSession = res.data.session;
+        if (cachedSession) return refreshProfile();
+        return null;
+      });
+    });
+    return clientReady;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 2) Profile mapping — DB row ↔ legacy DMJAuth.currentUser() shape
+  // ─────────────────────────────────────────────────────────────────────
+  function mapDbToLegacy(profile, authUser) {
+    if (!profile) return null;
+    return {
+      id: profile.id,
+      email: (authUser && authUser.email) || profile.email || '',
+      name: profile.display_name || '',
+      nickname: profile.nickname || '',
+      gender: profile.gender || '',
+      birthYear: profile.birth_year != null ? String(profile.birth_year) : '',
+      ridingStart: profile.riding_start || '',
+      mainSports: profile.main_sports || [],
+      favoriteSpot: profile.favorite_spot_text || '',
+      avatarBase64: profile.avatar_url || '',  // legacy 필드명 보존
+      avatar_url: profile.avatar_url || '',    // Kakao 프로필 사진 URL 직접 접근용
+      tier: profile.tier || 'member',
+      tierLabel: profile.tier_label || '회원',
+      tierDiscount: profile.tier_discount || 0,
+      tierSlug: profile.tier || 'member',      // §175 legacy
+      gear: [],                                // inventory 테이블 사용 — Phase 13
+      totalSpend: profile.total_spend_krw || 0,
+      createdAt: profile.created_at ? new Date(profile.created_at).getTime() : Date.now(),
+      passwordHash: ''                         // legacy stub
+    };
+  }
+
+  function mapLegacyPatchToDb(patch) {
+    var db = {};
+    if ('name' in patch) db.display_name = patch.name;
+    if ('nickname' in patch) db.nickname = patch.nickname;
+    if ('gender' in patch) db.gender = patch.gender;
+    if ('birthYear' in patch) db.birth_year = patch.birthYear ? Number(patch.birthYear) : null;
+    if ('ridingStart' in patch) db.riding_start = patch.ridingStart;
+    if ('mainSports' in patch) db.main_sports = patch.mainSports;
+    if ('favoriteSpot' in patch) db.favorite_spot_text = patch.favoriteSpot;
+    if ('avatarBase64' in patch) db.avatar_url = patch.avatarBase64;
+    if ('avatar_url' in patch) db.avatar_url = patch.avatar_url;
+    return db;
+  }
+
+  function refreshProfile() {
+    if (!cachedSession || !sb) return Promise.resolve(null);
+    return sb.from('profiles').select('*').eq('id', cachedSession.user.id).single()
+      .then(function (res) {
+        if (res.error) {
+          console.warn('[DMJAuth §180] refreshProfile error', res.error);
+          return null;
+        }
+        cachedProfile = mapDbToLegacy(res.data, cachedSession.user);
+        try { localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cachedProfile)); } catch (e) {}
+        return cachedProfile;
+      });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 3) localStorage 캐시 부트 — 새로고침 시 sync API 즉시 반응
+  // ─────────────────────────────────────────────────────────────────────
+  try {
+    var raw = localStorage.getItem(USER_CACHE_KEY);
+    if (raw) cachedProfile = JSON.parse(raw);
+  } catch (e) {}
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 4) Auth API
+  // ─────────────────────────────────────────────────────────────────────
+  function signup(email, password, name) {
+    return ensureClient().then(function () {
+      return sb.auth.signUp({
+        email: String(email || '').trim(),
+        password: String(password || ''),
+        options: { data: { display_name: name || '', name: name || '' } }
+      });
+    }).then(function (res) {
+      if (res.error) throw new Error(_translateAuthError(res.error.message));
+      cachedSession = res.data.session;
+      // signup 시 trigger 가 profile row 생성 → refresh
+      return refreshProfile();
+    });
+  }
+
+  function login(email, password) {
+    return ensureClient().then(function () {
+      return sb.auth.signInWithPassword({
+        email: String(email || '').trim(),
+        password: String(password || '')
+      });
+    }).then(function (res) {
+      if (res.error) throw new Error(_translateAuthError(res.error.message));
+      cachedSession = res.data.session;
+      return refreshProfile();
+    });
+  }
+
+  // §180 — 카카오 OAuth 로그인. signInWithOAuth 는 카카오 페이지로 redirect.
+  // redirectTo = 현재 페이지 — OAuth callback 후 자동으로 돌아옴.
+  function signInWithKakao(opts) {
+    opts = opts || {};
+    return ensureClient().then(function () {
+      return sb.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: {
+          redirectTo: opts.redirectTo || (window.location.origin + window.location.pathname),
+          scopes: 'profile_nickname profile_image'  // account_email 은 비즈 인증 필요
+        }
+      });
+    }).then(function (res) {
+      if (res.error) throw new Error(_translateAuthError(res.error.message));
+      return res.data;  // browser is now redirecting
+    });
+  }
+
+  function logout() {
+    return ensureClient().then(function () {
+      return sb.auth.signOut();
+    }).then(function () {
+      cachedSession = null;
+      cachedProfile = null;
+      try { localStorage.removeItem(USER_CACHE_KEY); } catch (e) {}
+    });
+  }
+
+  function currentUser() { return cachedProfile; }
+  function isLoggedIn()  { return !!cachedProfile; }
+  function currentUserId() { return cachedProfile ? cachedProfile.id : null; }
+
+  function updateUser(patch) {
+    if (!patch || typeof patch !== 'object') return Promise.resolve(cachedProfile);
+    return ensureClient().then(function () {
+      if (!cachedSession) return null;
+      var dbPatch = mapLegacyPatchToDb(patch);
+      if (Object.keys(dbPatch).length === 0) return cachedProfile;
+      return sb.from('profiles').update(dbPatch).eq('id', cachedSession.user.id)
+        .then(function (res) {
+          if (res.error) {
+            console.warn('[DMJAuth §180] updateUser error', res.error);
+            return cachedProfile;
+          }
+          return refreshProfile();
+        });
+    });
+  }
+
+  // legacy stub — Supabase 가 서버측 hash 처리
+  function hashPassword(pw) {
+    return Promise.resolve('');
+  }
+
+  // §179 — Supabase 이메일 기반 비밀번호 재설정
+  // accountExists 는 client 측에서 확인 불가 (보안) → 항상 true 반환, 실제 검증은 서버측
+  function accountExists(email) {
+    return true;
+  }
+
+  function resetPassword(email, newPassword) {
+    return ensureClient().then(function () {
+      if (newPassword) {
+        // 로그인 후 새 비밀번호로 변경
+        if (!cachedSession) {
+          return Promise.reject(new Error('비밀번호 변경은 로그인 상태에서만 가능합니다.'));
+        }
+        return sb.auth.updateUser({ password: String(newPassword) })
+          .then(function (res) {
+            if (res.error) throw new Error(_translateAuthError(res.error.message));
+            return cachedProfile;
+          });
+      }
+      // 이메일 reset 링크 발송
+      return sb.auth.resetPasswordForEmail(String(email || '').trim(), {
+        redirectTo: window.location.origin + '/password-reset.html'
+      }).then(function (res) {
+        if (res.error) throw new Error(_translateAuthError(res.error.message));
+        return null;
+      });
+    });
+  }
+
+  function _translateAuthError(msg) {
+    var m = String(msg || '').toLowerCase();
+    if (m.indexOf('invalid login') >= 0 || m.indexOf('invalid credential') >= 0) return '이메일 또는 비밀번호가 일치하지 않습니다.';
+    if (m.indexOf('user already registered') >= 0) return '이미 등록된 이메일입니다.';
+    if (m.indexOf('email not confirmed') >= 0) return '이메일 인증을 먼저 완료해 주세요.';
+    if (m.indexOf('rate limit') >= 0) return '잠시 후 다시 시도해 주세요. (요청이 너무 많습니다)';
+    if (m.indexOf('weak password') >= 0 || m.indexOf('password') >= 0) return '비밀번호는 8자 이상이어야 합니다.';
+    return msg;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 5) Per-user data API — localStorage 캐시 + Supabase sync
+  // ─────────────────────────────────────────────────────────────────────
+  function userKey(suffix) {
+    var uid = currentUserId();
+    return uid ? (USER_NS_PREFIX + uid + '_' + String(suffix)) : null;
+  }
+
+  // sync read — localStorage 캐시 (background sync 가 신선도 보장)
+  function getUserData(suffix) {
+    try {
+      var k = userKey(suffix);
+      if (k) return localStorage.getItem(k);
+      return localStorage.getItem(ANON_NS_PREFIX + suffix);
+    } catch (e) { return null; }
+  }
+
+  // sync write — localStorage + 백그라운드 Supabase sync
+  function setUserData(suffix, value) {
+    try {
+      var v = String(value);
+      var k = userKey(suffix);
+      if (k) {
+        localStorage.setItem(k, v);
+        _scheduleCloudSync(suffix, v);
+        return true;
+      }
+      localStorage.setItem(ANON_NS_PREFIX + suffix, v);
+      return true;
+    } catch (e) {
+      console.warn('[DMJAuth §180] setUserData failed', suffix, e);
+      return false;
+    }
+  }
+
+  function removeUserData(suffix) {
+    try {
+      var k = userKey(suffix);
+      if (k) {
+        localStorage.removeItem(k);
+        _scheduleCloudRemove(suffix);
+      } else {
+        localStorage.removeItem(ANON_NS_PREFIX + suffix);
+      }
+    } catch (e) {}
+  }
+
+  // 백그라운드 sync — 1초 debounce per suffix
+  var _syncTimers = {};
+  function _scheduleCloudSync(suffix, valueStr) {
+    clearTimeout(_syncTimers[suffix]);
+    _syncTimers[suffix] = setTimeout(function () {
+      _cloudUpsert(suffix, valueStr).catch(function (e) {
+        console.warn('[DMJAuth §180] cloud sync failed', suffix, e);
+      });
+    }, 1000);
+  }
+  function _scheduleCloudRemove(suffix) {
+    clearTimeout(_syncTimers[suffix]);
+    _syncTimers[suffix] = setTimeout(function () {
+      _cloudRemove(suffix).catch(function () {});
+    }, 1000);
+  }
+
+  function _cloudUpsert(suffix, valueStr) {
+    return ensureClient().then(function () {
+      if (!cachedSession) return;
+      if (USER_DATA_SUFFIXES.indexOf(suffix) >= 0) {
+        var data;
+        try { data = JSON.parse(valueStr); } catch (e) { data = valueStr; }
+        return sb.from('user_data').upsert({
+          user_id: cachedSession.user.id,
+          suffix: suffix,
+          data: data
+        }, { onConflict: 'user_id,suffix' });
+      }
+      // cart — special handling (별도 cart_items 테이블, Phase 12+ 에서 individual row 로 확장 예정)
+      // Phase 1: 전체 cart 를 JSON 으로 user_data 처럼 저장 (cart_items 테이블은 향후 활용)
+      if (suffix === 'cart') {
+        var cartData;
+        try { cartData = JSON.parse(valueStr); } catch (e) { cartData = []; }
+        // cart_items 테이블에 sync — 기존 row 모두 삭제 후 재삽입 (단순화)
+        return sb.from('cart_items').delete().eq('user_id', cachedSession.user.id)
+          .then(function () {
+            if (!Array.isArray(cartData) || cartData.length === 0) return;
+            var rows = cartData.map(function (c) {
+              return {
+                user_id: cachedSession.user.id,
+                product_id: String(c.productId || c.product_id || c.sku || 'unknown'),
+                variant_size: c.size || c.variantSize || null,
+                variant_color: c.color || c.variantColor || null,
+                qty: Math.max(1, Math.min(99, Number(c.qty) || 1)),
+                unit_price_krw: Math.max(0, Number(c.priceKRW || c.unitPriceKRW || c.price || 0)),
+                notes: c.notes || null
+              };
+            });
+            return sb.from('cart_items').insert(rows);
+          });
+      }
+      // total_spend — profiles 테이블 컬럼으로 별도 처리
+      if (suffix === 'total_spend') {
+        return sb.from('profiles').update({
+          total_spend_krw: Math.max(0, Number(valueStr) || 0)
+        }).eq('id', cachedSession.user.id).then(function () { return refreshProfile(); });
+      }
+      // 기타 suffix — 무시 (legacy ad-hoc 데이터)
+    });
+  }
+
+  function _cloudRemove(suffix) {
+    return ensureClient().then(function () {
+      if (!cachedSession) return;
+      if (USER_DATA_SUFFIXES.indexOf(suffix) >= 0) {
+        return sb.from('user_data').delete().match({
+          user_id: cachedSession.user.id,
+          suffix: suffix
+        });
+      }
+      if (suffix === 'cart') {
+        return sb.from('cart_items').delete().eq('user_id', cachedSession.user.id);
+      }
+    });
+  }
+
+  // 로그인 시 cloud → localStorage pull (다른 디바이스에서 변경된 데이터 동기화)
+  function pullUserDataFromCloud() {
+    return ensureClient().then(function () {
+      if (!cachedSession) return;
+      var uid = cachedSession.user.id;
+      return Promise.all([
+        sb.from('user_data').select('suffix, data').eq('user_id', uid),
+        sb.from('cart_items').select('*').eq('user_id', uid)
+      ]).then(function (results) {
+        var udRes = results[0];
+        var cartRes = results[1];
+        // user_data 8종
+        if (!udRes.error && Array.isArray(udRes.data)) {
+          udRes.data.forEach(function (row) {
+            var k = USER_NS_PREFIX + uid + '_' + row.suffix;
+            var v = typeof row.data === 'string' ? row.data : JSON.stringify(row.data);
+            try { localStorage.setItem(k, v); } catch (e) {}
+          });
+        }
+        // cart_items → cart suffix 로 reconstruct
+        if (!cartRes.error && Array.isArray(cartRes.data)) {
+          var legacyCart = cartRes.data.map(function (row) {
+            return {
+              productId: row.product_id,
+              size: row.variant_size,
+              color: row.variant_color,
+              qty: row.qty,
+              priceKRW: row.unit_price_krw,
+              unitPriceKRW: row.unit_price_krw,
+              notes: row.notes,
+              addedAt: row.added_at
+            };
+          });
+          var ckey = USER_NS_PREFIX + uid + '_cart';
+          try { localStorage.setItem(ckey, JSON.stringify(legacyCart)); } catch (e) {}
+        }
+      });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 6) §175 누적 구매 자동 승급 — DB trigger 가 처리, 클라이언트는 trigger 발생
+  // ─────────────────────────────────────────────────────────────────────
+  var TIER_THRESHOLD_DANMUJI = 1000000;
+
+  function recomputeTotalSpend() {
+    try {
+      var raw = getUserData('orders');
+      if (!raw) return 0;
+      var orders = JSON.parse(raw);
+      if (!Array.isArray(orders)) return 0;
+      var total = 0;
+      for (var i = 0; i < orders.length; i++) {
+        var o = orders[i];
+        if (!o) continue;
+        total += Number(o.totalKRW) || 0;
+      }
+      // 백엔드 profiles.total_spend_krw 업데이트 → DB trigger profiles_auto_tier 가 등급 자동 변경
+      setUserData('total_spend', String(total));   // _cloudUpsert 가 'total_spend' branch 로 처리
+      return total;
+    } catch (e) {
+      console.warn('[DMJAuth §180 §175] recomputeTotalSpend failed', e);
+      return 0;
+    }
+  }
+
+  function getTotalSpend() {
+    return cachedProfile ? Number(cachedProfile.totalSpend || 0) : 0;
+  }
+
+  function autoUpgradeTier() {
+    // DB trigger profiles_auto_tier 가 자동 처리. recompute → refresh.
+    recomputeTotalSpend();
+    return ensureClient().then(refreshProfile);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 7) Public DMJAuth API — 기존 21개 사용처와 100% 호환
+  // ─────────────────────────────────────────────────────────────────────
+  window.DMJAuth = {
+    // Core auth
+    signup: signup,
+    login: login,
+    signInWithKakao: signInWithKakao,    // §180 신규
+    logout: logout,
+    currentUser: currentUser,
+    isLoggedIn: isLoggedIn,
+    updateUser: updateUser,
+    hashPassword: hashPassword,
+    // §179 password reset
+    accountExists: accountExists,
+    resetPassword: resetPassword,
+    // §169-K per-user namespace
+    currentUserId: currentUserId,
+    userKey: userKey,
+    getUserData: getUserData,
+    setUserData: setUserData,
+    removeUserData: removeUserData,
+    // §175 tier
+    recomputeTotalSpend: recomputeTotalSpend,
+    getTotalSpend: getTotalSpend,
+    autoUpgradeTier: autoUpgradeTier,
+    TIER_THRESHOLD_DANMUJI: TIER_THRESHOLD_DANMUJI,
+    // §169-K legacy stubs — Supabase 환경에서 no-op
+    _readUsers: function () { return {}; },
+    _writeUsers: function () {},
+    _migrateGlobalToUser: function () {},
+    _migrateAnonToUser: function () {},
+    _clearStaleGlobals: function () {},
+    anonOwnedByCurrentSession: function () { return true; },
+    _clearAnonBucket: function () {},
+    // §180 신규 — 고급 접근용
+    _supabase: function () { return sb; },
+    _refreshProfile: refreshProfile,
+    _pullUserDataFromCloud: pullUserDataFromCloud,
+    _ensureClient: ensureClient
+  };
+
+  // ─────────────────────────────────────────────────────────────────────
+  // 8) Init — client 부팅 + OAuth callback 자동 감지
+  // ─────────────────────────────────────────────────────────────────────
+  ensureClient().then(function () {
+    if (cachedSession) {
+      return pullUserDataFromCloud();
+    }
+  }).catch(function (e) {
+    console.warn('[DMJAuth §180] init failed', e);
+  });
+
+})();

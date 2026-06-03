@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A2540">
+<title>여성 라이더를 위한 윙·포일 큐레이션 | 단무지공방</title>
+<meta name="description" content="여성 라이더가 자주 마주치는 5가지 문제와 단무지의 솔루션. 윙·포일·board·웻슈트 women fit 추천. 옥덕필 수석코치가 운영하는 단무지공방.">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
+<link rel="canonical" href="https://dmjgroup.kr/women/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="여성 라이더 큐레이션 | 단무지공방">
+<meta property="og:description" content="여성 라이더 fit·사이즈·progression 3-stack 큐레이션. 네 브랜드 cross-fit.">
+<meta property="og:locale" content="ko_KR">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526">
+
+<style>
+  /* Lightweight demographic-page styling */
+  .demo-hero {
+    position: relative;
+    background:
+      radial-gradient(ellipse at 70% 30%, rgba(255,184,0,0.18), transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(31,143,255,0.32), transparent 55%),
+      linear-gradient(135deg, var(--color-navy) 0%, var(--color-charcoal) 100%);
+    color: #fff;
+    padding: 140px 0 88px;
+    overflow: hidden;
+  }
+  .demo-hero__crumb { font-size: 0.8125rem; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+  .demo-hero__crumb a { color: rgba(255,255,255,0.6); text-decoration: none; }
+  .demo-hero__crumb a:hover { color: #fff; }
+  .demo-hero__crumb .sep { margin: 0 8px; opacity: 0.5; }
+  .demo-hero__eyebrow {
+    display: inline-block; font-family: var(--font-sans-en);
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.18em;
+    color: var(--color-sun); padding: 6px 14px;
+    background: rgba(255,184,0,0.14); border: 1px solid rgba(255,184,0,0.32);
+    border-radius: 999px; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .demo-hero__title {
+    font-size: clamp(2rem, 4vw + 1rem, 3.5rem); font-weight: 800;
+    line-height: 1.1; letter-spacing: -0.03em; margin: 0 0 20px;
+  }
+  .demo-hero__title em { font-style: normal; color: var(--color-sun); }
+  .demo-hero__lead {
+    font-size: 1.125rem; line-height: 1.65;
+    color: rgba(255,255,255,0.78); max-width: 56ch; margin: 0 0 32px;
+  }
+  .demo-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .demo-section { padding: 80px 0; }
+  .demo-section--mist { background: var(--color-mist); }
+  .demo-section__head { max-width: 64ch; margin-bottom: 48px; }
+  .demo-section__eyebrow {
+    font-family: var(--font-sans-en);
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.16em;
+    color: var(--color-sea); text-transform: uppercase; margin-bottom: 12px;
+    display: block;
+  }
+  .demo-section__title {
+    font-size: clamp(1.5rem, 2.5vw + 0.75rem, 2.25rem);
+    font-weight: 800; line-height: 1.18; letter-spacing: -0.025em;
+    color: var(--color-navy); margin: 0 0 16px;
+  }
+  .demo-section__lead {
+    font-size: 1.0625rem; line-height: 1.7;
+    color: var(--color-slate); margin: 0;
+  }
+
+  .problem-list { display: grid; gap: 18px; counter-reset: prob; }
+  .problem-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px 28px;
+    display: grid; grid-template-columns: auto 1fr; gap: 20px;
+    transition: border-color 180ms ease, transform 180ms ease;
+  }
+  .problem-card:hover { border-color: var(--color-sea); transform: translateY(-2px); }
+  .problem-card__num {
+    counter-increment: prob;
+    font-family: var(--font-sans-en); font-weight: 800;
+    font-size: 1.75rem; color: var(--color-sun); line-height: 1;
+    min-width: 48px;
+  }
+  .problem-card__num::before { content: counter(prob, decimal-leading-zero); }
+  .problem-card__title {
+    font-size: 1.1875rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .problem-card__sol {
+    font-size: 0.9375rem; line-height: 1.65;
+    color: var(--color-slate); margin: 0;
+  }
+  .problem-card__sol strong { color: var(--color-navy); }
+
+  .gear-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .gear-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .gear-card__cat {
+    font-family: var(--font-sans-en); font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--color-sea); margin-bottom: 8px; display: block;
+  }
+  .gear-card__name {
+    font-size: 1.0625rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 6px;
+  }
+  .gear-card__why {
+    font-size: 0.875rem; line-height: 1.55;
+    color: var(--color-slate); margin: 0 0 12px;
+  }
+  .gear-card__sizes {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .gear-card__size {
+    background: rgba(31,143,255,0.10); color: var(--color-sea-dark);
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+
+  .path-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 760px) { .path-grid { grid-template-columns: 1fr; } }
+  .path-step {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 24px;
+    position: relative;
+  }
+  .path-step__num {
+    font-family: var(--font-sans-en); font-weight: 900;
+    font-size: 0.875rem; color: var(--color-sun);
+    letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-bottom: 8px;
+  }
+  .path-step__title {
+    font-size: 1.25rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 12px;
+  }
+  .path-step__body {
+    font-size: 0.9375rem; line-height: 1.65;
+    color: var(--color-slate); margin: 0;
+  }
+
+  .demo-cta {
+    background: linear-gradient(135deg, var(--color-navy), var(--color-sea-dark));
+    color: #fff;
+    border-radius: 24px; padding: 56px 48px;
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: center;
+  }
+  @media (max-width: 760px) {
+    .demo-cta { grid-template-columns: 1fr; padding: 40px 28px; }
+  }
+  .demo-cta__title {
+    font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2rem);
+    font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; line-height: 1.18;
+  }
+  .demo-cta__lead {
+    font-size: 1rem; line-height: 1.65;
+    color: rgba(255,255,255,0.78); margin: 0 0 24px;
+  }
+  .demo-cta__big {
+    font-family: var(--font-sans-en); font-size: 5rem; font-weight: 900;
+    color: var(--color-sun); line-height: 1; letter-spacing: -0.05em; text-align: center;
+  }
+  .demo-cta__big-sub {
+    font-size: 0.8125rem; color: rgba(255,255,255,0.6);
+    text-align: center; margin-top: 8px;
+  }
+
+  .placeholder-card {
+    border: 2px dashed rgba(31,143,255,0.32);
+    background: rgba(31,143,255,0.04);
+    border-radius: 14px; padding: 40px 28px; text-align: center;
+  }
+  .placeholder-card__tag {
+    display: inline-block;
+    background: rgba(31,143,255,0.12); color: var(--color-sea-dark);
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .placeholder-card__title {
+    font-size: 1.125rem; font-weight: 700;
+    color: var(--color-navy); margin: 0 0 6px;
+  }
+  .placeholder-card__sub {
+    font-size: 0.9375rem; line-height: 1.55;
+    color: var(--color-slate); margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- Trust bar -->
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>3회 올림픽 출전 코치 운영</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>여성 fit 웻슈트·하네스 정식 수입</span>
+  <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>1:1 컨설팅 무료</span>
+</div></div></div>
+
+<!-- Header -->
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="../index.html" class="nav__logo" aria-label="단무지공방 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
+        <span class="nav__logo-sub">단무지공방</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="../takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="../style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="../style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="../find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="../genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="../genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="../genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="../level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="../level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="../level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="../women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="../junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="../family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 스마트 컨설팅 (CTA) -->
+        <a href="../find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <a href="../login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button type="button" class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button type="button" class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== Mobile Menu ========== -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button type="button" class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="../find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="../login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">라이딩 스타일</li>
+    <li><a href="../style/flat-speed.html">Flat·Speed</a></li>
+    <li><a href="../style/choppy-freeride.html">Choppy·Freeride</a></li>
+    <li><a href="../style/wave.html">Wave</a></li>
+    <li><a href="../style/hybrid.html">Hybrid</a></li>
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="../level/beginner.html">입문</a></li><li><a href="../level/novice.html">초급</a></li>
+    <li><a href="../level/intermediate.html">중급</a></li>
+    <li><a href="../level/advanced.html">상급</a></li>
+    <li><a href="../level/pro.html">선수</a></li>
+    <li hidden><a href="../women/index.html">여성 라이더</a></li>
+    <li hidden><a href="../junior/index.html">유소년·어린이</a></li>
+    <li hidden><a href="../family/index.html">가족 라이딩</a></li>
+  </ul>
+  <div class="mobile-menu__about">
+    <h4>단무지공방 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+
+<!-- Hero -->
+<section class="demo-hero">
+  <div class="container">
+    <nav class="demo-hero__crumb"><a href="../index.html">단무지공방</a><span class="sep">/</span><a href="../index.html#consultation">컨설팅</a><span class="sep">/</span><span style="color:#fff">여성 라이더</span></nav>
+    <span class="demo-hero__eyebrow">For Women Riders</span>
+    <h1 class="demo-hero__title">여성 라이더를<br><em>응원합니다.</em></h1>
+    <p class="demo-hero__lead">전문 퍼포먼스 어드바이저는 한국 여성 윙·포일 라이더 커뮤니티가 더 안전하게, 더 오래, 더 즐겁게 성장하도록 윙·포일·board·웻슈트 큐레이션을 women fit 관점에서 다시 짭니다.</p>
+    <div class="demo-hero__ctas">
+      <a href="../find-my-gear.html?demographic=adult_female" class="btn btn--accent btn--lg">1분 만에 내 셋업 찾기</a>
+      <a href="../consult.html" class="btn btn--ghost-light btn--lg">1:1 구매 상담하기 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Section 1: Problems -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">자주 마주치는 5가지</span>
+      <h2 class="demo-section__title">여성 라이더가 자주 마주치는 문제</h2>
+      <p class="demo-section__lead">단무지공방이 1:1 컨설팅과 한국 여성 라이더 커뮤니티 피드백을 통해 정리한 가장 흔한 stuck point. 모든 문제는 장비·fit·progression의 조합으로 풀립니다.</p>
+    </div>
+    <ol class="problem-list" style="list-style:none;padding:0;margin:0">
+      <li class="problem-card">
+        <span class="problem-card__num"></span>
+        <div>
+          <h3 class="problem-card__title">파워가 너무 강해 컨트롤이 안 된다</h3>
+          <p class="problem-card__sol">한국 여성 라이더의 평균 체중·근력 기준으로 보면 표준 5.0m² wing은 종종 over-power. <strong>해결</strong> — 1단계 작은 wing으로 내려가는 것이 progression을 가속합니다. PPC M2 4.0/4.5, Takoon V4 4.0이 light wind에서도 제어 가능한 forgiveness를 제공합니다.</p>
+        </div>
+      </li>
+      <li class="problem-card">
+        <span class="problem-card__num"></span>
+        <div>
+          <h3 class="problem-card__title">보드 부피·길이가 본인 체중에 맞지 않다</h3>
+          <p class="problem-card__sol">남성 표준 보드(75-90L)는 50-60kg 라이더에게는 over-volume·over-length이라 turning이 둔합니다. <strong>해결</strong> — 작은 사이즈 (Takoon Cruise 4'8" / Glide Midlength 5'2") + 본인 체중 기준 +5L 정도로 buffer만 가져가세요. 안정성·반응성 동시에 잡힙니다.</p>
+        </div>
+      </li>
+      <li class="problem-card">
+        <span class="problem-card__num"></span>
+        <div>
+          <h3 class="problem-card__title">하네스·웻슈트 fit을 한국에서 구하기 어렵다</h3>
+          <p class="problem-card__sol">대부분 매장이 남성 unisex 위주. women cut 하네스·웻슈트 정식 수입 채널이 부족합니다. <strong>해결</strong> — Forward WIP는 women cut 하네스·웻슈트 라인업을 별도 운영하며, 단무지공방은 이 라인을 정식 수입 보유합니다. XS/S 사이즈 재고 상시 확인 가능.</p>
+        </div>
+      </li>
+      <li class="problem-card">
+        <span class="problem-card__num"></span>
+        <div>
+          <h3 class="problem-card__title">시작할 때 물·바람에 대한 두려움이 진입을 막는다</h3>
+          <p class="problem-card__sol">신체적 두려움은 정당하며 무시할 수 없습니다. <strong>해결</strong> — impact vest (WIP Forward Pro) 착용으로 부력·충격 보호를 동시에. 트레이너 포일·짧은 마스트(72cm)로 첫 fall들을 부드럽게. 개인의 페이스 존중이 progression의 시작입니다.</p>
+        </div>
+      </li>
+      <li class="problem-card">
+        <span class="problem-card__num"></span>
+        <div>
+          <h3 class="problem-card__title">남성 표준 progression 페이스에 본인을 맞추려다 정체된다</h3>
+          <p class="problem-card__sol">"남자친구는 3개월 만에 jibe 했는데 나는 왜..." — 이건 흔한 함정입니다. <strong>해결</strong> — 라이더 본인의 체력·시즌·spot에 맞는 페이스가 정답. 단무지 1:1 컨설팅은 비교가 아니라 본인 progression 로드맵을 함께 그리는 데 집중합니다.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- Section 2: Solutions / Gear -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Curated Gear</span>
+      <h2 class="demo-section__title">여성 라이더 친화 네 브랜드 셋업</h2>
+      <p class="demo-section__lead">Levitaz · PPC · Takoon · WIP — 네 가지 브랜드 라인업에서 women fit·smaller size·forgiveness 우선으로 전문 퍼포먼스 어드바이저가 추려낸 구성. 정확한 사이즈는 본인 체중·spot·레벨에 따라 1:1 컨설팅에서 확정합니다.</p>
+    </div>
+    <div class="gear-grid">
+      <article class="gear-card">
+        <span class="gear-card__cat">Wing</span>
+        <h3 class="gear-card__name">PPC M2 (forgiveness)</h3>
+        <p class="gear-card__why">입문·중급 우선. 학습 곡선 완화. 50-60kg 라이더는 3.5/4.0이 만능</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">3.5 m²</span>
+          <span class="gear-card__size">4.0 m²</span>
+          <span class="gear-card__size">4.5 m²</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Wing · 가성비</span>
+        <h3 class="gear-card__name">Takoon V4</h3>
+        <p class="gear-card__why">2026 V4 — 65 g/m² ripstop. 가벼움·forgiveness 동시. 한국 light wind 최적</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">3.5 m²</span>
+          <span class="gear-card__size">4.0 m²</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Foil · Front Wing</span>
+        <h3 class="gear-card__name">Levitaz Free Series mid</h3>
+        <p class="gear-card__why">FW 790 (입문)·680 (중급) — 큰 lift·낮은 stall speed. 가벼운 라이더에게 최적</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">FW 790</span>
+          <span class="gear-card__size">FW 680</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Board</span>
+        <h3 class="gear-card__name">Takoon Cruise / Glide Midlength</h3>
+        <p class="gear-card__why">작은 사이즈 (4'8" Cruise / 5'2" Glide ML). 50-65kg 체중 + 5L buffer 구간 적합</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">4'8" / 60L</span>
+          <span class="gear-card__size">5'2" / 75L</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Wetsuit · Women</span>
+        <h3 class="gear-card__name">Forward WIP Women Wetsuit</h3>
+        <p class="gear-card__why">3/2mm·4/3mm women cut. 한국 spring·fall·winter 시즌 cover</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">XS</span>
+          <span class="gear-card__size">S</span>
+          <span class="gear-card__size">M</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Harness · Women</span>
+        <h3 class="gear-card__name">Forward WIP Women Harness</h3>
+        <p class="gear-card__why">Women cut. hip·waist 비율 별도 패턴. 장시간 라이딩 부담 최소화</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">XS</span>
+          <span class="gear-card__size">S</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Safety</span>
+        <h3 class="gear-card__name">WIP Forward Impact Vest</h3>
+        <p class="gear-card__why">XS/S 사이즈 정식 수입. 부력 + 충격 보호. 시작 시즌 필수</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">XS</span>
+          <span class="gear-card__size">S</span>
+        </div>
+      </article>
+      <article class="gear-card">
+        <span class="gear-card__cat">Mast · Foil</span>
+        <h3 class="gear-card__name">Levitaz Mast 76 / 84</h3>
+        <p class="gear-card__why">짧은 mast (76cm) — 입문기 안전·반응 우선. 84cm는 중급 진입 시</p>
+        <div class="gear-card__sizes">
+          <span class="gear-card__size">76 cm</span>
+          <span class="gear-card__size">84 cm</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Section 3: Path -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">3-Stage Path</span>
+      <h2 class="demo-section__title">여성 라이더 progression 로드맵</h2>
+      <p class="demo-section__lead">개인의 체력·spot·시즌에 따라 페이스는 다릅니다. 다만 일반 가이드 — 단무지 1:1 컨설팅에서 본인 맞춤 plan으로 다시 짭니다.</p>
+    </div>
+    <div class="path-grid">
+      <div class="path-step">
+        <span class="path-step__num">Stage 1 · 입문</span>
+        <h3 class="path-step__title">첫 시즌 · 안전이 모든 것</h3>
+        <p class="path-step__body">PPC M2 4.0 + Takoon Cruise 4'8" + Levitaz FW 790 + Mast 76 + WIP impact vest·웻슈트. 강습 동반 첫 5-10세션은 싯팅 스타트·first flight 집중. 큰 wing 무리하지 마세요</p>
+      </div>
+      <div class="path-step">
+        <span class="path-step__num">Stage 2 · 중급</span>
+        <h3 class="path-step__title">Jibe·tack · 라이딩 표준화</h3>
+        <p class="path-step__body">PPC M2 → M1-X 진화 또는 Takoon V4 4.0/4.5 추가. Levitaz FW 680 + Mast 84. Glide Midlength 5'2"로 보드 down-size. women harness 도입으로 장시간 라이딩 부담 완화</p>
+      </div>
+      <div class="path-step">
+        <span class="path-step__num">Stage 3 · 상급</span>
+        <h3 class="path-step__title">전문 분야 · wave·downwind 진입</h3>
+        <p class="path-step__body">PPC M1 정밀 wing + Levitaz FW 540 (강풍) / FW 900 (다운윈드). Mast 96 long. wave 보드 (Takoon Prosurf) 또는 downwind 보드 (Ultra Glide) 전문 분야 추가. 본격적 종목 통합</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 4: 1:1 CTA -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-cta">
+      <div>
+        <span style="display:inline-block;background:rgba(255,184,0,0.18);color:var(--color-sun);font-size:0.6875rem;font-weight:700;padding:6px 14px;border-radius:999px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px">★ 추천 · 여성 라이더 1:1 컨설팅</span>
+        <h3 class="demo-cta__title">사이즈·fit·progression — 함께 설계합니다</h3>
+        <p class="demo-cta__lead">본인 체중·신장·라이딩 spot·이전 워터스포츠 경험을 카톡으로 알려주시면, 전문 퍼포먼스 어드바이저가 women fit 관점에서 셋업·하네스 사이즈·웻슈트 두께를 1대1로 추천합니다. 무료 컨설팅, 가입 불필요.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="../consult.html" class="btn btn--accent btn--lg">1:1 구매 상담하기</a>
+          <a href="../find-my-gear.html?demographic=adult_female" class="btn btn--ghost-light btn--lg">먼저 1분 퀴즈 →</a>
+        </div>
+      </div>
+      <div>
+        <div class="demo-cta__big">1:1</div>
+        <div class="demo-cta__big-sub">여성 라이더 전담 컨설팅</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 5: Interview Placeholder (Phase 6) -->
+<section class="demo-section demo-section--mist">
+  <div class="container">
+    <div class="demo-section__head">
+      <span class="demo-section__eyebrow">Coming Soon</span>
+      <h2 class="demo-section__title">한국 여성 라이더 인터뷰</h2>
+      <p class="demo-section__lead">한국에서 활동하는 여성 라이더의 실제 progression·장비 선택·challenge를 담은 시리즈를 준비 중입니다. 인터뷰 참여 의향이 있으시면 카톡으로 연락 주세요.</p>
+    </div>
+    <div class="grid-3cols"><!-- DO_NOT_REVERT §163: 3 placeholder 카드 (인터뷰) -->
+      <div class="placeholder-card">
+        <span class="placeholder-card__tag">Phase 6 · 예정</span>
+        <h4 class="placeholder-card__title">입문 → 중급 라이더 인터뷰</h4>
+        <p class="placeholder-card__sub">첫 시즌 challenge·장비 선택·페이스 잡기</p>
+      </div>
+      <div class="placeholder-card">
+        <span class="placeholder-card__tag">Phase 6 · 예정</span>
+        <h4 class="placeholder-card__title">상급 라이더 인터뷰</h4>
+        <p class="placeholder-card__sub">전문 분야 진입·wave·downwind·종목 통합</p>
+      </div>
+      <div class="placeholder-card">
+        <span class="placeholder-card__tag">Phase 6 · 예정</span>
+        <h4 class="placeholder-card__title">Mom Rider 인터뷰</h4>
+        <p class="placeholder-card__sub">육아·라이딩 양립·자녀와 함께하는 가족 라이딩</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>도움말</h4>
+        <ul>
+          <li><a href="../membership.html">회원 등급 안내</a></li>
+          <li><a href="../glossary.html">윙포일 용어 사전</a></li>
+          <li><a href="../calculator.html">Lift Calculator</a></li>
+          <li><a href="../find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>컨설팅</h4>
+        <ul>
+          <li><a href="../level/beginner.html">입문 가이드</a></li><li><a href="../level/novice.html">초급 가이드</a></li>
+          <li><a href="../level/intermediate.html">중급 가이드</a></li>
+          <li><a href="../level/advanced.html">상급 가이드</a></li>
+          <li><a href="../level/pro.html">선수 가이드</a></li>
+          <li><a href="../premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Brand</h4>
+        <ul>
+          <li><a href="../levitaz.html">Levitaz</a></li>
+          <li><a href="../ppc.html">PPC</a></li>
+          <li><a href="../takoon.html">Takoon</a></li>
+          <li><a href="../wip.html">Forward WIP</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>정책·안내</h4>
+        <ul>
+          <li><a href="../products/wip/size-chart.html">WIP 사이즈 차트</a></li>
+          <li><a href="../policy/shipping.html">배송 정책</a></li>
+          <li><a href="../policy/refund.html">환불 정책</a></li>
+          <li><a href="../policy/privacy.html">개인정보처리방침</a></li>
+          <li><a href="../policy/terms.html">이용약관</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
+      <div class="footer-bottom__legal">
+        <a href="../policy/privacy.html">개인정보처리방침</a>
+        <a href="../policy/terms.html">이용약관</a>
+        <a href="../policy/refund.html">환불정책</a>
+        <a href="../policy/shipping.html">배송정책</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="kakao-fab" aria-label="카톡 상담">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+</a>
+
+<script src="../assets/js/main.js" defer></script>
+  <script src="../assets/js/nav-auth.js" defer></script>
+  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
+  <link rel="stylesheet" href="../assets/css/agent-deny.css">
+  <script src="../assets/js/agent-deny.js" defer></script>
+</body>
+</html>

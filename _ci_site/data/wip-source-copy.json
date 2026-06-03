@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "source": "forward-wip.com 공식 페이지",
+    "fetched": "2026-05-10",
+    "purpose": "본사 영문 카피 source-of-truth. 사이트 표시는 한국어 자연 의역",
+    "license": "단무지공방 = Forward WIP 한국 정식 수입 partner. brand 자산 사용 권한 보유",
+    "note": "Forward WIP 메인 도메인은 forward-wip.com (with hyphen). 본사 brand 페이지는 follow-able about 페이지 X (404) — brand voice는 product 페이지·hero에서 추출"
+  },
+  "brand": {
+    "url": "https://www.forward-wip.com/",
+    "tagline_top_categories": "SURF · BOARDSPORTS · SAILING · RESCUE",
+    "category_taglines": {
+      "surf": "Over and under the Waves",
+      "boardsports": "Wing - Para Wing - Windsurf - Kite - DownWind",
+      "sailing": "SailGP & Olympics to Fast boats & Offshore",
+      "rescue": "Behind every Great Adventure"
+    },
+    "wip_team_status": "Official Partner",
+    "category_offerings": "Protection (Helmets, Vests, Eye Protection, Comm), Neoprene (Wetsuits, Tech tops, Tech pants, Gloves, Booties), Accessories (Harnesses, Leash, R4R, Bags, Spare parts), Apparel (Jackets, Caps, Sun Glasses, T-shirts, Shorts), Custom (Surf, Downwind, Wing, Kite, Wind)"
+  },
+  "products": {
+    "impact_vest_50n": {
+      "url": "https://www.forward-wip.com/produit/impact-vest-50n/",
+      "model_id": "GI10000001",
+      "sizes": "M / L / XL / XXL",
+      "price_eur": 159.99,
+      "tagline": "Ultimate High Speed and Big Shocks Protection",
+      "tenure_claim": "10 Years of improvements for the world's reference, used by the best teams and pro riders.",
+      "features": [
+        "High-density thermoformed foam for Shock absorption",
+        "Extra Protection – Side pads shield the ribcage",
+        "Freedom to Move – Slim profile, wide openings, harness-ready",
+        "5 smart pockets for gear and tools: 1 large zipped, 1 back pocket, 2 shoulder pads",
+        "Knife and safety cutter pockets",
+        "Built Tough – Tested with professional protective equipment",
+        "Personal Touch – Rear Velcro panel for name or sponsor",
+        "Perfect Fit – Adjustable shoulder straps",
+        "Certified Safety – 50N buoyancy, EN ISO 12402-5, impact tested",
+        "5 sizes"
+      ]
+    },
+    "x_over_helmet": {
+      "url": "https://www.forward-wip.com/produit/x-over-helmet/",
+      "model_id": "ACCAWIPXOV",
+      "sizes": "M-L (55-60cm)",
+      "price_eur": 139.99,
+      "tagline": "High Speed Water Helmet to Break Records",
+      "endorsement_claim": "The choice of the America's Cup and Sail GP sailors but also of the fastest riders on the water in Kitefoil, Wing Foil and Windsurf.",
+      "features": [
+        "In Mold Construction – lightweight and highly absorbent in case of impact",
+        "Perfect Fit – Internal thermoformed foam pads",
+        "Aerodynamic Protection – Rounded shape cuts air, shields the back of the head",
+        "Micrometric fit system – adjustment system for optimal fit",
+        "Magnetic fastening buckle for quick release",
+        "Visor Ready – Designed for easy visor integration",
+        "Wiplash Pad included for perfect adjustment & extra protection",
+        "Delivered with biodegradable protective bag (corn starch)",
+        "Optional Safety Stickers",
+        "Certified EN1385 & EN1077B (also certified for snow: ski, snowboard)",
+        "4 colors: Galaxy Purple, White/Orange, Yellow High-Viz, Stealth Black"
+      ],
+      "eco_cork_variant": "Stealth Black only — 20% cork inner liner (biosourcing in place of EPS), unpainted polycarbonate outer shell, recycled polyester + biosource cotton wrap, soy-ink cardboard packaging, corn-starch biodegradable bag",
+      "hero_image": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.X-OVER-HIGH-VIZ.jpg",
+      "multi_view_images": [
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/1.X-OVER-HIGH-VIZ.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/1.XOVER-GALAXY.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2024/08/1.-X-OVER-HELMET-STEALTH.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-X-OVER-HELMET-SHINY-WHITE-1.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/4.-X-OVER-HELMET-SHINY-WHITE-BBT.jpg"
+      ]
+    },
+    "low_cuff_booties_2_0": {
+      "url": "https://www.forward-wip.com/produit/low-cuff-booties-2-0/",
+      "model_id": "WIPBOH2000",
+      "sizes": "40-41 / 42-43 / 44-45 / 46-47",
+      "price_eur": 59.99,
+      "tagline": "Superlight and flexible — gives you great feel and agility without feeling wet",
+      "features": [
+        "Superlight and flexible — great feel and agility, no wet sensation",
+        "Extreme high grip rubber sole — maintains grip even when wet",
+        "Velcro strap closure — perfect adjustment and comfort",
+        "Low cuff design — ankle freedom, no board-control interference"
+      ],
+      "endorsement_examples": "Used by SailGP teams, Olympic 49erFX (Argentina, France), Class A windsurf (Stevie Brewin), Nacra 17",
+      "hero_image": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-LOW-CUFF-BOOTIES-2.0.jpg",
+      "multi_view_images": [
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-LOW-CUFF-BOOTIES-2.0.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-LOW-CUFF-BOOTIES-2.0.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/3.-LOW-CUFF-BOOTIES-2.0.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/4.-LOW-CUFF-BOOTIES-2.0.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/5.-LOW-CUFF-BOOTIES-2.0.jpg"
+      ]
+    },
+    "pro_harness_with_lumbar_2_0": {
+      "url": "https://www.forward-wip.com/produit/pro-harness-with-lumbar-2-0/",
+      "model_id": "HATR1PRO20",
+      "sizes": "S-M / L-XL",
+      "price_eur": 189.99,
+      "tagline": "Innovative harness designed with the French sailing team",
+      "features": [
+        "Lumbar belt removable and height adjustable",
+        "Integrated sleek harness design — keeps you agile, velcro adjustment",
+        "Large trapeze bar — prevents hip crushing",
+        "Padded crotch support with 1 leg strap — neoprene fabric for comfort",
+        "Reinforced seat — super durable and strong seat area",
+        "Innovation: shoulder strap adjustment from hook bar — accessible while sailing"
+      ],
+      "note": "현재 사이트 page X. 추후 sailing 카테고리 추가 시 별도 페이지로 분리 가능. source-copy 보존.",
+      "hero_image": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-PRO-HARNESS-WITH-LUMBAR-2.0.jpg",
+      "multi_view_images": [
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-PRO-HARNESS-WITH-LUMBAR-2.0.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-PRO-HARNESS-WITH-LUMBAR-2.0.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/3.-PRO-HARNESS-WITH-LUMBAR-2.0.jpg",
+        "https://www.forward-wip.com/wp-content/uploads/2021/02/4.-PRO-HARNESS-WITH-LUMBAR-2.0.jpg"
+      ]
+    }
+  }
+}
