@@ -1,0 +1,112 @@
+================================================================
+§194 sprint verify — node v22.22.0 · 2026-06-04T04:46:14.397Z
+lift-calculator.js md5 = 3f82b1da021dba2bd9e8ea5e4d96ef23
+================================================================
+
+### REG-0. Built-in tests ----------------------------------------
+  PASS  runSelfTest 62/62 — passed=62 failed=
+  PASS  runDannyMatrixTest PASS — max|Δ|=0.131
+
+### §4-1. Takeoff Vmin / Vtarget (kt) ----------------------------
+포일       체중     Vmin/Vtarg     feasible@10/15/20
+  FW900   60kg   8.1 / 8.5      T/T/T OK
+  FW900   75kg   9.0 / 9.4      T/T/T OK
+  FW900   90kg   9.7 / 10.2     T/T/T OK
+  FW790   60kg   8.7 / 9.1      T/T/T OK
+  FW790   75kg   9.6 / 10.0     T/T/T OK
+  FW790   90kg   10.4 / 10.9    T/T/T OK
+  FW680   60kg   9.4 / 9.8      T/T/T OK
+  FW680   75kg   10.3 / 10.8    T/T/T OK
+  FW680   90kg   11.2 / 11.7    T/T/T OK
+  PASS  §4-1 Vmin/Vtarget 회귀 0 — 0건 보고서 §4-1 표와 불일치
+  PASS  §4-1 CL step 경계 (8.0→8.01) — getCL(8.0)=1 getCL(8.01)=0.85
+
+### §4-2. 풍상 V_boat/VMG 매트릭스 -------------------------------
+skill   8kt         10kt        12kt        15kt        18kt        20kt        25kt        
+  입문    X           X           X           X           6.8/2.9     12.0/5.1    13.8/5.8    
+  초급    X           X           X           13.6/6.8    19.9/9.9    21.4/10.7   24.5/12.2   
+  중급    X           X           13.9/8.0    21.9/12.6   26.0/14.9   27.8/15.9   31.5/18.1   
+  상급    X           12.0/7.7    18.2/11.7   25.8/16.6   29.9/19.2   31.9/20.5   35.0/22.5   
+  선수    X           12.0/8.5    17.8/12.6   25.0/17.7   29.1/20.6   31.0/21.9   35.0/24.7   
+  PASS  §4-2 풍상 매트릭스 회귀 0 — 0개 셀이 보고서 §4-2 와 불일치 ('*' 표기)
+
+### §4-3. V_b cap binding scan + §191 capped flag ----------------
+  wind 24kt: V_boat=35.0 kt · capped flag=true ← AT CAP
+  wind 25kt: V_boat=35.0 kt · capped flag=true ← AT CAP
+  wind 26kt: V_boat=35.0 kt · capped flag=true ← AT CAP
+  wind 27kt: V_boat=35.0 kt · capped flag=true ← AT CAP
+  wind 28kt: V_boat=35.0 kt · capped flag=true ← AT CAP
+  wind 29kt: V_boat=35.0 kt · capped flag=true ← AT CAP
+  wind 30kt: V_boat=35.0 kt · capped flag=true ← AT CAP
+  PASS  §4-3 wind 24~30kt cap binding (보고서 재현) — cap_count=7/7
+  PASS  §4-3 capped flag 정확 (§191 — I-3 fix) — capped=7 vs at_cap=7
+  PASS  §4-3 upwindCurve.any_capped (25kt 상급) — any_capped=true
+
+### §4-4. §181-C anchor (11kt 80+5kg 상급-선수 7m² AR13.7) -------
+  PASS  §181-C anchor V_boat ≈ 18.1 — V_boat=18.1 kt (보고서 = 18.1)
+
+### §4-5. heel 결합 인자 (A/7.5)^-1.2 ----------------------------
+  2.5m² → ×3.74 (report=×3.74)
+  3.0m² → ×3.00 (report=×3.00)
+  4.0m² → ×2.13 (report=×2.13)
+  5.0m² → ×1.63 (report=×1.63)
+  6.0m² → ×1.31 (report=×1.31)
+  7.5m² → ×1.00 (report=×1.00)
+  9.0m² → ×0.80 (report=×0.80)
+  PASS  §4-5 heel 결합 인자 회귀 0 (I-5 lock — 값 불변)
+
+### §4-6. 추천 윙 매트릭스 (recommendMinFeasibleWingSize) --------
+포일       체중     10kt           15kt           20kt          
+  FW900   60kg   5.5 (c)        4.0 (c)        3.0 (c)       
+  FW900   75kg   6.5 (c)        5.0 (c)        3.5 (c)       
+  FW900   90kg   EXTREME (c)    6.0 (c)        4.0 (c)       
+  FW790   60kg   5.5 (c)        4.0 (c)        3.0 (c)       
+  FW790   75kg   6.5 (c)        5.0 (c)        3.5 (c)       
+  FW790   90kg   EXTREME (c)    6.0 (c)        4.0 (c)       
+  FW680   60kg   5.5 (c)        4.0 (c)        3.0 (c)       
+  FW680   75kg   6.5 (c)        5.0 (c)        3.5 (c)       
+  FW680   90kg   EXTREME (c)    6.0 (c)        4.0 (c)       
+  PASS  §4-6 추천 매트릭스 27/27 회귀 0 — 0건 보고서 §4-6 와 불일치 (* 표기)
+  PASS  §4-6 27/27 binding=comfort 재현 — comfort=27/27
+
+### I-1 fix. 90kg·FW900·10kt extreme 분기 정정 -------------------
+  입력: rider=90kg gear=10kg foil=FW900(AR13.3) wind=10kt
+  결과: {
+  "recommended_size_m2": null,
+  "extreme": true,
+  "binding": "comfort",
+  "extreme_reason": "comfort_floor",
+  "min_wind_kt": 10.3,
+  "min_foil_area_cm2": null,
+  "precise_comfort_floor_m2": 7.5,
+  "precise_takeoff_min_m2": 2.5
+}
+  PASS  I-1 extreme=true 유지
+  PASS  I-1 binding=comfort 검출
+  PASS  I-1 extreme_reason 신규 필드 = comfort_floor
+  PASS  I-1 min_foil 안내 제거 (null) — min_foil=null cm² — null 이어야 함 (포일 안내는 takeoff binding 만)
+  PASS  I-1 min_wind 안내 정정 (현재 풍속 10kt 이상) — min_wind=10.3 kt — 보고서 버그 = 4.9kt (역방향), 수정 후 ≥ 10kt 기대 (floor 충족 풍속)
+  PASS  I-1 min_wind 합리적 범위 (10.0~12.0) — min_wind=10.3 kt
+
+### I-1 회귀: takeoff binding extreme 케이스 (기존 동작 유지) ---
+  takeoff binding extreme 입력 (50kg·FW600·5kt): OK binding=takeoff extreme_reason=undefined min_foil_area_cm2=undefined
+
+### I-2 binding 사유 (모델 무변경 — UI 캡션은 calculator.html) ----
+  70kg·FW600·15kt: rec=4.5m² binding=comfort (comfort_floor 4.5m² / takeoff 2.5m²)
+  PASS  I-2 binding 필드 산출
+  PASS  I-2 precise_comfort_floor_m2 산출
+  PASS  I-2 precise_takeoff_min_m2 산출
+
+### I-4. §179 dead code 제거 검증 -------------------------------
+  PASS  I-4 export 에 §179 dead code 없음 — L 객체 키: WING_LINEUP_M2, WING_OPT, ldWing, WING_CD0_PARASITIC, WING_AREA_REF_M2, WING_HEEL_COUPLE_EXP, LDWING_K, CL_WING_MAX
+  PASS  I-4 소스 grep — 선언부 제거 확인
+  PASS  I-4 WING_CD0_PARASITIC (§181 lock) 유지
+  PASS  I-4 LDWING_K (§181-C lock) 유지
+
+### FINAL. 전체 fix 적용 후 내장 테스트 재실행 ------------------
+  PASS  runSelfTest still 62/62 — passed=62 failed=
+  PASS  runDannyMatrixTest still PASS — max|Δ|=0.131
+
+================================================================
+ALL CHECKS PASSED
+================================================================

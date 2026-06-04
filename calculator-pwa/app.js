@@ -129,8 +129,11 @@
       rWing.textContent = recMin.recommended_size_m2.toFixed(1);
       var marginTxt = (recMin.margin_kt != null && recMin.margin_kt >= 0)
         ? '여유 +' + recMin.margin_kt.toFixed(1) + 'kt' : '';
+      // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — P2: 추천 근거(binding) 캡션 명시.
+      // I-2 (b)안 — 표기만, 물리 계산 복권 모델 변경 없음. 텍스트 캡션 수준 (§165 v7 유념).
       var bindLabel = recMin.binding === 'comfort'
-        ? '컨트롤 floor 결정' : '부상 한계 결정';
+        ? '기준: 컨트롤 안정 (체중·풍속 업계 차트)'
+        : '기준: 이륙 물리 (양력 방정식)';
       rWingDetail.innerHTML = bindLabel + (marginTxt ? ' · ' + marginTxt : '')
         + ' · 부상 min ' + recMin.precise_takeoff_min_m2.toFixed(2)
         + ' / floor ' + recMin.precise_comfort_floor_m2.toFixed(2) + ' m²';
@@ -443,7 +446,9 @@
         + 'VMG <b>' + res.base.V_vmg_kt.toFixed(1) + ' kt</b> · '
         + 'tack ' + res.base.tack_angle_deg + '°'
         + (res.base.depowered ? ' · <span style="color:var(--warn-fg)">⚠ 라이더 한계</span>' : '')
-        + (res.base.feasible ? '' : ' · <span style="color:var(--err-fg)">⚠ 풍상 X</span>');
+        + (res.base.feasible ? '' : ' · <span style="color:var(--err-fg)">⚠ 풍상 X</span>')
+        // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — I-3: V_b cap 도달 표기 (§181-C lock 값 변경 금지)
+        + (res.base.capped ? ' · <span style="color:var(--warn-fg)">△ 모델 상한(35kt) 도달 — 참고용</span>' : '');
     }
 
     list.innerHTML = '';
@@ -637,6 +642,11 @@
       } else {
         txt = '이 조합에서는 <b>윙을 키울수록 속도가 오릅니다</b> — 라이더·바람 조건상 사용 가능한 범위 안에서는 과출력 정점이 나타나지 않습니다. '
             + '실제 사이즈는 컨트롤·이착수 편의를 고려해 추천 범위에서 고르세요.';
+      }
+      // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — I-3: V_b cap 도달 구간 표기.
+      // cap 값(35kt) 자체는 §181-C lock — 변경 금지, 표기만.
+      if (curve.any_capped) {
+        txt += '<br><span style="color:#8a5a00">△ 일부 강풍 구간은 모델 상한(35kt)에 도달 — 참고용</span>';
       }
       captionEl.innerHTML = txt;
     }

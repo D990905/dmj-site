@@ -554,17 +554,38 @@
     };
 
     if (extreme) {
-      var boostMax = windBoostKt(maxWing);
-      var minWindRaw = vtarget_kt_precise - boostMax;
-      result.min_wind_kt = Math.ceil(minWindRaw * 10) / 10;
-      var v_target_max_kt = windKt + boostMax;
-      if (v_target_max_kt > 0) {
-        var v_min_max_kt = v_target_max_kt / (pf * sf);
-        var v_min_max_ms = v_min_max_kt * CONST.KT_TO_MS;
-        var A_foil_min_m2 = (2 * mTotal * CONST.G) / (rho * cl * v_min_max_ms * v_min_max_ms);
-        result.min_foil_area_cm2 = Math.ceil(A_foil_min_m2 * 10000 / 10) * 10;
+      // §190 (티모 2026-06-04 · I-1 fix, 옥대표님 승인) — binding 원인별 역산 분기.
+      // 기존: comfort-floor binding 인데도 takeoff 물리만 역산 → 현재 풍속보다 낮은
+      // min_wind / 현재 포일보다 작은 min_foil 역방향 안내 (90kg@10kt 실측 버그).
+      if (binding === 'comfort') {
+        // floor(V) ≤ maxWing 이 되는 최소 풍속을 §178/§178b floor 식에서 역산:
+        //   (9.0 − 0.3·V) · (mTotal/80) · pumpScale ≤ maxWing
+        //   → V ≥ (9.0 − maxWing·80/(mTotal·pumpScale)) / 0.3
+        var pumpScale = (pumping === 'hard') ? 0.85
+                      : (pumping === 'easy') ? 1.15
+                      : 1.00;
+        var vFloor = (9.0 - (maxWing * 80) / (mTotal * pumpScale)) / 0.3;
+        // takeoff 측 최소 풍속과 둘 다 충족해야 하므로 max 취함
+        var boostMaxC = windBoostKt(maxWing);
+        var minWindTakeoff = vtarget_kt_precise - boostMaxC;
+        result.min_wind_kt = Math.ceil(Math.max(vFloor, minWindTakeoff) * 10) / 10;
+        result.extreme_reason = 'comfort_floor';   // UI 문구 분기용
+        result.min_foil_area_cm2 = null;           // 포일 안내는 takeoff binding 시에만 유효
       } else {
-        result.min_foil_area_cm2 = null;
+        // takeoff binding — 기존 역산 유지
+        var boostMax = windBoostKt(maxWing);
+        var minWindRaw = vtarget_kt_precise - boostMax;
+        result.min_wind_kt = Math.ceil(minWindRaw * 10) / 10;
+        result.extreme_reason = 'takeoff';
+        var v_target_max_kt = windKt + boostMax;
+        if (v_target_max_kt > 0) {
+          var v_min_max_kt = v_target_max_kt / (pf * sf);
+          var v_min_max_ms = v_min_max_kt * CONST.KT_TO_MS;
+          var A_foil_min_m2 = (2 * mTotal * CONST.G) / (rho * cl * v_min_max_ms * v_min_max_ms);
+          result.min_foil_area_cm2 = Math.ceil(A_foil_min_m2 * 10000 / 10) * 10;
+        } else {
+          result.min_foil_area_cm2 = null;
+        }
       }
     }
 
@@ -810,33 +831,41 @@
 
   /* §181-C — 풍상 보드 속도(V_b) sweep 상한. 기존 §176-C 21kt cap 은 과소예측
      모델 시절 calibration → 윙 L/D 재보정 후 15·20kt 에서 binding 되어 단조 증가
-     파괴 + Danny anchor 모순 → 35kt 로 상향. 35 = 8-25kt 실사용역에서 binding
-     되지 않는 runaway sanity guard. */
+     파괴 + Danny anchor 모순 → 35kt 로 상향. **DO_NOT_REVERT §181-C — 값 35 유지.**
+     §192 (티모 2026-06-04 · I-3 단기, 옥대표님 승인) — 주석 정정 only:
+       기존 "35 = 8-25kt 실사용역에서 binding 되지 않는 sanity guard" 표현은
+       lift_calc_review_2026-06-04.md §4-3 node 실측에서 반증됨 — 상급·5m²·AR8.7·
+       70+10kg 기준 wind ≥24kt 에서 V_boat = 35.0 cap binding. 따라서 cap 은
+       'runaway sanity guard' 인 동시에 강풍역 V_boat 출력의 실효 상한 (포화)으로
+       기능 중. 진짜 평형점은 cap 위에 있을 수 있음 → upwindSpeed() 가 capped
+       플래그를 산출(§191), UI 에 "△ 모델 상한 도달 — 참고용" 표기. 값 변경
+       (예: 40kt 상향)은 anchor 사슬(§181-C/D/E) 재보정 필요 → 옥대표님 별도 결정. */
   var UPWIND_VB_CAP_KT = 35;
 
-  /* §179 (Danny 2026-05-16) — L/D(CL) wing polar (depower L/D drop)
-     DO_NOT_REVERT §179.
+  /* §179 (Danny 2026-05-16) → §192 (티모 2026-06-04 · I-4 fix, 옥대표님 승인) —
+     L/D(CL) wing polar (depower L/D drop) 함수 4개 제거.
 
-     CD(CL, AR) = CD_0 + CL² / (π · e · AR)
-     L/D(CL, AR) = CL / CD(CL, AR)
-     CL_opt(AR) = √(CD_0·π·e·AR) = 0.360·√AR  (max L/D point)
-     L/D_max(AR) = 1.83·√AR  (LEI-airfoil 이론 도출; ldWing 은 §181-C 에서 2.2 로 실측 보정)
+     제거 대상: WING_CD0 (0.098) · WING_E (0.42) · ldWingAtCL(cl,ar) · clOptWing(ar)
+     제거 사유: lift_calc_review_2026-06-04.md §1-G + §4-7 — 전체 사이트(3 사본
+       포함) grep 결과 호출 0건. 선언만 존재하는 dead code 였음. stateAt() 의
+       추력식은 LD_wing(=2.2·√AR, §181-C) + WING_CD0_PARASITIC(0.04, §181) 합성을
+       사용 중 — §179 polar (CD = CD0 + CL²/(πeAR)) 는 한 번도 호출 안 됨.
 
-     Constants (LEI inflatable wing — Folkersma/Schmehl/Viré 2019):
-       CD_0 = 0.098,  e = 0.42
+     BREAKING 0: 호출 0건 확인됨 (assets · calculator-pwa · _ci_site 사본 모두 동일).
+       동일 sprint 검증 — _team/lift_calc_fix_verify_2026-06-04.md 참조.
 
-     Implication: 큰 윙 depower → CL 떨어짐 → CD_0 dominate → L/D 폭락 →
-     c_thrust = sin β − cos β/(L/D) 작아짐 → 큰 윙으로 갈수록 V_b ↓
-     (depower regime 에서 wing area 효과가 살아남) */
-  var WING_CD0 = 0.098;
-  var WING_E = 0.42;
-  function ldWingAtCL(cl, ar) {
-    if (!isFinite(cl) || cl <= 0 || !isFinite(ar) || ar <= 0) return 0;
-    var cd_i_factor = 1 / (Math.PI * WING_E * ar);
-    var cd = WING_CD0 + cd_i_factor * cl * cl;
-    return cl / cd;
-  }
-  function clOptWing(ar) { return 0.360 * Math.sqrt(ar); }
+     향후 사용 시: 본 §192 제거를 revert 후 stateAt() 추력식 (L1055 부근)에서
+       WING_CD0_PARASITIC·cos β 항을 §179 CD(CL) polar 로 교체해야 의미 있는
+       작동. 이 변경은 anchor 사슬(§181-C/D/E) 일괄 재보정 동반 — lift_calc_
+       review_2026-06-04.md §5 I-4 권장안 참조 (P4, 옥대표님 별도 결정 영역).
+
+     관련 lock 영역 — 본 §192 는 lock 무변경:
+       · WING_CD0_PARASITIC = 0.04 (§181 lock, L932) 유지
+       · LDWING_K = 2.2 (§181-C lock, L829) 유지
+       두 lock 간 부분 이중계상(§4-7 +11% @ CL 0.88) 정량은 보고서에 기록됨,
+       해결은 lock 재보정 영역 → 본 sprint 미적용.
+     References (Folkersma/Schmehl/Viré 2019, CD_0=0.098, e=0.42) — 출처는
+       upwindSpeed References 블록(§176)에 보존. */
 
   /* §181 (Danny 2026-05-21) — 옵션 C: 윙 형상 항력 + heel 약결합 (역U자 모델).
      DO_NOT_REVERT §181. §178 (선형 empirical V_b 보정) 을 영구 대체.
@@ -1046,7 +1075,10 @@
     // §181-C (Danny 2026-05-21): V_b sweep 상한 = UPWIND_VB_CAP_KT (35 kt).
     // 기존 §176-C 21kt cap 은 풍상 속도 과소예측 모델 시절 calibration → §181-C
     // 윙 L/D 재보정(1.83→2.2) 후 15·20kt 에서 binding 되어 단조 증가 파괴 →
-    // 35 로 상향. 35 = 8-25kt 실사용역에서 binding 되지 않는 runaway sanity guard.
+    // 35 로 상향. §192 (티모 2026-06-04, 옥대표님 승인) — 주석 정정:
+    // §4-3 실측에서 wind ≥24kt 에서 cap 자체가 binding (포화 평탄) → "runaway
+    // sanity guard" 와 동시에 강풍역 V_boat 출력의 실효 상한으로도 기능. capped
+    // 플래그(§191)로 UI 노출. cap 값 변경은 anchor 사슬 재보정 필요 → 옥대표님 결정.
     // VMG = SOG × cos(TWA). Sweep V_b ∈ [0, cap] 0.1 kt step, T ≥ D_foil 최대 V_b.
     var V_max = UPWIND_VB_CAP_KT * CONST.KT_TO_MS;
     var step = 0.1 * CONST.KT_TO_MS;
@@ -1066,6 +1098,13 @@
       bestState = stateAt(0);
     }
 
+    // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — V_b cap 도달 표기 (I-3 단기).
+    // bestVb 가 sweep 상한(UPWIND_VB_CAP_KT, §181-C lock — 값 변경 금지)에 닿으면
+    // T ≥ D_foil 이 sweep 꼭대기에서도 성립 → 진짜 평형점은 cap 위에 있을 수 있음.
+    // 결과를 모델 상한으로 절단했다는 표시만 — cap 값·sweep 로직 무변경.
+    // float 누적 오차 대비 step 1.5배 여유로 판정.
+    var capped = feasible && (bestVb >= V_max - step * 1.5);
+
     // §181 (Danny 2026-05-21) — §178 선형 empirical V_b 보정 제거.
     // 윙 면적 효과는 stateAt() 의 형상 항력 + heel 약결합으로 폴라 sweep 안에서
     // 물리 모델링됨 (역U자 곡선). 추가 후처리 보정 불필요.
@@ -1084,6 +1123,8 @@
       CL_wing_max_base: clMax,
       depowered: bestState.depowered,
       feasible: feasible,
+      capped: capped,   // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — V_b = 모델 상한(35kt) 도달
+
       side_force_N: Math.round(bestState.H * 10) / 10,
       side_force_max_N: Math.round(H_max * 10) / 10,
       side_force_max_base_N: Math.round(H_max_base * 10) / 10,   // §181 — heel 결합 전
@@ -1322,6 +1363,7 @@
     if (aMax < aMin) { var sw = aMin; aMin = aMax; aMax = sw; }
     var points = [];
     var optimum = null;
+    var anyCapped = false;   // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — I-3 cap 도달 집계
     for (var a = aMin; a <= aMax + 1e-9; a += step) {
       var area = Math.round(a * 100) / 100;
       var u = upwindSpeed(Object.assign({}, p, { wing_area_m2: area }));
@@ -1330,9 +1372,11 @@
         V_boat_kt: (u && u.feasible) ? u.V_boat_kt : 0,
         V_vmg_kt:  (u && u.feasible) ? u.V_vmg_kt  : 0,
         feasible:  !!(u && u.feasible),
-        depowered: !!(u && u.depowered)
+        depowered: !!(u && u.depowered),
+        capped:    !!(u && u.capped)   // §191 — V_b = 모델 상한(35kt) 도달 지점
       };
       points.push(pt);
+      if (pt.capped) anyCapped = true;
       if (pt.feasible && (!optimum || pt.V_vmg_kt > optimum.V_vmg_kt)) {
         optimum = pt;
       }
@@ -1340,6 +1384,7 @@
     return {
       points: points,
       optimum: optimum,
+      any_capped: anyCapped,   // §191 — 하나라도 cap 도달 시 true (UI 참고용 표기)
       area_min_m2: aMin,
       area_max_m2: aMax,
       step_m2: step
