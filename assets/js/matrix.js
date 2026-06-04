@@ -821,18 +821,19 @@
       const partsSumTxt = partsMissing > 0 ? (formatKRW(partsSum) + ' + 안내 ' + partsMissing + '개') : formatKRW(partsSum);
       const setBundleNote = (foilRes.setBundle || []).map(productName).join(' + ');
       const partsNote = [foilFW, foilMast, foilStab].filter(Boolean).map(productName).join(' + ');
+      // §186 (알렉스 2026-06-04) — 좌우 2칼럼 → 세로 1칼럼 스택, "개별 구성" 카드를 위에 / "세트 구매" 카드를 아래에 (DOM 순서 변경. 가격·구성·cart 로직 불변).
       foilHtml =
         '<p class="mtx-foil-options__lead">세트로 사면 할인, 개별로 사면 추천 마스트 — 가격·구성을 비교하고 고르세요.</p>' +
         '<div class="mtx-foil-options">' +
-          '<div class="mtx-foil-opt mtx-foil-opt--set">' +
-            '<div class="mtx-foil-opt__head"><span class="mtx-foil-opt__tag">세트 구매</span><span class="mtx-foil-opt__price">' + setPriceTxt + '</span></div>' +
-            '<div class="mtx-row__items">' + renderItem(foilRes.setId) + '</div>' +
-            '<p class="mtx-foil-opt__note">구성: ' + setBundleNote + ' — 한 세트, 개별 합산 대비 할인</p>' +
-          '</div>' +
           '<div class="mtx-foil-opt mtx-foil-opt--parts">' +
             '<div class="mtx-foil-opt__head"><span class="mtx-foil-opt__tag mtx-foil-opt__tag--alt">개별 구성</span><span class="mtx-foil-opt__price">' + partsSumTxt + '</span></div>' +
             '<div class="mtx-row__items">' + [foilFW, foilMast, foilStab].filter(Boolean).map(function (id) { return renderItem(id); }).join('') + '</div>' +
             '<p class="mtx-foil-opt__note">맞춤 추천: ' + partsNote + ' — 컴포넌트 개별 구매</p>' +
+          '</div>' +
+          '<div class="mtx-foil-opt mtx-foil-opt--set">' +
+            '<div class="mtx-foil-opt__head"><span class="mtx-foil-opt__tag">세트 구매</span><span class="mtx-foil-opt__price">' + setPriceTxt + '</span></div>' +
+            '<div class="mtx-row__items">' + renderItem(foilRes.setId) + '</div>' +
+            '<p class="mtx-foil-opt__note">구성: ' + setBundleNote + ' — 한 세트, 개별 합산 대비 할인</p>' +
           '</div>' +
         '</div>';
     } else {

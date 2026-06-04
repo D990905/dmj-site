@@ -5064,12 +5064,16 @@ p {
   word-break: keep-all;
   line-height: 1.5;
 }
+/* §186 (알렉스 2026-06-04) — 세트/개별 카드 좌우 2칼럼 → 세로 1칼럼 스택.
+   2칼럼 폭에서 제품명이 "Levita / z Free / Series" 식으로 한두 글자씩 깨지는 가독성 회귀 fix.
+   카드 순서는 matrix.js DOM 순서: 개별 구성(위) → 세트 구매(아래). 모바일/데스크탑 동일. */
 .mtx-foil-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
 }
-@media (max-width: 560px) { .mtx-foil-options { grid-template-columns: 1fr; } }
+/* §186 (알렉스 2026-06-04) — 좁은 컨텍스트 제품명 줄바꿈 보강 (글자 단위 break 방지). */
+.mtx-foil-opt .mtx-row__items { word-break: keep-all; overflow-wrap: break-word; }
 .mtx-foil-opt {
   border: 1px solid var(--border);
   border-radius: 10px;
