@@ -560,7 +560,7 @@
   <option value="Flash 3/2mm Wetsuit"><option value="Flash 4/3mm Wetsuit"><option value="Wetsuit Boots 3mm">
 </datalist>
 
-<script src="assets/js/supabase-auth.js?v=supabase-180-20260527" defer></script>
+<script src="assets/js/supabase-auth.js?v=supabase-184-20260604" defer></script>
 <!-- v2 데이터 주도 스킬 레벨 평가 — 추천·동의 카드 -->
 <script src="assets/js/skill-level.js" defer></script>
 <!-- §171-B cart system — for nav badge. -->
@@ -1473,6 +1473,8 @@
     // Stats (5 cards row below): 총 장비 / 평균 만족도 / 평균 상태 / 평균 사용기간 / 라이딩 경력.
     // gear ≥ 1 시 노출. vanilla SVG/CSS bars (외부 dep 없음, 사이트 일관 톤). 실시간 갱신.
     var LEVEL_COLORS = ['#EF4444', '#F97316', '#FBBF24', '#86EFAC', '#22C55E']; // §169-D v3 palette
+    // §185 (데이빗 2026-06-04) — SKU 차트 "+N 제품 더" 펼치기 상태 (성능 fn / 상태 cond)
+    var SKU_CHART_EXPANDED = { fn: false, cond: false };
     function levelColorForScore(score) {
       // score in 1-5 range; round to nearest level
       var lvl = Math.max(1, Math.min(5, Math.round(score)));
@@ -1618,8 +1620,14 @@
           '<span class="gear-dash-bar-row__count">' + r.right + '</span>' +
           '</div>';
       }).join('');
+      // §185 (데이빗 2026-06-04) — "+N 제품 더" 클릭 → 전체 펼치기/접기 토글 (정적 텍스트 회귀 X)
       if (opts.moreCount && opts.moreCount > 0) {
-        html += '<div class="gear-dash-bar-row gear-dash-bar-row--more">+' + opts.moreCount + ' ' + (opts.moreLabel || '더') + '</div>';
+        html += '<button type="button" class="gear-dash-bar-row gear-dash-bar-row--more gear-dash-bar-row--more-btn"' +
+          (opts.expandKey ? ' data-sku-expand="' + escAttr(opts.expandKey) + '"' : '') +
+          ' aria-expanded="false">+' + opts.moreCount + ' ' + (opts.moreLabel || '더') + ' ▾</button>';
+      } else if (opts.expanded && opts.expandKey) {
+        html += '<button type="button" class="gear-dash-bar-row gear-dash-bar-row--more gear-dash-bar-row--more-btn" data-sku-expand="' +
+          escAttr(opts.expandKey) + '" aria-expanded="true">접기 ▴</button>';
       }
       return html;
     }
@@ -1761,7 +1769,7 @@
         .map(function (g) { return { label: skuLabel(g), score: typeof g.functionality === 'number' ? g.functionality : null, id: g.id || null }; })
         .filter(function (r) { return r.score !== null; })
         .sort(function (a, b) { return a.score - b.score; });
-      var fnRowsTop = fnRows.slice(0, 10);
+      var fnRowsTop = SKU_CHART_EXPANDED.fn ? fnRows : fnRows.slice(0, 10);   // §185 펼치기
       var eRows = fnRowsTop.map(function (r) {
         return {
           label: r.label, value: r.score, max: 5,
@@ -1771,8 +1779,10 @@
         };
       });
       document.getElementById('gear-dash-sku-fn').innerHTML = renderBarRows(eRows, {
-        moreCount: fnRows.length > 10 ? (fnRows.length - 10) : 0,
+        moreCount: (!SKU_CHART_EXPANDED.fn && fnRows.length > 10) ? (fnRows.length - 10) : 0,
         moreLabel: '제품 더',
+        expandKey: 'fn',
+        expanded: SKU_CHART_EXPANDED.fn && fnRows.length > 10,
         emptyMsg: '성능 응답 없음'
       });
 
@@ -1782,7 +1792,7 @@
         .map(function (g) { return { label: skuLabel(g), score: typeof g.condition === 'number' ? g.condition : null, id: g.id || null }; })
         .filter(function (r) { return r.score !== null; })
         .sort(function (a, b) { return a.score - b.score; });
-      var condRowsTop = condRows.slice(0, 10);
+      var condRowsTop = SKU_CHART_EXPANDED.cond ? condRows : condRows.slice(0, 10);   // §185 펼치기
       var fRows = condRowsTop.map(function (r) {
         return {
           label: r.label, value: r.score, max: 5,
@@ -1792,13 +1802,28 @@
         };
       });
       document.getElementById('gear-dash-sku-cond').innerHTML = renderBarRows(fRows, {
-        moreCount: condRows.length > 10 ? (condRows.length - 10) : 0,
+        moreCount: (!SKU_CHART_EXPANDED.cond && condRows.length > 10) ? (condRows.length - 10) : 0,
         moreLabel: '제품 더',
+        expandKey: 'cond',
+        expanded: SKU_CHART_EXPANDED.cond && condRows.length > 10,
         emptyMsg: '상태 응답 없음'
       });
       // §169-N v5 — wire inline slider edit handlers (idempotent — guard inside)
       attachBarEditHandlers(document.getElementById('gear-dash-sku-fn'));
       attachBarEditHandlers(document.getElementById('gear-dash-sku-cond'));
+      // §185 — "+N 제품 더" / "접기" 토글 (delegated, 1회 wiring — innerHTML 재렌더에도 유지)
+      ['gear-dash-sku-fn', 'gear-dash-sku-cond'].forEach(function (cid) {
+        var elc = document.getElementById(cid);
+        if (!elc || elc._moreWired) return;
+        elc._moreWired = true;
+        elc.addEventListener('click', function (ev) {
+          var btn = ev.target.closest('[data-sku-expand]');
+          if (!btn) return;
+          var key = btn.getAttribute('data-sku-expand');
+          SKU_CHART_EXPANDED[key] = !SKU_CHART_EXPANDED[key];
+          renderGearDashboard(getGear());
+        });
+      });
 
       // ── Stats row — 5 cards (총장비/평균만족도/평균상태/평균사용기간/라이딩경력) ──
       var usageYears = avgUsage / 12;
