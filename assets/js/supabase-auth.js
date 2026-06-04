@@ -113,6 +113,37 @@
   // ─────────────────────────────────────────────────────────────────────
   // 2) Profile mapping — DB row ↔ legacy DMJAuth.currentUser() shape
   // ─────────────────────────────────────────────────────────────────────
+  /* §184 (데이빗 2026-06-04) — gear 저장 경로.
+     profiles 테이블에 gear 컬럼이 없어 Supabase 전환 때 gear:[] 하드코딩 →
+     "+ 장비 추가" 가 저장 증발·기존 장비 소실되던 회귀. Phase 13 inventory
+     테이블 전까지 user_data 'gear' suffix (JSON 배열 문자열) 를 SoT 로 쓴다.
+     setUserData = 동기 localStorage + 백그라운드 Supabase user_data sync 라
+     저장 직후 currentUser().gear 동기 읽기 호환 + 기기간 동기화 둘 다 충족.
+     옛 auth-shim(dmj_users[email].gear) 잔존 장비는 1회 자동 이관. */
+  function _readGearCache(uid, email) {
+    try {
+      var k = USER_NS_PREFIX + uid + '_gear';
+      var raw = localStorage.getItem(k);
+      if (raw != null) {
+        var arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      }
+      // 레거시 dmj_users 1회 이관 — 옛 localStorage 회원 시스템에 등록했던 장비 복구
+      if (email) {
+        var usersRaw = localStorage.getItem('dmj_users');
+        if (usersRaw) {
+          var users = JSON.parse(usersRaw);
+          var legacy = users && users[String(email).toLowerCase()];
+          if (legacy && Array.isArray(legacy.gear) && legacy.gear.length) {
+            localStorage.setItem(k, JSON.stringify(legacy.gear));
+            return legacy.gear.slice();
+          }
+        }
+      }
+    } catch (e) {}
+    return [];
+  }
+
   function mapDbToLegacy(profile, authUser) {
     if (!profile) return null;
     return {
@@ -131,7 +162,7 @@
       tierLabel: profile.tier_label || '회원',
       tierDiscount: profile.tier_discount || 0,
       tierSlug: profile.tier || 'member',      // §175 legacy
-      gear: [],                                // inventory 테이블 사용 — Phase 13
+      gear: _readGearCache(profile.id, (authUser && authUser.email) || profile.email),  // §184 user_data 'gear' (Phase 13 inventory 전 임시 SoT)
       totalSpend: profile.total_spend_krw || 0,
       createdAt: profile.created_at ? new Date(profile.created_at).getTime() : Date.now(),
       passwordHash: ''                         // legacy stub
@@ -239,6 +270,22 @@
 
   function updateUser(patch) {
     if (!patch || typeof patch !== 'object') return Promise.resolve(cachedProfile);
+    // §184 (데이빗 2026-06-04) — gear 는 profiles 컬럼이 없어 user_data 'gear' 로 저장.
+    // 동기 반영 (저장 직후 currentUser().gear 를 읽는 기존 사용처 호환 — 옛 shim 과 동일 semantics).
+    if ('gear' in patch) {
+      var gearArr = Array.isArray(patch.gear) ? patch.gear : [];
+      try { setUserData('gear', JSON.stringify(gearArr)); } catch (e) {}
+      if (cachedProfile) {
+        cachedProfile.gear = gearArr;
+        try { localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cachedProfile)); } catch (e) {}
+      }
+      var rest = {}; var hasRest = false;
+      for (var rk in patch) {
+        if (rk !== 'gear' && Object.prototype.hasOwnProperty.call(patch, rk)) { rest[rk] = patch[rk]; hasRest = true; }
+      }
+      if (!hasRest) return Promise.resolve(cachedProfile);
+      patch = rest;
+    }
     return ensureClient().then(function () {
       if (!cachedSession) return null;
       var dbPatch = mapLegacyPatchToDb(patch);
