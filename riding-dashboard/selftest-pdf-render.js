@@ -63,7 +63,7 @@ function renderPdf(lang) {
   doc.setFontSize(14);
   doc.text(T('윙포일·세일링 GPX 트랙 분석', lang), 56, 150);
   doc.setFontSize(11);
-  doc.text(T('단무지공방', lang) + ' · SailTech · dmjgroup.kr', 56, 800);
+  doc.text(T('단무지', lang) + ' · SailTech · dmjgroup.kr', 56, 800);
 
   // 페이지 2-9
   var sections = [
@@ -78,7 +78,7 @@ function renderPdf(lang) {
     doc.text(T('{n}쪽', lang).replace('{n}', i + 2) + ' / 9', 500, 80);
     // 본문 더미
     doc.setFontSize(11);
-    doc.text(T(ko, lang) + ' — ' + T('단무지공방', lang), 56, 120);
+    doc.text(T(ko, lang) + ' — ' + T('단무지', lang), 56, 120);
   });
 
   return doc.output('arraybuffer');

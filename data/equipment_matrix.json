@@ -2,7 +2,7 @@
   "_meta": {
     "version": "2.2",
     "updated": "2026-05-15",
-    "generator": "단무지공방 64-scenario consultation matrix + demographic adjustment layer",
+    "generator": "단무지 64-scenario consultation matrix + demographic adjustment layer",
     "pricing_methodology": {
       "_redacted": "내부 가격 메타데이터 사이트 노출 금지 (§128-K). 가격은 products.json size_pricing_KRW 또는 matrix.js PRICE_OVERRIDES 참조."
     },
@@ -127,7 +127,7 @@
     },
     "total_entries": 64,
     "note": "Best-effort 큐레이션. 가격은 본 파일에 박지 않음 (Danny 가격표.xlsx 별도 관리).",
-    "curator": "단무지공방 / 옥덕필 (3회 올림픽 출전, 대한민국 윈드서핑 국가대표 수석코치)",
+    "curator": "단무지 / 옥덕필 (3회 올림픽 출전, 대한민국 윈드서핑 국가대표 수석코치)",
     "ppc_lineup_order": [
       "ppc-m2",
       "ppc-m1x",

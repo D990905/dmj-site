@@ -3,7 +3,7 @@
     "version": "1.0",
     "updated": "2026-05-21",
     "phase": "퍼포먼스 시각화 통일 — Phase 1 (데이터 통합)",
-    "note": "단무지공방 제품 퍼포먼스 점수의 단일 SoT(Source of Truth). 기존 generate_products.py VIZ 딕셔너리 + 브랜드 페이지 inline 숫자 + products_phase11.json performance 필드를 통합. canonical = 제품 상세 페이지 점수. 시각화는 'Performance Attributes' 카드 그리드 단일 방식.",
+    "note": "단무지 제품 퍼포먼스 점수의 단일 SoT(Source of Truth). 기존 generate_products.py VIZ 딕셔너리 + 브랜드 페이지 inline 숫자 + products_phase11.json performance 필드를 통합. canonical = 제품 상세 페이지 점수. 시각화는 'Performance Attributes' 카드 그리드 단일 방식.",
     "scale": "0-5 정수 (5 = best in class). ★ N/5 별점 + 그라데이션 막대.",
     "canonical_viz": "Performance Attributes 카드 그리드 — product-detail.css .attr-list / .attr-row (L422-520), generate_products.py render_attr_block().",
     "verified": false,

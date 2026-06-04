@@ -191,7 +191,7 @@ sitemap.xml: 22 SKU URL 추가
 3. **WIP wetsuit·UV 라인 detail page** — 3Ds Neoprene 3mm, Hooded UV, Tech Hoodie
 4. **로컬 이미지 캐시** — CDN hotlink 의존 제거 (Phase 2 commerce launch 전)
 5. **WebP/AVIF 변환 + lazy-loading 강화**
-6. **Performance bars 본사 데이터 cross-check** — 현재 단무지공방 자체 calibration. Levitaz/PPC/Takoon 본사 spec sheet 입수 후 정확도 검증.
+6. **Performance bars 본사 데이터 cross-check** — 현재 단무지 자체 calibration. Levitaz/PPC/Takoon 본사 spec sheet 입수 후 정확도 검증.
 
 ---
 
@@ -223,4 +223,4 @@ sitemap.xml: 22 SKU URL 추가
 **Phase 11 완료**. 차별화 시각화 + 22 detail page + brand hub 가로 비교 모두 라이브.
 
 ---
-[리브랜딩 2026-05-05: 단무지그룹 → 단무지공방 — Option A 채택. 이 changelog 안 '단무지공방'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]
+[리브랜딩 2026-05-05: 단무지그룹 → 단무지 — Option A 채택. 이 changelog 안 '단무지'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]

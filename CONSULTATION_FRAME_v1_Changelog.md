@@ -2,7 +2,7 @@
 
 작성일: 2026-05-05  
 세션: Mega Task — Phase A~H 동시 build (Danny 외출 중)  
-운영자 권고: 옥덕필 수석코치 운영 단무지공방의 1:1 컨설팅 frame을 site에 정식 도입.
+운영자 권고: 옥덕필 수석코치 운영 단무지의 1:1 컨설팅 frame을 site에 정식 도입.
 
 ---
 
@@ -158,7 +158,7 @@
 ## 7. Local preview
 
 ```bash
-cd "/Users/dannyok/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site"
+cd "/Users/dannyok/Documents/Claude/Projects/단무지 홈페이지 만들기/site"
 python3 -m http.server 8080
 # 브라우저: http://localhost:8080
 ```
@@ -233,4 +233,4 @@ python3 -m http.server 8080
 6. Find My Gear v1.1 — Body Weight slider input (현재 4-button) + Sport selection이 결과에 영향
 
 ---
-[리브랜딩 2026-05-05: 단무지그룹 → 단무지공방 — Option A 채택. 이 changelog 안 '단무지공방'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]
+[리브랜딩 2026-05-05: 단무지그룹 → 단무지 — Option A 채택. 이 changelog 안 '단무지'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]

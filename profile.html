@@ -11,8 +11,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0A2540">
 <meta name="robots" content="noindex,nofollow">
-<title>마이 페이지 | 단무지공방</title>
-<meta name="description" content="단무지공방 회원 마이 페이지 — 기본 정보, 보유 장비, 스킬 진단 결과, 트레이닝 진행 상황을 한곳에서 확인하세요.">
+<title>마이 페이지 | 단무지</title>
+<meta name="description" content="단무지 회원 마이 페이지 — 기본 정보, 보유 장비, 스킬 진단 결과, 트레이닝 진행 상황을 한곳에서 확인하세요.">
 
 <!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
 <script>
@@ -62,10 +62,10 @@
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="index.html" class="nav__logo" aria-label="단무지공방 홈">
+      <a href="index.html" class="nav__logo" aria-label="단무지 홈">
         <span class="nav__logo-mark">D</span>
         <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
-        <span class="nav__logo-sub">단무지공방</span>
+        <span class="nav__logo-sub">단무지</span>
       </a>
 
       <!-- DO_NOT_REVERT §145-G v4 — Danny 2026-05-13: profile.html nav 6-item canonical 복원.
@@ -1269,7 +1269,7 @@
         +   '<div class="gear-field"><span class="gear-field__label">사이즈</span>'
         +     '<input type="text" data-k="size" value="' + escAttr(gear.size || '') + '" placeholder="예: 5.0m / FW 680 / 83L"></div>'
         +   '<div class="gear-field"><span class="gear-field__label">구매처</span>'
-        +     '<input type="text" data-k="vendor" value="' + escAttr(gear.vendor || '') + '" placeholder="예: 단무지공방, 직구 등"></div>'
+        +     '<input type="text" data-k="vendor" value="' + escAttr(gear.vendor || '') + '" placeholder="예: 단무지, 직구 등"></div>'
         +   '<div class="gear-field"><span class="gear-field__label">구매년/월 *</span>'
         +     monthYearPickerHtml('purchaseDate', gear.purchaseDate, 2018, THIS_YEAR, true) + '</div>'
         +   '<div class="gear-field"><span class="gear-field__label">사용기간</span>'
@@ -2628,7 +2628,7 @@
         paymentNotice = '<div class="order-payment-notice">'
           + '<h4 class="order-payment-notice__title">입금 안내</h4>'
           + '<p>견적 확정 후 운영팀이 정확한 입금 안내를 카톡 또는 이메일로 드립니다. '
-          + '<b>입금 계좌: ' + escOrder(order.accountInfo || '농축협 352-9420-2739 (예금주 단무지공방)') + '</b></p>'
+          + '<b>입금 계좌: ' + escOrder(order.accountInfo || '농축협 352-9420-2739 (예금주 단무지)') + '</b></p>'
           + '</div>';
       }
       var fmgLink = '';

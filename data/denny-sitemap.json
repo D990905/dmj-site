@@ -69,11 +69,11 @@
     {
       "id": "index",
       "url": "index.html",
-      "title": "단무지공방 홈",
+      "title": "단무지 홈",
       "type": "hub",
-      "content": "단무지공방 소개. 옥덕필 박사(3× 올림픽·운동생리학 박사·3개국 NT 코치) + 조수철 선수. persona-grid 로 본인 단계 진입. Levitaz/PPC/Takoon/WIP 4 브랜드 큐레이션.",
+      "content": "단무지 소개. 옥덕필 박사(3× 올림픽·운동생리학 박사·3개국 NT 코치) + 조수철 선수. persona-grid 로 본인 단계 진입. Levitaz/PPC/Takoon/WIP 4 브랜드 큐레이션.",
       "answers": [
-        "단무지공방이 뭐야?",
+        "단무지가 뭐야?",
         "여기 뭐하는 곳?",
         "홈으로"
       ],

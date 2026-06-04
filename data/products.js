@@ -122,7 +122,7 @@ window.DMJ_PRODUCTS_INLINE = {
           }
         ],
         "discovered": "2026-05-07 (스크린샷 catalog) + 2026-05-07 (Chrome MCP /products.json fetch)",
-        "decision_pending": "단무지공방 라인업 포함 여부 — Danny 결정 대기 (라이트윈드 입문·초급 시장 확장 가능성)"
+        "decision_pending": "단무지 라인업 포함 여부 — Danny 결정 대기 (라이트윈드 입문·초급 시장 확장 가능성)"
       },
       "takoon_full_spec_db": {
         "file": "site/data/takoon-full-spec.json",

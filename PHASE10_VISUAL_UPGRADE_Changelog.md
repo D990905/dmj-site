@@ -222,7 +222,7 @@ hero__visual--video          →  1 건 (index.html) ✅
 ## Local preview
 
 ```bash
-cd "단무지공방 홈페이지 만들기/site"
+cd "단무지 홈페이지 만들기/site"
 python3 -m http.server 8000
 # 브라우저: http://localhost:8000
 ```
@@ -230,4 +230,4 @@ python3 -m http.server 8000
 데스크톱에서 시작하여 반응형 dev tools로 viewport 5단계 (1920/1440/1024/640/375) 확인 권장.
 
 ---
-[리브랜딩 2026-05-05: 단무지그룹 → 단무지공방 — Option A 채택. 이 changelog 안 '단무지공방'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]
+[리브랜딩 2026-05-05: 단무지그룹 → 단무지 — Option A 채택. 이 changelog 안 '단무지'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]

@@ -35,7 +35,7 @@
 ```bash
 # (macOS)
 brew install supabase/tap/supabase
-cd "/Users/dannyok/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site"
+cd "/Users/dannyok/Documents/Claude/Projects/단무지 홈페이지 만들기/site"
 supabase init
 supabase link --project-ref <ref-id>
 ```

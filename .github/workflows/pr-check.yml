@@ -41,9 +41,13 @@ name: PR checks
 on:
   pull_request:
     branches: [main]
-  # main push 시에도 동일 검증 (단일 안전망)
-  push:
-    branches: [main]
+  # 2026-06-04 (옥대표님 root-cause 지시): main 직접 push 시 알림 spam 차단.
+  # 사유: 본 repo 는 PR 워크플로우 미사용 (단일 owner direct push). push 트리거 시
+  #       1 annotation 이라도 잡히면 옥대표님 폰에 매 push 알림 푸시 (deploy 와 별개).
+  #       실제 배포는 static.yml 이 별도로 처리 — pr-check.yml fail 이 배포를 막지 않음.
+  # 회귀 가드 유지: 향후 PR 기반 워크플로우 도입되면 자동 재가동.
+  # 수동 trigger: GitHub UI → Actions → "PR checks" → Run workflow.
+  workflow_dispatch:
 
 permissions:
   contents: read

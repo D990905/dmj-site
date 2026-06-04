@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-05
 **Scope:** Phase 4-8 통합 build · matrix demographic axis + 3 신규 landing pages + nav·hero·level pages 정합 + typography 전수 fix
-**Curator:** 단무지공방 / 옥덕필 (3회 올림픽 출전, 대한민국 윈드서핑 국가대표 수석코치)
+**Curator:** 단무지 / 옥덕필 (3회 올림픽 출전, 대한민국 윈드서핑 국가대표 수석코치)
 
 ## 0. 요약
 
@@ -89,7 +89,7 @@
 
 ```bash
 # 단무지 site 폴더로 이동
-cd "/Users/dannyok/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site"
+cd "/Users/dannyok/Documents/Claude/Projects/단무지 홈페이지 만들기/site"
 
 # 간단 정적 서버 (Python 3)
 python3 -m http.server 8080
@@ -116,4 +116,4 @@ npx http-server -p 8080 -c-1
 6. sitemap.xml 22개 URL XML valid 확인
 
 ---
-[리브랜딩 2026-05-05: 단무지그룹 → 단무지공방 — Option A 채택. 이 changelog 안 '단무지공방'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]
+[리브랜딩 2026-05-05: 단무지그룹 → 단무지 — Option A 채택. 이 changelog 안 '단무지'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]

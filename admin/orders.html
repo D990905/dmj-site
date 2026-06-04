@@ -1,6 +1,6 @@
 <!-- DO_NOT_REVERT §174 — Danny 2026-05-13: Admin tool for order timeline management.
      Access control: Danny (kor22@me.com) only. Phase 12 시 조수철 추가 + Supabase RBAC.
-     Phase 1 = 로컬 only — 단무지공방 컴퓨터에서 Danny 가 직접 stage update.
+     Phase 1 = 로컬 only — 단무지 컴퓨터에서 Danny 가 직접 stage update.
      데이터 source = localStorage iterate (dmj_user_<uid>_orders).
      UI = order list + stage dropdown + admin message composer.
      2026-05-16: 카피 누수 정리 — h1 "(§174)" 및 본문 "§H" 내부 참조 제거 (렌더 텍스트에서만, 기능 동일). -->
@@ -12,8 +12,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0A2540">
 <meta name="robots" content="noindex,nofollow">
-<title>관리자 · 주문 진행 관리 | 단무지공방</title>
-<meta name="description" content="단무지공방 관리자 도구 — 주문 진행 stage 업데이트, 관리자 메시지 전송.">
+<title>관리자 · 주문 진행 관리 | 단무지</title>
+<meta name="description" content="단무지 관리자 도구 — 주문 진행 stage 업데이트, 관리자 메시지 전송.">
 
 <!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
 <script>
@@ -103,7 +103,7 @@
   <a href="../profile.html" class="admin-page__back">← 마이 페이지로</a>
   <div class="admin-page__header">
     <h1>관리자 · 주문 진행 관리</h1>
-    <p>전체 회원의 주문 진행을 한곳에서 관리합니다. stage update / 관리자 메시지 전송 즉시 사용자 마이 페이지에 반영. Phase 1 = 로컬 only (단무지공방 컴퓨터). Phase 12 = Supabase realtime sync.</p>
+    <p>전체 회원의 주문 진행을 한곳에서 관리합니다. stage update / 관리자 메시지 전송 즉시 사용자 마이 페이지에 반영. Phase 1 = 로컬 only (단무지 컴퓨터). Phase 12 = Supabase realtime sync.</p>
   </div>
 
   <div id="admin-gate"></div>

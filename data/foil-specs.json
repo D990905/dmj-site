@@ -19,7 +19,7 @@
       "PPC sail wing은 air wing이라 hydrodynamic CL 계산은 적용 불가 — calc는 hydrofoil front wing 전용"
     ],
     "brand_classification": {
-      "_note": "§180-D (Danny 2026-05-17) — 단무지공방 취급 brand 와 사용자 입력 전용 brand 분리.",
+      "_note": "§180-D (Danny 2026-05-17) — 단무지 취급 brand 와 사용자 입력 전용 brand 분리.",
       "_policy": "취급 brand 만 사이트 visible UI (brand cards · find-my-gear · matrix · hero · footer) 노출. 사용자 입력 전용 brand 는 calculator preset 드롭다운에서만 노출 (사용자 자기 장비 입력 편의용). §158-B 경쟁사 노출 금지 정책의 예외 영역 = calculator preset.",
       "carried_by_dmj": ["levitaz", "takoon"],
       "user_input_only": ["chubanga", "north"],

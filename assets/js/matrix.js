@@ -1,5 +1,5 @@
 /* ==========================================================================
-   단무지공방 — 64-scenario Equipment Matrix Renderer
+   단무지 — 64-scenario Equipment Matrix Renderer
    /assets/js/matrix.js
    v1.3 — Demographic adjustment layer (5 segments) added 2026-05-05
    v1.4 — Wind baseline pill + ±1 사이즈 fallback note (2026-05-07, Danny 명시)
@@ -1046,7 +1046,7 @@
         <article class="mtx-card" style="background:linear-gradient(135deg, rgba(31,143,255,0.08), rgba(255,184,0,0.04));border-color:var(--color-sea)">
           <div style="padding:8px 0">
             <p style="font-size:1.0625rem;line-height:1.7;color:var(--color-navy);margin:0 0 16px">
-              <strong>단무지공방은 12세 미만 라이더에게 직접 장비 sales를 진행하지 않습니다.</strong>
+              <strong>단무지는 12세 미만 라이더에게 직접 장비 sales를 진행하지 않습니다.</strong>
               자녀의 신체조건·체력·이전 워터스포츠 경험이 progression 페이스를 좌우하기 때문입니다.
             </p>
             <p style="line-height:1.65;color:var(--color-slate);margin:0 0 16px">

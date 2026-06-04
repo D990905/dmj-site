@@ -1,5 +1,5 @@
 /* ==========================================================================
-   단무지공방 — Foil presets (file:// 친화 — fetch CORS 우회용)
+   단무지 — Foil presets (file:// 친화 — fetch CORS 우회용)
    SoT: site/data/foil-specs.json (수정 시 둘 다 동시 갱신 필수)
    DO_NOT_REVERT §102 Lift Calculator MVP · §170 v7 · §170 v8
 

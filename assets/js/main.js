@@ -1,5 +1,5 @@
 /* ==========================================================================
-   단무지공방 — main.js
+   단무지 — main.js
    Phase 1 interactivity: header scroll, mobile menu, reveal, form, perf chart
    ========================================================================== */
 
@@ -279,7 +279,7 @@
           if (!res.ok) throw new Error('submit failed');
         } else {
           // Fallback: mailto
-          const subject = encodeURIComponent('[단무지공방] Phase 2 launch 알림 신청');
+          const subject = encodeURIComponent('[단무지] Phase 2 launch 알림 신청');
           const body = encodeURIComponent(
             `이메일: ${email}\n이름: ${nameInput ? nameInput.value : ''}\n동의: 개인정보 수집·이용\n출처: dmjgroup.kr Phase 1 launch alert form`
           );

@@ -174,7 +174,7 @@ Danny가 자는 동안 수행한 dmjgroup.kr 완성형 작업 리포트.
 ## Local preview 방법
 
 ```bash
-cd "~/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site"
+cd "~/Documents/Claude/Projects/단무지 홈페이지 만들기/site"
 python3 -m http.server 8080
 # 브라우저에서: http://localhost:8080/
 ```
@@ -243,7 +243,7 @@ python3 -m http.server 8080
 
 ### Local preview 명령어
 ```bash
-cd "~/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site" && python3 -m http.server 8080
+cd "~/Documents/Claude/Projects/단무지 홈페이지 만들기/site" && python3 -m http.server 8080
 ```
 브라우저: http://localhost:8080/
 
@@ -265,4 +265,4 @@ cd "~/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site" && 
 작업 끝. 잘 자고 일어나서 review 부탁해 🙏
 
 ---
-[리브랜딩 2026-05-05: 단무지그룹 → 단무지공방 — Option A 채택. 이 changelog 안 '단무지공방'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]
+[리브랜딩 2026-05-05: 단무지그룹 → 단무지 — Option A 채택. 이 changelog 안 '단무지'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]

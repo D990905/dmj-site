@@ -373,7 +373,7 @@
     var brand = el('div', 'pdf-cover__brand');
     brand.innerHTML =
       '<span class="pdf-cover__brand-mark">D</span>' +
-      '<span>' + esc(T('단무지공방')) + ' · SailTech</span>';
+      '<span>' + esc(T('단무지')) + ' · SailTech</span>';
     page.appendChild(brand);
 
     var titleWrap = el('div');
@@ -414,10 +414,10 @@
     var ts = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
       + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
     foot.innerHTML =
-      '<div><strong>' + esc(T('단무지공방')) + '</strong> · dmjgroup.kr/riding-dashboard</div>' +
+      '<div><strong>' + esc(T('단무지')) + '</strong> · dmjgroup.kr/riding-dashboard</div>' +
       '<div>' + esc(T('생성 시각')) + ': ' + esc(ts) + '</div>' +
       '<div style="margin-top:6px">' +
-      esc(T('이 보고서는 단무지공방 라이딩 분석 대시보드로 생성되었습니다')) + '</div>';
+      esc(T('이 보고서는 단무지 라이딩 분석 대시보드로 생성되었습니다')) + '</div>';
     page.appendChild(foot);
     return page;
   }
@@ -433,7 +433,7 @@
     page.appendChild(head);
     var foot = el('div', 'pdf-page__foot');
     foot.innerHTML =
-      '<span>' + esc(T('단무지공방')) + ' · SailTech</span>' +
+      '<span>' + esc(T('단무지')) + ' · SailTech</span>' +
       '<span>dmjgroup.kr/riding-dashboard</span>';
     page.appendChild(foot);
     return page;
@@ -760,7 +760,7 @@
     var copy = el('div', 'pdf-block');
     copy.innerHTML =
       '<p class="pdf-app__b" style="font-size:9px;color:#7E93A8;border-top:1px solid #E5EAF0;padding-top:12px;margin-top:24px">' +
-      esc(T('© 단무지공방 / SailTech. 본 보고서는 dmjgroup.kr 라이딩 분석 대시보드로 자동 생성되었습니다.')) +
+      esc(T('© 단무지 / SailTech. 본 보고서는 dmjgroup.kr 라이딩 분석 대시보드로 자동 생성되었습니다.')) +
       '</p>';
     page.appendChild(copy);
     return page;
@@ -932,7 +932,7 @@
               return navigator.share({
                 files: [file],
                 title: T('라이딩 분석 보고서'),
-                text: T('단무지공방 라이딩 분석 보고서')
+                text: T('단무지 라이딩 분석 보고서')
               }).then(function () {
                 showStatus(T('PDF 공유 완료'), 'ok');
                 return { shared: true, filename: filename,
@@ -1096,7 +1096,7 @@
           navigator.share({
             files: [file],
             title: T('라이딩 분석 보고서'),
-            text: T('단무지공방 라이딩 분석 보고서')
+            text: T('단무지 라이딩 분석 보고서')
           }).then(function () {
             showStatus(T('PDF 공유 완료'), 'ok');
             teardown();

@@ -34,7 +34,7 @@ Danny가 자는 동안 dmjgroup.kr 완성형으로 만드는 작업의 Phase 1.
 
 ### 2-1. 윈드서핑 카테고리 — 삭제 필요
 - **위치:** `index.html` line 90 (desktop nav), 128 (mobile menu), 222 (sport tile), 584 (footer). 모든 brand page 동일.
-- **결정:** 단무지공방은 윙포일·SUP 포커스, 윈드서핑 카테고리 노출 X. Takoon의 windsurf sail은 별도 inquiry 시 응대 (catalog 외 옵션).
+- **결정:** 단무지는 윙포일·SUP 포커스, 윈드서핑 카테고리 노출 X. Takoon의 windsurf sail은 별도 inquiry 시 응대 (catalog 외 옵션).
 
 ### 2-2. 윈드포일 — Foil 카테고리에 통합
 - **현상:** 현재 nav에 "윙포일"과 "포일"이 별도 존재. "윈드포일"은 nav에 없음 (애초에 X).
@@ -152,4 +152,4 @@ Danny가 자는 동안 dmjgroup.kr 완성형으로 만드는 작업의 Phase 1.
 이 audit를 기반으로 Phase 2~6 진행.
 
 ---
-[리브랜딩 2026-05-05: 단무지그룹 → 단무지공방 — Option A 채택. 이 changelog 안 '단무지공방'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]
+[리브랜딩 2026-05-05: 단무지그룹 → 단무지 — Option A 채택. 이 changelog 안 '단무지'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]

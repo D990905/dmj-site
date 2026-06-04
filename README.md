@@ -1,4 +1,4 @@
-# 단무지공방 — Phase 1 HTML 정적 사이트
+# 단무지 — Phase 1 HTML 정적 사이트
 
 `dmjgroup.kr` Phase 1 launch용 HTML 정적 사이트. Phase 2 Cafe24 e-commerce 본격 launch 전 brand 인지·lead generation 단계 site.
 

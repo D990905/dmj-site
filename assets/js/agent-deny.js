@@ -55,7 +55,7 @@
         related: ['site-start', 'training-12week'] },
       { id: 'consult', category: 'site_guide', keywords: ['1:1', '상담', '컨설팅'],
         question: '1:1 상담은 어떻게 받나요?',
-        answer: '1:1 컨설팅 페이지에서 신청 가능합니다. 라이딩 스타일·예산·시즌에 맞춰 단무지공방 옥덕필 박사가 직접 답변드려요 ✨',
+        answer: '1:1 컨설팅 페이지에서 신청 가능합니다. 라이딩 스타일·예산·시즌에 맞춰 단무지 옥덕필 박사가 직접 답변드려요 ✨',
         page_links: [{ label: '1:1 상담', url: 'consult.html' }],
         related: ['site-start', 'membership'] },
       { id: 'membership', category: 'site_guide', keywords: ['회원 등급', '등급', '할인'],
@@ -65,12 +65,12 @@
         related: ['site-start'] },
       { id: 'consult-redirect-fallback', category: 'site_guide', keywords: ['fallback', '모름', '도와줘'],
         question: '잘 모르는 내용이에요',
-        answer: '제가 답을 못 찾았네요 😅 — 단무지공방에 직접 문의해 보세요. 옥덕필 박사가 1:1 컨설팅으로 답변드릴 수 있습니다 ✨',
+        answer: '제가 답을 못 찾았네요 😅 — 단무지에 직접 문의해 보세요. 옥덕필 박사가 1:1 컨설팅으로 답변드릴 수 있습니다 ✨',
         page_links: [{ label: '1:1 상담 신청', url: 'consult.html' }],
         related: ['consult'] },
       { id: 'agent-self', category: 'site_guide', keywords: ['Coach Danny', '대니', '너 누구', '당신', '누구'],
         question: 'Coach Danny가 누구야?',
-        answer: '**Coach Danny** — 단무지공방 옥덕필 박사(Danny) 입니다 ✨ 윙포일·라이딩 컨설팅 채널이에요. 이 챗은 FAQ + 지식 베이스 기반 AI 어시스턴트로 Coach Danny 노하우를 빠르게 안내해 드립니다 (Phase 1 = FAQ 130+, Phase 2 = LLM + RAG) 🌊',
+        answer: '**Coach Danny** — 단무지 옥덕필 박사(Danny) 입니다 ✨ 윙포일·라이딩 컨설팅 채널이에요. 이 챗은 FAQ + 지식 베이스 기반 AI 어시스턴트로 Coach Danny 노하우를 빠르게 안내해 드립니다 (Phase 1 = FAQ 130+, Phase 2 = LLM + RAG) 🌊',
         page_links: [{ label: '1:1 상담 (실제 Danny)', url: 'consult.html' }],
         related: ['consult'] },
       { id: 'wingfoil-intro', category: 'wingfoil_basics', keywords: ['윙포일', '입문'],
@@ -401,7 +401,7 @@
   function knowledgeChunkToReply(scored) {
     if (!scored || !scored.length) return null;
     var top = scored[0].chunk;
-    var prefix = '제 단무지공방 지식 베이스에서 찾았어요 ✨\n\n**' + top.title + '**\n\n';
+    var prefix = '제 단무지 지식 베이스에서 찾았어요 ✨\n\n**' + top.title + '**\n\n';
     var body = top.content;
     var sourceLine = '\n\n_📚 출처: ' + (top.source || 'canonical memory') + '_';
 
@@ -1219,7 +1219,7 @@
     }
     if (intent === 'price-inquiry') {
       return {
-        answer: '가격 문의시군요! 어떤 제품인지 알려주시면 정확한 정보를 드릴 수 있어요.\n\n참고로 단무지공방은 **회원 등급별 PPC 라인 10-40% 차등 할인**이 있고, 장바구니 → **견적 요청** 시 등급 할인이 자동 적용돼요 ✨',
+        answer: '가격 문의시군요! 어떤 제품인지 알려주시면 정확한 정보를 드릴 수 있어요.\n\n참고로 단무지는 **회원 등급별 PPC 라인 10-40% 차등 할인**이 있고, 장바구니 → **견적 요청** 시 등급 할인이 자동 적용돼요 ✨',
         page_links: [
           { label: '회원 등급·할인 안내', url: 'membership.html' },
           { label: '브랜드별 제품 보기 (Levitaz)', url: 'levitaz.html' }
@@ -1370,12 +1370,12 @@
     };
   }
 
-  // §173 Phase2 v4 — 강습·스쿨 문의 → 단무지공방 자체 컨설팅·강습 안내
+  // §173 Phase2 v4 — 강습·스쿨 문의 → 단무지 자체 컨설팅·강습 안내
   //   canonical lock: 외부 강습 스쿨 추천 절대 X (책임·검증 이슈). 일반 정의 fallback X.
   function lessonReply() {
     return {
       answer:
-        '단무지공방은 직접 **1:1 윙포일 컨설팅·강습**을 운영합니다 🙌\n\n'
+        '단무지는 직접 **1:1 윙포일 컨설팅·강습**을 운영합니다 🙌\n\n'
         + '**옥덕필 박사**(윙) + **조수철 선수**(카이트) 공동 운영이에요. '
         + '입문자는 **육상 → 수상 조작 → 수상 띄우기** 3단계 세션 분리가 핵심 노하우예요.\n\n',
       page_links: [
@@ -1392,9 +1392,9 @@
       return greetingReply();
     }
 
-    // §173 Phase2 v4 — 강습·스쿨·레슨 문의 → 단무지공방 자체 컨설팅·강습 안내 (KB/FAQ 검색 전 최우선)
+    // §173 Phase2 v4 — 강습·스쿨·레슨 문의 → 단무지 자체 컨설팅·강습 안내 (KB/FAQ 검색 전 최우선)
     //   "윙포일 강습스쿨 추천" 이 "윙포일" FAQ 강매치로 일반 정의로 떨어지는 버그 방지.
-    //   외부 강습 스쿨 추천 절대 X — 단무지공방 컨설팅 frame 으로만 안내.
+    //   외부 강습 스쿨 추천 절대 X — 단무지 컨설팅 frame 으로만 안내.
     if (LESSON_TRIGGER_RE.test(query)) {
       return lessonReply();
     }
@@ -1588,7 +1588,7 @@
     // §173-E (2026-05-22) — 비로그인 방문자에게도 "안녕하세요" 인사 노출 (기본 인사 누락 fix).
     var nameLine = name ? '안녕하세요 **' + name + '**님!\n' : '안녕하세요!\n';
     var greeting = nameLine
-      + '**Coach Danny** — 단무지공방 옥덕필 박사(Danny) 입니다 ✨\n\n'
+      + '**Coach Danny** — 단무지 옥덕필 박사(Danny) 입니다 ✨\n\n'
       + '윙포일 **라이딩·장비·교육** 무엇이든 자유롭게 질문해 주세요.\n\n'
       + '*예시 질문:*\n'
       + '• "윙포일 처음인데 뭐부터 시작해야 해요?"\n'
@@ -1630,7 +1630,7 @@
     var fab = document.createElement('button');
     fab.type = 'button';
     fab.className = 'agent-deny-fab';
-    fab.setAttribute('aria-label', 'Coach Danny — 단무지공방 윙포일 컨설팅 챗 열기');
+    fab.setAttribute('aria-label', 'Coach Danny — 단무지 윙포일 컨설팅 챗 열기');
     fab.setAttribute('aria-expanded', 'false');
     fab.setAttribute('aria-controls', 'agent-deny-panel');
     fab.innerHTML = ''
@@ -1652,7 +1652,7 @@
       +   '<span class="agent-deny-panel__avatar">' + avatarPictureHtml(48, '') + '</span>'
       +   '<div class="agent-deny-panel__titles">'
       +     '<h2 class="agent-deny-panel__title" id="agent-deny-title">Coach Danny</h2>'
-      +     '<p class="agent-deny-panel__subtitle">옥덕필 박사 · 단무지공방 윙포일 컨설팅</p>'
+      +     '<p class="agent-deny-panel__subtitle">옥덕필 박사 · 단무지 윙포일 컨설팅</p>'
       +   '</div>'
       +   '<button type="button" class="agent-deny-panel__close" aria-label="대화창 닫기">×</button>'
       + '</header>'

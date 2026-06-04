@@ -1,6 +1,6 @@
 # DMJ Lifting Calculator — PWA
 
-윙포일 라이딩 윙 사이즈·속도 계산기. 단무지공방 사이트 안 calculator.html 의 mobile-first PWA port.
+윙포일 라이딩 윙 사이즈·속도 계산기. 단무지 사이트 안 calculator.html 의 mobile-first PWA port.
 
 ## 파일 구조
 
@@ -43,7 +43,7 @@ site/calculator-pwa/
 
 **Mac 에서**:
 ```bash
-cd ~/Documents/Claude/Projects/단무지공방\ 홈페이지\ 만들기/site/calculator-pwa
+cd ~/Documents/Claude/Projects/단무지\ 홈페이지\ 만들기/site/calculator-pwa
 python3 -m http.server 8080
 ```
 
@@ -63,7 +63,7 @@ ipconfig getifaddr en0
 
 ### 옵션 B: dmjgroup.kr 사이트에 deploy (권장)
 
-기존 단무지공방 사이트와 같이 배포:
+기존 단무지 사이트와 같이 배포:
 ```
 https://dmjgroup.kr/calculator-pwa/
 ```
@@ -78,7 +78,7 @@ https://dmjgroup.kr/calculator-pwa/
 ### 옵션 C: ngrok 으로 임시 https 터널 (베타 테스트용)
 
 ```bash
-cd ~/Documents/Claude/Projects/단무지공방\ 홈페이지\ 만들기/site/calculator-pwa
+cd ~/Documents/Claude/Projects/단무지\ 홈페이지\ 만들기/site/calculator-pwa
 python3 -m http.server 8080 &
 ngrok http 8080
 ```
@@ -88,7 +88,7 @@ ngrok 이 발급한 `https://xxxx-xx-xx.ngrok-free.app` URL 을 라이더에게 
 ## 로컬 시각 검증 (mac 에서 직접)
 
 ```bash
-cd ~/Documents/Claude/Projects/단무지공방\ 홈페이지\ 만들기/site/calculator-pwa
+cd ~/Documents/Claude/Projects/단무지\ 홈페이지\ 만들기/site/calculator-pwa
 python3 -m http.server 8080
 ```
 
@@ -137,4 +137,4 @@ PWA MVP 검증 후 Danny 결정 시 React Native 또는 Flutter 로 native rewri
 
 빌드 step 없음 — 정적 HTML/CSS/JS 만으로 작동. Nginx·Apache·GitHub Pages·Netlify·Cloudflare Pages 등 어디든 정적 호스팅 가능.
 
-기존 단무지공방 사이트 영향 0 — `site/calculator-pwa/` 폴더 내부에서만 작동, 사이트 다른 페이지 수정 0건.
+기존 단무지 사이트 영향 0 — `site/calculator-pwa/` 폴더 내부에서만 작동, 사이트 다른 페이지 수정 0건.

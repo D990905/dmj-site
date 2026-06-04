@@ -1,7 +1,7 @@
 # PHASE 9 — Nav 재구성 + 이미지·콘텐츠 완성형 Changelog
 
 **날짜**: 2026-05-05
-**범위**: 단무지공방 사이트 nav 5-stage 재구성, 4 brand SKU 이미지 적용, 한국 대화체 description, products.json 동기화
+**범위**: 단무지 사이트 nav 5-stage 재구성, 4 brand SKU 이미지 적용, 한국 대화체 description, products.json 동기화
 
 ---
 
@@ -25,7 +25,7 @@
 | Policy | policy/terms.html, policy/refund.html, policy/shipping.html, policy/privacy.html | ✅ | ✅ |
 
 ### Footer 변경
-- About 단무지공방 컬럼 추가 (정식 수입·4 brand·spot 검증·1년 AS·Danny credentials)
+- About 단무지 컬럼 추가 (정식 수입·4 brand·spot 검증·1년 AS·Danny credentials)
 - 20 페이지 적용 (footer-grid 있는 페이지)
 
 ### CSS 추가 (style.css)
@@ -126,14 +126,14 @@
 - `placeholder-img` (catalog.html Tailwind grid) — Phase 2 product card refactor 시 처리
 
 ### Footer
-- About 단무지공방 컬럼 — 20/20 (footer-grid 있는 페이지) ✅
+- About 단무지 컬럼 — 20/20 (footer-grid 있는 페이지) ✅
 
 ---
 
 ## Local preview
 
 ```bash
-cd "단무지공방 홈페이지 만들기/site"
+cd "단무지 홈페이지 만들기/site"
 python3 -m http.server 8000
 # 브라우저: http://localhost:8000
 ```
@@ -178,4 +178,4 @@ python3 -m http.server 8000
 | `site/assets/images/IMAGE_INVENTORY.md` | 새 manifest 문서 |
 
 ---
-[리브랜딩 2026-05-05: 단무지그룹 → 단무지공방 — Option A 채택. 이 changelog 안 '단무지공방'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]
+[리브랜딩 2026-05-05: 단무지그룹 → 단무지 — Option A 채택. 이 changelog 안 '단무지'은 후속 일괄 치환 결과이며, 작성 당시 brand는 '단무지그룹'이었음.]

@@ -3,7 +3,7 @@
     "version": "1.0",
     "updated": "2026-05-11",
     "source": "WW_Distributor_CHF_WIP_SS26_PREORDER_FORM_A.xlsx (Forward WIP 본사 distributor preorder form)",
-    "note": "Forward WIP SS26 시즌 단무지공방 실제 발주 SKU 한정. 491 SKU 카탈로그 中 74 SKU 만 발주 → 사이트 우선 노출 대상.",
+    "note": "Forward WIP SS26 시즌 단무지 실제 발주 SKU 한정. 491 SKU 카탈로그 中 74 SKU 만 발주 → 사이트 우선 노출 대상.",
     "pricing_basis": "KRW retail = RRP USD × 1471 (1,000원 단위 반올림) · KRW cost = Purchase CHF × 1882 (100원 단위 반올림)",
     "total_ordered_sku": 73,
     "total_ordered_units": 124,

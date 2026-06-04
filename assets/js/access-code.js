@@ -1,5 +1,5 @@
 /* ==========================================================================
-   단무지공방 — Premium Access Code Module v1
+   단무지 — Premium Access Code Module v1
    DO_NOT_REVERT §100 / §104 / §175 (Danny 2026-05-16 FREE_MODE)
 
    모델: 회원가입 + 장비 등록 → 액세스 코드 발급 (Phase 1 임시 구현)

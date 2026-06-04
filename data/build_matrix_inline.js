@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ==========================================================================
-   단무지공방 — Matrix inline generator
+   단무지 — Matrix inline generator
    /site/data/build_matrix_inline.js
    사용법:  node site/data/build_matrix_inline.js
    입력  :  data/products.json + data/equipment_matrix.json (canonical SoT)
@@ -26,7 +26,7 @@ const matrix   = JSON.parse(fs.readFileSync(matrixPath,   'utf8'));
 const today    = new Date().toISOString().slice(0, 10);
 
 const body = `/* ==========================================================================
-   단무지공방 — Matrix data inline fallback
+   단무지 — Matrix data inline fallback
    /site/data/dmj-matrix-inline.js
    GENERATED ${today} — DO NOT EDIT BY HAND.
    Single source of truth = data/products.json + data/equipment_matrix.json.
