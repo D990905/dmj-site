@@ -79,10 +79,10 @@ footer{margin-top:12px;font-size:11px;color:#9aa1ac;text-align:center;}
 </style>
 </head>
 <body>
-<h2 class="sr-only">단무지그룹 작전실 — 12명 좌석. 앞 데이빗(CoS), 인프라 3, 전문가 8(3·3·2). 출근/진행/대기 상태와 담당·진행중·다음 업무.</h2>
+<h2 class="sr-only">단무지그룹 작전실 — 9명 좌석. 데이빗(CoS) 1명 + 전문가 8명(3·3·2). 인프라 운영은 CoS 영역으로 흡수 (2026-06-04 결정). 출근/진행/대기 상태와 담당·진행중·다음 업무.</h2>
 <div class="wrap">
   <h1><span class="stamp">單武智</span> 단무지그룹 작전실</h1>
-  <div class="sub" id="meta">교실 배치 · 출근/진행/대기 실시간 · 2026-06-02 KST</div>
+  <div class="sub" id="meta">교실 배치 · 출근/진행/대기 실시간 · 2026-06-04 KST · 9명 (CoS 1 + 전문가 8)</div>
   <div class="summary" id="summary"></div>
   <div class="hint">카드를 <b>탭</b>하면 그 사람에게 지시할 수 있습니다. 채팅에서 <b>데이빗</b>에게 바로 말해도 됩니다.</div>
   <div class="board">— 단무지그룹 작전실 —</div>
@@ -93,7 +93,7 @@ footer{margin-top:12px;font-size:11px;color:#9aa1ac;text-align:center;}
     <span><i class="dot standby"></i> 대기 중</span>
     <span><i class="dot off"></i> 미출근</span>
   </div>
-  <footer>앞줄 데이빗(CoS) · 둘째 줄 인프라(시스템) · 뒷줄 전문가 8명 (3·3·2). 아바타는 인물 특징 반영 일러스트.</footer>
+  <footer>앞줄 데이빗(CoS) · 뒷줄 전문가 8명 (3·3·2). 인프라 운영은 CoS 영역으로 흡수 (2026-06-04 결정). 아바타는 인물 특징 반영 일러스트.</footer>
 </div>
 <script>
 // ---- SVG 사람 아바타 (Persona Bible 외형 특징 반영) ----
@@ -151,13 +151,10 @@ function robot(o){
     <rect x="32" y="54" width="16" height="8" rx="3" fill="${c}" opacity="0.5"/>
   </svg>`;
 }
-const COS=[{type:"p",name:"데이빗 옥",role:"팀 지휘·지시 전달",att:"work",now:"아티팩트 거울 개선",done:"회원 로그인 연결·사이트 QA 총괄",next:"hero·about 검수 + 도메인 인증 안내",learn:"멀티에이전트 오케스트레이션 패턴",assignable:false,
+// 2026-06-04 옥대표님 결정: 팀 12명 → 9명 재구조.
+// 인프라 #9·#10·#11 entry 제거 (도메인 전문가 아닌 운영 sub-track) → CoS (데이빗) 영역으로 흡수.
+const COS=[{type:"p",name:"데이빗 옥",role:"팀 지휘·지시 전달·인프라 운영",att:"work",now:"팀 9명 재구조 + 인프라 흡수",done:"§193 모바일·§194 lift-calc·§195 단무지 sweep 라이브 + KPI audit",next:"마케팅 캠페인 발사 sprint dispatch",learn:"멀티에이전트 오케스트레이션 패턴",assignable:false,
   av:{bg:"#fdf3da",skin:"#e8c4a0",skinD:"#d4ad88",hair:"side",hairCol:"#2a2a2a",gray:true,glasses:"metal",shirt:"#2d3e5e"}}];
-const INFRA=[
- {type:"r",name:"인프라 #9",role:"대시보드 운영",att:"work",now:"거울 갱신·운영",done:"모바일 layout 종결·거울 라이브",next:"실데이터 자동 연결",learn:"실시간 상태 투영(state projection) 최적화",av:{col:"#2aa39a",bg:"#e4f4f2"}},
- {type:"r",name:"인프라 #10",role:"서버·데이터 관리",att:"work",now:"Supabase 점검",done:"DB 스키마·SMTP·인증 점검(95%)",next:"Kakao OAuth 연결",learn:"RLS 행 보안 정책 심화",av:{col:"#8a93a3",bg:"#eef0f3"}},
- {type:"r",name:"인프라 #11",role:"자동화 총괄",att:"standby",now:"대기 모드",done:"daemon·자동화 셋업",next:"옥대표님 명령 대기",learn:"이벤트 기반 워크플로우 설계",av:{col:"#7c5cc4",bg:"#efe9f8"}},
-];
 const EXPERTS=[
  {type:"p",name:"로즈 윤",role:"화면 디자인",att:"work",now:"디자인 QA",done:"디자인 일관성 QA·nav 간격 기준",next:"색·폰트 토큰 통일",learn:"W3C 디자인 토큰 시스템",
    av:{bg:"#eceef2",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#191919",glasses:"rimless",shirt:"#2b3340"}},
@@ -169,15 +166,15 @@ const EXPERTS=[
    av:{bg:"#ecedef",skin:"#eac6a4",skinD:"#d6b08c",hair:"curlyShort",hairCol:"#171717",glasses:"round",shirt:"#262626"}},
  {type:"p",name:"메이 한",role:"사용 편의 연구",att:"work",now:"UX 점검",done:"UX QA 15건",next:"구매흐름 개선",learn:"모바일 결제 흐름 UX 패턴",
    av:{bg:"#f3ece8",skin:"#f0d3bd",skinD:"#dcb89e",hair:"bob",hairCol:"#5a3d28",glasses:"none",shirt:"#c08560"}},
- {type:"p",name:"캔 최",role:"마케팅·홍보",att:"work",now:"콘텐츠 QA",done:"카톡 통일·콘텐츠 QA·about 카피",next:"6/3 론칭 게시 카피",learn:"인스타 릴스 알고리즘 트렌드",
+ {type:"p",name:"캔 최",role:"마케팅·홍보",att:"work",now:"§195 단무지 sweep 라이브",done:"브랜드 단무지 sweep 986건 교체·법무 유지",next:"마케팅 캠페인 발사 (다음 sprint)",learn:"인스타 릴스 알고리즘 트렌드",
    av:{bg:"#eaf1ea",skin:"#e6b88e",skinD:"#d1a173",hair:"short",hairCol:"#161616",cap:"#1a1f2b",glasses:"big",shirt:"#4f6f4f"}},
- {type:"p",name:"히로 구",role:"센서·기기 개발",att:"standby",now:"EVT 전 대기",done:"하드웨어 reference v1",next:"장비 규격 확정",learn:"BLE GATT 저전력 설계",
+ {type:"p",name:"히로 구",role:"센서·기기 개발",att:"standby",now:"Phase 2 EVT 진입 대기",done:"하드웨어 reference v1",next:"옥대표님 EVT GO 신호",learn:"BLE GATT 저전력 설계",
    av:{bg:"#edeef0",skin:"#deb288",skinD:"#c89c70",hair:"short",hairCol:"#565656",gray:true,glasses:"square",shirt:"#444b4a"}},
- {type:"p",name:"왕 정",role:"휴대폰 앱",att:"work",now:"앱 설계 완료",done:"모바일 앱 설계 문서",next:"옥대표님 verify 3건",learn:"HealthKit 워크아웃 API",
+ {type:"p",name:"왕 정",role:"휴대폰 앱",att:"standby",now:"verify 3건 대기",done:"모바일 앱 설계 문서 1,175라인",next:"옥대표님 Garmin·status·push 통일 verify",learn:"HealthKit 워크아웃 API",
    av:{bg:"#ecedf1",skin:"#eac6a4",skinD:"#d6b08c",hair:"longCurly",hairCol:"#171717",glasses:"none",shirt:"#2b2b2b"}},
 ];
 const LABEL={work:"근무 중",block:"막힘",standby:"대기 중",off:"미출근"};
-function avatar(p){ return p.type==="r"? robot({...p.av,name:p.name}) : person({...p.av,name:p.name}); }
+function avatar(p){ return person({...p.av,name:p.name}); }
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 function seat(p){
   const cls="seat "+p.att+(p.assignable===false?" cos":"");
@@ -196,7 +193,7 @@ function seat(p){
 }
 function rows(arr,n){const r=[];for(let i=0;i<arr.length;i+=n)r.push(arr.slice(i,i+n));return r;}
 function render(){
-  const all=[...COS,...INFRA,...EXPERTS];
+  const all=[...COS,...EXPERTS];
   const c={work:0,block:0,standby:0,off:0}; all.forEach(p=>c[p.att]++);
   document.getElementById("summary").innerHTML=
     `<span class="chip"><b>${all.length}</b>명</span>`+
@@ -205,8 +202,7 @@ function render(){
     `<span class="chip standby"><b>${c.standby}</b> 대기</span>`+
     `<span class="chip off"><b>${c.off}</b> 미출근</span>`;
   let h="";
-  h+=`<div class="deck-label">CoS · 작전 지휘</div><div class="seats one">${COS.map(seat).join("")}</div>`;
-  h+=`<div class="divider"></div><div class="deck-label">인프라 (시스템)</div><div class="seats three">${INFRA.map(seat).join("")}</div>`;
+  h+=`<div class="deck-label">CoS · 작전 지휘 + 인프라 운영</div><div class="seats one">${COS.map(seat).join("")}</div>`;
   h+=`<div class="divider"></div><div class="deck-label">전문가 8</div>`;
   rows(EXPERTS,3).forEach(r=>{const rc=r.length===3?"three":(r.length===2?"two":"one");h+=`<div class="seats ${rc}" style="margin-bottom:9px">${r.map(seat).join("")}</div>`;});
   document.getElementById("room").innerHTML=h;

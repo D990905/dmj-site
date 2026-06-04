@@ -743,9 +743,13 @@
 
 ---
 
-## 14. 인프라 #9·#10·#11 — Orchestration Trio (★ 비표준, 사람 페르소나 아님)
+## 14. 인프라 #9·#10·#11 — Orchestration Trio (★ DEPRECATED 2026-06-04)
 
-> **위치**: 클라우드 + Danny Mac. 데이빗 부재 동안의 dispatch 자동화 + 의장의 single-pane-of-glass + 자동 git push. **인프라 = 신경계, 데이빗 = 머리**. 둘 다 필요.
+> ⚠️ **DEPRECATED 2026-06-04 — 옥대표님 결정**: 인프라 #9·#10·#11 의 "페르소나 entry" 는 12명 운영팀 KPI 단위에서 제거. 도메인 전문가가 아닌 운영 sub-track 이라는 판단. 코드와 라이브 산출물 (`admin/dashboard/`, `orchestrator/src/`, Supabase 등) 은 모두 그대로 유지되며, 운영 책임은 **데이빗 옥 (CoS) 영역으로 흡수**. 본 §14 은 history archive 로 남김 (개념·아키텍처 reference). KPI scorecard 에서는 8 전문가 + 데이빗 = 9명 기준으로 운영.
+> 
+> 참고: `_team/kpi_audit_2026-06-04.md` §5·§7 (의장 결정 부록), `_team/team_mirror.html` 9 좌석 layout, `team_mirror.html` Cowork 라이브 아티팩트 v2 (2026-06-04 갱신).
+
+> **위치 (archived)**: 클라우드 + Danny Mac. 데이빗 부재 동안의 dispatch 자동화 + 의장의 single-pane-of-glass + 자동 git push. **인프라 = 신경계, 데이빗 = 머리**. 둘 다 필요.
 
 ### 14-1. 정체
 - **분류**: 시스템 인프라 (사람 페르소나 아님 — 사람 entry 와 같은 깊이로 정리하되 일부 항목은 인프라용 어휘로 치환)
