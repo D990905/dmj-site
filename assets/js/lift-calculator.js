@@ -554,17 +554,38 @@
     };
 
     if (extreme) {
-      var boostMax = windBoostKt(maxWing);
-      var minWindRaw = vtarget_kt_precise - boostMax;
-      result.min_wind_kt = Math.ceil(minWindRaw * 10) / 10;
-      var v_target_max_kt = windKt + boostMax;
-      if (v_target_max_kt > 0) {
-        var v_min_max_kt = v_target_max_kt / (pf * sf);
-        var v_min_max_ms = v_min_max_kt * CONST.KT_TO_MS;
-        var A_foil_min_m2 = (2 * mTotal * CONST.G) / (rho * cl * v_min_max_ms * v_min_max_ms);
-        result.min_foil_area_cm2 = Math.ceil(A_foil_min_m2 * 10000 / 10) * 10;
+      // §190 (티모 2026-06-04 · I-1 fix, 옥대표님 승인) — binding 원인별 역산 분기.
+      // 기존: comfort-floor binding 인데도 takeoff 물리만 역산 → 현재 풍속보다 낮은
+      // min_wind / 현재 포일보다 작은 min_foil 역방향 안내 (90kg@10kt 실측 버그).
+      if (binding === 'comfort') {
+        // floor(V) ≤ maxWing 이 되는 최소 풍속을 §178/§178b floor 식에서 역산:
+        //   (9.0 − 0.3·V) · (mTotal/80) · pumpScale ≤ maxWing
+        //   → V ≥ (9.0 − maxWing·80/(mTotal·pumpScale)) / 0.3
+        var pumpScale = (pumping === 'hard') ? 0.85
+                      : (pumping === 'easy') ? 1.15
+                      : 1.00;
+        var vFloor = (9.0 - (maxWing * 80) / (mTotal * pumpScale)) / 0.3;
+        // takeoff 측 최소 풍속과 둘 다 충족해야 하므로 max 취함
+        var boostMaxC = windBoostKt(maxWing);
+        var minWindTakeoff = vtarget_kt_precise - boostMaxC;
+        result.min_wind_kt = Math.ceil(Math.max(vFloor, minWindTakeoff) * 10) / 10;
+        result.extreme_reason = 'comfort_floor';   // UI 문구 분기용
+        result.min_foil_area_cm2 = null;           // 포일 안내는 takeoff binding 시에만 유효
       } else {
-        result.min_foil_area_cm2 = null;
+        // takeoff binding — 기존 역산 유지
+        var boostMax = windBoostKt(maxWing);
+        var minWindRaw = vtarget_kt_precise - boostMax;
+        result.min_wind_kt = Math.ceil(minWindRaw * 10) / 10;
+        result.extreme_reason = 'takeoff';
+        var v_target_max_kt = windKt + boostMax;
+        if (v_target_max_kt > 0) {
+          var v_min_max_kt = v_target_max_kt / (pf * sf);
+          var v_min_max_ms = v_min_max_kt * CONST.KT_TO_MS;
+          var A_foil_min_m2 = (2 * mTotal * CONST.G) / (rho * cl * v_min_max_ms * v_min_max_ms);
+          result.min_foil_area_cm2 = Math.ceil(A_foil_min_m2 * 10000 / 10) * 10;
+        } else {
+          result.min_foil_area_cm2 = null;
+        }
       }
     }
 

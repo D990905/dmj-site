@@ -136,10 +136,16 @@
         + ' / floor ' + recMin.precise_comfort_floor_m2.toFixed(2) + ' m²';
     } else if (recMin && recMin.extreme) {
       rWing.textContent = '—';
-      var alt = [];
-      if (recMin.min_wind_kt != null) alt.push('풍속 ≥ ' + recMin.min_wind_kt.toFixed(1) + 'kt');
-      if (recMin.min_foil_area_cm2 != null) alt.push('foil ≥ ' + recMin.min_foil_area_cm2 + 'cm²');
-      rWingDetail.innerHTML = '<span style="color:var(--err-fg)">라인업으로 불가</span> · 필요: ' + alt.join(' 또는 ');
+      // §190 (티모 2026-06-04 · I-1 fix, 옥대표님 승인) — comfort-floor extreme 은 풍속 안내만
+      if (recMin.extreme_reason === 'comfort_floor') {
+        rWingDetail.innerHTML = '<span style="color:var(--err-fg)">컨트롤 기준으로 라인업(최대 ' + recMin.max_wing_in_lineup_m2.toFixed(1) + 'm²) 초과</span>'
+          + (recMin.min_wind_kt != null ? ' · 풍속이 약 ' + recMin.min_wind_kt.toFixed(1) + 'kt 이상이면 현재 라인업으로 컨트롤 기준을 충족합니다' : '');
+      } else {
+        var alt = [];
+        if (recMin.min_wind_kt != null) alt.push('풍속 ≥ ' + recMin.min_wind_kt.toFixed(1) + 'kt');
+        if (recMin.min_foil_area_cm2 != null) alt.push('foil ≥ ' + recMin.min_foil_area_cm2 + 'cm²');
+        rWingDetail.innerHTML = '<span style="color:var(--err-fg)">라인업으로 불가</span> · 필요: ' + alt.join(' 또는 ');
+      }
     } else {
       rWing.textContent = '—';
       rWingDetail.textContent = '';
