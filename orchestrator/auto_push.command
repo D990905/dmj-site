@@ -203,8 +203,8 @@ push_output=$(git push origin main 2>&1); push_rc=$?
 if [ $push_rc -ne 0 ]; then
   case "$push_output" in
     *"non-fast-forward"*|*"fetch first"*|*"rejected"*)
-      echo "==> push rejected (non-fast-forward). Trying pull --rebase..."
-      retry_git "git pull --rebase" git pull --rebase origin main || {
+      echo "==> push rejected (non-fast-forward). Trying pull --rebase --autostash..."
+      retry_git "git pull --rebase --autostash" git pull --rebase --autostash origin main || {
         echo "ERROR: pull --rebase failed. Manual intervention needed." >&2
         echo "$push_output" >&2
         read -n 1 -p "Press any key..."; exit 1
