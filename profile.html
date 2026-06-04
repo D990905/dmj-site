@@ -560,7 +560,7 @@
   <option value="Flash 3/2mm Wetsuit"><option value="Flash 4/3mm Wetsuit"><option value="Wetsuit Boots 3mm">
 </datalist>
 
-<script src="assets/js/supabase-auth.js?v=supabase-184-20260604" defer></script>
+<script src="assets/js/supabase-auth.js?v=supabase-187-20260604" defer></script>
 <!-- v2 데이터 주도 스킬 레벨 평가 — 추천·동의 카드 -->
 <script src="assets/js/skill-level.js" defer></script>
 <!-- §171-B cart system — for nav badge. -->
@@ -620,8 +620,14 @@
     renderHero(user);
 
     document.getElementById('btn-logout').addEventListener('click', function () {
-      window.DMJAuth.logout();
-      window.location.assign('login.html');
+      // §188 (데이빗 2026-06-04) — Supabase logout 은 async. 완료 전 페이지 이동 시
+      // signOut 요청이 중단돼 세션이 살아남던 버그 fix (nav-auth §179 와 동일 패턴).
+      var go = function () { window.location.assign('login.html'); };
+      try {
+        var r = window.DMJAuth.logout();
+        if (r && typeof r.then === 'function') { r.then(go)['catch'](go); return; }
+      } catch (e) {}
+      go();
     });
     document.getElementById('btn-edit-info').addEventListener('click', function () {
       var s = document.getElementById('section-info');
@@ -965,8 +971,12 @@
           }
         }
       } catch (_) {}
-      var updated = window.DMJAuth.updateUser(patch);
-      if (updated) {
+      // §187 (인프라#10 2026-06-04) — updateUser 는 Supabase 전환 후 Promise.
+      // §187 extra 필드 (stance/phone/address/favoriteSpots) 는 동기 반영되므로
+      // currentUser() 가 저장 직후 이미 완전한 객체를 돌려준다. Promise 결과를
+      // 직접 객체로 쓰던 옛 sync-shim 코드 회귀 X.
+      Promise.resolve(window.DMJAuth.updateUser(patch)).then(function () {
+        var updated = window.DMJAuth.currentUser() || {};
         renderHero(updated);
         var st = document.getElementById('info-save-status');
         st.textContent = '저장 완료';
@@ -975,7 +985,29 @@
         toast('기본 정보 저장됨');
         // §169-N v5-B — 저장 후 compact view 로 자동 collapse
         renderInfoCompact(updated);
+      }).catch(function () {
+        toast('저장 중 오류가 발생했습니다');
+      });
+    });
+
+    // §187 (인프라#10 2026-06-04) — Supabase 세션/프로필이 async 로 해소된 뒤
+    // (cloud pull 완료 포함) 기본 정보 폼·compact view 재채움.
+    // 페이지 로드 직후 1회 채움만으로는 fresh 로그인 시 빈 캐시가 들어가던 회귀 fix.
+    // 사용자가 폼 편집 중 (expanded + focus가 폼 안) 이면 덮어쓰지 않는다.
+    window.addEventListener('dmj-auth-change', function (ev) {
+      var d = (ev && ev.detail) || {};
+      if (!d.isLoggedIn) return;
+      var u = window.DMJAuth.currentUser();
+      if (!u) return;
+      var expanded = document.getElementById('info-expanded');
+      var editing = expanded && !expanded.hidden &&
+                    expanded.contains(document.activeElement) &&
+                    document.activeElement !== document.body;
+      if (!editing) {
+        loadInfoForm(u);
+        renderInfoCompact(u);
       }
+      renderHero(u);
     });
 
     // ===== 3. §B 프로필 사진 =====

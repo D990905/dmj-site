@@ -367,6 +367,137 @@
     return null;
   }
 
+  /* ---------- 영상 클립 blob 영구 보존 (IndexedDB) — §189 (샘 2026-06-04) ----------
+   * 리플레이에 올린 영상 파일 자체를 IndexedDB 에 보존한다. 기존
+   * rd_videosync_v1 (localStorage) 은 "배치값"만 저장해, 재방문 시
+   * 영상을 다시 올려야 했다 — blob 까지 저장해 "저장한 내용이 모두
+   * 그대로" 남게 한다. localStorage 는 문자열 전용·~5MB 라 영상 blob
+   * 에 부적합하므로 IndexedDB 를 쓴다.
+   *   DB: rd_video_blobs_v1 / objectStore: clips
+   *   key = sessionSig + '::' + 파일명 (keyPath 없음 — out-of-line key)
+   *   value = { sig, name, type, lastModified, blob }
+   * 전부 Promise 기반. IndexedDB 미지원·실패 시 reject — caller 가
+   * try/catch(.catch) 로 흡수해 리플레이 본 기능은 절대 깨지 않는다. */
+  var VIDEO_DB_NAME = 'rd_video_blobs_v1';
+  var VIDEO_DB_STORE = 'clips';
+  var videoDbPromise = null;
+  function openVideoDb() {
+    /* §189 — DB 연결은 1회 열어 재사용. 실패 시 promise 캐시를 비워
+       다음 호출에서 재시도할 수 있게 한다. */
+    if (videoDbPromise) return videoDbPromise;
+    videoDbPromise = new Promise(function (resolve, reject) {
+      try {
+        var idb = global.indexedDB;
+        if (!idb) { reject(new Error('IndexedDB unavailable')); return; }
+        var req = idb.open(VIDEO_DB_NAME, 1);
+        req.onupgradeneeded = function () {
+          var db = req.result;
+          if (!db.objectStoreNames.contains(VIDEO_DB_STORE)) {
+            db.createObjectStore(VIDEO_DB_STORE);
+          }
+        };
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { reject(req.error || new Error('IndexedDB open failed')); };
+        req.onblocked = function () { reject(new Error('IndexedDB open blocked')); };
+      } catch (e) { reject(e); }
+    });
+    videoDbPromise['catch'](function () { videoDbPromise = null; });
+    return videoDbPromise;
+  }
+  function videoBlobKey(sig, name) { return String(sig) + '::' + String(name); }
+  function videoTx(mode, fn) {
+    /* §189 — 트랜잭션 보일러플레이트. fn(store, resolve, reject) */
+    return openVideoDb().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        try {
+          var tx = db.transaction(VIDEO_DB_STORE, mode);
+          var store = tx.objectStore(VIDEO_DB_STORE);
+          tx.onerror = function () { reject(tx.error || new Error('IndexedDB tx failed')); };
+          tx.onabort = function () { reject(tx.error || new Error('IndexedDB tx aborted')); };
+          fn(store, resolve, reject);
+        } catch (e) { reject(e); }
+      });
+    });
+  }
+  /* 영상 blob 저장 — 같은 키(세션+파일명)면 덮어쓴다(put). */
+  function saveVideoBlob(sig, name, file) {
+    if (!sig || !name || !file) return Promise.reject(new Error('saveVideoBlob: bad args'));
+    return videoTx('readwrite', function (store, resolve, reject) {
+      var rec = {
+        sig: String(sig),
+        name: String(name),
+        type: file.type || '',
+        lastModified: file.lastModified || Date.now(),
+        blob: file
+      };
+      var req = store.put(rec, videoBlobKey(sig, name));
+      req.onsuccess = function () { resolve({ ok: true }); };
+      req.onerror = function () { reject(req.error || new Error('saveVideoBlob put failed')); };
+    });
+  }
+  /* 해당 세션(sig)의 저장된 영상 전체 목록 — [{name,type,lastModified,blob}] */
+  function loadVideoBlobs(sig) {
+    if (!sig) return Promise.resolve([]);
+    return videoTx('readonly', function (store, resolve, reject) {
+      var prefix = String(sig) + '::';
+      var out = [];
+      var range = null;
+      try {
+        /* prefix 범위 커서 — '::' 뒤 파일명은 임의이므로
+           [prefix, prefix + '\uffff'] 로 잡는다. */
+        range = global.IDBKeyRange
+          ? global.IDBKeyRange.bound(prefix, prefix + '\uffff')
+          : null;
+      } catch (e) { range = null; }
+      var req = store.openCursor(range);
+      req.onsuccess = function () {
+        var cur = req.result;
+        if (!cur) { resolve(out); return; }
+        var k = String(cur.key);
+        if (k.indexOf(prefix) === 0 && cur.value && cur.value.blob) {
+          out.push({
+            name: cur.value.name || k.slice(prefix.length),
+            type: cur.value.type || '',
+            lastModified: cur.value.lastModified || Date.now(),
+            blob: cur.value.blob
+          });
+        }
+        cur['continue']();
+      };
+      req.onerror = function () { reject(req.error || new Error('loadVideoBlobs cursor failed')); };
+    });
+  }
+  /* 클립 1개 blob 삭제 (사용자가 클립 Remove 시) */
+  function removeVideoBlob(sig, name) {
+    if (!sig || !name) return Promise.resolve({ ok: false });
+    return videoTx('readwrite', function (store, resolve, reject) {
+      var req = store['delete'](videoBlobKey(sig, name));
+      req.onsuccess = function () { resolve({ ok: true }); };
+      req.onerror = function () { reject(req.error || new Error('removeVideoBlob failed')); };
+    });
+  }
+  /* 해당 세션(sig)의 blob 전체 삭제 (전체 영상 제거 시) */
+  function clearVideoBlobs(sig) {
+    if (!sig) return Promise.resolve({ ok: false });
+    return videoTx('readwrite', function (store, resolve, reject) {
+      var prefix = String(sig) + '::';
+      var range = null;
+      try {
+        range = global.IDBKeyRange
+          ? global.IDBKeyRange.bound(prefix, prefix + '\uffff')
+          : null;
+      } catch (e) { range = null; }
+      var req = store.openCursor(range);
+      req.onsuccess = function () {
+        var cur = req.result;
+        if (!cur) { resolve({ ok: true }); return; }
+        if (String(cur.key).indexOf(prefix) === 0) cur['delete']();
+        cur['continue']();
+      };
+      req.onerror = function () { reject(req.error || new Error('clearVideoBlobs failed')); };
+    });
+  }
+
   /* ---------- 라이더 · 장비 프로필 (전역, 마지막 입력값 유지) ---------- */
   /* 체중·스킬은 거의 안 바뀌고 윙·포일도 자주 안 바뀌므로, 한 번
      입력하면 다음 세션에 자동으로 채워지도록 브라우저에 저장한다.
@@ -1042,6 +1173,11 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     loadSessionTitle: loadSessionTitle,
     saveVideoSync: saveVideoSync,
     loadVideoSync: loadVideoSync,
+    /* §189 (샘 2026-06-04) — 영상 클립 blob 영구 보존 (IndexedDB) */
+    saveVideoBlob: saveVideoBlob,
+    loadVideoBlobs: loadVideoBlobs,
+    removeVideoBlob: removeVideoBlob,
+    clearVideoBlobs: clearVideoBlobs,
     saveRider: saveRider,
     loadRider: loadRider,
     computeFitnessTrend: computeFitnessTrend,

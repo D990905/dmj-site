@@ -47,7 +47,9 @@
     'water_stage',
     'consult_history',
     'quotes_history',
-    'orders'
+    'orders',
+    'gear',          // §184 — profiles 컬럼 없음 → user_data sync
+    'profile_extra'  // §187 (인프라#10 2026-06-04) — stance/phone/address/favoriteSpots
   ];
 
   var sb = null;             // Supabase client (lazy init)
@@ -85,7 +87,11 @@
           refreshProfile().then(function () {
             if (event === 'SIGNED_IN') {
               // OAuth 로그인 또는 첫 진입 — cloud 데이터 pull
-              pullUserDataFromCloud().catch(function () {});
+              // §187 — pull 후 refreshProfile 재실행: profile_extra (stance/phone/address/
+              // favoriteSpots) 가 cloud → localStorage 로 내려온 뒤 cachedProfile 에 병합되도록.
+              pullUserDataFromCloud().then(function () {
+                return refreshProfile();
+              }).catch(function () {});
             }
           });
         } else {
@@ -144,8 +150,56 @@
     return [];
   }
 
+  /* §187 (인프라#10 2026-06-04) — 기본 정보 확장 필드 저장 경로.
+     profiles 테이블에 stance/phone/address/favorite_spots 컬럼이 없어
+     (a) mapLegacyPatchToDb 가 silently drop (쓰기 증발)
+     (b) mapDbToLegacy 가 필드 자체를 안 만들어 항상 undefined (읽기 증발)
+     → 마이페이지 기본 정보가 로그인할 때마다 비는 회귀. §184 gear 와 동일 패턴.
+     Phase 13 컬럼 추가 전까지 user_data 'profile_extra' suffix (JSON object
+     {stance, phone, address, favoriteSpots, favoriteSpot}) 를 SoT 로 쓴다.
+     setUserData = 동기 localStorage + 백그라운드 Supabase user_data sync.
+     옛 auth-shim(dmj_users[email]) 잔존 기본정보는 1회 자동 이관.
+     DO_NOT_REVERT §187. */
+  var EXTRA_PROFILE_FIELDS = ['stance', 'phone', 'address', 'favoriteSpots', 'favoriteSpot'];
+
+  function _readProfileExtraCache(uid, email) {
+    try {
+      var k = USER_NS_PREFIX + uid + '_profile_extra';
+      var raw = localStorage.getItem(k);
+      if (raw != null) {
+        var obj = JSON.parse(raw);
+        return (obj && typeof obj === 'object' && !Array.isArray(obj)) ? obj : {};
+      }
+      // 레거시 dmj_users 1회 이관 — 옛 localStorage 회원 시스템 기본정보 복구
+      if (email) {
+        var usersRaw = localStorage.getItem('dmj_users');
+        if (usersRaw) {
+          var users = JSON.parse(usersRaw);
+          var legacy = users && users[String(email).toLowerCase()];
+          if (legacy) {
+            var mig = {};
+            var found = false;
+            for (var i = 0; i < EXTRA_PROFILE_FIELDS.length; i++) {
+              var f = EXTRA_PROFILE_FIELDS[i];
+              var v = legacy[f];
+              if (v != null && v !== '' && !(Array.isArray(v) && v.length === 0)) {
+                mig[f] = v; found = true;
+              }
+            }
+            if (found) {
+              localStorage.setItem(k, JSON.stringify(mig));
+              return mig;
+            }
+          }
+        }
+      }
+    } catch (e) {}
+    return {};
+  }
+
   function mapDbToLegacy(profile, authUser) {
     if (!profile) return null;
+    var extra = _readProfileExtraCache(profile.id, (authUser && authUser.email) || profile.email);  // §187
     return {
       id: profile.id,
       email: (authUser && authUser.email) || profile.email || '',
@@ -155,7 +209,12 @@
       birthYear: profile.birth_year != null ? String(profile.birth_year) : '',
       ridingStart: profile.riding_start || '',
       mainSports: profile.main_sports || [],
-      favoriteSpot: profile.favorite_spot_text || '',
+      favoriteSpot: profile.favorite_spot_text || extra.favoriteSpot || '',
+      // §187 — profiles 컬럼 없는 기본정보 확장 필드 (user_data 'profile_extra' SoT)
+      favoriteSpots: Array.isArray(extra.favoriteSpots) ? extra.favoriteSpots : [],
+      stance: extra.stance || '',
+      phone: extra.phone || '',
+      address: extra.address || '',
       avatarBase64: profile.avatar_url || '',  // legacy 필드명 보존
       avatar_url: profile.avatar_url || '',    // Kakao 프로필 사진 URL 직접 접근용
       tier: profile.tier || 'member',
@@ -285,6 +344,48 @@
       }
       if (!hasRest) return Promise.resolve(cachedProfile);
       patch = rest;
+    }
+    // §187 (인프라#10 2026-06-04) — stance/phone/address/favoriteSpots(+favoriteSpot)
+    // 는 profiles 컬럼이 없어 user_data 'profile_extra' 로 저장 (§184 gear 동일 패턴).
+    // 동기 반영 — 저장 직후 currentUser() 를 읽는 사용처 (profile.html compact view 등) 호환.
+    var hasExtra = false;
+    for (var ei = 0; ei < EXTRA_PROFILE_FIELDS.length; ei++) {
+      if (EXTRA_PROFILE_FIELDS[ei] in patch) { hasExtra = true; break; }
+    }
+    if (hasExtra) {
+      var uid = currentUserId();
+      var extraObj = uid ? _readProfileExtraCache(uid, cachedProfile && cachedProfile.email) : {};
+      var rest2 = {}; var hasRest2 = false;
+      for (var pk in patch) {
+        if (!Object.prototype.hasOwnProperty.call(patch, pk)) continue;
+        if (EXTRA_PROFILE_FIELDS.indexOf(pk) >= 0) {
+          extraObj[pk] = patch[pk];
+          if (cachedProfile) cachedProfile[pk] = patch[pk];
+        } else {
+          rest2[pk] = patch[pk]; hasRest2 = true;
+          // favoriteSpot 은 profiles.favorite_spot_text 컬럼도 있어 양쪽 모두 기록
+        }
+      }
+      // favoriteSpot 는 DB 컬럼도 존재 — DB patch 에도 유지 (extra 는 fallback 용)
+      if ('favoriteSpot' in patch) { rest2.favoriteSpot = patch.favoriteSpot; hasRest2 = true; }
+      try { setUserData('profile_extra', JSON.stringify(extraObj)); } catch (e) {}
+      if (cachedProfile) {
+        try { localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cachedProfile)); } catch (e) {}
+      }
+      if (!hasRest2) return Promise.resolve(cachedProfile);
+      patch = rest2;
+    }
+    // §187 — DB 컬럼 매핑 필드도 동기 반영 (refreshProfile 완료 전 stale 읽기 방지)
+    if (cachedProfile) {
+      var SYNC_FIELDS = ['name', 'nickname', 'gender', 'birthYear', 'ridingStart', 'mainSports', 'favoriteSpot', 'avatarBase64'];
+      var touched = false;
+      for (var si = 0; si < SYNC_FIELDS.length; si++) {
+        var sf = SYNC_FIELDS[si];
+        if (sf in patch) { cachedProfile[sf] = patch[sf]; touched = true; }
+      }
+      if (touched) {
+        try { localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cachedProfile)); } catch (e) {}
+      }
     }
     return ensureClient().then(function () {
       if (!cachedSession) return null;
@@ -592,7 +693,16 @@
   // ─────────────────────────────────────────────────────────────────────
   ensureClient().then(function () {
     if (cachedSession) {
-      return pullUserDataFromCloud();
+      // §187 — pull 후 refreshProfile 재실행 (profile_extra 병합 + dmj-auth-change 재통지)
+      return pullUserDataFromCloud().then(function () {
+        return refreshProfile();
+      }).then(function () {
+        try {
+          window.dispatchEvent(new CustomEvent('dmj-auth-change', {
+            detail: { event: 'PROFILE_SYNCED', isLoggedIn: true }
+          }));
+        } catch (e) {}
+      });
     }
   }).catch(function (e) {
     console.warn('[DMJAuth §180] init failed', e);

@@ -1943,6 +1943,85 @@
     R.videoReady = true;
     readVideoMeta(file, clip);                 // 녹화 시각 → 자동 배치
     if (R.activeClipId == null) activateClip(clip);
+    /* §189 (샘 2026-06-04) — 영상 파일 자체를 IndexedDB 에 백그라운드
+       보존. 배치값(rd_videosync_v1)만 저장하던 기존 방식은 재방문 시
+       영상을 다시 올려야 했다 — blob 까지 저장해 "저장한 내용이 모두
+       그대로" 남게 한다. 저장 실패(quota 등)는 console.warn 만 —
+       리플레이 본 기능은 그대로 동작한다. IndexedDB 에서 복원된
+       파일(_rdRestored)은 다시 쓰지 않는다(동일 blob 재기록 회피).
+       같은 이름 파일을 다시 올리면 put 으로 덮어쓴다. */
+    persistClipBlob(clip);
+  }
+
+  /* §189 (샘 2026-06-04) — 클립 blob 영구 저장 (실패해도 본 기능 무손상) */
+  function persistClipBlob(clip) {
+    try {
+      if (!global.RDStorage || !global.RDStorage.saveVideoBlob) return;
+      if (!R || !R.sessionSig || !clip || !clip.file) return;
+      if (clip.file._rdRestored) return;       // 복원분 — 이미 저장돼 있음
+      var file = clip.file, name = clip.name, sig = R.sessionSig;
+      function doSave() {
+        global.RDStorage.saveVideoBlob(sig, name, file)['catch'](function (e) {
+          console.warn('§189 video blob save failed (' + name + '):', e);
+        });
+      }
+      /* 용량 안전 — 추정 가능하면 남은 quota 가 파일보다 작을 때 skip */
+      if (global.navigator && global.navigator.storage &&
+          typeof global.navigator.storage.estimate === 'function') {
+        global.navigator.storage.estimate().then(function (est) {
+          var free = (est && est.quota != null && est.usage != null)
+            ? (est.quota - est.usage) : null;
+          if (free != null && file.size != null && free < file.size) {
+            console.warn('§189 video blob save skipped (quota 부족): ' + name +
+              ' (' + file.size + 'B > free ' + free + 'B)');
+            return;
+          }
+          doSave();
+        })['catch'](doSave);                   // estimate 실패 — 그냥 시도
+      } else {
+        doSave();
+      }
+    } catch (e) {
+      console.warn('§189 persistClipBlob error:', e);
+    }
+  }
+
+  /* §189 (샘 2026-06-04) — open() 시 저장된 영상 blob 복원. 저장된 각
+     항목을 File 로 되살려 기존 loadVideoFiles 경로로 추가한다 —
+     autoPlaceClip 의 'Saved manual placement' 복원과 자동 연결돼
+     수동 동기화 위치까지 그대로 살아난다. 같은 이름 클립이 이미
+     있으면 skip (중복 복원 방지). 실패는 console.warn 만. */
+  function restorePersistedClips() {
+    try {
+      if (!global.RDStorage || !global.RDStorage.loadVideoBlobs) return;
+      if (!R || !R.sessionSig) return;
+      var ref = R;                             // 복원 완료 시점 세션 동일성 가드
+      var sig = R.sessionSig;
+      global.RDStorage.loadVideoBlobs(sig).then(function (items) {
+        if (!R || R !== ref || !items || !items.length) return;
+        var files = [];
+        items.forEach(function (it) {
+          if (!it || !it.blob || !it.name) return;
+          var dup = R.clips.some(function (c) { return c.name === it.name; });
+          if (dup) return;                     // 이미 올라온 같은 이름 클립 — skip
+          try {
+            var f = new File([it.blob], it.name, {
+              type: it.type || it.blob.type || '',
+              lastModified: it.lastModified || Date.now()
+            });
+            f._rdRestored = true;              // persistClipBlob 재기록 방지 표식
+            files.push(f);
+          } catch (e) {
+            console.warn('§189 video blob restore failed (' + it.name + '):', e);
+          }
+        });
+        if (files.length && R && R === ref) loadVideoFiles(files);
+      })['catch'](function (e) {
+        console.warn('§189 video blob restore failed:', e);
+      });
+    } catch (e) {
+      console.warn('§189 restorePersistedClips error:', e);
+    }
   }
 
   /* 활성 클립 — 단일 <video> 에 그 클립의 src 를 싣는다 */
@@ -1987,6 +2066,16 @@
     if (idx < 0) return;
     var clip = R.clips[idx];
     try { URL.revokeObjectURL(clip.url); } catch (e) {}
+    /* §189 (샘 2026-06-04) — 클립 제거 시 보존된 blob 도 삭제.
+       (close() 는 removeClip 을 부르지 않으므로 닫기만으로는 안 지워진다 —
+       의도된 동작: 닫았다 다시 열면 영상이 그대로 복원된다.) */
+    try {
+      if (global.RDStorage && global.RDStorage.removeVideoBlob && R.sessionSig) {
+        global.RDStorage.removeVideoBlob(R.sessionSig, clip.name)['catch'](function (e) {
+          console.warn('§189 video blob remove failed (' + clip.name + '):', e);
+        });
+      }
+    } catch (e) { console.warn('§189 video blob remove error:', e); }
     R.clips.splice(idx, 1);
     if (R.activeClipId === id) {
       R.activeClipId = null;
@@ -2014,7 +2103,17 @@
   /* 전체 영상 제거 */
   function removeAllClips() {
     if (!R) return;
+    var sig = R.sessionSig;
     R.clips.slice().forEach(function (c) { removeClip(c.id); });
+    /* §189 (샘 2026-06-04) — 세션의 보존 blob 일괄 정리 (removeClip 의
+       개별 삭제에 더해, 혹시 남은 orphan 항목까지 비운다). */
+    try {
+      if (global.RDStorage && global.RDStorage.clearVideoBlobs && sig) {
+        global.RDStorage.clearVideoBlobs(sig)['catch'](function (e) {
+          console.warn('§189 video blob clear failed:', e);
+        });
+      }
+    } catch (e) { console.warn('§189 video blob clear error:', e); }
   }
 
   /* 영상 ↔ 데이터 동기 (영상은 슬레이브) — 재생 헤드가 든 구간의
@@ -2872,6 +2971,11 @@
     }, 80);
 
     seek(R.t0, true);
+    /* §189 (샘 2026-06-04) — 이전에 올렸던 영상 blob 을 IndexedDB 에서
+       복원. 기존 loadVideoFiles 경로로 추가돼 autoPlaceClip 의
+       'Saved manual placement' (rd_videosync_v1) 와 자동 연결 —
+       수동 동기화 위치까지 그대로 살아난다. 비동기·실패 무해. */
+    restorePersistedClips();
     return true;
   }
 
