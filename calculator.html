@@ -73,6 +73,8 @@
   .calc-radio-group--2 { grid-template-columns: repeat(2, 1fr); }
   .calc-radio-group--4 { grid-template-columns: repeat(4, 1fr); }
   @media (max-width: 480px) { .calc-radio-group--4 { grid-template-columns: repeat(2, 1fr); } }
+  /* §193 P1-? — 3열 default 라벨 360px 화면에서 ≈100px → 한국어 라벨 wrap/잘림 방지 */
+  @media (max-width: 480px) { .calc-radio-group { grid-template-columns: repeat(2, 1fr); } }
   .calc-radio-group label { padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; font-size: 0.875rem; font-weight: 600; color: var(--color-charcoal); transition: all 0.15s; }
   .calc-radio-group input { display: none; }
   .calc-radio-group input:checked + span { color: var(--color-navy); }
@@ -276,6 +278,11 @@
     <li><a href="style/choppy-freeride.html">Choppy·Freeride</a></li>
     <li><a href="style/wave.html">Wave</a></li>
     <li><a href="style/hybrid.html">Hybrid</a></li>
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="levitaz.html">Levitaz</a></li>
+    <li><a href="ppc.html">PPC</a></li>
+    <li><a href="takoon.html">Takoon</a></li>
+    <li><a href="wip.html">Forward WIP</a></li>
     <li class="mobile-menu__heading">실력 수준</li>
     <li><a href="level/beginner.html">입문</a></li>
     <li><a href="level/novice.html">초급</a></li>
@@ -810,9 +817,11 @@
       var marginTxt = (recMin.margin_kt != null && recMin.margin_kt >= 0)
         ? '여유 +' + recMin.margin_kt.toFixed(1) + 'kt'
         : '';
+      // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — P2: 추천 근거(binding) 캡션 명시.
+      // I-2 (b)안 — 표기만, 물리 계산 복권 모델 변경 없음. 텍스트 캡션 수준 (§165 v7 유념).
       var bindLabel = recMin.binding === 'comfort'
-        ? '<span style="color:#8a5a00">컨트롤 여유 floor 결정</span>'
-        : '<span style="color:#1d6b3a">부상 한계 결정</span>';
+        ? '<span style="color:#8a5a00">기준: 컨트롤 안정 (체중·풍속 업계 차트)</span>'
+        : '<span style="color:#1d6b3a">기준: 이륙 물리 (양력 방정식)</span>';
       crWingDetail.innerHTML = bindLabel
         + ' · <span style="color:#1d6b3a">' + marginTxt + '</span>'
         + ' · 부상 min ' + recMin.precise_takeoff_min_m2.toFixed(2) + 'm² / 컨트롤 floor ' + recMin.precise_comfort_floor_m2.toFixed(2) + 'm²';
@@ -1193,7 +1202,9 @@
         + '<span class="term" title="Velocity Made Good — 풍상 방향으로의 실효 진척 속도. SOG × cos(풍상 진행 각도)">VMG(VMG)</span> <b>' + res.base.V_vmg_kt.toFixed(1) + ' kt</b> · '
         + '<span class="term" title="True Wind Angle — 바람 방향과 보드 진행 방향 사이의 각도. 작을수록 풍상 가까이 진행">풍상 진행 각도</span> ' + res.base.tack_angle_deg + '°'
         + (res.base.depowered ? ' · <span style="color:#8a5a00" class="term" title="라이더가 옆으로 받는 힘이 한계에 도달 — 윙이 풀파워를 못 냄">⚠ 라이더 한계에 걸려 윙 힘 일부 손실</span>' : '')
-        + (res.base.feasible ? '' : ' · <span style="color:#8b2014">⚠ 풍상 진행 불가</span>');
+        + (res.base.feasible ? '' : ' · <span style="color:#8b2014">⚠ 풍상 진행 불가</span>')
+        // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — I-3: V_b cap 도달 표기 (§181-C lock 값 변경 금지)
+        + (res.base.capped ? ' · <span style="color:#8a5a00">△ 모델 상한(35kt) 도달 — 참고용</span>' : '');
     }
     list.innerHTML = '';
     // Top 5 만 노출. delta_vmg 양수만 — 음수는 별도 영역
@@ -1288,17 +1299,17 @@
     for (var i = 0; i <= 4; i++) {
       var yv = yTop * i / 4, yy = sy(yv);
       s.push('<line x1="' + mL + '" y1="' + f1(yy) + '" x2="' + (mL + pw) + '" y2="' + f1(yy) + '" stroke="#EDF1F5"/>');
-      s.push('<text x="' + (mL - 6) + '" y="' + f1(yy + 3) + '" text-anchor="end" font-size="9" fill="#5C6F7E">' + yv.toFixed(0) + '</text>');
+      s.push('<text x="' + (mL - 6) + '" y="' + f1(yy + 4) + '" text-anchor="end" font-size="12" fill="#5C6F7E">' + yv.toFixed(0) + '</text>');
     }
-    s.push('<text x="13" y="' + (mT + ph / 2) + '" text-anchor="middle" font-size="9" fill="#5C6F7E" transform="rotate(-90 13 ' + (mT + ph / 2) + ')">' + yLabel + ' (kt)</text>');
+    s.push('<text x="13" y="' + (mT + ph / 2) + '" text-anchor="middle" font-size="12" fill="#5C6F7E" transform="rotate(-90 13 ' + (mT + ph / 2) + ')">' + yLabel + ' (kt)</text>');
 
     // x 눈금 (정수)
     for (var a = 3; a <= 8; a++) {
       var xx = sx(a);
       s.push('<line x1="' + f1(xx) + '" y1="' + (mT + ph) + '" x2="' + f1(xx) + '" y2="' + (mT + ph + 4) + '" stroke="#C8D2DC"/>');
-      s.push('<text x="' + f1(xx) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">' + a + '</text>');
+      s.push('<text x="' + f1(xx) + '" y="' + (mT + ph + 18) + '" text-anchor="middle" font-size="12" fill="#5C6F7E">' + a + '</text>');
     }
-    s.push('<text x="' + (mL + pw / 2) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">윙 사이즈 (m²)</text>');
+    s.push('<text x="' + (mL + pw / 2) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="12" fill="#5C6F7E">윙 사이즈 (m²)</text>');
 
     // §181-F/G — 추천 밴드: 실사용(변풍 반영) ~ 퍼포먼스
     var recPerf = (rec && rec.performance) ? rec.performance : null;
@@ -1390,6 +1401,11 @@
         txt = '이 조합에서는 <b>윙을 키울수록 속도가 오릅니다</b> — 라이더·바람 조건상 사용 가능한 범위 안에서는 과출력 정점이 나타나지 않습니다. '
             + '실제 사이즈는 컨트롤·이착수 편의를 고려해 추천 범위에서 고르세요.';
       }
+      // §191 (티모 2026-06-04 · P2+I-3, 옥대표님 승인) — I-3: V_b cap 도달 구간 표기.
+      // cap 값(35kt) 자체는 §181-C lock — 변경 금지, 표기만.
+      if (curve.any_capped) {
+        txt += '<br><span style="color:#8a5a00">△ 일부 강풍 구간은 모델 상한(35kt)에 도달 — 참고용</span>';
+      }
       captionEl.innerHTML = txt;
     }
   }
@@ -1448,17 +1464,17 @@
     for (var i = 0; i <= 4; i++) {
       var yv = yTop * i / 4, yy = sy(yv);
       s.push('<line x1="' + mL + '" y1="' + f1(yy) + '" x2="' + (mL + pw) + '" y2="' + f1(yy) + '" stroke="#EDF1F5"/>');
-      s.push('<text x="' + (mL - 6) + '" y="' + f1(yy + 3) + '" text-anchor="end" font-size="9" fill="#5C6F7E">' + yv.toFixed(0) + '</text>');
+      s.push('<text x="' + (mL - 6) + '" y="' + f1(yy + 4) + '" text-anchor="end" font-size="12" fill="#5C6F7E">' + yv.toFixed(0) + '</text>');
     }
-    s.push('<text x="13" y="' + (mT + ph / 2) + '" text-anchor="middle" font-size="9" fill="#5C6F7E" transform="rotate(-90 13 ' + (mT + ph / 2) + ')">버틸 수 있는 max 윙 (m²)</text>');
+    s.push('<text x="13" y="' + (mT + ph / 2) + '" text-anchor="middle" font-size="12" fill="#5C6F7E" transform="rotate(-90 13 ' + (mT + ph / 2) + ')">버틸 수 있는 max 윙 (m²)</text>');
 
     // x 눈금 (heel 각도)
     [0, 10, 20, 30, 40].forEach(function (d) {
       var xx = sx(d);
       s.push('<line x1="' + f1(xx) + '" y1="' + (mT + ph) + '" x2="' + f1(xx) + '" y2="' + (mT + ph + 4) + '" stroke="#C8D2DC"/>');
-      s.push('<text x="' + f1(xx) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">' + d + '°</text>');
+      s.push('<text x="' + f1(xx) + '" y="' + (mT + ph + 18) + '" text-anchor="middle" font-size="12" fill="#5C6F7E">' + d + '°</text>');
     });
-    s.push('<text x="' + (mL + pw / 2) + '" y="' + (H - 7) + '" text-anchor="middle" font-size="9" fill="#5C6F7E">heel (기댐) 각도</text>');
+    s.push('<text x="' + (mL + pw / 2) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="12" fill="#5C6F7E">heel (기댐) 각도</text>');
 
     // 레이싱 클래스 상한 (7.4) 수평 점선
     if (cap <= yTop) {

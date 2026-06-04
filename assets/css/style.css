@@ -1401,7 +1401,7 @@ a.persona__pack:focus-visible,
   margin: 0 0 var(--space-4);
 }
 .footer-col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-2); }
-.footer-col ul a { font-size: var(--fs-sm); color: rgba(255,255,255,0.65); transition: color var(--dur-base) var(--ease); }
+.footer-col ul a { font-size: var(--fs-sm); color: rgba(255,255,255,0.65); transition: color var(--dur-base) var(--ease); display: inline-block; padding: 6px 0; } /* §193 P1-7 — 모바일 터치 타겟 pitch ≥36px (이전 ~28px) */
 .footer-col ul a:hover { color: var(--color-white); }
 
 .footer-business {
@@ -2718,8 +2718,10 @@ a.persona__pack:focus-visible,
 }
 
 /* ── Compare table: 모바일에서 가로 스크롤 + 폰트 축소 ──────────────────── */
+/* §193 .compare-wrap 추가 — 브랜드 hub 4페이지 (levitaz/ppc/takoon/wip) 비교표 가로 스크롤 보장 */
 @media (max-width: 640px) {
-  .compare-table-wrap {
+  .compare-table-wrap,
+  .compare-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -5867,6 +5869,38 @@ p {
 .gear-dash-stat__cta:hover { text-decoration: underline; }
 
 .gear-dash-empty { margin: 0; color: var(--color-slate); font-size: 13px; text-align: center; }
+
+/* §192 (알렉스 2026-06-04) — My Gear 대시보드 모바일(≤540px) 가독성 축소.
+   옥대표님 지시: 모바일 차트 사이즈 대폭 축소 + 카드 패딩/폰트 축소 + 컴팩트 배치.
+   데스크탑(>540px) 모양 불변 — 이 블록은 ≤540px 미디어쿼리 안에만 존재. §185 +N 버튼 보존. */
+@media (max-width: 540px) {
+  .gear-dashboard { padding: 12px 12px; margin-bottom: 16px; }
+  .gear-dashboard__head { margin-bottom: 10px; }
+  .gear-dashboard__title { font-size: 15px; }
+  .gear-dashboard__sub { font-size: 11px; }
+  .gear-dashboard__grid { gap: 8px; }
+  .gear-dash-card { padding: 10px 12px; min-height: 0; gap: 6px; border-radius: 10px; }
+  .gear-dash-card__title { font-size: 10px; }
+  /* 차트 자체 축소 — donut 160→112px, gauge 160×100→120×75 (viewBox scale) */
+  .gear-dash-card--donut .gear-dash-card__viz svg { width: 112px; height: 112px; }
+  .gear-dash-card--gauge .gear-dash-card__viz svg { width: 120px; height: 75px; }
+  .gear-dash-card__legend { gap: 4px 10px; }
+  .gear-dash-legend__item { font-size: 11px; }
+  .gear-dash-legend__dot { width: 8px; height: 8px; }
+  .gear-dash-gauge-label { font-size: 11px; margin-top: 4px; }
+  /* bar row — 라벨 잘림 없이 좁은 폭에서도 3열 유지 (라벨 비중 ↑ / count 폭 ↓) */
+  .gear-dash-bar-row { grid-template-columns: minmax(72px, 42%) 1fr 30px; gap: 6px; font-size: 11px; padding: 1px 0; }
+  .gear-dash-bar-row__track { height: 6px; }
+  .gear-dash-bar-row__count { font-size: 11px; }
+  .gear-dash-bar-row--more-btn { font-size: 10px; padding: 4px 0; }
+  /* stats — 2열 유지(기존) + 카드 자체 컴팩트 */
+  .gear-dashboard__stats { gap: 6px; margin-top: 10px; }
+  .gear-dash-stat { padding: 8px 10px; min-height: 54px; gap: 2px; }
+  .gear-dash-stat__value { font-size: 17px; }
+  .gear-dash-stat__value small { font-size: 10px; }
+  .gear-dash-stat__label { font-size: 10px; }
+  .gear-dash-stat__cta { font-size: 11px; }
+}
 
 /* §169-N v3 — gear list collapsed by default on return visit. toggle button styling. */
 .gear-list-controls { margin-bottom: 12px; }
