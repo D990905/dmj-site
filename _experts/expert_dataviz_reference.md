@@ -202,11 +202,13 @@ Tufte 의 핵심 4 원칙을 우리 대시보드 맥락으로 번역한다.
 ### 2-8. 속도 분포 파이 (Chart.js pie) — `renderHistogram`
 
 - **위치** `charts.js:1290~1450`
-- **구성** 체류 시간 비율 (≥7% 슬라이스에 % 직접 표기) + sea blue 단일 hue ramp + '기타' 자동 병합 (<3%) + 범례에 구간·% 동반
+- **구성** 체류 시간 비율 (≥7% 슬라이스에 % 직접 표기) + **status 5단계 ramp (statusAt 위임)** + '기타' 자동 병합 (<3%) + 범례에 구간·% 동반
 - **정합성** ✅ — 작은 구간 OTHER_PCT_THRESHOLD 병합으로 범례가 0% 줄줄이 안 됨 (5월 25일).
-- **Data-ink ratio** ✅ — 5월 26일 Layer 2.0 변경 (status 5단계 → sea blue 단일 hue) 이 **정확히 옳다.** 분포는 sequential 이지 diverging 이 아님.
+- **Data-ink ratio** ✅ — **6/5 옥대표님 결정** — `speedColor()` 를 `statusAt(f)` 위임으로 변경. 다른 차트 (VPS donut · 효율 셀) 와 색감 통일.
 - **인터랙션** 🟡 — Chart.js 기본 tooltip + 범례 토글. legend item 클릭으로 슬라이스 hide 가능.
 - **개선 후보** (P2) — **파이 vs 도넛 vs 가로 막대** 검토. Tufte 는 파이를 싫어한다 (각도 비교가 길이 비교보다 어려움). 우리 케이스는 슬라이스 수가 5~8 개라 파이가 OK 지만, **가로 막대 (sorted by %)** 가 더 정확. 단 파이의 친숙도 이점이 있어 trade-off — Visual Designer / UX Researcher 협업 결정.
+
+**자기 정정 (2026-06-05)** — 5/27 본 entry 의 "5월 26일 Layer 2.0 변경 (status 5단계 → sea blue 단일 hue) 이 정확히 옳다" 평가는 Tufte sequential vs diverging 원칙만 우선한 학술 결론. 사용자 (옥대표님) 인지 검증 안 함. 실제로는 "빠를수록 좋음" 직관 매핑이 자연 → status 5단계 sequential 인코딩이 정합. 다른 차트와 색감 통일이 인지 효율 ↑. 6/5 옥대표님 verbatim 피드백 받아 `speedColor()` → `statusAt(f)` 위임으로 정정.
 
 ### 2-9. 심박 추이 (Chart.js line + zone 배경) — `renderHrChart`
 

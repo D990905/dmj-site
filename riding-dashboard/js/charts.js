@@ -51,24 +51,27 @@
       '"Malgun Gothic",system-ui,sans-serif';
   }
 
-  /* 속도 분포 파이 색 — 단일 hue (sea blue) 진하기 진행으로 통일
-     (Danny 2026-05-26 Layer 2.0 — 라임·머스타드 짬뽕 시정).
-     이전: chart-theme statusAt() 5단계 빨강→노랑→초록 램프. 시각적으로
-     상태색의 다른 차트(VPS·성공률 도넛 등) 와 의미 혼동을 일으켜, 단일
-     sea blue hue 의 옅음→짙음 진행으로 변경한다. 의미는 동일 — 느릴수록
-     옅고, 빠를수록 짙다 (속도 분포 인코딩). 디자인 시스템 §1 상태색은
-     '성과(잘함/못함)' 인코딩 전용이라, 분포 인코딩은 hue 가 다른 게 옳다.
-     색은 chart-theme.js 의 sea blue(#1F8FFF) 단일 톤에서만 파생. */
-  function speedColor(kt, maxKt) {
-    var f = maxKt > 0 ? Math.max(0, Math.min(1, kt / maxKt)) : 0;
-    /* opacity 0.32 → 1.0 진행 + lightness 도 함께 (옅음→짙음) */
-    /* 시작색 #BDD9FF (연한 sea) → 끝색 #1F8FFF (짙은 sea) — sea blue 단일 hue */
-    var startR = 189, startG = 217, startB = 255;       /* #BDD9FF */
-    var endR   =  22, endG   = 112, endB   = 204;       /* #1670CC */
-    return 'rgb(' +
-      Math.round(startR + (endR - startR) * f) + ',' +
-      Math.round(startG + (endG - startG) * f) + ',' +
-      Math.round(startB + (endB - startB) * f) + ')';
+  /* 속도 분포 파이 색 — chart-theme.js statusAt() 5단계 ramp 직접 위임
+     (옥대표님 2026-06-05 — 다른 그래프와 색감 통일 + 6 slice 구분 명확).
+     이전 (2026-05-26 Layer 2.0): sea blue 단일 hue ramp (#BDD9FF → #1670CC).
+     상태색과 의미 혼동 회피 의도였으나, 사용자 인지에서 "빠를수록 좋음"
+     직관 매핑이 자연 → status 5단계 sequential 인코딩이 정합. 다른 차트
+     (VPS donut · 효율 셀 등) 와 색감 통일 = 인지 효율 ↑.
+     statusAt 5 앵커 (#D6453A → #EC8A2E → #F2C20E → #7FC241 → #1FA055):
+       속도 낮음 = 빨강(veryBad) → 높음 = 초록(veryGood). 빠를수록 좋음.
+     디자인 시스템 §1 상태색 "성과 잘함/못함 전용" 원칙은 속도 분포에도
+     valid — 속도 자체가 "빠름=좋음" sequential 인코딩이므로.
+     본인 (샘 정 #2) audit 자기 정정 — expert_dataviz_reference.md §2-8
+     "sea blue 정확히 옳다" 평가 철회. 신규 hex 0건, 토큰 100% 재사용.
+     minKt 인자 — bin 범위로 정규화해 6 slice 전체 5 앵커 ramp 사용
+     (생략 시 0 default = 절대 정규화). renderHistogram 은 minKt 전달. */
+  function speedColor(kt, maxKt, minKt) {
+    var lo = (minKt != null) ? minKt : 0;
+    var span = (maxKt - lo);
+    var f = (span > 0) ? Math.max(0, Math.min(1, (kt - lo) / span)) : 0;
+    /* RDChartTheme.statusAt(0..1) 위임 — null 또는 누락 시 sea blue fallback */
+    if (T && typeof T.statusAt === 'function') return T.statusAt(f);
+    return 'rgb(31,143,255)';                                 /* fallback */
   }
 
   /* 지도 트랙 선·범례 — 느림=빨강·중간=주황·빠름=초록. 밝은 OSM 타일
@@ -1361,9 +1364,13 @@
              ' ' + unit;
     });
     var mins = bins.map(function (b) { return b.seconds / 60; });
+    /* bin 범위 (minKt) 정규화 — 12kt 이상 분포가 5 앵커 ramp 전체를 사용
+       (그렇지 않으면 라임~초록만 나옴). 첫 live bin 의 fromKt 가 minKt. */
+    var minKt = (liveBins.length && liveBins[0].fromKt != null)
+      ? liveBins[0].fromKt : 0;
     var colors = bins.map(function (b) {
       var mid = b.isOther ? b.otherSpeed : (b.fromKt + b.toKt) / 2;
-      return speedColor(mid, maxKt);
+      return speedColor(mid, maxKt, minKt);
     });
     var pcts = bins.map(function (b) { return b.seconds / totalSec * 100; });
 

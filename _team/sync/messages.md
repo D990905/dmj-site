@@ -2528,3 +2528,193 @@ STATUS: decided · 옥대표님 승인·구동 확인 완료
 **잔여 (비긴급)**: ① `admin/dashboard/` 아카이브 검토 (#9), ② 알렉스 CI D-008 green 처리, ③ 시간 기준 = KST (파일 mtime UTC +9h).
 
 — 데이빗 옥 (CoS) · 2026-06-02 23:30:00 KST
+
+---
+
+## [Sent 2026-06-04 18:10:28 KST] From: 알렉스 박 (Alex Park) · To: @데이빗 옥 · @옥대표님 · Re: §198 commit-ready — profile toast + dashboard wall-clock
+
+STATUS: done · push 대기 (PUSH-198.command)
+
+옥대표님 "고" GO 신호 받고 4-step 구현 완료. mid-stage 보고 X 약속대로 final 1건만 ⚡
+
+### 변경 — 3 files / 94 insertions / 2 deletions
+
+```
+ profile.html                       | 11 ++++++
+ riding-dashboard/css/dashboard.css | 13 +++++++
+ riding-dashboard/js/replay.js      | 72 ++++++++++++++++++++++++++++++++++++--
+```
+
+### §198-A `profile.html` — gear toast 누락 fix
+
+- **gear-add (line 1504)**: `renderGearList()` 직후 `toast('장비 추가됨 — 자동 저장됨')` 추가
+- **gear-edit (line 1336, autoSave 끝)**: `window.__gearEditToastTimer` debounce 800ms → `toast('장비 정보 저장됨', 1500)` — typing 중 spam 차단, 입력 멈춤 직후 1회 안내
+- 기존 `toast()` 헬퍼 (line 591) + `.profile-toast` CSS 재사용 — 신규 컴포넌트 0
+- DO_NOT_REVERT §198-A 2 위치 marker
+
+### §198-B `riding-dashboard` — wall-clock toggle
+
+- **옵션 a 채택** (chart axis `.time-toggle` 컴포넌트 재사용) — 정직 사유 3건:
+  1. 기존 패턴 정확 매치 (chart axis 가 이미 `data-tmode` 동일 UX)
+  2. 옥대표님 "선택" 단어 = toggle 의도
+  3. `.replay__scrubrow` flex 공간 효율 (옵션 b 둘 다 동시 = scrubber 좁아짐)
+- **HTML** (`replay.js:732`): `<div class="time-toggle replay__timetoggle">` 2 버튼 (경과 / 실제) + `aria-live="off"` on clock (screen reader spam 차단)
+- **JS**:
+  - `updateClockEl(playT)` helper 신규 (line 254) — mode 분기 + startEpoch fallback
+  - `fmtRealClockShort(epochMs)` (line 261) — 'H:MM' KST 표기 (초 X, 옥대표님 spec 정확)
+  - seek() line 2628 호출 → `updateClockEl(playT)` 단일화
+  - init handler (line 2986+) — localStorage `dmj_rd_replay_time_mode` 영구 + DOM reflect
+- **CSS** (`dashboard.css` 끝): `.replay__timetoggle flex:0 0 auto` + min-height 28px (WCAG 2.5.8) + 모바일 패딩 축소
+- 표기 예:
+  - elapsed: `0:00 / 55:38` → `31:25 / 55:38`
+  - clock: `15:43 / 16:38` (재생 따라 cur 갱신)
+- legacy 세션 (`startEpoch == null`) → elapsed 자동 fallback
+- DO_NOT_REVERT §198-B 4 위치 marker
+
+### 자체 검증 — grep + node sanity ✅
+
+| 항목 | 기대 | 실측 |
+|---|---|---|
+| `§198-A` marker in profile.html | 2 | ✅ line 1336 + 1504 |
+| `§198-B` marker (replay.js + dashboard.css) | 5 | ✅ 4 (replay.js) + 1 (dashboard.css) |
+| `toast(` 호출 count in profile.html | +2 from 12 = 14 | ✅ 14 |
+| `updateClockEl` 호출 위치 | seek + toggle handler = 2 | ✅ line 2663 + 3015 |
+| 직접 `R.clockEl.textContent` 호출 (구 패턴 잔존) | 0 | ✅ helper 내부만 (line 271, 273) |
+| `replay.js` JS syntax | OK | ✅ `node -e "new Function(...)"` 통과 |
+| `profile.html` `<script>` count | 8 | ✅ 8 (변경 없음) |
+| `PUSH-198.command` bash syntax | OK | ✅ `bash -n` 통과 |
+| `PUSH-198.command` executable | yes | ✅ `chmod +x` 적용 (`-rwx------`) |
+
+### PUSH-198.command — v2 idempotent + 자가 삭제 + PUSH-19?.command 청소
+
+- **idempotent**: working tree clean → no-op 성공 (재실행 안전)
+- **iCloud retry**: `auto_push.command` 패턴 차용 — exponential backoff (1·2·4·8·16s, 8회) + brctl download + lock 정리
+- **HEAD 무결성 사전 체크** + push 실패 시 pull-rebase 자동 fallback
+- **자가 삭제**: 성공 push 후 PUSH-198.command 자체 + `PUSH-19?.command` glob (PUSH-197 포함) 일괄 청소 → 별도 cleanup commit
+- **명시적 file scope**: `git add -A profile.html riding-dashboard/js/replay.js riding-dashboard/css/dashboard.css` — 다른 unrelated untracked (예: `assets/images/products/ppc/lifestyle/wing-hainan-china-1*`) 영향 X
+- 옥대표님 검증 안내 3건 포함 (gear-add toast / gear-edit debounce toast / dashboard '실제' toggle)
+
+### 회귀 가드 검증 — 영향 0 확인
+
+| § | 영향 |
+|---|---|
+| §169-N v3 (gear list expanded state) | 0 (toast 별도 layer) |
+| §185 (+N 제품 더 펼치기) | 0 (별도 UI) |
+| §192 (모바일 축소 영역) | 0 |
+| §172 (Stale SW cleanup head inline) | 0 |
+| 재생 컨트롤 0.5x/2x/4x/8x · 스크럽 바 · 일시정지 | 0 (clockEl 표기만 변경, 재생 로직 동일) |
+| chart axis `data-tmode` 와 namespace 격리 | 0 (`data-rmode` 별도) |
+| DO_NOT_REVERT §181·§181-C·§181-D·§181-E·§181-F (티모 lock) | 0 (analysis.js 미터치) |
+
+### 옥대표님 실행 방법
+
+옥대표님 Mac 합류 시 더블클릭 1회:
+```
+~/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site/PUSH-198.command
+```
+
+또는 #11 sandbox 의 `auto_push.command` whitelist 확장도 가능 (`AUTO_PUSH_ALLOW_PATHS` 추가 path):
+```
+profile.html,riding-dashboard/js/replay.js,riding-dashboard/css/dashboard.css
+```
+
+CI/CD `.github/workflows/static.yml` 가 push 후 30초 라이브 반영 → 옥대표님 iPhone 즉시 검증 가능.
+
+— 알렉스 박 · 2026-06-04 18:10:28 KST ⚡
+
+---
+
+## [Sent 2026-06-05 21:16:00 KST] From: 알렉스 박 (Alex Park) · To: @데이빗 옥 · @옥대표님 · Re: §199 PPC Orbit Parawing — commit-ready
+
+STATUS: done · push 대기 (PUSH-199.command)
+
+옥대표님 발언 "사이트에 소개페이지 올려주고 번역해서" + 데이빗 dispatch 받고 작업 완료. 영문 원문 → 한국어 번역 + 사이트 통합 + PUSH-199 ⚡
+
+### 변경 — 3 files (1 신규 · 2 수정)
+
+```
+ NEW  products/ppc/orbit-parawing.html  608 lines
+  M   ppc.html                          +17 / -3  (§199 NEW · PRE-ORDER highlight 카드)
+  M   genre/parawing.html               +17 / -1  (Orbit + Cloud 카드 추가)
+```
+
+### §199 — PPC Orbit Parawing 신규 상세
+
+- **Hero** — eyebrow "NEW · Coming soon — Pre-Order Now for July" · 타이틀 "PPC Orbit Parawing" · 태그라인 "한 번의 세션, 진짜로 넓은 풍속 영역..." · NOVA × PPC PERFORMANCE TELEMETRY 3축 (풍속 폭·패킹·DW free)
+- **본사 공식 설명** — dual-skin 효율 + single-skin 패킹 hybrid 구조 / NOVA 협업 (2025 X-Alps 우승 패브릭) / 뉴질랜드 전 풍역 실증 테스트 / POWER ASSIST Line (PAL) 특허 출원 중
+- **Skill journey** — 4 tier 모두 active 표기 (parawing 의 전 레벨 cover 특성)
+- **Performance Attributes 6축** — 풍속 폭·패킹·DW 자유·풍상·테이크오프·팔 피로도 (1=좋음)
+- **Spec table 사이즈별** — 2.7m² 30/35+kt ₩2.7M · 3.5m² 12-30+kt ₩2.85M · 4.5m² 10-28kt ₩3.0M · 5.9m² 8-24kt ₩3.18M (v16 통합가격표)
+- **4 핵심 기술** — POWER ASSIST Line · NOVA 협업 top surface · ultra-light silicone-coated · trailing-edge openings
+- **라이딩 메리트 3** — 넓은 풍속 한 세션 / 진정한 hands-free DW / 팔 부담 ↓
+- **Para Sack 액세서리** — magnetic lock · larger pouch · integrated hook · safety knife
+- **Cross-sell** — Takoon Parawing Cloud · PPC M2 · Find My Gear
+- **CTA** — 사전 예약 카톡 1:1 상담
+
+### 사이트 통합 2건
+
+- **ppc.html** (line 361 §199 marker) — 4-tier wing lineup 위에 노란 dashed border "NEW · PRE-ORDER" 카드. hover lift 인터랙션. orbit-parawing.html 클릭 link 전체 카드.
+- **genre/parawing.html** (line 158 §199 marker) — 파라윙 카테고리 카드 3건: PPC Orbit Parawing (NEW highlight) + Takoon Parawing Cloud (기존 미게재 → 추가) + Takoon Slide (기존 board 카드 유지).
+
+### 번역 정책 적용 ([[feedback_translation_policy]])
+
+| 원문 | 한국어 |
+|---|---|
+| parawing | 파라윙 (사이트 표준) |
+| single-skin / dual-skin | 영문 유지 (업계 용어) |
+| POWER ASSIST Line (PAL) | 영문 그대로 + 풀이 "동력 보조 라인" |
+| Patent Pending | "특허 출원 중" |
+| Para Sack | 영문 그대로 (제품명) |
+| trailing-edge openings | "뒷전 배출구" + 영문 |
+| hands-free downwind | "다운윈드 자유" / "hands-free 다운윈드" |
+
+라이더 친화적 톤 (-습니다 / -이에요 적절히 혼용, PPC 기존 페이지 voice 일치)
+
+### 자체 검증 ✅
+
+| 항목 | 결과 |
+|---|---|
+| HTML 구조 균형 (head·body·main·section·div·table·tr) | ✅ 모두 open=close |
+| local link refs 검증 | ✅ broken 0 |
+| 신규 페이지 line count | ✅ 608 (m1=570, m2=577, fds=567 와 동급 범위) |
+| §199 marker (ppc.html + genre/parawing.html) | ✅ 2 위치 |
+| §172 SW cleanup head 인라인 | ✅ 동일 패턴 |
+| §171-B v4 cart 패턴 | ✅ data-sku=ppc-orbit-parawing |
+| §182-B aria-live="polite" aria-atomic="true" on nav__cart-badge | ✅ 적용 |
+| §173 agent-deny widget 인클루드 | ✅ |
+| PUSH-199.command bash syntax + chmod +x | ✅ OK + -rwx |
+| viewport meta `viewport-fit=cover` | ✅ 적용 (모바일 safe-area 대비) |
+
+### 이미지 status
+
+- 권장 경로: `assets/images/products/ppc/orbit/orbit-2.7-hero.jpg`
+- 본 push 시점 = 파일 부재 → `onerror` fallback CSS `pd-hero__image--err` 자동 적용 (graceful degrade)
+- **옥대표님 정식 자료 도착 시 해당 경로에 업로드만 하면 즉시 라이브 반영** — 페이지 코드 변경 X
+
+### PUSH-199.command 핵심 features
+
+- **v2 idempotent** — clean working tree = no-op 성공
+- **iCloud retry** — exponential backoff (1·2·4·8·16s, 8회) + brctl download + lock 정리
+- **HEAD 무결성 사전 체크** + pull-rebase 자동 fallback
+- **명시적 scope** — `git add` 3 files만 (untracked unrelated 영향 X)
+- **자가 삭제** — push 성공 후 `PUSH-199.command` + `PUSH-19?.command` (PUSH-198 잔존 있으면 함께) 별도 cleanup commit
+- 옥대표님 검증 URL 4건 출력 (ppc.html / orbit-parawing.html / genre/parawing.html / 이미지 업로드 경로)
+
+### 옥대표님 다음 action
+
+Mac 합류 시 1회 더블클릭:
+```
+~/Documents/Claude/Projects/단무지공방 홈페이지 만들기/site/PUSH-199.command
+```
+
+또는 #11 sandbox `auto_push.command` whitelist 확장:
+```
+AUTO_PUSH_ALLOW_PATHS="products/ppc/orbit-parawing.html,ppc.html,genre/parawing.html"
+```
+
+push 후 30초 라이브 반영. 옥대표님 iPhone Safari 에서:
+1. `https://dmjgroup.kr/ppc.html` → NEW · PRE-ORDER 카드
+2. `https://dmjgroup.kr/products/ppc/orbit-parawing.html` → 풀 페이지
+3. `https://dmjgroup.kr/genre/parawing.html` → Orbit + Cloud + Slide 3 카드
+
+— 알렉스 박 · 2026-06-05 21:16:00 KST ⚡

@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>속도 분포 파이 색감 BEFORE / AFTER — 샘 정 (DataViz #2) · 2026-06-05</title>
+<style>
+  :root {
+    --bg: #F4F7FA;
+    --card: #FFFFFF;
+    --ink: #0A2540;
+    --ink-mid: #5C6F7E;
+    --ink-soft: #7E93A8;
+    --line: #E5EAF0;
+    --sea: #1F8FFF;
+    --sun: #FFB800;
+    --good: #1FA055;
+    --bad: #D6453A;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 18px 16px 60px;
+    line-height: 1.5;
+  }
+
+  /* ───────── Header ───────── */
+  .hdr {
+    max-width: 920px; margin: 0 auto 24px;
+    padding: 18px 20px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(10,37,64,0.04);
+  }
+  .hdr__brand {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    color: var(--sea); text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .hdr__title { margin: 0 0 4px; font-size: 19px; font-weight: 700; }
+  .hdr__sub { margin: 0; font-size: 13px; color: var(--ink-mid); }
+  .hdr__meta {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--line);
+    font-size: 12px; color: var(--ink-soft);
+    display: flex; flex-wrap: wrap; gap: 12px;
+  }
+  .hdr__meta span { display: inline-flex; align-items: center; gap: 4px; }
+
+  /* ───────── Verdict bar ───────── */
+  .verdict {
+    max-width: 920px; margin: 0 auto 20px;
+    padding: 14px 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--sea);
+    border-radius: 10px;
+    font-size: 13px; color: var(--ink-mid);
+  }
+  .verdict strong { color: var(--ink); }
+
+  /* ───────── Scenario card ───────── */
+  .scen {
+    max-width: 920px; margin: 0 auto 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(10,37,64,0.04);
+  }
+  .scen__hd {
+    padding: 14px 18px;
+    background: linear-gradient(180deg, #FAFCFE 0%, #FFFFFF 100%);
+    border-bottom: 1px solid var(--line);
+  }
+  .scen__no {
+    display: inline-block;
+    padding: 2px 8px; margin-right: 8px;
+    background: var(--ink); color: #FFFFFF;
+    border-radius: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .scen__title { font-size: 14px; font-weight: 700; }
+  .scen__sub {
+    margin: 4px 0 0; font-size: 12px; color: var(--ink-soft);
+  }
+
+  .scen__cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--line);
+  }
+  .col {
+    background: var(--card);
+    padding: 18px 14px 16px;
+    text-align: center;
+  }
+  .col__tag {
+    display: inline-block; margin-bottom: 10px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .col__tag--before {
+    background: rgba(126,147,168,0.14);
+    color: var(--ink-mid);
+  }
+  .col__tag--after {
+    background: rgba(31,160,85,0.14);
+    color: var(--good);
+  }
+  .col svg.pie { display: block; margin: 0 auto; max-width: 180px; height: auto; }
+
+  /* ───────── Legend ───────── */
+  .legend {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid; grid-template-columns: 1fr;
+    gap: 4px;
+    text-align: left;
+    font-size: 11px;
+    color: var(--ink-mid);
+  }
+  .legend li {
+    display: flex; align-items: center; gap: 6px;
+    padding: 2px 0;
+  }
+  .legend__sw {
+    flex: 0 0 14px;
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(10,37,64,0.08);
+  }
+  .legend__lbl {
+    flex: 1 1 auto;
+    font-variant-numeric: tabular-nums;
+  }
+  .legend__hex {
+    flex: 0 0 auto;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+  }
+  .legend__pct {
+    flex: 0 0 36px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ───────── Foot ───────── */
+  .foot {
+    max-width: 920px; margin: 24px auto 0;
+    padding: 14px 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .foot p { margin: 0 0 6px; }
+  .foot p:last-child { margin: 0; color: var(--ink-mid); }
+  .foot strong { color: var(--ink); }
+
+  /* ───────── Mobile compact ───────── */
+  @media (max-width: 480px) {
+    body { padding: 14px 10px 50px; }
+    .hdr, .verdict, .scen, .foot { border-radius: 10px; }
+    .scen__cols { gap: 1px; }
+    .col { padding: 14px 10px 14px; }
+    .col svg.pie { max-width: 150px; }
+    .legend { font-size: 10.5px; }
+    .legend__hex { font-size: 9.5px; }
+    .hdr__title { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="hdr">
+  <div class="hdr__brand">DataViz #2 · Sam Jung · Preview</div>
+  <h1 class="hdr__title">속도 분포 파이 — 색감 BEFORE / AFTER</h1>
+  <p class="hdr__sub">옥대표님 2026-06-05 피드백 후속. <strong>좌 = 현재 (sea blue mono)</strong> · <strong>우 = fix (statusAt 5 앵커 ramp)</strong>.</p>
+  <div class="hdr__meta">
+    <span>📊 신규 hex 0건 (chart-theme 토큰 100% 재사용)</span>
+    <span>🎯 다른 차트 (VPS donut · 효율 셀) 와 색감 통일</span>
+    <span>♿ WCAG 1.4.3 contrast ✓</span>
+  </div>
+</header>
+
+<!-- ═══════════════════ VERDICT ═══════════════════ -->
+<section class="verdict">
+  <strong>본인 권장 — AFTER 채택.</strong> 6 slice 가 status 5 앵커 ramp 전체 사용 (빨강→주황→노랑→라임→초록). bin 범위 정규화 (`minKt=12, maxKt=22.5`) 적용으로 라이딩 속도 분포가 ramp 의 mid~veryGood 한쪽이 아닌 전체 분포에 매핑됨. 옥대표님 "다른 그래프와 색감 맞춤" 요청 부합.
+</section>
+
+<!-- ═══════════════════ SCENARIO 1 ═══════════════════ -->
+<article class="scen">
+  <div class="scen__hd">
+    <span class="scen__no">시나리오 1</span>
+    <span class="scen__title">옥대표님 실측 분포 (스크린샷 1 재현)</span>
+    <p class="scen__sub">12-14kt 5% · 14-16kt 20% · 16-18kt 37% · 18-20kt 24% · 20-22kt 8% · 22+kt 6%</p>
+  </div>
+  <div class="scen__cols">
+
+    <!-- BEFORE -->
+    <div class="col">
+      <span class="col__tag col__tag--before">BEFORE — sea blue mono</span>
+      <svg class="pie" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="현재 속도 분포 파이 (sea blue monochrome)">
+        <!-- 시나리오 1 BEFORE: 5/20/37/24/8/6% · sea blue ramp -->
+        <!-- 각도 (clockwise from 12): 0→18→108→241.2→327.6→356.4→360 -->
+        <path d="M100,100 L100,15 A85,85 0 0,1 126.27,19.16 Z" fill="#5C9CE1"/>
+        <path d="M100,100 L126.27,19.16 A85,85 0 0,1 180.84,126.27 Z" fill="#4D93DD"/>
+        <path d="M100,100 L180.84,126.27 A85,85 0 0,1 25.51,140.95 Z" fill="#3E89D8"/>
+        <path d="M100,100 L25.51,140.95 A85,85 0 0,1 54.36,28.30 Z" fill="#3181D4"/>
+        <path d="M100,100 L54.36,28.30 A85,85 0 0,1 94.67,15.17 Z" fill="#2278D0"/>
+        <path d="M100,100 L94.67,15.17 A85,85 0 0,1 100,15 Z" fill="#1871CD"/>
+      </svg>
+      <ul class="legend">
+        <li><span class="legend__sw" style="background:#5C9CE1"></span><span class="legend__lbl">12-14kt</span><span class="legend__hex">#5C9CE1</span><span class="legend__pct">5%</span></li>
+        <li><span class="legend__sw" style="background:#4D93DD"></span><span class="legend__lbl">14-16kt</span><span class="legend__hex">#4D93DD</span><span class="legend__pct">20%</span></li>
+        <li><span class="legend__sw" style="background:#3E89D8"></span><span class="legend__lbl">16-18kt</span><span class="legend__hex">#3E89D8</span><span class="legend__pct">37%</span></li>
+        <li><span class="legend__sw" style="background:#3181D4"></span><span class="legend__lbl">18-20kt</span><span class="legend__hex">#3181D4</span><span class="legend__pct">24%</span></li>
+        <li><span class="legend__sw" style="background:#2278D0"></span><span class="legend__lbl">20-22kt</span><span class="legend__hex">#2278D0</span><span class="legend__pct">8%</span></li>
+        <li><span class="legend__sw" style="background:#1871CD"></span><span class="legend__lbl">22+kt</span><span class="legend__hex">#1871CD</span><span class="legend__pct">6%</span></li>
+      </ul>
+    </div>
+
+    <!-- AFTER -->
+    <div class="col">
+      <span class="col__tag col__tag--after">AFTER — statusAt 5 앵커</span>
+      <svg class="pie" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="fix 후 속도 분포 파이 (statusAt 빨강 → 초록 ramp)">
+        <path d="M100,100 L100,15 A85,85 0 0,1 126.27,19.16 Z" fill="#DE5F35"/>
+        <path d="M100,100 L126.27,19.16 A85,85 0 0,1 180.84,126.27 Z" fill="#ED9229"/>
+        <path d="M100,100 L180.84,126.27 A85,85 0 0,1 25.51,140.95 Z" fill="#F1BD11"/>
+        <path d="M100,100 L25.51,140.95 A85,85 0 0,1 54.36,28.30 Z" fill="#A5C230"/>
+        <path d="M100,100 L54.36,28.30 A85,85 0 0,1 94.67,15.17 Z" fill="#56B34A"/>
+        <path d="M100,100 L94.67,15.17 A85,85 0 0,1 100,15 Z" fill="#28A353"/>
+      </svg>
+      <ul class="legend">
+        <li><span class="legend__sw" style="background:#DE5F35"></span><span class="legend__lbl">12-14kt</span><span class="legend__hex">#DE5F35</span><span class="legend__pct">5%</span></li>
+        <li><span class="legend__sw" style="background:#ED9229"></span><span class="legend__lbl">14-16kt</span><span class="legend__hex">#ED9229</span><span class="legend__pct">20%</span></li>
+        <li><span class="legend__sw" style="background:#F1BD11"></span><span class="legend__lbl">16-18kt</span><span class="legend__hex">#F1BD11</span><span class="legend__pct">37%</span></li>
+        <li><span class="legend__sw" style="background:#A5C230"></span><span class="legend__lbl">18-20kt</span><span class="legend__hex">#A5C230</span><span class="legend__pct">24%</span></li>
+        <li><span class="legend__sw" style="background:#56B34A"></span><span class="legend__lbl">20-22kt</span><span class="legend__hex">#56B34A</span><span class="legend__pct">8%</span></li>
+        <li><span class="legend__sw" style="background:#28A353"></span><span class="legend__lbl">22+kt</span><span class="legend__hex">#28A353</span><span class="legend__pct">6%</span></li>
+      </ul>
+    </div>
+
+  </div>
+</article>
+
+<!-- ═══════════════════ SCENARIO 2 ═══════════════════ -->
+<article class="scen">
+  <div class="scen__hd">
+    <span class="scen__no">시나리오 2</span>
+    <span class="scen__title">균등 분포 (감지 검증)</span>
+    <p class="scen__sub">각 slice 16.67% — 6 slice 사이 hue 구분 가능성 직접 비교</p>
+  </div>
+  <div class="scen__cols">
+
+    <!-- BEFORE -->
+    <div class="col">
+      <span class="col__tag col__tag--before">BEFORE — sea blue mono</span>
+      <svg class="pie" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="균등 분포 BEFORE (sea blue 6 slice)">
+        <!-- 6 × 60° clockwise from 12: 0→60→120→180→240→300→360 -->
+        <path d="M100,100 L100,15 A85,85 0 0,1 173.61,57.50 Z" fill="#5C9CE1"/>
+        <path d="M100,100 L173.61,57.50 A85,85 0 0,1 173.61,142.50 Z" fill="#4D93DD"/>
+        <path d="M100,100 L173.61,142.50 A85,85 0 0,1 100,185 Z" fill="#3E89D8"/>
+        <path d="M100,100 L100,185 A85,85 0 0,1 26.39,142.50 Z" fill="#3181D4"/>
+        <path d="M100,100 L26.39,142.50 A85,85 0 0,1 26.39,57.50 Z" fill="#2278D0"/>
+        <path d="M100,100 L26.39,57.50 A85,85 0 0,1 100,15 Z" fill="#1871CD"/>
+      </svg>
+      <ul class="legend">
+        <li><span class="legend__sw" style="background:#5C9CE1"></span><span class="legend__lbl">12-14kt</span><span class="legend__hex">#5C9CE1</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#4D93DD"></span><span class="legend__lbl">14-16kt</span><span class="legend__hex">#4D93DD</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#3E89D8"></span><span class="legend__lbl">16-18kt</span><span class="legend__hex">#3E89D8</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#3181D4"></span><span class="legend__lbl">18-20kt</span><span class="legend__hex">#3181D4</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#2278D0"></span><span class="legend__lbl">20-22kt</span><span class="legend__hex">#2278D0</span><span class="legend__pct">16%</span></li>
+        <li><span class="legend__sw" style="background:#1871CD"></span><span class="legend__lbl">22+kt</span><span class="legend__hex">#1871CD</span><span class="legend__pct">16%</span></li>
+      </ul>
+    </div>
+
+    <!-- AFTER -->
+    <div class="col">
+      <span class="col__tag col__tag--after">AFTER — statusAt 5 앵커</span>
+      <svg class="pie" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="균등 분포 AFTER (status 5 앵커 6 slice)">
+        <path d="M100,100 L100,15 A85,85 0 0,1 173.61,57.50 Z" fill="#DE5F35"/>
+        <path d="M100,100 L173.61,57.50 A85,85 0 0,1 173.61,142.50 Z" fill="#ED9229"/>
+        <path d="M100,100 L173.61,142.50 A85,85 0 0,1 100,185 Z" fill="#F1BD11"/>
+        <path d="M100,100 L100,185 A85,85 0 0,1 26.39,142.50 Z" fill="#A5C230"/>
+        <path d="M100,100 L26.39,142.50 A85,85 0 0,1 26.39,57.50 Z" fill="#56B34A"/>
+        <path d="M100,100 L26.39,57.50 A85,85 0 0,1 100,15 Z" fill="#28A353"/>
+      </svg>
+      <ul class="legend">
+        <li><span class="legend__sw" style="background:#DE5F35"></span><span class="legend__lbl">12-14kt</span><span class="legend__hex">#DE5F35</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#ED9229"></span><span class="legend__lbl">14-16kt</span><span class="legend__hex">#ED9229</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#F1BD11"></span><span class="legend__lbl">16-18kt</span><span class="legend__hex">#F1BD11</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#A5C230"></span><span class="legend__lbl">18-20kt</span><span class="legend__hex">#A5C230</span><span class="legend__pct">17%</span></li>
+        <li><span class="legend__sw" style="background:#56B34A"></span><span class="legend__lbl">20-22kt</span><span class="legend__hex">#56B34A</span><span class="legend__pct">16%</span></li>
+        <li><span class="legend__sw" style="background:#28A353"></span><span class="legend__lbl">22+kt</span><span class="legend__hex">#28A353</span><span class="legend__pct">16%</span></li>
+      </ul>
+    </div>
+
+  </div>
+</article>
+
+<!-- ═══════════════════ SCENARIO 3 ═══════════════════ -->
+<article class="scen">
+  <div class="scen__hd">
+    <span class="scen__no">시나리오 3</span>
+    <span class="scen__title">고풍속 치우침 (mid 70%+ 영역 집중)</span>
+    <p class="scen__sub">12-14kt 5% · 14-16kt 10% · 16-18kt 35% · 18-20kt 35% · 20-22kt 10% · 22+kt 5%</p>
+  </div>
+  <div class="scen__cols">
+
+    <!-- BEFORE -->
+    <div class="col">
+      <span class="col__tag col__tag--before">BEFORE — sea blue mono</span>
+      <svg class="pie" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="고풍속 치우침 BEFORE">
+        <!-- 5/10/35/35/10/5% · 누적 각도 (cw from 12): 0→18→54→180→306→342→360 -->
+        <path d="M100,100 L100,15 A85,85 0 0,1 126.27,19.16 Z" fill="#5C9CE1"/>
+        <path d="M100,100 L126.27,19.16 A85,85 0 0,1 168.77,50.04 Z" fill="#4D93DD"/>
+        <path d="M100,100 L168.77,50.04 A85,85 0 0,1 100,185 Z" fill="#3E89D8"/>
+        <path d="M100,100 L100,185 A85,85 0 0,1 31.23,50.04 Z" fill="#3181D4"/>
+        <path d="M100,100 L31.23,50.04 A85,85 0 0,1 73.73,19.16 Z" fill="#2278D0"/>
+        <path d="M100,100 L73.73,19.16 A85,85 0 0,1 100,15 Z" fill="#1871CD"/>
+      </svg>
+      <ul class="legend">
+        <li><span class="legend__sw" style="background:#5C9CE1"></span><span class="legend__lbl">12-14kt</span><span class="legend__hex">#5C9CE1</span><span class="legend__pct">5%</span></li>
+        <li><span class="legend__sw" style="background:#4D93DD"></span><span class="legend__lbl">14-16kt</span><span class="legend__hex">#4D93DD</span><span class="legend__pct">10%</span></li>
+        <li><span class="legend__sw" style="background:#3E89D8"></span><span class="legend__lbl">16-18kt</span><span class="legend__hex">#3E89D8</span><span class="legend__pct">35%</span></li>
+        <li><span class="legend__sw" style="background:#3181D4"></span><span class="legend__lbl">18-20kt</span><span class="legend__hex">#3181D4</span><span class="legend__pct">35%</span></li>
+        <li><span class="legend__sw" style="background:#2278D0"></span><span class="legend__lbl">20-22kt</span><span class="legend__hex">#2278D0</span><span class="legend__pct">10%</span></li>
+        <li><span class="legend__sw" style="background:#1871CD"></span><span class="legend__lbl">22+kt</span><span class="legend__hex">#1871CD</span><span class="legend__pct">5%</span></li>
+      </ul>
+    </div>
+
+    <!-- AFTER -->
+    <div class="col">
+      <span class="col__tag col__tag--after">AFTER — statusAt 5 앵커</span>
+      <svg class="pie" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="고풍속 치우침 AFTER">
+        <path d="M100,100 L100,15 A85,85 0 0,1 126.27,19.16 Z" fill="#DE5F35"/>
+        <path d="M100,100 L126.27,19.16 A85,85 0 0,1 168.77,50.04 Z" fill="#ED9229"/>
+        <path d="M100,100 L168.77,50.04 A85,85 0 0,1 100,185 Z" fill="#F1BD11"/>
+        <path d="M100,100 L100,185 A85,85 0 0,1 31.23,50.04 Z" fill="#A5C230"/>
+        <path d="M100,100 L31.23,50.04 A85,85 0 0,1 73.73,19.16 Z" fill="#56B34A"/>
+        <path d="M100,100 L73.73,19.16 A85,85 0 0,1 100,15 Z" fill="#28A353"/>
+      </svg>
+      <ul class="legend">
+        <li><span class="legend__sw" style="background:#DE5F35"></span><span class="legend__lbl">12-14kt</span><span class="legend__hex">#DE5F35</span><span class="legend__pct">5%</span></li>
+        <li><span class="legend__sw" style="background:#ED9229"></span><span class="legend__lbl">14-16kt</span><span class="legend__hex">#ED9229</span><span class="legend__pct">10%</span></li>
+        <li><span class="legend__sw" style="background:#F1BD11"></span><span class="legend__lbl">16-18kt</span><span class="legend__hex">#F1BD11</span><span class="legend__pct">35%</span></li>
+        <li><span class="legend__sw" style="background:#A5C230"></span><span class="legend__lbl">18-20kt</span><span class="legend__hex">#A5C230</span><span class="legend__pct">35%</span></li>
+        <li><span class="legend__sw" style="background:#56B34A"></span><span class="legend__lbl">20-22kt</span><span class="legend__hex">#56B34A</span><span class="legend__pct">10%</span></li>
+        <li><span class="legend__sw" style="background:#28A353"></span><span class="legend__lbl">22+kt</span><span class="legend__hex">#28A353</span><span class="legend__pct">5%</span></li>
+      </ul>
+    </div>
+
+  </div>
+</article>
+
+<!-- ═══════════════════ FOOT ═══════════════════ -->
+<footer class="foot">
+  <p><strong>구현 정확성</strong> — AFTER 색은 라이브 코드 (charts.js:62~74) 의 `speedColor()` → `RDChartTheme.statusAt(f)` 위임 실측 결과. bin 범위 정규화 `f = (kt − 12) / (22.5 − 12)` 로 6 slice 가 0.10 → 0.98 매핑.</p>
+  <p><strong>토큰 source</strong> — chart-theme.js 5 앵커 (#D6453A · #EC8A2E · #F2C20E · #7FC241 · #1FA055) sRGB linear 보간. OKLCH 보간 업그레이드는 Phase 2 후속 검토 (로즈 윤 협업 후 결정).</p>
+  <p><strong>호환성</strong> — VPS donut · 효율 셀 (eff--hi/mid/lo) · status 5단계 인디케이터 모두 같은 토큰 ramp 사용. 본 fix 후 다른 차트 영향 0.</p>
+  <p>— 샘 정 (Sam Jung) · DataViz Specialist #2 · 2026-06-05 · Observable · data-honesty · WCAG 2.2 AA</p>
+</footer>
+
+</body>
+</html>

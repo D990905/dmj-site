@@ -1,0 +1,530 @@
+{
+  "_meta": {
+    "source": "levitaz.com",
+    "date": "2026-06-05",
+    "collector": "agent (subagent of Cowork)",
+    "method": "web_fetch + image URL pattern probing (curl HEAD checks)",
+    "notes": [
+      "Levitaz product pages render full description content ONLY for the canonical variant; other size variants return blank detail sections (JS-rendered).",
+      "Per-size descriptions were extracted from the canonical-variant page; for other sizes the description body is shared (same product page) but spec table changes with size - spec tables for non-canonical sizes were NOT scraped (would require headless browser).",
+      "Image URLs were validated by curl HTTP status (200=OK, 302=redirect/missing).",
+      "Prices listed are Levitaz HQ EUR (excl. 20% VAT) as displayed on levitaz.com 2026-06-05.",
+      "Currency lock: Levitaz=EUR (KRW 1,800 per EUR per Danny brand currency lock).",
+      "PARTIAL DATA WARNING: per-size spec tables (Span/Area/AR for FW 680/790/900; Length/Thickness for Mast 84/96) were not extractable via HTML - only FW 540 + Mast 76 + STAB 180 specs are confirmed. Other size specs marked 'not found'."
+    ]
+  },
+  "free_series_fw_540": {
+    "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25301",
+    "title": "Free Series Front Wing - FW 540",
+    "category": "Free Series / Foils / Front Wing",
+    "item_nr": "G470459",
+    "price_eur_excl_vat": 940.83,
+    "specs": {
+      "span_cm": 67,
+      "area_cm2": 540,
+      "aspect_ratio": 8.4,
+      "included": "Cover, 2 x M6x20 glider connection screws and TX30 tool"
+    },
+    "tagline": "High-Performance Free Series Front Wing - Built for extremely high top-end performance, agile handling, and precise control.",
+    "key_benefits": ["High top-end performance", "Agile control", "Direct response"],
+    "description": "The FW 540 is the smallest front wing in the Free Series, optimized for riders who want maximum top-end performance with agile and easy control. With a 67 cm span, 540 cm2 area, and 8.4 aspect ratio, it is positioned for kite, wing, and big wave surf use.",
+    "product_features": [
+      "Free Series-specific outline and anhedral geometry for agility and balance",
+      "Lift-to-drag ratio optimized for its specific application",
+      "Designed for kite, wing, and big wave surf use"
+    ],
+    "construction_highlights": [
+      "Integrated titanium interface for a play-free fit and ultra-precise power transfer",
+      "Pressed into the front wing during lamination for a permanent, ultra-stiff bond in the system's most highly loaded area",
+      "All main connection threads are located in titanium for reduced wear, easier maintenance, and long-term durability",
+      "Corrosion-resistant construction for reliable use in saltwater environments",
+      "One-tool system: all key connections on the hydrofoil setup and board use the same T30 Torx tool"
+    ],
+    "use_cases": ["WING", "KITE", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_540_u2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_540_v2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_foils.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_exo_kite_marc_2026_1920x1080_2026-05-05-091229_xpmt.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_foils_frontwing_01.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_exo_kite_girls_2026_1920x1080.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_construction_2026_1920x1080.jpg"
+    ]
+  },
+  "free_series_fw_680": {
+    "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25302",
+    "title": "Free Series Front Wing - FW 680",
+    "category": "Free Series / Foils / Front Wing",
+    "item_nr": "not found (variant page returns blank item_nr field)",
+    "price_eur_excl_vat": 957.83,
+    "specs": {
+      "span_cm": "not found (per-size spec table not rendered server-side; 850 mm stated in user requirements; needs HQ confirmation)",
+      "area_cm2": 680,
+      "aspect_ratio": "not found",
+      "included": "Cover, 2 x M6x20 glider connection screws and TX30 tool (inferred from FW 540 shared pattern)"
+    },
+    "tagline": "High-Performance Free Series Front Wing - Built for extremely high top-end performance, agile handling, and precise control.",
+    "key_benefits": ["High top-end performance", "Agile control", "Direct response"],
+    "description": "Free Series 680 cm2 front wing. Per-size description body not rendered server-side; shared Free Series Front Wing context applies (Free Series-specific outline, anhedral geometry, lift-to-drag tuned for application).",
+    "product_features": [
+      "Free Series-specific outline and anhedral geometry for agility and balance",
+      "Lift-to-drag ratio optimized for its specific application"
+    ],
+    "construction_highlights": "(same as FW 540 - see free_series_fw_540.construction_highlights)",
+    "use_cases": ["WING", "KITE", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_680_u2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_680_v2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_foils.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_foils_frontwing_01.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_construction_2026_1920x1080.jpg"
+    ]
+  },
+  "free_series_fw_790": {
+    "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25303",
+    "title": "Free Series Front Wing - FW 790",
+    "category": "Free Series / Foils / Front Wing",
+    "item_nr": "not found",
+    "price_eur_excl_vat": 1040.83,
+    "specs": {
+      "span_cm": "not found (900 mm stated in user requirements; needs HQ confirmation)",
+      "area_cm2": 790,
+      "aspect_ratio": "not found",
+      "included": "Cover, 2 x M6x20 glider connection screws and TX30 tool (inferred)"
+    },
+    "tagline": "High-Performance Free Series Front Wing",
+    "key_benefits": ["High top-end performance", "Agile control", "Direct response"],
+    "description": "Free Series 790 cm2 front wing - mid-large size in the Free Series range. Per-size description body not rendered server-side.",
+    "product_features": [
+      "Free Series-specific outline and anhedral geometry",
+      "Lift-to-drag ratio optimized for its specific application"
+    ],
+    "construction_highlights": "(same as FW 540)",
+    "use_cases": ["WING", "KITE", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_790_u2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_790_v2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_foils.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_wig_790_foils_2026-05-05-111424_skjd.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_construction_2026_1920x1080.jpg"
+    ]
+  },
+  "free_series_fw_900": {
+    "url": "https://levitaz.com/shop/product/free-series-front-wings/?variant=25304",
+    "title": "Free Series Front Wing - FW 900",
+    "category": "Free Series / Foils / Front Wing",
+    "item_nr": "not found",
+    "price_eur_excl_vat": 1082.50,
+    "specs": {
+      "span_cm": "not found (950 mm stated in user requirements; needs HQ confirmation)",
+      "area_cm2": 900,
+      "aspect_ratio": "not found",
+      "included": "Cover, 2 x M6x20 glider connection screws and TX30 tool (inferred)"
+    },
+    "tagline": "High-Performance Free Series Front Wing",
+    "key_benefits": ["Early lift / low-wind performance", "Smooth glide", "Stable platform"],
+    "description": "Free Series 900 cm2 front wing - largest in the Free Series range, optimized for early lift, smooth carving, and efficient glide. Per-size description body not rendered server-side.",
+    "product_features": [
+      "Free Series-specific outline and anhedral geometry",
+      "Largest Free Series front wing - early lift, broad low-wind window"
+    ],
+    "construction_highlights": "(same as FW 540)",
+    "use_cases": ["WING", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_900_u2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_900_v2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_foils.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_construction_2026_1920x1080.jpg"
+    ]
+  },
+  "free_series_mast_76": {
+    "url": "https://levitaz.com/shop/product/free-series-masts/?variant=25235",
+    "title": "Free Series Mast - MAST FS 76",
+    "category": "Free Series / Foils / Mast",
+    "item_nr": "G472509",
+    "price_eur_excl_vat": 1124.17,
+    "specs": {
+      "length_cm": 76,
+      "min_thickness_mm": 16,
+      "included": "Mast covers, mounting hardware (2 x M6x60 and T30 tool)"
+    },
+    "tagline": "Free Series Mast - Built for direct control, low drag, and a highly agile freeride setup.",
+    "key_benefits": ["Compact and direct", "Precise control", "Agile setup"],
+    "description": "The MAST 76 is built for riders who want the most compact and direct mast option in the Free Series. Its length-specific design, race-inspired profile, and high stiffness deliver low drag, precise control, and a highly agile ride feel.",
+    "product_features": [
+      "Length-specific design with customized taper, thickness profile, and layup",
+      "Race-inspired profile for low drag, high stiffness, and precise control",
+      "Hydro- and aerodynamic plate interface with slotted holes for quick mounting and fine-tuned trim adjustment"
+    ],
+    "construction_highlights": [
+      "Length-specific design with customized taper, thickness profile, and layup for each size",
+      "Race-inspired profile for low drag, high stiffness, and precise control",
+      "Hydro- and aerodynamic plate interface with slotted holes for quick mounting and fine-tuned trim adjustment",
+      "Durable titanium thread concept for repeated assembly cycles with reduced wear",
+      "One-tool system: all key connections on the hydrofoil setup and board use the same T30 Torx tool"
+    ],
+    "use_cases": ["WING", "KITE", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_mast_76_l2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_mast_76_f2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/20251127_154740_07924.jpg",
+      "https://levitaz.com/uploads/shop/20251127_155400_08256.jpg",
+      "https://levitaz.com/uploads/shop/20251127_101820_01521.jpg",
+      "https://levitaz.com/uploads/shop/20251127_161403_00486.jpg",
+      "https://levitaz.com/uploads/shop/20251127_101835_01537.jpg"
+    ]
+  },
+  "free_series_mast_84": {
+    "url": "https://levitaz.com/shop/product/free-series-masts/?variant=25236",
+    "title": "Free Series Mast - MAST FS 84",
+    "category": "Free Series / Foils / Mast",
+    "item_nr": "not found",
+    "price_eur_excl_vat": 1165.83,
+    "specs": {
+      "length_cm": 84,
+      "min_thickness_mm": "not found (assumed 16 mm - same as MAST 76 - needs HQ confirmation)",
+      "included": "Mast covers, mounting hardware (2 x M6x60 and T30 tool) - inferred"
+    },
+    "tagline": "Free Series Mast - Built for direct control, low drag, and an agile freeride setup.",
+    "key_benefits": ["Balanced length", "Precise control", "All-round freeride"],
+    "description": "The MAST 84 is the all-round freeride length in the Free Series mast range, balancing leverage for wave/swell work with low-drag glide. Per-size description body not rendered server-side; shared Free Series Mast context applies.",
+    "product_features": "(same construction concept as MAST 76)",
+    "construction_highlights": "(same as MAST 76)",
+    "use_cases": ["WING", "KITE", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_mast_84_l2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_mast_84_v2000x2000px.jpg"
+    ]
+  },
+  "free_series_mast_96": {
+    "url": "https://levitaz.com/shop/product/free-series-masts/?variant=25237",
+    "title": "Free Series Mast - MAST FS 96",
+    "category": "Free Series / Foils / Mast",
+    "item_nr": "not found",
+    "price_eur_excl_vat": 1249.17,
+    "specs": {
+      "length_cm": 96,
+      "min_thickness_mm": "not found (assumed 16 mm - same as MAST 76 - needs HQ confirmation)",
+      "included": "Mast covers, mounting hardware (2 x M6x60 and T30 tool) - inferred"
+    },
+    "tagline": "Free Series Mast - Maximum leverage for long-mast freeride and downwind use.",
+    "key_benefits": ["Long-mast leverage", "Stable in chop", "Race-inspired profile"],
+    "description": "The MAST 96 is the longest mast in the Free Series, designed for riders who want maximum clearance for downwind, chop, and bigger swell. Length-specific layup keeps the longer mast stiff and direct. Per-size description body not rendered server-side.",
+    "product_features": "(same construction concept as MAST 76)",
+    "construction_highlights": "(same as MAST 76)",
+    "use_cases": ["WING", "KITE", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_mast_96_l2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_mast_96_v2000x2000px.jpg"
+    ]
+  },
+  "free_series_stab_180": {
+    "url": "https://levitaz.com/shop/product/free-series-stabilizer/?variant=24792",
+    "title": "Free Series Stabilizer - STAB 180",
+    "category": "Free Series / Foils / Stabilizer",
+    "item_nr": "G470296",
+    "price_eur_excl_vat": 457.50,
+    "specs": {
+      "span_cm": 39,
+      "area_cm2": 180,
+      "aspect_ratio": 8.6,
+      "included": "Cover, 2 x M6x20 glider connection screws and T30 tool"
+    },
+    "tagline": "Free Series Stabilizer - Built for consistent pitch stability, familiar handling, and seamless compatibility across the Free Series.",
+    "key_benefits": ["Consistent pitch stability", "Familiar handling", "Fast front wing swaps"],
+    "description": "The STAB 180 is the universal rear wing of the Free Series, designed to create one consistent setup feel across the complete front wing range. Combined with the front-wing-specific titanium fuselages, it delivers identical interfaces, stable pitch behavior, and fast, easy front wing changes without altering the familiar ride feel.",
+    "product_features": [
+      "One stabilizer for all Free Series front wings",
+      "Front-wing-specific titanium fuselages ensure identical interfaces",
+      "Consistent pitch stability and familiar handling across different setups"
+    ],
+    "construction_highlights": [
+      "Precision-fit system interface for consistent compatibility across the Free Series",
+      "All connection threads are located in the titanium interface of the front wing, eliminating integrated threads in the stabilizer for easier maintenance, reduced wear, and improved long-term durability",
+      "Universal stabilizer concept for one consistent setup feel across all Free Series front wings",
+      "Corrosion-resistant interface concept for reliable long-term use in saltwater environments",
+      "One-tool system: all key connections on the hydrofoil setup and board use the same T30 Torx tool"
+    ],
+    "use_cases": ["WING", "KITE", "DOWNWIND/PARAWING", "PUMP/DOCKSTART", "PRONE / FOIL ASSIST"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_rearwing_180_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_rearwing_180_u2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_rearwing_180_o_zoomed2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_rearwing_180_u_zoomed2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_foils_stab180.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_free_series_wig_790_foils_2026-05-05-111424_skjd.jpg",
+      "https://levitaz.com/uploads/shop/20251127_102935_01756.jpg",
+      "https://levitaz.com/uploads/shop/20251126_134223_05956.jpg",
+      "https://levitaz.com/uploads/shop/20251125_092533_06227.jpg"
+    ]
+  },
+  "boom_rs_scc_63": {
+    "url": "https://levitaz.com/shop/product/boom-scc-boards-2/",
+    "title": "Boom Race Series 63 SCC",
+    "category": "Race Series / Boards",
+    "item_nr": "G472490",
+    "status": "coming soon (Levitaz flag on listing page)",
+    "price_eur_excl_vat": 2415.83,
+    "specs": {
+      "volume_l": 63,
+      "length_cm": "user-stated 150 cm - not confirmed on Levitaz site (per-size spec table not rendered)",
+      "construction": "SCC (Stringer Carbon Construction - inferred from naming convention)",
+      "user_target": "Race Series wing/race"
+    },
+    "tagline": "Boom RS SCC - Race Series board (smallest, 63 L)",
+    "key_benefits": "not found (per-size description not rendered)",
+    "description": "Per-size description body not rendered server-side. The Boom SCC boards are Levitaz's Race Series boards built with SCC construction.",
+    "product_features": "not found",
+    "construction_highlights": "not found (page renders 'coming soon' flag and skeletal info only)",
+    "use_cases": ["WING"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_63_ssc_overview2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_63_ssc_deck2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_63_ssc_rail2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_63_ssc_bottom2000x2000px.jpg"
+    ]
+  },
+  "boom_rs_scc_83": {
+    "url": "https://levitaz.com/shop/product/boom-scc-boards-2/",
+    "title": "Boom Race Series 83 SCC",
+    "category": "Race Series / Boards",
+    "item_nr": "not found",
+    "status": "coming soon",
+    "price_eur_excl_vat": 2499.17,
+    "specs": {
+      "volume_l": 83,
+      "length_cm": "user-stated 170 cm - not confirmed on Levitaz site",
+      "construction": "SCC"
+    },
+    "tagline": "Boom RS SCC - Race Series board (mid 83 L)",
+    "description": "Per-size description body not rendered server-side.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_83_ssc_overview2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_83_ssc_deck2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_83_ssc_rail2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_83_ssc_bottom2000x2000px.jpg"
+    ]
+  },
+  "boom_rs_scc_95": {
+    "url": "https://levitaz.com/shop/product/boom-scc-boards-2/",
+    "title": "Boom Race Series 95 SCC",
+    "category": "Race Series / Boards",
+    "item_nr": "not found",
+    "status": "coming soon",
+    "price_eur_excl_vat": 2582.50,
+    "specs": {
+      "volume_l": 95,
+      "length_cm": "user-stated 194 cm - not confirmed on Levitaz site",
+      "construction": "SCC"
+    },
+    "tagline": "Boom RS SCC - Race Series board (largest 95 L)",
+    "description": "Per-size description body not rendered server-side.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_95_ssc_overview2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_95_ssc_deck2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_95_ssc_rail2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_free_series_boom_95_ssc_bottom2000x2000px.jpg"
+    ]
+  },
+  "r6_race_series_set_v1_mast_v1": {
+    "url": "https://levitaz.com/shop/product/r6-race-series/?variant=18745",
+    "title": "R6 Race Series - V1 set (with R6 V1 mast)",
+    "category": "Race Series / Foils / Complete Set",
+    "item_nr": "LEV510100",
+    "price_eur_excl_vat": 3999.00,
+    "specs": {
+      "front_wing": "Front Wing R6 V1 [G461562]",
+      "mast": "Mast R6 V1 [G460700]",
+      "rear_wing": "Rear Wing R6 V1 [G463777]",
+      "screw_kit": "2 x M6x60 + 1x M6 x 30 TX; 2 x Threaded Pin M6 x 0,75 (pre-mounted); 5 x Mast Inserts brass (pre-mounted); 1 x Crossway Bolt",
+      "tool_kit": "1 x Allen Key INBUS 3.0 mm; 1 x Allen key TX-30; 1 x Anti-Seize Paste Foerch S425 5g",
+      "cover": "R6 Cover Set NOT included - must be ordered separately"
+    },
+    "tagline": "Elevate Your Race with the Next Generation of Hydrofoil Technology",
+    "description": "The Levitaz R6 Race Series marks a revolutionary leap in hydrofoil racing, succeeding the renowned R5 Race Series. Designed for superior performance and control, the R6 Race Series sets a new benchmark in competitive hydrofoiling. The R6 V1 set comes with the R6 V1 mast, which is characterized by exceptional stiffness, perfect for rough conditions or heavier riders needing a direct and responsive feel from their glider.",
+    "performance_features": [
+      "Enhanced Acceleration and Low Wind Performance: increased acceleration and improved low-wind capabilities for varied conditions.",
+      "Superior Upwind and Downwind VMG: optimized lift/drag ratio guarantees highest Velocity Made Good (VMG) for upwind and downwind courses.",
+      "Smooth Running: flexing wings ensure a stable ride, effectively dampening turbulences.",
+      "Insensitive Wingtip Breaching: maintain control and performance even when wingtips breach the surface.",
+      "Superior Glide in Maneuvers: excellent controlled gliding during tacks and jibes for precise and confident navigation.",
+      "Focused Competition: R6's intuitive control lets riders push hard while staying fully focused on the race."
+    ],
+    "construction_features": [
+      "Intelligent mix of material: unique stainless-steel box is the heart of the foil and sets a new benchmark for stiffness, accuracy of fit and durability.",
+      "Integrated trimming system: adjust angle of incidence (AOI) to personal preference and conditions without disassembling any part. AOI tuning possible even on-water between races. Adapt to weight, board model/scoop-rocker-line, foot strap and box position, riding conditions."
+    ],
+    "use_cases": ["WING", "KITE"],
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_v1000x1000px_2024.jpg",
+      "https://levitaz.com/uploads/shop/Webshop_product_description_formula_kite2024-2028_formula-wing_2026.jpg",
+      "https://levitaz.com/uploads/shop/LZ_description_R6_fleet_racing1333x1000px.jpg",
+      "https://levitaz.com/uploads/shop/LZ_description_R6_TdR_BigAir1333x1000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6_Integrated-Trimming-System1333x1000px_2024.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6_V1_scope-of-delivery1333x1000px_2024.jpg"
+    ]
+  },
+  "r6_race_series_set_v2_mast_v2": {
+    "url": "https://levitaz.com/shop/product/r6-race-series/",
+    "title": "R6 Race Series - V2 set (with R6 V2 mast)",
+    "category": "Race Series / Foils / Complete Set",
+    "price_eur_excl_vat": 3999.00,
+    "specs": {
+      "front_wing": "Front Wing R6 V2",
+      "mast": "Mast R6 V2",
+      "rear_wing": "Rear Wing R6 V1 or V2 (rear wing selection per set config)",
+      "cover": "R6 Cover Set NOT included"
+    },
+    "description": "R6 V2 mast is the alternative mast option in the R6 lineup, paired with the V2 front wing for an intermediate setup feel. See V1 set for full Race Series feature/construction descriptions (shared product page).",
+    "performance_features": "(same as V1 set)",
+    "construction_features": "(same as V1 set)",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6V2_vl1000x1000px_2024.jpg"
+    ]
+  },
+  "r6_race_series_set_v3": {
+    "url": "https://levitaz.com/shop/product/r6-race-series/",
+    "title": "R6 Race Series - V3 set",
+    "category": "Race Series / Foils / Complete Set",
+    "price_eur_excl_vat": 3999.00,
+    "specs": {
+      "front_wing": "Front Wing R6 V3",
+      "mast": "Mast R6 V1 or V2 (selectable)",
+      "rear_wing": "Rear Wing R6 V1 or V2",
+      "cover": "R6 Cover Set NOT included"
+    },
+    "description": "V3 front wing variant within the R6 Race Series. See V1 set for full Race Series feature/construction descriptions.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg"
+    ]
+  },
+  "r6_component_fw_v1": {
+    "url": "https://levitaz.com/shop/product/r6-components/",
+    "title": "R6 Front Wing V1 (component)",
+    "category": "Race Series / Foils / Components",
+    "item_nr": "G461562 (per R6 set delivery list)",
+    "price_eur_excl_vat": 1299.00,
+    "specs": {"type": "Race Series front wing - V1 profile"},
+    "description": "Standalone R6 V1 front wing component for the Race Series. See r6_race_series_set_v1_mast_v1 for full Race Series performance/construction context.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v1_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_v1000x1000px_2024.jpg"
+    ]
+  },
+  "r6_component_fw_v2": {
+    "url": "https://levitaz.com/shop/product/r6-components/",
+    "title": "R6 Front Wing V2 (component)",
+    "category": "Race Series / Foils / Components",
+    "price_eur_excl_vat": 1299.00,
+    "specs": {"type": "Race Series front wing - V2 profile"},
+    "description": "Standalone R6 V2 front wing component. Per-component dedicated description body not rendered.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg"
+    ]
+  },
+  "r6_component_fw_v3": {
+    "url": "https://levitaz.com/shop/product/r6-components/",
+    "title": "R6 Front Wing V3 (component)",
+    "category": "Race Series / Foils / Components",
+    "price_eur_excl_vat": 1299.00,
+    "specs": {"type": "Race Series front wing - V3 profile"},
+    "description": "Standalone R6 V3 front wing component. Per-component dedicated description body not rendered.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg"
+    ]
+  },
+  "r6_component_rw_v1": {
+    "url": "https://levitaz.com/shop/product/r6-components/",
+    "title": "R6 Rear Wing V1 (component)",
+    "category": "Race Series / Foils / Components",
+    "item_nr": "G463777 (per R6 set delivery list)",
+    "price_eur_excl_vat": 999.00,
+    "specs": {"type": "Race Series rear wing - V1"},
+    "description": "Standalone R6 V1 rear wing component.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_rearwing_r6_v1_o2000x2000px.jpg"
+    ]
+  },
+  "r6_component_rw_v2": {
+    "url": "https://levitaz.com/shop/product/r6-components/",
+    "title": "R6 Rear Wing V2 (component)",
+    "category": "Race Series / Foils / Components",
+    "price_eur_excl_vat": 999.00,
+    "specs": {"type": "Race Series rear wing - V2"},
+    "description": "Standalone R6 V2 rear wing component.",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_rearwing_r6_v2_o2000x2000px.jpg"
+    ]
+  },
+  "r6_component_mast_v1": {
+    "url": "https://levitaz.com/shop/product/r6-components/",
+    "title": "R6 Mast V1 (component)",
+    "category": "Race Series / Foils / Components",
+    "item_nr": "G460700 (per R6 set delivery list)",
+    "price_eur_excl_vat": 1899.00,
+    "specs": {"type": "Race Series mast - V1 (high stiffness - for rough conditions or heavier riders)"},
+    "description": "Standalone R6 V1 mast. Characterized by exceptional stiffness - perfect for rough conditions or heavier riders needing a direct and responsive feel from their glider (per R6 set description).",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_mast_r6_v1_l2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg"
+    ]
+  },
+  "r6_component_mast_v2": {
+    "url": "https://levitaz.com/shop/product/r6-components/",
+    "title": "R6 Mast V2 (component)",
+    "category": "Race Series / Foils / Components",
+    "price_eur_excl_vat": 1899.00,
+    "specs": {"type": "Race Series mast - V2 (alternative stiffness/flex profile)"},
+    "description": "Standalone R6 V2 mast - alternative mast option for lighter riders or smoother conditions (per Levitaz set descriptions - exact V2 spec details not rendered server-side).",
+    "image_urls": [
+      "https://levitaz.com/uploads/shop/levitaz_race_series_mast_r6_v2_l2000x2000px.jpg",
+      "https://levitaz.com/uploads/shop/levitaz_race_series_R6V2_vl1000x1000px_2024.jpg"
+    ]
+  },
+  "_open_questions": {
+    "fw_specs_other_sizes": "Levitaz only renders FW 540 spec table server-side. Spec tables for FW 680/790/900 (span, AR, weight) need to be requested from Levitaz HQ or scraped with a headless browser (variant selector triggers AJAX).",
+    "mast_specs_other_sizes": "Same as FW - only MAST 76 spec table confirmed (length 76 cm, min thickness 16 mm). MAST 84/96 thickness needs HQ confirmation.",
+    "boom_scc_per_size_descriptions": "Boom RS SCC product page shows 'coming soon' flag and skeletal info. Per-size descriptions (board length, width, recommended rider weight, wind range) not yet published on levitaz.com.",
+    "r6_v2_v3_dedicated_descriptions": "R6 V2 and V3 do not have dedicated description bodies on the shared R6 Race Series page. Only V1 set description is rendered. V2/V3 differentiation (use case / rider weight) needs HQ.",
+    "fs_set_pricing": "Free Series Set (FS Set 540/680/790/900 = FW + Mast + Stab + hardware bundle) is NOT listed as a packaged product on levitaz.com. The Free Series Bundles & Setups page (https://levitaz.com/shop/products/accessoires/bundles-setups/?af=freeSeries) was not separately scraped - may contain bundle SKUs.",
+    "wind_range_rider_weight": "Levitaz does not publish wind range / rider weight recommendations directly on product pages. Marked null across all SKUs.",
+    "lifestyle_action_shots": "Captured generic Free Series lifestyle/action shots (Webshop_product_description_*_2026_1920x1080.jpg series). These are shared assets across the Free Series, not per-size."
+  },
+  "_summary": {
+    "products_total": 20,
+    "images_total": 81,
+    "products_with_5plus_images": 6,
+    "image_count_per_product": {
+      "free_series_fw_540": 8,
+      "free_series_fw_680": 6,
+      "free_series_fw_790": 6,
+      "free_series_fw_900": 5,
+      "free_series_mast_76": 7,
+      "free_series_mast_84": 2,
+      "free_series_mast_96": 2,
+      "free_series_stab_180": 9,
+      "boom_rs_scc_63": 4,
+      "boom_rs_scc_83": 4,
+      "boom_rs_scc_95": 4,
+      "r6_race_series_set_v1_mast_v1": 7,
+      "r6_race_series_set_v2_mast_v2": 1,
+      "r6_race_series_set_v3": 2,
+      "r6_component_fw_v1": 3,
+      "r6_component_fw_v2": 2,
+      "r6_component_fw_v3": 2,
+      "r6_component_rw_v1": 1,
+      "r6_component_rw_v2": 1,
+      "r6_component_mast_v1": 2,
+      "r6_component_mast_v2": 2
+    }
+  }
+}
