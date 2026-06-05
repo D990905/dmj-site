@@ -118,6 +118,58 @@
 }
 .pd-hero__image--err { display: none; }
 
+/* §200-B (Alex Park 2026-06-05) — pd-hero 3-view gallery (썸네일 swap).
+   Levitaz Front Wing 4 페이지 (540/680/790/900) 적용. 본사 사이트 3-angle 패턴 매치.
+   썸네일 클릭 → 메인 이미지 src 교체. 키보드 ←/→ 도 작동.
+   적용 페이지가 단일 URL 만 보유한 경우 — 모든 썸네일 동일 src · onerror fallback 으로 graceful degrade. */
+.pd-hero__gallery {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 14px 0 10px;
+}
+.pd-hero__gallery-thumb {
+  border: 2px solid var(--border, #E5EAF0);
+  background: #fff;
+  border-radius: 8px;
+  padding: 4px;
+  width: 64px;
+  height: 64px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  flex: 0 0 auto;
+  /* §182-A 패턴 — iOS Safari hit-test */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(10, 37, 64, 0.10);
+}
+.pd-hero__gallery-thumb > img,
+.pd-hero__gallery-thumb svg * { pointer-events: none; }
+.pd-hero__gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pd-hero__gallery-thumb:hover { transform: translateY(-1px); border-color: var(--color-sea, #1F8FFF); }
+.pd-hero__gallery-thumb:focus-visible {
+  outline: none;
+  border-color: var(--color-sea, #1F8FFF);
+  box-shadow: 0 0 0 3px rgba(31, 143, 255, 0.25);
+}
+.pd-hero__gallery-thumb.is-active {
+  border-color: var(--color-navy, #0A2540);
+  box-shadow: 0 4px 12px rgba(10, 37, 64, 0.12);
+}
+.pd-hero__gallery-thumb .pd-hero__gallery-label {
+  display: none;
+}
+@media (max-width: 620px) {
+  .pd-hero__gallery-thumb { width: 56px; height: 56px; }
+}
+
 .pd-hero__brand-mark {
   position: absolute;
   top: 18px;

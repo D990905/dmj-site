@@ -136,10 +136,30 @@
         <div class="pd-hero__image-wrap" data-brand="levitaz">
           <img src="https://levitaz.com/uploads/shop/levitaz_free_series_frontwing_680_v2000x2000px.jpg" alt="Levitaz Free Series FW 680 카본 프론트 윙 — 마스트 결합 정면"
                class="pd-hero__image"
+               id="pd-hero__main-img"
                loading="eager"
                decoding="async"
                onerror="this.classList.add('pd-hero__image--err')" />
           <span class="pd-hero__brand-mark" data-brand="levitaz">Levitaz</span>
+        </div>
+        <!-- §200-B (Alex Park 2026-06-05) — 3-view gallery (전체/윗면/측면). 본사 패턴 매치.
+             옥대표님 직접 보내신 FW 680 studio shots (img6=perspective, img7=top, img9=side). -->
+        <div class="pd-hero__gallery" role="group" aria-label="제품 사진 보기 — 3가지 각도">
+          <button type="button" class="pd-hero__gallery-thumb is-active" data-view="perspective"
+                  data-src="../../assets/images/products/levitaz/fw-680/fw-680-img6.png"
+                  aria-label="전체 시점" title="전체">
+            <img src="../../assets/images/products/levitaz/fw-680/fw-680-img6.png" alt="" loading="lazy" decoding="async">
+          </button>
+          <button type="button" class="pd-hero__gallery-thumb" data-view="top"
+                  data-src="../../assets/images/products/levitaz/fw-680/fw-680-img7.png"
+                  aria-label="윗면" title="윗면">
+            <img src="../../assets/images/products/levitaz/fw-680/fw-680-img7.png" alt="" loading="lazy" decoding="async">
+          </button>
+          <button type="button" class="pd-hero__gallery-thumb" data-view="side"
+                  data-src="../../assets/images/products/levitaz/fw-680/fw-680-img9.png"
+                  aria-label="측면" title="측면">
+            <img src="../../assets/images/products/levitaz/fw-680/fw-680-img9.png" alt="" loading="lazy" decoding="async">
+          </button>
         </div>
         <ol class="pd-hero__crumbs">
           <li><a href="../../index.html">단무지</a></li>
@@ -388,7 +408,7 @@
     .rec-set-components__op{font-size:1.6rem;font-weight:300;color:var(--text-secondary);align-self:center;padding-bottom:34px}
     .rec-set-components__item{margin:0;text-align:center;display:flex;flex-direction:column;align-items:center;width:160px}
     .rec-set-components__item img{width:140px;height:130px;object-fit:contain}
-    .rec-set-components__item--mast img{height:170px}
+    .rec-set-components__item--mast img{height:170px;width:auto;max-width:140px;object-fit:contain;background:#fff;display:block;margin:0 auto}
     .rec-set-components__item figcaption{margin-top:6px;font-size:0.78em;line-height:1.45;color:var(--text-secondary)}
     .rec-set-components__item figcaption b{display:block;font-size:1.02em;color:var(--color-navy);margin:2px 0}
     .rec-set-components__item figcaption span{display:block;font-size:0.92em;color:var(--text-secondary);opacity:0.85}
@@ -408,7 +428,7 @@
       .rec-set-components{grid-template-columns:1fr 24px 1fr 24px 1fr;gap:6px;padding:14px 10px}
       .rec-set-components__item{width:auto}
       .rec-set-components__item img{width:90px;height:80px}
-      .rec-set-components__item--mast img{height:110px}
+      .rec-set-components__item--mast img{height:110px;width:auto;max-width:90px;object-fit:contain;background:#fff;display:block;margin:0 auto}
       .rec-set-components__op{font-size:1.2rem;padding-bottom:24px}
       .rec-set-combos{grid-template-columns:1fr;gap:12px}
     }
@@ -426,7 +446,7 @@
         </figure>
         <span class="rec-set-components__op" aria-hidden="true">+</span>
         <figure class="rec-set-components__item rec-set-components__item--mast">
-          <img src="../../assets/images/products/levitaz/free-components/mast-84.jpg" alt="Free Series Mast (75/84/96 선택)" loading="lazy" decoding="async">
+          <img src="../../assets/images/products/levitaz/mast-84/mast-84-img7.png" alt="Free Series Mast — 76cm vertical studio shot (옥대표님 발신)" loading="lazy" decoding="async">
           <figcaption>Mast<b>75 · 84 · 96</b><span>아래에서 선택</span></figcaption>
         </figure>
         <span class="rec-set-components__op" aria-hidden="true">+</span>
@@ -661,6 +681,34 @@
         }
       });
     }
+  })();
+  </script>
+  <script>
+  /* §200-B (Alex Park 2026-06-05) — 3-view gallery 썸네일 swap handler.
+     Levitaz FW 4 페이지 공통. data-src 를 메인 이미지(#pd-hero__main-img) src 로 교체.
+     키보드 ←/→ 작동. is-active class 동기. */
+  (function () {
+    var gal = document.querySelector('.pd-hero__gallery');
+    var main = document.getElementById('pd-hero__main-img');
+    if (!gal || !main) return;
+    var thumbs = Array.prototype.slice.call(gal.querySelectorAll('.pd-hero__gallery-thumb'));
+    function activate(i) {
+      i = ((i % thumbs.length) + thumbs.length) % thumbs.length;
+      thumbs.forEach(function (b, j) { b.classList.toggle('is-active', j === i); });
+      var src = thumbs[i].getAttribute('data-src');
+      if (src && main.getAttribute('src') !== src) main.setAttribute('src', src);
+      thumbs[i].focus({ preventScroll: true });
+    }
+    thumbs.forEach(function (b, i) {
+      b.addEventListener('click', function () { activate(i); });
+    });
+    gal.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      var idx = thumbs.findIndex(function (b) { return b.classList.contains('is-active'); });
+      if (idx < 0) idx = 0;
+      activate(idx + (e.key === 'ArrowRight' ? 1 : -1));
+      e.preventDefault();
+    });
   })();
   </script>
   <script src="../../assets/js/nav-auth.js" defer></script>
