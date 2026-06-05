@@ -251,6 +251,29 @@
       ' ' + d.getHours() + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds());
   }
 
+  /* §198-B (Danny 2026-06-04) — playback clock element 갱신 (mode 분기).
+     R.timeMode === 'clock' 이고 R.session.startEpoch 가 유효하면 wall-clock
+     표기 (H:MM 시·분, 초 X — 정확도 over-information 회피). 그 외 = elapsed
+     기존 동작. 옥대표님 요청에 맞춘 hybrid 표기. seek() · 토글 handler 둘 다
+     이 helper 만 호출하도록 단일화. */
+  function fmtRealClockShort(epochMs) {
+    /* fmtRealClock(line 241) 와 다르게 초는 표시하지 않는다 — 재생 컨트롤
+       옆 공간이 좁고, 사용자가 "오후 3시 43분 경" mental model 로 충분. */
+    var d = new Date(epochMs);
+    return d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+  }
+  function updateClockEl(playT) {
+    if (!R || !R.clockEl) return;
+    var startEpoch = R.session && R.session.startEpoch;
+    if (R.timeMode === 'clock' && startEpoch != null && isFinite(startEpoch)) {
+      var curEpoch = startEpoch + Math.max(0, (playT - R.t0)) * 1000;
+      var endEpoch = startEpoch + R.dur * 1000;
+      R.clockEl.textContent = fmtRealClockShort(curEpoch) + ' / ' + fmtRealClockShort(endEpoch);
+    } else {
+      R.clockEl.textContent = fmtClock(playT - R.t0) + ' / ' + fmtClock(R.dur);
+    }
+  }
+
   /* 시계 시각 문자열("HH:MM:SS"·"H:MM"·"HH:MM:SS") → 데이터 기준
      경과초(startElapsed). 데이터 세션 시작 epoch 를 기준으로 같은 날의
      그 시각을 잡되, 자정을 넘는 경우를 위해 ±1일 후보 중 현재 배치값
@@ -705,7 +728,17 @@
           'id="replay-play" aria-label="Play">▶</button>' +
         '<button type="button" class="replay__btn" id="replay-stop" ' +
           'aria-label="Stop (to start)" title="Stop — back to start">⏹</button>' +
-        '<span class="replay__clock" id="replay-clock">0:00 / 0:00</span>' +
+        '<span class="replay__clock" id="replay-clock" aria-live="off">0:00 / 0:00</span>' +
+        /* §198-B (Danny 2026-06-04) — playback clock time-mode toggle.
+           옥대표님 요청: "당일 실제 시간도 선택해서 볼 수 있게". chart axis
+           의 .time-toggle 컴포넌트 재사용 (dashboard.css:142-153) — 일관성.
+           localStorage 'dmj_rd_replay_time_mode' 로 mode 영구. */
+        '<div class="time-toggle replay__timetoggle" id="replay-time-toggle" ' +
+          'role="group" aria-label="재생 시간 표기 — 경과 또는 실제">' +
+          '<button type="button" data-rmode="elapsed" class="is-active" ' +
+            'aria-pressed="true">경과</button>' +
+          '<button type="button" data-rmode="clock" aria-pressed="false">실제</button>' +
+        '</div>' +
         '<input type="range" id="replay-scrub" class="replay__scrub" ' +
           'min="0" max="1000" value="0" step="1" aria-label="Time scrubber">' +
         '<div class="replay__speed" id="replay-speed" role="group" ' +
@@ -2625,7 +2658,9 @@
       R.scrub.value = String(Math.round(frac * 1000));
     }
     paintScrub();
-    R.clockEl.textContent = fmtClock(playT - R.t0) + ' / ' + fmtClock(R.dur);
+    /* §198-B (Danny 2026-06-04) — clock 표기는 updateClockEl 로 단일화.
+       toggle 'elapsed'/'clock' mode 분기 + 빈 startEpoch 자동 fallback. */
+    updateClockEl(playT);
 
     syncVideo(playT - R.t0, scrubbing);
     drawBlur();
@@ -2947,6 +2982,39 @@
     R.scrub = el('replay-scrub');
     R.clockEl = el('replay-clock');
     R.video = el('replay-video');
+
+    /* §198-B (Danny 2026-06-04) — playback clock time-mode.
+       'elapsed' = 경과시간 (0:00 / 55:38), 'clock' = 실제시각 (15:43 / 16:38).
+       옥대표님 요청. 마지막 mode 는 localStorage 에 영구 (next session 복원). */
+    R.timeMode = 'elapsed';
+    try {
+      var savedMode = localStorage.getItem('dmj_rd_replay_time_mode');
+      if (savedMode === 'clock' || savedMode === 'elapsed') R.timeMode = savedMode;
+    } catch (_) {}
+    R.timeToggleEl = el('replay-time-toggle');
+    if (R.timeToggleEl) {
+      /* DOM 초기 reflect — localStorage 에 'clock' 이었으면 toggle 버튼도 동기 */
+      R.timeToggleEl.querySelectorAll('button[data-rmode]').forEach(function (b) {
+        var active = b.getAttribute('data-rmode') === R.timeMode;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      R.timeToggleEl.addEventListener('click', function (e) {
+        var btn = e.target.closest('button[data-rmode]');
+        if (!btn) return;
+        var mode = btn.getAttribute('data-rmode');
+        if (mode !== 'elapsed' && mode !== 'clock') return;
+        R.timeMode = mode;
+        try { localStorage.setItem('dmj_rd_replay_time_mode', mode); } catch (_) {}
+        R.timeToggleEl.querySelectorAll('button[data-rmode]').forEach(function (b) {
+          var active = b.getAttribute('data-rmode') === mode;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        /* toggle 직후 즉시 clock 표기 갱신 */
+        updateClockEl(R.playT);
+      });
+    }
 
     // 재생 속도 버튼
     el('replay-speed').innerHTML = SPEED_STEPS.map(function (m) {

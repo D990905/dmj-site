@@ -1333,6 +1333,13 @@
         card.querySelector('[data-cond-label]').textContent = fnLabel(arr[i].condition || 3);
         // §169-N — Dashboard 실시간 갱신
         if (typeof renderGearDashboard === 'function') renderGearDashboard(arr);
+        // §198-A (DO_NOT_REVERT, Danny 2026-06-04) — gear-edit debounce toast.
+        // typing 중 매 keystroke toast spam 차단 위해 800ms debounce.
+        // 사용자가 입력 멈춘 후 1회 안내. clear timer 는 closure 안에서.
+        if (window.__gearEditToastTimer) clearTimeout(window.__gearEditToastTimer);
+        window.__gearEditToastTimer = setTimeout(function () {
+          toast('장비 정보 저장됨', 1500);
+        }, 800);
       }
       card.querySelectorAll('[data-k]').forEach(function (el) {
         el.addEventListener('input', autoSave);
@@ -1494,6 +1501,10 @@
       // §169-N v3 — adding gear always expands the list + focus new card.
       setGearExpanded(true);
       renderGearList();
+      // §198-A (DO_NOT_REVERT, Danny 2026-06-04) — gear-add toast.
+      // delete (line 1391) / copy (line 1416) 에 이미 toast 있는 반면 add 에 누락.
+      // 옥대표님 발견: "자동저장이면 자동저장된다고 메세지를 주든지 해야할듯".
+      toast('장비 추가됨 — 자동 저장됨');
       // Scroll to and focus the newly added card.
       var allCards = gearListEl.querySelectorAll('.gear-card');
       var newCard = allCards[allCards.length - 1];

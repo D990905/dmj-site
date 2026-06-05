@@ -2283,6 +2283,19 @@ input::placeholder { color:var(--text-dim); }
   .replay-graph { flex:1 1 100%; }
 }
 
+/* §198-B (Alex Park 2026-06-04) — playback clock time-mode toggle.
+   chart axis 의 .time-toggle 컴포넌트(line 142-153) 재사용 — 일관성·재사용성.
+   replay__scrubrow flex 안 자연 배치 (clock 옆). 모바일 패딩만 축소. */
+.replay__timetoggle { flex:0 0 auto; }
+.replay__timetoggle button {
+  /* tap target 보존 (WCAG 2.5.8 — 24×24 CSS px). */
+  min-height:28px;
+}
+@media (max-width:620px) {
+  /* 모바일 — toggle 버튼 압축 (scrubber 폭 확보) */
+  .replay__timetoggle button { padding:4px 8px; font-size:0.72rem; }
+}
+
 /* ============================================================
  * 시각 폴리시 — 카운트업·등장 애니메이션·스켈레톤·빈 상태
  * (Danny 2026-05-26 라이딩 분석 대시보드 시각 폴리시 Layer 1)
