@@ -68,22 +68,37 @@
 
       function update() {
         var size = sel.value;
-        if (!matrix || !size) {
-          display.textContent = '—';
-          return;
-        }
+        var price = null;
+        var fromHTML = false;
+
+        // §212 (Danny 2026-06-06) — fallback path #1: option 의 data-price attribute.
+        // matrix.js 의 size_pricing_KRW data 가 없는 product 도 작동 가능. HTML 이 source.
         try {
-          var price = matrix.getPrice(sku, size);
-          display.textContent = fmtKRW(price);
-          // matrix.js 가 isPriceEstimate(sku) 도 제공 — 추정값이면 시각 hint
-          if (typeof matrix.isPriceEstimate === 'function' && matrix.isPriceEstimate(sku)) {
-            display.setAttribute('data-estimate', '1');
-          } else {
-            display.removeAttribute('data-estimate');
+          var opt = sel.selectedOptions && sel.selectedOptions[0];
+          if (opt && opt.dataset && opt.dataset.price) {
+            var n = parseInt(opt.dataset.price, 10);
+            if (isFinite(n) && n > 0) { price = n; fromHTML = true; }
           }
-        } catch (e) {
-          console.warn('[product-detail §209] getPrice err', { sku: sku, size: size, err: e });
-          display.textContent = '—';
+        } catch (_) {}
+
+        // fallback path #2: matrix.js getPrice (size_pricing_KRW + PRICE_OVERRIDES)
+        if (price == null && matrix && size) {
+          try {
+            var mp = matrix.getPrice(sku, size);
+            if (isFinite(mp) && mp > 0) price = mp;
+          } catch (e) {
+            console.warn('[product-detail §209] getPrice err', { sku: sku, size: size, err: e });
+          }
+        }
+
+        // Render — '—' silent fallback (data 부재 시 honest 표시)
+        display.textContent = fmtKRW(price);
+
+        // estimate hint — HTML data-price 직접 source 면 estimate X (의도된 정확값).
+        if (!fromHTML && typeof matrix !== 'undefined' && matrix && typeof matrix.isPriceEstimate === 'function' && matrix.isPriceEstimate(sku)) {
+          display.setAttribute('data-estimate', '1');
+        } else {
+          display.removeAttribute('data-estimate');
         }
       }
 

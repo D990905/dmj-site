@@ -455,49 +455,97 @@
 
 <hr class="divider">
 
-<section class="section section--tight section--bg-image" id="sports"
-         style="background-image:url('assets/images/products/ppc/lifestyle/foiling-action-1.jpg')">
-  <div class="container">
-    <div class="section-head section-head--center reveal">
-      <span class="section-head__eyebrow">Sport-First</span>
-      <h2 class="section-head__title">무엇이 필요한가요?</h2>
-      <p class="section-head__lead">종목 단위로 빠르게 검색하세요. 브랜드는 그 다음 결정입니다.</p>
-    </div>
+<!-- §215 (Danny 2026-06-06) — SPORT-FIRST genre selector grid 제거.
+     옥대표님 verbatim "왜 있는지 이유 모름" → section 통째 제거.
+     cross-reference verify: 외부 페이지의 #sports anchor 참조 0건 (grep evidence) → 안전 제거.
+     이전 #consultation 직후 #founder 직전 hr divider 1개로 연결. -->
 
-    <div class="sport-grid sport-grid--four reveal">
-      <a href="#brands" class="sport-tile">
-        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 22 16 4l12 18z"/><path d="M16 4v18"/>
-        </svg>
-        <span class="sport-tile__name">윙포일</span>
-        <span class="sport-tile__count">Wingfoil</span>
-      </a>
-      <a href="#brands" class="sport-tile">
-        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <ellipse cx="16" cy="20" rx="11" ry="3"/><path d="M16 20V6"/><path d="M9 9h14"/>
-        </svg>
-        <span class="sport-tile__name">포일</span>
-        <span class="sport-tile__count">Hydrofoil · Pump · Downwind</span>
-      </a>
-      <a href="#brands" class="sport-tile">
-        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <ellipse cx="16" cy="20" rx="11" ry="4"/><path d="M16 4v16M11 8l5-4 5 4"/>
-        </svg>
-        <span class="sport-tile__name">SUP</span>
-        <span class="sport-tile__count">Stand Up Paddle</span>
-      </a>
-      <a href="#brands" class="sport-tile">
-        <svg class="sport-tile__icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="8" y="6" width="16" height="20" rx="3"/><path d="M12 6V4M20 6V4M8 12h16"/>
-        </svg>
-        <span class="sport-tile__name">액세서리</span>
-        <span class="sport-tile__count">Wetsuit · Helmet · Impact</span>
-      </a>
+<!-- ========== §210 SailTech Sports Science Lab · Founder ==========
+     Inserted: 2026-06-06 (Alex Park #4) · Rose Yoon (#1) spec + 옥대표님 verbatim option A
+     Numerals: 3× Olympic · PhD 운동생리학 · 3 NTs (한국·싱가폴·인도 국가대표 코치)
+     Asset: assets/images/about/danny-hainan-candid-{4x5,1x1,sm}.webp + .jpg fallback
+     Tokens: 기존 style.css 토큰 사용 (--color-navy, --color-sea, --color-mist, --font-mono)
+     v2 design-system tokens 합의 시 자동 매핑 (BEM class 그대로 유지). -->
+<style>
+  /* §210 — Founder section scoped CSS (single-file inline; v2 token migration 시 _design-system/founder.css 분리). */
+  .founder { padding: clamp(64px, 9vw, 120px) 0; background: linear-gradient(180deg, var(--color-navy, #0A2540) 0%, #061A2E 100%); color: #fff; }
+  .founder .container { max-width: 1180px; }
+  .founder__layout { display: grid; gap: clamp(28px, 4vw, 56px); grid-template-columns: 1fr; align-items: center; }
+  @media (min-width: 880px) {
+    .founder__layout { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
+  }
+  .founder__metrics { display: flex; flex-direction: column; gap: 22px; word-break: keep-all; }
+  .founder__eyebrow { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-sun, #FFB800); margin: 0; }
+  .founder__title { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 800; line-height: 1.1; margin: 0; display: flex; flex-direction: column; gap: 4px; letter-spacing: -0.02em; }
+  .founder__name { color: #fff; }
+  .founder__role { font-size: 1rem; font-weight: 500; letter-spacing: 0.04em; color: rgba(255,255,255,0.75); font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); }
+  .founder__credentials { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 6px 0 0; padding: 0; }
+  @media (min-width: 560px) { .founder__credentials { grid-template-columns: repeat(3, 1fr); gap: 18px; } }
+  .founder__credential { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; background: rgba(255,255,255,0.04); backdrop-filter: blur(8px) saturate(120%); -webkit-backdrop-filter: blur(8px) saturate(120%); margin: 0; }
+  .founder__credential dt { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.62); margin: 0; }
+  .founder__credential dd { margin: 0; }
+  .founder__credential .founder__metric { font-family: var(--font-mono, 'JetBrains Mono', 'SF Mono', monospace); font-size: clamp(1.6rem, 3.2vw, 2.1rem); font-weight: 700; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; display: inline-flex; align-items: baseline; gap: 2px; }
+  .founder__credential .founder__metric sup { font-size: 0.55em; font-weight: 600; color: var(--color-sun, #FFB800); margin-left: 1px; vertical-align: super; }
+  .founder__credential .founder__metric sub { font-size: 0.42em; font-weight: 700; color: rgba(255,255,255,0.85); margin-left: 3px; letter-spacing: 0.04em; vertical-align: baseline; transform: translateY(-2px); display: inline-block; }
+  .founder__credential-label { font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); font-size: 0.82rem; line-height: 1.5; color: rgba(255,255,255,0.7); }
+  .founder__lead { font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); font-size: 1rem; line-height: 1.7; color: rgba(255,255,255,0.82); margin: 12px 0 0; max-width: 50ch; }
+  .founder__portrait { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.36); }
+  .founder__portrait img { width: 100%; height: auto; display: block; aspect-ratio: 4 / 5; object-fit: cover; }
+  .founder__caption { position: absolute; left: 14px; bottom: 14px; right: 14px; padding: 12px 14px; border-radius: 12px; background: rgba(10,14,22,0.55); backdrop-filter: blur(12px) saturate(140%); -webkit-backdrop-filter: blur(12px) saturate(140%); border: 1px solid rgba(255,255,255,0.10); display: flex; flex-direction: column; gap: 2px; }
+  .founder__caption .eyebrow { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-sun, #FFB800); }
+  .founder__caption-text { font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); font-size: 0.84rem; line-height: 1.5; color: rgba(255,255,255,0.92); word-break: keep-all; }
+  @media (prefers-reduced-motion: reduce) { .founder__credential { backdrop-filter: none; -webkit-backdrop-filter: none; } }
+</style>
+<section class="founder" id="founder" aria-labelledby="founder-title">
+  <div class="container">
+    <div class="founder__layout">
+      <!-- Left — Hero metric stack (Rose C1 패턴 · 옥대표님 verbatim option A) -->
+      <div class="founder__metrics">
+        <p class="founder__eyebrow">SailTech Sports Science Lab · Founder</p>
+        <h2 class="founder__title" id="founder-title">
+          <span class="founder__name">옥덕필 (Duckpil Ok)</span>
+          <span class="founder__role">대표 · 운동생리학박사</span>
+        </h2>
+        <dl class="founder__credentials">
+          <div class="founder__credential">
+            <dt>Olympic</dt>
+            <dd><span class="founder__metric">3<sup>×</sup></span></dd>
+            <dd class="founder__credential-label">윈드서핑 국가대표 선수 · 올림픽 3회 연속 출전</dd>
+          </div>
+          <div class="founder__credential">
+            <dt>학위</dt>
+            <dd><span class="founder__metric">PhD</span></dd>
+            <dd class="founder__credential-label">운동생리학 (체육응용과학)</dd>
+          </div>
+          <div class="founder__credential">
+            <dt>National Team Coach</dt>
+            <dd><span class="founder__metric">3<sub>NTs</sub></span></dd>
+            <dd class="founder__credential-label">한국 · 싱가폴 · 인도 국가대표 코치</dd>
+          </div>
+        </dl>
+        <p class="founder__lead">
+          단무지는 commerce + sports science lab. 윙포일 컨설팅의 본질은 product 가 아니라 데이터와 코칭의 깊이입니다.
+        </p>
+      </div>
+
+      <!-- Right — Portrait (4:5 vertical) + glassmorphism caption -->
+      <figure class="founder__portrait">
+        <picture>
+          <source media="(max-width: 768px)" srcset="assets/images/about/danny-hainan-candid-sm.webp" type="image/webp">
+          <source srcset="assets/images/about/danny-hainan-candid-4x5.webp" type="image/webp">
+          <img src="assets/images/about/danny-hainan-candid.jpg"
+               alt="옥덕필 — 2025 중국 Hainan 윙포일 챔피언십, 라이딩 준비 중"
+               width="800" height="1000"
+               loading="lazy" decoding="async">
+        </picture>
+        <figcaption class="founder__caption">
+          <span class="eyebrow">2025 China · Hainan</span>
+          <span class="founder__caption-text">National Wing Foiling Championship — 라이딩 준비 중</span>
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
-
-<hr class="divider">
 
 <!-- ========== 4 Brand Hub ========== -->
 <section class="section" id="brands">
@@ -508,24 +556,10 @@
         <h2 class="section-head__title">입문부터 선수까지,<br>한 곳에서 모두</h2>
         <p class="section-head__lead">단무지 전문 퍼포먼스 어드바이저가 직접 현장에서 테스트한 네 브랜드만 엄선했습니다.</p>
       </div>
-      <div class="section-head__side">
-        <div class="section-head__stat">
-          <span class="section-head__stat-num">4</span>
-          <span class="section-head__stat-label">브랜드</span>
-        </div>
-        <div class="section-head__stat">
-          <span class="section-head__stat-num">4</span>
-          <span class="section-head__stat-label">종목</span>
-        </div>
-        <div class="section-head__stat">
-          <span class="section-head__stat-num">15+</span>
-          <span class="section-head__stat-label">스팟 검증</span>
-        </div>
-        <div class="section-head__stat">
-          <span class="section-head__stat-num">1년</span>
-          <span class="section-head__stat-label">무상 보증</span>
-        </div>
-      </div>
+      <!-- §216 (Danny 2026-06-06) — stat 4-cell grid 제거 (4 브랜드/4 종목/15+ 스팟/1년 무상).
+           옥대표님 verbatim "이것도 제거". section-head__side wrapper 통째 제거.
+           cross-reference: production HTML 외 _qa_screenshots/ 만 사용 → 라이브 영향 0.
+           orphaned CSS class (.section-head__stat*) 는 별도 housekeeping sprint. -->
     </div>
 
     <div class="brand-grid">

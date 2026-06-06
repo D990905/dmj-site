@@ -204,11 +204,15 @@
 <!-- ========== Hero ========== -->
 <section class="hero hero--cinematic" id="home">
   <div class="hero__cine-bg" aria-hidden="true">
+    <!-- §214 Swap 1 (Danny 2026-06-06) — hero 사진 옥대표 본인 액션 컷 (IMG_0503 · 하이난 2025).
+         옥대표님 "단무지에 안 어울림" 지적 → 옥대표 본인 라이딩 액션 (윙 + 하이난 스카이라인) 으로 교체.
+         반응형 srcset: sm(960px) · md(1280px) · webp · jpg fallback. -->
     <picture>
-      <source srcset="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.webp" type="image/webp">
-      <source srcset="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg" type="image/jpeg">
-      <img class="hero__cine-image" src="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg"
-           alt="단무지 라이딩 — Sean Herbert PPC 윙 Brazil 2025"
+      <source srcset="assets/images/about/danny-hainan-action-hero-sm.webp" media="(max-width:768px)" type="image/webp">
+      <source srcset="assets/images/about/danny-hainan-action-hero-md.webp" media="(max-width:1280px)" type="image/webp">
+      <source srcset="assets/images/about/danny-hainan-action-hero.webp" type="image/webp">
+      <img class="hero__cine-image" src="assets/images/about/danny-hainan-action-hero.jpg"
+           alt="옥대표 윙포일 라이딩 — 2025 중국 하이난 챔피언십"
            loading="eager" decoding="async" fetchpriority="high">
     </picture>
     <div class="hero__cine-overlay"></div>
@@ -309,9 +313,15 @@
       <!-- 옥덕필 박사 -->
       <article class="value-card" style="padding:32px">
         <!-- §183 (Danny 2026-06-03): 옥덕필 박사 라이딩샷 실사진 — 세로 사진 → 4/3 box object-position 상단 보존. -->
-        <img src="assets/images/about/danny-riding-portrait.jpg" alt="옥덕필 박사 윙포일 라이딩"
-             loading="lazy" decoding="async"
-             style="width:100%;aspect-ratio:4/3;border-radius:14px;object-fit:cover;object-position:center 22%;margin-bottom:24px;display:block">
+        <!-- §214 Swap 2 (Danny 2026-06-06) — 옥덕필 박사 portrait IMG_0504 (하이난 candid).
+             세로 4:5 crop · object-position face 보존 · webp + jpg fallback. -->
+        <picture>
+          <source srcset="assets/images/about/danny-hainan-candid-sm.webp" media="(max-width:768px)" type="image/webp">
+          <source srcset="assets/images/about/danny-hainan-candid-4x5.webp" type="image/webp">
+          <img src="assets/images/about/danny-hainan-candid.jpg" alt="옥덕필 박사 — 2025 중국 하이난 윙포일 챔피언십 라이딩 준비"
+               loading="lazy" decoding="async"
+               style="width:100%;aspect-ratio:4/3;border-radius:14px;object-fit:cover;object-position:center 30%;margin-bottom:24px;display:block">
+        </picture>
         <span class="pill pill--accent" style="margin-bottom:12px">운동생리학박사 · 퍼포먼스 컨설팅</span>
         <h3 class="t-h2" style="margin:0 0 12px">옥덕필 박사</h3>
         <p style="color:var(--text-secondary);font-size:1rem;line-height:1.75;margin:0 0 16px">
@@ -346,11 +356,16 @@
       </article>
     </div>
 
-    <!-- §183 (Danny 2026-06-03): 시상식 1위 사진 — 실적·신뢰 banner. 운영진 grid 아래. -->
+    <!-- §183 (Danny 2026-06-03): 시상식 1위 사진 — 실적·신뢰 banner. 운영진 grid 아래.
+         §214 Swap 3 (Danny 2026-06-06): danny-masters-cup-win → -podium (IMG_0536 신규). -->
     <div class="reveal about-achievement" style="max-width:1080px;margin:48px auto 0;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:center;background:var(--color-navy);border-radius:18px;overflow:hidden">
-      <img src="assets/images/about/danny-masters-cup-win.jpg" alt="옥덕필 박사 윙포일 대회 시상식 1위"
+      <picture>
+        <source srcset="assets/images/about/danny-masters-cup-podium-sm.webp" media="(max-width:768px)" type="image/webp">
+        <source srcset="assets/images/about/danny-masters-cup-podium.webp" type="image/webp">
+        <img src="assets/images/about/danny-masters-cup-podium.jpg" alt="옥덕필 박사 윙포일 마스터스 컵 1위 시상식 포디움"
            loading="lazy" decoding="async"
            style="width:100%;height:100%;min-height:260px;object-fit:cover;object-position:center;display:block">
+      </picture>
       <div style="padding:32px 36px 32px 8px;color:#fff">
         <span class="pill pill--accent" style="margin-bottom:14px">현장에서 증명한 실적</span>
         <h3 class="t-h2" style="margin:0 0 12px;color:#fff">물 위에서 검증된 신뢰</h3>
