@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0E1A">
+<title>Apple Watch Fitness Style — 4 Chart Cards (Glassmorphism Demo)</title>
+
+<!--
+  ============================================================
+  riding-dashboard / 우측 4 차트 카드 — Apple Watch Fitness 스타일 demo
+  By 알렉스 박 (Alex Park, #4 Frontend Engineer) · 2026-06-05
+  옥대표님 dispatch — "투명 다크 모드 카드 뷰 + Apple Watch 네온 컬러"
+  ============================================================
+
+  본 데모 = standalone preview (옥대표님 sandbox 라이브 확인용).
+  실제 riding-dashboard 통합 = §204 sprint 별도 (CSS 토큰화 + chart-theme.js
+  연동 + Chart.js config 통합). 본 파일 = 시각 spec lock + 검증 자료.
+
+  ─── 사이트 stack 정합 ───────────────────────────────────────
+  단무지 사이트 = vanilla HTML/CSS + design token (--color-*) 기반.
+  Tailwind 미사용. 본 demo 는:
+    - 옥대표님 발언 verbatim "Tailwind CSS 컴포넌트" 존중 → 각 element 에
+      Tailwind utility class 명시 (참조용 주석 + class attribute).
+    - 실제 작동 = vanilla CSS (Tailwind 없이도 100% 동일하게 렌더링).
+    - §204 통합 시 → vanilla CSS 가 그대로 chart-theme.js + dashboard.css
+      에 흡수, Tailwind class 는 명세 reference 로만 보존.
+
+  ─── 색 매핑 (Apple Watch HIG · Fitness app) ─────────────────
+    SOG (속도)  →  #32D74B  네온 초록 (Activity Move ring)
+    VMG         →  #FF9F0A  네온 오렌지 (Exercise ring)
+    TWA         →  #FF375F  네온 핑크 (Stand ring · 풍각 intensity)
+    HR (심박)   →  #FF453A  네온 빨강 (HealthKit HR canonical)
+
+  ─── iOS Safari fallback ────────────────────────────────────
+    -webkit-backdrop-filter (iOS 9+) + backdrop-filter (Chrome 76+).
+    @supports not 분기 → backdrop-filter 미지원 시 opaque dark bg fallback.
+
+  ─── 회귀 가드 ────────────────────────────────────────────
+    §172 (SW cleanup) · §171-B (cart) · §173 (agent) — 본 demo 미적용
+    (standalone). 통합 시 §204 spec 으로 다시 적용.
+-->
+
+<style>
+/* ============================================================
+   Design tokens — Glassmorphism + uniform white data + red cursor
+   §203-B revision (옥대표님 2026-06-05): 데이터 line = 흰색 통일,
+   네온 컬러는 카드 액센트도 제거 (uniform white). 빨간 cursor
+   세로선만 유지 (기준점 — 변경 X).
+   ============================================================ */
+:root {
+  /* Data line / area = 흰색 통일 (네온 X) */
+  --data-line:       rgba(255, 255, 255, 0.95);
+  --data-fill-top:   rgba(255, 255, 255, 0.14);
+  --data-fill-bot:   rgba(255, 255, 255, 0.00);
+  /* Cursor — 빨강 (live dashboard 기준점 그대로) */
+  --cursor-color:    #FF3B30;          /* iOS system red */
+  --cursor-glow:     0 0 6px rgba(255, 59, 48, 0.6), 0 0 12px rgba(255, 59, 48, 0.28);
+  /* Glass tokens */
+  --glass-bg:        rgba(0, 0, 0, 0.48);          /* 더 어둡고 영상 비치도록 (옥대표님 0.45-0.55 범위) */
+  --glass-bg-solid:  rgba(20, 22, 28, 0.92);       /* backdrop-filter 미지원 fallback */
+  --glass-border:    rgba(255, 255, 255, 0.08);
+  --glass-shadow:    0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+  /* Type */
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Pretendard Variable', 'Pretendard', system-ui, sans-serif;
+  --font-mono:   'SF Mono', 'JetBrains Mono', Menlo, ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: var(--font-system);
+  /* Demo backdrop = 어두운 동영상 felt — 글래스 효과 시연 */
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(50,215,75,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,55,95,0.08) 0%, transparent 50%),
+    linear-gradient(135deg, #0A0E1A 0%, #161B26 100%);
+  min-height: 100vh;
+  color: rgba(255,255,255,0.92);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.demo-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;   /* left = video stage placeholder · right = 4 cards */
+  gap: 16px;
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+.video-stage {
+  /* riding-dashboard 의 영상·지도 영역 placeholder */
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 8px, rgba(255,255,255,0.04) 8px 16px),
+    linear-gradient(180deg, #1A2030, #0E1320);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.35);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  min-height: 480px;
+}
+@media (max-width: 720px) {
+  .demo-layout { grid-template-columns: 1fr; }
+  .video-stage { min-height: 220px; }
+}
+
+/* ============================================================
+   .gd-cards — 4 카드 vertical stack
+   Tailwind 대응: flex flex-col gap-2 md:gap-3
+   ============================================================ */
+.gd-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ============================================================
+   .gd-card — Glassmorphism dark card
+   Tailwind 대응:
+     class="relative rounded-2xl border border-white/10 overflow-hidden
+            bg-[rgba(20,22,28,0.48)] backdrop-blur-lg backdrop-saturate-150
+            shadow-[0_8px_32px_rgba(0,0,0,0.35)]
+            transition-transform duration-200 hover:scale-[1.01]"
+   ============================================================ */
+.gd-card {
+  position: relative;
+  background: var(--glass-bg-solid);  /* fallback first */
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  padding: 12px 14px;
+}
+@supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+  .gd-card {
+    background: var(--glass-bg);   /* iOS Safari + Chrome 모두 backdrop-filter 지원 시 */
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+            backdrop-filter: blur(12px) saturate(160%);
+  }
+}
+.gd-card:hover { transform: translateY(-1px); }
+
+/* §203-B 옥대표님 정정 — left accent stripe 제거 (uniform white 정책).
+   카드 식별은 title 텍스트로만 — 색 인코딩 X. */
+.gd-card::before { content: none; }
+
+/* Header — 메트릭명 + 현재 값 */
+.gd-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.gd-card__title {
+  /* Tailwind: text-[0.65rem] uppercase tracking-[0.15em] font-semibold text-white/60 */
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255,255,255,0.62);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gd-card__title small {
+  font-size: 0.6rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  color: rgba(255,255,255,0.42);
+}
+.gd-card__value {
+  /* Tailwind: text-2xl font-semibold tabular-nums text-white */
+  /* §203-B — 네온 X. uniform white value. */
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-system);
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+.gd-card__value sub {
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-left: 2px;
+  vertical-align: baseline;
+  color: rgba(255,255,255,0.42);
+}
+
+/* Chart canvas — neon line via filter:drop-shadow */
+.gd-card__chart {
+  height: 64px;
+  position: relative;
+}
+.gd-card__chart canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* §203-B 옥대표님 정정 — drop-shadow glow 제거. 흰 line, glow 없음. */
+}
+
+/* Footer — min / max */
+.gd-card__foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.62rem;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.42);
+}
+
+/* §203-B 옥대표님 정정 — per-metric color override 영구 제거.
+   .gd-card--sog/vmg/twa/hr class 는 HTML 에 남아있지만 시각 영향 X
+   (semantic group 식별용으로만 유지 — JS / a11y 가 활용). */
+
+/* Cursor — 현재 시점 indicator (각 카드 안 세로선).
+   §203-B 옥대표님: "세로선은 기준점이니 손댈 필요 없고" — 빨강 + glow 유지. */
+.gd-card__cursor {
+  position: absolute;
+  top: 4px; bottom: 4px;
+  width: 1.5px;
+  background: var(--cursor-color);
+  box-shadow: var(--cursor-glow);
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+/* prefers-reduced-motion 존중 (a11y) */
+@media (prefers-reduced-motion: reduce) {
+  .gd-card { transition: none; }
+  .gd-card:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="demo-layout">
+  <!-- 좌측 — 영상·지도 placeholder (riding-dashboard 의 실 영역) -->
+  <div class="video-stage" aria-hidden="true">
+    Video / Map Stage (placeholder)
+  </div>
+
+  <!-- 우측 — 4 metric cards (Apple Watch Fitness style) -->
+  <!-- Tailwind: <aside class="flex flex-col gap-2 md:gap-3"> -->
+  <aside class="gd-cards" aria-label="라이딩 메트릭 4종">
+
+    <!-- ─── SOG (Speed Over Ground) ─── -->
+    <!-- Tailwind: <article class="gd-card gd-card--sog ..."> -->
+    <article class="gd-card gd-card--sog" aria-label="SOG · 속도">
+      <div class="gd-card__head">
+        <span class="gd-card__title">
+          SOG
+          <small>속도 · Speed Over Ground</small>
+        </span>
+        <span class="gd-card__value" id="val-sog">23.4<sub>kt</sub></span>
+      </div>
+      <div class="gd-card__chart">
+        <canvas id="chart-sog" width="320" height="64" aria-hidden="true"></canvas>
+        <div class="gd-card__cursor" style="left:74%"></div>
+      </div>
+      <div class="gd-card__foot">
+        <span>min 8.2</span>
+        <span>max 31.7 kt</span>
+      </div>
+    </article>
+
+    <!-- ─── VMG (Velocity Made Good) ─── -->
+    <article class="gd-card gd-card--vmg" aria-label="VMG · Velocity Made Good">
+      <div class="gd-card__head">
+        <span class="gd-card__title">
+          VMG
+          <small>풍상 효율 · Velocity Made Good</small>
+        </span>
+        <span class="gd-card__value" id="val-vmg">9.1<sub>kt</sub></span>
+      </div>
+      <div class="gd-card__chart">
+        <canvas id="chart-vmg" width="320" height="64" aria-hidden="true"></canvas>
+        <div class="gd-card__cursor" style="left:74%"></div>
+      </div>
+      <div class="gd-card__foot">
+        <span>min 4.1</span>
+        <span>max 11.3 kt</span>
+      </div>
+    </article>
+
+    <!-- ─── TWA (True Wind Angle) ─── -->
+    <article class="gd-card gd-card--twa" aria-label="TWA · 풍각">
+      <div class="gd-card__head">
+        <span class="gd-card__title">
+          TWA
+          <small>풍각 · True Wind Angle</small>
+        </span>
+        <span class="gd-card__value" id="val-twa">42<sub>°</sub></span>
+      </div>
+      <div class="gd-card__chart">
+        <canvas id="chart-twa" width="320" height="64" aria-hidden="true"></canvas>
+        <div class="gd-card__cursor" style="left:74%"></div>
+      </div>
+      <div class="gd-card__foot">
+        <span>upwind 38°</span>
+        <span>downwind 145°</span>
+      </div>
+    </article>
+
+    <!-- ─── HR (Heart Rate) ─── -->
+    <article class="gd-card gd-card--hr" aria-label="HR · 심박">
+      <div class="gd-card__head">
+        <span class="gd-card__title">
+          HR
+          <small>심박수 · Heart Rate</small>
+        </span>
+        <span class="gd-card__value" id="val-hr">148<sub>bpm</sub></span>
+      </div>
+      <div class="gd-card__chart">
+        <canvas id="chart-hr" width="320" height="64" aria-hidden="true"></canvas>
+        <div class="gd-card__cursor" style="left:74%"></div>
+      </div>
+      <div class="gd-card__foot">
+        <span>min 92</span>
+        <span>max 174 bpm</span>
+      </div>
+    </article>
+
+  </aside>
+</div>
+
+<!-- ============================================================
+     Chart.js — CDN lazy load (demo 자체 렌더용)
+     실제 riding-dashboard 통합 시 = 기존 charts.js / chart-theme.js
+     안에서 동일 config 패턴 재사용 (네온 색 토큰만 cross-import).
+     ============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ─── Mock data — 라이브 통합 시 state.session.samples 로 대체 ─────
+  function mockSeries(count, min, max, smooth) {
+    var arr = [], v = (min + max) / 2;
+    for (var i = 0; i < count; i++) {
+      v += (Math.random() - 0.5) * (max - min) * (smooth || 0.08);
+      v = Math.max(min, Math.min(max, v));
+      arr.push(v);
+    }
+    return arr;
+  }
+  var labels = Array.from({length: 80}, function (_, i) { return i; });
+  var data = {
+    sog: mockSeries(80, 5, 32, 0.05),
+    vmg: mockSeries(80, 3, 12, 0.06),
+    twa: mockSeries(80, 30, 160, 0.04),
+    hr:  mockSeries(80, 85, 175, 0.03)
+  };
+
+  // ─── Chart.js config 공통 — Apple Watch line spec ─────────────
+  var baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 280, easing: 'easeOutQuart' },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false }
+    },
+    scales: {
+      x: { display: false },
+      y: { display: false, grace: '8%' }
+    },
+    elements: {
+      point: { radius: 0 },
+      line: {
+        tension: 0.35,                  // smooth curve (Apple Watch 스타일)
+        borderWidth: 2,
+        borderCapStyle: 'round',
+        borderJoinStyle: 'round'
+      }
+    }
+  };
+
+  // ─── Gradient area fill — §203-B uniform white tint ─────────
+  // 옥대표님 정정: 데이터 = 흰색 통일. metric 별 색 X.
+  function whiteGradient(ctx, area) {
+    var g = ctx.createLinearGradient(0, area.top, 0, area.bottom);
+    g.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
+    g.addColorStop(1, 'rgba(255, 255, 255, 0.00)');
+    return g;
+  }
+
+  function makeChart(canvasId, series) {
+    var ctx = document.getElementById(canvasId).getContext('2d');
+    return new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: series,
+          /* §203-B — uniform white line. 모든 metric 동일 */
+          borderColor: 'rgba(255, 255, 255, 0.95)',
+          backgroundColor: function (ctx) {
+            var chart = ctx.chart;
+            var area = chart.chartArea;
+            if (!area) return null;
+            return whiteGradient(chart.ctx, area);
+          },
+          fill: 'origin'
+        }]
+      },
+      options: baseOpts
+    });
+  }
+
+  // 4 카드 차트 — DOM ready 후 init.
+  // 색 파라미터 제거 — uniform white.
+  function init() {
+    makeChart('chart-sog', data.sog);
+    makeChart('chart-vmg', data.vmg);
+    makeChart('chart-twa', data.twa);
+    makeChart('chart-hr',  data.hr);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+</body>
+</html>

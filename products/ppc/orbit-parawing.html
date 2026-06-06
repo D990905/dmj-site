@@ -53,8 +53,7 @@
     <nav class="nav" aria-label="주 메뉴">
       <a href="../../index.html" class="nav__logo" aria-label="단무지 홈">
         <span class="nav__logo-mark">D</span>
-        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
-        <span class="nav__logo-sub">단무지</span>
+        <span>단무지</span>
       </a>
 
       <div class="nav__primary" role="menubar">
@@ -213,6 +212,11 @@
             <option value="4.5">4.5 m² · 라이트 표준</option>
             <option value="5.9">5.9 m² · 미풍</option>
           </select>
+          <div class="pd-buy__price" role="status" aria-live="polite" aria-atomic="true">
+            <span class="pd-buy__price-label">한국 가격</span>
+            <span class="pd-buy__price-value" data-pd-price>—</span>
+            <span class="pd-buy__price-hint">표시가는 운송·세금 포함 정가입니다.</span>
+          </div>
           <button type="button" class="btn btn--secondary btn--lg pd-buy__addcart" data-cart-add data-cart-state="out" data-sku="ppc-orbit-parawing" data-size="3.5" aria-label="사전 예약 담기">사전 예약 담기</button>
           <p class="pd-buy__note">2025년 7월 출고 · 회원 전용 · 사전 예약 시 100% 환불 가능 (출고 전).</p>
         </div>
@@ -600,6 +604,7 @@
     }
   })();
   </script>
+    <script src="../product-detail.js" defer></script>
   <script src="../../assets/js/nav-auth.js" defer></script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="../../assets/css/agent-deny.css">

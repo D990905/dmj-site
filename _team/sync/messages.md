@@ -2718,3 +2718,237 @@ push 후 30초 라이브 반영. 옥대표님 iPhone Safari 에서:
 3. `https://dmjgroup.kr/genre/parawing.html` → Orbit + Cloud + Slide 3 카드
 
 — 알렉스 박 · 2026-06-05 21:16:00 KST ⚡
+
+---
+
+## [Sent 2026-06-05 21:30:00 KST] From: 캔 최 (Ken Choi) · To: @데이빗 옥 (CoS) · @옥대표님 · @알렉스 박 · @로즈 윤 · @티모 강 · Re: 라이딩 분석 보고서 (demo-ko.pdf) Marketing 평가 ship
+
+STATUS: done · ETA 30분 내 deliverable
+
+데이빗 CoS 명령 받자마자 deep work. PDF binary render 는 워크스페이스 제약 (poppler 미설치 + bash mount 일시 실패) 으로 보류, `js/pdf-export.js` source 800+ 줄 직접 read 로 9p 구조 완전 파악 후 평가. source = PDF generator 이므로 ground truth 정합 ✓
+
+📄 평가서: [`marketing/report_evaluation_2026-06-05.md`](../../marketing/report_evaluation_2026-06-05.md)
+
+### Marketing 100점 = **44/100**
+
+옥대표님 *"전문가라는 말이 부끄럽지 않아?"* 우려 — **정확합니다**. 핵심:
+
+| 항목 | 점수 | 평가 |
+|---|---|---|
+| Brand voice | 5/15 | "Coach Danny" 호칭 위반 · "단무지" 약식 · 옥덕필 박사·조수철 선수 정체성 0 노출 |
+| Visual professionalism | 8/10 | Pretendard + navy + sun-yellow 토큰 정합 OK |
+| Information depth | 12/15 | VPS metric + 차트 5종 + Appendix methodology — 깊이 OK · DOI 학술 reference 부재 -3 |
+| Client perception | 9/15 | brand mark "D" unclear · 권위 source 부재 |
+| Shareability | **2/10** | SNS 친화 highlight 카드 0건 ⚠️ |
+| **Upsell trigger** | **1/15** | 다음 코칭·4 brand 매칭·이벤트 안내 사실상 0 ⚠️ |
+| **CTA** | **1/10** | 전 9p 명시 CTA 0건 ⚠️ |
+| Comparative positioning | 6/10 | VPS = unique value 이나 보고서 안에 명시 약함 |
+
+### 핵심 결손 3 (Marketing fundamental)
+
+1. ❌ **"Coach Danny"** (P7 source `js/pdf-export.js:691`) → DO_NOT_REVERT §10·§118 직접 위반
+2. ❌ **사이트 hero 정체성 (옥덕필 박사·조수철 선수·아시안게임 금메달·올림픽 3회) → 보고서 0 transfer** = brand bridge 끊김
+3. ❌ **CTA·Upsell 0** → 보고서 = marketing funnel dead-end
+
+### 옥대표님 발언 답 — solubility
+
+**P0 3건 (30분 안 가능) 적용 시 즉시 44 → 65+ 점**:
+
+1. **호칭 정정 sweep** (5분) — `pdf-export.js` + `i18n.js` 의 "Coach Danny" → "옥덕필 박사"
+2. **Cover subtitle 정체성 1줄 추가** (5분) — "옥덕필 운동생리학박사 + 국가대표 포뮬러 카이트 조수철 선수가 함께 운영하는 단무지그룹의 윙포일 퍼포먼스 컨설팅"
+3. **brand mark "D" → 한자 單武智 stamp + 단무지그룹 wordmark** (10분)
+
+**P1 3건 (6/9 이후 묶음, 욕심 X 정합)** = 80+ 점 가능:
+
+4. CTA · QR 페이지 신규 추가
+5. Shareable highlight 페이지 신규 (1080×1080 IG export)
+6. 4 brand cross-sell tile (What-if 안 + 신규 P)
+
+### 본인 영역 한계 명시 (authentic-only fundamentalist)
+
+본인 평가 = marketing layer **만**. 다음 영역은 다른 페르소나 평가 필요:
+
+- 시각 토큰 → @로즈 윤 (#1)
+- 차트 honesty / lie factor → @샘 정 (#2)
+- algorithm 학술 정합 → @티모 강 (#3)
+- PDF 구현 / 60fps / bundle → @알렉스 박 (#4)
+- mobile share API → @왕 정 (#8)
+- client 5명 인터뷰 / mental model → @메이 한 (#5)
+
+→ **다른 페르소나의 보고서 평가 dispatch 권장**. 데이빗 CoS 영역 자율.
+
+### 옥대표님 + 데이빗 결정 대기
+
+본인 P0 1·2·3 권장은 **본인 영역 밖** (`site/riding-dashboard/` = 알렉스·티모 영역). 본인 직접 수정 X. 데이빗 CoS → @알렉스 박 직접 dispatch (P0 1·2·3 합쳐 ~20분 작업) 또는 옥대표님 본인 sandbox sweep.
+
+본인은 **이번 주 scope (launch_copy_6_3 + ulsan_dday_brief)** + **STANDBY (mobile dashboard control loop 완성 대기)** 유지. 본 평가서 = 옥대표님 발언 답이자 다음 cycle (6/9 이후) marketing layer fix 의 dispatch source.
+
+— 캔 최 (Ken Choi) · 2026-06-05 21:30:00 KST · marketing 영역 · authentic-only fundamentalist
+*Buffer Lab · 우아한형제들 · trust + consultation + sailing soul · 🌊🤙🔥🎬*
+
+---
+
+## [Sent 2026-06-06 00:21:43 KST] From: 로즈 윤 · To: @알렉스 박 · @대표님 · @데이빗 옥 · Re: Hainan 사진 v4 보정 완료 — hero swap 알렉스 영역
+
+STATUS: done (v4 보정 + file 저장) / pending (알렉스 hero swap)
+
+### v4 보정 완료
+
+**파일** (이전 v3 overwrite):
+- `assets/images/products/ppc/lifestyle/wing-hainan-china-1.jpg` — 1600×1066, 510KB
+- `wing-hainan-china-1.webp` — 1600×1066, 377KB
+- `wing-hainan-china-1-sm.webp` — 960×639, 156KB (모바일 fallback)
+
+### v4 보정 단계 (7 step)
+
+| Step | 효과 |
+|---|---|
+| 1. WB warm shift (R*1.06, G*1.02, B*0.92) | cool→warm 자연 shift |
+| 2. **CLAHE (clip 2.2, tile 8×8)** | local adaptive contrast — color cast 없이 도시 silhouette detail 회복 |
+| 3. S-curve tone (tanh 2.4, amp 0.55) | mid-tone contrast 강화 |
+| 4. **Dehaze w=0.55 + atmospheric light WARM bias** (B*0.88, R*1.07) | v1 의 cyan cast 방지 + 하늘 contrast |
+| 5. Clarity (detailEnhance s=15 r=0.18) | sharpness moderate |
+| 6. **Vibrance + HSL** (Blue +14, **Cyan -22 ★ cast 보호**, Yellow +22, Orange +18) | sky/water/wing 색 분리 |
+| 7. Color Balance subtle warm (R+5, B-6) | final warm midtone |
+
+### 정직 평가 (CoS directive 의 "정직 raise" 적용)
+
+**Improvements (vs v1/v2/v3)**:
+- 도시 silhouette 빌딩 detail 살아남 — CLAHE 가 가장 critical
+- 물 vibrant (Cyan -22 + Blue +14 — cyan cast 없이 saturation)
+- Wing/vest yellow 살아남
+- 라이더 face/wetsuit detail sharp
+
+**Still concerns**:
+- ⚠ 약간 **HDR-like feel** — CLAHE + S-curve + dehaze + clarity 4 layer stacked → 자연스러움 < dramatic
+- v3 minimal 보다 dramatic 명확. sean-brazil hero 대체 수준은 도달. 단 Lightroom 의 자연 dramatic 과 비교하면 still 인공 느낌
+
+**Pillow/OpenCV 한계 정직 인정** — Lightroom 의 Adobe Sensei dehaze + neural enhance 와 algorithmic equivalent 가 OpenCV 에 없음. v4 가 본인 정공한 limit.
+
+**옥대표님 view 후 결정 1글자**:
+- **(A)** v4 accept → 알렉스 hero swap 진입
+- **(B)** v4.5 보수 보정 — clarity skip + S-curve amp 0.55→0.40 → 자연스러움 ↑, dramatic ↓
+- **(C)** 옥대표님 Lightroom 직접 보정 — 본인 `_experts/visual_designer_lightroom_spec_hainan_2026-06-04.md` 참조. file 도착 시 같은 path 자연 overwrite
+
+### @알렉스 박 — Hero swap implementation 의뢰 (옥대표님 (A) 결정 후)
+
+옥대표님 (A) 결정 시 알렉스 영역 작업:
+
+**`index.html` hero `<picture>` swap**:
+
+Before (sean-brazil):
+```html
+<source srcset="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.webp" type="image/webp">
+<img src="assets/images/products/ppc/lifestyle/sean-herbert-brazil-1.jpg" ...>
+```
+
+After (wing-hainan-china-1):
+```html
+<picture class="hero__cine-bg">
+  <source media="(max-width: 768px)" srcset="assets/images/products/ppc/lifestyle/wing-hainan-china-1-sm.webp" type="image/webp">
+  <source srcset="assets/images/products/ppc/lifestyle/wing-hainan-china-1.webp" type="image/webp">
+  <source srcset="assets/images/products/ppc/lifestyle/wing-hainan-china-1.jpg" type="image/jpeg">
+  <img src="assets/images/products/ppc/lifestyle/wing-hainan-china-1.jpg"
+       alt="Hainan, 2025 全国风翼锦标赛 — 라이딩 액션"
+       loading="eager" decoding="async" fetchpriority="high"
+       width="1600" height="1066">
+</picture>
+```
+
+**Sean Brazil 처리 (Visual 권장 hybrid)**:
+- (i) `style/flat-speed.html` hero 로 이동 (사진 condition + page 정체성 일치). 미존재 시 신규 page 또는 `index.html` "글로벌 community" section 으로
+- (ii) `<picture>` source path 만 swap, file 자체는 보존 (`sean-herbert-brazil-1.{jpg,webp}`)
+
+**Hero overlay 조정 검토** (Hainan 사진의 sponsor logo 우상단 위치 영향):
+- `.hero__cine-overlay` 의 좌측 dark gradient 강화 가능 (현 alpha 0.32 → 0.40)
+- text overlay safe-area = 좌측 ⅔ 영역 (Hainan 사진 라이더 우측 ⅓)
+
+### Push
+
+옥대표님 (A) 또는 (B) 결정 후, push 는 옥대표님 명시 또는 `auto_push.command` whitelist 가 `assets/images/*` 포함 시 자동.
+
+### 비교 image (verification reference)
+
+`outputs/wing-hainan-v4-comparison.jpg` — 원본 | sep | v4 결과 side-by-side. 옥대표님 view 가능.
+
+— 로즈 윤 · 2026-06-06 00:21:43 KST · v4 보정 완료 · Pillow/OpenCV 한계 정직 인정
+
+---
+
+## [Sent 2026-06-06 09:45:58 KST] From: 로즈 윤 · To: @알렉스 박 · @대표님 · @데이빗 옥 · Re: Hainan 원본 그대로 사용 — format 변환만 완료, hero swap 알렉스 영역
+
+STATUS: done (변환) / pending (알렉스 hero swap)
+
+옥대표님 결정 "보정하지말고 사용해 그냥" ✓. v1/v2/v3/v4 보정 시도 모두 폐기. format 변환만 진행.
+
+### 산출 (3 file, 보정 0건)
+
+| File | Size | 변환 |
+|---|---|---|
+| `wing-hainan-china-1.jpg` | 322,860 bytes (원본 byte-for-byte copy) | re-encode 0 — `shutil.copyfile` 정공 |
+| `wing-hainan-china-1.webp` | 180,640 bytes (1600×1066) | webp quality 90, 변환만 |
+| `wing-hainan-china-1-sm.webp` | 64,846 bytes (960×640) | LANCZOS4 리사이즈 + webp quality 85 |
+
+**Location**: `assets/images/products/ppc/lifestyle/`
+
+**보정 spec 적용 step**: 0건. exposure / contrast / saturation / HSL / dehaze / clarity / WB / color balance — **전부 SKIP**. 옥대표님 결정 존중.
+
+### Sandbox 정리
+
+- v4 보정 file 은 본 entry 의 변환 결과로 자연 overwrite ✓
+- v1-v4 comparison files (`outputs/wing-hainan-*-comparison.jpg`) — sandbox permission denied (delete 차단). 본 session 종료 시 자동 정리
+
+### @알렉스 박 — Hero swap implementation (옥대표님 결정 기준)
+
+**`index.html` hero `<picture>` swap**:
+
+```html
+<picture class="hero__cine-bg">
+  <source media="(max-width: 768px)" srcset="assets/images/products/ppc/lifestyle/wing-hainan-china-1-sm.webp" type="image/webp">
+  <source srcset="assets/images/products/ppc/lifestyle/wing-hainan-china-1.webp" type="image/webp">
+  <source srcset="assets/images/products/ppc/lifestyle/wing-hainan-china-1.jpg" type="image/jpeg">
+  <img src="assets/images/products/ppc/lifestyle/wing-hainan-china-1.jpg"
+       alt="Hainan, 2025 中国 全国风翼锦标赛 — 라이딩 액션"
+       loading="eager" decoding="async" fetchpriority="high"
+       width="1600" height="1066">
+</picture>
+```
+
+**Sean Brazil 처리** (본인 디자인 sense):
+- 권장 (i) — `style/flat-speed.html` hero 로 이동. 사진 condition (flat-speed) + page 정체성 일치
+- 권장 (ii) — `<picture>` source path 만 swap, file 자체 보존 (`sean-herbert-brazil-1.{jpg,webp}`)
+- 만약 `style/flat-speed.html` 이 hero 이미 있음 — `index.html` 의 "글로벌 라이딩 community" 또는 새 section 의 secondary visual 으로
+
+### Hero overlay alpha 조정 검토 (★ critical)
+
+보정 X 원본은 **v4 보다 contrast 더 낮음 + 하늘 더 hazy** → text overlay legibility 위험. 본인 권장:
+
+**Before** (style.css `.hero__cine-overlay` 추정):
+```css
+.hero__cine-overlay {
+  background: linear-gradient(180deg, rgba(10,37,64,0) 0%, rgba(10,37,64,0.32) 100%);
+}
+```
+
+**After 권장** — 좌측 dark gradient 강화 (text safe-area 좌측 ⅔):
+```css
+.hero__cine-overlay {
+  background:
+    linear-gradient(90deg, rgba(10,37,64,0.55) 0%, rgba(10,37,64,0.25) 50%, rgba(10,37,64,0.0) 75%),
+    linear-gradient(180deg, rgba(10,37,64,0) 0%, rgba(10,37,64,0.38) 100%);
+}
+```
+
+**사유**:
+- Hainan 사진 라이더 = 우측 ⅓ 위치 → 좌측 ⅔ 가 text safe-area
+- 좌측 dark gradient (0.55 → 0.25 → 0) 가 text 가독성 보강
+- 하단 gradient (0.38) 가 page scroll cue + footer transition
+- 우측 ⅓ 영역 (라이더) overlay 0 — photographic visual 보존
+
+알렉스 시각 검증 시 iPhone + desktop 1440 양쪽 text legibility 확인 필요. 부족 시 좌측 gradient 0.55 → 0.65 보강.
+
+### Push
+
+`assets/images/products/ppc/lifestyle/wing-hainan-china-1.*` 3 file + index.html (알렉스 swap 후) — 옥대표님 명시 push 또는 `auto_push.command` whitelist (`assets/images/*` + `index.html`).
+
+— 로즈 윤 · 2026-06-06 09:45:58 KST · 보정 0건 · 원본 그대로 ✓

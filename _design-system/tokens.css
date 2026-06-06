@@ -1,0 +1,309 @@
+/* ============================================================
+ * 단무지 · SailTech — Design System v2 · tokens.css (single source)
+ * Owner: Visual Designer (Rose Yoon) · 2026-06-06
+ * ------------------------------------------------------------
+ * Dark-first 다크 cockpit + sports science telemetry 톤.
+ * 벤치마크 8: whoop · vakaros · form · catapult · garmin · trainingpeaks · strava metro · 8thirty4
+ * 핵심 패턴 7: dark-first · mono numeral · 숫자 hero · glassmorphism · sparkline · comparison · breathing
+ *
+ * 사용:
+ *   <link rel="stylesheet" href="/_design-system/tokens.css">
+ *   <html data-theme="dark">  ← 다크 default. light 는 Phase 2 lock 시.
+ *
+ * 기존 v1 tokens (assets/css/style.css) 와 별도 system.
+ * v1 = light 메인 사이트 + brand triplet (navy/sea/sun).
+ * v2 = dark cockpit + single accent + sports science 톤.
+ * 공통 색 (sea/sun) 은 hex 일치 — brand identity 연속.
+ * ============================================================ */
+
+:root,
+:root[data-theme="dark"] {
+
+  /* ── COLOR — Surface (다크 cockpit) ─────────────────────── */
+  --bg-base:        #0A0E1A;   /* 페이지 base (시스템 A admin/dashboard 와 일치) */
+  --bg-surface:    #121829;   /* 카드 base */
+  --bg-elevated:   #1A2238;   /* nested 카드 · modal · hover lift */
+  --bg-sunken:    #06091A;   /* 함몰 영역 · tonal contrast */
+
+  /* ── COLOR — Foreground (텍스트) ────────────────────────── */
+  --fg-primary:    #E8ECF4;   /* 본문 main */
+  --fg-secondary:  #9AA3B8;   /* label · sub */
+  --fg-muted:      #5E6781;   /* meta · caption · sparkline grid */
+  --fg-inverse:    #0A0E1A;   /* light bg 위 (드물게) */
+
+  /* ── COLOR — Brand accent (단일 — Phase 1 lock 후) ──────── */
+  /* ★ 3 옵션 — spec §3 의 본인 권장 = SEA. 옥대표님 1글자 결정 대기.
+     해당 옵션의 hex 를 --accent 에 alias 로 wire. 본 default = SEA. */
+
+  --accent-sea:    #3B82F6;   /* (A) SEA · vakaros / catapult / form B2B 톤 ★ 본인 권장 */
+  --accent-sun:    #FFB800;   /* (B) SUN · whoop / dramatic warm. 단무지 brand 의 sun */
+  --accent-neon:   #00E676;   /* (C) NEON · strava metro / catapult sport B2B */
+
+  --accent:        var(--accent-sea);  /* ← default. 옥대표님 결정 후 alias swap */
+  --accent-hover:  #60A5FA;   /* sea hover (1 step lighter). 다른 색 선택 시 동등 lighter */
+  --accent-glow:   rgba(59, 130, 246, 0.18); /* accent + alpha for glow / focus ring */
+  --accent-subtle: rgba(59, 130, 246, 0.08); /* hover bg · selected bg */
+
+  /* ── COLOR — Status (sports science telemetry) ──────────── */
+  /* chart-theme.js status 5 앵커와 isomorphic — DataViz 협업 일관. */
+  --status-very-good: #22C55E;
+  --status-good:     #84CC16;
+  --status-mid:      #FACC15;
+  --status-bad:      #F97316;
+  --status-very-bad: #EF4444;
+
+  /* ── COLOR — Glass (glassmorphism) ──────────────────────── */
+  --glass-bg:       rgba(255, 255, 255, 0.04);
+  --glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --glass-border:   rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.16);
+  --glass-blur:     24px;
+
+  /* ── COLOR — Border (subtle) ────────────────────────────── */
+  --border-subtle:  rgba(255, 255, 255, 0.06);
+  --border-strong:  rgba(255, 255, 255, 0.14);
+
+  /* ── COLOR — Side (P/S 항해 표준 — DataViz §2 일관) ────── */
+  --side-port:      #E12B2B;
+  --side-starboard: #00A651;
+
+  /* ============================================================
+   * TYPOGRAPHY — sans + mono pairing
+   * Mono numeral OBLIGATORY — 숫자 = 무조건 mono.
+   * Korean = Pretendard. Latin = Inter. Mono = JetBrains.
+   * ============================================================ */
+
+  /* Family */
+  --font-sans-kr: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+                  system-ui, Roboto, 'Helvetica Neue', 'Segoe UI',
+                  'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --font-sans-en: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Consolas, ui-monospace, monospace;
+
+  /* Aliases (use case) */
+  --font-display:   var(--font-sans-en);  /* hero 타이틀 (영문 위주) */
+  --font-body:      var(--font-sans-kr);  /* 한국어 본문 default */
+  --font-numeral:   var(--font-mono);     /* 숫자 = 무조건 mono. 본 system 의 핵심 */
+  --font-label:     var(--font-mono);     /* eyebrow · meta · mono 통일 */
+
+  /* ── TYPE SCALE — clamp() 모바일 우선 ─────────────────── */
+
+  /* Hero metric — Whoop 식 거대 mono 숫자 */
+  --text-hero-metric: clamp(72px, 12vw, 160px);
+  --text-hero-unit:   clamp(16px, 2vw, 28px);
+  --text-hero-label:  clamp(13px, 1.2vw, 16px);
+
+  /* Display (영문 hero title) */
+  --text-display-xl: clamp(40px, 6vw, 80px);
+  --text-display-lg: clamp(32px, 5vw, 56px);
+  --text-display-md: clamp(24px, 4vw, 40px);
+
+  /* Body / heading */
+  --text-h1:        clamp(28px, 3vw, 40px);
+  --text-h2:        clamp(22px, 2.4vw, 32px);
+  --text-h3:        clamp(18px, 1.8vw, 22px);
+  --text-h4:        clamp(15px, 1.4vw, 17px);
+  --text-body:      15px;
+  --text-body-sm:   13px;
+  --text-caption:   12px;
+  --text-meta:      11px;
+  --text-eyebrow:   10.5px;   /* mono uppercase letterspaced */
+
+  /* ── TYPE — Weight ────────────────────────────────── */
+  --fw-light:     300;
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+  --fw-extrabold: 800;
+  --fw-black:     900;
+
+  /* ── TYPE — Numeral defaults (사용 site 공통) ────────── */
+  --num-letterspacing: -0.04em;
+  --num-feature-settings: "tnum", "ss01";   /* tabular-nums (column 정렬) + slashed-zero */
+
+  /* ============================================================
+   * SPACING — white-space breathing (sports science 사이트 표준)
+   * Section breath = clamp() 큰 단위. Card 안 = 일반 scale.
+   * ============================================================ */
+
+  /* Atomic spacing (4px sub-base) */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --space-40: 160px;
+
+  /* Aliases (use case — breathing) */
+  --space-section:  clamp(80px, 12vw, 160px);   /* major section padding-block */
+  --space-section-sm: clamp(48px, 8vw, 96px);
+  --space-card:     32px;                       /* card 안 padding */
+  --space-card-sm:  20px;                       /* compact card */
+  --space-card-gap: 16px;                       /* card 안 element gap */
+  --space-stack:    24px;                       /* vertical rhythm */
+  --space-grid-gap: 24px;                       /* grid cards gap */
+
+  /* ── LAYOUT — container ─────────────────────────────── */
+  --container-narrow: 720px;
+  --container-base:  1080px;
+  --container-wide:  1440px;
+  --gutter:          clamp(20px, 4vw, 48px);
+
+  /* ============================================================
+   * RADIUS
+   * ============================================================ */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;          /* glass card default */
+  --radius-xl:   24px;          /* hero blocks */
+  --radius-2xl:  32px;
+  --radius-full: 9999px;
+
+  /* ============================================================
+   * SHADOW — dark cockpit 적합 (반사 적게, depth 명확)
+   * ============================================================ */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.32),
+               0 1px 2px rgba(0, 0, 0, 0.16);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.32),
+               0 2px 4px rgba(0, 0, 0, 0.18);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.38),
+               0 4px 12px rgba(0, 0, 0, 0.24);
+  --shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.46),
+               0 8px 16px rgba(0, 0, 0, 0.24);
+
+  /* Glow (accent 위 glow — focus ring, important card highlight) */
+  --glow-accent:    0 0 24px var(--accent-glow);
+  --glow-accent-sm: 0 0 12px var(--accent-glow);
+
+  /* ============================================================
+   * MOTION
+   * ============================================================ */
+  --ease:         cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast:     140ms;
+  --dur-base:     220ms;
+  --dur-slow:     400ms;
+  --dur-section:  600ms;
+
+  /* ============================================================
+   * SPARKLINE / CHART (재사용 토큰)
+   * ============================================================ */
+  --sparkline-stroke: var(--accent);
+  --sparkline-stroke-width: 1.5;
+  --sparkline-bg-grid: rgba(255, 255, 255, 0.04);
+  --sparkline-dot: var(--accent);
+  --sparkline-dot-r: 2.5;
+  --sparkline-area-fill: var(--accent-subtle);
+
+  /* ============================================================
+   * FOCUS RING
+   * ============================================================ */
+  --ring-color: var(--accent);
+  --ring-width: 2px;
+  --ring-offset: 2px;
+  --ring-radius-extra: 4px;
+
+  /* ============================================================
+   * Z-INDEX
+   * ============================================================ */
+  --z-base:     0;
+  --z-elevated: 10;
+  --z-sticky:   20;
+  --z-nav:      40;
+  --z-overlay:  60;
+  --z-modal:    80;
+  --z-toast:   100;
+}
+
+/* ============================================================
+ * LIGHT THEME placeholder (Phase 2 lock 시)
+ * 다크 first 정책으로 light 는 후순위. 단 system theme detect
+ * 또는 user toggle 시 light variant 가능 — 본 block 채워야.
+ * ============================================================ */
+:root[data-theme="light"] {
+  --bg-base:       #FFFFFF;
+  --bg-surface:    #F5F7FA;
+  --bg-elevated:   #FFFFFF;
+  --bg-sunken:     #E5EAF0;
+  --fg-primary:    #0A2540;
+  --fg-secondary:  #5C6F7E;
+  --fg-muted:      #9AA3B8;
+  --glass-bg:      rgba(10, 14, 26, 0.04);
+  --glass-bg-hover: rgba(10, 14, 26, 0.06);
+  --glass-border:  rgba(10, 14, 26, 0.08);
+  --glass-border-hover: rgba(10, 14, 26, 0.16);
+  --border-subtle: rgba(10, 14, 26, 0.06);
+  --border-strong: rgba(10, 14, 26, 0.14);
+  /* accent 동일 hex 유지 (sea / sun / neon 모두 light bg 위에서도 valid) */
+  /* shadow 는 light 적합 변환 — Phase 2 lock 시 본인 별도 작성 */
+}
+
+/* ============================================================
+ * Reduced motion 호환 (모든 컴포넌트가 본 block 자동 통과)
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+ * Base reset — body / html (다크 적용)
+ * ============================================================ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: var(--bg-base);
+  color: var(--fg-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* Utility — mono numeral helper */
+.num {
+  font-family: var(--font-numeral);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: var(--num-feature-settings);
+  letter-spacing: var(--num-letterspacing);
+}
+.eyebrow {
+  font-family: var(--font-label);
+  font-size: var(--text-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--fg-muted);
+  font-weight: var(--fw-medium);
+}
+
+/* Focus ring — :where() specificity 0, 다른 :focus-visible 가 override 가능 */
+:where(
+  a, button, input, select, textarea,
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: var(--ring-width) solid var(--ring-color);
+  outline-offset: var(--ring-offset);
+}

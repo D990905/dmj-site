@@ -118,6 +118,49 @@
 }
 .pd-hero__image--err { display: none; }
 
+/* §209 (Alex Park 2026-06-06) — 사이즈 → 가격 reactive display.
+   `<select data-buy-size>` 변경 시 product-detail.js 가 DMJMatrix.getPrice
+   결과를 `.pd-buy__price-value` 에 표시. WCAG 2.1 SC 4.1.3 aria-live announce.
+   매트릭스 미가용 시 "—" silent fallback. */
+.pd-buy__price {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  background: var(--color-mist, #F5F7FA);
+  border: 1px solid var(--border, #E5EAF0);
+  border-radius: 8px;
+  margin-top: 8px;
+}
+.pd-buy__price-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-secondary, #5C6F7E);
+}
+.pd-buy__price-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-navy, #0A2540);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  transition: color 180ms ease;
+}
+.pd-buy__price-value[data-estimate="1"]::after {
+  content: " (추정)";
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary, #5C6F7E);
+  letter-spacing: 0;
+}
+.pd-buy__price-hint {
+  font-size: 0.7rem;
+  color: var(--text-secondary, #5C6F7E);
+  line-height: 1.45;
+}
+
 /* §200-B (Alex Park 2026-06-05) — pd-hero 3-view gallery (썸네일 swap).
    Levitaz Front Wing 4 페이지 (540/680/790/900) 적용. 본사 사이트 3-angle 패턴 매치.
    썸네일 클릭 → 메인 이미지 src 교체. 키보드 ←/→ 도 작동.

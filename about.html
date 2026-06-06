@@ -82,8 +82,7 @@
     <nav class="nav" aria-label="주 메뉴">
       <a href="/" class="nav__logo" aria-label="단무지 홈">
         <span class="nav__logo-mark">D</span>
-        <span>DMJ<span style="color:var(--color-sea)">·</span>공방</span>
-        <span class="nav__logo-sub">단무지</span>
+        <span>단무지</span>
       </a>
 
       <div class="nav__primary" role="menubar">
@@ -324,9 +323,17 @@
       </article>
 
       <!-- 조수철 선수 -->
+      <!-- §204 (Danny 2026-06-06) — 조수철 선수 portrait 실사진 (옥덕필 §183 패턴 동일).
+           이미지 파일 = `assets/images/about/cho-soocheol-portrait.jpeg`. iCloud 'Resource deadlock'
+           로 본 session 에서 cp 차단 — 옥대표님 Mac 합류 시 정식 copy 진행. 그 전까지는
+           onerror fallback (gradient + 텍스트) 으로 graceful degrade. -->
       <article class="value-card" style="padding:32px">
-        <div style="width:100%;aspect-ratio:4/3;border-radius:14px;background:linear-gradient(135deg,var(--color-sea-dark),var(--color-sea));display:flex;align-items:center;justify-content:center;margin-bottom:24px" aria-label="조수철 선수 사진 자리">
-          <span style="font-family:var(--font-sans-en);font-size:3rem;font-weight:900;color:rgba(255,255,255,0.85);letter-spacing:-0.04em">조수철</span>
+        <div style="position:relative;width:100%;aspect-ratio:4/3;border-radius:14px;background:linear-gradient(135deg,var(--color-sea-dark),var(--color-sea));overflow:hidden;margin-bottom:24px">
+          <img src="assets/images/about/cho-soocheol-portrait.jpeg" alt="조수철 선수 — 국가대표 포뮬러 카이트"
+               loading="lazy" decoding="async"
+               style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;z-index:1"
+               onerror="this.style.display='none'">
+          <span aria-hidden="true" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans-en);font-size:3rem;font-weight:900;color:rgba(255,255,255,0.85);letter-spacing:-0.04em;pointer-events:none">조수철</span>
         </div>
         <span class="pill pill--accent" style="margin-bottom:12px">국가대표 포뮬러 카이트 선수</span>
         <h3 class="t-h2" style="margin:0 0 12px">조수철 선수</h3>
