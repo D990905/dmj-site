@@ -4914,6 +4914,13 @@
     };
   }
 
+  // §400 — Expose state to window for pdf-export.js consumption.
+  //        (Sam Phase 0-2 Exec block reads global state to render
+  //         Grade chip / Top 3 / delta chip / sparkline.)
+  //        state is declared once (L33) and only mutated thereafter,
+  //        so this single reference stays live for all later reads.
+  window.state = state;
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else { init(); }
