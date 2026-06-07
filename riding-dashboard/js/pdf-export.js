@@ -348,6 +348,124 @@
       + ".pdf-app__sec{margin-bottom:16px}"
       + ".pdf-app__h{font-size:12px;font-weight:700;color:#0A2540;margin:0 0 4px}"
       + ".pdf-app__b{font-size:10px;line-height:1.6;color:#5C6F7E;margin:0}"
+      /* ═══ §302 PDF v2 — 옥대표님 2026-06-06 ═══════════════════════
+         Spec: _experts/dataviz_pdf_report_v2_spec.md (1130 line)
+         본인 (샘 정 #2) v2 staging 구현.
+         Phase 0 Executive Summary · Phase 2 Recommendation · Phase 3 Caption
+         목표: 38/100 → 82/100 */
+      /* Phase 0 — Executive Summary */
+      + ".pdf-exec{display:flex;flex-direction:column;gap:28px;margin-bottom:24px}"
+      + ".pdf-exec-zone1{display:flex;flex-direction:column;gap:16px}"
+      + ".pdf-grade-chip{display:flex;align-items:center;gap:20px;"
+      +   "padding:24px 28px;border-radius:14px;border-left:8px solid #5C6F7E;"
+      +   "background:rgba(126,147,168,0.08)}"
+      + ".pdf-grade-chip[data-grade='A']{border-color:#1FA055;background:rgba(31,160,85,0.10)}"
+      + ".pdf-grade-chip[data-grade='B']{border-color:#7FC241;background:rgba(127,194,65,0.10)}"
+      + ".pdf-grade-chip[data-grade='C']{border-color:#F2C20E;background:rgba(224,161,0,0.10)}"
+      + ".pdf-grade-chip[data-grade='D']{border-color:#EC8A2E;background:rgba(236,138,46,0.10)}"
+      + ".pdf-grade-chip[data-grade='F']{border-color:#D6453A;background:rgba(214,69,58,0.10)}"
+      + ".pdf-grade-chip__letter{font-size:64px;font-weight:800;line-height:1;color:#0A2540}"
+      + ".pdf-grade-chip[data-grade='A'] .pdf-grade-chip__letter{color:#1FA055}"
+      + ".pdf-grade-chip[data-grade='B'] .pdf-grade-chip__letter{color:#7FC241}"
+      + ".pdf-grade-chip[data-grade='C'] .pdf-grade-chip__letter{color:#F2C20E}"
+      + ".pdf-grade-chip[data-grade='D'] .pdf-grade-chip__letter{color:#EC8A2E}"
+      + ".pdf-grade-chip[data-grade='F'] .pdf-grade-chip__letter{color:#D6453A}"
+      + ".pdf-grade-chip__col{display:flex;flex-direction:column;gap:4px}"
+      + ".pdf-grade-chip__score{font-size:22px;font-weight:700;color:#0A2540}"
+      + ".pdf-grade-chip__label{font-size:11px;font-weight:700;color:#7E93A8;"
+      +   "text-transform:uppercase;letter-spacing:1px}"
+      + ".pdf-exec-verdict{margin:0;font-size:15px;font-weight:600;color:#0A2540;"
+      +   "line-height:1.5;padding:0 4px}"
+      + ".pdf-exec-verdict strong{color:#1F8FFF}"
+      /* Phase 0 — Top 3 highlights */
+      + ".pdf-exec-zone2{display:flex;flex-direction:column;gap:10px}"
+      + ".pdf-exec-zone2 .pdf-block__h{font-size:14px;margin:0 0 6px}"
+      + ".pdf-highlights{list-style:none;padding:0;margin:0;"
+      +   "display:flex;flex-direction:column;gap:8px}"
+      + ".pdf-highlight{display:flex;align-items:baseline;gap:12px;"
+      +   "padding:12px 16px;border-radius:8px;border-left:4px solid #7E93A8}"
+      + ".pdf-highlight--good{border-color:#1FA055;background:rgba(31,160,85,0.10)}"
+      + ".pdf-highlight--warn{border-color:#F2C20E;background:rgba(224,161,0,0.10)}"
+      + ".pdf-highlight--bad{border-color:#D6453A;background:rgba(214,69,58,0.10)}"
+      + ".pdf-highlight__icon{flex:0 0 20px;font-size:16px;font-weight:700;color:#1FA055}"
+      + ".pdf-highlight--warn .pdf-highlight__icon{color:#F2C20E}"
+      + ".pdf-highlight--bad .pdf-highlight__icon{color:#D6453A}"
+      + ".pdf-highlight__metric{flex:1;font-size:13px;font-weight:700;color:#0A2540}"
+      + ".pdf-highlight__context{font-size:11px;color:#5C6F7E;font-weight:500}"
+      /* Phase 0 — Next action */
+      + ".pdf-exec-zone3{margin-top:8px}"
+      + ".pdf-next-action{padding:16px 20px;border-radius:10px;"
+      +   "background:rgba(31,143,255,0.08);border:1px solid rgba(31,143,255,0.30)}"
+      + ".pdf-next-action__label{display:block;font-size:11px;font-weight:700;"
+      +   "letter-spacing:1px;text-transform:uppercase;color:#1F8FFF;margin-bottom:6px}"
+      + ".pdf-next-action__text{margin:0;font-size:15px;font-weight:600;"
+      +   "color:#0A2540;line-height:1.5}"
+      /* Phase 1 — vs baseline delta chip + sparkline */
+      + ".pdf-delta-chip{display:inline-flex;align-items:baseline;gap:4px;"
+      +   "padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700;"
+      +   "vertical-align:middle;margin-left:6px}"
+      + ".pdf-delta-chip[data-tone='good']{background:rgba(31,160,85,0.12);color:#1FA055}"
+      + ".pdf-delta-chip[data-tone='mid']{background:rgba(224,161,0,0.12);color:#E0A100}"
+      + ".pdf-delta-chip[data-tone='bad']{background:rgba(214,69,58,0.12);color:#D6453A}"
+      + ".pdf-delta-chip__arrow{font-size:9px}"
+      + ".pdf-delta-chip__base{font-weight:500;opacity:0.8;font-size:9px;margin-left:2px}"
+      + ".pdf-sparkline{display:inline-block;vertical-align:middle;"
+      +   "width:120px;height:20px;margin-left:6px}"
+      /* Phase 2 — Recommendation callout 3-chip */
+      + ".pdf-rec-callouts{display:grid;grid-template-columns:1fr 1fr 1fr;"
+      +   "gap:12px;margin:0 0 24px}"
+      + ".pdf-rec{padding:14px 16px;border-radius:10px;border-left:4px solid #7E93A8}"
+      + ".pdf-rec--good{border-color:#1FA055;background:rgba(31,160,85,0.10)}"
+      + ".pdf-rec--warn{border-color:#F2C20E;background:rgba(224,161,0,0.10)}"
+      + ".pdf-rec--accent{border-color:#1F8FFF;background:rgba(31,143,255,0.08)}"
+      + ".pdf-rec__icon{font-size:14px;font-weight:700;display:inline-block;margin-right:4px;"
+      +   "color:#1FA055}"
+      + ".pdf-rec--warn .pdf-rec__icon{color:#F2C20E}"
+      + ".pdf-rec--accent .pdf-rec__icon{color:#1F8FFF}"
+      + ".pdf-rec__label{font-size:10px;font-weight:700;letter-spacing:1px;"
+      +   "text-transform:uppercase;color:#7E93A8}"
+      + ".pdf-rec__text{margin:6px 0 0;font-size:12px;font-weight:500;"
+      +   "color:#0A2540;line-height:1.4}"
+      /* Phase 3 — Caption + Limitations + estimate/measured flag */
+      + ".pdf-chart-caption{margin:8px 0 12px;padding:10px 14px;border-radius:6px;"
+      +   "background:rgba(126,147,168,0.08);font-size:11px;color:#5C6F7E;line-height:1.5}"
+      + ".pdf-chart-caption strong{color:#0A2540;font-weight:700}"
+      + ".pdf-chart-limitation{margin:4px 0 12px;font-size:9px;color:#7E93A8;"
+      +   "line-height:1.4;padding-left:14px}"
+      + ".pdf-chart-limitation::before{content:'ⓘ ';color:#A8B4C0}"
+      + ".pdf-est-chip{display:inline-flex;align-items:center;gap:3px;"
+      +   "padding:1px 6px;border-radius:999px;font-size:9px;font-weight:700;"
+      +   "background:rgba(126,147,168,0.14);color:#7E93A8;letter-spacing:0.5px;"
+      +   "text-transform:uppercase;margin-left:6px;vertical-align:middle}"
+      + ".pdf-est-chip--est{background:rgba(126,147,168,0.18)}"
+      + ".pdf-est-chip--meas{background:rgba(31,160,85,0.14);color:#1FA055}"
+      /* Coach callout limitations footnote */
+      + ".pdf-coach-limitations{margin-top:18px;padding:10px 14px;border-radius:6px;"
+      +   "background:rgba(126,147,168,0.08);font-size:11px;color:#5C6F7E;line-height:1.5}"
+      + ".pdf-coach-limitations strong{color:#0A2540}"
+      /* ═══ §303 — Task D: PDF 라벨 / page-break / 반응형 px fix ════
+         옥대표님 2026-06-05 verbatim: '차트 라벨 깨짐 + 플롯 아래 텍스트 겹침
+         방지 CSS page-break + 고정 px 반응형 코드' */
+      + "@media print{"
+      +   ".pdf-page{page-break-after:always;break-after:page;"
+      +     "page-break-inside:avoid;break-inside:avoid}"
+      +   ".pdf-block,.pdf-exec,.pdf-rec-callouts,.pdf-grade-chip,"
+      +     ".pdf-statgrid,.pdf-vps,.pdf-narrative,.pdf-table{"
+      +     "page-break-inside:avoid;break-inside:avoid}"
+      +   ".pdf-block__h,.pdf-page__h{page-break-after:avoid;break-after:avoid}"
+      +   ".pdf-chart-caption,.pdf-chart-limitation{"
+      +     "page-break-before:avoid;break-before:avoid}"
+      +   ".pdf-img{page-break-inside:avoid;break-inside:avoid;max-width:100%}"
+      + "}"
+      /* Task D — 고정 px (Chart.js · 라벨 깨짐 방지) */
+      + "#rd-pdf-root .chartjs-render-monitor,"
+      +   "#rd-pdf-root canvas{max-width:100%;height:auto}"
+      + "#rd-pdf-root .pdf-block__h,#rd-pdf-root .pdf-block__sub,"
+      +   "#rd-pdf-root .pdf-stat__k,#rd-pdf-root .pdf-stat__v,"
+      +   "#rd-pdf-root .pdf-table th,#rd-pdf-root .pdf-table td,"
+      +   "#rd-pdf-root .pdf-highlight__metric,#rd-pdf-root .pdf-rec__text,"
+      +   "#rd-pdf-root .pdf-chart-caption,#rd-pdf-root .pdf-est-chip{"
+      +   "font-size:inherit !important;line-height:inherit !important}"
       ;
     var s = document.createElement('style');
     s.id = STYLE_ID;
@@ -365,6 +483,260 @@
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  /* ═══ §302 v2 Helper 함수 — Phase 0-3 ════════════════════════════
+     Spec: _experts/dataviz_pdf_report_v2_spec.md §3-6.
+     본인 (샘 정 #2) impl — fabrication 0건, state.* / analysis.* / vps.*
+     실 필드만 read. 누락 시 graceful fallback. */
+
+  /* score (0-100) → Grade chip { letter, tone } */
+  function scoreToGrade(score) {
+    if (score == null || !isFinite(score)) return { letter: '—', tone: 'mid' };
+    if (score >= 85) return { letter: 'A', tone: 'veryGood' };
+    if (score >= 70) return { letter: 'B', tone: 'good' };
+    if (score >= 55) return { letter: 'C', tone: 'mid' };
+    if (score >= 40) return { letter: 'D', tone: 'bad' };
+    return { letter: 'F', tone: 'veryBad' };
+  }
+
+  /* 시즌 history 에서 percentile rank (이번 score 가 상위 몇 %인가) */
+  function percentileRank(arr, value) {
+    if (!arr || !arr.length) return null;
+    var below = 0;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i] < value) below++;
+    }
+    return Math.round((below / arr.length) * 100);
+  }
+
+  /* verdict 한 줄 — state.vps + state.history 기반.
+     History 없으면 score-only fallback. */
+  function buildVerdict(vps, history) {
+    if (!vps || !vps.overall || vps.overall.score == null) {
+      return T('풍향 확정 후 종합 평가 활성화');
+    }
+    var score = vps.overall.score;
+    var rank = null, seasonAvg = null;
+    if (history && history.length >= 3) {
+      var arr = history.map(function (h) { return h && h.vps; })
+                       .filter(function (v) { return v != null && isFinite(v); });
+      if (arr.length >= 3) {
+        seasonAvg = arr.reduce(function (s, v) { return s + v; }, 0) / arr.length;
+        rank = percentileRank(arr, score);
+      }
+    }
+    if (score >= 85) {
+      return rank != null
+        ? T('오늘 = 시즌 베스트급 (top {p}%)').replace('{p}', 100 - rank)
+        : T('오늘 = 우수한 세션 (A 등급)');
+    }
+    if (score >= 70) {
+      if (seasonAvg != null) {
+        var dp = Math.round((score - seasonAvg) / seasonAvg * 100);
+        return T('오늘 = 시즌 평균 대비 {d}% 빠름')
+                 .replace('{d}', (dp >= 0 ? '+' : '') + dp);
+      }
+      return T('오늘 = 양호한 세션 (B 등급)');
+    }
+    if (score >= 55) {
+      return rank != null
+        ? T('오늘 = 시즌 평균 수준 ({p} percentile)').replace('{p}', rank)
+        : T('오늘 = 보통 수준 (C 등급)');
+    }
+    if (score >= 40) return T('오늘 = 평균 미달 — 회전 효율 개선 필요');
+    return T('오늘 = 풍속·컨디션 한계');
+  }
+
+  /* Top 3 highlights — analysis · vps · history 기반.
+     Strong 2 + weak 1 = 균형 (Sports psychology — positive/constructive ratio).
+     티모 협업 항목 — 본 frame 만 유지, 학술 ref 추후 보강. */
+  function buildTop3Highlights(analysis, vps, history, summary) {
+    var cands = [];
+    var sum = summary || (analysis && analysis.summary) || {};
+
+    /* avg speed kt — direction='higher' */
+    if (sum.avgSpeedMovingMs != null) {
+      var avgKt = sum.avgSpeedMovingMs * 1.9438444924406;
+      var avgScore = Math.min(100, avgKt * 5);  /* 20kt = 100, 10kt = 50 */
+      cands.push({
+        metric: T('평균 속도'),
+        value: avgKt.toFixed(1) + ' kt',
+        contextLabel: T('시즌 분포 추정'),
+        score: avgScore,
+        direction: 'higher'
+      });
+    }
+    if (sum.maxSpeedMs != null) {
+      var maxKt = sum.maxSpeedMs * 1.9438444924406;
+      var maxScore = Math.min(100, maxKt * 4);
+      cands.push({
+        metric: T('최고 속도'),
+        value: maxKt.toFixed(1) + ' kt',
+        contextLabel: T('세션 peak'),
+        score: maxScore,
+        direction: 'higher'
+      });
+    }
+    /* 회전 효율 — analysis.maneuvers.efficiencyOverall (있으면) */
+    if (analysis && analysis.maneuvers) {
+      var effOv = null;
+      if (typeof analysis.maneuvers.efficiencyOverall === 'number') {
+        effOv = analysis.maneuvers.efficiencyOverall;
+      } else if (Array.isArray(analysis.maneuvers) && analysis.maneuvers.length) {
+        var es = analysis.maneuvers
+          .map(function (m) { return m && m.efficiency; })
+          .filter(function (v) { return v != null && isFinite(v); });
+        if (es.length) {
+          effOv = es.reduce(function (s, v) { return s + v; }, 0) / es.length;
+        }
+      }
+      if (effOv != null) {
+        cands.push({
+          metric: T('회전 효율'),
+          value: Math.round(effOv * 100) + '%',
+          contextLabel: T('전체 회전 평균'),
+          score: effOv * 100,
+          direction: 'higher'
+        });
+      }
+    }
+    /* VPS 풍상 / 풍하 — 약점 발굴 */
+    if (vps && vps.upwind && vps.upwind.score != null) {
+      cands.push({
+        metric: T('VPS 풍상'),
+        value: Math.round(vps.upwind.score) + ' / 100',
+        contextLabel: T('수직 vs 측면 효율'),
+        score: vps.upwind.score,
+        direction: 'higher'
+      });
+    }
+    if (vps && vps.downwind && vps.downwind.score != null) {
+      cands.push({
+        metric: T('VPS 풍하'),
+        value: Math.round(vps.downwind.score) + ' / 100',
+        contextLabel: T('가속·VMG'),
+        score: vps.downwind.score,
+        direction: 'higher'
+      });
+    }
+
+    if (!cands.length) return [];
+
+    /* 정렬 — score 높은 2 (good 70+) + score 낮은 1 (improve <70) */
+    var sorted = cands.slice().sort(function (a, b) { return b.score - a.score; });
+    var goods = sorted.filter(function (c) { return c.score >= 70; }).slice(0, 2);
+    var weaks = sorted.filter(function (c) { return c.score < 70; });
+    var weak = weaks.length ? weaks[weaks.length - 1] : null;  /* worst */
+    var top3 = goods.concat(weak ? [weak] : []);
+    /* 부족 시 score 순 채우기 */
+    if (top3.length < 3) {
+      var rest = sorted.filter(function (c) {
+        return top3.indexOf(c) === -1;
+      });
+      top3 = top3.concat(rest.slice(0, 3 - top3.length));
+    }
+    return top3.slice(0, 3);
+  }
+
+  /* Next-action 1줄 — Top 3 의 weakest + whatif 보완 */
+  function buildNextAction(highlights, whatif) {
+    if (!highlights || !highlights.length) {
+      return T('풍향 확정 시 다음 세션 권장 활성화');
+    }
+    var weak = highlights[highlights.length - 1];
+    if (weak.score >= 70) {
+      /* 전부 good — whatif 권장 우선 */
+      if (whatif && whatif.recommendChange && whatif.optimumWingM2 != null) {
+        return T('다음 세션 윙 {w} m² 시도 (+{d} kt VMG)')
+          .replace('{w}', whatif.optimumWingM2.toFixed(1))
+          .replace('{d}', whatif.deltaVmg ? whatif.deltaVmg.toFixed(1) : '0.5');
+      }
+      return T('지속 — 동일 컨디션에서 회전 1-pass 비중 ↑');
+    }
+    /* weak metric → action 매핑 */
+    var m = weak.metric;
+    if (m.indexOf(T('평균 속도')) >= 0) {
+      return T('다음 세션 14kt 임계 5분 유지 + 회전 1-pass 비중 ↑');
+    }
+    if (m.indexOf(T('회전 효율')) >= 0) {
+      return T('다음 세션 자이브 -2초 손실 목표 + 1-pass 비중 70%↑');
+    }
+    if (m.indexOf(T('VPS 풍상')) >= 0) {
+      return T('다음 세션 풍상 VMG % target 85%↑ + 회전 efficient');
+    }
+    if (m.indexOf(T('VPS 풍하')) >= 0) {
+      return T('다음 세션 풍하 가속·VMG ↑ + 자이브 손실 -2초');
+    }
+    return T('다음 세션 ') + m + T(' 개선 — 동일 컨디션 재시도');
+  }
+
+  /* Phase 1 — vs baseline delta chip (HTML string) */
+  function buildDeltaChip(value, base, label) {
+    if (value == null || base == null || !isFinite(value) || !isFinite(base)
+        || base === 0) return '';
+    var deltaPct = (value - base) / base * 100;
+    var tone = deltaPct > 5 ? 'good' : (deltaPct < -5 ? 'bad' : 'mid');
+    var arrow = deltaPct > 0 ? '↑' : (deltaPct < 0 ? '↓' : '→');
+    var d = (deltaPct >= 0 ? '+' : '') + deltaPct.toFixed(0) + '%';
+    return '<span class="pdf-delta-chip" data-tone="' + tone + '">' +
+      '<span class="pdf-delta-chip__arrow">' + arrow + '</span>' +
+      '<span class="pdf-delta-chip__value">' + d + '</span>' +
+      '<span class="pdf-delta-chip__base">' + esc(label || T('vs baseline')) + '</span>' +
+      '</span>';
+  }
+
+  /* Phase 1 — sparkline SVG (Tufte 정통, 12 세션 trend) */
+  function buildSparklineSvg(values) {
+    if (!values || values.length < 2) return '';
+    var nums = values.filter(function (v) { return v != null && isFinite(v); });
+    if (nums.length < 2) return '';
+    var W = 120, H = 20, pad = 2;
+    var mn = Math.min.apply(Math, nums);
+    var mx = Math.max.apply(Math, nums);
+    var range = (mx - mn) || 1;
+    var stepX = (W - pad * 2) / (nums.length - 1);
+    var pts = nums.map(function (v, i) {
+      var x = pad + i * stepX;
+      var y = pad + (1 - (v - mn) / range) * (H - pad * 2);
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    var latest = nums[nums.length - 1];
+    var latestY = pad + (1 - (latest - mn) / range) * (H - pad * 2);
+    return '<svg class="pdf-sparkline" viewBox="0 0 ' + W + ' ' + H +
+      '" xmlns="http://www.w3.org/2000/svg">' +
+      '<polyline points="' + pts +
+      '" stroke="#1F8FFF" stroke-width="1.5" fill="none" stroke-linejoin="round"/>' +
+      '<circle cx="' + (W - pad) + '" cy="' + latestY.toFixed(1) +
+      '" r="2.5" fill="#FFB800"/>' +
+      '</svg>';
+  }
+
+  /* Phase 3 — 차트 caption (이 차트가 말하는 것) */
+  function buildChartCaption(text) {
+    if (!text) return null;
+    var p = el('p', 'pdf-chart-caption');
+    p.innerHTML = text;
+    return p;
+  }
+
+  /* Phase 3 — 차트 limitation footnote */
+  function buildChartLimitation(text) {
+    if (!text) return null;
+    var p = el('p', 'pdf-chart-limitation');
+    p.textContent = text;
+    return p;
+  }
+
+  /* Phase 3 — estimate / measured flag chip */
+  function estChip(source) {
+    if (source === 'measured') {
+      return '<span class="pdf-est-chip pdf-est-chip--meas">' + esc(T('실측')) + '</span>';
+    }
+    if (source === 'estimate' || source === 'computed') {
+      return '<span class="pdf-est-chip pdf-est-chip--est">' + esc(T('추정')) + '</span>';
+    }
+    return '';
   }
 
   /* ---------- P1 Cover ---------- */
@@ -439,12 +811,91 @@
     return page;
   }
 
-  /* ---------- P2 Session Summary ---------- */
+  /* ---------- P2 Executive Summary ★ Phase 0 (v2 §302) ----------
+     본인 (샘 정 #2) spec §3 — Grade chip + Top 3 + Top 1 next-action.
+     30초 인지 (Few _Information Dashboard Design_ ch.3).
+     기존 VPS 평면 grid + stat strip 는 보조 정보로 후순위. */
   function buildSummary(meta, page) {
-    // VPS 카드 (3개)
+    /* state.* 직접 read (window scope 또는 global). graceful fallback */
+    var state = (typeof global !== 'undefined' && global.state) ||
+                 (typeof window !== 'undefined' && window.state) || {};
+    var vps = state.vps || {};
+    var analysis = state.analysis || {};
+    var summary = analysis.summary || {};
+    var history = state.history || state.savedSessions || [];
+    var whatif = state.whatif || {};
+
+    /* ───── Zone 1 — Grade chip + verdict ───── */
+    var exec = el('div', 'pdf-exec');
+    var z1 = el('div', 'pdf-exec-zone1');
+    var score = vps && vps.overall && vps.overall.score;
+    var grade = scoreToGrade(score);
+    z1.innerHTML =
+      '<div class="pdf-grade-chip" data-grade="' + grade.letter + '">' +
+        '<span class="pdf-grade-chip__letter">' + esc(grade.letter) + '</span>' +
+        '<div class="pdf-grade-chip__col">' +
+          '<span class="pdf-grade-chip__score">' +
+            esc(score != null && isFinite(score) ? Math.round(score) + ' / 100' : T('산출 대기')) +
+          '</span>' +
+          '<span class="pdf-grade-chip__label">' + esc(T('오늘 세션')) + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<p class="pdf-exec-verdict"><strong>' +
+        esc(buildVerdict(vps, history)) +
+      '</strong></p>';
+    exec.appendChild(z1);
+
+    /* ───── Zone 2 — Top 3 Highlights ───── */
+    var highlights = buildTop3Highlights(analysis, vps, history, summary);
+    if (highlights && highlights.length) {
+      var z2 = el('div', 'pdf-exec-zone2');
+      z2.appendChild(el('h3', 'pdf-block__h', esc(T('Top 3 Highlights'))));
+      var ul = el('ul', 'pdf-highlights');
+      var ulHtml = '';
+      for (var i = 0; i < highlights.length; i++) {
+        var h = highlights[i];
+        var tone = h.score >= 70 ? 'good' : (h.score >= 40 ? 'warn' : 'bad');
+        var icon = tone === 'good' ? '✓' : (tone === 'warn' ? '⚠' : '✗');
+        ulHtml +=
+          '<li class="pdf-highlight pdf-highlight--' + tone + '">' +
+            '<span class="pdf-highlight__icon">' + icon + '</span>' +
+            '<span class="pdf-highlight__metric">' +
+              esc(h.metric) + ' ' + esc(h.value) + '</span>' +
+            '<span class="pdf-highlight__context">' +
+              esc('(' + h.contextLabel + ')') + '</span>' +
+          '</li>';
+      }
+      ul.innerHTML = ulHtml;
+      z2.appendChild(ul);
+      exec.appendChild(z2);
+    }
+
+    /* ───── Zone 3 — Top 1 next-action ───── */
+    var z3 = el('div', 'pdf-exec-zone3');
+    z3.innerHTML =
+      '<div class="pdf-next-action">' +
+        '<span class="pdf-next-action__label">★ ' + esc(T('다음 세션')) + '</span>' +
+        '<p class="pdf-next-action__text">' +
+          esc(buildNextAction(highlights, whatif)) +
+        '</p>' +
+      '</div>';
+    exec.appendChild(z3);
+
+    page.appendChild(exec);
+
+    /* ───── 보조 — VPS 3분할 + 시즌 sparkline (Phase 1) ───── */
     var vpsEl = $('vps-card');
-    var vpsCard = el('div', 'pdf-vps');
     var scores = extractVps(vpsEl);
+    /* sparkline 시즌 추세 — history.vps */
+    var hVpsArr = history && history.length
+      ? history.map(function (h) { return h && h.vps; })
+                .filter(function (v) { return v != null && isFinite(v); }) : [];
+    var sparkSvg = hVpsArr.length >= 2 ? buildSparklineSvg(hVpsArr) : '';
+    var seasonAvg = hVpsArr.length >= 3
+      ? hVpsArr.reduce(function (s, v) { return s + v; }, 0) / hVpsArr.length : null;
+    var deltaChip = (score != null && seasonAvg != null)
+      ? buildDeltaChip(score, seasonAvg, T('vs 시즌 평균')) : '';
+    var vpsCard = el('div', 'pdf-vps');
     vpsCard.innerHTML =
       '<div class="pdf-vps__card pdf-vps__card--up">' +
         '<div class="pdf-vps__k">' + esc(T('풍상')) + '</div>' +
@@ -453,8 +904,9 @@
       '</div>' +
       '<div class="pdf-vps__card pdf-vps__card--ovr">' +
         '<div class="pdf-vps__k">' + esc(T('종합')) + '</div>' +
-        '<div class="pdf-vps__v">' + esc(scores.overall || '—') + '</div>' +
-        '<div class="pdf-vps__sub">Overall VPS</div>' +
+        '<div class="pdf-vps__v">' + esc(scores.overall || '—') + deltaChip + '</div>' +
+        '<div class="pdf-vps__sub">Overall VPS' +
+          (sparkSvg ? ' ' + sparkSvg : '') + '</div>' +
       '</div>' +
       '<div class="pdf-vps__card pdf-vps__card--dn">' +
         '<div class="pdf-vps__k">' + esc(T('풍하')) + '</div>' +
@@ -463,7 +915,7 @@
       '</div>';
     page.appendChild(vpsCard);
 
-    // 요약 stat strip
+    // 요약 stat strip (보조)
     var stats = collectStatStrip('summary-strip');
     if (stats.length) {
       var block = el('div', 'pdf-block');
@@ -669,6 +1121,62 @@
 
   /* ---------- P7 Coach Narrative ---------- */
   function buildCoachPage(page) {
+    /* ───── Phase 2 — Recommendation 3-chip callout (★ P0) ─────
+       옥대표님 spec §5. Coach narrative 위에 3 chip — 강점 · 개선 · 다음 세션.
+       Phase 0 의 Top 3 highlights 결과 재사용 (data consistency). */
+    var state = (typeof global !== 'undefined' && global.state) ||
+                 (typeof window !== 'undefined' && window.state) || {};
+    var vps = state.vps || {};
+    var analysis = state.analysis || {};
+    var summary = analysis.summary || {};
+    var history = state.history || state.savedSessions || [];
+    var whatif = state.whatif || {};
+    var highlights = buildTop3Highlights(analysis, vps, history, summary);
+
+    if (highlights && highlights.length >= 1) {
+      var strong = highlights[0] || null;
+      var weak = highlights.length >= 2
+        ? highlights[highlights.length - 1] : null;
+      var nextText = buildNextAction(highlights, whatif);
+
+      var rec = el('div', 'pdf-rec-callouts');
+      var recHtml = '';
+      /* ✓ 강점 */
+      if (strong) {
+        recHtml += '<div class="pdf-rec pdf-rec--good">' +
+          '<span class="pdf-rec__icon">✓</span>' +
+          '<span class="pdf-rec__label">' + esc(T('강점')) + '</span>' +
+          '<p class="pdf-rec__text">' +
+            esc(strong.metric + ' ' + strong.value + ' · ' + strong.contextLabel) +
+          '</p></div>';
+      }
+      /* ⚠ 개선 */
+      if (weak && weak.score < 70) {
+        recHtml += '<div class="pdf-rec pdf-rec--warn">' +
+          '<span class="pdf-rec__icon">⚠</span>' +
+          '<span class="pdf-rec__label">' + esc(T('개선')) + '</span>' +
+          '<p class="pdf-rec__text">' +
+            esc(weak.metric + ' ' + weak.value + ' · ' + weak.contextLabel) +
+          '</p></div>';
+      } else {
+        /* 모두 good 일 때 — 유지 권장 */
+        recHtml += '<div class="pdf-rec pdf-rec--warn">' +
+          '<span class="pdf-rec__icon">⚠</span>' +
+          '<span class="pdf-rec__label">' + esc(T('관찰')) + '</span>' +
+          '<p class="pdf-rec__text">' +
+            esc(T('모두 양호 — 다음 컨디션 challenge')) +
+          '</p></div>';
+      }
+      /* ★ 다음 세션 */
+      recHtml += '<div class="pdf-rec pdf-rec--accent">' +
+        '<span class="pdf-rec__icon">★</span>' +
+        '<span class="pdf-rec__label">' + esc(T('다음 세션')) + '</span>' +
+        '<p class="pdf-rec__text">' + esc(nextText) + '</p></div>';
+      rec.innerHTML = recHtml;
+      page.appendChild(rec);
+    }
+
+    /* ───── 기존 Coach narrative (보조) ───── */
     var card = $('coach-card');
     var b = el('div', 'pdf-block');
     if (card && card.textContent.trim()) {
@@ -692,6 +1200,19 @@
       b.appendChild(ph);
     }
     page.appendChild(b);
+
+    /* ───── Phase 3 — Limitations footnote ───── */
+    var windConf = state.wind && state.wind.confidence;
+    if (windConf) {
+      var limTxt = T('풍향 추정 신뢰도: ') + windConf +
+        (windConf === '낮음'
+          ? T(' — 리칭 일색 세션은 추정 정합성 약함')
+          : '');
+      var lim = el('p', 'pdf-coach-limitations');
+      lim.innerHTML = '<strong>ⓘ ' + esc(T('제한점')) +
+        '</strong> · ' + esc(limTxt);
+      page.appendChild(lim);
+    }
     return page;
   }
 
