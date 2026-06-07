@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A2540">
+<meta name="color-scheme" content="light">
+<title>라이딩 통계 대시보드 — GPX 분석 (Phase 1)</title>
+<meta name="description" content="윙포일·세일링 GPX 트랙 분석 — 속도·택킹/자이빙 효율·VMG·TWA 폴라. 코치 등급 분석.">
+<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
+<script>
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    var hadStale = false;
+    regs.forEach(function(r){
+      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+      // Any SW not from our domain's allowed list is treated as stale.
+      // We don't ship our own SW right now → unregister all.
+      hadStale = true;
+      r.unregister();
+    });
+    if (hadStale && 'caches' in window) {
+      caches.keys().then(function(names){
+        names.forEach(function(n){ caches.delete(n); });
+        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
+        try {
+          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
+            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
+            location.reload();
+          }
+        } catch(e){}
+      });
+    }
+  }).catch(function(){});
+})();
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<!-- 메인 사이트 헤더·내비 스타일 — dashboard.css 를 뒤에 두어 대시보드 본문 스타일이 우선한다 -->
+<link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526">
+<link rel="stylesheet" href="css/dashboard.css?v=en-cleanup-20260526">
+</head>
+<body>
+
+<!-- ===================== 메인 사이트 헤더·내비 (통합 2026-05-22) ===================== -->
+<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>3회 올림픽 출전 코치 운영</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>네 브랜드 정식 수입</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>1:1 카톡 컨설팅</span>
+</div></div></div>
+
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="../index.html" class="nav__logo" aria-label="단무지 홈">
+        <span class="nav__logo-mark">D</span>
+        <span>단무지</span>
+      </a>
+
+      <div class="nav__primary" role="menubar">
+        <!-- 1. 브랜드 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <div class="nav__sub" role="menu">
+            <a href="../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
+            <a href="../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
+            <a href="../takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
+          </div>
+        </div>
+
+        <!-- 2. 라이딩 스타일 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <div class="nav__sub" role="menu">
+            <a href="../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
+            <a href="../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
+            <a href="../style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
+            <a href="../style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
+          </div>
+        </div>
+
+        <!-- 3. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
+        <div class="nav__has-sub" role="none">
+          <a href="../find-my-gear.html" class="nav__link">장비</a>
+          <div class="nav__sub" role="menu">
+            <a href="../genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
+            <a href="../genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
+            <a href="../genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
+            <a href="../wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
+          </div>
+        </div>
+
+        <!-- 4. 실력 수준 -->
+        <div class="nav__has-sub" role="none">
+          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <div class="nav__sub nav__sub--wide" role="menu">
+            <a href="../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="../level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
+            <a href="../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
+            <a href="../level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
+            <a href="../level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
+            <a href="../women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
+            <a href="../junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
+            <a href="../family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
+          </div>
+        </div>
+
+        <!-- 5. 스마트 컨설팅 (CTA) -->
+        <a href="../find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
+        <!-- DO_NOT_REVERT §171-B — cart icon. badge auto-updates via cart.js.
+             메인 사이트 헤더와 1:1 동일 spec (Danny 2026-05-26). -->
+        <a href="../cart.html" class="nav__link nav__cart" role="menuitem" aria-label="장바구니">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="nav__cart-badge" data-cart-badge aria-live="polite" aria-atomic="true" hidden>0</span>
+        </a>
+        <a href="../login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+        </button>
+        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+        <button class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== Mobile Menu ========== -->
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+  <button class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <ul class="mobile-menu__list">
+    <li><a href="../find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li><a href="../login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
+    <li class="mobile-menu__heading">브랜드</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">라이딩 스타일</li>
+    <li><a href="../style/flat-speed.html">Flat·Speed</a></li>
+    <li><a href="../style/choppy-freeride.html">Choppy·Freeride</a></li>
+    <li><a href="../style/wave.html">Wave</a></li>
+    <li><a href="../style/hybrid.html">Hybrid</a></li>
+    <li class="mobile-menu__heading">장비</li>
+    <li><a href="../levitaz.html">Levitaz</a></li>
+    <li><a href="../ppc.html">PPC</a></li>
+    <li><a href="../takoon.html">Takoon</a></li>
+    <li><a href="../wip.html">Forward WIP</a></li>
+    <li class="mobile-menu__heading">실력 수준</li>
+    <li><a href="../level/beginner.html">입문</a></li><li><a href="../level/novice.html">초급</a></li>
+    <li><a href="../level/intermediate.html">중급</a></li>
+    <li><a href="../level/advanced.html">상급</a></li>
+    <li><a href="../level/pro.html">선수</a></li>
+    <li hidden><a href="../women/index.html">여성 라이더</a></li>
+    <li hidden><a href="../junior/index.html">유소년·어린이</a></li>
+    <li hidden><a href="../family/index.html">가족 라이딩</a></li>
+  </ul>
+  <div class="mobile-menu__about">
+    <h4>단무지 소개</h4>
+    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+  </div>
+</div>
+
+<!-- ===================== 대시보드 서브헤더 (제목·Phase 1·노트/km/h 토글) ===================== -->
+<header class="app-header">
+  <div class="app-header__brand">
+    <span class="app-header__mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" width="30" height="30">
+        <circle cx="16" cy="16" r="15" fill="#FFFFFF"/>
+        <path d="M7 21 L16 7 L17 21 Z" fill="#1F8FFF"/>
+        <path d="M17 21 L17 8 L25 21 Z" fill="#FFB800"/>
+      </svg>
+    </span>
+    <div>
+      <h1 class="app-header__title">라이딩 통계 대시보드</h1>
+      <p class="app-header__sub">윙포일·세일링 GPX 분석 · Phase 1</p>
+    </div>
+  </div>
+  <div class="app-header__tools">
+    <div class="unit-toggle" id="unit-toggle" role="group" aria-label="속도 단위">
+      <button type="button" data-unit="kt" class="is-active">노트</button>
+      <button type="button" data-unit="kmh">km/h</button>
+    </div>
+  </div>
+</header>
+
+<!-- 언어 토글 (한↔영) — 라이딩 분석 대시보드 한정. 우측 상단 고정.
+     기본 한글, 선택값은 localStorage(dmj_rd_lang)에 저장 (Danny 2026-05-25). -->
+<div class="rd-langtoggle" role="group" aria-label="Language / 언어">
+  <button type="button" class="rd-langtoggle__btn" data-rd-lang-btn="ko"
+          aria-pressed="true">한글</button>
+  <button type="button" class="rd-langtoggle__btn" data-rd-lang-btn="en"
+          aria-pressed="false">English</button>
+</div>
+
+<!-- ===================== 분석 완료 Hero Summary (2026-05-26 시각 폴리시 Layer 2) =====================
+     GPX 분석이 끝난 직후 1회만 표시되는 임팩트 오버레이. 트랙 GPS overview
+     SVG 위에 4개 핵심 KPI(VPS·이동 시간·최고 속도·총 거리)를 큰 글자로
+     얹는다. 사용자가 클릭하거나 5초 후 자동으로 fade out → 대시보드 본
+     화면으로 넘어간다. 다크 X — 라이트 테마 유지. 데이터는 app.js
+     showHeroSummary() 가 채운다. -->
+<div id="hero-summary" class="rd-hero" hidden aria-hidden="true">
+  <button type="button" class="rd-hero__skip" id="hero-skip">대시보드 바로 보기 →</button>
+  <div class="rd-hero__bg" aria-hidden="true">
+    <svg id="hero-track" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice"></svg>
+  </div>
+  <div class="rd-hero__scrim" aria-hidden="true"></div>
+  <div class="rd-hero__content">
+    <p class="rd-hero__kicker">라이딩 분석 완료</p>
+    <h2 class="rd-hero__title" id="hero-title">라이딩 세션</h2>
+    <p class="rd-hero__meta" id="hero-meta">—</p>
+    <div class="rd-hero__kpis" id="hero-kpis"></div>
+    <p class="rd-hero__hint">아무 곳이나 누르면 대시보드로 이동합니다</p>
+  </div>
+</div>
+
+<main class="app-main">
+
+  <!-- ===================== 인트로 화면 ===================== -->
+  <section id="intro-view" class="intro">
+    <div class="intro__hero">
+      <h2>GPX 파일 하나로 라이딩을 분석합니다</h2>
+      <p>워치·GPS 앱에서 내보낸 트랙을 올리면 속도 분석과 함께
+         <strong>택킹·자이빙 효율, VMG, TWA 폴라</strong>까지 — 일반 GPS 앱이 보여주지 않는
+         코치 등급 분석을 바로 확인할 수 있습니다.</p>
+    </div>
+
+    <div class="intro__card">
+      <label class="field-label">1. 스포츠 선택</label>
+      <div class="sport-chips" id="sport-chips" role="radiogroup" aria-label="스포츠 종류"></div>
+
+      <label class="field-label" style="margin-top:18px;">2. GPX · VKX 파일 업로드</label>
+      <div class="dropzone" id="drop-zone" tabindex="0" role="button"
+           aria-label="GPX 또는 VKX 파일을 끌어다 놓거나 선택">
+        <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">
+          <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke="#1F8FFF" stroke-width="2"
+                fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" stroke="#7E93A8"
+                stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <p class="dropzone__main">GPX 또는 VKX 파일을 여기에 끌어다 놓으세요</p>
+        <p class="dropzone__sub">또는 클릭해서 파일 선택 · .gpx · .vkx (Vakaros Atlas 2)</p>
+        <input type="file" id="file-input" accept=".gpx,.vkx,application/gpx+xml,text/xml,application/octet-stream" hidden>
+      </div>
+      <div class="intro__actions">
+        <button type="button" class="btn btn--accent" id="sample-btn">
+          샘플 데이터로 둘러보기 →
+        </button>
+        <span class="intro__hint">처음이라면 샘플로 먼저 살펴보세요</span>
+      </div>
+    </div>
+
+    <details class="intro__guide">
+      <summary>워치·앱에서 GPX 파일 내보내는 법</summary>
+      <div class="intro__guide-body">
+        <div>
+          <h4>Garmin</h4>
+          <p>Garmin Connect 웹 → 액티비티 열기 → 우측 상단 ⚙(톱니) →
+             <em>원본 내보내기</em> 또는 <em>GPX 내보내기</em></p>
+        </div>
+        <div>
+          <h4>Apple Watch</h4>
+          <p>Apple 건강 앱에는 GPX 내보내기가 없습니다. <em>HealthFit</em> 또는
+             <em>RunGap</em> 같은 앱으로 워크아웃을 GPX/FIT 로 내보내세요.</p>
+        </div>
+        <div>
+          <h4>Samsung Galaxy Watch</h4>
+          <p>Samsung Health 에서 운동 기록 내보내기를 사용하거나, GPX 를 지원하는
+             서드파티 트래킹 앱(예: 윙포일 GPS 앱)으로 기록하세요.</p>
+        </div>
+      </div>
+    </details>
+
+    <ul class="intro__features">
+      <li><strong>Speed Analysis</strong><span>속도 시계열·분포·2초/10초/500m/1해리 베스트·고속 구간</span></li>
+      <li><strong>Maneuver Analysis</strong><span>택킹·자이빙 자동 감지 + 진입/최저/탈출 속도·손실·회복</span></li>
+      <li><strong>코치 분석</strong><span>VMG·TWA 폴라·풍향 추정 — 풍향만 입력하면 열립니다</span></li>
+    </ul>
+    <p class="intro__privacy">분석은 모두 브라우저 안에서 처리되며, 파일은 어디에도 업로드되지 않습니다.</p>
+  </section>
+
+  <!-- ===================== 대시보드 화면 ===================== -->
+  <section id="dashboard-view" class="dash" hidden>
+
+    <!-- 세션 헤더 -->
+    <div class="dash__head">
+      <div class="dash__head-info">
+        <div class="session-title-row">
+          <h2 id="session-title" class="session-title" tabindex="0" role="button"
+              title="클릭하면 세션 제목을 편집합니다"
+              aria-label="세션 제목 — 클릭하면 편집합니다">라이딩 세션</h2>
+          <button type="button" id="session-title-edit-btn" class="session-title-edit"
+                  title="세션 제목 편집" aria-label="세션 제목 편집">&#9998;</button>
+          <span id="session-edited-badge" class="session-badge" hidden>편집본</span>
+          <input type="text" id="session-title-input" class="session-title-input"
+                 maxlength="80" autocomplete="off" spellcheck="false"
+                 aria-label="세션 제목 입력" hidden />
+        </div>
+        <p class="dash__head-meta">
+          <span id="session-date">—</span>
+          <span class="dash__head-sep">·</span>
+          <label class="inline-select">
+            스포츠:
+            <select id="session-sport-select"></select>
+          </label>
+          <span class="dash__head-sep">·</span>
+          <span id="session-source" class="dash__head-source">—</span>
+        </p>
+      </div>
+      <div class="dash__head-actions">
+        <button type="button" class="btn btn--ghost" id="new-file-btn">새 파일</button>
+        <!-- PDF 보고서 다운로드 (Danny 2026-05-26) — 모바일 Web Share API 지원 시
+             ⬇ 버튼을 ↗ 공유 버튼으로 자동 전환 (RDPdfExport.canShareFiles). -->
+        <button type="button" class="btn btn--ghost" id="pdf-export-btn"
+                aria-label="PDF 보고서 다운로드">📄 PDF 보고서</button>
+        <button type="button" class="btn btn--primary" id="save-session-btn">이 세션 저장</button>
+      </div>
+    </div>
+    <p id="save-status" class="save-status" hidden></p>
+    <p id="data-notice" class="data-notice" hidden></p>
+
+    <!-- 요약 스탯 스트립 -->
+    <div class="stat-strip" id="summary-strip"></div>
+
+    <!-- ============ 세션 요약 — 세일링 퍼포먼스 스코어
+         (대시보드 최상단 · 풍향 설정 카드 바로 위 — Danny 2026-05-23) ============ -->
+    <div class="section-head section-head--summary">
+      <span class="section-head__no">요약</span>
+      <h3>🧭 세션 요약 · 세일링 퍼포먼스 스코어</h3>
+    </div>
+
+    <!-- 라이더 · 장비 입력 -->
+    <div class="card card--rider">
+      <div class="card__head"><h3>라이더 · 장비</h3>
+        <span class="card__hint">세일링 퍼포먼스 스코어·Coach Danny 분석에 사용 · 이 브라우저에 저장됩니다</span></div>
+      <div class="rider-grid">
+        <div class="rider-field">
+          <label for="rider-weight-input">체중 (kg)</label>
+          <input type="number" id="rider-weight-input" min="20" max="200" step="0.5"
+                 placeholder="예: 75" inputmode="decimal" autocomplete="off">
+        </div>
+        <div class="rider-field">
+          <label for="rider-skill-select">스킬 등급</label>
+          <select id="rider-skill-select"></select>
+        </div>
+        <div class="rider-field">
+          <label for="rider-wing-input">윙 사이즈 (m²)</label>
+          <input type="number" id="rider-wing-input" min="1.5" max="9.5" step="0.5"
+                 placeholder="예: 6.0" inputmode="decimal" autocomplete="off">
+        </div>
+        <div class="rider-field">
+          <label for="rider-foilar-input">프론트 윙 AR (선택)</label>
+          <input type="number" id="rider-foilar-input" min="3" max="16" step="0.1"
+                 placeholder="기본 6.5" inputmode="decimal" autocomplete="off">
+        </div>
+      </div>
+      <p class="rider-note">윙 사이즈는 Coach Danny what-if 분석의 필수 입력입니다.
+        풍속은 아래 <b>풍향 설정</b> 카드에서 입력합니다. 프론트 윙 면적 조언은 v2 범위입니다.</p>
+    </div>
+
+    <!-- VPS -->
+    <div class="card card--vps card--hero" id="vps-card"></div>
+
+    <!-- 세션 평균 — SPS 바로 아래. 포트/스타보드 × 풍상/풍하 평균 (G) -->
+    <div class="card" id="session-avg-card" hidden></div>
+
+    <!-- Coach Danny 코멘트 카드는 별도 섹션으로 분리해 대시보드 아래쪽에 둔다
+         (Danny 2026-05-23) — 아래 'Coach Danny 코멘트' 섹션 참조. -->
+
+    <!-- 풍향 설정 (지도 위쪽 — 지도 풍향 화살표와 함께 보며 조정) -->
+    <div class="card card--wind">
+      <div class="card__head"><h3>풍향 설정</h3>
+        <span class="card__hint">확정하면 택킹/자이빙 분류 · VMG · 폴라가 갱신됩니다</span></div>
+      <div class="wind-controls">
+        <div class="wind-dial-wrap">
+          <svg id="wind-dial" viewBox="0 0 120 120" width="128" height="128"
+               role="img" aria-label="풍향 다이얼">
+            <circle cx="60" cy="60" r="54" fill="#F5F7FA" stroke="#C7CFD8" stroke-width="2"/>
+            <text x="60" y="16" text-anchor="middle" class="wind-dial__n">N</text>
+            <text x="108" y="64" text-anchor="middle" class="wind-dial__d">E</text>
+            <text x="60" y="112" text-anchor="middle" class="wind-dial__d">S</text>
+            <text x="12" y="64" text-anchor="middle" class="wind-dial__d">W</text>
+            <g id="wind-arrow">
+              <line x1="60" y1="18" x2="60" y2="46" stroke="#DE4639" stroke-width="4"
+                    stroke-linecap="round"/>
+              <path d="M60 54 L53 41 L67 41 Z" fill="#DE4639"/>
+            </g>
+            <circle cx="60" cy="60" r="5" fill="#FFB800"/>
+          </svg>
+          <p class="wind-dial__readout" id="wind-readout">풍향 미설정</p>
+          <p class="wind-dial__caption">빨간 바늘 = 바람이 불어오는 방향 · 다이얼 클릭/슬라이더로 조정</p>
+        </div>
+        <div class="wind-fields">
+          <div class="wind-field">
+            <label for="wind-dir-input">풍향 (°)</label>
+            <input type="number" id="wind-dir-input" min="0" max="359" step="1"
+                   placeholder="예: 205" inputmode="numeric" autocomplete="off">
+            <input type="range" id="wind-dir-range" min="0" max="359" step="1" value="270"
+                   autocomplete="off">
+          </div>
+          <div class="wind-field">
+            <label for="wind-speed-input">풍속 (선택, kt)</label>
+            <input type="number" id="wind-speed-input" min="0" max="60" step="0.5"
+                   placeholder="예: 18" inputmode="decimal" autocomplete="off">
+          </div>
+          <div class="wind-buttons">
+            <button type="button" class="btn btn--sm btn--ghost" id="wind-estimate-btn">
+              ✦ 트랙으로 추정
+            </button>
+            <button type="button" class="btn btn--sm btn--ghost" id="wind-clear-btn">
+              초기화
+            </button>
+          </div>
+          <button type="button" class="btn btn--sm btn--primary wind-confirm-btn"
+                  id="wind-confirm-btn">✓ 이 풍향으로 확정</button>
+          <p class="wind-note" id="wind-note">풍향을 설정하고 “확정”하면 택킹·자이빙 분류와 VMG·폴라 분석이 활성화됩니다.</p>
+        </div>
+      </div>
+      <!-- 풍향 추정 소스 비교 (수동·no-go·회전기하·외부날씨) -->
+      <div class="wind-sources" id="wind-sources" hidden></div>
+    </div>
+
+    <!-- 트랙 편집 — 속도 시계열 차트에 양끝 트림·구간 제외 통합. 지도 바로 위에 배치 -->
+    <div class="card card--edit" id="speed-card">
+      <div class="card__head"><h3>트랙 편집</h3>
+        <div class="card__head-right">
+          <span class="card__hint" id="edit-status">원본 전체</span>
+          <div class="time-toggle" id="time-axis-toggle" role="group" aria-label="X축 시간 표기">
+            <button type="button" data-tmode="elapsed" class="is-active">경과 시간</button>
+            <button type="button" data-tmode="clock">실제 시간</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-box chart-box--speed"><canvas id="speed-chart"></canvas></div>
+      <p class="edit-hint">
+        양끝 <b>핸들</b>을 드래그해 워밍업·이동 구간을 잘라내면 남은 트랙이
+        가로 폭을 꽉 채웁니다. 그래프 위를 가로로 드래그하면 <b>제외 구간</b>(휴식·표류
+        등)이 만들어지고, 제외 구간을 누르면 해제됩니다. 편집은 실제 시간을 기준으로
+        하며 즉시 거리·속도·회전 분석에 반영됩니다.
+      </p>
+      <div class="edit-buttons">
+        <button type="button" class="btn btn--sm btn--ghost" id="edit-reset-btn">
+          원본 복원
+        </button>
+        <button type="button" class="btn btn--sm btn--ghost" id="edit-save-btn">
+          ⧉ 편집본 복사 저장
+        </button>
+      </div>
+    </div>
+
+    <!-- 지도 -->
+    <div class="card card--map">
+      <div class="card__head">
+        <h3>GPS 트랙</h3>
+        <div class="card__head-right">
+          <span class="card__hint">색상 = 속도(빨강 느림·초록 빠름) · 마커 = 택킹/자이빙</span>
+          <button type="button" class="btn btn--sm btn--primary" id="replay-btn">
+            ▶ 라이딩 리플레이
+          </button>
+          <button type="button" class="btn btn--sm btn--ghost" id="map-fs-btn">
+            ⛶ 전체화면
+          </button>
+        </div>
+      </div>
+      <div class="map-wrap">
+        <div id="map" class="map"></div>
+        <canvas id="wind-grid" class="wind-grid" aria-hidden="true"></canvas>
+        <div id="wind-arrows" class="wind-arrows" aria-hidden="true"></div>
+      </div>
+      <div class="map-legend" id="map-legend"></div>
+    </div>
+
+    <!-- GPS 트랙 전체화면 오버레이 -->
+    <div id="map-fs" class="map-fs" hidden>
+      <div class="map-fs__bar">
+        <span class="map-fs__title">GPS 트랙 — 전체화면 · 지도/그래프 hover 로 위치 확인</span>
+        <button type="button" class="btn btn--sm btn--ghost" id="map-fs-close">
+          ✕ 닫기 (ESC)
+        </button>
+      </div>
+      <div id="fs-map" class="map-fs__map"></div>
+      <div class="map-fs__chart"><canvas id="fs-speed-chart"></canvas></div>
+    </div>
+
+    <!-- ============ SPEED ANALYSIS ============ -->
+    <div class="section-head section-head--speed">
+      <span class="section-head__no">분석 1</span>
+      <h3>📊 Speed Analysis · 속도 분석</h3>
+    </div>
+
+    <!-- 퍼포먼스 통계 — 핵심 지표 평균·대표 최댓값·대표 최솟값 압축
+         (Njord 'Statistics' 벤치마크 후속 ③-3) -->
+    <div class="card" id="stats-panel-card">
+      <div class="card__head"><h3>퍼포먼스 통계</h3>
+        <span class="card__hint">핵심 지표의 평균 · 대표 최댓값 · 대표 최솟값</span></div>
+      <div id="stats-panel-body"></div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3 id="race-title">오늘의 세션 속도 (노트)</h3>
+        <span class="card__hint">구간별 베스트 속도</span></div>
+      <div class="metric-grid" id="race-metrics"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card__head"><h3>속도 분포</h3>
+          <span class="card__hint">속도 구간별 체류 시간 비율</span></div>
+        <div class="chart-box chart-box--sm"><canvas id="histogram-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card__head"><h3>고속 구간 (Run)</h3>
+          <span class="card__hint" id="runs-hint"></span></div>
+        <div id="runs-list" class="runs-list"></div>
+      </div>
+    </div>
+
+    <!-- ============ MANEUVER ANALYSIS ============ -->
+    <div class="section-head section-head--maneuver">
+      <span class="section-head__no">분석 2</span>
+      <h3>🔄 Maneuver Analysis · 회전(택킹·자이빙) 분석</h3>
+    </div>
+
+    <!-- 택킹/자이빙 집계 -->
+    <div class="card">
+      <div class="card__head"><h3>택킹 / 자이빙 요약</h3></div>
+      <div class="stat-strip stat-strip--inner" id="maneuver-stats"></div>
+      <div class="maneuver-quality" id="maneuver-quality"></div>
+      <div class="bestworst" id="maneuver-bestworst"></div>
+      <div class="maneuver-groups" id="maneuver-groups"></div>
+    </div>
+
+    <!-- 택킹/자이빙 리스트 -->
+    <div class="card">
+      <div class="card__head"><h3>택킹 / 자이빙 목록</h3>
+        <span class="card__hint">행을 누르면 지도 번호·±10초 곡선에 표시</span></div>
+      <div class="mv-list-controls" id="mv-list-controls">
+        <div class="mv-filter" id="mv-filter" role="group" aria-label="회전 종류 필터">
+          <button type="button" data-mvf="all" class="is-active">전체</button>
+          <button type="button" data-mvf="tack">택킹</button>
+          <button type="button" data-mvf="gybe">자이빙</button>
+        </div>
+        <button type="button" class="btn btn--sm btn--ghost" id="mv-detail-toggle" hidden>
+          자세히 ▾
+        </button>
+      </div>
+      <p class="mv-legend" id="mv-legend" hidden></p>
+      <div class="maneuver-table-wrap">
+        <table class="rd-table maneuver-table" id="maneuver-table">
+          <thead><tr id="maneuver-thead-row"></tr></thead>
+          <tbody id="maneuver-tbody"></tbody>
+        </table>
+      </div>
+      <p class="mv-list-note" id="mv-list-note"></p>
+    </div>
+
+    <!-- 회전 ±10초 상세 곡선 (Vantage 스타일 핵심 분석) -->
+    <div class="card">
+      <div class="card__head"><h3 id="maneuver-detail-heading">회전 상세 — ±10초 곡선</h3>
+        <span class="card__hint">여러 회전을 선택하면 겹쳐 그리고 평균선을 표시</span></div>
+      <p id="maneuver-detail-hint" class="empty-note">
+        위 회전 목록 또는 지도에서 회전을 선택하면 정점 ±10초 곡선이 표시됩니다.
+        여러 회전을 선택하면 겹쳐 그리고 평균 곡선을 함께 보여줍니다.
+      </p>
+      <div id="maneuver-detail-hint-actions" class="mv-hint-actions" hidden>
+        <button type="button" class="btn btn--sm btn--ghost" id="mv-select-all-hint">
+          목록의 회전 모두 선택
+        </button>
+      </div>
+      <div id="maneuver-detail-body" hidden>
+        <div id="maneuver-detail-controls" class="mv-detail-controls"></div>
+        <p id="maneuver-detail-title" class="mv-detail-title"></p>
+        <div id="maneuver-detail-metrics" class="mv-detail-metrics"></div>
+        <p id="maneuver-detail-note" class="mv-detail-note" hidden></p>
+        <div id="maneuver-detail-single" class="chart-box chart-box--sm">
+          <canvas id="maneuver-detail-chart"></canvas>
+        </div>
+        <div id="maneuver-detail-split" class="mv-detail-split" hidden>
+          <div class="mv-detail-tile">
+            <p class="mv-detail-tile__cap mv-detail-tile__cap--p" id="maneuver-detail-tile-cap-p">포트 회전</p>
+            <div class="chart-box chart-box--sm">
+              <canvas id="maneuver-detail-chart-p"></canvas>
+            </div>
+          </div>
+          <div class="mv-detail-tile">
+            <p class="mv-detail-tile__cap mv-detail-tile__cap--s" id="maneuver-detail-tile-cap-s">스타보드 회전</p>
+            <div class="chart-box chart-box--sm">
+              <canvas id="maneuver-detail-chart-s"></canvas>
+            </div>
+          </div>
+        </div>
+        <div id="maneuver-detail-legend" class="mv-detail-legend" hidden></div>
+        <div id="maneuver-detail-compare" class="mv-compare" hidden></div>
+        <div id="maneuver-detail-coach" class="mv-coach" hidden></div>
+      </div>
+    </div>
+
+    <!-- 택 분포 (바이올린) — 포트/스타보드 SOG·VMG·TWA -->
+    <div class="card card--violin">
+      <div class="card__head"><h3>택 분포 — 포트 · 스타보드</h3>
+        <span class="card__hint">가운데 축 기준 좌 = 포트(P) · 우 = 스타보드(S)</span></div>
+      <div id="violin-body">
+        <div class="violin-toggles">
+          <div class="violin-toggle" id="violin-wind-toggle"
+               role="group" aria-label="풍상/풍하 선택">
+            <button type="button" data-vwind="upwind" class="is-active">풍상</button>
+            <button type="button" data-vwind="downwind">풍하</button>
+          </div>
+          <div class="violin-toggle" id="violin-metric-toggle"
+               role="group" aria-label="지표 선택">
+            <button type="button" data-vmetric="sog" class="is-active">SOG</button>
+            <button type="button" data-vmetric="vmg">VMG</button>
+            <button type="button" data-vmetric="twa">TWA</button>
+            <button type="button" data-vmetric="heel">Heel</button>
+            <button type="button" data-vmetric="pitch">Pitch</button>
+          </div>
+          <div class="violin-toggle" id="violin-pop-toggle"
+               role="group" aria-label="모집단 선택">
+            <button type="button" data-vpop="all" class="is-active">전체</button>
+            <button type="button" data-vpop="top50">상위 50%</button>
+            <button type="button" data-vpop="top20">상위 20%</button>
+          </div>
+        </div>
+        <div class="violin-wrap"><canvas id="violin-canvas"></canvas></div>
+        <div id="violin-empty" class="violin-empty" hidden></div>
+        <div id="violin-legend" class="violin-legend"></div>
+      </div>
+      <p id="violin-note" class="polar-note"></p>
+    </div>
+
+    <!-- 통합 폴라 · % of target (풍각 폴라 + 타깃 폴라 통합 · 2026-05-23 §A1) -->
+    <div class="card" id="target-polar-card">
+      <div class="card__head"><h3>폴라 다이어그램 · % of target</h3>
+        <span class="card__hint">이번 세션 포트·스타보드(실선) + 개인 베스트 타깃(점선)</span></div>
+      <p id="target-polar-empty" class="empty-note" hidden></p>
+      <div id="target-polar-body" hidden>
+        <div id="target-wind-banner" class="tp-banner" hidden></div>
+        <div class="stat-strip stat-strip--inner" id="target-pct-strip"></div>
+        <div class="polar-wrap">
+          <canvas id="target-polar-canvas"></canvas>
+        </div>
+        <p id="target-polar-note" class="polar-note"></p>
+      </div>
+    </div>
+
+    <!-- ============ HEART RATE ANALYSIS ============ -->
+    <div class="section-head section-head--hr" id="hr-section-head" hidden>
+      <span class="section-head__no">분석 3</span>
+      <h3>❤️ Heart Rate Analysis · 심박수 분석</h3>
+    </div>
+
+    <!-- 심박 요약 + 최대 심박수 입력 -->
+    <div class="card" id="hr-summary-card" hidden>
+      <div class="card__head"><h3>심박수 요약</h3>
+        <span class="card__hint">GPX 트랙에 기록된 포인트별 심박수(bpm)</span></div>
+      <div class="stat-strip stat-strip--inner" id="hr-summary-strip"></div>
+      <div class="hr-maxhr">
+        <label for="hr-maxhr-input">최대 심박수 (bpm)</label>
+        <input type="number" id="hr-maxhr-input" min="100" max="240" step="1"
+               inputmode="numeric" autocomplete="off">
+        <span class="hr-maxhr__note" id="hr-maxhr-note"></span>
+      </div>
+    </div>
+
+    <!-- 분석 3-1 · 세션 중 심박 추이 -->
+    <div class="card" id="hr-trend-card" hidden>
+      <div class="card__head"><h3>세션 중 심박 추이</h3>
+        <div class="card__head-right">
+          <span class="card__hint" id="hr-trend-hint">배경 띠 = 심박 존 · 그래프 클릭 시 지도가 그 시점으로 이동</span>
+          <div class="time-toggle" id="hr-time-axis-toggle" role="group" aria-label="X축 시간 표기">
+            <button type="button" data-tmode="elapsed" class="is-active">경과 시간</button>
+            <button type="button" data-tmode="clock">실제 시간</button>
+          </div>
+          <div class="time-toggle" id="hr-overlay-toggle" role="group" aria-label="속도 오버랩">
+            <button type="button" data-omode="hr" class="is-active">심박만</button>
+            <button type="button" data-omode="overlay">라이딩 오버랩</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="hr-trend-chart"></canvas></div>
+      <p class="hr-trend-note" id="hr-trend-gapnote" hidden></p>
+    </div>
+
+    <!-- 분석 3-2 · 심박 존 분포 -->
+    <div class="card" id="hr-zone-card" hidden>
+      <div class="card__head"><h3>심박 존 분포</h3>
+        <span class="card__hint">각 심박 존에 머문 시간</span></div>
+      <div class="chart-box chart-box--sm"><canvas id="hr-zone-chart"></canvas></div>
+      <div class="hr-zone-legend" id="hr-zone-legend"></div>
+    </div>
+
+    <!-- 분석 3-3 · 퍼포먼스 대비 심박 효율 -->
+    <div class="card" id="hr-eff-card" hidden>
+      <div class="card__head"><h3>퍼포먼스 대비 심박 효율</h3>
+        <span class="card__hint">같은 속도를 더 낮은 심박으로 — 유산소 효율</span></div>
+      <div class="metric-grid" id="hr-eff-metrics"></div>
+      <div class="chart-box chart-box--sm"><canvas id="hr-eff-chart"></canvas></div>
+      <p class="hr-eff-note" id="hr-eff-note"></p>
+    </div>
+
+    <!-- 분석 3-4 · 스킬-심박수 분석 — 회전 전후 심박 반응·회복 -->
+    <div class="card" id="hr-skill-card" hidden>
+      <div class="card__head"><h3>스킬–심박수 분석</h3>
+        <span class="card__hint">택킹·자이빙의 진입 전 → 기술 중 → 완료 후 심박 반응과 회복</span></div>
+      <div class="stat-strip stat-strip--inner" id="hr-skill-strip"></div>
+      <div id="hr-skill-body"></div>
+    </div>
+
+    <!-- ============ Coach Danny 코멘트 (별도 섹션 — 세션 요약/SPS 에서 분리해
+         대시보드 아래쪽으로 이동 · Danny 2026-05-23) ============ -->
+    <div class="section-head section-head--coach">
+      <span class="section-head__no">코칭</span>
+      <h3>💬 Coach Danny 코멘트 · 장비 코칭</h3>
+    </div>
+    <div class="card card--coach" id="coach-card"></div>
+
+    <!-- ============ 저장된 세션 ============ -->
+    <div class="section-head section-head--saved">
+      <span class="section-head__no">기록</span>
+      <h3>📈 저장된 세션 · 시즌 흐름</h3>
+    </div>
+    <div class="card">
+      <div class="card__head"><h3>세션 비교</h3>
+        <button type="button" class="btn btn--sm btn--ghost" id="clear-sessions-btn">전체 삭제</button>
+      </div>
+      <p id="saved-empty" class="saved-empty">
+        아직 저장된 세션이 없습니다. 위에서 <strong>이 세션 저장</strong>을 누르면
+        시즌별 성장 흐름과 개인 베스트가 여기에 쌓입니다.
+      </p>
+      <div id="saved-body" hidden>
+        <!-- 비교 그래프 — 3분리 → 1통합 (Danny 2026-05-23 §C):
+             지표 다중선택 드롭다운 + 막대/선 차트 토글 -->
+        <div class="prog-panel">
+          <div class="prog-controls">
+            <details class="prog-select" id="prog-metric-select">
+              <summary>
+                <span class="prog-select__label">표시 지표</span>
+                <span class="prog-select__summary" id="prog-metric-summary"></span>
+                <span class="prog-select__caret" aria-hidden="true">▾</span>
+              </summary>
+              <div class="prog-select__menu" role="group" aria-label="표시할 지표 선택">
+                <label><input type="checkbox" data-pmetric="avgSpeed" checked> 평균 속도</label>
+                <label><input type="checkbox" data-pmetric="maxSpeed" checked> 최고 속도</label>
+                <label><input type="checkbox" data-pmetric="distance"> 거리</label>
+                <label><input type="checkbox" data-pmetric="time"> 라이딩 시간</label>
+                <label><input type="checkbox" data-pmetric="hrRecovery"> 심박 회복 지수</label>
+              </div>
+            </details>
+            <div class="violin-toggle" id="prog-type-toggle" role="group"
+                 aria-label="차트 종류">
+              <button type="button" data-ptype="line" class="is-active">선</button>
+              <button type="button" data-ptype="bar">막대</button>
+            </div>
+          </div>
+          <div class="chart-box chart-box--sm">
+            <canvas id="progression-chart"></canvas>
+          </div>
+          <p class="prog-empty-note" id="prog-empty-note" hidden>
+            표시할 지표를 1개 이상 선택해 주세요.
+          </p>
+        </div>
+        <div id="personal-bests" class="career"></div>
+        <div class="saved-table-wrap">
+          <table class="rd-table saved-table" id="saved-table">
+            <thead><tr>
+              <th>날짜</th><th>스포츠</th><th>거리</th><th>최고</th>
+              <th>평균</th><th>택킹</th><th>자이빙</th><th></th>
+            </tr></thead>
+            <tbody id="saved-tbody"></tbody>
+          </table>
+        </div>
+        <!-- 세션 목록은 최근 5개만 보이고, 전체보기/접기로 펼치고 접는다 -->
+        <div class="saved-table-more" id="saved-table-more" hidden>
+          <button type="button" class="btn btn--sm btn--ghost"
+                  id="saved-table-toggle"></button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<footer class="app-footer">
+  <p>라이딩 통계 대시보드 — Phase 1 (검증용 MVP) · GPX 클라이언트 사이드 분석</p>
+  <p class="app-footer__sub">데이터는 브라우저에만 저장됩니다 · 단무지 / SailTech</p>
+</footer>
+
+<div id="error-toast" class="toast" hidden role="alert"></div>
+
+<!-- 외부 라이브러리 (cdnjs) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- i18n (언어 토글) — 다른 모듈보다 먼저 로드해 RDI18n.T 가 어디서든 가용
+     캐시 버스터 = en-cleanup-v2-20260526 (nav-auth 동적 드롭다운 + career-tile 보강) -->
+<script src="js/i18n.js?v=en-cleanup-v2-20260526"></script>
+<!-- 분석 엔진 -->
+<script src="js/geo.js"></script>
+<script src="js/gpx-parser.js"></script>
+<script src="js/vkx-parser.js"></script>
+<script src="js/analysis.js"></script>
+<script src="js/storage.js"></script>
+<!-- 차트 디자인 토큰 (단일 소스) — charts.js 보다 먼저 로드 -->
+<script src="js/chart-theme.js"></script>
+<!-- 시각 폴리시 모션 헬퍼 (Danny 2026-05-26 — KPI 카운트업·등장 stagger).
+     charts.js 보다 먼저 로드해 차트 렌더가 끝난 직후 KPI 카운트가 함께 시작. -->
+<script src="js/anim.js"></script>
+<script src="js/charts.js"></script>
+<!-- 라이딩 리플레이 뷰어 (지도·영상 동기 재생) -->
+<script src="js/replay.js"></script>
+<!-- 리프팅 계산기 (물리 모델 — VPS·Coach Danny 레퍼런스) -->
+<script src="../assets/js/lift-calculator.js"></script>
+<!-- Coach Danny 엔진 (VPS · what-if) -->
+<script src="js/coach.js"></script>
+<!-- 샘플 데이터 (file:// 에서도 동작하도록 인라인) -->
+<script src="sample/sample-gpx-data.js"></script>
+<!-- PDF 보고서 생성 — html2pdf.js · Pretendard 는 클릭 시점에 lazy load
+     (초기 페이지 로드 영향 0). (Danny 2026-05-26) -->
+<script src="js/pdf-export.js"></script>
+<!-- 앱 -->
+<script src="js/app.js"></script>
+<!-- 메인 사이트 헤더·내비 동작 (헤더 스크롤·모바일 메뉴·계정 드롭다운) -->
+<script src="../assets/js/main.js"></script>
+<!-- §171-B cart system — auth-shim + cart.js for nav badge (메인과 동일).
+     Danny 2026-05-26. DO_NOT_REVERT §171-B -->
+<script src="../assets/js/supabase-auth.js?v=supabase-187-20260604" defer></script>
+<script src="../assets/js/cart.js" defer></script>
+<script src="../assets/js/nav-auth.js" defer></script>
+</body>
+</html>

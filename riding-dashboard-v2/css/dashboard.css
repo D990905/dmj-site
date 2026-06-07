@@ -1,0 +1,2765 @@
+/* ============================================================
+ * dashboard.css — 라이딩 통계 대시보드 Phase 1
+ * 모바일 우선 · 계산기 라이트 테마 (dmjgroup 곤색 액센트 일관)
+ * ------------------------------------------------------------
+ * 색은 전부 :root 토큰으로 중앙화한다.
+ *   bg-*     : 표면 단계 (앱 → 카드 → 중첩 타일 → 함몰 → 입력)
+ *   text-*   : 글자 단계 (기본 → 보조 → 흐림)
+ *   sea/sun  : 브랜드 액센트, good/bad/warn : 상태색
+ *   *-ink    : 라이트 배경 위에서 쓰는 짙은 상태/액센트 글자색
+ * 팔레트는 계산기(assets/css/style.css)의 :root 토큰과 짝을 이룬다.
+ * 차트·캔버스 색은 js/charts.js 의 THEME 객체와 짝을 이룬다.
+ * ============================================================ */
+:root {
+  /* 브랜드 (계산기 style.css 토큰과 동일) */
+  --navy:#0A2540; --navy-deep:#061A2E;
+  --sea:#1F8FFF;  --sea-deep:#1670CC;
+  --sun:#FFB800;  --sun-deep:#E0A100;
+
+  /* 표면 — 계산기 라이트 테마 elevation */
+  --bg-app:#F5F7FA;      /* 페이지 배경 = 계산기 mist */
+  --bg-card:#FFFFFF;     /* 패널·카드 = 흰색 */
+  --bg-card-2:#F5F7FA;   /* 카드 안 중첩 타일 (stat·metric·dm·pb) */
+  --bg-sunk:#F5F7FA;     /* 드롭존·타임라인·토글 트랙·노트 등 함몰면 */
+  --bg-input:#FFFFFF;    /* 입력칸 = 흰색 (계산기 입력 일관) */
+  --bg-hover:#E5EAF0;    /* hover·강조 */
+
+  /* 선 (계산기 fog/stone) */
+  --border:#C7CFD8;      /* 또렷한 선 — 입력·표 헤더 */
+  --border-soft:#E5EAF0; /* 은은한 선 — 카드 */
+
+  /* 글자 */
+  --text:#0A2540;        /* 기본 = navy */
+  --text-mid:#5C6F7E;    /* 보조 = slate */
+  --text-dim:#6E7C8A;    /* 흐림·캡션 */
+  --on-accent:#FFFFFF;   /* 짙은 액센트(navy) 위 글자 */
+
+  /* 상태·데이터색 — solid fill (막대·마커) */
+  --good:#27AE60; --bad:#C0392B; --warn:#E0A100;
+  /* 상태색 — ink (라이트 배경 위 글자) */
+  --good-ink:#1D6B3A; --bad-ink:#8B2014; --warn-ink:#8A5A00;
+
+  /* 회전 종류색 — fill / ink */
+  --tack:#1F8FFF; --gybe:#EF7D00; --turn:#8295A8;
+  --tack-ink:#1670CC; --gybe-ink:#A85700; --turn-ink:#46586B;
+
+  /* 좌우색 — 포트(P)/스타보드(S). 국제 항해 표준(좌현 홍·우현 녹).
+     좌우 비교 표·차트의 시리즈/정체성 색. js/chart-theme.js SIDE 와 짝.
+     -ink 는 라이트 배경 위 글자용(가독성 보정). */
+  --port:#E12B2B; --starboard:#00A651;
+  --port-ink:#C42121; --starboard-ink:#0B7C44;
+
+  --radius:14px;
+  /* ── shadow 스케일 — 다층 합성으로 깊이감 (Danny 2026-05-26 시각 폴리시)
+     -sm: 미세한 contact shadow (입체감 시작)
+     기본: 평상시 카드 — 1px 라인 + 4px diffuse + 16px ambient
+     hover: lift 시 사용 (translateY -2px 와 짝)
+     -lg: 호버·드롭·토스트 등 적극적 강조 */
+  --shadow-sm:0 1px 2px rgba(10,37,64,.04);
+  --shadow:0 1px 2px rgba(10,37,64,.04),
+           0 2px 8px rgba(10,37,64,.05),
+           0 8px 20px -6px rgba(10,37,64,.06);
+  --shadow-hover:0 1px 2px rgba(10,37,64,.05),
+                 0 6px 16px rgba(10,37,64,.08),
+                 0 16px 32px -8px rgba(10,37,64,.10);
+  --shadow-lg:0 1px 2px rgba(10,37,64,.06),
+              0 10px 24px rgba(10,37,64,.10),
+              0 24px 48px -10px rgba(10,37,64,.18);
+
+  /* ── 트랜지션 — 일관된 easing 한 곳에서 (Danny 2026-05-26 시각 폴리시) */
+  --ease-out:cubic-bezier(.22,.84,.36,1);
+  --t-fast:.14s;
+  --t-base:.22s;
+  --t-slow:.36s;
+
+  /* ── 타입 스케일 — piecemeal 추가로 글자 크기가 산발적으로 흩어지던
+     문제를 막는 한정 단계. 새 섹션·컴포넌트는 아래 토큰만 쓴다
+     (Danny 2026-05-23 디자인 일관성 정리 — report §3-③ 반영). */
+  --fs-section:1.08rem;  /* 섹션 헤더 제목 */
+  --fs-card:1rem;        /* 카드 제목 (h3) */
+  --fs-body:.82rem;      /* 본문·표 셀 기본 */
+  --fs-label:.75rem;     /* 라벨·카드 힌트·캡션 */
+  --fs-foot:.72rem;      /* 풋노트·표 하단 설명·보조 안내 */
+  --fs-micro:.66rem;     /* 배지·태그·표 헤더 보조 라벨 */
+  --fs-th:.72rem;        /* 표 헤더 셀 */
+  /* 지표 숫자 — 5단 (2026-05-26 시각 폴리시: 대형 hero 단계 추가)
+     hero 단계는 첫 인상의 임팩트를 만든다. 모든 숫자 토큰은 짝으로
+     tabular-nums + tight tracking 을 같이 쓴다 (.num-display 헬퍼 참고). */
+  --fs-num-hero:3.0rem;  /* 임팩트 hero — VPS 종합·임팩트 디스플레이 (≈48px) */
+  --fs-num-xl:1.92rem;   /* 대형 KPI — stat-strip 타일·career hero (≈31px) */
+  --fs-num-lg:1.32rem;   /* 대표 지표 타일 값 */
+  --fs-num-md:1.02rem;   /* 표 안 지표값 */
+  --fs-num-sm:.86rem;    /* 작은 지표값 */
+
+  /* ── 간격 스케일 (4px 사다리) — gap·padding 토큰화 */
+  --space-1:4px;  --space-2:8px;  --space-3:11px;
+  --space-4:14px; --space-5:18px; --space-6:24px;
+
+  /* ── radius 스케일 — 카드(14) 아래 중첩 단계 */
+  --radius-md:10px;  /* 중첩 타일 */
+  --radius-sm:8px;   /* 작은 컨트롤·노트·배너 */
+  --radius-xs:6px;   /* 인라인 배지·태그 */
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html { color-scheme:light; }
+html,body { -webkit-text-size-adjust:100%; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo",
+    "Malgun Gothic",system-ui,sans-serif;
+  color:var(--text); background:var(--bg-app); line-height:1.55;
+  word-break:keep-all;
+}
+h1,h2,h3,h4 { line-height:1.3; font-weight:700; color:var(--text); }
+a { color:var(--sea-deep); }
+
+/* 스크롤바 */
+::-webkit-scrollbar { width:11px; height:11px; }
+::-webkit-scrollbar-track { background:var(--bg-app); }
+::-webkit-scrollbar-thumb {
+  background:var(--border); border-radius:7px; border:2px solid var(--bg-app);
+}
+::-webkit-scrollbar-thumb:hover { background:#A6B2BE; }
+
+/* ---------- 헤더 (대시보드 서브헤더 — 메인 사이트 내비 아래에 위치) ---------- */
+/* 메인 site-header 가 sticky 이므로 서브헤더는 static — 두 sticky 가 겹치지 않게 한다. */
+.app-header {
+  position:static;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:10px 16px;
+  background:var(--navy); color:#fff;
+  border-bottom:1px solid var(--navy-deep);
+  box-shadow:0 1px 10px rgba(10,37,64,.18);
+}
+.app-header__brand { display:flex; align-items:center; gap:10px; }
+.app-header__mark { display:flex; }
+.app-header__title { font-size:1.02rem; letter-spacing:-.01em; color:#fff; }
+.app-header__sub { font-size:.72rem; color:rgba(255,255,255,.72); font-weight:500; }
+/* ============================================================
+ * 공용 토글 컨트롤 — 전 대시보드의 세그먼트 토글이 1종 규격을
+ * 공유한다(트랙·버튼·활성 상태 동일). unit-toggle 만 다크 헤더
+ * 위에 있어 색만 따로 둔다 (Danny 검토 2026-05-24 C).
+ * ============================================================ */
+.unit-toggle, .time-toggle, .mv-filter, .violin-toggle {
+  display:flex; background:var(--bg-sunk); border-radius:9px; padding:3px;
+}
+.unit-toggle button, .time-toggle button,
+.mv-filter button, .violin-toggle button {
+  border:0; background:transparent; color:var(--text-mid);
+  font-family:inherit; font-size:.78rem; font-weight:600;
+  padding:5px 12px; border-radius:7px; cursor:pointer;
+  transition:background .14s, color .14s;
+}
+.time-toggle button.is-active, .mv-filter button.is-active,
+.violin-toggle button.is-active { background:var(--navy); color:#fff; }
+/* unit-toggle — 다크 헤더 컨텍스트(밝은 트랙·버튼색) */
+.unit-toggle { background:rgba(255,255,255,.10); }
+.unit-toggle button { color:rgba(255,255,255,.72); }
+.unit-toggle button.is-active { background:#fff; color:var(--navy); }
+
+/* ---------- 레이아웃 ---------- */
+.app-main { max-width:1080px; margin:0 auto; padding:16px 14px 40px; }
+.card {
+  background:var(--bg-card); border-radius:var(--radius);
+  border:1px solid var(--border-soft);
+  box-shadow:var(--shadow); padding:16px; margin-bottom:14px;
+  transition:box-shadow var(--t-base) var(--ease-out),
+             border-color var(--t-fast) var(--ease-out);
+}
+/* hero 카드 — VPS·세션 평균 등 대시보드 첫 화면에서 임팩트 강조.
+   미묘한 위→아래 그라데이션으로 카드 자체에 깊이감을 더한다.
+   본문 카드는 평면 유지(시각적 노이즈 방지). */
+.card--hero {
+  background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFD 100%);
+  border-color:var(--border);
+  box-shadow:var(--shadow-hover);
+}
+.card__head {
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:10px; margin-bottom:12px; flex-wrap:wrap;
+}
+.card__head h3 { font-size:var(--fs-card); }
+.card__hint { font-size:var(--fs-label); color:var(--text-mid); font-weight:500; }
+.grid-2 { display:grid; gap:14px; grid-template-columns:1fr; }
+.empty-note { color:var(--text-dim); font-size:var(--fs-body); padding:14px 4px; text-align:center; }
+
+/* ---------- 버튼 ---------- */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1.5px solid transparent; border-radius:9px; cursor:pointer;
+  font-size:.88rem; font-weight:600; padding:9px 16px; font-family:inherit;
+  transition:background .15s,border-color .15s,transform .05s;
+}
+.btn:active { transform:translateY(1px); }
+.btn--primary { background:var(--navy); color:#fff; }
+.btn--primary:hover { background:var(--navy-deep); }
+.btn--accent { background:var(--sun); color:var(--navy); }
+.btn--accent:hover { background:var(--sun-deep); }
+.btn--ghost { background:var(--bg-card-2); border-color:var(--border); color:var(--text); }
+.btn--ghost:hover { background:var(--bg-hover); border-color:var(--border); }
+.btn--sm { font-size:.78rem; padding:6px 11px; }
+
+/* ---------- 인트로 ---------- */
+.intro { max-width:680px; margin:0 auto; }
+.intro__hero { text-align:center; padding:18px 6px 22px; }
+.intro__hero h2 { font-size:1.5rem; letter-spacing:-.02em; }
+.intro__hero p { margin-top:10px; color:var(--text-mid); font-size:.95rem; }
+.intro__hero strong { color:var(--text); }
+.intro__card {
+  background:var(--bg-card); border-radius:var(--radius);
+  border:1px solid var(--border-soft);
+  box-shadow:var(--shadow); padding:20px;
+}
+.field-label {
+  display:block; font-size:.82rem; font-weight:700; color:var(--text);
+  margin-bottom:9px;
+}
+.sport-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.sport-chip {
+  position:relative; display:inline-flex; align-items:center;
+  border:1.5px solid var(--border); border-radius:999px; padding:8px 14px;
+  font-size:.85rem; font-weight:600; color:var(--text-mid); cursor:pointer;
+  transition:all .14s;
+}
+.sport-chip input { position:absolute; opacity:0; }
+.sport-chip.is-active { border-color:var(--sea); background:rgba(31,143,255,.12); color:var(--text); }
+.sport-chip:hover { border-color:var(--sea); }
+
+.dropzone {
+  margin-top:4px; border:2px dashed var(--border); border-radius:12px;
+  padding:30px 16px; text-align:center; cursor:pointer;
+  background:var(--bg-sunk); transition:border-color .15s,background .15s;
+}
+.dropzone:hover,.dropzone:focus { border-color:var(--sea); background:rgba(31,143,255,.08); outline:none; }
+.dropzone.is-over { border-color:var(--sea); background:rgba(31,143,255,.14); }
+.dropzone__main { font-weight:700; margin-top:8px; font-size:.95rem; color:var(--text); }
+.dropzone__sub { font-size:.8rem; color:var(--text-dim); margin-top:3px; }
+.intro__actions {
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:14px;
+}
+.intro__hint { font-size:.78rem; color:var(--text-dim); }
+
+.intro__guide {
+  background:var(--bg-card); border-radius:var(--radius);
+  border:1px solid var(--border-soft); box-shadow:var(--shadow);
+  margin-top:14px; padding:4px 16px;
+}
+.intro__guide summary {
+  cursor:pointer; font-weight:700; font-size:.9rem; padding:12px 4px; color:var(--text);
+}
+.intro__guide-body { display:grid; gap:12px; padding:4px 4px 14px; }
+.intro__guide-body h4 { font-size:.85rem; color:var(--sea-deep); }
+.intro__guide-body p { font-size:.82rem; color:var(--text-mid); margin-top:3px; }
+.intro__guide-body em { color:var(--text); font-style:normal; font-weight:600; }
+
+.intro__features { list-style:none; margin-top:16px; display:grid; gap:8px; }
+.intro__features li {
+  background:var(--bg-card); border-radius:10px; padding:12px 14px;
+  border:1px solid var(--border-soft);
+  box-shadow:var(--shadow); border-left:3px solid var(--sea);
+}
+.intro__features strong { display:block; font-size:.9rem; color:var(--text); }
+.intro__features span { font-size:.8rem; color:var(--text-mid); }
+.intro__privacy {
+  text-align:center; font-size:.76rem; color:var(--text-dim); margin-top:16px;
+}
+
+/* ---------- 대시보드 헤더 ---------- */
+.dash__head {
+  display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start;
+  justify-content:space-between; margin-bottom:12px;
+}
+.dash__head-info h2 { font-size:1.25rem; letter-spacing:-.01em; }
+
+/* ---------- 편집 가능한 세션 제목 ---------- */
+.session-title-row {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:30px;
+}
+/* 제목 본문 — 클릭하면 편집칸으로 바뀐다 */
+.session-title {
+  cursor:text; border-radius:7px; padding:2px 6px; margin:-2px -6px;
+  transition:background .12s;
+}
+.session-title:hover { background:var(--bg-hover); }
+.session-title:focus-visible { outline:2px solid var(--sea); outline-offset:1px; }
+/* 편집 아이콘 — 제목이 편집 가능함을 알리는 명시적 단서 */
+.session-title-edit {
+  flex:none; width:26px; height:26px; padding:0;
+  border:1px solid var(--border-soft); border-radius:7px;
+  background:var(--bg-card); color:var(--text-mid);
+  font-size:.82rem; line-height:1; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:background .12s, color .12s, border-color .12s;
+}
+.session-title-edit:hover {
+  background:var(--bg-hover); color:var(--text); border-color:var(--border);
+}
+.session-title-edit:focus-visible { outline:2px solid var(--sea); outline-offset:1px; }
+/* 인라인 편집 입력칸 — 제목과 같은 타이포로 자리 흔들림을 줄인다 */
+.session-title-input {
+  font-family:inherit; font-size:1.25rem; font-weight:700;
+  letter-spacing:-.01em; color:var(--text);
+  border:1px solid var(--sea); border-radius:8px;
+  padding:2px 7px; background:var(--bg-input);
+  min-width:min(300px,72vw); max-width:100%;
+}
+.session-title-input:focus { outline:2px solid var(--sea); outline-offset:1px; }
+/* 편집본 상태 배지 — ' · 편집본' 접미사를 대체한다(제목 본문과 분리) */
+.session-badge {
+  flex:none; font-size:.68rem; font-weight:700; letter-spacing:.02em;
+  padding:3px 8px; border-radius:999px;
+  background:rgba(31,143,255,.12); color:var(--sea-deep);
+}
+.dash__head-meta {
+  font-size:.8rem; color:var(--text-mid); margin-top:4px;
+  display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+}
+.dash__head-sep { color:var(--text-dim); }
+.dash__head-source { color:var(--text-mid); }
+.inline-select select {
+  font-family:inherit; font-size:.8rem; border:1px solid var(--border);
+  border-radius:7px; padding:3px 6px; color:var(--text); background:var(--bg-input);
+}
+.inline-select select option { background:var(--bg-card); color:var(--text); }
+.dash__head-actions { display:flex; gap:8px; }
+.save-status { font-size:.82rem; padding:8px 12px; border-radius:8px; margin-bottom:12px; }
+.save-status--ok { background:rgba(39,174,96,.12); color:var(--good-ink); }
+.save-status--err { background:rgba(192,57,43,.10); color:var(--bad-ink); }
+.data-notice {
+  font-size:.82rem; padding:10px 12px; border-radius:8px; margin-bottom:12px;
+  background:rgba(224,161,0,.16); color:var(--warn-ink);
+}
+
+/* ---------- 스탯 스트립 ---------- */
+.stat-strip {
+  display:grid; gap:10px; margin-bottom:14px;
+  grid-template-columns:repeat(2,1fr);
+}
+/* 회전 요약 타일 줄 — 타일 수에 맞춰 자동으로 칸을 채운다(auto-fit).
+   타일 5개(전체·택킹 횟수·택킹 성공률·자이빙 횟수·자이빙 성공률)는 한 줄,
+   풍향 미설정 시 2개도 빈 칸 없이 균등하게 찬다. 두 클래스 선택자로
+   .stat-strip 미디어쿼리 규칙보다 우선순위를 확보한다. */
+.stat-strip.stat-strip--inner {
+  margin-bottom:14px;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+}
+/* 헤드라인 숫자 타일 — 라벨·값·보조를 모두 가운데 정렬로 통일
+   (Danny 2026-05-23: .metric 타일과 정렬 일치).
+   2026-05-26 시각 폴리시: 값(value) 폰트를 hero 단계로 확대, tabular-nums
+   고정으로 정렬 노이즈 제거, hover 시 미세 lift + shadow 강화. */
+.stat {
+  background:var(--bg-card); border-radius:12px; box-shadow:var(--shadow);
+  border:1px solid var(--border-soft);
+  padding:14px 14px 13px; display:flex; flex-direction:column; gap:4px;
+  text-align:center;
+  transition:box-shadow var(--t-base) var(--ease-out),
+             transform var(--t-base) var(--ease-out),
+             border-color var(--t-fast) var(--ease-out);
+}
+.stat:hover { transform:translateY(-2px); box-shadow:var(--shadow-hover); }
+.stat-strip--inner .stat {
+  background:var(--bg-card-2); box-shadow:none; border-color:var(--border-soft);
+}
+.stat-strip--inner .stat:hover {
+  background:var(--bg-card); box-shadow:var(--shadow);
+  transform:translateY(-1px);
+}
+.stat__label {
+  font-size:var(--fs-label); color:var(--text-mid); font-weight:600;
+  letter-spacing:.01em;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; flex-wrap:wrap;
+}
+.stat__value {
+  font-size:var(--fs-num-xl); font-weight:800; letter-spacing:-.025em;
+  color:var(--text); line-height:1.05;
+  font-variant-numeric:tabular-nums;
+}
+.stat-strip--inner .stat__value { font-size:var(--fs-num-lg); }
+.stat__sub {
+  font-size:var(--fs-foot); color:var(--text-dim);
+  font-variant-numeric:tabular-nums;
+}
+/* Sparkline — KPI 타일 하단 미니 그라데이션 영역 차트 (Layer 1.5).
+   mockup 의 Customers Overview · Monthly sales 카드 패턴.
+   stat 타일이 sparkline 을 가진 경우만 표시. */
+.stat__spark {
+  display:block; width:100%; height:32px; margin-top:8px;
+  margin-bottom:-2px;
+  overflow:visible;
+}
+/* 트렌드 chip — KPI 라벨 옆 또는 보조 텍스트 옆에 작게.
+   ▲ +12% / ▼ −5% / = 0 — 부호로 톤 자동 결정. */
+.rd-chip {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:.62rem; font-weight:800; letter-spacing:.02em;
+  padding:2px 7px; border-radius:999px;
+  white-space:nowrap; line-height:1.3;
+  font-variant-numeric:tabular-nums;
+  background:var(--bg-sunk); color:var(--text-mid);
+}
+.rd-chip small {
+  font-size:.92em; font-weight:600; color:var(--text-dim);
+  margin-left:2px;
+}
+.rd-chip--up { background:rgba(39,174,96,.14); color:var(--good-ink); }
+.rd-chip--down { background:rgba(192,57,43,.12); color:var(--bad-ink); }
+.rd-chip--flat { background:var(--bg-hover); color:var(--text-mid); }
+/* dir override — '좋고 나쁨' 의미가 뒤집힌 지표(예: 이동시간 ↓ 가 좋음) */
+.rd-chip--good { background:rgba(39,174,96,.14); color:var(--good-ink); }
+.rd-chip--bad  { background:rgba(192,57,43,.12); color:var(--bad-ink); }
+
+/* stat 타일 — 미니 도넛 + 숫자 split 레이아웃 (Layer 1.5).
+   택킹/자이빙 성공률 등 % 지표용. */
+.stat--with-donut { padding-top:14px; }
+.stat__donutrow {
+  display:flex; align-items:center; justify-content:center;
+  gap:12px; margin-top:6px;
+}
+.stat__donutmeta {
+  display:flex; flex-direction:column; align-items:flex-start;
+  text-align:left; gap:2px;
+}
+.stat__value--donut { font-size:var(--fs-num-lg); line-height:1; }
+
+/* ============================================================
+ * Layer 2.0 — 일관성 정리 패스 (Danny 2026-05-26)
+ * ------------------------------------------------------------
+ * 흩어진 typography·색·여백을 *덧칠 없이 통일*. 이 블록은 dashboard.css
+ * 끝에 두어 위쪽의 ad-hoc 선언을 모두 오버라이드한다.
+ *
+ * 1) value 노드는 4 사이즈만 — hero / xl / lg / md.
+ * 2) value 노드는 weight 800 + tracking -0.025em + tabular-nums + line-height 1.05 강제.
+ * 3) value 줄바꿈 금지 — white-space:nowrap (라벨에 단위 명시 가정).
+ * 4) 라벨·캡션은 3 사이즈만 — label / foot / micro.
+ *
+ * 리플레이 뷰어(.replay) 는 다크 전용 스코프라 이 블록 영향 X
+ * (선택자에서 .replay scope 미포함).
+ * ============================================================ */
+
+/* (1) 값 노드 공통 스타일 — 단일 mixin 효과. 사이즈는 별도 규칙으로. */
+.stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v,
+.stats-val,
+.vps-tile__score,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time {
+  font-weight:800;
+  letter-spacing:-.025em;
+  line-height:1.05;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
+/* (2) 사이즈 4 버킷 강제 */
+/* hero — VPS Overall 도넛 중앙 점수 (한 곳만) */
+.vps-tile--main .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-hero); }
+/* xl — 첫 인상 KPI (summary-strip 의 stat__value) */
+.stat-strip > .stat > .stat__value { font-size:var(--fs-num-xl); }
+.vps-tile .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-xl); }
+/* lg — 본문 KPI · 모든 보조 value 노드 */
+.stat-strip--inner > .stat > .stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v {
+  font-size:var(--fs-num-lg);
+}
+/* md — 표·인라인 value */
+.stats-val,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time {
+  font-size:var(--fs-num-md);
+}
+
+/* (3) max 라벨(/ 100) — VPS 도넛 max 텍스트 통일 */
+.vps-tile__max,
+.vps-tile__donutctr .vps-tile__max {
+  font-size:var(--fs-micro);
+  font-weight:700; color:var(--text-dim);
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+
+/* (4) NA score — 사이즈는 동일하게 (작아지지 않게) */
+.vps-score--na { font-size:inherit !important; }
+
+/* (5) 카드 제목 1 사이즈 */
+.card__head h3 { font-size:var(--fs-card); }
+/* (6) 라벨·캡션 3 사이즈만 */
+.stat__label, .metric__label, .career-tile__label,
+.dm__l, .savg-k, .wsrc__label, .vps-tile__label {
+  font-size:var(--fs-label);
+  font-weight:600;
+  color:var(--text-mid);
+  letter-spacing:0;
+}
+.stat__sub, .career-tile__sub, .wsrc-rec__note, .wsrc__note,
+.vps-tile__note {
+  font-size:var(--fs-foot);
+  color:var(--text-dim);
+  font-weight:500;
+}
+/* card hint·foot 통일 */
+.card__hint, .stats-note, .vps-foot, .mvc-foot, .mg-foot,
+.hr-eff-note, .hr-trend-note, .mv-list-note, .polar-note,
+.edit-hint {
+  font-size:var(--fs-foot);
+  color:var(--text-mid);
+  line-height:1.55;
+}
+/* badge·micro 단계 */
+.section-head__no, .card__hint b, .stats-dir, .mv-badge,
+.session-badge, .row-tag, .sweep-tag, .stats-unsplit-tier {
+  font-size:var(--fs-micro);
+}
+
+
+/* ---------- 섹션 헤더 ---------- */
+.section-head {
+  display:flex; align-items:center; gap:10px; margin:24px 2px 12px;
+  position:relative;
+}
+.section-head__no {
+  background:var(--navy); color:#fff; font-size:var(--fs-micro); font-weight:700;
+  padding:4px 9px; border-radius:var(--radius-xs); letter-spacing:.02em;
+}
+.section-head h3 { font-size:var(--fs-section); letter-spacing:-.01em; }
+
+/* Layer 1.5 — 섹션별 색 정체성 (Danny 2026-05-26)
+   섹션 헤더 배지에 톤 색을 부여해 Speed / Maneuver / HR / Coach 가
+   각자 다른 chapter 임을 즉시 인식한다. mockup 의 페이지 컬러 다양성.
+   배지 색만 바꿀 뿐, 카드 본체는 그대로 — 시각 정보 변별력만 ↑. */
+.section-head--speed .section-head__no {
+  background:linear-gradient(135deg, #1F8FFF 0%, #1670CC 100%);
+}
+.section-head--maneuver .section-head__no {
+  background:linear-gradient(135deg, #EF7D00 0%, #C26800 100%);
+}
+.section-head--hr .section-head__no {
+  background:linear-gradient(135deg, #E14B5C 0%, #B5263F 100%);
+}
+.section-head--coach .section-head__no {
+  background:linear-gradient(135deg, #7A5FA8 0%, #5A3F88 100%);
+}
+.section-head--saved .section-head__no {
+  background:linear-gradient(135deg, #1FB6B6 0%, #128585 100%);
+}
+.section-head--summary .section-head__no {
+  background:linear-gradient(135deg, #0A2540 0%, #061A2E 100%);
+}
+/* 섹션 본문을 둘러싸는 zone wrapper — 옅은 파스텔 배경 + 좌측 색 띠.
+   섹션 헤더 + 그 뒤의 카드들을 묶어 시각적 chapter 로 인식. */
+.rd-zone {
+  position:relative;
+  margin:0 -2px 4px;
+  padding:6px 14px 2px 18px;
+  border-radius:14px;
+}
+.rd-zone--speed { background:linear-gradient(180deg, rgba(31,143,255,.05), rgba(31,143,255,0) 70%); }
+.rd-zone--maneuver { background:linear-gradient(180deg, rgba(239,125,0,.05), rgba(239,125,0,0) 70%); }
+.rd-zone--hr { background:linear-gradient(180deg, rgba(225,75,92,.05), rgba(225,75,92,0) 70%); }
+.rd-zone--coach { background:linear-gradient(180deg, rgba(122,95,168,.05), rgba(122,95,168,0) 70%); }
+.rd-zone--saved { background:linear-gradient(180deg, rgba(31,182,182,.05), rgba(31,182,182,0) 70%); }
+.rd-zone::before {
+  content:''; position:absolute; left:4px; top:30px; bottom:14px;
+  width:3px; border-radius:3px;
+  background:currentColor; opacity:.32;
+  pointer-events:none;
+}
+.rd-zone--speed::before    { color:#1F8FFF; }
+.rd-zone--maneuver::before { color:#EF7D00; }
+.rd-zone--hr::before       { color:#E14B5C; }
+.rd-zone--coach::before    { color:#7A5FA8; }
+.rd-zone--saved::before    { color:#1FB6B6; }
+/* zone 안 section-head 와 카드 보정 — zone 내부 패딩과 어울리게 */
+.rd-zone .section-head { margin-top:14px; margin-left:0; }
+.rd-zone .card:last-of-type { margin-bottom:8px; }
+
+/* ---------- 트랙 편집 (속도 시계열 통합 위젯) ---------- */
+.edit-hint {
+  font-size:.75rem; color:var(--text-mid); line-height:1.5; margin-top:12px;
+}
+.edit-hint b { color:var(--text); }
+.edit-buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+#edit-status { font-weight:600; }
+#edit-status.is-edited { color:var(--warn-ink); }
+
+/* 차트 crosshair 오버레이 */
+.rd-crosshair { z-index:5; }
+/* 지도 커서 마커 tooltip */
+.leaflet-tooltip.rd-cursor-tip {
+  background:var(--navy); color:#fff; border:0; font-size:.72rem;
+  font-weight:600; padding:3px 7px; box-shadow:0 1px 6px rgba(10,37,64,.3);
+}
+.leaflet-tooltip.rd-cursor-tip::before { border-top-color:var(--navy); }
+
+/* ---------- 지도 ---------- */
+.card__head-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.card--map { padding:16px 16px 12px; }
+
+/* GPS 트랙 전체화면 */
+.map-fs {
+  position:fixed; inset:0; z-index:4000; background:var(--bg-app);
+  display:flex; flex-direction:column;
+}
+.map-fs[hidden] { display:none; }   /* hidden 속성이 display:flex 에 무력화되지 않도록 */
+.map-fs__bar {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; padding:8px 14px; background:var(--navy); color:#fff;
+  border-bottom:1px solid var(--navy-deep);
+}
+.map-fs__title { font-weight:700; font-size:.9rem; }
+.map-fs__bar .btn--ghost { background:rgba(255,255,255,.14); border-color:transparent; color:#fff; }
+.map-fs__map { flex:1; min-height:0; }
+.map-fs__chart {
+  height:160px; background:var(--bg-card); padding:8px 12px 4px;
+  position:relative; flex:0 0 auto;
+}
+.map-wrap { position:relative; }
+.map {
+  height:330px; border-radius:10px; overflow:hidden; background:var(--border-soft);
+  z-index:1;
+}
+/* 풍향 모눈종이 그리드 오버레이 — 흰 그리드가 풍향과 함께 회전(±45°
+   클로즈홀드 택 방향에 고정)하고, 정렬 시 반짝(glint)인다. 캔버스로
+   그리며 pointer-events:none 라 지도 조작을 가리지 않는다.
+   canvas 는 치환 요소(replaced element)라 inset:0 만으로는 늘어나지
+   않고 고유 크기(300×150)로 좌상단에 박힌다 — width/height:100% 를
+   명시해 지도 전체를 덮게 한다(#violin-canvas 와 같은 이유). */
+.wind-grid {
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; border-radius:10px;
+  z-index:15;   /* 지도(z-index:1) 위·화살표(20) 아래 */
+}
+/* 풍향 화살표 격자 오버레이 (Vantage 스타일) */
+.wind-arrows {
+  position:absolute; inset:0; pointer-events:none; border-radius:10px; overflow:hidden;
+  z-index:20;   /* Leaflet 컨테이너(z-index:1) 위에 오도록 */
+  display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(4,1fr);
+  place-items:center; opacity:0; transition:opacity .25s;
+}
+.wind-arrows.is-on { opacity:.55; }
+.wa { transform:rotate(var(--wind-rot,180deg)); transition:transform .12s ease; }
+.wa svg { display:block; filter:drop-shadow(0 1px 1px rgba(255,255,255,.85)); }
+/* 지도 속도 범례 — 연속 색 스케일(그라데이션 바). 범례 텍스트는
+   공용 규격(11px·text-mid)을 따른다 (Danny 검토 2026-05-24 C). */
+.map-legend {
+  display:flex; align-items:center; gap:8px; margin-top:10px;
+  font-size:11px; color:var(--text-mid);
+}
+.map-legend__bar { flex:1; height:8px; border-radius:4px; }
+
+/* ---------- 차트 ---------- */
+/* .time-toggle 스타일은 위 '공용 토글 컨트롤' 블록에서 일괄 정의한다. */
+.chart-box { position:relative; height:300px; }
+.chart-box--sm { height:240px; }
+/* 속도 시계열 — 트랙 편집 통합 위젯. 상하 높이를 낮춰 컴팩트하게 */
+.chart-box--speed { height:220px; }
+
+/* ---------- 워터스포츠 지표 ---------- */
+.metric-grid {
+  display:grid; gap:10px;
+  grid-template-columns:repeat(auto-fit,minmax(96px,1fr));
+}
+.metric {
+  background:var(--bg-card-2); border-radius:10px; padding:12px 8px;
+  text-align:center; display:flex; flex-direction:column; gap:1px;
+  border:1px solid transparent;
+  transition:background var(--t-fast) var(--ease-out),
+             border-color var(--t-fast) var(--ease-out),
+             transform var(--t-base) var(--ease-out),
+             box-shadow var(--t-base) var(--ease-out);
+}
+.metric:hover {
+  background:var(--bg-card); border-color:var(--border-soft);
+  box-shadow:var(--shadow); transform:translateY(-1px);
+}
+.metric__val {
+  font-size:var(--fs-num-lg); font-weight:800; color:var(--text);
+  letter-spacing:-.025em; line-height:1.1;
+  font-variant-numeric:tabular-nums;
+}
+.metric__unit { font-size:var(--fs-micro); color:var(--text-dim); font-weight:600; }
+.metric__label { font-size:var(--fs-foot); color:var(--text-mid); margin-top:3px; }
+
+/* ---------- 심박수 분석 ---------- */
+.hr-maxhr {
+  margin-top:14px; display:flex; flex-wrap:wrap; align-items:center;
+  gap:8px 11px; background:var(--bg-sunk);
+  border:1px solid var(--border-soft); border-radius:10px; padding:11px 13px;
+}
+.hr-maxhr label { font-size:.78rem; font-weight:700; color:var(--text); }
+.hr-maxhr input {
+  width:96px; font-family:inherit; font-size:.9rem; font-weight:600;
+  border:1.5px solid var(--border); border-radius:8px; padding:7px 9px;
+  color:var(--text); background:var(--bg-input);
+}
+.hr-maxhr input:focus { outline:none; border-color:var(--sea); }
+.hr-maxhr__note { font-size:.74rem; color:var(--text-mid); flex:1 1 220px; line-height:1.5; }
+
+.hr-zone-legend { display:grid; gap:7px; margin-top:13px; }
+.hr-zone-row {
+  display:flex; flex-wrap:wrap; align-items:center; gap:6px 9px;
+  background:var(--bg-card-2); border:1px solid var(--border-soft);
+  border-radius:9px; padding:8px 11px;
+}
+/* 심박 존 범례 스왓치 — 공용 범례 스왓치 규격 12×12·radius 2px */
+.hr-zone-row__sw { width:12px; height:12px; border-radius:2px; flex:none; }
+.hr-zone-row__name { font-weight:700; font-size:.83rem; color:var(--text); flex:none; }
+.hr-zone-row__range {
+  font-size:.75rem; color:var(--text-mid); flex:none;
+  font-variant-numeric:tabular-nums;
+}
+.hr-zone-row__desc { font-size:.74rem; color:var(--text-dim); flex:1 1 150px; }
+.hr-zone-row__time {
+  font-size:.82rem; font-weight:800; color:var(--text); flex:none;
+  font-variant-numeric:tabular-nums; margin-left:auto;
+}
+.hr-zone-row__pct { font-size:.74rem; color:var(--text-mid); flex:none; }
+.hr-eff-note {
+  font-size:var(--fs-foot); color:var(--text-mid); line-height:1.6; margin-top:11px;
+}
+/* 심박 추이 — 기록 공백 안내 (Danny 2026-05-23 §D) */
+.hr-trend-note {
+  font-size:var(--fs-foot); color:var(--text-mid); line-height:1.6; margin-top:9px;
+}
+.hr-trend-note[hidden] { display:none; }
+
+/* ---------- 고속 구간 ---------- */
+.runs-list { display:flex; flex-direction:column; gap:7px; }
+.run-row {
+  display:flex; align-items:center; gap:10px;
+  background:var(--bg-card-2); border-radius:9px; padding:9px 11px;
+  border:1.5px solid transparent;
+}
+.run-row--clickable { cursor:pointer; transition:background .12s, border-color .12s; }
+.run-row--clickable:hover { background:var(--bg-hover); border-color:var(--border); }
+.run-row--clickable:focus-visible { outline:2px solid var(--sea); outline-offset:1px; }
+.run-row--selected,
+.run-row--selected.run-row--clickable:hover {
+  background:rgba(31,143,255,.12); border-color:var(--sea);
+}
+.run-row--selected .run-row__rank { background:var(--sea); }
+.run-row__rank {
+  width:22px; height:22px; flex:0 0 22px; border-radius:50%;
+  background:var(--navy); color:#fff; font-size:.74rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+.run-row__main { flex:1; font-size:.86rem; color:var(--text); }
+.run-row__main strong { font-size:.95rem; }
+.run-row__sub { color:var(--text-mid); font-size:.76rem; }
+.run-row__hr { color:var(--bad-ink); font-weight:700; white-space:nowrap; }
+.run-row__meta { font-size:.74rem; color:var(--text-mid); text-align:right; }
+
+/* ---------- 풍향 ---------- */
+.wind-controls { display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start; }
+.wind-dial-wrap { text-align:center; }
+#wind-dial { cursor:pointer; }
+.wind-dial__n { font-size:11px; font-weight:800; fill:var(--text); }
+.wind-dial__d { font-size:9px; font-weight:600; fill:var(--text-mid); }
+.wind-dial__caption { font-size:.7rem; color:var(--text-dim); margin-top:3px; max-width:150px; line-height:1.4; }
+.wind-dial__readout { font-size:.9rem; font-weight:800; color:var(--text); margin-top:5px; }
+.wind-dial__readout.is-pending { color:var(--warn-ink); }
+.wind-confirm-btn { width:100%; margin-top:2px; }
+.wind-confirm-btn:disabled { opacity:.45; cursor:default; }
+.wind-fields { flex:1; min-width:210px; display:flex; flex-direction:column; gap:12px; }
+.wind-field { display:flex; flex-direction:column; gap:5px; }
+.wind-field label { font-size:.76rem; font-weight:700; color:var(--text); }
+.wind-field input[type=number] {
+  font-family:inherit; font-size:.95rem; border:1.5px solid var(--border);
+  border-radius:8px; padding:8px 10px; width:100%;
+  color:var(--text); background:var(--bg-input);
+}
+.wind-field input[type=number]:focus { outline:none; border-color:var(--sea); }
+.wind-field input[type=range] { width:100%; accent-color:var(--sea); }
+input::placeholder { color:var(--text-dim); }
+.wind-buttons { display:flex; gap:8px; }
+.wind-note {
+  font-size:.78rem; color:var(--text-mid); background:var(--bg-sunk);
+  border:1px solid var(--border-soft); border-radius:8px; padding:9px 11px;
+}
+
+/* ---------- 풍향 추정 소스 비교 ---------- */
+.wind-sources {
+  margin-top:16px; padding-top:15px;
+  border-top:1px solid var(--border-soft);
+  display:flex; flex-direction:column; gap:10px;
+}
+.wind-sources[hidden] { display:none; }
+.wsrc-head { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.wsrc-head h4 { font-size:.9rem; font-weight:800; color:var(--text); }
+.wsrc-head__hint { font-size:.72rem; color:var(--text-dim); }
+/* 소스 목록 접기/펴기 토글 */
+.wsrc-toggle {
+  margin-left:auto; font-family:inherit; font-size:.74rem; font-weight:700;
+  color:var(--sea-deep); background:var(--bg-card-2);
+  border:1px solid var(--border); border-radius:999px; padding:4px 11px;
+  cursor:pointer; transition:background .12s;
+}
+.wsrc-toggle:hover { background:var(--bg-hover); }
+.wsrc-toggle:focus-visible { outline:2px solid var(--sea); outline-offset:1px; }
+.wind-sources--collapsed .wsrc-list { display:none; }
+
+/* 권장 배너 — 두 독립 추정의 교차검증 결과 */
+.wsrc-rec {
+  border-radius:10px; padding:10px 12px;
+  display:flex; flex-direction:column; gap:5px;
+  border:1px solid var(--border-soft); background:var(--bg-card-2);
+}
+.wsrc-rec--high { border-color:rgba(39,174,96,.45); background:rgba(39,174,96,.08); }
+.wsrc-rec--mid  { border-color:rgba(224,161,0,.45); background:rgba(224,161,0,.09); }
+.wsrc-rec--low,
+.wsrc-rec--none { border-color:var(--border); background:var(--bg-sunk); }
+.wsrc-rec--set  { border-color:rgba(31,143,255,.45); background:rgba(31,143,255,.08); }
+.wsrc-rec__body { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.wsrc-rec__tag {
+  font-size:.68rem; font-weight:800; color:var(--on-accent);
+  background:var(--navy); border-radius:5px; padding:2px 7px;
+}
+.wsrc-rec__val { font-size:1.05rem; font-weight:800; color:var(--text); }
+.wsrc-rec__note { font-size:.74rem; color:var(--text-mid); line-height:1.5; }
+.wsrc-rec__body .btn { margin-left:auto; }
+
+/* 소스 목록 — 수동 · no-go · 회전기하 · 외부날씨 */
+.wsrc-list { display:flex; flex-direction:column; gap:7px; }
+.wsrc {
+  border:1px solid var(--border-soft); border-radius:9px;
+  padding:8px 11px; background:var(--bg-card);
+}
+.wsrc__row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.wsrc__label { font-size:.8rem; font-weight:700; color:var(--text); }
+.wsrc__val { font-size:.9rem; font-weight:800; color:var(--text); }
+.wsrc__val small { font-size:.72rem; font-weight:600; color:var(--text-mid); }
+.wsrc__none { color:var(--text-dim); font-weight:700; }
+.wsrc__row .btn { margin-left:auto; }
+.wsrc__note { font-size:.72rem; color:var(--text-mid); line-height:1.5; margin-top:4px; }
+.wsrc__detail { color:var(--text-dim); }
+.wsrc--na { background:var(--bg-sunk); }
+.wsrc--na .wsrc__label { color:var(--text-mid); }
+.wsrc--soon { background:var(--bg-sunk); border-style:dashed; }
+.wsrc--soon .wsrc__label { color:var(--text-dim); }
+
+/* 신뢰도 칩 */
+.wsrc__conf {
+  font-size:.68rem; font-weight:800; border-radius:999px;
+  padding:2px 8px; white-space:nowrap;
+}
+.wsrc__conf--high { color:var(--good-ink); background:rgba(39,174,96,.14); }
+.wsrc__conf--mid  { color:var(--warn-ink); background:rgba(224,161,0,.16); }
+.wsrc__conf--low  { color:var(--text-mid); background:var(--bg-hover); }
+.wsrc__conf--set  { color:var(--sea-deep); background:rgba(31,143,255,.14); }
+
+/* ---------- 베스트/워스트 ---------- */
+.bestworst { display:grid; gap:10px; grid-template-columns:1fr; }
+/* 콜아웃 카드 — 한 줄 가로 배치(좁으면 최대 2줄). 좌측 클러스터(라벨 +
+   #번호 + 유형 배지)와 우측 클러스터(메트릭)를 좌우로 펼쳐 우측 공백을
+   없앤다. 택킹·자이빙 두 카드 동일 규격 (Danny 검토 2026-05-24). */
+.bw-card {
+  text-align:left; border:0; cursor:pointer; font-family:inherit;
+  border-radius:11px; padding:11px 14px;
+  display:flex; flex-flow:row wrap; align-items:center;
+  justify-content:space-between; gap:6px 14px;
+}
+.bw-card--good { background:rgba(39,174,96,.10); }
+.bw-card--bad { background:rgba(192,57,43,.09); }
+/* 좌측 클러스터 — 라벨 + #번호 + 배지를 한 줄에 */
+.bw-card__lead {
+  display:flex; align-items:center; flex-wrap:wrap; gap:7px; min-width:0;
+}
+.bw-card__title { font-size:.74rem; font-weight:700; color:var(--text-mid); }
+.bw-card--good .bw-card__title { color:var(--good-ink); }
+.bw-card--bad .bw-card__title { color:var(--bad-ink); }
+.bw-card__head { font-size:1rem; font-weight:800; color:var(--text); }
+/* 우측 클러스터 — 메트릭. 한 줄이면 카드 우측 끝, 줄바꿈 시 그 줄 우측 */
+.bw-card__metrics {
+  font-size:.8rem; color:var(--text-mid); margin-left:auto; text-align:right;
+}
+
+/* ---------- 회전 배지 ---------- */
+.mv-badge {
+  display:inline-block; font-size:.72rem; font-weight:700;
+  padding:2px 8px; border-radius:999px;
+}
+.mv-badge--tack { background:rgba(31,143,255,.14); color:var(--tack-ink); }
+.mv-badge--gybe { background:rgba(239,125,0,.16); color:var(--gybe-ink); }
+.mv-badge--turn { background:rgba(130,149,168,.22); color:var(--turn-ink); }
+
+/* ---------- 회전 테이블 ---------- */
+.maneuver-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+/* ============================================================
+ * 공용 표 스타일 — 대시보드의 모든 HTML 표가 .rd-table 한 클래스로
+ * 동일한 룩앤필을 공유한다. 레퍼런스 = 퍼포먼스 통계 표(Speed
+ * Analysis). 컬럼 구조는 표마다 다르므로 그대로 두되, 헤더·격자선·
+ * 숫자 타이포·정렬·여백·그룹/소계 행 강조는 여기서 한 번만 정의한다.
+ * 표별 고유 규칙(컬럼 색·배지·행 동작)만 각 표 클래스에 남긴다.
+ * 차트 디자인 시스템(chart-theme.js)처럼 표도 한 곳에서 관리해
+ * 앞으로 흐트러지지 않게 한다 (Danny 검토 2026-05-24 A).
+ * ============================================================ */
+.rd-table { width:100%; border-collapse:collapse; font-size:var(--fs-body); }
+/* 헤더 — 2px 밑줄 + 보조 라벨(small) */
+.rd-table thead th {
+  font-size:var(--fs-th); color:var(--text-mid); font-weight:700;
+  text-align:center; vertical-align:bottom; white-space:nowrap;
+  padding:var(--space-2) var(--space-3); border-bottom:2px solid var(--border);
+}
+.rd-table thead th small {
+  display:block; margin-top:2px; font-size:var(--fs-micro);
+  font-weight:600; color:var(--text-dim);
+}
+/* 본문 셀 — 1px 격자선 · 숫자 tabular · 데이터 셀 전부 가운데 정렬
+   (Danny 검토 2026-05-24 — 전 표 데이터 셀 가운데 정렬). */
+.rd-table td, .rd-table tbody th {
+  padding:var(--space-2) var(--space-3); text-align:center;
+  border-bottom:1px solid var(--border-soft);
+  white-space:nowrap; color:var(--text); font-variant-numeric:tabular-nums;
+}
+.rd-table tbody tr:last-child td,
+.rd-table tbody tr:last-child th { border-bottom:0; }
+/* 종류(rowspan 그룹) 셀 — 세로 가운데 정렬 */
+.rd-table td.rd-grp { vertical-align:middle; font-weight:700; }
+/* 값 셀 안 작은 보조 표기(±표준편차·표본수 등) — 전 표 공통 */
+.rd-table .stats-val small {
+  font-size:var(--fs-micro); font-weight:600; color:var(--text-dim);
+}
+/* 그룹 시작 행 — 굵은 윗선 (표별 레거시 클래스를 공용 룩앤필로 통일) */
+.rd-table tr.stats-row--group td,
+.rd-table tr.mg-row--head td { border-top:2px solid var(--border); }
+.rd-table tr.stats-row--group:first-child td,
+.rd-table tr.mg-row--head:first-child td { border-top:0; }
+/* 소계·합산(종합) 행 — 함몰 배경 + 굵은 윗선 */
+.rd-table tr.skillhr-row--all td,
+.rd-table tr.mg-row--all td,
+.rd-table tr.mvc-row--dps td,
+.rd-table tr.mvc-row--dps th {
+  background:var(--bg-sunk); border-top:2px solid var(--border);
+}
+.maneuver-table tbody tr { cursor:pointer; transition:background .12s; }
+.maneuver-table tbody tr:hover { background:rgba(10,37,64,.04); }
+.maneuver-table tbody tr.is-selected { background:rgba(31,143,255,.12); }
+.eff {
+  display:inline-block; min-width:30px; padding:2px 7px; border-radius:6px;
+  font-weight:800; font-size:.78rem;
+}
+.eff--hi { background:rgba(39,174,96,.14); color:var(--good-ink); }
+.eff--mid { background:rgba(224,161,0,.20); color:var(--warn-ink); }
+.eff--lo { background:rgba(192,57,43,.12); color:var(--bad-ink); }
+.row-tag {
+  font-size:.64rem; font-weight:700; padding:1px 6px; border-radius:5px;
+}
+.row-tag--good { background:rgba(39,174,96,.14); color:var(--good-ink); }
+.row-tag--bad { background:rgba(192,57,43,.12); color:var(--bad-ink); }
+
+/* ---------- 택킹/자이빙 목록 필터 ---------- */
+.mv-list-controls {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:10px; margin-bottom:10px; flex-wrap:wrap;
+}
+/* hidden 속성이 display:flex 에 무력화되지 않도록 (풍향 미설정 시 숨김) */
+.mv-list-controls[hidden] { display:none; }
+/* 풍향 미설정 안내 — 미분류 회전 목록 대신 표시 */
+.maneuver-table td.mv-need-wind {
+  text-align:center; color:var(--text-mid); font-size:.85rem;
+  padding:22px 16px; line-height:1.65;
+}
+.maneuver-table td.mv-need-wind b { color:var(--text); }
+
+/* ---------- 퍼포먼스 통계 패널 ---------- */
+.stats-panel-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+/* 표 룩앤필(헤더·격자·셀·정렬)은 .rd-table 공용 규칙이 담당한다.
+   아래는 퍼포먼스 통계 표 고유의 컬럼 구조 규칙만 남긴다. */
+.stats-table thead th.stats-table__metric,
+.stats-table thead th.stats-table__bucket { text-align:left; }
+/* 포트·스타보드 열 그룹 헤더 — colspan 3 으로 각 택을 한 번만 표기
+   (Danny 2026-05-23: 지표마다 반복되던 포트/스타보드 행 제거). */
+.stats-table thead th.stats-side-head {
+  text-align:center; font-size:.78rem;
+}
+/* 포트·스타보드 열 헤더 — 좌우색(국제 항해 표준 홍/녹) */
+.stats-table thead th.stats-side-head--p { color:var(--port-ink); }
+.stats-table thead th.stats-side-head--s { color:var(--starboard-ink); }
+/* 지표 칸(rowspan) — 한 지표의 풍상·풍하 행을 묶는다 */
+.stats-table td.stats-table__metric {
+  text-align:left; white-space:normal; vertical-align:top;
+  padding-top:10px; border-right:1px solid var(--border-soft);
+}
+/* 지표 그룹 경계(stats-row--group)는 .rd-table 공용 규칙이 처리한다.
+   한 지표 안에서 풍하 행 — 풍상/풍하 사이 옅은 구분선 (stats 전용) */
+.stats-table tbody tr.stats-row--mode td { border-top:1px solid var(--border-soft); }
+.stats-mx__name { font-weight:700; color:var(--text); }
+.stats-mx__dir {
+  display:flex; flex-direction:column; align-items:flex-start;
+  gap:3px; margin-top:5px;
+}
+/* 방향(풍상/풍하) 칸 — 행마다 한 번 (포트/스타보드는 열로 빠짐) */
+.stats-table td.stats-dir-cell {
+  text-align:left; vertical-align:middle;
+  border-right:1px solid var(--border-soft);
+}
+.stats-bucket__mode { color:var(--text-mid); font-weight:600; }
+/* 포트·스타보드 열 그룹 경계 구분선 (포트 마지막 칸 오른쪽) */
+.stats-table th.stats-c-div, .stats-table td.stats-c-div {
+  border-right:1px solid var(--border-soft);
+}
+/* 좌우 택 미분할 지표(심박) — 포트·스타보드 두 열에 걸친 값 칸.
+   어느 열에 걸치는지와 무관하게 읽히도록 작은 구간 라벨을 함께 둔다. */
+.stats-table td.stats-unsplit-cell { text-align:center; }
+.stats-unsplit-tier {
+  font-size:.64rem; font-weight:700; color:var(--text-dim);
+  margin-right:6px;
+}
+.stats-val {
+  font-size:1.08rem; font-weight:800; color:var(--text); letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.stats-note {
+  margin-top:11px; font-size:var(--fs-foot); line-height:1.65; color:var(--text-dim);
+}
+
+/* ---------- 세션 평균 스트립 (G · SPS 카드 바로 아래) ----------
+   포트·스타보드 × 풍상·풍하 4 그룹을 한 줄 가로로. 값 셀은 무색,
+   좌우 구분은 그룹 헤더 색(포트=빨강·스타보드=초록)으로만. */
+.savg-strip { display:flex; gap:10px; flex-wrap:wrap; }
+.savg-group {
+  flex:1 1 0; min-width:142px;
+  background:var(--bg-card-2);
+  border:1px solid var(--border-soft); border-radius:10px;
+  padding:10px 12px;
+}
+.savg-group__hd {
+  font-size:var(--fs-label); font-weight:800;
+  margin-bottom:5px; padding-bottom:5px;
+  border-bottom:1px solid var(--border-soft);
+}
+.savg-group--p .savg-group__hd { color:var(--port-ink); }
+.savg-group--s .savg-group__hd { color:var(--starboard-ink); }
+.savg-row {
+  display:flex; align-items:baseline; justify-content:space-between;
+  padding:3px 0;
+}
+.savg-k { font-size:var(--fs-label); font-weight:600; color:var(--text-mid); }
+.savg-v {
+  font-size:1.18rem; font-weight:800; color:var(--text);
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em; line-height:1.1;
+}
+.savg-v small { font-size:var(--fs-micro); font-weight:600; color:var(--text-dim); }
+@media (max-width:600px) { .savg-group { flex:1 1 44%; } }
+/* 스킬-심박수 표 — 종합(합산) 행의 배경·윗선은 .rd-table 공용 규칙,
+   값 보조 표기는 .rd-table .stats-val small 공용 규칙을 따른다. */
+/* 스킬-심박수 카드 — 요약 타일과 표 사이 간격 */
+#hr-skill-body { margin-top:13px; }
+/* 지표 '좋은 방향' 배지 */
+.stats-dir {
+  display:inline-block; padding:1px 8px;
+  font-size:.62rem; font-weight:700; border-radius:999px;
+  white-space:nowrap; letter-spacing:-.01em;
+}
+.stats-dir--good { color:var(--good-ink); background:rgba(39,174,96,.12); }
+.stats-dir--neutral { color:var(--text-mid); background:var(--bg-sunk); }
+/* .mv-filter 스타일은 위 '공용 토글 컨트롤' 블록에서 일괄 정의한다. */
+.mv-list-note { font-size:var(--fs-foot); color:var(--text-dim); margin-top:8px; text-align:center; }
+
+/* ---------- 회전 ±10초 상세 ---------- */
+.mv-detail-controls {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:10px; flex-wrap:wrap;
+}
+.mv-sel-count { font-size:.8rem; font-weight:700; color:var(--text); }
+.mv-sel-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.mv-hint-actions { text-align:center; margin:0 0 6px; }
+.mv-detail-title { font-size:.98rem; font-weight:800; color:var(--text); margin-bottom:12px; }
+.mv-detail-metrics {
+  display:grid; gap:8px; margin-bottom:14px;
+  grid-template-columns:repeat(auto-fit,minmax(104px,1fr));
+}
+.dm {
+  background:var(--bg-card-2); border-radius:9px; padding:9px 11px;
+  display:flex; flex-direction:column; gap:1px;
+  transition:background var(--t-fast) var(--ease-out);
+}
+.dm:hover { background:var(--bg-card); box-shadow:var(--shadow-sm); }
+.dm__l { font-size:.7rem; color:var(--text-mid); font-weight:600; }
+.dm__v {
+  font-size:1.18rem; font-weight:800; color:var(--text); letter-spacing:-.025em;
+  font-variant-numeric:tabular-nums; line-height:1.1;
+}
+
+/* 지도 회전 번호 라벨 */
+.mv-num-label.leaflet-tooltip {
+  background:transparent; border:0; box-shadow:none; padding:0;
+  color:var(--navy); font-weight:800; font-size:10px; pointer-events:none;
+}
+.mv-num-label.leaflet-tooltip::before { display:none; }
+
+/* ---------- 택 분포 (바이올린) — 포트/스타보드 SOG·VMG·TWA ---------- */
+.violin-toggles {
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:10px;
+}
+/* .violin-toggle 스타일은 위 '공용 토글 컨트롤' 블록에서 일괄 정의한다. */
+.violin-wrap { text-align:center; }
+.violin-wrap[hidden] { display:none; }
+/* width:100% 라야 canvas.clientWidth 가 카드 폭을 따라간다
+   (기본 canvas 는 width 속성값 300px 로 측정됨) */
+#violin-canvas { width:100%; display:block; }
+/* Heel·Pitch 등 로드된 파일에 없는 지표 선택 시 차트 자리 안내 */
+.violin-empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:7px; min-height:220px; padding:24px 16px; text-align:center;
+}
+.violin-empty[hidden] { display:none; }
+.violin-empty__main { font-size:.95rem; font-weight:700; color:var(--text); }
+.violin-empty__sub {
+  font-size:.79rem; color:var(--text-dim); line-height:1.6; max-width:400px;
+}
+.violin-legend {
+  display:grid; gap:9px; margin-top:12px;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+}
+.violin-legend:empty { display:none; }
+.violin-legend__grp {
+  background:var(--bg-card-2); border-radius:10px; padding:9px 12px;
+}
+.violin-legend__cap {
+  font-size:.72rem; font-weight:700; color:var(--text-mid); margin-bottom:6px;
+}
+.violin-legend__row {
+  display:flex; justify-content:space-between; gap:8px;
+  font-size:.83rem; padding:1.5px 0;
+}
+.violin-legend__side { color:var(--text-mid); font-weight:600; }
+.violin-legend__val { font-weight:800; }
+.violin-legend__val--p { color:var(--port-ink); }
+.violin-legend__val--s { color:var(--starboard-ink); }
+
+/* ---------- 회전 상세 — 포트/스타보드 좌우 분할 ---------- */
+.mv-detail-split { display:grid; gap:12px; grid-template-columns:1fr 1fr; }
+.mv-detail-split[hidden] { display:none; }
+#maneuver-detail-single[hidden] { display:none; }
+.mv-detail-tile { display:flex; flex-direction:column; gap:7px; }
+.mv-detail-tile__cap {
+  font-size:.82rem; font-weight:800; text-align:center;
+  padding:5px 0; border-radius:7px;
+}
+/* 회전 상세 분할 타일 캡션 — 좌우색(포트=홍·스타보드=녹) */
+.mv-detail-tile__cap--p { color:var(--port-ink); background:rgba(225,43,43,.10); }
+.mv-detail-tile__cap--s { color:var(--starboard-ink); background:rgba(0,166,81,.11); }
+@media (max-width:560px) {
+  .mv-detail-split { grid-template-columns:1fr; }
+}
+
+/* ---------- 택킹·자이빙 기술 그룹 표 ---------- */
+.maneuver-groups:not(:empty) { margin-top:14px; }
+.maneuver-quality:not(:empty) { margin-top:14px; }
+/* 택킹·자이빙 기술·품질 표 — 룩앤필·값 타이포·정렬·격자는 모두 .rd-table
+   공용 규칙(HR 표와 동일)을 따른다. 셀 상태색 틴트는 제거했다 — 표는
+   색 없이 숫자만, 상태색은 차트에만 (Danny 검토 2026-05-24 6차). */
+.mg-title { font-size:.86rem; font-weight:800; color:var(--text); margin:0 0 8px; }
+.mg-table-wrap { overflow-x:auto; }
+.mg-foot { font-size:var(--fs-foot); color:var(--text-dim); margin:6px 0 0; }
+
+/* 회전 상세 — 가속 통과 안내 */
+.mv-detail-note {
+  font-size:.8rem; color:var(--good-ink); background:rgba(39,174,96,.10);
+  border-radius:8px; padding:8px 11px; margin:10px 0 0; line-height:1.5;
+}
+
+/* ---------- 회전 상세 — 공용 레전드 (분할 타일 범례 중복 제거) ---------- */
+.mv-detail-legend {
+  display:flex; flex-wrap:nowrap; gap:6px 14px; justify-content:center;
+  align-items:center; margin:12px 0 2px; padding:9px 10px;
+  background:var(--bg-sunk); border-radius:9px; overflow-x:auto;
+}
+.mv-detail-legend[hidden] { display:none; }
+/* 회전 상세 범례 — 텍스트는 공용 규격(11px·text-mid). 마크는 선/밴드
+   2종 — 차트가 '선 시리즈'와 '±1σ 음영 밴드'를 함께 그려, 사각 스왓치
+   하나로는 둘을 구분할 수 없으므로 기능상 마크를 유지한다. */
+.mvl-item {
+  display:flex; align-items:center; gap:6px; flex:none; white-space:nowrap;
+  font-size:11px; font-weight:600; color:var(--text-mid);
+}
+.mvl-mark { width:20px; flex:none; }
+.mvl-mark--line { height:0; border-top:3px solid; border-radius:2px; }
+.mvl-mark--faint { height:0; border-top:2px solid rgba(10,37,64,.42); }
+.mvl-mark--band { height:12px; border-radius:2px; }
+
+/* ---------- 회전 상세 — 포트 vs 스타보드 비교 표 ---------- */
+.mv-compare { margin-top:16px; }
+.mv-compare[hidden] { display:none; }
+.mvc-cap { font-size:.86rem; font-weight:800; color:var(--text); margin:0 0 9px; }
+.mvc-table-wrap { overflow-x:auto; }
+/* 표 룩앤필·격자선은 .rd-table 공용 규칙이 담당한다. 아래는 mvc 표
+   고유 — 행 머리글(지표명) 글자 굵기·색. */
+.mvc-table th[scope=row] {
+  font-size:var(--fs-body); font-weight:700; color:var(--text-mid);
+}
+/* 포트·스타보드 비교 표 — 좌우색(포트=홍·스타보드=녹) */
+.mvc-h--p { color:var(--port-ink); }
+.mvc-h--s { color:var(--starboard-ink); }
+.mvc-h__n {
+  display:block; font-size:.66rem; font-weight:600; color:var(--text-dim);
+}
+/* 포트·스타보드 열 — 셀 배경 틴트 제거(표는 색 없이 숫자만 ·
+   Danny 검토 2026-05-24 6차). 좌우 구분은 헤더 텍스트 색으로만. */
+.mvc-mean { font-weight:800; color:var(--text); }
+.mvc-sd { font-weight:600; color:var(--text-mid); }
+.mvc-unit { font-weight:600; color:var(--text-dim); font-size:.76rem; }
+.mvc-n { font-size:.7rem; color:var(--text-dim); }
+.mvc-na { color:var(--text-dim); font-weight:600; }
+.mvc-diff { font-weight:700; color:var(--text-mid); }
+/* SPS 점수 행 — 합산 행 배경·윗선은 .rd-table 공용(.mvc-row--dps 매핑)이
+   처리한다. 여기서는 navy 강조 글자색만 둔다. */
+.mvc-row--dps th[scope=row] { color:var(--navy); }
+.mvc-row--dps .mvc-mean { color:var(--navy); }
+.mvc-foot {
+  font-size:var(--fs-foot); color:var(--text-dim); margin:9px 0 0; line-height:1.65;
+}
+
+/* ---------- 회전 Coach Danny 코멘트 ---------- */
+.mv-coach { margin-top:16px; }
+.mv-coach[hidden] { display:none; }
+.mv-coach__cap { font-size:.86rem; font-weight:800; color:var(--text); margin:0 0 9px; }
+/* Coach Danny 코멘트 캡션 — Coach Danny(Danny 실사) 아바타와 함께 표시 */
+.mv-coach__cap-row {
+  display:flex; align-items:center; gap:10px; margin:0 0 10px;
+}
+.mv-coach__cap-row .mv-coach__cap { margin:0; }
+.mv-coach__cap-row .coach-avatar img { width:40px; height:40px; }
+.mv-coach__headline {
+  font-size:.92rem; font-weight:800; color:var(--text);
+  margin:0 0 11px; line-height:1.55;
+}
+.coach-card {
+  padding:11px 13px; border-radius:10px; background:var(--bg-card-2);
+  border-left:3px solid var(--border); margin-bottom:8px;
+}
+.coach-card--fix  { border-left-color:var(--bad); }
+.coach-card--warn { border-left-color:var(--warn); }
+.coach-card--good { border-left-color:var(--good); }
+.coach-card__title { font-size:.85rem; font-weight:800; margin:0 0 3px; color:var(--text); }
+.coach-card--fix  .coach-card__title { color:var(--bad-ink); }
+.coach-card--warn .coach-card__title { color:var(--warn-ink); }
+.coach-card--good .coach-card__title { color:var(--good-ink); }
+.coach-card__nums {
+  font-size:.76rem; color:var(--text-dim); margin:0 0 6px;
+  font-variant-numeric:tabular-nums;
+}
+.coach-card__line {
+  font-size:.82rem; color:var(--text-mid); margin:3px 0 0; line-height:1.62;
+}
+.coach-card__line b {
+  display:inline-block; min-width:2.4em; margin-right:5px;
+  font-weight:800; color:var(--text); font-size:.74rem;
+}
+.mv-coach__guard { font-size:.78rem; color:var(--text-dim); margin:8px 0 0; }
+.mv-coach__foot {
+  font-size:.72rem; color:var(--text-dim); margin:8px 0 0; line-height:1.55;
+}
+
+/* ---------- 지표 정의 툴팁 ---------- */
+/* "속도 손실" 등 지표 라벨에 hover 시 정의가 뜨는 표식 — 점선 밑줄 +
+   작은 ⓘ 로 설명이 있음을 알린다. 네이티브 title 속성을 쓰므로 표
+   셀이 가로 스크롤돼도 잘리지 않는다. */
+.tip-label { border-bottom:1px dotted var(--text-dim); cursor:pointer; }
+.tip-label__i {
+  margin-left:3px; font-size:.82em; font-weight:700; color:var(--sea-deep);
+}
+/* ⓘ 정의 팝오버 — tip-label(ⓘ) 클릭 시 정의를 띄운다.
+   title 속성 툴팁은 hover 에서만 떠 클릭이 듣지 않던 문제 보완 (Danny 검토). */
+.tip-popover {
+  position:fixed; z-index:3000; max-width:300px;
+  background:var(--navy); color:#fff;
+  font-size:.78rem; line-height:1.55; font-weight:500;
+  padding:10px 13px; border-radius:9px;
+  box-shadow:0 8px 26px rgba(10,37,64,.32);
+  pointer-events:none;
+}
+.tip-popover[hidden] { display:none; }
+
+/* ---------- 폴라 ---------- */
+.polar-wrap { text-align:center; }
+#polar-canvas { max-width:100%; }
+#target-polar-canvas { max-width:100%; }
+.polar-note { font-size:var(--fs-foot); color:var(--text-dim); margin-top:6px; }
+
+/* 타깃 폴라 — 풍향 신뢰도 배너 */
+.tp-banner {
+  font-size:.78rem; line-height:1.6; border-radius:9px;
+  padding:9px 12px; margin-bottom:11px;
+}
+.tp-banner--warn {
+  background:rgba(224,161,0,.10); border:1px solid rgba(224,161,0,.42);
+  color:var(--warn-ink);
+}
+.tp-banner--info {
+  background:var(--bg-sunk); border:1px solid var(--border-soft);
+  color:var(--text-mid);
+}
+.tp-banner[hidden] { display:none; }
+
+/* ---------- 저장된 세션 ---------- */
+.saved-empty { font-size:.86rem; color:var(--text-dim); padding:14px 4px; }
+/* 비교 그래프 — 3분리 → 1통합 + 지표 다중선택 드롭다운·차트 토글
+   (Danny 2026-05-23 §C) */
+.prog-panel { margin:4px 0; }
+.prog-controls {
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  margin-bottom:10px;
+}
+.prog-select { position:relative; }
+.prog-select > summary {
+  list-style:none; cursor:pointer; user-select:none;
+  display:flex; align-items:center; gap:7px;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:9px; padding:7px 11px;
+  font-size:.8rem; color:var(--text);
+}
+.prog-select > summary::-webkit-details-marker { display:none; }
+.prog-select > summary:hover { border-color:var(--sea); }
+.prog-select > summary:focus-visible { outline:2px solid var(--sea); outline-offset:1px; }
+.prog-select__label { font-weight:700; }
+.prog-select__summary { color:var(--text-mid); }
+.prog-select__caret { color:var(--text-dim); font-size:.7rem; transition:transform .15s; }
+.prog-select[open] .prog-select__caret { transform:rotate(180deg); }
+.prog-select__menu {
+  position:absolute; z-index:20; top:calc(100% + 5px); left:0;
+  min-width:170px;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:10px; box-shadow:var(--shadow);
+  padding:6px; display:flex; flex-direction:column; gap:2px;
+}
+.prog-select__menu label {
+  display:flex; align-items:center; gap:8px;
+  font-size:.82rem; color:var(--text); cursor:pointer;
+  padding:6px 8px; border-radius:7px;
+}
+.prog-select__menu label:hover { background:var(--bg-sunk); }
+.prog-select__menu input { accent-color:var(--sea); width:15px; height:15px; flex:none; }
+.prog-empty-note {
+  font-size:var(--fs-body); color:var(--text-dim); text-align:center; padding:14px 4px;
+}
+.prog-empty-note[hidden] { display:none; }
+/* 세션 목록 전체보기 / 접기 버튼 줄 */
+.saved-table-more { text-align:center; margin-top:11px; }
+.saved-table-more[hidden] { display:none; }
+/* 커리어 누적 데이터 패널 — 누적 합계 · 최고 기록 · 평균 (2026-05-23 §A2) */
+.career { display:flex; flex-direction:column; gap:15px; margin:14px 0; }
+.career-group__title {
+  display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+  font-size:.84rem; font-weight:800; color:var(--text); margin-bottom:7px;
+}
+.career-group__hint { font-size:.68rem; font-weight:500; color:var(--text-dim); }
+.career-tiles {
+  display:grid; gap:10px;
+  grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+}
+.career-tile {
+  background:var(--bg-card-2); border-radius:10px; padding:11px 13px;
+  display:flex; flex-direction:column; gap:2px; text-align:center;
+  border:1px solid transparent;
+}
+.career-tile__label { font-size:.72rem; color:var(--text-mid); font-weight:600; }
+.career-tile__val {
+  font-size:1.42rem; font-weight:800; color:var(--text); letter-spacing:-.025em;
+  font-variant-numeric:tabular-nums; line-height:1.1;
+}
+.career-tile__sub {
+  font-size:.66rem; color:var(--text-dim);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.career-tile__go { font-size:.7rem; color:var(--sea); font-weight:700; }
+.career-tile.is-clickable {
+  cursor:pointer;
+  transition:border-color .14s, background .14s, box-shadow .14s, transform .08s;
+}
+.career-tile.is-clickable:hover {
+  border-color:var(--sea); background:var(--bg-card); box-shadow:var(--shadow);
+}
+.career-tile.is-clickable:active { transform:scale(.98); }
+.saved-table-wrap { overflow-x:auto; }
+.link-del {
+  border:0; background:none; color:var(--bad-ink); font-size:.78rem; cursor:pointer;
+  font-family:inherit; text-decoration:underline;
+}
+/* 저장된 세션 다시 보기 — 행 클릭 또는 '↻ 다시 보기' 버튼 */
+.saved-table tbody tr.saved-row.is-loadable { cursor:pointer; transition:background .12s; }
+.saved-table tbody tr.saved-row.is-loadable:hover { background:rgba(31,143,255,.07); }
+.saved-actions { white-space:nowrap; }
+.link-load {
+  border:0; background:none; color:var(--sea-deep); font-size:.78rem; cursor:pointer;
+  font-family:inherit; font-weight:700; white-space:nowrap; margin-right:14px;
+}
+.link-load:hover { text-decoration:underline; }
+.saved-norec { font-size:.74rem; color:var(--text-dim); margin-right:14px; }
+
+/* ---------- 택킹/자이빙 목록 — 베스트 행 하이라이트 ---------- */
+/* 베스트 회전은 인라인 태그 대신 행 전체를 은은한 그라데이션으로 강조 */
+.mv-legend {
+  display:flex; align-items:center; gap:8px; margin:0 0 10px;
+  padding:7px 11px; font-size:.75rem; color:var(--text-mid);
+  background:var(--bg-sunk); border:1px solid var(--border-soft); border-radius:8px;
+}
+.mv-legend[hidden] { display:none; }
+.mv-legend__swatch {
+  flex:0 0 28px; width:28px; height:14px; border-radius:4px;
+  background:linear-gradient(90deg, rgba(39,174,96,.50) 0%, rgba(39,174,96,.07) 100%);
+  box-shadow:inset 2px 0 0 var(--good);
+}
+.mv-legend b { color:var(--good-ink); font-weight:700; }
+.maneuver-table tbody tr.is-best {
+  background:linear-gradient(90deg, rgba(39,174,96,.18) 0%,
+    rgba(39,174,96,.06) 62%, rgba(39,174,96,0) 100%);
+  box-shadow:inset 3px 0 0 var(--good);
+}
+.maneuver-table tbody tr.is-best:hover {
+  background:linear-gradient(90deg, rgba(39,174,96,.26) 0%,
+    rgba(39,174,96,.11) 62%, rgba(10,37,64,.02) 100%);
+}
+.maneuver-table tbody tr.is-best.is-selected {
+  background:linear-gradient(90deg, rgba(31,143,255,.22) 0%, rgba(39,174,96,.13) 100%);
+}
+
+/* ---------- 라이더 · 장비 입력 ---------- */
+.rider-grid {
+  display:grid; gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(142px,1fr));
+}
+.rider-field { display:flex; flex-direction:column; gap:5px; }
+.rider-field label { font-size:.76rem; font-weight:700; color:var(--text); }
+.rider-field input, .rider-field select {
+  font-family:inherit; font-size:.92rem; border:1.5px solid var(--border);
+  border-radius:8px; padding:8px 10px; width:100%;
+  color:var(--text); background:var(--bg-input);
+}
+.rider-field input:focus, .rider-field select:focus {
+  outline:none; border-color:var(--sea);
+}
+.rider-field select option { background:var(--bg-card); color:var(--text); }
+.rider-note {
+  font-size:var(--fs-foot); color:var(--text-mid); margin-top:11px; line-height:1.55;
+}
+.rider-note b { color:var(--text); }
+
+/* ---------- 정보(i) 토글 ---------- */
+.info-btn {
+  width:20px; height:20px; flex:0 0 20px; border-radius:50%;
+  border:1px solid var(--border); background:var(--bg-card-2); color:var(--text-mid);
+  font-size:.76rem; font-weight:800; font-style:italic; cursor:pointer;
+  font-family:Georgia,"Times New Roman",serif;
+  display:inline-flex; align-items:center; justify-content:center; line-height:1;
+}
+.info-btn:hover { border-color:var(--sea); color:var(--sea); }
+.info-panel {
+  font-size:.77rem; color:var(--text-mid); line-height:1.65;
+  background:var(--bg-sunk); border:1px solid var(--border-soft); border-radius:9px;
+  padding:11px 13px; margin-bottom:13px;
+}
+.info-panel[hidden] { display:none; }
+.info-panel b { color:var(--text); }
+.info-panel ul { margin:5px 0 0; padding-left:17px; }
+.info-panel li { margin-top:3px; }
+
+/* ---------- VPS (세일링 퍼포먼스 스코어 · SPS) ---------- */
+/* 5개 정식 점수 카드 — 풍상·종합·풍하·택킹·자이빙을 한 줄에 배치
+   (Danny 2026-05-23: 두 줄 그룹 배치 → 한 줄. 폭이 좁으면 반응형으로
+   줄바꿈하되 넓은 화면에서는 5장이 한 줄에 들어간다). */
+.vps-grid { display:grid; gap:11px; grid-template-columns:repeat(2,1fr); }
+.vps-tile {
+  background:var(--bg-card-2); border-radius:14px; border:1px solid var(--border-soft);
+  padding:16px 12px 18px; display:flex; flex-direction:column; gap:10px;
+  text-align:center; align-items:center;
+  transition:transform var(--t-base) var(--ease-out),
+             box-shadow var(--t-base) var(--ease-out),
+             border-color var(--t-fast) var(--ease-out);
+}
+.vps-tile:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+.vps-tile--main {
+  background:linear-gradient(180deg,#FFFFFF 0%,#FAFBFD 100%);
+  border-color:var(--border); box-shadow:var(--shadow);
+  padding:20px 14px 22px;
+}
+.vps-tile--main:hover { box-shadow:var(--shadow-hover); }
+
+/* 도넛 wrapper — SVG 진행 호 + 중앙 점수 텍스트 absolute 겹침
+   (Layer 1.5 — Sales Statistics mockup 패턴) */
+.vps-tile__donutwrap {
+  position:relative; display:inline-flex; align-items:center; justify-content:center;
+  margin:4px 0 6px;
+}
+.vps-tile__donutctr {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  pointer-events:none;
+}
+.vps-tile--main .vps-tile__donutctr .vps-tile__score { font-size:2.8rem; }
+.vps-tile .vps-tile__donutctr .vps-tile__score { font-size:1.85rem; line-height:1; }
+.vps-tile__donutctr .vps-tile__max {
+  font-size:.66rem; color:var(--text-dim); font-weight:700;
+  margin-top:2px; letter-spacing:.02em;
+}
+.vps-tile--main .vps-tile__donutctr .vps-tile__max { font-size:.74rem; }
+.rd-donut { display:block; }
+.vps-tile__label {
+  font-size:.78rem; font-weight:700; color:var(--text-mid);
+}
+.vps-tile--main .vps-tile__label { color:var(--text); font-size:.82rem; }
+.vps-tile__scorerow { display:flex; align-items:baseline; justify-content:center; gap:6px; }
+/* 5장(풍상·풍하·종합·택킹·자이빙) 점수 숫자 크기 동일 — 종합 카드만
+   크던 것을 통일 (Danny 2026-05-23). 종합 카드 구분은 배경·테두리로만.
+   2026-05-26 시각 폴리시: 점수 숫자 tabular-nums + line-height tight. */
+.vps-tile__score {
+  font-size:2.4rem; font-weight:800; letter-spacing:-.03em; line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.vps-tile--main .vps-tile__score { font-size:var(--fs-num-hero); }
+.vps-tile__max {
+  font-size:.78rem; color:var(--text-dim); font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+.vps-score--hi { color:var(--good-ink); }
+.vps-score--mid { color:var(--warn-ink); }
+.vps-score--lo { color:var(--bad-ink); }
+.vps-score--na { color:var(--text-dim); font-size:1.5rem; }
+.vps-bar { height:7px; border-radius:4px; background:rgba(10,37,64,.08); overflow:hidden; }
+.vps-bar__fill { height:100%; border-radius:4px; transition:width .3s; }
+.vps-fill--hi { background:var(--good); }
+.vps-fill--mid { background:var(--warn); }
+.vps-fill--lo { background:var(--bad); }
+.vps-delta { font-size:.75rem; font-weight:700; }
+.vps-delta--up { color:var(--good-ink); }
+.vps-delta--down { color:var(--bad-ink); }
+.vps-delta--flat { color:var(--text-dim); }
+/* vps-tile__break(속도 N점) 은 SPS 카드 하단 정리로 제거됨 (Danny 2026-05-23). */
+.vps-tile__note { font-size:var(--fs-foot); color:var(--text-mid); line-height:1.45; }
+.vps-foot {
+  font-size:var(--fs-foot); color:var(--text-dim); margin-top:13px; line-height:1.55;
+}
+
+/* ---------- Coach Danny ---------- */
+.coach-row { display:flex; gap:13px; align-items:flex-start; }
+.coach-avatar { flex:0 0 auto; line-height:0; }
+/* Coach Danny 아바타 = Coach Danny(Danny 실사) — 원형 크롭 + sea 링 */
+.coach-avatar img {
+  width:56px; height:56px; border-radius:50%; object-fit:cover;
+  display:block; border:2.4px solid var(--sea); background:var(--bg-card-2);
+}
+.coach-bubble {
+  flex:1; background:var(--bg-card-2); border-radius:12px;
+  border:1px solid var(--border-soft); padding:12px 14px; position:relative;
+}
+.coach-bubble::before {
+  content:''; position:absolute; left:-7px; top:20px; width:0; height:0;
+  border:7px solid transparent; border-right-color:var(--bg-card-2); border-left:0;
+}
+.coach-bubble__name {
+  font-size:.8rem; font-weight:800; color:var(--sea-deep);
+  margin-bottom:6px; display:flex; align-items:center; gap:7px;
+}
+.coach-tag {
+  font-size:.62rem; font-weight:700; color:var(--text-dim);
+  border:1px solid var(--border); border-radius:5px; padding:1px 6px;
+}
+.coach-bubble__body p { font-size:.86rem; color:var(--text); line-height:1.65; }
+.coach-bubble__body p + p { margin-top:7px; }
+.coach-bubble__body .coach-hedge { color:var(--text-dim); font-size:.79rem; }
+.coach-num { color:var(--sea-deep); font-weight:700; }
+.coach-num--good { color:var(--good-ink); font-weight:700; }
+
+.coach-whatif {
+  margin-top:15px; border-top:1px solid var(--border-soft); padding-top:13px;
+}
+.coach-whatif__title { font-size:.83rem; font-weight:800; color:var(--text); }
+/* 앵커 기준 표기 — 제목 옆 작은 부연(상위 20% · 우세 택 기준) */
+.coach-whatif__basis {
+  font-size:.68rem; font-weight:700; color:var(--text-dim);
+  margin-left:6px; white-space:nowrap;
+}
+.coach-whatif__sub { font-size:.74rem; color:var(--text-dim); margin:3px 0 11px; }
+.sweep-row {
+  display:flex; align-items:center; gap:9px; padding:2.5px 0; font-size:.74rem;
+}
+/* 막대(track)는 모든 행에서 폭이 같아야 막대 길이가 VMG 에 정확히
+   비례한다(Danny 검토 §issue-5). 고정 폭 칸(size·val·tag)에 min-width:0
+   을 줘, 내용이 길어도(예: '퍼포먼스 추천 · 현재' 태그) flex-basis 를
+   넘겨 늘어나지 않게 한다 — 늘어나면 flex:1 인 track 의 폭을 빼앗아
+   그 행의 막대만 짧아진다. tag·val 칸은 가장 긴 내용에 맞춰 폭을 잡았다. */
+.sweep-row__size {
+  flex:0 0 50px; min-width:0; text-align:right;
+  color:var(--text-mid); font-weight:600;
+}
+.sweep-row__track {
+  flex:1 1 0; min-width:0; height:15px;
+  background:rgba(10,37,64,.06); border-radius:4px;
+}
+.sweep-row__bar { display:block; height:100%; border-radius:4px; background:rgba(31,143,255,.55); min-width:2px; }
+.sweep-row__val {
+  flex:0 0 86px; min-width:0; white-space:nowrap;
+  color:var(--text-mid); font-weight:600;
+}
+.sweep-row__tag { flex:0 0 124px; min-width:0; }
+.sweep-row--actual .sweep-row__track { box-shadow:inset 0 0 0 1.6px var(--sea); }
+.sweep-row--actual .sweep-row__size { color:var(--sea-deep); font-weight:800; }
+/* 퍼포먼스 추천 윙 (VMG 정점) — 초록 채움 강조 (메인) */
+.sweep-row--recommended .sweep-row__bar { background:var(--good); }
+.sweep-row--recommended .sweep-row__size { color:var(--good-ink); font-weight:800; }
+.sweep-row--recommended .sweep-row__track { box-shadow:inset 0 0 0 1.6px var(--good); }
+/* 편안함 추천 윙 (정점 − 0.5㎡) — 초록 테두리(옅게) 참고 표시 (보조) */
+.sweep-row--comfort .sweep-row__track { box-shadow:inset 0 0 0 1.5px rgba(39,174,96,.45); }
+.sweep-row--comfort .sweep-row__size { color:var(--good-ink); font-weight:700; }
+.sweep-row--infeasible .sweep-row__bar { background:rgba(10,37,64,.06); }
+.sweep-row--infeasible .sweep-row__val { color:var(--text-dim); }
+.sweep-tag {
+  display:inline-block; font-size:.65rem; font-weight:700;
+  padding:1px 6px; border-radius:5px; white-space:nowrap;
+}
+.sweep-tag--rec { background:rgba(39,174,96,.16); color:var(--good-ink); }
+.sweep-tag--actual { background:rgba(31,143,255,.14); color:var(--sea-deep); }
+.sweep-tag--comfort { background:rgba(39,174,96,.10); color:var(--good-ink); }
+/* 윙 VMG 추천 차트 범례 — 공용 범례 규격: 스왓치 12×12·radius 2px,
+   텍스트 11px·text-mid, 차트 하단 중앙 배치 (Danny 검토 2026-05-24 C). */
+.sweep-legend {
+  display:flex; flex-wrap:wrap; gap:8px 14px; justify-content:center;
+  margin-top:10px; font-size:11px; color:var(--text-mid);
+}
+.sweep-legend span { display:flex; align-items:center; gap:6px; }
+.sweep-legend i {
+  width:12px; height:12px; border-radius:2px; display:inline-block; flex:0 0 12px;
+}
+.sweep-legend i.lg-actual { background:transparent; box-shadow:inset 0 0 0 1.6px var(--sea); }
+.sweep-legend i.lg-recommended { background:var(--good); }
+.sweep-legend i.lg-comfort { background:transparent; box-shadow:inset 0 0 0 1.5px rgba(39,174,96,.50); }
+.sweep-legend i.lg-feasible { background:rgba(31,143,255,.55); }
+
+/* ---------- 푸터 ---------- */
+.app-footer {
+  text-align:center; padding:24px 16px; color:var(--text-dim); font-size:.78rem;
+}
+.app-footer__sub { font-size:var(--fs-foot); color:var(--text-dim); margin-top:3px; }
+
+/* ---------- 토스트 ---------- */
+.toast {
+  position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+  background:var(--navy); color:#fff; font-size:.85rem;
+  border:1px solid var(--navy-deep);
+  padding:12px 18px; border-radius:10px; box-shadow:var(--shadow-lg);
+  max-width:90vw; z-index:2000;
+}
+
+/* ---------- 반응형 ---------- */
+@media (min-width:600px) {
+  .stat-strip { grid-template-columns:repeat(3,1fr); }
+  .bestworst { grid-template-columns:1fr 1fr; }
+  .map { height:400px; }
+  /* SPS 5장 — 좁은 화면에서는 3열로 줄바꿈 */
+  .vps-grid { grid-template-columns:repeat(3,1fr); }
+}
+@media (min-width:760px) {
+  .app-main { padding:22px 20px 48px; }
+  .grid-2 { grid-template-columns:1fr 1fr; }
+  .grid-2 .card { margin-bottom:0; }
+  .grid-2 { margin-bottom:14px; }
+  .stat-strip { grid-template-columns:repeat(6,1fr); }
+  /* SPS 5장(풍상·종합·풍하·택킹·자이빙) 한 줄 배치 */
+  .vps-grid { grid-template-columns:repeat(5,1fr); align-items:stretch; }
+  .intro__hero h2 { font-size:1.8rem; }
+  .app-header__title { font-size:1.15rem; }
+}
+@media (min-width:760px) and (max-width:1010px) {
+  .stat-strip { grid-template-columns:repeat(3,1fr); }
+}
+
+/* ============================================================
+ * 라이딩 리플레이 뷰어 — Video Viewer (전면 재설계 2026-05-23)
+ * ------------------------------------------------------------
+ * 의도적으로 다크 테마이다. 영상을 화면 배경에 흐리게(blur) 깔고
+ * 그 위에 모든 정보·기능을 오버레이하는 몰입형 재생 표면이다.
+ * 색은 .replay 스코프 안 토큰으로 한정한다. js/replay.js 와 짝.
+ * ============================================================ */
+.replay {
+  --rp-bg:#0A0F18;            /* 최심 배경 (영상 없을 때) */
+  --rp-panel:rgba(14,20,31,0.78);   /* 오버레이 패널 */
+  --rp-panel-2:rgba(255,255,255,0.07);
+  --rp-line:rgba(255,255,255,0.13);
+  --rp-text:#ECF1F7;
+  --rp-dim:#9DACBD;
+  --rp-accent:#33A1FF;
+  --rp-accent-dim:rgba(51,161,255,0.18);
+  position:fixed; inset:0; z-index:4500;
+  background:var(--rp-bg); color:var(--rp-text);
+  display:flex; flex-direction:column; overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+    "Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+.replay[hidden] { display:none; }
+
+/* ---------- 배경 — 영상 블러 + 스크림 ---------- */
+/* blur 는 영상이 비치되 오버레이 가독성을 해치지 않을 만큼만 — Danny
+   검토 2026-05-23 §B1: 34px 는 영상이 거의 안 보였다. 14px 로 낮추고
+   brightness 도 0.66→0.82 로 올려 배경 영상이 또렷이 비치게 한다. */
+.replay__blur {
+  position:absolute; inset:0; width:100%; height:100%;
+  z-index:0; object-fit:cover;
+  filter:blur(14px) saturate(1.12) brightness(0.82);
+  transform:scale(1.12);
+}
+.replay__scrim {
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 38%,
+    rgba(10,15,24,0.18) 0%,rgba(10,15,24,0.62) 78%,rgba(10,15,24,0.86) 100%);
+}
+
+/* ---------- 상단 바 ---------- */
+.replay__bar {
+  position:relative; z-index:20;
+  display:flex; align-items:center; gap:12px;
+  padding:9px 14px;
+  background:linear-gradient(180deg,rgba(8,12,20,0.86),rgba(8,12,20,0.30));
+}
+.replay__exit {
+  flex:0 0 auto;
+  display:inline-flex; align-items:center; gap:5px;
+  background:transparent; border:0; cursor:pointer;
+  color:var(--rp-text); font-size:.92rem; font-weight:700;
+  font-family:inherit; padding:7px 9px; border-radius:8px;
+}
+.replay__exit:hover { background:var(--rp-panel-2); }
+.replay__exit span { font-size:1.3rem; line-height:1; }
+
+.replay__chips {
+  display:flex; gap:6px; flex-wrap:wrap; flex:1;
+  justify-content:center;
+}
+.replay__chip {
+  background:var(--rp-panel-2); color:var(--rp-dim);
+  border:1.5px solid transparent; border-radius:999px;
+  padding:5px 13px; font-size:.78rem; font-weight:700;
+  cursor:pointer; font-family:inherit; backdrop-filter:blur(6px);
+  transition:background .14s,color .14s,border-color .14s;
+}
+.replay__chip:hover { color:var(--rp-text); }
+.replay__chip.is-on {
+  background:var(--rp-accent-dim); color:#A9D6FF;
+  border-color:var(--rp-accent);
+}
+.replay__chip--nowind { opacity:.55; }
+.replay__chip--nowind.is-on { opacity:1; }
+
+.replay__tools { flex:0 0 auto; display:flex; align-items:center; gap:7px; }
+.replay__upload {
+  display:inline-flex; align-items:center; gap:5px; cursor:pointer;
+  background:var(--rp-accent); color:#fff;
+  border-radius:8px; padding:7px 12px;
+  font-size:.8rem; font-weight:700;
+}
+.replay__upload:hover { background:#1F8AEC; }
+.replay__layout {
+  display:inline-flex; background:var(--rp-panel-2);
+  border:1px solid var(--rp-line); border-radius:8px; overflow:hidden;
+}
+.replay__lay {
+  background:transparent; border:0; cursor:pointer; font-family:inherit;
+  color:var(--rp-dim); font-size:.78rem; font-weight:700; padding:6px 11px;
+}
+.replay__lay:hover:not(:disabled) { color:var(--rp-text); }
+.replay__lay.is-on { background:var(--rp-accent-dim); color:#A9D6FF; }
+.replay__lay:disabled { opacity:.34; cursor:not-allowed; }
+.replay__tool {
+  width:34px; height:34px; flex:0 0 auto;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:8px;
+  font-size:.86rem; font-weight:700; cursor:pointer; font-family:inherit;
+}
+#replay-sync-btn { width:auto; padding:0 11px; font-size:.78rem; }
+.replay__tool:hover { background:rgba(255,255,255,0.14); }
+.replay__close-x {
+  width:34px; height:34px; flex:0 0 auto;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1.5px solid var(--rp-line); border-radius:8px;
+  font-size:1rem; line-height:1; cursor:pointer; font-family:inherit;
+  transition:background .14s,border-color .14s;
+}
+.replay__close-x:hover { background:#C0392B; border-color:#C0392B; }
+.replay__close-x:focus-visible,
+.replay__tool:focus-visible,
+.replay__lay:focus-visible {
+  outline:2px solid var(--rp-accent); outline-offset:2px;
+}
+
+/* ---------- 동기화 패널 ---------- */
+.replay__sync {
+  position:absolute; top:54px; right:14px; z-index:40;
+  width:min(560px,calc(100vw - 28px));
+  background:var(--rp-panel); backdrop-filter:blur(14px);
+  border:1px solid var(--rp-line); border-radius:12px;
+  box-shadow:0 16px 44px rgba(0,0,0,0.5);
+  padding:11px 13px;
+}
+.replay__sync[hidden] { display:none; }
+.replay-sync__row {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  margin-top:9px;
+}
+.replay-sync__row--top { margin-top:0; }
+.replay-sync__name { font-weight:800; font-size:.85rem; }
+.replay-sync__badge {
+  font-size:.72rem; font-weight:800; padding:3px 8px; border-radius:999px;
+}
+.replay-sync__badge--ok { background:rgba(39,174,96,0.22); color:#5FD693; }
+.replay-sync__badge--manual { background:rgba(224,161,0,0.22); color:#F0C040; }
+.replay-sync__src { font-size:.74rem; color:var(--rp-dim); flex:1; }
+.replay-sync__close {
+  width:24px; height:24px; flex:0 0 auto; cursor:pointer;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:6px; font-family:inherit;
+}
+.replay-sync__lbl { font-size:.78rem; font-weight:700; color:var(--rp-dim); }
+.replay-sync__range { flex:1; min-width:120px; accent-color:var(--rp-accent); }
+.replay-sync__num {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:.76rem; color:var(--rp-dim);
+}
+.replay-sync__num input {
+  width:64px; background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:6px;
+  padding:4px 6px; font-family:inherit; font-size:.8rem;
+}
+.replay-sync__hint { flex:1; font-size:.76rem; color:var(--rp-dim); }
+.replay__nudge {
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:7px;
+  padding:5px 9px; font-size:.74rem; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+.replay__nudge:hover { background:rgba(255,255,255,0.14); }
+.replay-sync__act {
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:7px;
+  padding:5px 10px; font-size:.74rem; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+.replay-sync__act:hover { background:rgba(255,255,255,0.14); }
+#replay-video-remove:hover { background:#C0392B; border-color:#C0392B; }
+
+/* 다중 클립 — 클립별 동기화 블록 (2026-05-23 §B7) */
+.replay__sync { max-height:calc(100vh - 80px); overflow-y:auto; }
+.replay-sync__clip {
+  margin-top:9px; padding:8px 9px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--rp-line); border-radius:9px;
+}
+.replay-sync__row--clip { margin-top:0; }
+.replay-sync__live {
+  font-size:.7rem; font-weight:800; color:#5FD693;
+}
+.replay-sync__times { gap:14px; }
+.replay-sync__time {
+  display:flex; flex-direction:column; gap:1px;
+  font-size:.76rem; color:var(--rp-text); flex:1; min-width:130px;
+}
+.replay-sync__time b {
+  font-size:.66rem; font-weight:700; color:var(--rp-dim);
+  letter-spacing:.02em;
+}
+.replay-sync__cnum {
+  width:74px; background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:6px;
+  padding:4px 6px; font-family:inherit; font-size:.8rem;
+}
+/* 클립 시작 시각 HH:MM:SS 직접 입력 (§C1) */
+.replay-sync__ctime {
+  width:104px; background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-accent); border-radius:6px;
+  padding:5px 8px; font-family:inherit; font-size:.92rem; font-weight:700;
+  letter-spacing:.02em; font-variant-numeric:tabular-nums; text-align:center;
+}
+.replay-sync__ctime:focus {
+  outline:2px solid var(--rp-accent); outline-offset:1px;
+}
+.replay-sync__chmss { font-size:.7rem; color:var(--rp-dim); }
+
+/* ---------- 무대 — 좌측 컬럼 · 중앙 스테이지 · 미니그래프 ----------
+   공통 멘탈모델: 좌측 컬럼 맨 위엔 항상 컴팩트 데이터 패널, 그 아래
+   타일엔 '중앙 스테이지에 없는 것'을 둔다. 영상·지도 패널은 JS
+   setLayout 이 좌측 컬럼 ↔ 중앙 스테이지로 옮긴다 — 좌측 컬럼은
+   어느 모드든 340px 고정폭이라 데이터 패널이 가로로 늘어나지 않는다
+   (나란히 뷰 버그 수정). 모바일은 세로 스택으로 reflow 한다(아래
+   @media). 다크 테마는 유지한다 (Danny 검토 2026-05-24 — 3 뷰 보정). */
+.replay__stage {
+  position:relative; z-index:10;
+  flex:1; min-height:0; display:flex;
+}
+/* 좌우 교환(⇄) — 좌측 컬럼과 중앙 스테이지의 가로 순서를 바꾼다.
+   나란히 뷰는 스테이지는 그대로 두고 중앙의 영상·지도만 교환한다. */
+.replay--swap .replay__stage { flex-direction:row-reverse; }
+.replay--both.replay--swap .replay__stage  { flex-direction:row; }
+.replay--both.replay--swap .replay__cstage { flex-direction:row-reverse; }
+
+/* 좌측 컬럼 — 어느 모드든 340px 고정폭. 위=데이터 패널, (영상·지도
+   뷰)에선 그 아래에 타일 1개. 두 타일은 같은 규격으로 위아래로 쌓인다. */
+.replay__lcol {
+  position:relative; z-index:2;
+  flex:0 0 340px;
+  display:flex; flex-direction:column; gap:10px; padding:10px;
+  min-width:0; min-height:0;
+  border-right:1px solid var(--rp-line);
+}
+.replay--swap .replay__lcol {
+  border-right:0; border-left:1px solid var(--rp-line);
+}
+
+/* 중앙 스테이지 — 남는 폭을 모두 채운다. 나란히 뷰에서는 영상·지도
+   두 패널을 좌우 반반(세로 높이 동일)으로 담는다. */
+.replay__cstage {
+  flex:1; min-width:0; min-height:0; display:flex;
+}
+/* 영상 뷰 — 우측 미니그래프 레일(absolute · width 288 + right 12 = 300px)
+   이 중앙 스테이지 오른쪽을 덮는다. 그만큼 스테이지에 우측 패딩을 줘,
+   영상이 그래프를 뺀 '실제로 보이는' 영역 기준으로 좌우 가운데에 오게
+   한다(패딩 없으면 전체 스테이지 기준 중앙 → 그래프에 가려 오른쪽으로
+   밀려 보인다). 영상 뷰에만 적용 — 나란히·지도 뷰는 건드리지 않는다
+   (Danny 2026-05-24). */
+.replay--video .replay__cstage { padding-right:300px; }
+
+.replay__vpanel, .replay__mpanel {
+  position:relative; min-width:0; min-height:0;
+  /* z-index 로 스태킹 컨텍스트를 만들어 Leaflet 내부 z-index(타일·
+     컨트롤)가 미니그래프 위로 새어 나오지 않게 한다. */
+  z-index:1;
+}
+
+/* 좌측 컬럼 안의 패널 = 타일 — 데이터 패널과 완전히 같은 규격(너비
+   동일, 모서리 곡선 동일). 높이 분배는 아래 규칙이 정한다. */
+.replay__lcol > .replay__rider,
+.replay__lcol > .replay__vpanel,
+.replay__lcol > .replay__mpanel,
+.replay__lcol > .replay__stats {
+  min-height:0; min-width:0;
+  border:1px solid var(--rp-line);
+  border-radius:13px;
+}
+/* 좌측 컬럼 분배 — 위 타일(데이터 패널)은 내용 높이만큼만, 아래 타일은
+   남는 공간을 전부 차지한다. 3개 뷰 모드(영상·나란히·지도) 모두 동일
+   — 위는 항상 데이터 패널, 아래는 모드별로 지도/영상/세션 요약 타일.
+   50/50 균등 분배는 짧은 화면에서 아래 타일 내용이 넘쳐 스크롤바를
+   띄웠다 → 내용 기준 분배로 두 타일 모두 스크롤 없이 한 화면에 담는다
+   (Danny 2026-05-24). */
+.replay__lcol > .replay__rider { flex:0 0 auto; }
+.replay__lcol > .replay__vpanel,
+.replay__lcol > .replay__mpanel,
+.replay__lcol > .replay__stats { flex:1 1 auto; }
+/* 영상·지도 타일은 내용을 클립한다(데이터 패널은 자체 규칙에서
+   overflow 를 다룬다). */
+.replay__lcol > .replay__vpanel,
+.replay__lcol > .replay__mpanel { overflow:hidden; }
+/* 중앙 스테이지 안의 패널 = 스테이지를 꽉 채운다(나란히는 반반). */
+.replay__cstage > .replay__vpanel,
+.replay__cstage > .replay__mpanel { flex:1 1 0; min-height:0; min-width:0; }
+
+.replay__vpanel {
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.replay__video {
+  max-width:100%; max-height:100%; width:100%; height:100%;
+  object-fit:contain;
+}
+/* 영상이 메인 스테이지를 단독으로 쓸 때만 전체 프레임 보존(contain).
+   나란히·지도 뷰처럼 영상이 반쪽/타일이면 칸을 꽉 채운다(cover —
+   영상 양옆 크롭 허용, 세로 높이를 지도와 맞추기 위함). */
+.replay--both .replay__cstage .replay__video,
+.replay--map  .replay__lcol   .replay__video { object-fit:cover; }
+.replay__vpanel--vout .replay__video { opacity:.32; }
+.replay__nohint {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  max-width:330px; text-align:center; line-height:1.6;
+  font-size:.9rem; color:var(--rp-text);
+  background:var(--rp-panel); backdrop-filter:blur(10px);
+  border:1px solid var(--rp-line); border-radius:14px; padding:20px 22px;
+}
+.replay__nohint[hidden] { display:none; }
+.replay__nohint small { color:var(--rp-dim); font-size:.78rem; }
+
+/* z-index 필수 — Leaflet 컨테이너가 스태킹 컨텍스트를 형성하지 않으면
+   내부 pane(타일 z200·오버레이 z400·마커 z600)이 부모 컨텍스트로 새어
+   나와 풍향 격자(z5)·ladder rung(z6) 위를 덮는다. z-index:1 로 컨텍스트를
+   만들어 Leaflet 내용을 가두면 격자·rung 이 지도 위에 보인다 — 대시보드
+   .map 과 동일 (Danny 2026-05-25: 격자·rung 미표시 버그 수정). */
+.replay__map { position:absolute; inset:0; background:#162132; z-index:1; }
+/* 풍향 모눈 격자 — 지도 타일 위, 맵 컨트롤(z 600) 아래. 클릭은 통과
+   시킨다(지도 드래그·줌 방해 X). 옅은 선이라 트랙·마커가 비쳐 보인다.
+   canvas 는 대체 요소(replaced element)라 position:absolute;inset:0 만으로는
+   고유 크기(300×150)에 머문다 — width/height:100% 를 명시해 패널을 덮게
+   한다(.wind-grid 와 동일 이유). 누락 시 sizeWindGrid 가 clientWidth 를
+   매번 dpr 배로 키워 캔버스가 무한 팽창한다. */
+.replay__windgrid {
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; z-index:5;
+}
+/* ladder rung 캔버스 — 풍향 격자(z 5) 위, 맵 컨트롤(z 600) 아래.
+   보드 추적 모드에서 보드를 지나는 풍상 레드라인을 이 레이어에 그린다. */
+.replay__ladder {
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; z-index:6;
+}
+.replay__mapctl {
+  position:absolute; left:10px; bottom:10px; z-index:600;
+  display:flex; gap:6px;
+}
+/* 보드 추적 토글이 켜졌을 때 — 강조(아센트) (F · Danny 2026-05-24) */
+.replay__mapbtn.is-on {
+  background:var(--rp-accent-dim); color:#A9D6FF; border-color:var(--rp-accent);
+}
+.replay__mapbtn {
+  background:var(--rp-panel); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:8px;
+  padding:6px 10px; font-size:.76rem; font-weight:700;
+  cursor:pointer; font-family:inherit; backdrop-filter:blur(8px);
+}
+.replay__mapbtn:hover { background:rgba(255,255,255,0.16); }
+.replay__mapbtn--ico {
+  padding:6px; min-width:32px; text-align:center;
+  font-size:.95rem; line-height:1;
+}
+
+/* ---------- 좌측 컬럼 상단 타일 — 라이더 데이터 패널 ----------
+   타일 규격(크기·테두리·모서리)은 위의 .replay__rider,.replay__mpanel
+   공용 규칙이 정한다. 여기서는 패널 고유의 배경·여백만 둔다. */
+/* 데이터 패널·세션 요약 타일 — 두 타일이 한 세트로 보이도록 배경·
+   여백·타이포·정렬을 공유한다 (Danny 검토 2026-05-24 A 보정). */
+.replay__rider,
+.replay__stats {
+  position:relative; z-index:18;
+  background:linear-gradient(180deg,rgba(8,13,22,0.82),rgba(8,13,22,0.58));
+  backdrop-filter:blur(8px);
+  padding:13px 14px;
+  /* 가로는 클립(둥근 모서리 유지). 세로는 내용이 타일을 채우도록
+     레이아웃을 잡아 스크롤바가 뜨지 않게 한다(아래 flex 규칙). auto 는
+     아주 좁은 화면용 안전장치일 뿐 보통은 동작하지 않는다. */
+  overflow:hidden auto;
+}
+.replay__rider[hidden], .replay__stats[hidden] { display:none; }
+/* 타일 헤더 — 데이터 패널 이름 / '세션 요약' 동일 규격 */
+.replay-rider__name,
+.replay-stats__hd {
+  font-size:1.04rem; font-weight:800; letter-spacing:-.01em; color:#fff;
+}
+.replay-stats__hd { margin-bottom:5px; }
+.replay-rider__clock {
+  font-size:.72rem; color:var(--rp-dim); margin:1px 0 10px;
+  font-variant-numeric:tabular-nums;
+}
+.replay-rider__metrics { display:flex; flex-direction:column; gap:7px; }
+.replay-rider__m,
+.replay-stats__row { display:flex; align-items:baseline; gap:8px; }
+.replay-stats__row { padding:2px 0; }
+/* 라벨 — 두 타일 공통 규격(흰색·동일 크기·굵기·폭)이라 값 열이 두
+   타일에서 같은 x 에 정렬된다 (Danny 검토 ④ 흰색 통일 + A 보정). */
+.replay-rider__lbl,
+.replay-stats__k {
+  font-size:.72rem; font-weight:800; flex:0 0 66px;
+  letter-spacing:.02em; color:#fff;
+}
+/* 값 — 두 타일 공통(동일 크기·굵기·tabular-nums). */
+.replay-rider__num,
+.replay-stats__v {
+  font-size:1.2rem; font-weight:800; color:#fff; line-height:1.1;
+  font-variant-numeric:tabular-nums;
+}
+/* 단위 — 두 타일 공통. */
+.replay-rider__u,
+.replay-stats__v small {
+  font-size:.7rem; font-weight:600; color:var(--rp-dim);
+}
+/* 세션 요약 — 구간 소제목('세션' · '택킹 · 자이빙') */
+.replay-stats__sec {
+  font-size:.63rem; font-weight:800; letter-spacing:.06em;
+  color:var(--rp-dim); text-transform:uppercase;
+  margin:7px 0 2px; padding-top:6px;
+  border-top:1px solid var(--rp-line);
+}
+/* 세션 요약 — 행 우측의 부가값(성공률 등) */
+.replay-stats__x {
+  margin-left:auto; font-size:.7rem; font-weight:600; color:var(--rp-dim);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- 우측 미니그래프 레일 ----------
+   top:56px — 우상단 고정 KO/EN 토글(.rd-langtoggle top:23 + height ~26 = 하단 ~49px,
+   Danny 2026-06-03 nav 정렬 fix)이 첫 번째 미니 그래프 카드 상단을 덮지 않도록 비워 둔다.
+   (Danny 2026-05-26 → 2026-06-03 토글 재배치 반영) */
+.replay__graphs {
+  position:absolute; top:56px; right:12px; bottom:12px; z-index:16;
+  width:288px; max-width:42vw;
+  display:flex; flex-direction:column; gap:8px;
+  overflow-y:auto; padding-right:2px;
+}
+.replay-graph {
+  flex:1 1 0; min-height:74px;
+  display:flex; flex-direction:column;
+  background:var(--rp-panel); backdrop-filter:blur(8px);
+  border:1px solid var(--rp-line); border-radius:10px; overflow:hidden;
+}
+.replay-graph[hidden] { display:none; }
+.replay-graph__head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:5px 10px 3px; flex:0 0 auto;
+}
+.replay-graph__label {
+  font-size:.72rem; font-weight:800; letter-spacing:.04em;
+}
+.replay-graph__val {
+  font-size:.8rem; font-weight:800; color:#fff;
+  font-variant-numeric:tabular-nums;
+}
+.replay-graph__val--muted { color:var(--rp-dim); font-weight:700; font-size:.7rem; }
+.replay-graph__cv { flex:1; min-height:0; width:100%; display:block; }
+.replay-graph--nowind { background:rgba(30,43,61,0.7); border-style:dashed; }
+.replay-graph__note {
+  flex:1; min-height:0; display:flex; align-items:center;
+  padding:6px 11px; font-size:.74rem; line-height:1.5; color:var(--rp-dim);
+}
+.replay-graph__note b { color:#A9D6FF; font-weight:700; }
+.replay-graph__empty {
+  color:var(--rp-dim); font-size:.82rem; line-height:1.6;
+  padding:14px; text-align:center;
+}
+
+/* ---------- 스크러버 행 (지도 바로 아래) ---------- */
+.replay__scrubrow {
+  position:relative; z-index:20;
+  display:flex; align-items:center; gap:13px;
+  padding:9px 26px;
+  background:linear-gradient(180deg,rgba(8,12,20,0.32),rgba(8,12,20,0.74));
+}
+.replay__btn {
+  width:38px; height:38px; flex:0 0 auto; border-radius:999px;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1.5px solid var(--rp-line); cursor:pointer;
+  font-size:1rem; line-height:1; font-family:inherit;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.replay__btn:hover { background:rgba(255,255,255,0.14); }
+.replay__btn--play {
+  width:46px; height:46px; font-size:1.12rem;
+  background:var(--rp-accent); border-color:var(--rp-accent); color:#fff;
+}
+.replay__btn--play:hover { background:#1F8AEC; }
+.replay__btn--play.is-playing {
+  background:var(--rp-panel-2); border-color:var(--rp-line); color:var(--rp-text);
+}
+.replay__clock {
+  font-size:.84rem; font-weight:700; color:var(--rp-text);
+  font-variant-numeric:tabular-nums; min-width:106px; flex:0 0 auto;
+}
+.replay__scrub {
+  -webkit-appearance:none; appearance:none;
+  flex:1; height:8px; margin:0; border-radius:999px;
+  background:rgba(255,255,255,0.16); cursor:pointer;
+}
+.replay__scrub::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; border:2px solid var(--rp-accent); cursor:pointer;
+}
+.replay__scrub::-moz-range-thumb {
+  width:14px; height:14px; border-radius:50%;
+  background:#fff; border:2px solid var(--rp-accent); cursor:pointer;
+}
+.replay__scrub::-moz-range-track { background:transparent; }
+.replay__speed { display:flex; gap:4px; flex:0 0 auto; }
+.replay__spd {
+  background:var(--rp-panel-2); color:var(--rp-dim);
+  border:1.5px solid transparent; border-radius:7px;
+  padding:5px 8px; font-size:.74rem; font-weight:800;
+  cursor:pointer; font-family:inherit; font-variant-numeric:tabular-nums;
+}
+.replay__spd:hover { color:var(--rp-text); }
+.replay__spd.is-active {
+  background:var(--rp-accent-dim); color:#A9D6FF; border-color:var(--rp-accent);
+}
+
+/* ---------- 하단 메인 트랙 스트립 ---------- */
+.replay__trackrow {
+  position:relative; z-index:20;
+  display:flex; align-items:stretch; gap:10px;
+  padding:8px 14px 11px;
+  background:linear-gradient(180deg,rgba(8,12,20,0.74),rgba(8,12,20,0.92));
+}
+.replay__trackwrap { flex:1; min-width:0; }
+.replay__track {
+  width:100%; height:84px; display:block; cursor:pointer;
+  touch-action:none;
+}
+.replay__trackctl {
+  flex:0 0 auto; display:flex; align-items:center; gap:6px;
+}
+.replay__tbtn {
+  width:32px; height:32px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:7px;
+  font-size:1rem; font-weight:800; cursor:pointer; font-family:inherit;
+}
+.replay__tbtn:hover { background:rgba(255,255,255,0.14); }
+.replay__tspan {
+  font-size:.74rem; font-weight:700; color:var(--rp-dim);
+  min-width:54px; text-align:center; font-variant-numeric:tabular-nums;
+}
+.replay__tlink {
+  background:var(--rp-panel-2); color:var(--rp-dim);
+  border:1.5px solid var(--rp-line); border-radius:7px;
+  padding:6px 10px; font-size:.74rem; font-weight:700;
+  cursor:pointer; font-family:inherit; white-space:nowrap;
+}
+.replay__tlink.is-on {
+  background:var(--rp-accent-dim); color:#A9D6FF; border-color:var(--rp-accent);
+}
+
+/* ---------- 지도 재생 위치 마커 — 동적 보드 아이콘 ---------- */
+.rd-ph-icon { background:transparent; border:0; }
+.rd-ph, .rd-ph__rot { width:56px; height:56px; }
+.rd-ph__rot {
+  transform-origin:50% 50%;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.55));
+  transition:transform .12s linear;
+}
+/* 세일 회전은 SVG transform 속성으로 매 프레임 직접 갱신한다
+   (updateSailIcon · R.sailSide 보간으로 부드럽게). */
+.rd-ph__sail { transition:none; }
+
+/* ---------- 반응형 — 좁은 화면 ---------- */
+@media (max-width:920px) {
+  .replay__bar { flex-wrap:wrap; }
+  .replay__chips { order:3; flex-basis:100%; justify-content:flex-start; }
+  .replay__graphs { width:232px; }
+  .replay-rider__num { font-size:1.3rem; }
+  /* 769~920px — 좌측 컬럼을 약간 좁혀 중앙 공간을 확보한다(전 모드 공통) */
+  .replay__lcol { flex:0 0 290px; }
+  /* 그래프 레일이 232px 로 좁아지므로 영상 뷰 우측 패딩도 맞춘다(232+12) */
+  .replay--video .replay__cstage { padding-right:244px; }
+}
+
+/* 모바일(≤768px) — 세로 스택으로 reflow 한다: 중앙 스테이지 → 좌측
+   컬럼(데이터 패널 + 타일) → 미니그래프. 데스크톱 폭·방향 규칙을
+   무효화하고 모든 패널을 전체 폭 세로 스택으로 쌓는다. 다크 테마는
+   유지한다 (Danny 검토 2026-05-24 — 3 뷰 보정). */
+@media (max-width:768px) {
+  .replay__stage { flex-direction:column; overflow-y:auto; }
+  .replay--swap .replay__stage  { flex-direction:column; }
+  .replay--both.replay--swap .replay__cstage { flex-direction:column; }
+  /* 세로 스택 순서 — 중앙 스테이지 → 좌측 컬럼 → 미니그래프 */
+  .replay__cstage { order:1; }
+  .replay__lcol   { order:2; border-right:0; border-left:0; }
+  .replay__graphs { order:3; }
+  /* 데스크톱 폭·방향 규칙 무효화 — 모바일은 전부 전체 폭·세로 컬럼 */
+  .replay__lcol   { flex:0 0 auto; flex-direction:column; }
+  .replay__cstage { flex:0 0 auto; flex-direction:column; }
+  /* 모바일은 그래프가 인-플로우(겹침 없음) — 영상 뷰 우측 패딩 해제 */
+  .replay--video .replay__cstage { padding-right:0; }
+  /* 중앙 스테이지 패널 — 세로 스택, 각 42vh */
+  .replay__cstage > .replay__vpanel,
+  .replay__cstage > .replay__mpanel { flex:0 0 42vh; min-height:42vh; }
+  /* 좌측 컬럼 타일(데이터 패널·영상·지도) — 세로 스택, 각 32vh */
+  .replay__lcol > .replay__rider,
+  .replay__lcol > .replay__vpanel,
+  .replay__lcol > .replay__mpanel { flex:0 0 32vh; min-height:32vh; }
+  /* 미니그래프 — 세로 스택 마지막에 인-플로우 가로 타일로 */
+  .replay__graphs {
+    position:static; width:auto; max-width:none; flex:0 0 auto;
+    flex-direction:row; flex-wrap:wrap; padding:8px; gap:8px;
+  }
+  .replay-graph { flex:1 1 150px; min-height:96px; }
+}
+@media (max-width:620px) {
+  .replay__scrubrow { padding:8px 12px; gap:9px; }
+  .replay__clock { min-width:0; }
+  .replay-graph { flex:1 1 100%; }
+}
+
+/* §198-B (Alex Park 2026-06-04) — playback clock time-mode toggle.
+   chart axis 의 .time-toggle 컴포넌트(line 142-153) 재사용 — 일관성·재사용성.
+   replay__scrubrow flex 안 자연 배치 (clock 옆). 모바일 패딩만 축소. */
+.replay__timetoggle { flex:0 0 auto; }
+.replay__timetoggle button {
+  /* tap target 보존 (WCAG 2.5.8 — 24×24 CSS px). */
+  min-height:28px;
+}
+@media (max-width:620px) {
+  /* 모바일 — toggle 버튼 압축 (scrubber 폭 확보) */
+  .replay__timetoggle button { padding:4px 8px; font-size:0.72rem; }
+}
+
+/* ============================================================
+ * 시각 폴리시 — 카운트업·등장 애니메이션·스켈레톤·빈 상태
+ * (Danny 2026-05-26 라이딩 분석 대시보드 시각 폴리시 Layer 1)
+ * ------------------------------------------------------------
+ * - 카운트업: js/anim.js 가 data-rd-num 속성을 가진 노드를 600ms 만에
+ *   최종값으로 증가시킨다. is-counting 동안은 등폭 정렬을 유지.
+ * - 등장: 분석 완료 시 카드들이 살짝 아래에서 위로 fade in (stagger).
+ * - 스켈레톤: 분석 중 차트·KPI 자리에 shimmer 임시 표시.
+ * - prefers-reduced-motion 사용자는 모든 모션 즉시 표기 (시스템 존중).
+ * ============================================================ */
+/* 등폭 숫자 — 토큰화. 모든 KPI·표 숫자 노드가 동일 자리수 폭을 유지. */
+.num-tab { font-variant-numeric:tabular-nums; }
+
+/* 카운트업 진행 중 — 텍스트 점멸 방지·자리수 흔들림 방지 */
+.is-counting { font-variant-numeric:tabular-nums; }
+
+/* ---------- 카드/타일 등장 (stagger) ---------- */
+@keyframes rd-rise {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.rd-rise {
+  animation:rd-rise .42s var(--ease-out) both;
+}
+/* stagger — 1~6 단계. JS 가 부여하거나 nth-child 가 잡는다 */
+.rd-rise:nth-child(1) { animation-delay:0ms; }
+.rd-rise:nth-child(2) { animation-delay:50ms; }
+.rd-rise:nth-child(3) { animation-delay:100ms; }
+.rd-rise:nth-child(4) { animation-delay:150ms; }
+.rd-rise:nth-child(5) { animation-delay:200ms; }
+.rd-rise:nth-child(6) { animation-delay:250ms; }
+
+/* ---------- 스켈레톤 — shimmer 로딩 ---------- */
+@keyframes rd-shimmer {
+  0%   { background-position:200% 0; }
+  100% { background-position:-200% 0; }
+}
+.rd-skel {
+  background:linear-gradient(90deg,
+    var(--bg-card-2) 0%,
+    var(--bg-hover) 50%,
+    var(--bg-card-2) 100%);
+  background-size:200% 100%;
+  animation:rd-shimmer 1.4s linear infinite;
+  border-radius:8px; color:transparent !important;
+}
+.rd-skel--line { height:14px; margin:4px 0; }
+.rd-skel--num  { height:28px; width:60%; margin:6px auto; }
+.rd-skel--chart {
+  position:absolute; inset:8px; border-radius:10px;
+}
+/* 분석 중 차트박스에 임시 오버레이 */
+.chart-box.is-loading::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,
+    var(--bg-card-2) 0%, var(--bg-hover) 50%, var(--bg-card-2) 100%);
+  background-size:200% 100%;
+  animation:rd-shimmer 1.4s linear infinite;
+  border-radius:8px;
+  pointer-events:none; opacity:.65;
+}
+
+/* ---------- 빈 상태 — 텍스트만 두지 않고 작은 일러스트 안내 ---------- */
+.rd-empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:9px; padding:26px 16px; text-align:center;
+  color:var(--text-dim);
+}
+.rd-empty__art {
+  width:64px; height:64px; opacity:.72;
+  color:var(--text-mid);
+}
+.rd-empty__main {
+  font-size:.92rem; font-weight:700; color:var(--text-mid);
+}
+.rd-empty__sub {
+  font-size:.78rem; color:var(--text-dim); line-height:1.55;
+  max-width:340px;
+}
+
+/* ---------- 리듀스드 모션 존중 ---------- */
+@media (prefers-reduced-motion:reduce) {
+  .rd-rise, .stat, .metric, .vps-tile, .career-tile, .dm, .card { animation:none !important; transition:none !important; }
+  .rd-skel, .chart-box.is-loading::after { animation:none !important; }
+  .stat:hover, .metric:hover, .vps-tile:hover, .career-tile.is-clickable:hover { transform:none !important; }
+}
+
+/* ============================================================
+ * Layer 2 — Hero Summary 오버레이 + 인라인 아이콘 시스템 + 색 톤 깊이
+ * (Danny 2026-05-26 라이딩 분석 대시보드 시각 폴리시 Layer 2)
+ * ------------------------------------------------------------
+ * 라이트 테마 유지 — 다크 전환 금지. 색·폰트는 기존 토큰을 그대로
+ * 쓰고, 깊이감·임팩트만 끌어올린다. 본 오버레이는 분석 완료 직후
+ * 1회만 표시되며 5초 또는 클릭으로 사라진다.
+ * ============================================================ */
+/* ---------- Hero Summary (분석 완료 임팩트) ---------- */
+.rd-hero {
+  position:fixed; inset:0; z-index:5000;
+  background:linear-gradient(135deg, #F8FAFD 0%, #FFFFFF 35%, #F4F8FE 100%);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  animation:rd-hero-in .5s var(--ease-out) both;
+}
+.rd-hero[hidden] { display:none !important; }
+.rd-hero.is-leaving { animation:rd-hero-out .5s var(--ease-out) forwards; }
+@keyframes rd-hero-in {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+@keyframes rd-hero-out {
+  from { opacity:1; }
+  to   { opacity:0; visibility:hidden; }
+}
+
+/* 트랙 SVG 배경 — 옅게, 가로지르는 동선 */
+.rd-hero__bg {
+  position:absolute; inset:0; z-index:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:.30; pointer-events:none;
+}
+.rd-hero__bg svg { width:100%; height:100%; max-width:1200px; }
+/* 스크림 — 중앙은 옅게, 가장자리는 더 옅게 — 컨텐츠 가독성 보강 */
+.rd-hero__scrim {
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(60% 70% at 50% 50%,
+    rgba(255,255,255,0) 0%, rgba(248,250,253,.6) 60%, rgba(248,250,253,.9) 100%);
+}
+
+.rd-hero__skip {
+  position:absolute; top:18px; right:18px; z-index:30;
+  background:var(--bg-card); color:var(--text-mid);
+  border:1px solid var(--border-soft); border-radius:999px;
+  padding:8px 16px; font-size:.82rem; font-weight:700;
+  font-family:inherit; cursor:pointer;
+  box-shadow:var(--shadow-sm);
+  transition:background var(--t-fast) var(--ease-out),
+             color var(--t-fast) var(--ease-out),
+             border-color var(--t-fast) var(--ease-out);
+}
+.rd-hero__skip:hover {
+  background:var(--bg-card); color:var(--text); border-color:var(--border);
+  box-shadow:var(--shadow);
+}
+
+.rd-hero__content {
+  position:relative; z-index:20;
+  text-align:center; padding:24px 20px;
+  max-width:960px; width:100%;
+  animation:rd-rise .6s var(--ease-out) .15s both;
+}
+.rd-hero__kicker {
+  font-size:.78rem; font-weight:800; color:var(--sea-deep);
+  letter-spacing:.18em; text-transform:uppercase;
+  margin-bottom:12px;
+}
+.rd-hero__title {
+  font-size:clamp(1.8rem, 4vw, 2.6rem);
+  font-weight:800; letter-spacing:-.025em; color:var(--text);
+  line-height:1.1;
+}
+.rd-hero__meta {
+  font-size:.92rem; color:var(--text-mid); margin-top:8px;
+}
+.rd-hero__kpis {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:14px; margin:30px auto 22px; max-width:880px;
+}
+.rd-hero-kpi {
+  display:flex; flex-direction:column; align-items:center;
+  gap:6px; padding:14px 12px;
+  background:rgba(255,255,255,.72); border:1px solid var(--border-soft);
+  border-radius:14px; box-shadow:var(--shadow);
+  backdrop-filter:blur(8px);
+  animation:rd-rise .55s var(--ease-out) both;
+}
+.rd-hero-kpi:nth-child(1) { animation-delay:.30s; }
+.rd-hero-kpi:nth-child(2) { animation-delay:.38s; }
+.rd-hero-kpi:nth-child(3) { animation-delay:.46s; }
+.rd-hero-kpi:nth-child(4) { animation-delay:.54s; }
+.rd-hero-kpi__icon { color:var(--sea-deep); width:22px; height:22px; }
+.rd-hero-kpi__val {
+  font-size:clamp(1.8rem, 3.4vw, 2.6rem);
+  font-weight:800; letter-spacing:-.03em; line-height:1;
+  color:var(--text); font-variant-numeric:tabular-nums;
+}
+.rd-hero-kpi__val small {
+  font-size:.45em; font-weight:700; color:var(--text-mid);
+  margin-left:3px;
+}
+.rd-hero-kpi__lbl {
+  font-size:.74rem; font-weight:700; color:var(--text-mid);
+  letter-spacing:.02em;
+}
+.rd-hero__hint {
+  font-size:.78rem; color:var(--text-dim); margin-top:14px;
+  font-style:italic;
+}
+@media (max-width:600px) {
+  .rd-hero__kpis { grid-template-columns:repeat(2,1fr); gap:10px; }
+  .rd-hero-kpi { padding:11px 8px; }
+}
+
+/* ---------- 인라인 아이콘 시스템 ---------- */
+/* 모든 인라인 SVG 아이콘은 .rd-icon 으로 통일된 stroke·sizing 을 받는다.
+   currentColor 로 호환되므로 어디에 박아도 부모 글자색을 따른다. */
+.rd-icon {
+  display:inline-block; vertical-align:-3px;
+  width:1em; height:1em; stroke-width:2;
+  flex:none;
+}
+.rd-icon--lg { width:1.2em; height:1.2em; vertical-align:-4px; }
+
+/* 섹션 헤더 — 카드 그룹 시작에 아이콘 인접 (이미지/이모지 보강이 아니라
+   대체). 기존 emoji prefix(📊·🔄·❤️·💬·📈)는 그대로 두되, SVG 아이콘이
+   우선시되도록 .section-head__no 옆에 inline SVG 부착 가능하게 함. */
+.section-head__icon {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:30px; height:30px; flex:none;
+  background:linear-gradient(180deg, rgba(31,143,255,.10), rgba(31,143,255,.04));
+  border:1px solid rgba(31,143,255,.20);
+  border-radius:8px;
+  color:var(--sea-deep);
+}
+.section-head__icon svg { width:18px; height:18px; }
+
+/* ---------- 색 톤 보조 (Layer 2) ---------- */
+/* Zone 배경 — 카드들 사이 옅은 zone 구분 (필요한 곳만 부여) */
+.zone-tint {
+  background:linear-gradient(180deg, #F0F3F8 0%, var(--bg-app) 100%);
+  border-radius:var(--radius); padding:14px 16px;
+  margin:8px -2px;
+}
+
+/* ---------- 차트 카드 진입 (Layer 2 marker) ---------- */
+.chart-box-enter {
+  animation:rd-rise .5s var(--ease-out) both;
+}
+.chart-box-enter:nth-child(odd) { animation-delay:.04s; }
+.chart-box-enter:nth-child(even) { animation-delay:.10s; }
+
+/* ---------- 빈 상태 일러스트 (Layer 2 활용 클래스) ----------
+   기존 .empty-note 를 .rd-empty 로 업그레이드 할 때 쓴다. */
+.rd-empty svg { display:block; margin:0 auto; }
+
+@media (prefers-reduced-motion:reduce) {
+  .rd-hero, .rd-hero__content, .rd-hero-kpi, .chart-box-enter {
+    animation:none !important;
+  }
+}
+
+/* ============================================================
+ * Layer 2.0 — FINAL OVERRIDE PASS (Danny 2026-05-26)
+ * ------------------------------------------------------------
+ * 파일 끝 위치 — 위쪽에 산발적으로 흩어진 ad-hoc font-size 들을 *마지막에*
+ * 덮어쓰기로 통일. 위쪽의 동등 specificity 선언과 충돌 시 cascade 마지막
+ * 규칙(이 블록)이 이긴다. !important 는 사용 안 함 — 정상 cascade 로만
+ * 일관성 강제. 리플레이 뷰어(.replay) 는 스코프 격리되어 영향 X.
+ *
+ * 4 사이즈 토큰만 허용 — hero / xl / lg / md. 그 외 값 노드는 모두 lg 로.
+ * ============================================================ */
+
+/* (1) 모든 value 노드 — 공통 스타일 강제 */
+.stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v,
+.stats-val,
+.vps-tile__score,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time,
+.eff,
+.run-row__main strong,
+.bw-card__head,
+.mvc-mean {
+  font-weight:800;
+  letter-spacing:-.025em;
+  line-height:1.05;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
+/* (2) 사이즈 4 버킷 — 늦은 cascade 로 ad-hoc 사이즈 override */
+/* hero — VPS Overall 도넛 중앙 (한 곳만) */
+.vps-tile--main .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-hero); }
+.vps-tile--main .vps-tile__score { font-size:var(--fs-num-hero); }
+
+/* xl — 첫 인상 KPI (summary-strip 의 stat__value) + VPS 서브 도넛 */
+.stat-strip > .stat > .stat__value { font-size:var(--fs-num-xl); }
+.vps-tile .vps-tile__donutctr .vps-tile__score { font-size:var(--fs-num-xl); }
+.vps-tile__score { font-size:var(--fs-num-xl); }
+
+/* lg — 본문 KPI · 모든 보조 value 노드 */
+.stat-strip--inner > .stat > .stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v {
+  font-size:var(--fs-num-lg);
+}
+
+/* md — 표·인라인 value */
+.stats-val,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time {
+  font-size:var(--fs-num-md);
+}
+
+/* (3) max / unit 라벨 — VPS / sub */
+.vps-tile__max,
+.vps-tile__donutctr .vps-tile__max {
+  font-size:var(--fs-micro);
+  font-weight:700; color:var(--text-dim);
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+
+/* (4) NA score — 사이즈 동일 유지 */
+.vps-score--na { font-size:inherit !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+ * §204 — Replay viewer transparency + 명도대비 (옥대표님 2026-06-06)
+ * ───────────────────────────────────────────────────────────────
+ * Spec: _experts/dataviz_replay_viewer_transparency_spec.md (305 줄)
+ * 옥대표님 verbatim:
+ *   - 우측 4 차트 사각 백그라운드 투명 → 영상 visible
+ *   - 타임라인/지도/영상 명도대비 (§301)
+ * 본인 (샘 정 #2) 구현 — v2 staging 전용, 기존 dashboard 무수정.
+ * ═══════════════════════════════════════════════════════════════ */
+
+/* §204-A — 우측 4 chart card 투명도 (Task A) ----------------------
+ * 현재 .replay-graph background = var(--rp-panel) = rgba(14,20,31,0.78)
+ *   alpha 0.78 → 영상 거의 안 보임 (옥대표님 호소)
+ * 목표 alpha 0.40 + backdrop-filter blur(8px) saturate(140%) glass
+ *   Apple Vision Pro glass material 패턴.
+ * border alpha 0.13 → 0.18 (윤곽 유지). box-shadow 제거 (flat).
+ * WCAG 1.4.3 contrast: 텍스트 + 데이터 line 가독성 사수 (§204-B/C/D). */
+.replay .replay-graph {
+  /* alpha 0.78 → 0.40, hue 보존 (--rp-panel 14,20,31 base) */
+  background: rgba(14, 20, 31, 0.40);
+  /* glass material — saturate 140% 로 영상 색 강조 */
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  /* 윤곽만 — alpha 0.13 → 0.18 dim border */
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  /* flat 처리 — box-shadow 제거 */
+  box-shadow: none;
+}
+
+/* backdrop-filter 미지원 fallback (구 Firefox 등) — alpha 약간 ↑ */
+@supports not (backdrop-filter: blur(0)) {
+  .replay .replay-graph {
+    background: rgba(14, 20, 31, 0.72);
+  }
+}
+
+/* §204-B — Chart 안 텍스트 가독성 보강 (Task A, 영상 위)
+ * Chart.js canvas 안 텍스트는 ticks.color override 로 (charts.js).
+ * CSS 는 graph__label / graph__val 같은 HTML 텍스트만 보강. */
+.replay .replay-graph__label,
+.replay .replay-graph__val {
+  text-shadow:
+    0 0 4px rgba(10, 14, 26, 0.95),
+    0 1px 1px rgba(10, 14, 26, 0.80);
+}
+
+/* §204-C — 타임라인 (스크러버 행) 명도대비 (Task B §301)
+ * 현재 .replay__scrubrow = linear-gradient(rgba(8,12,20,0.32→0.74))
+ * 옥대표님: "하단 타임라인 명도대비 수정"
+ * 목표: 영상 위에서 시간/버튼/슬라이더 가독성 확보.
+ *   - 아래 방향으로 더 진한 gradient (0.32→0.85)
+ *   - top border 1px white 0.10 (영상과 분리 시각 hint)
+ *   - 시간 텍스트 text-shadow */
+.replay .replay__scrubrow {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 12, 20, 0.42) 0%,
+    rgba(8, 12, 20, 0.85) 100%
+  );
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+.replay .replay__clock {
+  text-shadow: 0 1px 2px rgba(10, 14, 26, 0.70);
+}
+/* 슬라이더 track — 영상 위 시각 강조 */
+.replay .replay__scrub {
+  background: rgba(255, 255, 255, 0.22);  /* 0.16 → 0.22 (visible) */
+}
+
+/* §204-D — 좌측 rider/stats 패널 명도대비 (Task B §301)
+ * 현재 background gradient rgba(8,13,22,0.82→0.58)
+ * 일관성 위해 우측 chart card 와 같은 glass material 정신.
+ * 단 좌측은 데이터 panel 이라 텍스트 가독성 더 중요 → alpha 약간 ↑. */
+.replay .replay__rider,
+.replay .replay__stats {
+  /* alpha 0.82→0.58 → 0.62→0.42 (일관성 + 영상 시인성 ↑) */
+  background: linear-gradient(
+    180deg,
+    rgba(8, 13, 22, 0.62),
+    rgba(8, 13, 22, 0.42)
+  );
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+@supports not (backdrop-filter: blur(0)) {
+  .replay .replay__rider,
+  .replay .replay__stats {
+    background: linear-gradient(
+      180deg,
+      rgba(8, 13, 22, 0.86),
+      rgba(8, 13, 22, 0.72)
+    );
+  }
+}
+/* rider/stats 텍스트 가독성 — text-shadow */
+.replay .replay-rider__name,
+.replay .replay-stats__hd,
+.replay .replay-rider__num,
+.replay .replay-stats__v {
+  text-shadow: 0 1px 2px rgba(10, 14, 26, 0.75);
+}
+
+/* §204-E — 지도 panel (Task B §301)
+ * Leaflet tile 라이트 → 다크 swap 은 JS (replay.js) 에서.
+ * CSS 는 지도 컨테이너 panel border + overlay. */
+.replay .replay__mpanel {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  /* 다크 tile 권장 — 영상과 톤 일관 */
+}
+
+/* §204-F — 영상 명도대비 (Task B §301)
+ * 옥대표님: "영상의 명도대비"
+ * 영상 위 텍스트·차트의 가독성 = 영상 위에 옅은 dark gradient overlay.
+ * 영상 자체 위 (비디오 element 위) 가 아니라 .replay__vpanel 의
+ * overlay scrim 으로. 영상 상단 (텍스트 영역) 만 진하게.
+ *
+ * 우리 markup 에서 영상은 .replay__vpanel 안 또는 .replay__blur 배경.
+ * 기존 .replay__scrim (line 1711) 가 이미 영상 위 scrim 역할.
+ * 정정: scrim alpha 미세 ↑ + gradient 강화. */
+.replay .replay__scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 14, 26, 0.55) 0%,
+    rgba(10, 14, 26, 0.15) 35%,
+    rgba(10, 14, 26, 0.20) 70%,
+    rgba(10, 14, 26, 0.65) 100%
+  );
+}
+
+/* §204-G — Reduce motion 안전망 */
+@media (prefers-reduced-motion: reduce) {
+  .replay .replay-graph,
+  .replay .replay__rider,
+  .replay .replay__stats {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(14, 20, 31, 0.85);
+  }
+}
+
+

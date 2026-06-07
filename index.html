@@ -460,92 +460,10 @@
      cross-reference verify: 외부 페이지의 #sports anchor 참조 0건 (grep evidence) → 안전 제거.
      이전 #consultation 직후 #founder 직전 hr divider 1개로 연결. -->
 
-<!-- ========== §210 SailTech Sports Science Lab · Founder ==========
-     Inserted: 2026-06-06 (Alex Park #4) · Rose Yoon (#1) spec + 옥대표님 verbatim option A
-     Numerals: 3× Olympic · PhD 운동생리학 · 3 NTs (한국·싱가폴·인도 국가대표 코치)
-     Asset: assets/images/about/danny-hainan-candid-{4x5,1x1,sm}.webp + .jpg fallback
-     Tokens: 기존 style.css 토큰 사용 (--color-navy, --color-sea, --color-mist, --font-mono)
-     v2 design-system tokens 합의 시 자동 매핑 (BEM class 그대로 유지). -->
-<style>
-  /* §210 — Founder section scoped CSS (single-file inline; v2 token migration 시 _design-system/founder.css 분리). */
-  .founder { padding: clamp(64px, 9vw, 120px) 0; background: linear-gradient(180deg, var(--color-navy, #0A2540) 0%, #061A2E 100%); color: #fff; }
-  .founder .container { max-width: 1180px; }
-  .founder__layout { display: grid; gap: clamp(28px, 4vw, 56px); grid-template-columns: 1fr; align-items: center; }
-  @media (min-width: 880px) {
-    .founder__layout { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
-  }
-  .founder__metrics { display: flex; flex-direction: column; gap: 22px; word-break: keep-all; }
-  .founder__eyebrow { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-sun, #FFB800); margin: 0; }
-  .founder__title { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 800; line-height: 1.1; margin: 0; display: flex; flex-direction: column; gap: 4px; letter-spacing: -0.02em; }
-  .founder__name { color: #fff; }
-  .founder__role { font-size: 1rem; font-weight: 500; letter-spacing: 0.04em; color: rgba(255,255,255,0.75); font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); }
-  .founder__credentials { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 6px 0 0; padding: 0; }
-  @media (min-width: 560px) { .founder__credentials { grid-template-columns: repeat(3, 1fr); gap: 18px; } }
-  .founder__credential { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; background: rgba(255,255,255,0.04); backdrop-filter: blur(8px) saturate(120%); -webkit-backdrop-filter: blur(8px) saturate(120%); margin: 0; }
-  .founder__credential dt { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.62); margin: 0; }
-  .founder__credential dd { margin: 0; }
-  .founder__credential .founder__metric { font-family: var(--font-mono, 'JetBrains Mono', 'SF Mono', monospace); font-size: clamp(1.6rem, 3.2vw, 2.1rem); font-weight: 700; line-height: 1; color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; display: inline-flex; align-items: baseline; gap: 2px; }
-  .founder__credential .founder__metric sup { font-size: 0.55em; font-weight: 600; color: var(--color-sun, #FFB800); margin-left: 1px; vertical-align: super; }
-  .founder__credential .founder__metric sub { font-size: 0.42em; font-weight: 700; color: rgba(255,255,255,0.85); margin-left: 3px; letter-spacing: 0.04em; vertical-align: baseline; transform: translateY(-2px); display: inline-block; }
-  .founder__credential-label { font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); font-size: 0.82rem; line-height: 1.5; color: rgba(255,255,255,0.7); }
-  .founder__lead { font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); font-size: 1rem; line-height: 1.7; color: rgba(255,255,255,0.82); margin: 12px 0 0; max-width: 50ch; }
-  .founder__portrait { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.36); }
-  .founder__portrait img { width: 100%; height: auto; display: block; aspect-ratio: 4 / 5; object-fit: cover; }
-  .founder__caption { position: absolute; left: 14px; bottom: 14px; right: 14px; padding: 12px 14px; border-radius: 12px; background: rgba(10,14,22,0.55); backdrop-filter: blur(12px) saturate(140%); -webkit-backdrop-filter: blur(12px) saturate(140%); border: 1px solid rgba(255,255,255,0.10); display: flex; flex-direction: column; gap: 2px; }
-  .founder__caption .eyebrow { font-family: var(--font-sans-en, 'Inter', system-ui, sans-serif); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-sun, #FFB800); }
-  .founder__caption-text { font-family: var(--font-sans-kr, 'Pretendard', system-ui, sans-serif); font-size: 0.84rem; line-height: 1.5; color: rgba(255,255,255,0.92); word-break: keep-all; }
-  @media (prefers-reduced-motion: reduce) { .founder__credential { backdrop-filter: none; -webkit-backdrop-filter: none; } }
-</style>
-<section class="founder" id="founder" aria-labelledby="founder-title">
-  <div class="container">
-    <div class="founder__layout">
-      <!-- Left — Hero metric stack (Rose C1 패턴 · 옥대표님 verbatim option A) -->
-      <div class="founder__metrics">
-        <p class="founder__eyebrow">SailTech Sports Science Lab · Founder</p>
-        <h2 class="founder__title" id="founder-title">
-          <span class="founder__name">옥덕필 (Duckpil Ok)</span>
-          <span class="founder__role">대표 · 운동생리학박사</span>
-        </h2>
-        <dl class="founder__credentials">
-          <div class="founder__credential">
-            <dt>Olympic</dt>
-            <dd><span class="founder__metric">3<sup>×</sup></span></dd>
-            <dd class="founder__credential-label">윈드서핑 국가대표 선수 · 올림픽 3회 연속 출전</dd>
-          </div>
-          <div class="founder__credential">
-            <dt>학위</dt>
-            <dd><span class="founder__metric">PhD</span></dd>
-            <dd class="founder__credential-label">운동생리학 (체육응용과학)</dd>
-          </div>
-          <div class="founder__credential">
-            <dt>National Team Coach</dt>
-            <dd><span class="founder__metric">3<sub>NTs</sub></span></dd>
-            <dd class="founder__credential-label">한국 · 싱가폴 · 인도 국가대표 코치</dd>
-          </div>
-        </dl>
-        <p class="founder__lead">
-          단무지는 commerce + sports science lab. 윙포일 컨설팅의 본질은 product 가 아니라 데이터와 코칭의 깊이입니다.
-        </p>
-      </div>
-
-      <!-- Right — Portrait (4:5 vertical) + glassmorphism caption -->
-      <figure class="founder__portrait">
-        <picture>
-          <source media="(max-width: 768px)" srcset="assets/images/about/danny-hainan-candid-sm.webp" type="image/webp">
-          <source srcset="assets/images/about/danny-hainan-candid-4x5.webp" type="image/webp">
-          <img src="assets/images/about/danny-hainan-candid.jpg"
-               alt="옥덕필 — 2025 중국 Hainan 윙포일 챔피언십, 라이딩 준비 중"
-               width="800" height="1000"
-               loading="lazy" decoding="async">
-        </picture>
-        <figcaption class="founder__caption">
-          <span class="eyebrow">2025 China · Hainan</span>
-          <span class="founder__caption-text">National Wing Foiling Championship — 라이딩 준비 중</span>
-        </figcaption>
-      </figure>
-    </div>
-  </div>
-</section>
+<!-- §217 (Danny 2026-06-06) — §210 founder section REVERTED.
+     옥대표님 verbatim "이거 제거해요" (hero 중복 + founder redundancy).
+     Asset 보존 (danny-hainan-candid*) — about.html §214 Swap 2 portrait 의존.
+     Rose 의 founder-section-spec.md 보존 (_design-system/) — 추후 사용 case 시 참고. -->
 
 <!-- ========== 4 Brand Hub ========== -->
 <section class="section" id="brands">
@@ -698,7 +616,7 @@
       <article class="persona reveal" data-delay="2" style="border-color:var(--color-sea);box-shadow:var(--shadow-md)">
         <div class="persona__num">02 · INTERMEDIATE · 추천</div>
         <span class="wind-baseline-pill" title="모든 추천 카드는 중풍 11-16kt 기준 — 본인 spot에 맞춰 ±1 사이즈 조정"><span class="wind-baseline-pill__label">기준 풍속</span>중풍 11-16 kt</span>
-        <h3 class="persona__title">한국 표준 — 중급 라이더</h3>
+        <h3 class="persona__title">자이빙되는 중급 라이더</h3>
         <p class="persona__sub">한 셋업으로 다양한 컨디션 커버하고 싶은 실용주의자. 어떤 컨디션에서나</p>
         <ul class="persona__list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Free Series FW 790 (790cm²) 또는 FW 900 (900cm²)</li>
@@ -713,7 +631,7 @@
       <article class="persona reveal" data-delay="3">
         <div class="persona__num">03 · ADVANCED</div>
         <span class="wind-baseline-pill" title="모든 추천 카드는 중풍 11-16kt 기준 — 본인 spot에 맞춰 ±1 사이즈 조정"><span class="wind-baseline-pill__label">기준 풍속</span>중풍 11-16 kt</span>
-        <h3 class="persona__title">강풍·다운윈드 상급</h3>
+        <h3 class="persona__title">택킹도 잘되는 상급 라이더</h3>
         <p class="persona__sub">정밀 응답성과 일관된 성능 추구. 5년 이상 사용할 마지막 업그레이드</p>
         <ul class="persona__list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Levitaz Free Series FW 540 (540cm²) 또는 FW 680 (680cm²)</li>
@@ -728,7 +646,7 @@
       <article class="persona reveal" data-delay="4" style="border-color:#C03030">
         <div class="persona__num" style="color:#C03030">04 · PRO · 선수</div>
         <span class="wind-baseline-pill" title="모든 추천 카드는 중풍 11-16kt 기준 — 본인 spot에 맞춰 ±1 사이즈 조정"><span class="wind-baseline-pill__label">기준 풍속</span>중풍 11-16 kt</span>
-        <h3 class="persona__title">국가대표·국제 대회 라이더</h3>
+        <h3 class="persona__title">국제대회 출전 라이더</h3>
         <p class="persona__sub">선수처럼 함께 경쟁하며 성장하는 스타일이라면. Race wing + cross-platform 마스트 셋업</p>
         <ul class="persona__list">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>PPC Sonic FDS Wing (Full Dual Skin race wing)</li>
@@ -737,7 +655,7 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>WIP X-OVER race-grade Helmet + Kompact 50N 2.0 (slim 라이프자켓) + Waistfoil Harness 3.0</li>
         </ul>
         <div class="wind-baseline-note" role="note"><span class="wind-baseline-note__row"><strong>미풍 ≤10 kt</strong> — 윙 한 사이즈 ↑ 권장</span><span class="wind-baseline-note__row"><strong>강풍 ≥17 kt</strong> — 윙 한 사이즈 ↓ 권장</span></div>
-        <a class="persona__pack persona__pack--cta" href="#contact" data-level="pro" aria-label="선수 풀 시스템 견적 요청 — 카톡 상담으로 이동"><strong>선수 풀 시스템 견적 요청 →</strong>국가대표·국제 대회 라이더 대상 1:1 컨설팅</a>
+        <a class="persona__pack persona__pack--cta" href="#contact" data-level="pro" aria-label="선수 풀 시스템 견적 요청 — 카톡 상담으로 이동"><strong>선수 풀 시스템 견적 요청 →</strong>국제대회 출전 라이더 대상 1:1 컨설팅</a>
       </article>
     </div>
   </div>
