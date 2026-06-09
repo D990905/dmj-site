@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0A2540">
 <title>상급 — wave·downwind·race까지 | 단무지 컨설팅</title>
-<meta name="description" content="상급 라이더를 위한 윙·포일·SUP 셋업 컨설팅. 체중·스타일 16조합 큐레이션. 옥덕필 수석코치가 운영하는 단무지.">
+<meta name="description" content="상급 라이더를 위한 윙·포일·SUP 셋업 컨설팅. 체중·풍속 자동 추천 (4 컨디션). 옥덕필 수석코치가 운영하는 단무지.">
 <!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
 <script>
 (function(){
@@ -37,7 +37,7 @@
 <link rel="canonical" href="https://dmjgroup.kr/level/advanced.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="상급 라이더 컨설팅 | 단무지">
-<meta property="og:description" content="상급 라이더를 위한 윙·포일·SUP 셋업 컨설팅. 체중·스타일 16조합 큐레이션. 옥덕필 수석코치가 운영하는 단무지.">
+<meta property="og:description" content="상급 라이더를 위한 윙·포일·SUP 셋업 컨설팅. 체중·풍속 자동 추천 (4 컨디션). 옥덕필 수석코치가 운영하는 단무지.">
 <meta property="og:locale" content="ko_KR">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
 
@@ -47,6 +47,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526">
+<link rel="stylesheet" href="../assets/css/level-recommender.css">
 </head>
 <body>
 
@@ -194,7 +195,7 @@
       <h1 class="cons-hero__title"><em>상급</em>의 다음 단계</h1>
       <p class="cons-hero__lead">잘 떠오르고, jibe·tack 90%+, downwind·wave까지 시도하는 단계. 이제 <strong>전문 분야</strong>가 갈라집니다. flat-speed인지, wave인지, downwind인지 — 각 길마다 셋업이 다릅니다.</p>
       <div class="cons-hero__cta">
-        <a href="#matrix" class="btn btn--accent btn--lg">16조합 매트릭스 보기</a>
+        <a href="#matrix" class="btn btn--accent btn--lg">맞춤 셋업 추천 받기</a>
         <a href="../find-my-gear.html" class="btn btn--ghost-light btn--lg">1분 만에 내 장비 찾기 →</a>
       </div>
     </div>
@@ -286,15 +287,15 @@
   </div>
 </section>
 
-<!-- Matrix — 16 combinations -->
-<section class="cons-matrix" id="matrix">
+<!-- §403 — 4-tile interactive gear recommender (옥대표님 verbatim 2026-06-09 · DO_NOT_REVERT) -->
+<section class="lvl-rec" id="matrix" data-level="advanced">
   <div class="container">
-    <div class="cons-matrix__head">
-      <span class="t-eyebrow">4 weight × 4 style = 16</span>
-      <h2 class="cons-matrix__title">상급 체중·스타일별 추천 16조합</h2>
-      <p class="cons-matrix__lead">M1 중심의 정밀 셋업. 전문 분야에 따라 윙·포일 조합이 갈라집니다.</p>
+    <div class="lvl-rec__head">
+      <span class="lvl-rec__eyebrow">맞춤 셋업 추천</span>
+      <h2 class="lvl-rec__title">상급 — 컨디션별 4 셋업</h2>
+      <p class="lvl-rec__lead">체중·풍속 입력 → 4 컨디션별 셋업 자동 추천 · M1 중심 정밀 셋업. 본인 체중과 spot 풍속을 입력하면 윙·포일·보드·안전장비가 자동으로 추천됩니다.</p>
     </div>
-    <div id="matrix-grid"></div>
+    <!-- 4 tile (Flat·Speed / Choppy·Freeride / Wave / Hybrid) — gear-recommender.js 가 DOM build -->
   </div>
 </section>
 
@@ -470,15 +471,15 @@
 <script src="../assets/js/access-code.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    if (window.DMJMatrix) {
-      window.DMJMatrix.renderLevel('advanced', '#matrix-grid');
-    }
-    if (window.DMJAccess) { window.DMJAccess.applyUnlock(); }
+    // §403 — DMJMatrix.renderLevel 제거. gear-recommender.js 가 4-tile UI build.
+    // matrix.js 는 cart.js price fallback (DMJMatrix.getPrice) 용으로 로드 유지.
+if (window.DMJAccess) { window.DMJAccess.applyUnlock(); }
   });
 </script>
   <script src="../assets/js/nav-auth.js" defer></script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="../assets/css/agent-deny.css">
+  <script src="../assets/js/gear-recommender.js" defer></script>
   <script src="../assets/js/agent-deny.js" defer></script>
 </body>
 </html>
