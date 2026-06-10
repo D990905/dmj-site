@@ -2,7 +2,7 @@
      5 스킬 (토우 택킹/힐 택킹/토 자이빙/힐 자이빙/점핑) × Port/Starboard = 10 axes.
      설문 = 5점 만족도 척도 (매우불만족 / 불만족 / 보통 / 만족 / 매우만족) — 미입력 상태 없음 · 모든 축이 값을 가짐 · 100점 만점.
        Danny 2026-05-23: 3단계(완벽/문제없음/정말못함) + 미입력 폐지. 5점 만족도로 교체.
-     §165 v4 — 5-zone (입문/초급/중급/상급/선수) · Score 5-tier (0-20/21-40/41-60/61-80/81-100) · Speed 5-zone (≤12/13-19/20-24/25-29/30+).
+     §165 v4 + §408 — 5-zone (입문/초급/중급/상급/선수) · Score 5-tier (옥대표님 2026-06-10: 0-30/31-50/51-70/71-85/86-100 · 중급=51부터) · Speed 5-zone (≤10/11-18/19-25/26-30/31+ kt).
      약점 자동 (불만족 이하) + 육상/해상 분리.
      ⛔ Wave/Downwind 5 스킬 v1 세트 영구 금지.
      SoT: project_dmj_phase_b_skill_assessment.md / reference_dmj_10axis_skill_taxonomy.md / reference_dmj_skill_training_programs.md / reference_dmj_level_4_categories.md (§155 v3). -->
@@ -456,13 +456,14 @@
   var WEAK_MAX_INDEX = 1;       // 0 매우불만족 · 1 불만족 = 약점
 
   // ---- Tier mapping (100점 만점 → 종합 레벨 · §155 v2 / §165 v3 4-tier) ----
-  // §155 v3 + §165 v4 — Score 5-tier (0-20 입문 / 21-40 초급 / 41-60 중급 / 61-80 상급 / 81-100 선수)
+  // §155 v3 + §165 v4 + §408 — Score 5-tier (옥대표님 verbatim 2026-06-10: 0-30 입문 / 31-50 초급 / 51-70 중급 / 71-85 상급 / 86-100 선수 · 중급 = 51 부터)
+  // skill-level.js KNOBS.tierBounds [30,50,70,85] 와 동일 경계.
   function getOverallTier(total) {
     if (total === 0) return { label: '—', color: 'var(--color-slate)' };
-    if (total <= 20) return { label: '입문', color: '#4ade80' };
-    if (total <= 40) return { label: '초급', color: '#67e8f9' };
-    if (total <= 60) return { label: '중급', color: '#3FB8C9' };
-    if (total <= 80) return { label: '상급', color: '#FF8A3D' };
+    if (total <= 30) return { label: '입문', color: '#4ade80' };
+    if (total <= 50) return { label: '초급', color: '#67e8f9' };
+    if (total <= 70) return { label: '중급', color: '#3FB8C9' };
+    if (total <= 85) return { label: '상급', color: '#FF8A3D' };
     return                  { label: '선수', color: '#FFB800' };
   }
 

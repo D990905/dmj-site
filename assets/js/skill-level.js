@@ -41,8 +41,8 @@
     confCap: 0.97,
     /* 13. 추천 신뢰도 게이트 */
     recommendGate: 0.50,
-    /* 15. 등급 경계 */
-    tierBounds: [20, 40, 60, 80]
+    /* 15. 등급 경계 — §408 옥대표님 verbatim 2026-06-10: 0-30 입문 / 31-50 초급 / 51-70 중급 / 71-85 상급 / 86-100 선수 (중급 = 51 부터) */
+    tierBounds: [30, 50, 70, 85]
   };
 
   var TIER_NAMES = ['입문', '초급', '중급', '상급', '선수'];
@@ -386,10 +386,18 @@
     }
     function near(a, b, tol) { return Math.abs(a - b) <= (tol || 0.5); }
 
+    // §408 — threshold 정정 [30,50,70,85] 경계 검증 (옥대표님 verbatim: 0-30/31-50/51-70/71-85/86-100, 중급=51부터)
+    check('tierFromScore 30 → 입문 (경계)', tierFromScore(30) === '입문');
+    check('tierFromScore 31 → 초급 (경계)', tierFromScore(31) === '초급');
+    check('tierFromScore 50 → 초급 (경계)', tierFromScore(50) === '초급');
+    check('tierFromScore 51 → 중급 (경계·중급 시작)', tierFromScore(51) === '중급');
     check('tierFromScore 58 → 중급', tierFromScore(58) === '중급');
+    check('tierFromScore 70 → 중급 (경계)', tierFromScore(70) === '중급');
+    check('tierFromScore 71 → 상급 (경계)', tierFromScore(71) === '상급');
+    check('tierFromScore 80 → 상급', tierFromScore(80) === '상급');
+    check('tierFromScore 85 → 상급 (경계)', tierFromScore(85) === '상급');
+    check('tierFromScore 86 → 선수 (경계·선수 시작)', tierFromScore(86) === '선수');
     check('tierFromScore 88 → 선수', tierFromScore(88) === '선수');
-    check('tierFromScore 81 → 선수 (경계)', tierFromScore(81) === '선수');
-    check('tierFromScore 80 → 상급 (경계)', tierFromScore(80) === '상급');
     check('windBand 10kt → 약풍 ×1.20', windBand(10).name === '약풍' && windBand(10).factor === 1.20);
     check('windBand 15kt → 중풍 ×1.00', windBand(15).factor === 1.00);
     check('windBand 25kt → 강풍 ×0.95', windBand(25).factor === 0.95);
