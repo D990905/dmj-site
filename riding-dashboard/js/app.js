@@ -100,16 +100,27 @@
     return mmss(tSec);
   }
   function fmtDate(ep) {
-    if (!ep) return '날짜 정보 없음';
+    if (!ep) return i18nT('날짜 정보 없음');
     var d = new Date(ep);
+    var hh = ('0' + d.getHours()).slice(-2), mm = ('0' + d.getMinutes()).slice(-2);
+    /* §410 — 영문 모드면 EN 날짜 포맷(요일 약어 포함). 한글 요일 '(화)' 가
+       텍스트노드에 합쳐져 DOM 번역이 못 닿던 잔존을 빌드 시점에 EN 으로. */
+    if (window.RDI18n && window.RDI18n.getLang && window.RDI18n.getLang() === 'en') {
+      var EN_WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      var EN_MO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return EN_MO[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() +
+             ' (' + EN_WD[d.getDay()] + ') ' + hh + ':' + mm;
+    }
     var wd = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
     return d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() +
-           '. (' + wd + ') ' + ('0' + d.getHours()).slice(-2) + ':' +
-           ('0' + d.getMinutes()).slice(-2);
+           '. (' + wd + ') ' + hh + ':' + mm;
   }
   function compass(deg) {
     var dirs = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
-    return dirs[Math.round(((deg % 360) + 360) % 360 / 45) % 8];
+    /* §410 — 영문 모드면 8방위를 EN 약어(N·NE·…)로. MAP 에 한↔영 8방위가
+       모두 있어 i18nT 로 변환 — '212° 남서' 처럼 노드가 합쳐져도 빌드 시 EN. */
+    return i18nT(dirs[Math.round(((deg % 360) + 360) % 360 / 45) % 8]);
   }
   /* 실제(시계) 시각 HH:MM:SS — 세션 시작 epoch 기준 */
   function fmtClock(tSec) {
@@ -183,8 +194,8 @@
        모바일 Web Share API 지원 시 모달의 '공유' 버튼이 자동 활성화된다. */
     var pdfBtn = $('pdf-export-btn');
     if (pdfBtn && window.RDPdfExport) {
-      pdfBtn.textContent = '📄 PDF 미리보기';
-      pdfBtn.setAttribute('aria-label', 'PDF 보고서 미리보기');
+      pdfBtn.textContent = '📄 ' + i18nT('PDF 미리보기');
+      pdfBtn.setAttribute('aria-label', i18nT('PDF 보고서 미리보기'));
       pdfBtn.addEventListener('click', function () {
         if (pdfBtn.disabled) return;
         pdfBtn.disabled = true;
@@ -464,6 +475,16 @@
         var wm = location.search.match(/[?&]wind=(\d+)/);
         if (wm) { setWindPending(parseInt(wm[1], 10)); confirmWind(); }
       }, 50);
+    }
+
+    // §415 (Alex Park #4 · 2026-06-10) — ?session=<id> URL parameter handler.
+    // profile.html '최근 라이딩' row click (§411) — cross-page URL navigate 시
+    // 세션 자동 load. app.js 의 [data-load] global click handler 는 같은 도메인
+    // inline click 처리, 본 handler 가 진입 시점 URL parameter 처리.
+    // 매칭 X 또는 load 실패 시 인트로 화면 그대로 (showError 가 안내).
+    var sessMatch = location.search.match(/[?&]session=([A-Za-z0-9_-]+)/);
+    if (sessMatch) {
+      setTimeout(function () { loadSavedSession(sessMatch[1]); }, 50);
     }
   }
 
@@ -770,8 +791,8 @@
     $('hero-title').textContent = state.sessionName || '라이딩 세션';
     var meta = fmtDate(s.startEpoch);
     var src = s.speedSource === 'device' ? 'Device' : 'GPS';
-    $('hero-meta').textContent = meta + ' · ' + (SPORTS[state.sport].label || state.sport) +
-      ' · ' + src;
+    $('hero-meta').textContent = meta + ' · ' +
+      i18nT(SPORTS[state.sport].label || state.sport) + ' · ' + src;
 
     /* 4 핵심 KPI */
     var sum = a.summary;
@@ -870,6 +891,24 @@
     if (state && state.session) {
       try { renderDashboard(); }
       catch (e) { console.warn('renderDashboard on langchange failed:', e); }
+      /* §410 — renderDashboard 가 다시 만들지 않는 'built-once' 노드(영웅 카드
+         메타·풍향 확정 토스트)는 토글 시 빌드 당시 언어로 굳어 한글이 남는다.
+         텍스트만 현재 언어로 갱신(오버레이 재표시 없이). */
+      try {
+        var s = state.session;
+        var heroMeta = $('hero-meta');
+        if (heroMeta && s && state.analysis) {
+          heroMeta.textContent = fmtDate(s.startEpoch) + ' · ' +
+            i18nT(SPORTS[state.sport].label || state.sport) + ' · ' +
+            (s.speedSource === 'device' ? 'Device' : 'GPS');
+        }
+        if (state.windDir != null) {
+          var wn = $('wind-note');
+          if (wn) wn.textContent = i18nT(
+            '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.',
+            { deg: state.windDir, dir: compass(state.windDir) });
+        }
+      } catch (e2) { /* 토글 갱신 실패는 무음 — renderDashboard 가 본문은 처리 */ }
     }
   });
 
@@ -877,13 +916,15 @@
     renderSessionTitle();
     $('session-date').textContent = fmtDate(state.session.startEpoch);
     $('session-sport-select').value = state.sport;
+    /* §410 — 속도원·포인트 수 source 줄을 i18nT 로(영문 모드 한글 잔존 제거).
+       이전엔 PATTERNS 의 '$1 · $2' 백참조가 한국어 캡처를 그대로 재출력했다. */
     var src = state.session.speedSource === 'device'
-      ? '속도원: 기기 기록' : '속도원: GPS 좌표 계산';
+      ? i18nT('속도원: 기기 기록') : i18nT('속도원: GPS 좌표 계산');
     // 원본 GPX trkpt 전량 사용 (다운샘플링 없음)
     var ptN = (state.parsed && state.parsed.pointCount) || state.session.pointCount;
-    src += ' · GPS 포인트 ' + ptN.toLocaleString() + '개 전량 사용';
+    src += i18nT(' · GPS 포인트 {n}개 전량 사용', { n: ptN.toLocaleString() });
     if (state.session.editApplied) {
-      src += ' · 편집 적용 ' + state.session.pointCount.toLocaleString() + '개 분석';
+      src += i18nT(' · 편집 적용 {n}개 분석', { n: state.session.pointCount.toLocaleString() });
     }
     $('session-source').textContent = src;
 
@@ -1523,8 +1564,8 @@
         (i < 6 ? ',' : '');
     }
     $('map-legend').innerHTML =
-      '<span>느림</span><span class="map-legend__bar" style="background:' +
-      'linear-gradient(90deg,' + stops + ')"></span><span>빠름 (' +
+      '<span>' + i18nT('느림') + '</span><span class="map-legend__bar" style="background:' +
+      'linear-gradient(90deg,' + stops + ')"></span><span>' + i18nT('빠름') + ' (' +
       fmtSpeed(state.analysis.summary.maxSpeedMs, 0) + ' ' + unitLabel() + ')</span>';
     /* 지도가 새로 그려졌으므로(전체화면·리플레이 토글 등) 선택된
        고속 구간이 있으면 강조를 다시 적용한다. */
@@ -1684,9 +1725,11 @@
       var nk = (row.metric === 'twa') ? 'twa-' + row.mode : row.metric;
       if (STATS_NEUTRAL_NOTE[nk]) txt = STATS_NEUTRAL_NOTE[nk];
     }
-    var pre = withMode ? (STATS_MODE_LABEL[row.mode] + ' ') : '';
+    /* §410 — 풍상/풍하 접두·배지 문구를 i18nT 로 변환(노드가 '풍상 ▼ 낮을수록
+       좋음' 처럼 합쳐져 DOM 번역이 못 닿던 잔존을 빌드 시점에 EN 으로). */
+    var pre = withMode ? (i18nT(STATS_MODE_LABEL[row.mode]) + ' ') : '';
     return '<span class="stats-dir stats-dir--' + b.cls + '">' +
-      esc(pre) + b.arrow + esc(txt) + '</span>';
+      esc(pre) + b.arrow + esc(i18nT(txt)) + '</span>';
   }
   function statsUnitOf(row) {
     return row.unit === 'speed' ? unitLabel()
@@ -1697,7 +1740,9 @@
      그 지표가 차지하는 표 행 수(= 방향(풍상/풍하) 수). */
   function statsMetricCell(rows, rowspanN) {
     var r0 = rows[0];
-    var nameTxt = r0.label + ' (' + statsUnitOf(r0) + ')';
+    /* §410 — 지표명(SOG (속도)·VMG (풍상·풍하 유효속도)·심박수 (HR) 등)을
+       i18nT 로 변환. 단위와 합쳐진 'SOG (속도) (kt)' 노드를 빌드 시 EN 으로. */
+    var nameTxt = i18nT(r0.label) + ' (' + statsUnitOf(r0) + ')';
     var tip = STATS_TIP[r0.metric];
     var nameHtml = '<span class="stats-mx__name">' +
       (tip ? tipLabel(nameTxt, tip) : esc(nameTxt)) + '</span>';
@@ -1972,7 +2017,7 @@
         '" title="클릭하면 지도에 이 구간 트랙이 표시됩니다">' +
         '<span class="run-row__rank">' + (i + 1) + '</span>' +
         '<span class="run-row__main"><strong>' + fmtSpeedU(r.avgSpeedMs) + '</strong>' +
-        ' <span class="run-row__sub">평균 · 최고 ' + fmtSpeedU(r.maxSpeedMs) +
+        ' <span class="run-row__sub">' + i18nT('평균 · 최고') + ' ' + fmtSpeedU(r.maxSpeedMs) +
         hr + '</span></span>' +
         '<span class="run-row__meta">' + fmtDur(r.durationSec) + ' · ' +
         Math.round(r.distanceM) + ' m · ' + Math.round(r.heading) + '° ' +
@@ -2192,7 +2237,7 @@
       var r = ws.recommended;
       setWindPending(r.windDir);
       $('wind-note').textContent = '권장 추정값 ' + r.windDir + '° (' +
-        compass(r.windDir) + ') · 신뢰도 ' + r.confidence + ' — ' + r.note +
+        compass(r.windDir) + ') · 신뢰도 ' + i18nT(r.confidence) + ' — ' + r.note +
         ' 다이얼·슬라이더로 보정 후 “확정”을 누르세요.';
       renderWindSources();
     });
@@ -2233,10 +2278,13 @@
     renderSpeedChart();
     renderSessionSummary();
     if (state.windDir != null) {
-      $('wind-note').textContent = '✓ 풍향 ' + state.windDir + '° (' +
-        compass(state.windDir) + ') 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.';
+      /* §410 — 확정 안내를 단일 i18nT 템플릿으로(compass 는 lang-aware → 방위 EN).
+         이전엔 PATTERNS 가 프레임만 번역하고 방위 캡처를 한글로 재출력했다. */
+      $('wind-note').textContent = i18nT(
+        '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.',
+        { deg: state.windDir, dir: compass(state.windDir) });
     } else {
-      $('wind-note').textContent = '풍향이 해제되었습니다.';
+      $('wind-note').textContent = i18nT('풍향이 해제되었습니다.');
     }
     /* 리플레이 뷰어가 열려 있으면 새 확정 풍향을 즉시 반영한다 —
        리플레이는 open() 시점 풍향을 캐시하므로 재확정 시 격자·ladder
@@ -2264,7 +2312,7 @@
       arrow.style.opacity = '1';
       var confirmed = (state.windDir === p);
       ro.textContent = '풍향 ' + p + '° (' + compass(p) + ') · ' +
-        (confirmed ? '확정됨' : '미확정 — 확정 필요');
+        (confirmed ? i18nT('확정됨') : i18nT('미확정 — 확정 필요'));
       ro.className = 'wind-dial__readout' + (confirmed ? '' : ' is-pending');
       updateWindArrows(p);
       updateWindGrid(p);                 // 그리드를 미리보기 풍향으로 회전
@@ -2619,9 +2667,13 @@
         '<span class="bw-card__head">#' + (idx + 1) +
         ' <span class="mv-badge mv-badge--' + tm.cls + '">' + tm.label + '</span></span>' +
       '</span>' +
-      '<span class="bw-card__metrics">손실 ' + Math.round(m.lossDisplayPct) + '% · 회복 ' +
-      (m.recoverySec != null ? m.recoverySec.toFixed(1) + ' sec' : '—') +
-      ' · 회전효율 ' + m.efficiency + ' score</span></button>';
+      '<span class="bw-card__metrics">' +
+        i18nT('손실 {loss}% · 회복 {rec} · 회전효율 {eff} score', {
+          loss: Math.round(m.lossDisplayPct),
+          rec: (m.recoverySec != null ? m.recoverySec.toFixed(1) + ' sec' : '—'),
+          eff: m.efficiency
+        }) +
+      '</span></button>';
   }
 
   function renderManeuverTable() {
@@ -2671,7 +2723,8 @@
     var u = unitLabel();
     $('maneuver-thead-row').innerHTML =
       '<th>#</th><th>종류</th><th>방향</th><th>시각</th>' +
-      '<th>진입 (' + u + ')</th><th>최저 (' + u + ')</th><th>탈출 (' + u + ')</th>' +
+      '<th>' + i18nT('진입') + ' (' + u + ')</th><th>' + i18nT('최저') + ' (' + u +
+        ')</th><th>' + i18nT('탈출') + ' (' + u + ')</th>' +
       '<th>' + tipLabel('손실 (%)', LOSS_TIP) + '</th>' +
       '<th>' + tipLabel('소요 (sec)', DURATION_TIP) + '</th>' +
       '<th>' + tipLabel('회복 (sec)', RECOVERY_TIP) + '</th>' +
@@ -2728,8 +2781,11 @@
         legend.hidden = false;
         legend.innerHTML =
           '<span class="mv-legend__swatch" aria-hidden="true"></span>' +
-          '<span>그라데이션으로 강조된 줄은 <b>세션 베스트 회전</b>입니다 — ' +
-          '택킹·자이빙 각 종류에서 효율 점수가 가장 높은 회전을 표시합니다.</span>';
+          /* §410 — <b> 로 노드가 셋으로 갈려 DOM 번역이 못 닿던 잔존을, 한 문장을
+             {b} 보간하는 단일 i18nT 키로 묶어 영문 모드에서 한글 0. */
+          '<span>' + i18nT(
+            '그라데이션으로 강조된 줄은 {b}입니다 — 택킹·자이빙 각 종류에서 효율 점수가 가장 높은 회전을 표시합니다.',
+            { b: '<b>' + i18nT('세션 베스트 회전') + '</b>' }) + '</span>';
       } else {
         legend.hidden = true;
         legend.innerHTML = '';
@@ -3367,15 +3423,20 @@
         '</span></div></div>';
     }
     if (legend) {
+      /* §410 — 모집단 라벨·캡션을 i18nT 로(영문 모드 한글 잔존 제거). */
       legend.innerHTML =
-        grpHtml(popLabel + ' 모집단 — 평균 (실선)', pd.avg, sd.avg);
+        grpHtml(i18nT('{pop} 모집단 — 평균 (실선)', { pop: i18nT(popLabel) }), pd.avg, sd.avg);
     }
 
-    var twaDesc = (metric === 'twa') ? ' · TWA = 풍향 대비 진행 각도' : '';
-    note.textContent = mLabel + ' 분포 · ' + popLabel + ' 모집단 · ' +
-      (mode === 'upwind' ? '풍상' : '풍하') + ' ' + actWord +
-      ' 구간 (SOG ' + actKt + ' kt 이상) · 표본 P ' + pd.count +
-      '개 · S ' + sd.count + '개' + twaDesc;
+    /* §410 — 분포 subtitle 전체를 단일 i18nT 템플릿으로(지표·모집단·방향·구간을
+       각각 i18nT 변환 후 보간). 한글 enum 이 한 텍스트노드로 합쳐져도 빌드 시 EN. */
+    var twaDesc = (metric === 'twa') ? i18nT(' · TWA = 풍향 대비 진행 각도') : '';
+    note.textContent = i18nT(
+      '{m} 분포 · {pop} 모집단 · {dir} {act} 구간 (SOG {kt} kt 이상) · 표본 P {p}개 · S {s}개', {
+        m: i18nT(mLabel), pop: i18nT(popLabel),
+        dir: i18nT(mode === 'upwind' ? '풍상' : '풍하'), act: i18nT(actWord),
+        kt: actKt, p: pd.count, s: sd.count
+      }) + twaDesc;
   }
 
   /* ============================================================
@@ -3450,11 +3511,12 @@
       return statTile(label, '–', '비교 가능한 구간 없음');
     }
     var pct = Math.round(side.pctOfTarget);
-    var sub = (side.comparedTimeSec >= 60
+    var tstr = (side.comparedTimeSec >= 60
       ? Math.round(side.comparedTimeSec / 60) + 'min'
-      : Math.round(side.comparedTimeSec) + 'sec') + ' 비교';
+      : Math.round(side.comparedTimeSec) + 'sec');
+    var sub = i18nT('{t} 비교', { t: tstr });
     if (side.coverage < 0.995) {
-      sub += ' · 주행의 ' + Math.round(side.coverage * 100) + '%만 타깃 보유';
+      sub += i18nT(' · 주행의 {p}%만 타깃 보유', { p: Math.round(side.coverage * 100) });
     }
     return statTile(label, pct + ' %', sub);
   }
@@ -3509,10 +3571,9 @@
     banner.hidden = false;
     if (allLow) {
       banner.className = 'tp-banner tp-banner--warn';
-      banner.textContent = '⚠ 이 세션은 풍향 자동 추정 신뢰도가 낮습니다' +
-        (ests.length ? '' : ' (추정 불가)') +
-        ' — TWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 ' +
-        '직접 확인해 주세요.';
+      banner.textContent = '⚠ ' + i18nT(
+        '이 세션은 풍향 자동 추정 신뢰도가 낮습니다{x} — TWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 직접 확인해 주세요.',
+        { x: ests.length ? '' : i18nT(' (추정 불가)') });
     } else if (farDelta > 25) {
       banner.className = 'tp-banner tp-banner--warn';
       banner.textContent = '⚠ 설정한 풍향 ' + Math.round(state.windDir) +
@@ -3597,7 +3658,7 @@
       statTile('순항 기준 심박 (bpm)', sk.cruiseHr, '포일링·회전 밖 시간가중 평균') +
       statTile('최대 생리 반응 (bpm)',
         sk.biggest ? sgn(sk.biggest.riseBpm) : '—',
-        sk.biggest ? (sk.biggest.label + ' · 순항 대비') : null) +
+        sk.biggest ? (i18nT(sk.biggest.label) + ' · 순항 대비') : null) +
       statTile('세션 회복 지수 (bpm/min)',
         sk.recoveryIndex != null ? sk.recoveryIndex.toFixed(1) : '—',
         rec.n ? ('회복 표본 ' + rec.n + '회 평균 · 클수록 빠른 회복')
@@ -3722,16 +3783,17 @@
        입력 없으면 세션 관측 최대(maxBpm)를 fallback 으로 쓰지만,
        그 경우엔 '관측 기준' 임을 부수 설명에서 명시한다 (Danny 2026-05-27 §174). */
     var maxHr = (state.rider && state.rider.maxHr) || hr.maxBpm;
+    /* §410 — 기준 라벨·부수 문구를 i18nT 로(영문 모드 한글 잔존 제거). */
     var basisLabel = (state.rider && state.rider.maxHr)
-      ? '입력 최대 ' + maxHr + ' bpm'
-      : '관측 최대 ' + maxHr + ' bpm';
+      ? i18nT('입력 최대 {n} bpm', { n: maxHr })
+      : i18nT('관측 최대 {n} bpm', { n: maxHr });
     function pctOf(bpm) {
       if (!bpm || !maxHr) return null;
       return Math.round(bpm / maxHr * 100);
     }
     function withPct(sub, bpm) {
       var p = pctOf(bpm);
-      return p != null ? sub + ' · ' + p + '% HRmax' : sub;
+      return p != null ? i18nT(sub) + ' · ' + p + '% HRmax' : i18nT(sub);
     }
     box.innerHTML =
       statTile('평균 심박 (bpm)', Math.round(hr.avgBpm),
@@ -3741,8 +3803,9 @@
       statTile('최저 심박 (bpm)', hr.minBpm,
         withPct('세션 관측 최소', hr.minBpm)) +
       statTile('심박 기록률 (%)', Math.round(hr.coveragePct),
-        '기록 포인트 ' + recTotal.toLocaleString() + '개 중 심박 ' +
-        hr.count.toLocaleString() + '개 · 기준 ' + basisLabel);
+        i18nT('기록 포인트 {rec}개 중 심박 {hr}개 · 기준 {basis}', {
+          rec: recTotal.toLocaleString(), hr: hr.count.toLocaleString(), basis: basisLabel
+        }));
   }
 
   /* 심박 존 분포 + 추이 차트(존 배경 띠) — 최대 심박수 입력이 바뀔
@@ -3829,9 +3892,9 @@
       var pct = Math.round(r.sec / tot * 100);
       return '<div class="hr-zone-row">' +
         '<span class="hr-zone-row__sw" style="background:' + r.sw + '"></span>' +
-        '<span class="hr-zone-row__name">' + esc(r.name) + ' (' + r.tag + ')</span>' +
+        '<span class="hr-zone-row__name">' + esc(i18nT(r.name)) + ' (' + i18nT(r.tag) + ')</span>' +
         '<span class="hr-zone-row__range">' + esc(r.range) + '</span>' +
-        '<span class="hr-zone-row__desc">' + esc(r.desc) + '</span>' +
+        '<span class="hr-zone-row__desc">' + esc(i18nT(r.desc)) + '</span>' +
         '<span class="hr-zone-row__time">' + fmtDur(r.sec) + '</span>' +
         '<span class="hr-zone-row__pct">' + pct + '%</span>' +
         '</div>';
@@ -4686,7 +4749,7 @@
         (canLoad ? ' data-load="' + r.id + '" title="클릭하면 이 세션을 대시보드에 다시 불러옵니다"' : '') +
         '>' +
         '<td>' + fmtDate(r.dateEpoch).split(' (')[0] + '</td>' +
-        '<td>' + (SPORTS[r.sport] ? SPORTS[r.sport].label : r.sport) + '</td>' +
+        '<td>' + i18nT(SPORTS[r.sport] ? SPORTS[r.sport].label : r.sport) + '</td>' +
         '<td>' + fmtDist(r.distanceM) + '</td>' +
         '<td>' + fmtSpeedU(r.maxSpeedMs) + '</td>' +
         '<td>' + fmtSpeedU(r.avgSpeedMovingMs) + '</td>' +
