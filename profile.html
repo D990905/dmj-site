@@ -331,6 +331,32 @@
       </div>
     </section>
 
+    <!-- §411 (Alex Park #4 · 2026-06-10) — 최근 라이딩 데이터.
+         옥대표님 verbatim: "마이페이지에 최근 라이딩 데이타를 볼 수 있게 해줘
+         최근 5개가 목록으로 나타나고 더보기 버튼 생성해서 모든 저장된 세션을 다 볼 수 있게"
+         Source: localStorage.rd_sessions_v1 (riding-dashboard storage.js 가 write).
+         Honest raise: Supabase rides 테이블은 현재 EMPTY (riding-dashboard 가 거기에
+         아직 write 안 함). 본 section = localStorage source. Cross-device sync =
+         Phase 12 추가 sprint 영역 — storage.js 에 upsert pipeline 추가 후 본 read 도
+         supabase fetch 로 전환. 그 전까지는 같은 브라우저 안 세션만 표시. -->
+    <section class="profile-section" id="section-rides">
+      <h2 class="profile-section__title">최근 라이딩 <small id="rides-count-badge"></small></h2>
+      <p class="profile-section__lead">라이딩 대시보드에 저장된 세션 — 최근 5개. 더보기로 전체 목록.</p>
+      <div class="rides-list" id="rides-list" data-state="loading" aria-live="polite" aria-busy="true">
+        <div class="rides-skel" aria-hidden="true">
+          <div class="rides-skel__row"></div>
+          <div class="rides-skel__row"></div>
+          <div class="rides-skel__row"></div>
+        </div>
+      </div>
+      <div class="rides-actions" id="rides-actions" hidden>
+        <button type="button" class="rides-more-btn" id="rides-more-btn" aria-expanded="false" aria-controls="rides-list">
+          <span data-rides-more-label>더보기 — 모든 세션</span>
+          <span class="rides-more-btn__chev" aria-hidden="true">↓</span>
+        </button>
+      </div>
+    </section>
+
     <!-- 5. §D My Gear -->
     <section class="profile-section" id="my-gear">
       <h2 class="profile-section__title">보유 장비 (My Gear) <small>입력 즉시 자동 저장</small></h2>
@@ -2900,6 +2926,206 @@
           window.location.reload();
         }
       });
+    })();
+
+    // ===== §411 (Alex Park #4 · 2026-06-10) — 최근 라이딩 데이터 =====
+    // 옥대표님 verbatim: "최근 5개가 목록으로 나타나고 더보기 버튼 생성해서 모든 저장된 세션을 다 볼 수 있게"
+    // Source: localStorage.rd_sessions_v1 (riding-dashboard storage.js write 경로).
+    // 정직 raise: Supabase rides 테이블은 현재 0건 (riding-dashboard 가 cloud upload 안 함).
+    //            본 §411 = localStorage source — 같은 브라우저 안 세션만 보임.
+    //            cross-device sync = Phase 12 sprint 별도 (storage.js → upsert pipeline 후 전환).
+    (function () {
+      // §413-3 (Alex Park #4 · 2026-06-10) — §412 namespace alignment.
+      // §412 Code task 가 storage.js 의 SESSIONS_KEY 를 'rd_sessions_v1' →
+      // 'rd_<uid>_sessions_v1' per-user 로 sweep. 본 readSessions() 도
+      // dual-key fallback 으로 pre/post §412 모두 작동:
+      //   1) 우선 per-user key (logged-in 시 'rd_<uid>_sessions_v1')
+      //   2) legacy global key ('rd_sessions_v1') — §412 마이그레이션 안 된
+      //      브라우저 또는 비로그인 시
+      //   3) 두 key 모두 읽으면 id dedupe (per-user 우선)
+      var LEGACY_KEY = 'rd_sessions_v1';
+      var KEY_PREFIX = 'rd_';
+      var KEY_SUFFIX = '_sessions_v1';
+      var INITIAL_LIMIT = 5;
+      var listEl = document.getElementById('rides-list');
+      var actionsEl = document.getElementById('rides-actions');
+      var moreBtn = document.getElementById('rides-more-btn');
+      var moreLabelEl = moreBtn ? moreBtn.querySelector('[data-rides-more-label]') : null;
+      var moreChevEl = moreBtn ? moreBtn.querySelector('.rides-more-btn__chev') : null;
+      var countBadge = document.getElementById('rides-count-badge');
+      if (!listEl || !actionsEl || !moreBtn) return;
+
+      var expanded = false;
+      var sessions = [];
+
+      function userScopedKey() {
+        try {
+          var uid = (window.DMJAuth && typeof DMJAuth.currentUserId === 'function')
+            ? DMJAuth.currentUserId() : null;
+          return uid ? (KEY_PREFIX + uid + KEY_SUFFIX) : null;
+        } catch (e) { return null; }
+      }
+      function readKey(k) {
+        try {
+          var raw = window.localStorage && window.localStorage.getItem(k);
+          if (!raw) return [];
+          var arr = JSON.parse(raw);
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) { return null; }
+      }
+      function readSessions() {
+        // §413-3 — dual-key fallback. null 반환 = parse 실패 (error state).
+        var perUserKey = userScopedKey();
+        var perUser = perUserKey ? readKey(perUserKey) : [];
+        if (perUser === null) return null;
+        var legacy = readKey(LEGACY_KEY);
+        if (legacy === null) return null;
+        // Dedupe by id (per-user 우선)
+        var seen = {}, merged = [];
+        perUser.forEach(function (r) { if (r && r.id) { seen[r.id] = 1; merged.push(r); } });
+        legacy.forEach(function (r) { if (r && r.id && !seen[r.id]) { merged.push(r); } });
+        // 최신 순 (dateEpoch desc). storage.js 가 asc 로 저장 → reverse.
+        return merged.sort(function (a, b) {
+          return (b.dateEpoch || 0) - (a.dateEpoch || 0);
+        });
+      }
+
+      function fmtDate(epochMs) {
+        if (!epochMs) return '—';
+        try {
+          var d = new Date(epochMs);
+          var y = d.getFullYear();
+          var mo = ('0' + (d.getMonth() + 1)).slice(-2);
+          var da = ('0' + d.getDate()).slice(-2);
+          var dow = ['일','월','화','수','목','금','토'][d.getDay()];
+          var hh = ('0' + d.getHours()).slice(-2);
+          var mm = ('0' + d.getMinutes()).slice(-2);
+          return y + '.' + mo + '.' + da + ' (' + dow + ') ' + hh + ':' + mm;
+        } catch (e) { return '—'; }
+      }
+
+      function fmtKm(distanceM) {
+        if (!distanceM || !isFinite(distanceM)) return null;
+        return (distanceM / 1000).toFixed(2) + ' km';
+      }
+
+      function fmtKt(ms) {
+        if (!ms || !isFinite(ms)) return null;
+        return (ms * 1.94384).toFixed(1) + ' kt';
+      }
+
+      function fmtVps(v) {
+        if (v == null || !isFinite(v)) return null;
+        return 'VPS ' + Math.round(v);
+      }
+
+      function sportLabel(s) {
+        var map = { wingfoil: '윙포일', sailing: '세일링', kitefoil: '카이트', windsurf: '윈드서핑' };
+        return map[s] || (s || '윙포일');
+      }
+
+      function escapeHtml(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      function buildRow(r) {
+        var stats = [];
+        var sport = sportLabel(r.sport);
+        if (sport) stats.push(sport);
+        var km = fmtKm(r.distanceM);
+        if (km) stats.push(km);
+        var top = fmtKt(r.maxSpeedMs);
+        if (top) stats.push('top ' + top);
+        var vps = fmtVps(r.vpsOverall);
+        if (vps) stats.push(vps);
+
+        var dateStr = fmtDate(r.dateEpoch);
+        var name = escapeHtml(r.name || '라이딩 세션');
+        var detailHref = 'riding-dashboard/?session=' + encodeURIComponent(r.id || '');
+
+        return '<a class="ride-row" href="' + detailHref + '">' +
+          '<span class="ride-row__date">' + escapeHtml(dateStr) + '</span>' +
+          '<span class="ride-row__name">' + name + '</span>' +
+          '<span class="ride-row__stats">' + escapeHtml(stats.join(' · ')) + '</span>' +
+          '<span class="ride-row__chev" aria-hidden="true">→</span>' +
+        '</a>';
+      }
+
+      function renderEmpty() {
+        listEl.setAttribute('data-state', 'empty');
+        listEl.setAttribute('aria-busy', 'false');
+        listEl.innerHTML =
+          '<div class="rides-empty">' +
+            '<p class="rides-empty__title">아직 저장된 라이딩이 없습니다.</p>' +
+            '<p class="rides-empty__sub">라이딩 대시보드에서 GPX 파일을 업로드하면 이 곳에 표시됩니다.</p>' +
+            '<a href="riding-dashboard/" class="rides-empty__cta">라이딩 대시보드로 이동 →</a>' +
+          '</div>';
+        actionsEl.hidden = true;
+        if (countBadge) countBadge.textContent = '';
+      }
+
+      function renderError() {
+        listEl.setAttribute('data-state', 'error');
+        listEl.setAttribute('aria-busy', 'false');
+        listEl.innerHTML =
+          '<div class="rides-empty rides-empty--error">' +
+            '<p class="rides-empty__title">세션을 불러오지 못했습니다.</p>' +
+            '<p class="rides-empty__sub">브라우저 저장 공간을 확인해 주세요.</p>' +
+          '</div>';
+        actionsEl.hidden = true;
+        if (countBadge) countBadge.textContent = '';
+      }
+
+      function renderRows() {
+        listEl.setAttribute('data-state', 'data');
+        listEl.setAttribute('aria-busy', 'false');
+        var slice = expanded ? sessions : sessions.slice(0, INITIAL_LIMIT);
+        listEl.innerHTML = slice.map(buildRow).join('');
+        if (countBadge) {
+          countBadge.textContent = '저장된 ' + sessions.length + '건';
+        }
+        // 더보기 버튼 표시 조건: 5건 초과
+        if (sessions.length > INITIAL_LIMIT) {
+          actionsEl.hidden = false;
+          if (moreLabelEl) {
+            moreLabelEl.textContent = expanded
+              ? '접기 — 최근 5개만'
+              : '더보기 — 모든 세션 (' + sessions.length + '건)';
+          }
+          if (moreChevEl) moreChevEl.textContent = expanded ? '↑' : '↓';
+          moreBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        } else {
+          actionsEl.hidden = true;
+        }
+      }
+
+      function init() {
+        sessions = readSessions();
+        if (sessions === null) { renderError(); return; }
+        if (sessions.length === 0) { renderEmpty(); return; }
+        renderRows();
+      }
+
+      moreBtn.addEventListener('click', function () {
+        expanded = !expanded;
+        renderRows();
+        // 펼쳤다 접을 때 section 위치 유지 (scroll 점프 방지)
+        if (!expanded) {
+          var section = document.getElementById('section-rides');
+          if (section && section.scrollIntoView) {
+            section.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          }
+        }
+      });
+
+      // storage 다른 탭에서 변경 시 자동 갱신
+      window.addEventListener('storage', function (e) {
+        if (e.key === SESSIONS_KEY) init();
+      });
+
+      init();
     })();
 
     // ===== 9. §I 트레이닝 progress (ex-§H, §174 letter shift) =====

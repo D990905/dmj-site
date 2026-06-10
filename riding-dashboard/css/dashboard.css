@@ -2622,3 +2622,148 @@ input::placeholder { color:var(--text-dim); }
 .vps-score--na { font-size:inherit !important; }
 
 
+
+/* ============================================================
+ * §413 (Alex Park #4 · 2026-06-10) — 인트로 화면 '최근 세션 보기' widget.
+ * DO_NOT_REVERT §413.
+ * 옥대표님 verbatim: "라이딩분석으로 들어가면 파일을 올리기 아래에 최근 세션보기 버튼"
+ * Source: RDStorage.listSessions() (localStorage rd_sessions_v1).
+ * 회귀 가드: 기존 intro__ class 무수정. 신규 .intro__recent / .intro-ride-row 만 추가.
+ * ============================================================ */
+.intro__recent { margin-top: 14px; }
+.intro__recent-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 14px;
+  background: rgba(31, 143, 255, 0.06);
+  border: 1px solid rgba(31, 143, 255, 0.22);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text, #0A2540);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.intro__recent-btn:hover,
+.intro__recent-btn:focus-visible {
+  background: rgba(31, 143, 255, 0.10);
+  border-color: rgba(31, 143, 255, 0.40);
+  outline: none;
+}
+.intro__recent-icon { font-size: 14px; }
+.intro__recent-chev { font-size: 11px; transition: transform 160ms ease; }
+.intro__recent-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Row — 한 줄 = 한 세션 (button 으로 — keyboard accessible) */
+.intro-ride-row {
+  display: grid;
+  grid-template-columns: 168px 1fr auto 18px;
+  grid-template-areas: "date name stats chev";
+  gap: 4px 14px;
+  align-items: center;
+  padding: 11px 14px;
+  background: #fff;
+  border: 1px solid rgba(10, 37, 64, 0.10);
+  border-radius: 10px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  word-break: keep-all;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 100ms ease;
+}
+.intro-ride-row:hover,
+.intro-ride-row:focus-visible {
+  border-color: var(--accent, #1F8FFF);
+  box-shadow: 0 4px 14px rgba(31, 143, 255, 0.10);
+  outline: none;
+}
+.intro-ride-row:active { transform: translateY(1px); }
+
+.intro-ride-row__date {
+  grid-area: date;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-dim, #7E93A8);
+  font-variant-numeric: tabular-nums;
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  letter-spacing: -0.01em;
+}
+.intro-ride-row__name {
+  grid-area: name;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #0A2540);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intro-ride-row__stats {
+  grid-area: stats;
+  font-size: 12.5px;
+  color: var(--text-mid, #5C6F7E);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.intro-ride-row__chev {
+  grid-area: chev;
+  font-size: 14px;
+  color: var(--text-dim, #7E93A8);
+  text-align: right;
+  transition: transform 160ms ease, color 160ms ease;
+}
+.intro-ride-row:hover .intro-ride-row__chev,
+.intro-ride-row:focus-visible .intro-ride-row__chev {
+  color: var(--accent, #1F8FFF);
+  transform: translateX(2px);
+}
+
+/* Mobile — stack 3 lines */
+@media (max-width: 640px) {
+  .intro-ride-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "date  chev"
+      "name  chev"
+      "stats stats";
+    gap: 2px 12px;
+    padding: 11px 14px 13px;
+  }
+  .intro-ride-row__chev { align-self: center; }
+  .intro-ride-row__stats { font-size: 12px; margin-top: 3px; }
+}
+
+/* 더보기 / 접기 button (5건 초과 시 만) */
+.intro-ride-more {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 9px 14px;
+  background: rgba(10, 37, 64, 0.04);
+  border: 1px dashed rgba(10, 37, 64, 0.20);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text, #0A2540);
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.intro-ride-more:hover,
+.intro-ride-more:focus-visible {
+  background: rgba(31, 143, 255, 0.06);
+  border-color: var(--accent, #1F8FFF);
+  outline: none;
+}

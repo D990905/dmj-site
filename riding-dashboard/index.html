@@ -257,6 +257,24 @@
         </button>
         <span class="intro__hint">처음이라면 샘플로 먼저 살펴보세요</span>
       </div>
+
+      <!-- §413 (Alex Park #4 · 2026-06-10) — 최근 세션 보기 button + expand list.
+           옥대표님 verbatim: "라이딩분석으로 들어가면 파일을 올리기 아래에
+           최근 세션보기 버튼을 만들어줘."
+           Data source = RDStorage.listSessions() (storage.js localStorage).
+           Click row = data-load="<id>" → app.js global click handler (line 4949)
+           가 loadSavedSession(id) 호출 → GPX 재투입 + dashboard view 전환.
+           §412 namespace migration 정합: RDStorage 가 per-user key 처리 시
+           본 widget 자동 benefit (storage.js API 활용 — 본 inline JS 무수정). -->
+      <div class="intro__recent" id="intro-recent" hidden>
+        <button type="button" class="intro__recent-btn" id="intro-recent-btn"
+                aria-expanded="false" aria-controls="intro-recent-list">
+          <span aria-hidden="true" class="intro__recent-icon">📂</span>
+          <span data-recent-label>최근 세션 보기 — 0건</span>
+          <span class="intro__recent-chev" aria-hidden="true">↓</span>
+        </button>
+        <div class="intro__recent-list" id="intro-recent-list" hidden role="region" aria-live="polite"></div>
+      </div>
     </div>
 
     <details class="intro__guide">
@@ -834,5 +852,150 @@
 <script src="../assets/js/supabase-auth.js?v=supabase-187-20260604" defer></script>
 <script src="../assets/js/cart.js" defer></script>
 <script src="../assets/js/nav-auth.js" defer></script>
+
+<!-- §413 (Alex Park #4 · 2026-06-10) — 최근 세션 보기 widget init.
+     storage.js 의 RDStorage.listSessions() = source-of-truth.
+     row click 은 app.js 의 global click handler 가 [data-load="<id>"] 로 잡아
+     loadSavedSession 호출 — 본 inline JS 는 widget 표시 / toggle 만 담당. -->
+<script>
+(function () {
+  'use strict';
+  var INITIAL = 5;
+  var wrap = document.getElementById('intro-recent');
+  var btn = document.getElementById('intro-recent-btn');
+  var listEl = document.getElementById('intro-recent-list');
+  if (!wrap || !btn || !listEl) return;
+  var labelEl = btn.querySelector('[data-recent-label]');
+  var chevEl = btn.querySelector('.intro__recent-chev');
+
+  function readSessions() {
+    if (!window.RDStorage || typeof RDStorage.listSessions !== 'function') return [];
+    var arr = [];
+    try { arr = RDStorage.listSessions() || []; } catch (e) { return []; }
+    // §413 — newest first (RDStorage.listSessions() sorts asc → reverse)
+    return arr.slice().sort(function (a, b) {
+      return (b.dateEpoch || 0) - (a.dateEpoch || 0);
+    });
+  }
+
+  function fmtDate(epochMs) {
+    if (!epochMs) return '—';
+    try {
+      var d = new Date(epochMs);
+      var y = d.getFullYear();
+      var mo = ('0' + (d.getMonth() + 1)).slice(-2);
+      var da = ('0' + d.getDate()).slice(-2);
+      var dow = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
+      var hh = ('0' + d.getHours()).slice(-2);
+      var mm = ('0' + d.getMinutes()).slice(-2);
+      return y + '.' + mo + '.' + da + ' (' + dow + ') ' + hh + ':' + mm;
+    } catch (e) { return '—'; }
+  }
+  function fmtKm(m) {
+    if (!m || !isFinite(m)) return null;
+    return (m / 1000).toFixed(2) + ' km';
+  }
+  function fmtKt(ms) {
+    if (!ms || !isFinite(ms)) return null;
+    return (ms * 1.94384).toFixed(1) + ' kt';
+  }
+  function fmtVps(v) {
+    if (v == null || !isFinite(v)) return null;
+    return 'VPS ' + Math.round(v);
+  }
+  function sportLabel(s) {
+    var m = { wingfoil: '윙포일', sailing: '세일링', kitefoil: '카이트', windsurf: '윈드서핑' };
+    return m[s] || (s || '윙포일');
+  }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function buildRow(r) {
+    var stats = [];
+    stats.push(sportLabel(r.sport));
+    var km = fmtKm(r.distanceM); if (km) stats.push(km);
+    var top = fmtKt(r.maxSpeedMs); if (top) stats.push('top ' + top);
+    var vps = fmtVps(r.vpsOverall); if (vps) stats.push(vps);
+    return '<button type="button" class="intro-ride-row" data-load="' + esc(r.id || '') + '"' +
+      ' aria-label="' + esc((r.name || '라이딩 세션') + ' 다시 보기') + '">' +
+      '<span class="intro-ride-row__date">' + esc(fmtDate(r.dateEpoch)) + '</span>' +
+      '<span class="intro-ride-row__name">' + esc(r.name || '라이딩 세션') + '</span>' +
+      '<span class="intro-ride-row__stats">' + esc(stats.join(' · ')) + '</span>' +
+      '<span class="intro-ride-row__chev" aria-hidden="true">→</span>' +
+      '</button>';
+  }
+
+  var sessions = [];
+  var expanded = false;
+  var moreOpen = false;  // 5건 + 더보기 추가 expand 상태
+
+  function render() {
+    var total = sessions.length;
+    if (total === 0) {
+      wrap.hidden = true;  // 0건이면 widget 자체 숨김 (intro UI clutter 방지)
+      return;
+    }
+    wrap.hidden = false;
+    if (labelEl) {
+      labelEl.textContent = expanded
+        ? '접기'
+        : '최근 세션 보기 — ' + total + '건';
+    }
+    if (chevEl) chevEl.textContent = expanded ? '↑' : '↓';
+    btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    listEl.hidden = !expanded;
+    if (!expanded) { listEl.innerHTML = ''; return; }
+    var slice = moreOpen ? sessions : sessions.slice(0, INITIAL);
+    var html = slice.map(buildRow).join('');
+    if (total > INITIAL) {
+      var moreLabel = moreOpen ? '접기 — 최근 5개만' : '더보기 — 모든 세션 (' + total + '건)';
+      var moreChev = moreOpen ? '↑' : '↓';
+      html += '<button type="button" class="intro-ride-more" data-recent-more>' +
+        '<span>' + moreLabel + '</span> <span aria-hidden="true">' + moreChev + '</span>' +
+        '</button>';
+    }
+    listEl.innerHTML = html;
+  }
+
+  btn.addEventListener('click', function () {
+    expanded = !expanded;
+    if (!expanded) moreOpen = false;  // 접을 때 더보기 상태도 초기화
+    render();
+  });
+
+  listEl.addEventListener('click', function (e) {
+    var more = e.target.closest('[data-recent-more]');
+    if (more) {
+      e.preventDefault();
+      moreOpen = !moreOpen;
+      render();
+      return;
+    }
+    // row click 은 app.js global handler ([data-load]) 가 처리 — 본 listener 영향 X
+  });
+
+  // storage event listener — 다른 탭에서 세션 변경 시 자동 갱신
+  window.addEventListener('storage', function (e) {
+    if (e.key && e.key.indexOf('rd_sessions_v1') === 0) {
+      sessions = readSessions();
+      render();
+    }
+  });
+
+  function init() {
+    sessions = readSessions();
+    render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
 </body>
 </html>

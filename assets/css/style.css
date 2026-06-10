@@ -8652,3 +8652,180 @@ p {
   .apply-form__podium-row [data-podium-rank] { grid-area: rank; }
   .apply-form__podium-row [data-podium-remove] { grid-area: remove; }
 }
+
+/* ============================================================
+ * §411 (Alex Park #4 · 2026-06-10) — 최근 라이딩 데이터 section
+ * DO_NOT_REVERT §411
+ * 옥대표님 verbatim: "최근 5개 목록 + 더보기 버튼 — 모든 저장된 세션"
+ * Source: localStorage.rd_sessions_v1 (profile.html JS 가 read).
+ * 회귀 가드: profile-section 의 default style 그대로 활용 — section level 무수정.
+ * ============================================================ */
+.rides-list { display: flex; flex-direction: column; gap: 8px; }
+
+/* Skeleton (loading state) */
+.rides-skel { display: flex; flex-direction: column; gap: 8px; }
+.rides-skel__row {
+  height: 56px; border-radius: 10px;
+  background: linear-gradient(90deg, rgba(10,37,64,0.05) 25%, rgba(10,37,64,0.10) 50%, rgba(10,37,64,0.05) 75%);
+  background-size: 200% 100%;
+  animation: rides-skel-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes rides-skel-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rides-skel__row { animation: none; opacity: 0.7; }
+}
+
+/* Row — 한 줄 = 한 세션 (a 태그 = link to dashboard) */
+.ride-row {
+  display: grid;
+  grid-template-columns: 160px 1fr auto 18px;
+  grid-template-areas: "date name stats chev";
+  gap: 4px 14px;
+  align-items: center;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid rgba(10, 37, 64, 0.09);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--color-charcoal, #2D3748);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 100ms ease;
+  word-break: keep-all;
+}
+.ride-row:hover, .ride-row:focus-visible {
+  border-color: var(--color-sea, #1F8FFF);
+  box-shadow: 0 4px 14px rgba(31, 143, 255, 0.10);
+  outline: none;
+}
+.ride-row:active { transform: translateY(1px); }
+
+.ride-row__date {
+  grid-area: date;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--color-slate, #7E93A8);
+  font-variant-numeric: tabular-nums;
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  letter-spacing: -0.01em;
+}
+.ride-row__name {
+  grid-area: name;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-navy, #0A2540);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ride-row__stats {
+  grid-area: stats;
+  font-size: 12.5px;
+  color: var(--color-slate, #7E93A8);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ride-row__chev {
+  grid-area: chev;
+  font-size: 14px;
+  color: var(--color-slate, #7E93A8);
+  text-align: right;
+  transition: transform 160ms ease, color 160ms ease;
+}
+.ride-row:hover .ride-row__chev,
+.ride-row:focus-visible .ride-row__chev {
+  color: var(--color-sea, #1F8FFF);
+  transform: translateX(2px);
+}
+
+/* Mobile — stack 3 lines */
+@media (max-width: 640px) {
+  .ride-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "date  chev"
+      "name  chev"
+      "stats stats";
+    gap: 2px 12px;
+    padding: 12px 14px 14px;
+  }
+  .ride-row__chev { align-self: center; }
+  .ride-row__stats { font-size: 12px; margin-top: 4px; }
+}
+
+/* Empty state */
+.rides-empty {
+  text-align: center;
+  padding: 32px 16px;
+  background: rgba(10, 37, 64, 0.025);
+  border: 1px dashed rgba(10, 37, 64, 0.14);
+  border-radius: 12px;
+}
+.rides-empty__title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-navy, #0A2540);
+  margin: 0 0 6px;
+  word-break: keep-all;
+}
+.rides-empty__sub {
+  font-size: 13px;
+  color: var(--color-slate, #7E93A8);
+  margin: 0 0 16px;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.rides-empty__cta {
+  display: inline-block;
+  padding: 9px 16px;
+  background: var(--color-navy, #0A2540);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease;
+}
+.rides-empty__cta:hover { background: var(--color-sea, #1F8FFF); }
+.rides-empty--error {
+  background: rgba(214, 69, 58, 0.05);
+  border-color: rgba(214, 69, 58, 0.24);
+}
+
+/* "더보기" 버튼 */
+.rides-actions { margin-top: 14px; }
+.rides-more-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(10, 37, 64, 0.04);
+  border: 1px solid rgba(10, 37, 64, 0.10);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-navy, #0A2540);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.rides-more-btn:hover,
+.rides-more-btn:focus-visible {
+  background: rgba(31, 143, 255, 0.08);
+  border-color: var(--color-sea, #1F8FFF);
+  outline: none;
+}
+.rides-more-btn__chev {
+  font-size: 11px;
+  transition: transform 160ms ease;
+}
+
+/* 세션 건수 badge (small in <h2>) */
+#rides-count-badge {
+  font-weight: 600;
+  color: var(--color-slate, #7E93A8);
+}
