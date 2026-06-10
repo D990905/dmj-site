@@ -1,31 +1,53 @@
 /* ============================================================
- * level-recommender.css — §403 4-tile interactive gear recommender
- * By 알렉스 박 (Alex Park, #4 Frontend Engineer) · 2026-06-09
- * DO_NOT_REVERT §403 — level/* 페이지 16-card grid → 4 interactive tile
+ * level-recommender.css — §403 + §405 4-tile gear recommender
+ * By 알렉스 박 (Alex Park, #4 Frontend Engineer) · 2026-06-10
+ * DO_NOT_REVERT §403 + §405
  *
- * 옥대표님 verbatim 2026-06-09: "체중과 바람세기를 입력하면 자동으로 장비가
- * 추천되게 할거야. 컨디션이 4가지이니까 4타일은 유지"
+ * 옥대표님 verbatim 2026-06-09: "체중과 바람세기 입력 → 자동 추천, 4타일 유지"
+ * 옥대표님 verbatim 2026-06-10: "여기서 사용하는 폰트가 일단 아주 맘에 들어"
  *
- * Component scope: level/{beginner,intermediate,advanced,pro}.html
- *   → 기존 cons-matrix 16-card grid (4 weight × 4 style) 제거
- *   → 4 tile (1 per style) interactive recommender
+ * §405 변경:
+ *  - Typography 매칭 (옥대표님 첨부 screenshot — claude.ai design preview 스타일)
+ *      한국어 본문/헤딩 = Pretendard Variable (이미 페이지 로드됨)
+ *      숫자 (체중·풍속·면적·볼륨) = JetBrains Mono (이미 페이지 로드됨)
+ *      tabular-nums + cv09 + tnum feature settings
+ *  - 슬라이더 골드 그라데이션 채움 (JS-driven `--lvl-rec-fill` CSS variable)
+ *  - 미풍 펌핑 +6L 배지 (≤10kt 보드 출력 line 옆)
+ *  - 추천 출력 layout 정돈 (sticky checkmark 제거 → 간결한 row)
  *
- * Each tile = self-contained: weight input + wind slider + auto rec + CTA
- *
- * 회귀 가드: cons-matrix grid 의 #matrix anchor 외부 ref 0건 (grep evidence).
- *            기존 matrix.js · DMJMatrix.renderLevel() 영향 X — JS 가 host
- *            page 의 data-level attribute 로 분기.
+ * 회귀 가드: cons-matrix grid #matrix anchor 외부 ref 0건.
+ *            matrix.js · DMJMatrix.renderLevel() 영향 X.
  * ============================================================ */
 
-/* ─── Section wrapper ─────────────────────────────────────── */
+/* ─── Design tokens (sun gold + ink + mist) ──────────────── */
 .lvl-rec {
+  --lvl-sun:        var(--color-sun, #FFB800);
+  --lvl-sun-dark:   #E89F00;
+  --lvl-navy:       var(--color-navy, #0A2540);
+  --lvl-charcoal:   var(--color-charcoal, #2D3748);
+  --lvl-slate:      var(--color-slate, #7E93A8);
+  --lvl-mist:       #F5F7FA;
+  --lvl-border:     var(--border, #E2E8F0);
+  --lvl-sea:        var(--color-sea, #1F8FFF);
+  --lvl-track-bg:   #E2E8F0;
+  /* 한국어/Latin 본문 — Pretendard Variable (페이지 이미 로드) + 시스템 fallback */
+  --lvl-font-sans:  'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont,
+                    'Söhne', 'SF Pro Display', 'Inter', system-ui, sans-serif;
+  /* 숫자 monospace — JetBrains Mono (페이지 이미 로드) */
+  --lvl-font-mono:  'JetBrains Mono', 'IBM Plex Mono', ui-monospace,
+                    'SF Mono', Menlo, Consolas, monospace;
+
   background: #fff;
   padding: 64px 0 80px;
+  font-family: var(--lvl-font-sans);
 }
+
+/* ─── Section head ─────────────────────────────────────── */
 .lvl-rec__head {
   text-align: center;
   margin: 0 auto 36px;
   max-width: 720px;
+  padding: 0 16px;
 }
 .lvl-rec__eyebrow {
   display: inline-block;
@@ -33,68 +55,66 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-sun, #FFB800);
+  color: var(--lvl-sun);
   margin-bottom: 8px;
 }
 .lvl-rec__title {
   font-size: clamp(1.5rem, 3.2vw, 2rem);
   font-weight: 800;
-  color: var(--color-navy, #0A2540);
+  color: var(--lvl-navy);
   margin: 0 0 12px;
   line-height: 1.2;
   word-break: keep-all;
+  letter-spacing: -0.01em;
 }
 .lvl-rec__lead {
   font-size: 1rem;
-  color: var(--color-charcoal, #2D3748);
+  color: var(--lvl-charcoal);
   margin: 0;
   line-height: 1.6;
   word-break: keep-all;
 }
 
-/* ─── 4-tile grid ──────────────────────────────────────────
- * Desktop ≥1024px: 4 columns
- * Tablet 720-1023px: 2 columns
- * Mobile ≤719px: 1 column
- */
+/* ─── 4-tile grid (responsive) ───────────────────────────── */
 .lvl-rec__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
   max-width: 1240px;
   margin: 0 auto;
+  padding: 0 16px;
 }
 @media (max-width: 1023px) {
   .lvl-rec__grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
 }
 @media (max-width: 719px) {
-  .lvl-rec__grid { grid-template-columns: 1fr; gap: 14px; }
+  .lvl-rec__grid { grid-template-columns: 1fr; gap: 14px; padding: 0 12px; }
 }
 
-/* ─── Tile ────────────────────────────────────────────────── */
+/* ─── Tile ──────────────────────────────────────────────── */
 .lvl-rec__tile {
   background: #fff;
-  border: 1.5px solid var(--border, #E2E8F0);
+  border: 1.5px solid var(--lvl-border);
   border-radius: 14px;
   padding: 20px 18px 22px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 .lvl-rec__tile:focus-within,
 .lvl-rec__tile:hover {
-  border-color: var(--color-sea, #1F8FFF);
-  box-shadow: 0 4px 16px rgba(31, 143, 255, 0.10);
+  border-color: var(--lvl-sun);
+  box-shadow: 0 6px 24px rgba(255, 184, 0, 0.10);
 }
 
-/* Tile style accents — left border tint per style */
-.lvl-rec__tile--flat-speed       { border-top: 3px solid #1F8FFF; }
-.lvl-rec__tile--choppy-freeride  { border-top: 3px solid #FFB800; }
+/* Per-style top accent (subtle — 식별만) */
+.lvl-rec__tile--flat-speed       { border-top: 3px solid var(--lvl-sea); }
+.lvl-rec__tile--choppy-freeride  { border-top: 3px solid var(--lvl-sun); }
 .lvl-rec__tile--wave             { border-top: 3px solid #00B894; }
 .lvl-rec__tile--hybrid           { border-top: 3px solid #7A5FA8; }
 
-/* ─── Tile head ───────────────────────────────────────────── */
+/* ─── Tile head ─────────────────────────────────────────── */
 .lvl-rec__tile-head {
   display: flex;
   flex-direction: column;
@@ -105,146 +125,206 @@
   font-weight: 800;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: var(--color-slate, #7E93A8);
+  color: var(--lvl-slate);
 }
 .lvl-rec__tile-title {
   font-size: 1.0625rem;
   font-weight: 800;
-  color: var(--color-navy, #0A2540);
+  color: var(--lvl-navy);
   margin: 0;
   line-height: 1.25;
   word-break: keep-all;
+  letter-spacing: -0.01em;
 }
 .lvl-rec__tile-sub {
   font-size: 0.8125rem;
-  color: var(--color-slate, #7E93A8);
+  color: var(--lvl-slate);
   margin: 0;
   line-height: 1.5;
   word-break: keep-all;
 }
 
-/* ─── Inputs row ──────────────────────────────────────────── */
+/* ─── Inputs row ───────────────────────────────────────── */
 .lvl-rec__inputs {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 4px;
-  border-top: 1px dashed var(--border, #E2E8F0);
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--lvl-border);
 }
 .lvl-rec__field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 .lvl-rec__field-label {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-charcoal, #2D3748);
+  color: var(--lvl-charcoal);
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 6px;
 }
 .lvl-rec__field-value {
-  font-size: 0.8125rem;
+  /* 숫자 readout — 골드 강조 */
+  font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--color-sea, #1F8FFF);
-  font-variant-numeric: tabular-nums;
+  color: var(--lvl-sun-dark);
+}
+.lvl-rec__unit {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--lvl-slate);
+  letter-spacing: 0.02em;
 }
 
+/* §405 — 숫자 typography 통일: JetBrains Mono + tabular */
+.lvl-rec__num {
+  font-family: var(--lvl-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on, 'cv09' on;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Weight number input (HTML5 step=0.5 spinner) ──────── */
 .lvl-rec__weight {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--border, #E2E8F0);
+  padding: 10px 12px;
+  border: 1px solid var(--lvl-border);
   border-radius: 8px;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: var(--color-navy, #0A2540);
-  font-family: inherit;
-  -webkit-appearance: none;
-  -moz-appearance: textfield;
-  appearance: none;
+  color: var(--lvl-navy);
+  background: #fff;
+  /* 화살표 spinner 유지 — appearance: auto. 모바일은 inputmode=decimal 키패드. */
+  -moz-appearance: auto;
+  appearance: auto;
 }
-.lvl-rec__weight::-webkit-inner-spin-button,
-.lvl-rec__weight::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .lvl-rec__weight:focus {
   outline: none;
-  border-color: var(--color-sea, #1F8FFF);
-  box-shadow: 0 0 0 3px rgba(31, 143, 255, 0.15);
+  border-color: var(--lvl-sun);
+  box-shadow: 0 0 0 3px rgba(255, 184, 0, 0.18);
 }
 
-/* Wind slider — accessible, full width */
+/* ─── Wind slider — gold gradient fill (JS-driven) ───────── */
+/*
+ * §405 — 슬라이더 채움. CSS variable --lvl-rec-fill (JS 가 매번 update,
+ * 0-100% range) 가 linear-gradient 의 분기점으로 작동.
+ * left = sun gold (--lvl-sun), right = track bg (--lvl-track-bg).
+ */
 .lvl-rec__wind {
+  --lvl-rec-fill: 50%;  /* fallback initial */
   width: 100%;
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
-  background: linear-gradient(90deg, #C7CFD8 0%, #1F8FFF 50%, #FF9F0A 100%);
+  background: linear-gradient(
+    to right,
+    var(--lvl-sun) 0%,
+    var(--lvl-sun) var(--lvl-rec-fill),
+    var(--lvl-track-bg) var(--lvl-rec-fill),
+    var(--lvl-track-bg) 100%
+  );
   border-radius: 999px;
   outline: none;
   cursor: pointer;
 }
 .lvl-rec__wind::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px; height: 18px;
+  width: 20px; height: 20px;
   background: #fff;
-  border: 2px solid var(--color-sea, #1F8FFF);
+  border: 2.5px solid var(--lvl-sun);
   border-radius: 50%;
   cursor: grab;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 6px rgba(255, 184, 0, 0.32), 0 1px 2px rgba(0,0,0,0.10);
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .lvl-rec__wind::-moz-range-thumb {
-  width: 18px; height: 18px;
+  width: 20px; height: 20px;
   background: #fff;
-  border: 2px solid var(--color-sea, #1F8FFF);
+  border: 2.5px solid var(--lvl-sun);
   border-radius: 50%;
   cursor: grab;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 6px rgba(255, 184, 0, 0.32), 0 1px 2px rgba(0,0,0,0.10);
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
-.lvl-rec__wind:focus::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(31,143,255,0.25); }
-.lvl-rec__wind:focus::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(31,143,255,0.25); }
+.lvl-rec__wind:focus::-webkit-slider-thumb,
+.lvl-rec__wind:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 5px rgba(255, 184, 0, 0.22), 0 2px 6px rgba(255,184,0,0.32);
+  transform: scale(1.08);
+}
+.lvl-rec__wind:focus::-moz-range-thumb,
+.lvl-rec__wind:active::-moz-range-thumb {
+  box-shadow: 0 0 0 5px rgba(255, 184, 0, 0.22), 0 2px 6px rgba(255,184,0,0.32);
+  transform: scale(1.08);
+}
 
-/* ─── Recommendation output ────────────────────────────────── */
+/* ─── Recommendation output ──────────────────────────────── */
 .lvl-rec__out {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 12px 14px;
-  background: #F5F7FA;
+  padding: 14px 16px;
+  background: var(--lvl-mist);
   border-radius: 10px;
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.55;
   word-break: keep-all;
+  min-height: 124px;  /* loading state 없이 즉시 4 line render — 공간 reserve */
 }
 .lvl-rec__out-row {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   align-items: baseline;
+  font-size: 0.875rem;
+  color: var(--lvl-charcoal);
 }
-.lvl-rec__out-row::before {
-  content: '';
-  flex: 0 0 18px;
-  height: 18px;
-  background: var(--color-sea, #1F8FFF);
-  mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20 6 9 17 4 12' fill='none' stroke='%23000' stroke-width='3'/%3E%3C/svg%3E") center/contain no-repeat;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20 6 9 17 4 12' fill='none' stroke='%23000' stroke-width='3'/%3E%3C/svg%3E") center/contain no-repeat;
+.lvl-rec__out-row > span {
+  display: inline-block;
+  flex: 1 1 auto;
 }
 .lvl-rec__out-row b {
   font-weight: 800;
-  color: var(--color-navy, #0A2540);
-  margin-right: 4px;
+  color: var(--lvl-navy);
+  margin-right: 6px;
+  display: inline-block;
+  min-width: 32px;
 }
-.lvl-rec__out-row a {
-  color: var(--color-charcoal, #2D3748);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--color-slate, #7E93A8);
+
+/* 숫자 사이즈 강조 (윙 m² / 포일 cm² / 보드 L) */
+.lvl-rec__out-size {
+  font-weight: 700;
+  color: var(--lvl-sun-dark);
+  margin-left: 2px;
 }
-.lvl-rec__out-row a:hover { color: var(--color-sea, #1F8FFF); border-bottom-style: solid; }
-.lvl-rec__out-loading {
-  font-style: italic;
-  color: var(--color-slate, #7E93A8);
-  text-align: center;
-  padding: 8px 0;
+/* 보드 target (계산값 — 어두운 회색) */
+.lvl-rec__out-target {
+  font-family: var(--lvl-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+  color: var(--lvl-slate);
+  margin-left: 4px;
 }
+
+/* §405 — 미풍 펌핑 배지 (≤10kt) */
+.lvl-rec__badge {
+  display: inline-block;
+  font-family: var(--lvl-font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--lvl-sun-dark);
+  background: rgba(255, 184, 0, 0.14);
+  border: 1px solid rgba(255, 184, 0, 0.32);
+  padding: 1px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  vertical-align: 1px;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
 .lvl-rec__out-error {
   color: #8B2014;
   background: rgba(239, 125, 0, 0.08);
@@ -256,22 +336,25 @@
 /* ─── CTA ─────────────────────────────────────────────────── */
 .lvl-rec__cta {
   display: block;
-  padding: 11px 14px;
-  background: var(--color-navy, #0A2540);
+  padding: 12px 14px;
+  background: var(--lvl-navy);
   color: #fff;
   border-radius: 10px;
   font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;
   text-align: center;
-  transition: background 180ms ease;
+  transition: background 180ms ease, transform 100ms ease;
   margin-top: auto;
 }
-.lvl-rec__cta:hover { background: var(--color-sea, #1F8FFF); }
+.lvl-rec__cta:hover { background: var(--lvl-sun-dark); }
+.lvl-rec__cta:active { transform: translateY(1px); }
 .lvl-rec__cta strong { display: inline; font-weight: 800; }
 
 /* ─── prefers-reduced-motion ──────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .lvl-rec__tile,
-  .lvl-rec__cta { transition: none; }
+  .lvl-rec__cta,
+  .lvl-rec__wind::-webkit-slider-thumb,
+  .lvl-rec__wind::-moz-range-thumb { transition: none; }
 }

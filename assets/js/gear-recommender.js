@@ -1,63 +1,153 @@
 /* ============================================================
- * gear-recommender.js — §403 + §404 4-tile interactive gear recommender
- * By 알렉스 박 (Alex Park, #4 Frontend Engineer) · 2026-06-09
- * DO_NOT_REVERT §403 + §404
+ * gear-recommender.js — §403 + §405 4-tile interactive gear recommender
+ * By 알렉스 박 (Alex Park, #4 Frontend Engineer) · 2026-06-10
+ * DO_NOT_REVERT §403 + §405
  *
- * 옥대표님 verbatim 2026-06-09:
- *   §403: "체중과 바람세기를 입력하면 자동으로 장비가 추천되게 할거야.
- *         대신 컨디션이 4가지이니까 4타일은 유지하면 되고."
- *   §404: "체중이랑 바람세기에 따라 보드 포일 윙 사이즈 모두 변하게 만들어줘.
- *         그리고 체중입력을 0.5단위로 화살표 아래위로 눌러서 수정도 가능하게"
+ * 옥대표님 verbatim 2026-06-10:
+ *   "체중과 바람세기에 따라서 모델과 사이즈 추천로직이 상당히 좋아.
+ *    니가 그걸 잘 복제했으면 하는데"
+ *   "여기서 사용하는 폰트가 일단 아주 맘에 들어"
+ *   "체중입력을 0.5단위로 화살표 아래위로 눌러서"
  *
- * §404 변경 (기존 §403 위에서 확장):
- *  (a) 윙 외에 보드 volume + 포일 area 도 weight × wind 에 따라 dynamic
- *  (b) GEAR_BANK 재구조화 — wingBrand + foilOptions[] + boardOptions[] + safety
- *  (c) targetBoardVolume(level, weight, wind, style) + targetFoilArea(...) 신규
- *  (d) 체중 input step=0.5 + inputmode=decimal + 화살표 spinner (HTML5 native)
- *  (e) Readout 1 자리 소수 (toFixed(1))
+ * §405 변경 (§404 알고리즘 폐기 — 옥대표님 spec 정확 1:1):
+ *  (a) LEVEL_CONSTANTS (wf/ff/bv/sailMin-Max/foilMin-Cap/sizes/pump) — 옥대표님 lock
+ *  (b) baseSail(kt) + windBand(kt) lookup — spec 표 1:1
+ *  (c) calcSail/calcFoil/calcBoard — 공식 spec 1:1
+ *  (d) round5 / clamp / nearest 유틸 — spec 명시
+ *  (e) Default wkg=68 / kt=13 — spec 명시
+ *  (f) 보드 표시 = "{brand} {size}L  ~{target}L" + ≤10kt 시 "미풍 펌핑 +6L" 배지
+ *  (g) 슬라이더 골드 채움 (linear-gradient JS-driven dynamic)
+ *  (h) 숫자 typography = JetBrains Mono (CSS) — 이미 페이지 로드됨
  *
- * Design
- *  · Host page 의 <section class="lvl-rec" data-level="..."> 자동 init
- *  · 4 tile (flat-speed / choppy-freeride / wave / hybrid) DOM 자동 build
- *  · Each tile: weight input (0.5kg step) + wind slider (4-24kt) → 자동 추천
- *  · Recommendation engine = local algorithm (GEAR_BANK + targetXxx 공식)
- *  · DMJMatrix.lookup() 은 wing sizes_m2 정교화 용도 (sources-of-truth fallback)
- *  · a11y: WCAG SC 1.3.1 labels, slider aria-valuemin/max/now, aria-live="polite"
- *  · 한국어 word-break keep-all (host CSS 적용)
+ * 정직 raise:
+ *  - 안전장비 3 level (중급/상급/선수) = 옥대표님 미명시 → 본인 임시. 라이브 view 후 정정.
+ *  - 포일 라인업 area 매핑 (Takoon Flow/Starter 1100cm² 등) = 미명시 → 본인 area 표시만, 모델명 = brand fallback.
+ *  - 폰트 정확 source = 옥대표님 첨부 screenshot 추정. 다르면 옥대표님 정정.
  *
- * 회귀 가드: 기존 matrix.js · DMJMatrix API 무수정. find-my-gear.html / style/*
- *           영향 0. 본 컴포넌트 = level/* 4 페이지 전용.
+ * 회귀 가드: 기존 matrix.js · DMJMatrix API 무수정. find-my-gear.html /
+ *           style/* / riding-dashboard/* / brands index 영향 0.
+ *           본 컴포넌트 = level/* 4 페이지 전용.
  * ============================================================ */
 (function () {
   'use strict';
 
-  // ─── Style metadata ────────────────────────────────────────
-  // 옥대표님 screenshot 의 4 컨디션 = matrix.js 의 4 style 키와 정합.
-  var STYLES = [
-    {
-      key: 'flat-speed',
-      title: 'Flat·Speed',
-      sub: '평수면·속도 우선 — 강·내수면 flat한 컨디션',
-      defaultWind: 18
+  // ─── §405 — Utility ──────────────────────────────────────
+  function round5(v) { return Math.round(v * 2) / 2; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function nearest(arr, t) {
+    return arr.reduce(function (p, c) {
+      return Math.abs(c - t) < Math.abs(p - t) ? c : p;
+    });
+  }
+
+  // ─── §405 — Lookup tables (옥대표님 spec 1:1) ────────────
+  // baseSail: kt → 75kg 기준 sail m² 베이스
+  function baseSail(kt) {
+    if (kt <=  8) return 7.5;
+    if (kt <= 10) return 7.0;
+    if (kt <= 12) return 6.0;
+    if (kt <= 14) return 5.5;
+    if (kt <= 16) return 5.0;
+    if (kt <= 18) return 4.5;
+    if (kt <= 20) return 4.0;
+    if (kt <= 22) return 3.5;
+    return 3.0;
+  }
+
+  // windBand: kt → { label: '미풍'|'중풍'|'강풍', pump: 추가 +L }
+  //  미풍 (≤10kt) → 보드에 펌핑 마진 +6L 자동 가산
+  function windBand(kt) {
+    if (kt <= 10) return { label: '미풍', pump: 6 };
+    if (kt <= 16) return { label: '중풍', pump: 0 };
+    return                 { label: '강풍', pump: 0 };
+  }
+
+  // ─── §405 — LEVEL_CONSTANTS (옥대표님 spec 1:1 lock) ─────
+  // wing.wf  = sail 곱 보정 (level 별)
+  // wing.sailMin/Max = clamp 범위
+  // foil.ff  = front-wing area 곱 보정
+  // foil.foilMin/Cap = clamp 범위 (foilMin=0 이면 무시)
+  // board.sizes = 라인업 후보 L (nearest 선택)
+  // board.bv = 체중 +볼륨 추가 마진 (level 별)
+  // safety = 안전장비 (옥대표님 입문만 명시 — 나머지 3 = 본인 임시, 라이브 view 후 정정)
+  var LEVEL_CONSTANTS = {
+    beginner: {
+      wing:   { brand: 'Takoon Wing V4',           wf: 1.05, sailMin: 4.0, sailMax: 8.5 },
+      foil:   { brand: 'Takoon Flow/Starter',      ff: 1.28, foilMin: 1000, foilCap: 1600 },
+      board:  { brand: 'Takoon Glide',             sizes: [100, 110, 120], bv: 42 },
+      safety: 'WIP Impact Vest 50N'
     },
-    {
-      key: 'choppy-freeride',
-      title: 'Choppy·Freeride',
-      sub: '한국 일반 spot — choppy 한 freeride',
-      defaultWind: 14
+    intermediate: {
+      wing:   { brand: 'PPC M1-X',                 wf: 1.0,  sailMin: 3.5, sailMax: 8.0 },
+      foil:   { brand: 'Levitaz FW (540/680/790/900)', ff: 1.0, foilMin: 0, foilCap: 1100 },
+      board:  { brand: 'Takoon Glide 미드레인지',     sizes: [85, 95, 105], bv: 22 },
+      safety: 'WIP Impact Vest 50N + 3/2mm Wetsuit'  /* 옥대표님 미명시 — 임시 */
     },
-    {
-      key: 'wave',
-      title: 'Wave',
-      sub: '파도·서핑 라이딩 — wave 한국 동해안',
-      defaultWind: 12
+    advanced: {
+      wing:   { brand: 'PPC M1',                   wf: 0.95, sailMin: 3.0, sailMax: 7.5 },
+      foil:   { brand: 'Levitaz FW',               ff: 0.9,  foilMin: 0, foilCap: 820 },
+      board:  { brand: 'Levitaz Boom FS',          sizes: [63, 83, 95], bv: 6 },
+      safety: 'WIP Impact Vest 50N + 3/2mm Wetsuit'  /* 옥대표님 미명시 — 임시 */
     },
-    {
-      key: 'hybrid',
-      title: 'Hybrid',
-      sub: '다목적 — 한 세트로 여러 컨디션',
-      defaultWind: 16
+    pro: {
+      wing:   { brand: 'PPC Sonic FDS',            wf: 0.95, sailMin: 3.0, sailMax: 7.0 },
+      foil:   { brand: 'Levitaz R6 530',           ff: 0.85, foilMin: 0, foilCap: 620 },
+      board:  { brand: 'PPC R1 레이스',              sizes: [73, 83, 93], bv: -4 },
+      safety: 'WIP Race Vest + 3/2mm Wetsuit'  /* 옥대표님 미명시 — 임시 */
     }
+  };
+
+  // novice → beginner fallback (matrix.js §155 v3 정합)
+  var LEVEL_BANK_FALLBACK = { novice: 'beginner' };
+
+  function levelKey(level) { return LEVEL_BANK_FALLBACK[level] || level; }
+  function getConst(level) { return LEVEL_CONSTANTS[levelKey(level)] || null; }
+
+  // ─── §405 — Calculators (옥대표님 spec 1:1) ──────────────
+  // 1) 윙 세일 (m²) — round5(baseSail × (w/75)^0.45 × wf), clamp sailMin/Max
+  function calcSail(wkg, kt, level) {
+    var c = getConst(level);
+    if (!c) return null;
+    var wAdj = Math.pow(wkg / 75, 0.45);
+    var v = round5(baseSail(kt) * wAdj * c.wing.wf);
+    return clamp(v, c.wing.sailMin, c.wing.sailMax);
+  }
+
+  // 2) 포일 프런트윙 area (cm²) — round(158 × w / kt × ff), clamp foilMin/Cap
+  function calcFoil(wkg, kt, level) {
+    var c = getConst(level);
+    if (!c) return null;
+    var area = Math.round(158 * wkg / kt * c.foil.ff);
+    if (c.foil.foilMin > 0) area = Math.max(area, c.foil.foilMin);
+    area = Math.min(area, c.foil.foilCap);
+    return area;
+  }
+
+  // 3) 보드 볼륨 (L) — wkg + bv + pump, nearest from sizes[]
+  function calcBoard(wkg, kt, level) {
+    var c = getConst(level);
+    if (!c) return null;
+    var band = windBand(kt);
+    var target = Math.round(wkg + c.board.bv + band.pump);
+    var size = nearest(c.board.sizes, target);
+    return { size: size, target: target, brand: c.board.brand, band: band.label, pump: band.pump };
+  }
+
+  // 4) 안전장비 — level 별 고정 string
+  function getSafety(level) {
+    var c = getConst(level);
+    return c ? c.safety : null;
+  }
+
+  // ─── §403 — Style metadata (4 tile DOM 빌드용) ──────────
+  // 옥대표님 verbatim 2026-06-09: "컨디션이 4가지이니까 4타일은 유지"
+  // 알고리즘은 level-only (§405 spec) — style 별 동일 산출. tile 마다
+  // defaultWind 가 다르므로 로드 시 4 tile 의 출력값은 자연스럽게 분기.
+  var STYLES = [
+    { key: 'flat-speed',      title: 'Flat·Speed',      sub: '평수면·속도 우선 — 강·내수면 flat한 컨디션',  defaultWind: 18 },
+    { key: 'choppy-freeride', title: 'Choppy·Freeride', sub: '한국 일반 spot — choppy 한 freeride',         defaultWind: 14 },
+    { key: 'wave',            title: 'Wave',            sub: '파도·서핑 라이딩 — wave 한국 동해안',          defaultWind: 12 },
+    { key: 'hybrid',          title: 'Hybrid',          sub: '다목적 — 한 세트로 여러 컨디션',                defaultWind: 16 }
   ];
 
   var LEVEL_LABELS = {
@@ -67,397 +157,43 @@
     advanced:     '상급',
     pro:          '선수'
   };
-  // novice → beginner fallback (matrix.js §155 v3 정합)
-  var LEVEL_BANK_FALLBACK = { novice: 'beginner' };
 
-  // 페이지 level 별 default 체중 (한국 평균 + level 별 상향 보정).
-  // §404 — step 0.5kg 정합 (모두 짝수 또는 .5 끝).
-  var DEFAULT_WEIGHT_BY_LEVEL = {
-    beginner:     65.0,
-    novice:       68.0,
-    intermediate: 72.0,
-    advanced:     75.0,
-    pro:          75.0
-  };
+  // §405 — Default 옥대표님 spec lock: wkg 68 / kt 13
+  // (페이지별 customize 가능 — data-default-wkg / data-default-kt section attr)
+  var SPEC_DEFAULT_WEIGHT = 68.0;
+  var SPEC_DEFAULT_WIND = 13;
 
-  // ─── §403 — Weight kg → matrix tier 매핑 ──────────────────
-  // matrix.js WEIGHT_RANGE: light 50-65 / mid-light 65-75 / mid-heavy 75-85 / heavy 85+
-  function weightTier(kg) {
-    var w = parseFloat(kg);
-    if (!isFinite(w) || w <= 0) return 'mid-light';
-    if (w < 65) return 'light';
-    if (w < 75) return 'mid-light';
-    if (w < 85) return 'mid-heavy';
-    return 'heavy';
-  }
-
-  // ─── §403 — wind kt × weight → 윙 면적 (m²) 추천 ──────────
-  // 75kg 기준 표 + ±10kg/±0.5m² 보정. 7.4m² cap (race rule).
-  function targetWingArea(weightKg, windKt, style) {
-    var w = parseFloat(weightKg);
-    var k = parseFloat(windKt);
-    if (!isFinite(w) || w <= 0) w = 75;
-    if (!isFinite(k) || k <= 0) k = 14;
-    var base;
-    if (k <= 8)       base = 7.0;
-    else if (k <= 10) base = 6.0;
-    else if (k <= 12) base = 5.5;
-    else if (k <= 14) base = 5.0;
-    else if (k <= 16) base = 4.5;
-    else if (k <= 18) base = 4.0;
-    else if (k <= 20) base = 3.5;
-    else              base = 3.0;
-    base += (w - 75) / 10 * 0.5;
-    // Wave style — 더 작은 wing (조작성 우선)
-    if (style === 'wave') base -= 0.5;
-    if (base > 7.4) base = 7.4;
-    if (base < 2.5) base = 2.5;
-    return Math.round(base * 2) / 2;  // round to 0.5m²
-  }
-
-  // ─── §404 — weight × wind × level × style → 보드 volume (L) ─
-  // Beginner 입문 = 체중 + 30-50L 마진 (가장 큰 보드)
-  // Intermediate 중급 = + 15-25L
-  // Advanced 상급 = + 0-15L
-  // Pro 선수 = -5 ~ +5L (sinker)
-  // Wave style = -5~-8L 추가 감소 (짧은 surf 보드)
-  // Flat·Speed = -3L (race 보드)
-  // Light wind (≤10kt) = +6~10L (테이크오프 용이)
-  // Strong wind (≥18kt) = -5~8L (sporty)
-  function targetBoardVolume(level, weightKg, windKt, style) {
-    var w = parseFloat(weightKg);
-    var k = parseFloat(windKt);
-    if (!isFinite(w) || w <= 0) w = 75;
-    if (!isFinite(k) || k <= 0) k = 14;
-    var marginByLevel = {
-      beginner:     38,
-      novice:       30,
-      intermediate: 18,
-      advanced:     8,
-      pro:          0
-    };
-    var base = w + (marginByLevel[level] != null ? marginByLevel[level] : 18);
-    // Wind adjustment
-    if (k <= 10)      base += 8;
-    else if (k >= 18) base -= 7;
-    // Style adjustment
-    if (style === 'wave')             base -= 8;
-    else if (style === 'flat-speed')  base -= 3;
-    // Floor + cap
-    if (base < 40) base = 40;
-    if (base > 150) base = 150;
-    return Math.round(base);
-  }
-
-  // ─── §404 — weight × wind × style → 포일 area (cm²) ────────
-  // 75kg 기준 표 (front wing area):
-  //   ≤8kt → 1500 / ≤10 → 1200 / ≤12 → 1000 / ≤14 → 850 /
-  //   ≤16 → 750  / ≤18 → 650  / ≤20 → 600  / >20 → 540
-  // Weight scaling: ±10kg → ±80cm²
-  // Wave style = ×0.85 (조작성 우선)
-  // Beginner override = floor 900 (떠오름 우선)
-  function targetFoilArea(level, weightKg, windKt, style) {
-    var w = parseFloat(weightKg);
-    var k = parseFloat(windKt);
-    if (!isFinite(w) || w <= 0) w = 75;
-    if (!isFinite(k) || k <= 0) k = 14;
-    var base;
-    if (k <= 8)        base = 1500;
-    else if (k <= 10)  base = 1200;
-    else if (k <= 12)  base = 1000;
-    else if (k <= 14)  base = 850;
-    else if (k <= 16)  base = 750;
-    else if (k <= 18)  base = 650;
-    else if (k <= 20)  base = 600;
-    else               base = 540;
-    base += (w - 75) * 8;
-    if (style === 'wave') base = Math.round(base * 0.85);
-    // Beginner / novice = 큰 포일 floor (떠오름 안정)
-    if ((level === 'beginner' || level === 'novice') && base < 900) base = 900;
-    if (base < 400)  base = 400;
-    if (base > 1700) base = 1700;
-    return Math.round(base);
-  }
-
-  // ─── §404 — GEAR_BANK ─────────────────────────────────────
-  // key = "level|style" → { wingBrand, foilOptions[], boardOptions[], safety }
-  // foilOptions: SKU 후보 + area cm². 알고리즘이 target area 에 가장 가까운 SKU 선택.
-  // boardOptions: SKU 후보 + vol L. target volume 에 가까운 SKU 선택.
-  // 메모리 reference 참조: takoon_board_specs, takoon_foil_guideline,
-  //   dmj_mast_length_progression, ppc_wing_model_characteristics
-  var GEAR_BANK = {
-    // ─── beginner ──────────────────────────────────────────
-    'beginner|flat-speed': {
-      wingBrand: 'PPC M2',
-      foilOptions: [
-        { label: 'Levitaz FW 900',              area: 900 },
-        { label: 'Takoon Foil Starter 1600cm²', area: 1600 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz Boom FS 95L',  vol: 95 },
-        { label: 'Takoon Cruise 110L',   vol: 110 },
-        { label: 'Takoon Cruise 130L',   vol: 130 }
-      ],
-      safety: 'WIP Impact Vest 50N + Entry Wetsuit'
-    },
-    'beginner|choppy-freeride': {
-      wingBrand: 'PPC M2',
-      foilOptions: [
-        { label: 'Levitaz FW 900',              area: 900 },
-        { label: 'Takoon Foil Starter 1600cm²', area: 1600 }
-      ],
-      boardOptions: [
-        { label: 'Takoon Cruise 110L', vol: 110 },
-        { label: 'Takoon Cruise 130L', vol: 130 },
-        { label: 'Takoon Cruise 145L', vol: 145 }
-      ],
-      safety: 'WIP Impact Vest 50N + 3/2 Wetsuit'
-    },
-    'beginner|wave': {
-      wingBrand: 'PPC M2',
-      foilOptions: [
-        { label: 'Levitaz FW 900',              area: 900 },
-        { label: 'Takoon Foil Starter 1600cm²', area: 1600 }
-      ],
-      boardOptions: [
-        { label: 'Takoon Cruise 95L',  vol: 95 },
-        { label: 'Takoon Cruise 110L', vol: 110 }
-      ],
-      safety: 'WIP Impact Vest 50N + WIP Helmet'
-    },
-    'beginner|hybrid': {
-      wingBrand: 'PPC M2',
-      foilOptions: [
-        { label: 'Levitaz FW 900',              area: 900 },
-        { label: 'Takoon Foil Starter 1600cm²', area: 1600 }
-      ],
-      boardOptions: [
-        { label: 'Takoon Cruise 110L',                vol: 110 },
-        { label: 'Takoon Glide Midlength 100L',       vol: 100 },
-        { label: 'Takoon Cruise 130L',                vol: 130 }
-      ],
-      safety: 'WIP Impact Vest 50N + Wetsuit'
-    },
-
-    // ─── intermediate ──────────────────────────────────────
-    'intermediate|flat-speed': {
-      wingBrand: 'PPC M1-X',
-      foilOptions: [
-        { label: 'Levitaz FW 680', area: 680 },
-        { label: 'Levitaz FW 790', area: 790 },
-        { label: 'Levitaz FW 900', area: 900 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz Boom FS 83L', vol: 83 },
-        { label: 'Levitaz Boom FS 95L', vol: 95 }
-      ],
-      safety: 'WIP Impact Vest 50N'
-    },
-    'intermediate|choppy-freeride': {
-      wingBrand: 'Takoon V4 Pro',
-      foilOptions: [
-        { label: 'Levitaz FW 790', area: 790 },
-        { label: 'Levitaz FW 900', area: 900 }
-      ],
-      boardOptions: [
-        { label: 'Takoon Glide Midlength 95L',  vol: 95 },
-        { label: 'Takoon Glide Midlength 110L', vol: 110 },
-        { label: 'Levitaz Boom FS 83L',         vol: 83 }
-      ],
-      safety: 'WIP Impact Vest 50N + 3/2 Wetsuit'
-    },
-    'intermediate|wave': {
-      wingBrand: 'Takoon V4 Pro',
-      foilOptions: [
-        { label: 'Takoon Flow 800cm² + Carbon HR', area: 800 },
-        { label: 'Takoon Flare 900cm² + Carbon HR', area: 900 },
-        { label: 'Takoon Flow 900cm² + Carbon HR', area: 900 }
-      ],
-      boardOptions: [
-        { label: 'Takoon Prosurf 75L',  vol: 75 },
-        { label: 'Levitaz Boom FS 83L', vol: 83 },
-        { label: 'Takoon Glide 80L',    vol: 80 }
-      ],
-      safety: 'WIP Impact Vest 50N + WIP Helmet'
-    },
-    'intermediate|hybrid': {
-      wingBrand: 'PPC M1-X',
-      foilOptions: [
-        { label: 'Levitaz FW 790', area: 790 },
-        { label: 'Levitaz FW 900', area: 900 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz Boom FS 83L',           vol: 83 },
-        { label: 'Takoon Glide Midlength 105L',   vol: 105 }
-      ],
-      safety: 'WIP Impact Vest 50N + Wetsuit'
-    },
-
-    // ─── advanced ──────────────────────────────────────────
-    'advanced|flat-speed': {
-      wingBrand: 'PPC M1',
-      foilOptions: [
-        { label: 'Levitaz FW 540 + Mast 96', area: 540 },
-        { label: 'Levitaz FW 680 + Mast 96', area: 680 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz Boom FS 63L', vol: 63 },
-        { label: 'Levitaz Boom FS 83L', vol: 83 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0'
-    },
-    'advanced|choppy-freeride': {
-      wingBrand: 'PPC M1-X',
-      foilOptions: [
-        { label: 'Levitaz FW 680 + Mast 96', area: 680 },
-        { label: 'Levitaz FW 790 + Mast 96', area: 790 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz Boom FS 63L', vol: 63 },
-        { label: 'Levitaz Boom FS 83L', vol: 83 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0'
-    },
-    'advanced|wave': {
-      wingBrand: 'PPC M1-X',
-      foilOptions: [
-        { label: 'Takoon Flash 530cm² + Carbon HM 16mm', area: 530 },
-        { label: 'Takoon Flash 680cm² + Carbon HM 16mm', area: 680 },
-        { label: 'Takoon Swell 900cm² + Carbon HM 16mm', area: 900 }
-      ],
-      boardOptions: [
-        { label: 'Takoon Prosurf 60L',  vol: 60 },
-        { label: 'Levitaz Boom FS 63L', vol: 63 },
-        { label: 'Takoon Prosurf 75L',  vol: 75 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0'
-    },
-    'advanced|hybrid': {
-      wingBrand: 'PPC M1',
-      foilOptions: [
-        { label: 'Levitaz FW 540 + Mast 96', area: 540 },
-        { label: 'Levitaz FW 680 + Mast 96', area: 680 },
-        { label: 'Levitaz FW 790 + Mast 96', area: 790 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz Boom FS 63L', vol: 63 },
-        { label: 'Levitaz Boom FS 83L', vol: 83 },
-        { label: 'Levitaz Boom FS 95L', vol: 95 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0 + Waistfoil Harness'
-    },
-
-    // ─── pro ───────────────────────────────────────────────
-    'pro|flat-speed': {
-      wingBrand: 'PPC Sonic FDS',
-      foilOptions: [
-        { label: 'Levitaz R6 풀세트 (Race front wing)', area: 750 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz R6 race board',  vol: 65 },
-        { label: 'Levitaz Boom FS 63L',     vol: 63 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0 + Waistfoil Harness 3.0'
-    },
-    'pro|choppy-freeride': {
-      wingBrand: 'PPC Sonic FDS',
-      foilOptions: [
-        { label: 'Levitaz R6 풀세트', area: 750 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz R6 race board', vol: 65 },
-        { label: 'Levitaz Boom FS 63L',    vol: 63 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0 + Waistfoil Harness 3.0'
-    },
-    'pro|wave': {
-      wingBrand: 'PPC Sonic FDS',
-      foilOptions: [
-        { label: 'Takoon Flash 530cm² + Carbon HM 16mm', area: 530 },
-        { label: 'Takoon Flash 680cm² + Carbon HM 16mm', area: 680 }
-      ],
-      boardOptions: [
-        { label: 'Takoon Prosurf 60L',  vol: 60 },
-        { label: 'Levitaz Boom FS 63L', vol: 63 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0'
-    },
-    'pro|hybrid': {
-      wingBrand: 'PPC Sonic FDS',
-      foilOptions: [
-        { label: 'Levitaz R6 풀세트', area: 750 }
-      ],
-      boardOptions: [
-        { label: 'Levitaz R6 race board', vol: 65 },
-        { label: 'Levitaz Boom FS 63L',    vol: 63 }
-      ],
-      safety: 'WIP X-OVER Helmet + Kompact 50N 2.0 + Waistfoil Harness 3.0'
-    }
-  };
-
-  function getBank(level, style) {
-    var lk = LEVEL_BANK_FALLBACK[level] || level;
-    return GEAR_BANK[lk + '|' + style] || null;
-  }
-
-  // ─── §404 — Pick nearest option by metric key ──────────────
-  function pickNearest(options, target, metricKey) {
-    if (!options || !options.length) return null;
-    var best = options[0];
-    var bestDist = Math.abs(options[0][metricKey] - target);
-    for (var i = 1; i < options.length; i++) {
-      var d = Math.abs(options[i][metricKey] - target);
-      if (d < bestDist) { bestDist = d; best = options[i]; }
-    }
-    return best;
-  }
-
-  // ─── §403 — wing sizes_m2 list 안 nearest 선택 (matrix entry 활용) ─
-  function pickNearestSize(sizesArr, targetArea) {
-    if (!sizesArr || !sizesArr.length) return null;
-    var best = sizesArr[0];
-    var bestDist = Math.abs(best - targetArea);
-    for (var i = 1; i < sizesArr.length; i++) {
-      var d = Math.abs(sizesArr[i] - targetArea);
-      if (d < bestDist) { bestDist = d; best = sizesArr[i]; }
-    }
-    return best;
-  }
-
-  // ─── matrix.js lookup wrapper (async, sizes_m2 정교화 용도) ─
-  function getEntry(level, weightTier, style) {
-    var mtxLevel = LEVEL_BANK_FALLBACK[level] || level;
-    if (window.DMJMatrix && typeof window.DMJMatrix.lookup === 'function') {
-      return window.DMJMatrix.lookup(mtxLevel, weightTier, style)
-        .catch(function () { return null; });
-    }
-    return Promise.resolve(null);
-  }
-
-  // ─── §404 — Render output rows (wing/foil/board/safety) ────
-  function renderRows(bank, suggestedWing, suggestedFoilArea, suggestedBoardVol) {
-    var rows = [];
-    if (!bank) return rows;
-    rows.push({ label: '윙',   text: bank.wingBrand + ' ' + suggestedWing + 'm²' });
-    var foil = pickNearest(bank.foilOptions, suggestedFoilArea, 'area');
-    if (foil) rows.push({ label: '포일', text: foil.label });
-    var board = pickNearest(bank.boardOptions, suggestedBoardVol, 'vol');
-    if (board) rows.push({ label: '보드', text: board.label });
-    if (bank.safety) rows.push({ label: '안전', text: bank.safety });
-    return rows;
-  }
-
-  // ─── §404 — Format weight readout (1 자리 소수) ────────────
+  // ─── §405 — Formatters ───────────────────────────────────
   function fmtWeight(kg) {
     var w = parseFloat(kg);
-    if (!isFinite(w)) return '— kg';
-    // 0.5 단위라 toFixed(1) 가 항상 정합 (70.0 / 70.5)
-    return w.toFixed(1) + ' kg';
+    if (!isFinite(w)) return '—';
+    // step 0.5 라 toFixed(1) 정합 (68.0 / 68.5)
+    return w.toFixed(1);
+  }
+  function fmtSail(m2) {
+    if (m2 == null || !isFinite(m2)) return '—';
+    // round5 결과는 .0 또는 .5 — toFixed(1) 로 일관 표시
+    return m2.toFixed(1);
+  }
+  function fmtArea(cm2) {
+    if (cm2 == null || !isFinite(cm2)) return '—';
+    return Math.round(cm2);
   }
 
-  // Build a single tile DOM (returns the article element).
-  function buildTile(style, levelKey) {
-    var defaultWeight = DEFAULT_WEIGHT_BY_LEVEL[levelKey] || 72.0;
+  // ─── §405 — Slider track fill (golden gradient JS-driven) ─
+  // pct = ((kt - min) / (max - min)) * 100
+  // CSS variable `--lvl-rec-fill` 가 .lvl-rec__wind 의 background-position 으로 작동.
+  function updateSliderFill(input) {
+    var min = parseFloat(input.min) || 4;
+    var max = parseFloat(input.max) || 24;
+    var val = parseFloat(input.value);
+    if (!isFinite(val)) val = min;
+    var pct = clamp(((val - min) / (max - min)) * 100, 0, 100);
+    input.style.setProperty('--lvl-rec-fill', pct.toFixed(2) + '%');
+  }
+
+  // ─── Build a single tile DOM ─────────────────────────────
+  function buildTile(style, levelKey, defaultWeight) {
     var defaultWind = style.defaultWind;
     var levelLabel = LEVEL_LABELS[levelKey] || levelKey;
 
@@ -470,9 +206,8 @@
     var windId = uid + '-k';
     var outId = uid + '-o';
 
-    // §404 — weight input: type=number, step=0.5, inputmode=decimal, min=40, max=120.
-    // HTML5 native spinner = 화살표 위/아래 click 시 ±0.5 자동.
-    // 모바일 (iOS/Android) = inputmode=decimal → 소수점 키패드 자동 노출.
+    // §404+§405 — weight input: type=number step=0.5 inputmode=decimal min=40 max=120.
+    // HTML5 native spinner = 화살표 ±0.5. 모바일 = inputmode=decimal → 소수점 키패드.
     tile.innerHTML =
       '<header class="lvl-rec__tile-head">' +
         '<span class="lvl-rec__tile-eyebrow">' + levelLabel + ' · ' + style.title + '</span>' +
@@ -482,16 +217,16 @@
       '<div class="lvl-rec__inputs">' +
         '<div class="lvl-rec__field">' +
           '<label class="lvl-rec__field-label" for="' + weightId + '">' +
-            '체중 <span class="lvl-rec__field-value" data-readout="weight">' + fmtWeight(defaultWeight) + '</span>' +
+            '체중 <span class="lvl-rec__field-value lvl-rec__num" data-readout="weight">' + fmtWeight(defaultWeight) + '</span><span class="lvl-rec__unit"> kg</span>' +
           '</label>' +
-          '<input type="number" class="lvl-rec__weight" id="' + weightId + '" ' +
+          '<input type="number" class="lvl-rec__weight lvl-rec__num" id="' + weightId + '" ' +
             'min="40" max="120" step="0.5" value="' + defaultWeight.toFixed(1) + '" ' +
             'inputmode="decimal" autocomplete="off" data-input="weight" ' +
             'aria-label="체중 (kg, 0.5kg 단위, 화살표로 ±0.5)">' +
         '</div>' +
         '<div class="lvl-rec__field">' +
           '<label class="lvl-rec__field-label" for="' + windId + '">' +
-            '풍속 <span class="lvl-rec__field-value" data-readout="wind">' + defaultWind + ' kt</span>' +
+            '풍속 <span class="lvl-rec__field-value lvl-rec__num" data-readout="wind">' + defaultWind + '</span><span class="lvl-rec__unit"> kt</span>' +
           '</label>' +
           '<input type="range" class="lvl-rec__wind" id="' + windId + '" ' +
             'min="4" max="24" step="1" value="' + defaultWind + '" ' +
@@ -501,7 +236,7 @@
         '</div>' +
       '</div>' +
       '<div class="lvl-rec__out" id="' + outId + '" data-out aria-live="polite" aria-atomic="true">' +
-        '<div class="lvl-rec__out-loading">추천 계산 중…</div>' +
+        '<!-- updateTile 가 동기 render — loading state 없음 (§405 spec) -->' +
       '</div>' +
       '<a href="#contact" class="lvl-rec__cta" ' +
         'data-level="' + levelKey + '" data-style="' + style.key + '" ' +
@@ -509,17 +244,20 @@
         '<strong>' + style.title + ' 풀세트 견적 요청 →</strong>' +
       '</a>';
 
+    // 슬라이더 초기 fill
+    var windInput = tile.querySelector('[data-input="wind"]');
+    if (windInput) updateSliderFill(windInput);
+
     return tile;
   }
 
-  // Re-render the output for one tile based on current input values.
+  // ─── §405 — Render one tile (synchronous, no loading state) ─
   function updateTile(tile, levelKey) {
     var weightInput = tile.querySelector('[data-input="weight"]');
     var windInput = tile.querySelector('[data-input="wind"]');
     var weightReadout = tile.querySelector('[data-readout="weight"]');
     var windReadout = tile.querySelector('[data-readout="wind"]');
     var out = tile.querySelector('[data-out]');
-    var styleKey = tile.getAttribute('data-style');
 
     var weight = parseFloat(weightInput.value);
     var wind = parseFloat(windInput.value);
@@ -534,44 +272,65 @@
     }
 
     weightReadout.textContent = fmtWeight(weight);
-    windReadout.textContent = wind + ' kt';
+    windReadout.textContent = wind;
     windInput.setAttribute('aria-valuenow', String(wind));
+    updateSliderFill(windInput);
 
-    // §404 — 3 sizes 모두 weight×wind 으로 동적 계산
-    var wingArea = targetWingArea(weight, wind, styleKey);
-    var foilArea = targetFoilArea(levelKey, weight, wind, styleKey);
-    var boardVol = targetBoardVolume(levelKey, weight, wind, styleKey);
+    // §405 spec — 3종 모두 동기 계산
+    var sail  = calcSail(weight, wind, levelKey);
+    var foil  = calcFoil(weight, wind, levelKey);
+    var board = calcBoard(weight, wind, levelKey);
+    var safety = getSafety(levelKey);
+    var c = getConst(levelKey);
+    if (!c || sail == null || foil == null || !board) {
+      out.innerHTML = '<div class="lvl-rec__out-error">레벨 상수 부재 — 1:1 상담 권장.</div>';
+      return;
+    }
 
-    // matrix entry 의 wing sizes_m2 가 있으면 정확 SKU size 로 정교화
-    getEntry(levelKey, weightTier(weight), styleKey).then(function (entry) {
-      var wingSize = wingArea;
-      if (entry && entry.wing && entry.wing.sizes_m2 && entry.wing.sizes_m2.length) {
-        var snap = pickNearestSize(entry.wing.sizes_m2, wingArea);
-        if (snap != null) wingSize = snap;
-      }
-      var bank = getBank(levelKey, styleKey);
-      var rows = renderRows(bank, wingSize, foilArea, boardVol);
-      if (!rows.length) {
-        out.innerHTML = '<div class="lvl-rec__out-error">추천 데이터 부재 — 1:1 상담 권장.</div>';
-        return;
-      }
-      var html = rows.map(function (r) {
-        return '<div class="lvl-rec__out-row"><span><b>' + r.label + '</b>' + r.text + '</span></div>';
-      }).join('');
-      out.innerHTML = html;
-    });
+    // 미풍 펌핑 +6L 배지 (≤10kt)
+    var pumpBadge = board.pump > 0
+      ? '<span class="lvl-rec__badge" aria-label="미풍 펌핑 추가 볼륨 +' + board.pump + 'L">미풍 펌핑 +' + board.pump + 'L</span>'
+      : '';
+
+    out.innerHTML =
+      '<div class="lvl-rec__out-row">' +
+        '<span><b>윙</b>' + c.wing.brand +
+          ' <span class="lvl-rec__num lvl-rec__out-size">' + fmtSail(sail) + 'm²</span></span>' +
+      '</div>' +
+      '<div class="lvl-rec__out-row">' +
+        '<span><b>포일</b>' + c.foil.brand +
+          ' <span class="lvl-rec__num lvl-rec__out-size">~' + fmtArea(foil) + 'cm²</span></span>' +
+      '</div>' +
+      '<div class="lvl-rec__out-row">' +
+        '<span><b>보드</b>' + board.brand +
+          ' <span class="lvl-rec__num lvl-rec__out-size">' + board.size + 'L</span>' +
+          ' <span class="lvl-rec__out-target">~' + board.target + 'L</span>' +
+          (pumpBadge ? ' ' + pumpBadge : '') +
+        '</span>' +
+      '</div>' +
+      '<div class="lvl-rec__out-row">' +
+        '<span><b>안전</b>' + safety + '</span>' +
+      '</div>';
   }
 
-  // Init one section: build 4 tiles, wire inputs, kick off initial render.
+  // ─── Init one section: build 4 tiles, wire inputs ─────────
   function initSection(section) {
     if (section.getAttribute('data-lvl-rec-init') === '1') return;
     section.setAttribute('data-lvl-rec-init', '1');
 
-    var levelKey = section.getAttribute('data-level');
-    if (!levelKey) {
-      console.warn('[gear-recommender §403] data-level attribute missing');
+    var lvl = section.getAttribute('data-level');
+    if (!lvl) {
+      console.warn('[gear-recommender §405] data-level attribute missing');
       return;
     }
+
+    // Default override via data-default-wkg / data-default-kt (page-level customize).
+    // 명시 안 되면 §405 spec default = 68.0 / 13.
+    var defaultWeight = parseFloat(section.getAttribute('data-default-wkg'));
+    if (!isFinite(defaultWeight) || defaultWeight < 40 || defaultWeight > 120) {
+      defaultWeight = SPEC_DEFAULT_WEIGHT;
+    }
+    var defaultWindOverride = parseFloat(section.getAttribute('data-default-kt'));
 
     var grid = section.querySelector('.lvl-rec__grid');
     if (!grid) {
@@ -581,23 +340,30 @@
     }
 
     STYLES.forEach(function (style) {
-      var tile = buildTile(style, levelKey);
+      // page-level override 가 있으면 모든 tile 의 default wind 동일 적용
+      var s = style;
+      if (isFinite(defaultWindOverride) && defaultWindOverride >= 4 && defaultWindOverride <= 24) {
+        s = { key: style.key, title: style.title, sub: style.sub, defaultWind: defaultWindOverride };
+      }
+      var tile = buildTile(s, lvl, defaultWeight);
       grid.appendChild(tile);
 
       var weightInput = tile.querySelector('[data-input="weight"]');
       var windInput = tile.querySelector('[data-input="wind"]');
 
+      // §405 spec — 로드 즉시 동기 render (loading state X)
+      updateTile(tile, lvl);
+
+      // Debounced update (typing in weight)
       var debounce = null;
       function trigger() {
         clearTimeout(debounce);
         debounce = setTimeout(function () {
-          updateTile(tile, levelKey);
-        }, 80);
+          updateTile(tile, lvl);
+        }, 60);
       }
       weightInput.addEventListener('input', trigger);
       windInput.addEventListener('input', trigger);
-
-      updateTile(tile, levelKey);
     });
   }
 
@@ -612,29 +378,26 @@
     initAll();
   }
 
-  // Expose for late-loaded matrix.js
-  document.addEventListener('dmj:matrix:ready', function () {
-    document.querySelectorAll('.lvl-rec[data-level]').forEach(function (section) {
-      var levelKey = section.getAttribute('data-level');
-      section.querySelectorAll('.lvl-rec__tile').forEach(function (tile) {
-        updateTile(tile, levelKey);
-      });
-    });
-  });
-
-  // Public API for testing
+  // Public API — testing + future page-level customization
   window.DMJGearRecommender = {
-    weightTier: weightTier,
-    targetWingArea: targetWingArea,
-    targetBoardVolume: targetBoardVolume,
-    targetFoilArea: targetFoilArea,
-    pickNearestSize: pickNearestSize,
-    pickNearest: pickNearest,
-    getBank: getBank,
-    fmtWeight: fmtWeight,
-    STYLES: STYLES,
+    // §405 calculators
+    calcSail: calcSail,
+    calcFoil: calcFoil,
+    calcBoard: calcBoard,
+    getSafety: getSafety,
+    // §405 utilities
+    round5: round5, clamp: clamp, nearest: nearest,
+    baseSail: baseSail, windBand: windBand,
+    // formatters
+    fmtWeight: fmtWeight, fmtSail: fmtSail, fmtArea: fmtArea,
+    // constants
+    LEVEL_CONSTANTS: LEVEL_CONSTANTS,
     LEVEL_LABELS: LEVEL_LABELS,
-    GEAR_BANK: GEAR_BANK,
-    initAll: initAll
+    STYLES: STYLES,
+    SPEC_DEFAULT_WEIGHT: SPEC_DEFAULT_WEIGHT,
+    SPEC_DEFAULT_WIND: SPEC_DEFAULT_WIND,
+    // hooks
+    initAll: initAll,
+    updateSliderFill: updateSliderFill
   };
 })();
