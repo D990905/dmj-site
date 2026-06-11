@@ -617,7 +617,22 @@ a { color:var(--sea-deep); }
 }
 .map-fs__title { font-weight:700; font-size:.9rem; }
 .map-fs__bar .btn--ghost { background:rgba(255,255,255,.14); border-color:transparent; color:#fff; }
-.map-fs__map { flex:1; min-height:0; }
+.map-fs__map { flex:1; min-height:0; position:relative; }
+/* 전체화면 풍향 오버레이 — 일반 mode 의 .wind-grid/.wind-arrows 와 동일.
+   #fs-map 은 Leaflet 컨테이너 자체라 그 직속 자식으로 두면 내부
+   map-pane(z-index auto) 위에 그려진다(일반 mode 가 #map 위에 오버레이를
+   얹는 것과 같은 효과). pointer-events:none 라 지도 조작은 가리지 않는다. */
+.fs-wind-grid {
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; z-index:400;   /* Leaflet map-pane 위 */
+}
+.fs-wind-arrows {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+  z-index:401;   /* 그리드 위 */
+  display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(4,1fr);
+  place-items:center; opacity:0; transition:opacity .25s;
+}
+.fs-wind-arrows.is-on { opacity:.55; }
 .map-fs__chart {
   height:160px; background:var(--bg-card); padding:8px 12px 4px;
   position:relative; flex:0 0 auto;

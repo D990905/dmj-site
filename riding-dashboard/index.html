@@ -38,7 +38,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <!-- 메인 사이트 헤더·내비 스타일 — dashboard.css 를 뒤에 두어 대시보드 본문 스타일이 우선한다 -->
 <link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526">
-<link rel="stylesheet" href="css/dashboard.css?v=en-cleanup-20260526">
+<link rel="stylesheet" href="css/dashboard.css?v=fs-wind-417-20260611">
 </head>
 <body>
 
@@ -505,7 +505,10 @@
           ✕ 닫기 (ESC)
         </button>
       </div>
-      <div id="fs-map" class="map-fs__map"></div>
+      <div id="fs-map" class="map-fs__map">
+        <canvas id="fs-wind-grid" class="fs-wind-grid" aria-hidden="true"></canvas>
+        <div id="fs-wind-arrows" class="fs-wind-arrows" aria-hidden="true"></div>
+      </div>
       <div class="map-fs__chart"><canvas id="fs-speed-chart"></canvas></div>
     </div>
 

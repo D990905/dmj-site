@@ -1517,6 +1517,15 @@
         onExcludeRemove: removeExcludeFromChart
       });
     }
+    // 풍향 오버레이(격자·화살표)를 전체화면 지도에도 그린다 (§417).
+    // fs-map 이 이제 보이므로 캔버스 크기를 측정해 다시 그리고, 현재
+    // 풍향(미리보기 우선)으로 화살표를 켠다 — 일반 mode 와 동일한 표시.
+    buildWindArrows();              // fs-wind-arrows 가 비어 있으면 채움
+    var deg = currentWindGridDeg();
+    resizeWindGrid();               // fs-wind-grid 캔버스 크기 재설정
+    WG.deg = deg;
+    if (!WG.glintRaf) drawWindGrid(WG.deg, 0);
+    updateWindArrows(deg);
   }
   function exitMapFullscreen() {
     if ($('map-fs').hidden) return;
@@ -2054,9 +2063,9 @@
   }
 
   /* ---------- 풍향 UI (Vantage 스타일: 미리보기 → 확정) ---------- */
+  /* 풍향 화살표 격자를 일반(#wind-arrows) + 전체화면(#fs-wind-arrows) 양쪽에
+     채운다 — 전체화면 진입 시 같은 풍향 오버레이가 보이도록 (§417). */
   function buildWindArrows() {
-    var box = $('wind-arrows');
-    if (!box || box.children.length) return;
     // 화살표 길이 3배 — 위치·개수·각도·굵기·화살촉 크기는 그대로,
     // 길이만 3배(21→63)로 늘려 지도에서 풍향을 더 또렷이 읽게 한다.
     var svg = '<svg width="20" height="69" viewBox="0 0 20 69">' +
@@ -2064,15 +2073,20 @@
       'stroke-linecap="round"/><path d="M10 3 L4 14 L16 14 Z" fill="#0A2540"/></svg>';
     var html = '';
     for (var i = 0; i < 24; i++) html += '<span class="wa">' + svg + '</span>';
-    box.innerHTML = html;
+    ['wind-arrows', 'fs-wind-arrows'].forEach(function (id) {
+      var box = $(id);
+      if (box && !box.children.length) box.innerHTML = html;
+    });
   }
   function updateWindArrows(deg) {
-    var box = $('wind-arrows');
-    if (!box) return;
-    if (deg == null) { box.classList.remove('is-on'); return; }
-    box.classList.add('is-on');
-    // 화살표는 바람이 흘러가는 방향(풍하)을 가리킴
-    box.style.setProperty('--wind-rot', ((deg + 180) % 360) + 'deg');
+    ['wind-arrows', 'fs-wind-arrows'].forEach(function (id) {
+      var box = $(id);
+      if (!box) return;
+      if (deg == null) { box.classList.remove('is-on'); return; }
+      box.classList.add('is-on');
+      // 화살표는 바람이 흘러가는 방향(풍하)을 가리킴
+      box.style.setProperty('--wind-rot', ((deg + 180) % 360) + 'deg');
+    });
   }
 
   /* ---------- 풍향 모눈종이 그리드 (지도 오버레이) ----------
@@ -2101,50 +2115,56 @@
   }
 
   function resizeWindGrid() {
-    var cv = $('wind-grid');
-    if (!cv) return;
-    var w = cv.clientWidth, h = cv.clientHeight;
-    if (w <= 0 || h <= 0) return;
     var dpr = window.devicePixelRatio || 1;
-    cv.width = Math.round(w * dpr);
-    cv.height = Math.round(h * dpr);
+    ['wind-grid', 'fs-wind-grid'].forEach(function (id) {
+      var cv = $(id);
+      if (!cv) return;
+      var w = cv.clientWidth, h = cv.clientHeight;
+      if (w <= 0 || h <= 0) return;   // 숨김(전체화면 닫힘) 상태면 0 → 건너뜀
+      cv.width = Math.round(w * dpr);
+      cv.height = Math.round(h * dpr);
+    });
   }
 
   /* 풍향 그리드 1회 그리기 — angleDeg(null=정적 0°) · glint 펄스 0~1.
      정사각 그리드를 풍향+45°로 회전해 두 라인 군이 ±45° 택 방향을
      따라가게 한다(정사각이라 90° 주기 — +45°·−45° 결과가 동일). */
   function drawWindGrid(angleDeg, pulse) {
-    var cv = $('wind-grid');
-    if (!cv || !cv.getContext) return;
-    var w = cv.width, h = cv.height;
-    if (w <= 0 || h <= 0) return;
-    var dpr = window.devicePixelRatio || 1;
-    var ctx = cv.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, w, h);
     pulse = pulse || 0;
+    var dpr = window.devicePixelRatio || 1;
     var rot = ((angleDeg == null ? 0 : angleDeg + 45) * Math.PI) / 180;
-    var gap = WG.gap * dpr;
-    var diag = Math.sqrt(w * w + h * h);
-    var half = Math.ceil(diag / 2 / gap) * gap + gap;
-    ctx.save();
-    ctx.translate(w / 2, h / 2);
-    ctx.rotate(rot);
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(255,255,255,' + (0.5 + 0.42 * pulse) + ')';
-    ctx.lineWidth = (1 + 2.4 * pulse) * dpr;
-    if (pulse > 0) {
-      ctx.shadowColor = 'rgba(255,255,255,0.92)';
-      ctx.shadowBlur = 6 * pulse * dpr;
-    }
-    var x, y;
-    for (x = -half; x <= half; x += gap) {
-      ctx.beginPath(); ctx.moveTo(x, -half); ctx.lineTo(x, half); ctx.stroke();
-    }
-    for (y = -half; y <= half; y += gap) {
-      ctx.beginPath(); ctx.moveTo(-half, y); ctx.lineTo(half, y); ctx.stroke();
-    }
-    ctx.restore();
+    // 일반(#wind-grid) + 전체화면(#fs-wind-grid) 양쪽 캔버스를 각자
+    // 고유 크기로 그린다 (§417). 숨김 캔버스(width 0)는 건너뛴다.
+    ['wind-grid', 'fs-wind-grid'].forEach(function (id) {
+      var cv = $(id);
+      if (!cv || !cv.getContext) return;
+      var w = cv.width, h = cv.height;
+      if (w <= 0 || h <= 0) return;
+      var ctx = cv.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      var gap = WG.gap * dpr;
+      var diag = Math.sqrt(w * w + h * h);
+      var half = Math.ceil(diag / 2 / gap) * gap + gap;
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(rot);
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.5 + 0.42 * pulse) + ')';
+      ctx.lineWidth = (1 + 2.4 * pulse) * dpr;
+      if (pulse > 0) {
+        ctx.shadowColor = 'rgba(255,255,255,0.92)';
+        ctx.shadowBlur = 6 * pulse * dpr;
+      }
+      var x, y;
+      for (x = -half; x <= half; x += gap) {
+        ctx.beginPath(); ctx.moveTo(x, -half); ctx.lineTo(x, half); ctx.stroke();
+      }
+      for (y = -half; y <= half; y += gap) {
+        ctx.beginPath(); ctx.moveTo(-half, y); ctx.lineTo(half, y); ctx.stroke();
+      }
+      ctx.restore();
+    });
   }
 
   /* glint 펄스 모양 — 0→1→0 (반 사인) */
