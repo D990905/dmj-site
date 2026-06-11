@@ -918,11 +918,23 @@
     var km = fmtKm(r.distanceM); if (km) stats.push(km);
     var top = fmtKt(r.maxSpeedMs); if (top) stats.push('top ' + top);
     var vps = fmtVps(r.vpsOverall); if (vps) stats.push(vps);
-    return '<button type="button" class="intro-ride-row" data-load="' + esc(r.id || '') + '"' +
-      ' aria-label="' + esc((r.name || '라이딩 세션') + ' 다시 보기') + '">' +
+    var cells =
       '<span class="intro-ride-row__date">' + esc(fmtDate(r.dateEpoch)) + '</span>' +
       '<span class="intro-ride-row__name">' + esc(r.name || '라이딩 세션') + '</span>' +
-      '<span class="intro-ride-row__stats">' + esc(stats.join(' · ')) + '</span>' +
+      '<span class="intro-ride-row__stats">' + esc(stats.join(' · ')) + '</span>';
+    // §416 (Alex Park #4 · 2026-06-11) — hasTrack 게이팅 (profile.html §411 과 동일).
+    // 원본 GPX 가 저장된 세션(hasTrack)만 [data-load] 로 다시 분석 가능. 요약본은
+    // 클릭 시 트랙을 못 찾아 인트로에 머물러 혼란 → 클릭 불가 행 + '요약본' 배지로 표시.
+    if (!r.hasTrack) {
+      return '<div class="intro-ride-row intro-ride-row--summary"' +
+        ' title="요약만 저장된 세션이라 다시 불러올 수 없습니다. 새 GPX 를 업로드하면 다시 볼 수 있습니다.">' +
+        cells +
+        '<span class="intro-ride-row__badge">요약본 · 다시 보기 불가</span>' +
+        '</div>';
+    }
+    return '<button type="button" class="intro-ride-row" data-load="' + esc(r.id || '') + '"' +
+      ' aria-label="' + esc((r.name || '라이딩 세션') + ' 다시 보기') + '">' +
+      cells +
       '<span class="intro-ride-row__chev" aria-hidden="true">→</span>' +
       '</button>';
   }

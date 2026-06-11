@@ -3043,12 +3043,32 @@
 
         var dateStr = fmtDate(r.dateEpoch);
         var name = escapeHtml(r.name || '라이딩 세션');
-        var detailHref = 'riding-dashboard/?session=' + encodeURIComponent(r.id || '');
 
-        return '<a class="ride-row" href="' + detailHref + '">' +
+        // §416 (Alex Park #4 · 2026-06-11) — hasTrack 게이팅.
+        // 옥대표님 verbatim: "최근 라이딩 중 하나 선택하면 여전히 파일업로드 뷰로 진입".
+        // 원인: 대시보드 '다시 보기'는 원본 GPX 가 저장된 세션(hasTrack)만 재분석할 수
+        // 있는데, 요약만 저장된 세션(hasTrack=false)도 똑같이 클릭 가능한 링크로 렌더돼,
+        // 클릭하면 대시보드가 트랙을 못 찾아 업로드(인트로) 화면에 그대로 머물렀다
+        // (잠깐 뜨는 토스트만 안내). 라이딩 대시보드 저장 목록(renderSavedSessions)과
+        // 동일하게, hasTrack 세션만 링크로 열고 요약본은 '다시 보기 불가' 안내 행으로 표시.
+        var commonCells =
           '<span class="ride-row__date">' + escapeHtml(dateStr) + '</span>' +
           '<span class="ride-row__name">' + name + '</span>' +
-          '<span class="ride-row__stats">' + escapeHtml(stats.join(' · ')) + '</span>' +
+          '<span class="ride-row__stats">' + escapeHtml(stats.join(' · ')) + '</span>';
+
+        if (!r.hasTrack) {
+          // 요약본 세션 — 원본 GPX 가 없어 대시보드 재분석 불가. 클릭 불가 행 + 안내 배지.
+          return '<div class="ride-row ride-row--summary" ' +
+            'title="요약만 저장된 세션이라 대시보드에서 다시 불러올 수 없습니다. ' +
+            '새 GPX 를 업로드하면 다시 볼 수 있습니다.">' +
+            commonCells +
+            '<span class="ride-row__badge">요약본 · 다시 보기 불가</span>' +
+          '</div>';
+        }
+
+        var detailHref = 'riding-dashboard/?session=' + encodeURIComponent(r.id || '');
+        return '<a class="ride-row" href="' + detailHref + '">' +
+          commonCells +
           '<span class="ride-row__chev" aria-hidden="true">→</span>' +
         '</a>';
       }
