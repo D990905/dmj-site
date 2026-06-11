@@ -988,15 +988,28 @@
     // row click 은 app.js global handler ([data-load]) 가 처리 — 본 listener 영향 X
   });
 
-  // storage event listener — 다른 탭에서 세션 변경 시 자동 갱신
+  // storage event listener — 다른 탭에서 세션 변경 시 자동 갱신.
+  // §412 — 세션 키가 per-user namespace ('rd_<uid>_sessions_v1') 가 되어
+  // 고정 prefix 매칭이 깨졌다. '...sessions_v1' 로 끝나는 모든 키 대응.
   window.addEventListener('storage', function (e) {
-    if (e.key && e.key.indexOf('rd_sessions_v1') === 0) {
+    if (e.key && e.key.indexOf('sessions_v1') >= 0) {
       sessions = readSessions();
       render();
     }
   });
 
+  // §412 — DMJAuth 세션이 async 로 해소되면 (로그인/로그아웃/탭간) namespace 가
+  // 바뀐다. 마이그레이션 트리거 후 현재 사용자 세션 목록으로 재렌더.
+  // (init 은 DOMContentLoaded = uid 미확정 시점이라 빈 목록으로 그려질 수 있고,
+  //  auth 해소 후 본 listener 가 옳은 목록으로 교체한다 — 격리·표시 둘 다 충족.)
+  window.addEventListener('dmj-auth-change', function () {
+    try { if (window.RDStorage && RDStorage.migrateLegacyIfNeeded) RDStorage.migrateLegacyIfNeeded(); } catch (e) {}
+    sessions = readSessions();
+    render();
+  });
+
   function init() {
+    // readSessions() → RDStorage.listSessions() 가 첫 read 시 migrate 자동 트리거.
     sessions = readSessions();
     render();
   }

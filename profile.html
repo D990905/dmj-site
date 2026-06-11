@@ -591,6 +591,11 @@
 </datalist>
 
 <script src="assets/js/supabase-auth.js?v=supabase-187-20260604" defer></script>
+<!-- §412 (Alex Park #4 · 2026-06-11) — 라이딩 storage per-user namespace + legacy
+     마이그레이션 (RDStorage.migrateLegacyIfNeeded). 마이페이지는 storage.js 를
+     쓰지 않았으나, 전역 bare 'rd_*' 키 제거(데이터 격리)를 위해 마이그레이션을
+     트리거해야 하므로 로드한다. 독립 IIFE — 부수효과 없음(window.RDStorage 정의만). -->
+<script src="riding-dashboard/js/storage.js?v=ns-412-20260611" defer></script>
 <!-- v2 데이터 주도 스킬 레벨 평가 — 추천·동의 카드 -->
 <script src="assets/js/skill-level.js" defer></script>
 <!-- §171-B cart system — for nav badge. -->
@@ -2079,12 +2084,16 @@
       var SL = window.DMJSkillLevel;
       if (!SL) { host.hidden = true; return; }
 
-      // --- 라이딩 대시보드 세션 (전역 localStorage) ---
+      // --- 라이딩 대시보드 세션 (per-user namespace, §412) ---
+      // 격리: 신규 가입자에게 전역/타인 세션으로 가짜 스킬진단을 띄우던 누수
+      // (전역 'rd_sessions_v1' 직접 읽기) 제거. RDStorage 가 현재 로그인 사용자
+      // namespace 만 읽는다 (비로그인·미확정 시 빈 목록 → 추천 안 뜸).
       var sessions = [];
       try {
-        var rawS = localStorage.getItem('rd_sessions_v1');
-        var arrS = rawS ? JSON.parse(rawS) : [];
-        if (Array.isArray(arrS)) sessions = arrS;
+        if (window.RDStorage && typeof RDStorage.listSessions === 'function') {
+          var arrS = RDStorage.listSessions() || [];
+          if (Array.isArray(arrS)) sessions = arrS;
+        }
       } catch (e) {}
 
       // --- 설문 (10축 스킬 진단, per-user) ---
@@ -2113,8 +2122,8 @@
       }
       if (!currentLevel) {
         try {
-          var rawR = localStorage.getItem('rd_rider_v1');
-          var rd = rawR ? JSON.parse(rawR) : null;
+          // §412 — per-user namespace (RDStorage.loadRider → 'rd_<uid>_rider_v1')
+          var rd = (window.RDStorage && RDStorage.loadRider) ? RDStorage.loadRider() : null;
           if (rd && rd.skill) currentLevel = rd.skill;
         } catch (e) {}
       }
@@ -2221,13 +2230,12 @@
           blendedScore: ev.blendedScore
         };
         try { window.DMJAuth.setUserData('skill_level_v1', JSON.stringify(payload)); } catch (e) {}
-        // 대시보드 라이더 프로필 스킬도 동기화 (전역 localStorage)
+        // 대시보드 라이더 프로필 스킬도 동기화 (§412 — per-user namespace)
         try {
-          var rawR = localStorage.getItem('rd_rider_v1');
-          var rd = rawR ? JSON.parse(rawR) : {};
+          var rd = (window.RDStorage && RDStorage.loadRider && RDStorage.loadRider()) || {};
           if (rd && typeof rd === 'object') {
             rd.skill = ev.recommendedLevel;
-            localStorage.setItem('rd_rider_v1', JSON.stringify(rd));
+            if (window.RDStorage && RDStorage.saveRider) RDStorage.saveRider(rd);
           }
         } catch (e) {}
         host.innerHTML = ''
@@ -3122,6 +3130,10 @@
       }
 
       function init() {
+        // §412 — bare 'rd_sessions_v1'(전역) → 'rd_<uid>_sessions_v1' 마이그레이션
+        // 후 읽는다. 마이그레이션이 bare 키를 제거해 dual-key reader 가 더는
+        // 다른 사용자에게 전역 데이터를 누수하지 않는다 (격리 fix 핵심).
+        try { if (window.RDStorage && RDStorage.migrateLegacyIfNeeded) RDStorage.migrateLegacyIfNeeded(); } catch (e) {}
         sessions = readSessions();
         if (sessions === null) { renderError(); return; }
         if (sessions.length === 0) { renderEmpty(); return; }
@@ -3140,10 +3152,18 @@
         }
       });
 
-      // storage 다른 탭에서 변경 시 자동 갱신
+      // storage 다른 탭에서 변경 시 자동 갱신.
+      // §412 — 세션 키가 per-user namespace ('rd_<uid>_sessions_v1') 라 고정
+      // 키 비교 대신 '...sessions_v1' 매칭. (구버전은 정의 안 된 SESSIONS_KEY 를
+      // 참조해 ReferenceError 로 핸들러가 작동조차 안 했다 — 같이 고침.)
       window.addEventListener('storage', function (e) {
-        if (e.key === SESSIONS_KEY) init();
+        if (e.key && e.key.indexOf('sessions_v1') >= 0) init();
       });
+
+      // §412 — DMJAuth 세션 async 해소(로그인/로그아웃) 시 namespace 가 바뀐다.
+      // DOMContentLoaded 시점엔 uid 미확정이라 처음엔 빈/레거시 목록일 수 있어,
+      // auth 해소 후 본인 namespace 목록으로 재렌더해야 옥대표님 4건이 보인다.
+      window.addEventListener('dmj-auth-change', function () { init(); });
 
       init();
     })();

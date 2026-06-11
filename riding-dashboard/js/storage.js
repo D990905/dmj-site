@@ -6,8 +6,52 @@
 (function (global) {
   'use strict';
 
-  var KEY = 'rd_sessions_v1';
-  var TRACK_PREFIX = 'rd_track_v1_';   /* 세션별 원본 GPX — '다시 보기' 재분석용 */
+  /* ============================================================
+   * §412 (Alex Park #4 · 2026-06-11) — per-user namespace
+   *   CRITICAL: 옥대표님 verbatim — "내계정이랑 지인 계정 두개따로 로긴해봤는데
+   *   최근 라이딩 기록 4개가 같으네." 모든 rd_* 키가 브라우저 전역이라 같은
+   *   브라우저에서 계정이 바뀌어도 데이터가 공유되던 격리 파탄.
+   *
+   *   해결: 키를 'rd_<uid>_*' 로 namespace. uid 는 DMJAuth.currentUserId()
+   *   (supabase-auth.js). 비로그인(anon) = 'rd_anon_*'. DMJAuth 자체가
+   *   없는 환경(node selftest)은 legacy bare 'rd_*' 그대로 — 회귀 방지.
+   *
+   *   suffix 표:  sessions_v1 · track_v1_<id> · edits_v1 · titles_v1 ·
+   *               videosync_v1 · video_blobs_v1(IndexedDB) · rider_v1
+   *   → nsPrefix() + suffix.  browser 로그인 시 'rd_<uid>_sessions_v1' 형태로,
+   *     profile.html §413-3 reader 가 기대하는 포맷과 정확히 일치.
+   * ============================================================ */
+  function _authLayerPresent() {
+    return !!(global.DMJAuth && typeof global.DMJAuth.currentUserId === 'function');
+  }
+  function _currentUid() {
+    try {
+      if (_authLayerPresent()) return global.DMJAuth.currentUserId() || null;
+    } catch (e) {}
+    return null;
+  }
+  /* namespace prefix. DMJAuth 부재(node) = legacy bare 'rd_' (selftest 무손상).
+     로그인 = 'rd_<uid>_', 비로그인 = 'rd_anon_'. */
+  function nsPrefix() {
+    if (!_authLayerPresent()) return 'rd_';
+    var uid = _currentUid();
+    return 'rd_' + (uid || 'anon') + '_';
+  }
+  function K_SESSIONS()    { return nsPrefix() + 'sessions_v1'; }
+  function K_TRACK_PREFIX(){ return nsPrefix() + 'track_v1_'; }
+  function K_TRACK(id)     { return K_TRACK_PREFIX() + id; }
+  function K_EDITS()       { return nsPrefix() + 'edits_v1'; }
+  function K_TITLES()      { return nsPrefix() + 'titles_v1'; }
+  function K_VIDEO()       { return nsPrefix() + 'videosync_v1'; }
+  function K_RIDER()       { return nsPrefix() + 'rider_v1'; }
+  function videoDbName()   { return nsPrefix() + 'video_blobs_v1'; }
+
+  /* §412 — legacy(전역) → uid namespace 1회 마이그레이션 플래그 (브라우저 전역).
+     '옥대표님 verbatim a' 옵션: 기존 전역 데이터를 첫 로그인 사용자의
+     namespace 로 옮긴다. 플래그 = uid@epoch. 한 번 set 되면 재실행 안 함. */
+  var MIGRATION_FLAG = 'rd_legacy_migrated_v1';
+  var _migrationTriedFor = {};   /* in-memory: uid 별 1회만 localStorage 프로빙 */
+
   var MAX_SESSIONS = 50;
   /* 트랙 1건 상한 — 공백 압축 후에도 이보다 크면 요약만 저장한다.
      realistic 세션(수 시간·1Hz GPS)은 압축 후 이 한도 안에 들어와
@@ -15,9 +59,67 @@
      storeTrackWithEviction 이 오래된 트랙을 비우며 따로 관리한다. */
   var MAX_TRACK_CHARS = 8000000;
 
-  function readAll() {
+  /* §412 — legacy 전역 데이터 → 로그인 사용자 namespace 마이그레이션.
+     로그인(uid present) + 미마이그레이션(flag 없음) + 전역 bare 키 존재 시 1회 실행.
+     verified-copy-then-remove: namespace 로 복사 → 읽기 검증 → bare 제거.
+     bare 제거가 핵심 — profile.html dual-key reader / 스킬위젯이 bare 를
+     무조건 읽어 다음 사용자에게 누수되던 경로를 끊는다. sessions 요약본은
+     rd_legacybak_sessions_v1 로 백업(롤백용). track 은 namespace 복사본이 보존본.
+     비로그인/DMJAuth 부재(node)/이미 마이그레이션 = no-op. */
+  function migrateLegacyIfNeeded() {
+    var ls; try { ls = global.localStorage; } catch (e) { ls = null; }
+    if (!ls) return { migrated: false, reason: 'no-localStorage' };
+    if (!_authLayerPresent()) return { migrated: false, reason: 'no-auth-layer' };
+    var uid = _currentUid();
+    if (!uid) return { migrated: false, reason: 'not-logged-in' };
+    if (_migrationTriedFor[uid]) return { migrated: false, reason: 'checked' };
     try {
-      var raw = global.localStorage ? global.localStorage.getItem(KEY) : null;
+      if (ls.getItem(MIGRATION_FLAG)) {
+        _migrationTriedFor[uid] = true;
+        return { migrated: false, reason: 'already-migrated' };
+      }
+      var SIMPLE = ['rd_sessions_v1', 'rd_edits_v1', 'rd_titles_v1', 'rd_videosync_v1', 'rd_rider_v1'];
+      var legacy = [];
+      SIMPLE.forEach(function (k) { if (ls.getItem(k) != null) legacy.push(k); });
+      for (var i = 0; i < ls.length; i++) {
+        var lk = ls.key(i);
+        if (lk && lk.indexOf('rd_track_v1_') === 0) legacy.push(lk);
+      }
+      if (!legacy.length) {
+        _migrationTriedFor[uid] = true;
+        return { migrated: false, reason: 'no-legacy-data' };
+      }
+      var prefix = 'rd_' + uid + '_';
+      var moved = [], failed = [];
+      for (var j = 0; j < legacy.length; j++) {
+        var bare = legacy[j];
+        var nk = prefix + bare.slice(3);     /* 'rd_sessions_v1' → 'rd_<uid>_sessions_v1' */
+        var val = ls.getItem(bare);
+        if (val == null) continue;
+        if (ls.getItem(nk) == null) {        /* 기존 namespace 데이터 clobber 금지 */
+          try { ls.setItem(nk, val); } catch (e) { failed.push(bare); continue; }
+          if (ls.getItem(nk) !== val) { failed.push(bare); continue; }   /* 복사 검증 */
+        }
+        if (bare === 'rd_sessions_v1') {     /* 요약본 백업(롤백용·작음) */
+          try { ls.setItem('rd_legacybak_sessions_v1', val); } catch (e) {}
+        }
+        try { ls.removeItem(bare); } catch (e) {}   /* verified copy 이후 bare 제거 */
+        moved.push(bare);
+      }
+      if (!failed.length) {                  /* 부분 실패 시 flag 미설정 → 다음 진입 재시도 */
+        try { ls.setItem(MIGRATION_FLAG, uid + '@' + (global.Date && Date.now ? Date.now() : 0)); } catch (e) {}
+        _migrationTriedFor[uid] = true;
+      }
+      return { migrated: moved.length > 0, uid: uid, moved: moved, failed: failed };
+    } catch (e) {
+      return { migrated: false, reason: 'error', error: String(e) };
+    }
+  }
+
+  function readAll() {
+    migrateLegacyIfNeeded();   /* §412 — 첫 read 시 자동 마이그레이션 (in-memory guard 로 저비용) */
+    try {
+      var raw = global.localStorage ? global.localStorage.getItem(K_SESSIONS()) : null;
       if (!raw) return [];
       var arr = JSON.parse(raw);
       return Array.isArray(arr) ? arr : [];
@@ -25,7 +127,7 @@
   }
   function writeAll(arr) {
     try {
-      global.localStorage.setItem(KEY, JSON.stringify(arr));
+      global.localStorage.setItem(K_SESSIONS(), JSON.stringify(arr));
       return { ok: true };
     } catch (e) {
       return { ok: false, error: '브라우저 저장 공간이 가득 찼습니다. 오래된 세션을 삭제해 주세요.' };
@@ -36,7 +138,7 @@
    * 요약 레코드(rd_sessions_v1)와 분리해 세션마다 별도 키에 저장한다.
    * 큰 트랙 하나가 전체 목록 저장을 막지 않도록 분리한 것이다.
    * 다시 보기 = 저장된 GPX 를 분석 파이프라인에 그대로 재투입. */
-  function trackKey(id) { return TRACK_PREFIX + id; }
+  function trackKey(id) { return K_TRACK(id); }
   function storeTrackRaw(id, text) {
     global.localStorage.setItem(trackKey(id), text);
   }
@@ -216,10 +318,10 @@
   function clearAll() {
     /* 저장된 GPX 트랙 키도 전부 제거 */
     try {
-      var ls = global.localStorage, kill = [];
+      var ls = global.localStorage, kill = [], tp = K_TRACK_PREFIX();
       for (var i = 0; i < ls.length; i++) {
         var k = ls.key(i);
-        if (k && k.indexOf(TRACK_PREFIX) === 0) kill.push(k);
+        if (k && k.indexOf(tp) === 0) kill.push(k);
       }
       kill.forEach(function (k) { ls.removeItem(k); });
     } catch (e) {}
@@ -274,10 +376,9 @@
   }
 
   /* ---------- 트랙 편집 상태 (세션 시그니처별) ---------- */
-  var EDIT_KEY = 'rd_edits_v1';
   function readEdits() {
     try {
-      var raw = global.localStorage ? global.localStorage.getItem(EDIT_KEY) : null;
+      var raw = global.localStorage ? global.localStorage.getItem(K_EDITS()) : null;
       var o = raw ? JSON.parse(raw) : {};
       return (o && typeof o === 'object') ? o : {};
     } catch (e) { return {}; }
@@ -291,7 +392,7 @@
     var all = readEdits();
     if (isEmptyEdit(editState)) delete all[sig];
     else all[sig] = editState;
-    try { global.localStorage.setItem(EDIT_KEY, JSON.stringify(all)); return { ok: true }; }
+    try { global.localStorage.setItem(K_EDITS(), JSON.stringify(all)); return { ok: true }; }
     catch (e) { return { ok: false }; }
   }
   function loadEditState(sig) {
@@ -306,10 +407,9 @@
    * 시그니처는 트랙 구조에서 나오므로 같은 GPX 는 항상 같은 키를 얻어,
    * 새로 업로드하든 '다시 보기' 하든 편집한 제목이 그대로 복원된다.
    * 빈 제목을 저장하면 항목을 지운다 = 파일명 기반 자동 제목으로 복귀. */
-  var TITLE_KEY = 'rd_titles_v1';
   function readTitles() {
     try {
-      var raw = global.localStorage ? global.localStorage.getItem(TITLE_KEY) : null;
+      var raw = global.localStorage ? global.localStorage.getItem(K_TITLES()) : null;
       var o = raw ? JSON.parse(raw) : {};
       return (o && typeof o === 'object') ? o : {};
     } catch (e) { return {}; }
@@ -320,7 +420,7 @@
     var t = (typeof title === 'string') ? title.trim() : '';
     if (!t) delete all[sig];          /* 빈 제목 = 자동 제목으로 복귀 */
     else all[sig] = t;
-    try { global.localStorage.setItem(TITLE_KEY, JSON.stringify(all)); return { ok: true }; }
+    try { global.localStorage.setItem(K_TITLES(), JSON.stringify(all)); return { ok: true }; }
     catch (e) { return { ok: false }; }
   }
   function loadSessionTitle(sig) {
@@ -336,10 +436,9 @@
    * 맞춰 둔 배치가 클립 파일명별로 복원된다 — "같은 작업 반복" 회피.
    *   data.clips    = { 파일명: 시작경과초, ... } (다중 클립, 2026-05-23)
    *   data.offsetSec = 단일 영상 오프셋 (구버전 호환 — 읽기만) */
-  var VIDEO_KEY = 'rd_videosync_v1';
   function readVideoSyncAll() {
     try {
-      var raw = global.localStorage ? global.localStorage.getItem(VIDEO_KEY) : null;
+      var raw = global.localStorage ? global.localStorage.getItem(K_VIDEO()) : null;
       var o = raw ? JSON.parse(raw) : {};
       return (o && typeof o === 'object') ? o : {};
     } catch (e) { return {}; }
@@ -355,7 +454,7 @@
     } else {
       delete all[sig];                                   /* 빈 배치 = 항목 제거 */
     }
-    try { global.localStorage.setItem(VIDEO_KEY, JSON.stringify(all)); return { ok: true }; }
+    try { global.localStorage.setItem(K_VIDEO(), JSON.stringify(all)); return { ok: true }; }
     catch (e) { return { ok: false }; }
   }
   function loadVideoSync(sig) {
@@ -378,18 +477,23 @@
    *   value = { sig, name, type, lastModified, blob }
    * 전부 Promise 기반. IndexedDB 미지원·실패 시 reject — caller 가
    * try/catch(.catch) 로 흡수해 리플레이 본 기능은 절대 깨지 않는다. */
-  var VIDEO_DB_NAME = 'rd_video_blobs_v1';
   var VIDEO_DB_STORE = 'clips';
   var videoDbPromise = null;
+  var videoDbOpenName = null;   /* §412 — 현재 열린 DB 이름. uid 바뀌면 재오픈. */
   function openVideoDb() {
     /* §189 — DB 연결은 1회 열어 재사용. 실패 시 promise 캐시를 비워
-       다음 호출에서 재시도할 수 있게 한다. */
-    if (videoDbPromise) return videoDbPromise;
+       다음 호출에서 재시도할 수 있게 한다.
+       §412 — DB 이름이 per-user namespace 라 로그인/로그아웃으로 uid 가
+       바뀌면 캐시된 핸들이 옛 사용자 DB 를 가리킨다. 이름이 달라지면
+       새로 연다 (옛 connection 은 GC 에 맡김). */
+    var name = videoDbName();
+    if (videoDbPromise && videoDbOpenName === name) return videoDbPromise;
+    videoDbOpenName = name;
     videoDbPromise = new Promise(function (resolve, reject) {
       try {
         var idb = global.indexedDB;
         if (!idb) { reject(new Error('IndexedDB unavailable')); return; }
-        var req = idb.open(VIDEO_DB_NAME, 1);
+        var req = idb.open(name, 1);
         req.onupgradeneeded = function () {
           var db = req.result;
           if (!db.objectStoreNames.contains(VIDEO_DB_STORE)) {
@@ -401,7 +505,7 @@
         req.onblocked = function () { reject(new Error('IndexedDB open blocked')); };
       } catch (e) { reject(e); }
     });
-    videoDbPromise['catch'](function () { videoDbPromise = null; });
+    videoDbPromise['catch'](function () { videoDbPromise = null; videoDbOpenName = null; });
     return videoDbPromise;
   }
   function videoBlobKey(sig, name) { return String(sig) + '::' + String(name); }
@@ -502,16 +606,15 @@
   /* 체중·스킬은 거의 안 바뀌고 윙·포일도 자주 안 바뀌므로, 한 번
      입력하면 다음 세션에 자동으로 채워지도록 브라우저에 저장한다.
      ("같은 입력 반복" 회피 — 코치가 매 세션 재입력하지 않게.) */
-  var RIDER_KEY = 'rd_rider_v1';
   function saveRider(rider) {
     try {
-      global.localStorage.setItem(RIDER_KEY, JSON.stringify(rider || {}));
+      global.localStorage.setItem(K_RIDER(), JSON.stringify(rider || {}));
       return { ok: true };
     } catch (e) { return { ok: false }; }
   }
   function loadRider() {
     try {
-      var raw = global.localStorage ? global.localStorage.getItem(RIDER_KEY) : null;
+      var raw = global.localStorage ? global.localStorage.getItem(K_RIDER()) : null;
       var o = raw ? JSON.parse(raw) : null;
       return (o && typeof o === 'object') ? o : null;
     } catch (e) { return null; }
@@ -1160,6 +1263,11 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
   }
 
   var Storage = {
+    /* §412 — per-user namespace 격리 + legacy 마이그레이션 */
+    migrateLegacyIfNeeded: migrateLegacyIfNeeded,
+    nsPrefix: nsPrefix,
+    sessionsKey: K_SESSIONS,
+    currentUid: _currentUid,
     saveSession: saveSession,
     listSessions: listSessions,
     deleteSession: deleteSession,

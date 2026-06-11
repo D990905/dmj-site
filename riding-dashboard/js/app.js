@@ -884,6 +884,18 @@
     document.addEventListener('keydown', heroEsc);
   }
 
+  /* §412 (Alex Park #4 · 2026-06-11) — DMJAuth 세션이 async 로 해소되면
+     (로그인/로그아웃/탭간) storage namespace 가 'rd_<uid>_*' 로 바뀐다.
+     init() 은 DOMContentLoaded = uid 미확정 시점이라 저장 세션 패널이 빈
+     목록으로 그려질 수 있고, auth 해소 후 본인 namespace 데이터로 교체해야
+     옥대표님 마이그레이션 4건이 보인다. 로그아웃 시엔 빈 목록(격리). */
+  window.addEventListener('dmj-auth-change', function () {
+    try {
+      if (Storage && Storage.migrateLegacyIfNeeded) Storage.migrateLegacyIfNeeded();
+      renderSavedSessions();
+    } catch (e) { console.warn('renderSavedSessions on auth-change failed:', e); }
+  });
+
   /* 언어 토글 (한↔영) — 세션이 로드돼 있으면 전 대시보드 재렌더하여
      캔버스(Chart.js·custom canvas) 문자열까지 새 언어로 baked in 되게.
      세션 없으면 정적 DOM 만 i18n.js 가 자동 번역(이미 처리됨). */
