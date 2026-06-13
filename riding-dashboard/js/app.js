@@ -132,10 +132,13 @@
     }
     return mmss(tSec);
   }
-  /* 풍향 기준 좌현(P)/우현(S) 약식 라벨 */
+  /* 풍향 기준 좌현(P)/우현(S) 약식 라벨.
+     §420 (옥대표님 verbatim 2026-06-12, Vantage 비교) — heading 이 풍축
+     기준 시계방향 (angleDiff > 0) = Port tack (좌현 풍). Larsson 2022 ch.7
+     + ISAF Racing Rules definition. DO_NOT_REVERT §420. */
   function sideShort(heading) {
     if (state.windDir == null || heading == null) return '–';
-    return Geo.angleDiff(state.windDir, heading) >= 0 ? 'S' : 'P';
+    return Geo.angleDiff(state.windDir, heading) >= 0 ? 'P' : 'S';
   }
   /* 회전 방향 — 풍향 있으면 P→S / S→P, 없으면 좌·우선회 */
   function maneuverDir(m) {
@@ -2825,10 +2828,12 @@
     }
   }
 
-  /* 풍향 기준 좌현/우현 라벨 */
+  /* 풍향 기준 좌현/우현 라벨.
+     §420 (옥대표님 verbatim 2026-06-12) — sideShort() 와 동일 swap fix.
+     angleDiff > 0 = Port tack 표준 convention. DO_NOT_REVERT §420. */
   function sideLabel(heading) {
     if (state.windDir == null || heading == null) return '';
-    return Geo.angleDiff(state.windDir, heading) >= 0 ? '스타보드(S)' : '포트(P)';
+    return Geo.angleDiff(state.windDir, heading) >= 0 ? '포트(P)' : '스타보드(S)';
   }
 
   /* 선택한 회전들이 한 종류(택킹만/자이빙만)이면 그 종류 이름을, 택·

@@ -827,10 +827,16 @@
   }
 
   /* 회전 진입 택 — 풍향 기준 좌현(P)/우현(S). 풍향 없으면 null.
-     app.js sideShort() 와 동일 규칙(angleDiff>=0 → 우현 S). */
+     §420 (옥대표님 verbatim 2026-06-12, Vantage Sailing 비교 fix):
+     표준 sailing convention 정정 — Port tack = 풍이 좌현(port side)에서 들어옴
+     = heading 이 풍축 기준 시계방향 (angleDiff > 0). 이전 코드는 정반대로
+     라벨링 → Vantage + 옥대표님 직관 (Port upwind VMG 빠름) 충돌.
+     References: Larsson & Eliasson 2022 ch.7 (ISBN 978-1-3994-0301-6),
+     ISAF Racing Rules of Sailing Definition (Port tack: wind from port side).
+     app.js sideShort() · app.js:2831 도 같은 swap. DO_NOT_REVERT §420. */
   function maneuverSide(m, windDir) {
     if (windDir == null || !m || m.headingBefore == null) return null;
-    return Geo.angleDiff(windDir, m.headingBefore) >= 0 ? 'S' : 'P';
+    return Geo.angleDiff(windDir, m.headingBefore) >= 0 ? 'P' : 'S';
   }
 
   /* 두 연속 헤딩 사이를 dir 방향이 통과하는가 */
@@ -927,7 +933,7 @@
    * 택별로 전체 평균 / 상·하위 50%·20% 구간 평균 (시간 가중) 산출.
    * 순간 극값(단일 GPS 포인트)은 노이즈라 제외 — 구간 평균을
    * 퍼포먼스 통계 패널의 '상위 50%/20%' 입력으로 쓴다.
-   * 택 분류는 computePolar·maneuverSide 와 동일 (angleDiff>=0 → S).
+   * 택 분류는 computePolar·maneuverSide 와 동일 (§421: angleDiff>=0 → P).
    *
    * References — VMG·polar 표준 정의:
    *   · Larsson, L., Eliasson, R., Orych, M. 2022. "Principles of Yacht Design" 5e.
@@ -954,7 +960,15 @@
         var twa = Math.abs(signed);                   // 0=정풍상, 180=정풍하
         var vmgSigned = sp * Math.cos(Geo.toRad(twa)); // +풍상 / -풍하
         S[i].twa = twa; S[i].vmg = vmgSigned;
-        var side = signed >= 0 ? 'S' : 'P';
+        /* §421 (옥대표님 verbatim 2026-06-12, "Deep" — Vantage 비교 fix):
+           표준 sailing convention 으로 정정 — angleDiff(windDir,heading)>=0
+           = heading 이 풍축 기준 시계방향 = 바람이 좌현(port)에서 = Port(P).
+           §420 이 라벨 함수(maneuverSide·app.js sideShort/sideLabel)만 이
+           규약으로 바꾸고 이 데이터 버킷은 옛 규약(>=0→S)에 남겨, 라벨↔
+           데이터가 어긋나 'Port 느림' 오표시가 났다 → 여기서 버킷도 정정.
+           maneuverSide(analysis.js:839)·computePolar 와 같은 부호 규약.
+           검증: selftest-421-vmg-parity.js. DO_NOT_REVERT §421. */
+        var side = signed >= 0 ? 'P' : 'S';
         /* 바이올린 분포·TWA 그룹화를 위해 twa 도 같은 표본에 담는다 —
            SOG·VMG·TWA 를 한 지표 그룹으로 다룬다(코치 분석 일관).
            heel·pitch 는 표본에 있을 때만 담아, 추후 Vakaros .vkx
@@ -1029,7 +1043,7 @@
    * 를 한 표로 압축한다. analyzeSession 이 이미 산출한 구간 평균을
    * 재배치할 뿐, 여기서 새로 계산하는 통계는 없다(중복 재계산 금지).
    *   · SOG·VMG·풍각·힐·피치 → 풍상/풍하 × 포트(P)/스타보드(S) 4 버킷.
-   *     포트/스타보드 분류는 computeWindMetrics 의 것(angleDiff>=0 → S)을
+   *     포트/스타보드 분류는 computeWindMetrics 의 것(§421: angleDiff>=0 → P)을
    *     재사용한다. 피치도 다른 지표처럼 좌우 택으로 쪼갠다(Danny 2026-05-23).
    *   · 심박 → 풍상/풍하 (택 합산). 좌우 택과 무관한 지표라 P/S 로
    *     쪼개지 않는다. 풍상/풍하 시간가중 구간 평균을 computeWindMetrics
@@ -1125,7 +1139,7 @@
           var dir = statsMetricDirection(md.metric, mo.id);
           /* split:true 지표는 포트(P)·스타보드(S) 버킷으로, split:false
              (심박)는 택 합산(all) 으로. 포트/스타보드 분류는
-             computeWindMetrics 가 이미 쓰는 것(angleDiff>=0 → S)을
+             computeWindMetrics 가 이미 쓰는 것(§421: angleDiff>=0 → P)을
              그대로 재사용한다. */
           var buckets = md.split
             ? STATS_SIDES
@@ -1186,7 +1200,10 @@
         var signed = Geo.angleDiff(wd, S[i].heading); // -180..180
         var twa = Math.abs(signed);
         var b = Math.min(nBins - 1, Math.floor(twa / binDeg));
-        (signed >= 0 ? stbd : port)[b].push(sp);
+        /* §421 — 표준 convention 정정: angleDiff>=0 → Port (computeWindMetrics·
+           maneuverSide 와 동일 부호 규약). 옛 규약(>=0→stbd)에서 swap.
+           검증: selftest-421-vmg-parity.js. DO_NOT_REVERT §421. */
+        (signed >= 0 ? port : stbd)[b].push(sp);
         /* combined — 택을 합산한 빈. 타깃 폴라(개인 베스트)는 택을
            가리지 않는 '능력 한계'이므로 포트·스타보드를 함께 모은다. */
         all[b].push(sp);

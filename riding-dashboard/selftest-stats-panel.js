@@ -422,15 +422,16 @@ check('힐·피치 direction = neutral (트림·자세 특성)',
 /* 8-2) 힐 좌우(P/S) 분할 — 택마다 부호가 갈리는 합성 자세로 검증.
    택과 상관된 힐(스타보드 +, 포트 −)을 넣어, 포트 버킷 평균은 음수·
    스타보드 버킷 평균은 양수로 나오고 좌우 크기가 대칭이어야 한다.
-   택 분류는 분석 엔진과 같은 식(angleDiff>=0 → S)으로 맞춘다. */
+   택 분류는 분석 엔진과 같은 식(§421: angleDiff>=0 → P)으로 맞춘다 —
+   포트(angleDiff>=0)에 음수 힐, 스타보드(angleDiff<0)에 양수 힐을 넣는다. */
 var HEEL_MAG = 33;
 var heelByIdx = [];
 for (var hx = 0; hx < sjPts.length; hx++) {
   var pa = sjPts[hx > 0 ? hx - 1 : 0];
   var pb = sjPts[hx > 0 ? hx : 1];
   var hdg = Geo.bearing(pa, pb);
-  var sgn = Geo.angleDiff(vkxW, hdg);     // >=0 → 스타보드(S)
-  heelByIdx.push((sgn >= 0 ? 1 : -1) * (HEEL_MAG + 3 * Math.sin(hx * 0.05)));
+  var sgn = Geo.angleDiff(vkxW, hdg);     // §421: >=0 → 포트(P)
+  heelByIdx.push((sgn >= 0 ? -1 : 1) * (HEEL_MAG + 3 * Math.sin(hx * 0.05)));
 }
 var vkxPSBuf = buildVKX(sjPts, function (i) {
   return { heel: heelByIdx[i], pitch: 9 };
