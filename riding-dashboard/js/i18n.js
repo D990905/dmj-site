@@ -72,6 +72,113 @@
     ' — 리칭 일색 세션은 추정 정합성 약함': ' — reaching-only sessions have weaker estimates',
     '실측': 'Measured',
     '추정': 'Estimate',
+
+    /* ════════════════════════════════════════════════════════════
+     * §410 — 영문 모드 한글 잔존 전수 sweep (옥대표님 verbatim 2026-06-10)
+     *  라이브 audit(.audit-410)으로 검출한 잔존을 정정. 다수는 소스에서
+     *  i18nT 로 enum/label 을 래핑(app.js)했고, 아래는 그 템플릿 키 + 정적
+     *  문장 + PDF/리플레이 UI + HR 복합 라벨.
+     * ════════════════════════════════════════════════════════════ */
+    /* 스포츠 라벨(누락분) */
+    '윈드포일': 'Windfoil',
+    '포뮬라 카이트': 'Formula Kite',
+    /* 세션 source 줄 (속도원·포인트 수) — 소스 i18nT 템플릿 */
+    '속도원: 기기 기록': 'Speed source: device record',
+    '속도원: GPS 좌표 계산': 'Speed source: GPS-derived',
+    ' · GPS 포인트 {n}개 전량 사용': ' · GPS points: {n} (all used)',
+    ' · 편집 적용 {n}개 분석': ' · edit applied — {n} points analyzed',
+    /* 풍향 다이얼 readout / 버튼 */
+    '미확정 — 확정 필요': 'Unconfirmed — needs confirmation',
+    '✓ 풍향 해제': '✓ Clear wind',
+    '✓ 이 풍향으로 확정': '✓ Confirm this wind',
+    /* 고속 구간 회전 카드 — 손실·회복·효율 */
+    '손실 {loss}% · 회복 {rec} · 회전효율 {eff} score':
+      'Loss {loss}% · recovery {rec} · maneuver eff {eff} score',
+    /* % of target 타일 sub */
+    '{t} 비교': '{t} compared',
+    ' · 주행의 {p}%만 타깃 보유': ' · only {p}% of riding has target coverage',
+    '비교 가능한 구간 없음': 'No comparable segment',
+    /* 심박 요약 strip — 기준 라벨 + 기록률 문구 */
+    '입력 최대 {n} bpm': 'entered max {n} bpm',
+    '관측 최대 {n} bpm': 'observed max {n} bpm',
+    '기록 포인트 {rec}개 중 심박 {hr}개 · 기준 {basis}':
+      '{hr} HR samples among {rec} recorded points · basis {basis}',
+    /* HR 회전 — 최대 생리 반응 복합 라벨 (택킹/자이빙 × 포트/스타보드) */
+    '택킹 · 포트': 'Tacking · Port',
+    '택킹 · 스타보드': 'Tacking · Starboard',
+    '자이빙 · 포트': 'Gybing · Port',
+    '자이빙 · 스타보드': 'Gybing · Starboard',
+    /* 바이올린 분포 — 모집단 캡션 + subtitle (단일 i18nT 템플릿) */
+    '{pop} 모집단 — 평균 (실선)': '{pop} population — mean (solid)',
+    '{m} 분포 · {pop} 모집단 · {dir} {act} 구간 (SOG {kt} kt 이상) · 표본 P {p}개 · S {s}개':
+      '{m} distribution · {pop} population · {dir} {act} segment (SOG {kt} kt or more) · n = P {p} · S {s}',
+    ' · TWA = 풍향 대비 진행 각도': ' · TWA = heading angle relative to wind',
+    /* 회전 요약 범례 — 세션 베스트({b} 보간) */
+    '그라데이션으로 강조된 줄은 {b}입니다 — 택킹·자이빙 각 종류에서 효율 점수가 가장 높은 회전을 표시합니다.':
+      'Gradient-highlighted rows are {b} — for each maneuver type (tack / gybe), the highest-efficiency maneuver is shown.',
+    /* SPS 방법론 부록 (접힘) — 정적 문장 */
+    '— 속도 점수 70% + 회전 효율 30% 가중.':
+      '— weighted 70% speed score + 30% maneuver efficiency.',
+    '— 풍상·풍하 속도를 각각 계산기 예측 대비 평가합니다.':
+      '— evaluates upwind and downwind speed each against the calculator prediction.',
+    '카드는 둘을 풍상·풍하 주행 시간 으로 가중 평균한 값을 씁니다.':
+      'The card uses the two time-weighted by upwind / downwind riding time.',
+    '— 같은 풍속·체중·스킬·장비로 리프팅 계산기가 예측한 달성 가능 풍상 VMG 대비, 실측 풍상 VMG(상위 50%) 의 비율.':
+      '— the ratio of measured upwind VMG (top 50%) to the achievable upwind VMG predicted by the lift calculator for the same wind, weight, skill and gear.',
+    '= 예측치의 50% 이하. 계산기 예측은 입력한 스킬 등급에 맞춘 값이라, 100점은 “세계 최고” 가 아니라 “이 조건의 물리 모델이 본 달성 가능치 도달” 을 뜻합니다.':
+      '= 50% or less of the prediction. Because the prediction is tuned to your entered skill grade, 100 points means not “world best” but “reaching the achievable level the physics model sees for these conditions”.',
+    '— 계산기에 아직 풍하 전용 속도 모델이 없어, 같은 조건의 풍상 보드 속도를 상대 기준으로 쓴 휴리스틱입니다. 실측 풍하 SOG(상위 50%) 가 풍상 보드 속도의 1.4배 = 100점, 1.0배 = 50점, 0.6배 = 0점. 풍상 속도처럼 정밀한 물리 예측은 아니며, v2 에서 풍하 폴라 모델로 개선 예정입니다.':
+      '— the calculator has no dedicated downwind speed model yet, so this is a heuristic that uses upwind board speed in the same conditions as a relative baseline. Measured downwind SOG (top 50%) at 1.4× the upwind board speed = 100 points, 1.0× = 50, 0.6× = 0. It is not a precise physics prediction like upwind speed, and will be improved with a downwind polar model in v2.',
+    '— 이 세션 회전의 효율 점수(0~100) 평균. 풍향이 신뢰도 있게 확정되면 회전 전후 VMG 의 로스·게인, 그렇지 않으면 속도 손실·회복 시간 기반입니다. 합성 점수의 회전 항은 Upwind 가 택킹 효율, Downwind 가 자이빙 효율, Overall 이 전체 회전 효율 평균이며,':
+      "— the average efficiency score (0–100) of this session's maneuvers. When the wind is confidently confirmed it is based on VMG loss/gain across the maneuver, otherwise on speed loss and recovery time. In the composite score the maneuver term uses tacking efficiency for Upwind, gybing efficiency for Downwind, and the overall maneuver-efficiency average for Overall,",
+    '— 같은 풍속 영역대(미풍 ≤10kt · 중풍 11–16kt · 강풍 ≥17kt) 에 저장된 다른 세션들의 평균 대비 변화입니다. 풍속 조건이 비슷한 세션끼리 비교해야 공정하기 때문입니다. 같은 풍속대에 저장된 세션이 없으면 ‘비교 데이터 부족’ 으로 표기합니다.':
+      '— the change versus the average of other saved sessions in the same wind band (light ≤10kt · moderate 11–16kt · strong ≥17kt). Comparing sessions in similar wind is the only fair basis. If no session is saved in the same wind band, it is marked “insufficient comparison data”.',
+    /* 풍향 추정 카드 — 수동 확정 / 채널 안내 / 리칭 경고 */
+    '수동으로 확정한 풍향을 사용합니다. 아래 추정값으로 바꾸려면 “미리보기 적용” 후 다시 확정해 주세요.':
+      'Using the wind direction you confirmed manually. To switch to an estimate below, tap “Apply preview” and confirm again.',
+    'Lineup 캡처 (W3-A)': 'Lineup capture (W3-A)',
+    '라이더가 라인업 단계에서 풍상 두 택 헤딩을 캡처하면 가용.':
+      'Available once the rider captures both upwind tack headings during the lineup phase.',
+    'Apple Watch standalone 앱 연결 시 가용 (Phase 2).':
+      'Available when the Apple Watch standalone app is connected (Phase 2).',
+    '트랙이 주로 리칭(횡주) 왕복이라 풍상·풍하 구분이 모호합니다 — 추정 정확도가 낮으니 직접 입력으로 보정하세요.':
+      'The track is mostly reaching (cross-wind) back-and-forth, so upwind / downwind is ambiguous — estimate accuracy is low, so correct it with manual input.',
+    '트랙이 주로 리칭(횡주) 반전이라 풍축을 가로지르는 택·자이브가 적습니다 — 회전 기하 추정의 신뢰도가 낮으니 직접 입력으로 보정해 주세요.':
+      'The track is mostly reaching (cross-wind) reversals, with few tacks / gybes crossing the wind axis — maneuver-geometry estimation has low confidence, so correct it with manual input.',
+    /* 폴라 · % of target 설명 (이번 세션 단독) */
+    '타깃 = 이번 세션 단독 기준입니다(누적 데이터 없음) — 세션을 저장하면 다음부터 누적 베스트로 갱신됩니다. 곡선 반지름 = TWA별 속도(kt) · 파랑 실선 = 이번 세션 포트(P) · 주황 실선 = 스타보드(S) · 옅은 점선 = 개인 베스트 타깃(기준). 실선=실제 라이딩, 점선=기준. 곡선이나 점에 커서를 올리면 해당 곡선이 강조되고 값이 표시됩니다. % of target 타일은 매 순간 속도(시간가중 평균)를 같은 TWA의 타깃과 비교한 값입니다. 연한 점 빈 13개(표본 60초 미만)는 타깃을 신뢰하기 어려워 % of target 계산에서 제외했습니다.':
+      'Target = this session alone (no cumulative data yet) — once you save sessions, it updates to a cumulative best from then on. Curve radius = speed per TWA (kt) · blue solid = this session Port (P) · orange solid = Starboard (S) · faint dashed = personal-best target (reference). Solid = actual riding, dashed = reference. Hover a curve or point to highlight it and show values. The % of target tile compares each moment’s speed (time-weighted average) with the target at the same TWA. The 13 faint-dot bins (under 60s samples) are excluded from the % of target calculation because their target is not reliable.',
+    /* 심박 회전 분석 설명 (순항 기준) */
+    '순항 기준 심박은 포일링 중이면서 회전 밖인 구간의 시간가중 평균입니다. ‘기술 중 최고’는 심박 반응 지연을 고려해 회전 종료 직후 20초까지 포함한 최고 심박, ‘순항 대비’는 그 값과 순항 기준 심박의 차이입니다. ‘완료 후 회복’은 정점 이후 순항으로 돌아갈 때의 심박 하강폭(bpm)이며 괄호는 집계 표본 수입니다 — 회전이 실제로 심박을 올렸고 다음 회전까지 관찰 시간이 충분한 경우만 셉니다. ‘차이(S−P)’ 는 같은 회전 종류에서 스타보드 택과 포트 택의 순항 대비 상승 차이로, 양수면 스타보드 쪽 심박 반응이 더 큽니다 — 심박은 참고 지표라 좋고 나쁨이 아니라 좌우 균형을 보는 수치입니다. 맨 아래 ‘종합’ 행은 모든 회전을 합산한 값입니다. 세션 회복 지수(bpm/min)는 회복 하강 속도의 평균으로, 높을수록 회전 직후 심박이 빠르게 안정돼 심혈관 회복이 빠르다는 뜻입니다. 세션이 쌓이면 이 지수의 추세로 장기 변화를 봅니다.':
+      'Cruise-baseline HR is the time-weighted average of segments that are foiling but outside maneuvers. “Peak in maneuver” is the highest HR including up to 20s after the maneuver ends (to allow for HR response lag); “vs cruise” is the difference between that peak and the cruise baseline. “Post recovery” is the HR drop (bpm) returning to cruise after the peak, and the parentheses show the sample count — only maneuvers that actually raised HR with enough observation time before the next maneuver are counted. “Difference (S−P)” is the gap in cruise-relative rise between the starboard and port tack of the same maneuver type; positive means the starboard side shows a larger HR response — HR is a reference metric, so this is about left/right balance rather than good or bad. The bottom “Overall” row sums all maneuvers. The session recovery index (bpm/min) is the average HR-drop rate during recovery; higher means HR settles faster right after a maneuver, i.e. faster cardiovascular recovery. As sessions accumulate, the trend of this index shows long-term change.',
+    /* PDF 미리보기 모달 UI */
+    'PDF 미리보기': 'PDF preview',
+    'PDF 미리보기 준비 완료': 'PDF preview ready',
+    'PDF 공유 실패': 'PDF share failed',
+    'PDF 보고서 미리보기': 'PDF report preview',
+    '세일링 퍼포먼스 스코어 산출 방식 설명': 'How the Sailing Performance Score is computed',
+    '차트와 지도를 캡쳐하고 있어요 · 최대 30초': 'Capturing charts and map · up to 30s',
+    '닫기': 'Close',
+    '다운로드': 'Download',
+    '공유': 'Share',
+    '새 탭': 'New tab',
+    '쪽': ' pages',
+    /* 리플레이 시간축 토글 */
+    '경과': 'Elapsed',
+    '실제': 'Actual',
+    '재생 시간 표기 — 경과 또는 실제': 'Playback time display — elapsed or actual',
+    /* 풍향 확정 안내 / 자동추정 신뢰도 경고 (compass 는 lang-aware) */
+    '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.':
+      '✓ Wind {deg}° ({dir}) confirmed — applied to tack / gybe, VMG and polar.',
+    '이 세션은 풍향 자동 추정 신뢰도가 낮습니다{x} — TWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 직접 확인해 주세요.':
+      'This session has low confidence in automatic wind estimation{x} — TWA, target polar and % of target may be inaccurate, so verify the wind direction yourself.',
+    ' (추정 불가)': ' (cannot estimate)',
+    /* PDF 미리보기 버튼(이모지 접두 포함 정적 HTML 대비) */
+    '📄 PDF 미리보기': '📄 PDF preview',
+    /* 언어 토글 — EN 모드에서 KO 버튼/그룹 라벨도 영문(옥대표님 한글 0 지시).
+       KO 모드는 restoreAll 로 '한글' 원복. native-script 선호 시 이 두 줄만 제거. */
+    '한글': 'Korean',
+    'Language / 언어': 'Language',
     /* ---------------- 페이지 메타 / 헤더 ---------------- */
     '라이딩 통계 대시보드 — GPX 분석 (Phase 1)':
       'Riding Stats Dashboard — GPX Analysis (Phase 1)',
@@ -1843,7 +1950,7 @@
     { ko: /^속도원: 기기 기록$/, en: 'Speed source: device record' },
     { ko: /^속도원: GPS 좌표 계산$/, en: 'Speed source: GPS-derived' },
     { ko: /^임계 ([\d.]+) (kt|km\/h) 이상$/, en: 'Threshold ≥ $1 $2' },
-    { ko: /^전체 ([\dhms ]+)$/, en: 'Total $1' },
+    { ko: /^전체 ([\dhms: ]+)$/, en: 'Total $1' },   /* §410 — 콜론 포함(전체 2:03:23) */
     { ko: /^편집됨 · (.+?) · 분석 길이 (.+)$/, en: 'Edited · $1 · analyzed length $2' },
     { ko: /^원본 전체 \((.+)\)$/, en: 'Full track ($1)' },
     { ko: /^앞 (.+?) 잘림$/, en: 'Trimmed front $1' },
@@ -1931,7 +2038,22 @@
     { ko: /^심박 드리프트는 활주 구간의 후반 평균 심박이 전반보다.*$/,
       en: 'HR drift = late-half average HR minus early-half during active riding — closer to 0 means you held the same effort to the end.' },
     { ko: /^✓ 회전 직전\(4초 평균\)보다 최저 속도가 더 빠릅니다 — 속도를 잃지 않고 오히려 가속하며 빠져나온 좋은 회전입니다\..*$/,
-      en: '✓ Minimum speed exceeded the pre-entry (4-second average) — a strong maneuver that accelerated through rather than losing speed. Loss is computed against the faster of entry/exit ($1).' }
+      en: '✓ Minimum speed exceeded the pre-entry (4-second average) — a strong maneuver that accelerated through rather than losing speed. Loss is computed against the faster of entry/exit ($1).' },
+
+    /* ─── §410 — 영문 모드 잔존 동적 문자열 (옥대표님 verbatim 2026-06-10) ─── */
+    /* 풍향 추정 신뢰도 디테일 (괄호 묶음) */
+    { ko: /^\(무항주 구역 폭 (\d+)° · 그리드 정렬도 ([\d.]+)\)$/,
+      en: '(No-go zone width $1° · grid alignment $2)' },
+    { ko: /^\(회전 (\d+)개 · 추정 분산 ([\d.]+)° · 풍상·풍하 판정 여유 ([\d.]+)%p\)$/,
+      en: '(Maneuvers $1 · spread $2° · upwind / downwind margin $3%p)' },
+    /* SPS·장비 코칭 — 입력 부족 안내 (missing 입력 라벨은 이미 EN) */
+    { ko: /^세일링 퍼포먼스 스코어를 산출하려면 다음 입력이 더 필요합니다 — (.+)\.$/,
+      en: 'To compute the Sailing Performance Score, more inputs are needed — $1.' },
+    { ko: /^장비 코칭을 시작하려면 다음 입력이 더 필요합니다 — (.+?)\. what-if 는 실측 풍상 VMG 에 맞춰 산출되므로 풍향 확정이 필요합니다\.$/,
+      en: 'To start gear coaching, more inputs are needed — $1. The what-if is computed against measured upwind VMG, so the wind must be confirmed.' },
+    /* 퍼포먼스 통계 패널 — 설명 문단(풍상/풍하 주행시간 보간) */
+    { ko: /^풍상·풍하 통계는 풍향 확정 후 주행 표본의 시간가중값입니다 \(풍상 (.+?) · 풍하 (.+?) 기준\)\. SOG·VMG·TWA·힐·피치는.*$/,
+      en: 'Upwind / downwind stats are time-weighted over riding samples after the wind is confirmed (upwind $1 · downwind $2). SOG, VMG, TWA, heel and pitch are split into 4 buckets — upwind/downwind × port/starboard — to compare the two tacks (HR is independent of tack, so it is split only by upwind/downwind). Three ranges are shown — average, top 50% and top 20%: the average is the time-weighted mean of that direction, and the top N% is the time-weighted segment mean (excluding single-GPS-point noise). “Top” follows each metric’s good direction (higher SOG/VMG, narrower upwind TWA); neutral metrics use the larger-magnitude side. Heel is shown with its sign as-is — port (−) and starboard (+).' }
   ];
 
   function applyPatterns(s) {
