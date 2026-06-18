@@ -716,6 +716,9 @@
               '<b>Upload a video</b> to fill the screen and play it ' +
               'alongside your data.<br><small>The file opens only in ' +
               'your browser and is never uploaded anywhere.</small></div>' +
+            /* §423 — 다른 기기에서 cloud 로 불러온 세션인데 영상이 이 기기에
+               없을 때 안내. 내용은 showVideoMissing() 가 RDI18n.T 로 채운다. */
+            '<div class="replay__vmissing" id="replay-vmissing" hidden></div>' +
           '</div>' +
         '</div>' +
         '<aside class="replay__graphs" id="replay-graphs" ' +
@@ -1952,6 +1955,11 @@
     if (firstEver && R.clips.length) {
       var hint = el('replay-nohint');
       if (hint) hint.hidden = true;
+      /* §423 — '영상 없음' 배너가 떠 있었다면(cross-device 재업로드) 동기화
+         완료 토스트로 교체. 그 외(원래 영상 있던 세션)는 조용히 숨긴다. */
+      var vm = el('replay-vmissing');
+      if (vm && !vm.hidden && R.hasVideoFlag) videoSyncedToast();
+      else hideVideoMissing();
       setLayout('video');
     }
     buildSyncPanel();
@@ -2026,12 +2034,15 @@
      있으면 skip (중복 복원 방지). 실패는 console.warn 만. */
   function restorePersistedClips() {
     try {
-      if (!global.RDStorage || !global.RDStorage.loadVideoBlobs) return;
-      if (!R || !R.sessionSig) return;
+      if (!global.RDStorage || !global.RDStorage.loadVideoBlobs) {
+        maybeShowVideoMissing(0); return;      // §423 — 복원 수단 없음 = 영상 0
+      }
+      if (!R || !R.sessionSig) { maybeShowVideoMissing(0); return; }
       var ref = R;                             // 복원 완료 시점 세션 동일성 가드
       var sig = R.sessionSig;
       global.RDStorage.loadVideoBlobs(sig).then(function (items) {
-        if (!R || R !== ref || !items || !items.length) return;
+        if (!R || R !== ref) return;
+        if (!items || !items.length) { maybeShowVideoMissing(0); return; }
         var files = [];
         items.forEach(function (it) {
           if (!it || !it.blob || !it.name) return;
@@ -2049,12 +2060,102 @@
           }
         });
         if (files.length && R && R === ref) loadVideoFiles(files);
+        else maybeShowVideoMissing(R ? R.clips.length : 0);
       })['catch'](function (e) {
         console.warn('§189 video blob restore failed:', e);
+        maybeShowVideoMissing(R ? R.clips.length : 0);   // §423 — 복원 실패도 없음 취급
       });
     } catch (e) {
       console.warn('§189 restorePersistedClips error:', e);
+      maybeShowVideoMissing(0);
     }
+  }
+
+  /* ============================================================
+   * §423 — 영상 없음 안내 (cross-device). 다른 기기에서 cloud 로 불러온
+   *   세션은 트랙·분석은 동기화되지만 영상은 local(IndexedDB)에만 있어
+   *   이 기기엔 없다. 그 사실(R.hasVideoFlag)을 알고 있고 이 기기에 복원된
+   *   클립이 0개일 때만 배너를 띄운다 — 영상이 원래 없던 세션엔 안 띄운다.
+   * ============================================================ */
+  function videoMissingOnDevice(hasVideoFlag, clipCount) {
+    return !!hasVideoFlag && !(clipCount > 0);
+  }
+  /* 리플레이는 영어 전용 몰입 모드지만, 안내 메시지는 사용자 언어로 보여
+     주는 편이 친절하다. 토글이 리플레이 중 숨겨져 walker 가 안 닿으므로
+     RDI18n.T 를 명시 호출(현재 lang 기준 1회 확정). 미로드 시 한글 fallback. */
+  function tt(ko, vars) {
+    try {
+      if (global.RDI18n && typeof global.RDI18n.T === 'function') {
+        return global.RDI18n.T(ko, vars || undefined);
+      }
+    } catch (e) {}
+    var s = ko;
+    if (vars) Object.keys(vars).forEach(function (k) {
+      s = s.split('{' + k + '}').join(String(vars[k]));
+    });
+    return s;
+  }
+  function fmtUploadedAt(epoch) {
+    if (!epoch || !isFinite(epoch)) return '';
+    try {
+      var d = new Date(epoch);
+      var p = function (n) { return (n < 10 ? '0' : '') + n; };
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    } catch (e) { return ''; }
+  }
+  function maybeShowVideoMissing(clipCount) {
+    if (!R) return;
+    if (videoMissingOnDevice(R.hasVideoFlag, clipCount)) showVideoMissing();
+    else hideVideoMissing();
+  }
+  function showVideoMissing() {
+    var box = el('replay-vmissing');
+    if (!box) return;
+    var hint = el('replay-nohint');
+    if (hint) hint.hidden = true;              // 일반 안내 대신 구체 안내
+    var dateStr = fmtUploadedAt(R && R.videoUploadedAt);
+    box.innerHTML =
+      '<div class="replay__vmissing-icon" aria-hidden="true">📹</div>' +
+      '<b class="replay__vmissing-title">' + escapeHtml(tt('이 기기에 영상이 없습니다')) + '</b>' +
+      '<p class="replay__vmissing-body">' +
+        escapeHtml(tt('다른 기기에서 업로드한 영상은 클라우드에 저장되지 않아 이 기기에 없습니다. 영상을 보시려면 같은 영상 파일을 다시 업로드해 주세요.')) +
+      '</p>' +
+      (dateStr
+        ? '<p class="replay__vmissing-at">' +
+            escapeHtml(tt('다른 기기에서 {date}에 저장한 세션입니다.', { date: dateStr })) + '</p>'
+        : '') +
+      '<div class="replay__vmissing-acts">' +
+        '<button type="button" class="replay__upload replay__vmissing-up" ' +
+          'id="replay-vmissing-up">' + escapeHtml(tt('📤 영상 업로드')) + '</button>' +
+        '<button type="button" class="replay__vmissing-skip" ' +
+          'id="replay-vmissing-skip">' + escapeHtml(tt('영상 없이 분석만 보기')) + '</button>' +
+      '</div>';
+    box.hidden = false;
+    var up = el('replay-vmissing-up');
+    if (up) up.addEventListener('click', function () {
+      var input = el('replay-video-input');    // 기존 업로드 경로 재사용
+      if (input) input.click();
+    });
+    var skip = el('replay-vmissing-skip');
+    if (skip) skip.addEventListener('click', function () {
+      hideVideoMissing();
+      var h = el('replay-nohint');             // 닫으면 일반 안내로 복귀
+      if (h) h.hidden = R && R.videoReady;
+    });
+  }
+  function hideVideoMissing() {
+    var box = el('replay-vmissing');
+    if (box) box.hidden = true;
+  }
+  /* 영상 업로드 → blob 저장(persistClipBlob) 후 같은 sig 로 복원되므로,
+     배너를 닫고 동기화 완료 토스트를 잠깐 띄운다. */
+  function videoSyncedToast() {
+    var box = el('replay-vmissing');
+    if (!box) return;
+    box.innerHTML = '<b class="replay__vmissing-title">' +
+      escapeHtml(tt('✓ 영상이 동기화되었습니다')) + '</b>';
+    box.hidden = false;
+    setTimeout(function () { hideVideoMissing(); }, 2600);
   }
 
   /* 활성 클립 — 단일 <video> 에 그 클립의 src 를 싣는다 */
@@ -2943,6 +3044,10 @@
       windDir: windDir,
       unit: opts.unit === 'kmh' ? 'kmh' : 'kt',
       sessionSig: opts.sessionSig || '',
+      /* §423 — cloud 기록상 영상이 있던(_hasVideo) 세션인지 + 저장 시각.
+         이 기기에 영상 blob 이 없으면(restorePersistedClips 0건) 안내 배너. */
+      hasVideoFlag: !!opts.hasVideoFlag,
+      videoUploadedAt: opts.videoUploadedAt || null,
       title: opts.title || session.trackName || 'Riding Session',
       riderName: opts.riderName || opts.title || session.trackName || 'Rider',
       onClose: typeof opts.onClose === 'function' ? opts.onClose : noop,
@@ -3112,6 +3217,7 @@
       fmtRealDateTime: fmtRealDateTime,
       parseClockToElapsed: parseClockToElapsed,
       parseMp4Meta: parseMp4Meta,
+      videoMissingOnDevice: videoMissingOnDevice,   /* §423 */
       parseFilenameDate: parseFilenameDate,
       parseIso8601: parseIso8601,
       extractCreationDate: extractCreationDate,

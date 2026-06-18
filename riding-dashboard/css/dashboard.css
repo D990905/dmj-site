@@ -2001,6 +2001,31 @@ input::placeholder { color:var(--text-dim); }
 .replay__nohint[hidden] { display:none; }
 .replay__nohint small { color:var(--rp-dim); font-size:.78rem; }
 
+/* §423 — 영상 없음 안내 배너 (cross-device). nohint 와 같은 자리·톤이되
+   아이콘·업로드 버튼·닫기를 갖춘 더 구체적인 안내. */
+.replay__vmissing {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  max-width:360px; text-align:center; line-height:1.6;
+  color:var(--rp-text); background:var(--rp-panel); backdrop-filter:blur(10px);
+  border:1px solid var(--rp-line); border-radius:14px; padding:22px 24px; z-index:7;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.replay__vmissing[hidden] { display:none; }
+.replay__vmissing-icon { font-size:2rem; line-height:1; }
+.replay__vmissing-title { font-size:1rem; font-weight:700; }
+.replay__vmissing-body { margin:0; font-size:.86rem; color:var(--rp-text); }
+.replay__vmissing-at { margin:0; font-size:.76rem; color:var(--rp-dim); }
+.replay__vmissing-acts {
+  display:flex; flex-direction:column; gap:8px; align-items:center;
+  margin-top:6px; width:100%;
+}
+.replay__vmissing-up { cursor:pointer; }
+.replay__vmissing-skip {
+  background:none; border:none; color:var(--rp-dim); cursor:pointer;
+  font-size:.8rem; text-decoration:underline; padding:2px 6px;
+}
+.replay__vmissing-skip:hover { color:var(--rp-text); }
+
 /* z-index 필수 — Leaflet 컨테이너가 스태킹 컨텍스트를 형성하지 않으면
    내부 pane(타일 z200·오버레이 z400·마커 z600)이 부모 컨텍스트로 새어
    나와 풍향 격자(z5)·ladder rung(z6) 위를 덮는다. z-index:1 로 컨텍스트를

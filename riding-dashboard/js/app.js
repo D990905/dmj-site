@@ -42,6 +42,10 @@
     selectedRun: null,          // 선택된 고속 구간 인덱스 — 지도 트랙 강조용
     windSourcesCollapsed: false, // 풍향 추정 소스 패널 접힘 상태
     editState: null, sessionSig: '', windPending: null,
+    /* §423 — cloud 기록상 영상이 있던 세션인지(_hasVideo) + 그 세션의 저장
+       시각. 다른 기기에서 cloud 로 불러온 세션은 영상이 local 에만 있어
+       이 기기엔 없으므로, 리플레이에서 '영상 없음' 안내 배너의 판정에 쓴다. */
+    sessionHasVideoFlag: false, sessionRemoteDateEpoch: null,
     /* 권장 풍향이 자동 적용됐는지 — 자동 적용 시 { windDir, confidence,
        sourceId }, 수동 확정·미설정이면 null. 풍향 소스 패널이 이 값을 보고
        자동 추정값을 '수동 확정'으로 오표시하지 않도록 한다 (§422). */
@@ -575,6 +579,10 @@
       state.selectedManeuvers = [];
       state.maneuverFilter = 'all';
       state.maneuverShowAll = false;
+      /* §423 — 새 파일 분석은 기본적으로 '이 기기' 세션이므로 영상 플래그 리셋.
+         저장된(cloud) 세션을 다시 보기 할 때만 loadSavedSessionLocal 이 덮는다. */
+      state.sessionHasVideoFlag = false;
+      state.sessionRemoteDateEpoch = null;
       state.sessionSig = sessionSignature(session);
       /* 사용자가 직접 편집·저장한 제목이 있으면 자동 제목 대신 복원한다 —
          같은 트랙은 시그니처가 같아 새 업로드·'다시 보기' 모두 유지된다. */
@@ -614,6 +622,10 @@
       state.selectedManeuvers = [];
       state.maneuverFilter = 'all';
       state.maneuverShowAll = false;
+      /* §423 — 새 파일 분석은 기본적으로 '이 기기' 세션이므로 영상 플래그 리셋.
+         저장된(cloud) 세션을 다시 보기 할 때만 loadSavedSessionLocal 이 덮는다. */
+      state.sessionHasVideoFlag = false;
+      state.sessionRemoteDateEpoch = null;
       state.sessionSig = sessionSignature(session);
       /* 사용자가 직접 편집·저장한 제목이 있으면 자동 제목 대신 복원한다 —
          같은 트랙은 시그니처가 같아 새 업로드·'다시 보기' 모두 유지된다. */
@@ -1620,6 +1632,10 @@
       unit: state.unit,
       sessionSig: state.sessionSig,
       title: state.sessionName,
+      /* §423 — cloud 기록상 영상 있던 세션 + 저장 시각. 이 기기에 영상
+         blob 이 없으면 리플레이가 '영상 없음' 안내 배너를 띄운다. */
+      hasVideoFlag: state.sessionHasVideoFlag,
+      videoUploadedAt: state.sessionRemoteDateEpoch,
       onClose: exitReplay
     });
   }
@@ -4929,6 +4945,11 @@
     if (rec.sport && SPORTS[rec.sport]) state.sport = rec.sport;
     processGpx(gpx, rec.name || '라이딩 세션');
     if ($('dashboard-view').hidden) return false;   // 재파싱 실패 — showError 가 이미 표시됨
+    /* §423 — 저장 시점에 영상이 있었는지(cloud _hasVideo) + 저장 시각을 보존.
+       processGpx 가 위에서 false 로 리셋했으므로 여기서 덮어쓴다. 이 기기에
+       영상 blob 이 없으면 리플레이가 '영상 없음' 안내를 띄운다. */
+    state.sessionHasVideoFlag = !!rec._hasVideo;
+    state.sessionRemoteDateEpoch = rec.dateEpoch || null;
     // 저장 당시 풍향·풍속 복원 → 택킹/자이빙 분류·VMG·폴라까지 그대로 재현
     if (rec.windSpeedKt != null) {
       state.windSpeedKt = rec.windSpeedKt;

@@ -167,6 +167,21 @@
     '경과': 'Elapsed',
     '실제': 'Actual',
     '재생 시간 표기 — 경과 또는 실제': 'Playback time display — elapsed or actual',
+
+    /* ════════════════════════════════════════════════════════════
+     * §423 — 영상 없음 안내 (다른 기기에서 cloud 로 불러온 세션, 영상은
+     *   local only 라 이 기기에 없을 때). 리플레이 영상 패널 배너에 사용.
+     *   (spec 의 §422 는 이미 '권장 풍향 자동 적용'이 점유 → §423 채택.)
+     *   replay.js 가 RDI18n.T() 로 호출(토글이 리플레이 중 숨겨져 walker
+     *   대신 명시 호출). 옥대표님 결정 2026-06-18 "3번 = 영상 없는 device 안내".
+     * ════════════════════════════════════════════════════════════ */
+    '이 기기에 영상이 없습니다': 'No video on this device',
+    '다른 기기에서 업로드한 영상은 클라우드에 저장되지 않아 이 기기에 없습니다. 영상을 보시려면 같은 영상 파일을 다시 업로드해 주세요.':
+      'Videos aren’t synced to the cloud, so a video uploaded on another device isn’t available here. To watch it, please re-upload the same video file.',
+    '📤 영상 업로드': '📤 Upload Video',
+    '영상 없이 분석만 보기': 'View analysis without video',
+    '다른 기기에서 {date}에 저장한 세션입니다.': 'Saved on another device on {date}.',
+    '✓ 영상이 동기화되었습니다': '✓ Video synced',
     /* 풍향 확정 안내 / 자동추정 신뢰도 경고 (compass 는 lang-aware) */
     '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.':
       '✓ Wind {deg}° ({dir}) confirmed — applied to tack / gybe, VMG and polar.',
