@@ -375,11 +375,21 @@
       wing_ar: wingAR
     };
 
-    /* 스윕 범위 — 현재 윙을 항상 포함하도록 확장. step 0.5 m². */
+    /* 스윕 범위 — 현재 윙을 항상 포함하도록 확장. step 0.5 m².
+       §414 (Danny 2026-06-10) — 윙 사이즈 cap commercial racing class max
+       (Timo spec sports_science_414_wing_cap_diminishing_returns_spec.md §2-1).
+       DO_NOT_REVERT §414.
+       WING_LINEUP_M2 (lift-calculator.js:446) 의 max = 7.4 m² 와 일관.
+       단 actualWing 이 commercial 범위 밖 (legacy stock 등) 인 경우는 막지 X
+       — 라이더 입력값 존중 + sweep 만 cap. */
     var step = WHATIF.SWEEP_STEP_M2;
-    var aMin = 2.5, aMax = 8.5;
+    var WHATIF_AMAX_COMMERCIAL = 7.4;   /* 윙포일 racing class max */
+    var aMin = 2.5, aMax = WHATIF_AMAX_COMMERCIAL;
     if (actualWing - 1.0 < aMin) aMin = Math.max(1.5, Math.round((actualWing - 1.0) * 2) / 2);
-    if (actualWing + 1.0 > aMax) aMax = Math.round((actualWing + 1.0) * 2) / 2;
+    /* actualWing > aMax 인 경우 — sweep range 는 cap 유지하되 actualWing 자체는
+       계산 (anchor 분모 보존). 단 sweep 표시는 cap + 0.5 만 (확장 제거). */
+    if (actualWing + 0.5 > aMax) aMax = actualWing + 0.5;
+    if (aMax > 9.5) aMax = 9.5;   /* hard ceiling — legacy 보호용 outer cap */
 
     var curve = Lift.upwindCurve(base, {
       area_min_m2: aMin, area_max_m2: aMax, step_m2: step
@@ -521,8 +531,51 @@
       anyFeasible: !!optimum,
       points: points,   // [{area_m2, vmgKt, calcVmgKt, feasible, depowered, isActual, isOptimum, isComfort, isRecommended}]
       sweep: { min: curve.area_min_m2, max: curve.area_max_m2, step: curve.step_m2 },
-      foilAR: foilAR
+      foilAR: foilAR,
+      /* §414 — wing not bottleneck 감지 (Timo spec §4-1) */
+      boundary: detectWingNotBottleneck({
+        optimumWingM2: optimum ? optimum.area_m2 : null,
+        points: points
+      })
     };
+  }
+
+  /* ============================================================
+   * §414 — Wing not bottleneck detection (Timo §4-1 spec)
+   * 옥대표님 verbatim 2026-06-10 — 약풍 + race foil 시나리오 등에서 wing
+   * 사이즈가 bottleneck 이 아닌 케이스 감지. 약풍·heavy rider·high-AR foil
+   * 결합 시 §181 model 의 A_transition 이 commercial 2.5-7.4 range 밖
+   * (12+ m²) 으로 가서 sweep 안에서는 monotonic appearance.
+   * 본 helper 는 UX layer 가 boundary indicator + lever 권장 표시할지 결정.
+   * 분리 helper — coach.js 외부에서도 import 가능 (selftest etc.). */
+  function detectWingNotBottleneck(whatifResult) {
+    if (!whatifResult) return { boundary: false };
+    /* §1 — 추천 윙이 cap boundary 안 (within 0.5 m² of 7.4 commercial max) */
+    if (whatifResult.optimumWingM2 != null &&
+        whatifResult.optimumWingM2 >= 6.9) {
+      return {
+        boundary: true,
+        type: 'optimum_at_cap',
+        reason: '최적 wing 이 commercial racing class max (7.4 m²) 경계',
+        levers: ['skill_up', 'foil_ar_up', 'mass_down']
+      };
+    }
+    /* §2 — 곡선이 commercial range 안에서 monotonic 증가
+     * (last feasible 가 optimum 과 같은 area 면 = upper edge 가 peak = monotonic) */
+    if (whatifResult.points && whatifResult.points.length >= 3) {
+      var feasibles = whatifResult.points.filter(function (p) { return p.feasible; });
+      var lastFeasible = feasibles[feasibles.length - 1];
+      if (lastFeasible && lastFeasible.area_m2 >= 6.9 &&
+          whatifResult.optimumWingM2 === lastFeasible.area_m2) {
+        return {
+          boundary: true,
+          type: 'monotonic_in_range',
+          reason: '이 시나리오에서 wing 사이즈는 bottleneck 아님 — peak 가 commercial range 밖',
+          levers: ['skill_up', 'foil_ar_up', 'mass_down']
+        };
+      }
+    }
+    return { boundary: false };
   }
 
   /* ============================================================
@@ -1441,6 +1494,7 @@
     TURN_COACH_TEXT: TURN_COACH_TEXT,
     computeVPS: computeVPS,
     computeWhatIf: computeWhatIf,
+    detectWingNotBottleneck: detectWingNotBottleneck,   /* §414 (Timo §4-1) */
     computeTurnCoaching: computeTurnCoaching,
     decideRecoveryAction: decideRecoveryAction,
     generateDailyNotification: generateDailyNotification,
