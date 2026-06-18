@@ -596,6 +596,10 @@
      쓰지 않았으나, 전역 bare 'rd_*' 키 제거(데이터 격리)를 위해 마이그레이션을
      트리거해야 하므로 로드한다. 독립 IIFE — 부수효과 없음(window.RDStorage 정의만). -->
 <script src="riding-dashboard/js/storage.js?v=ns-412-20260611" defer></script>
+<!-- §415 (Sprint 1.1) — 트랙·메타 cloud sync. 로그인 시 Supabase 의 라이딩
+     세션을 로컬 namespace 로 pull → 위 '최근 라이딩' 목록이 cross-device 로 채워진다.
+     DMJAuth 만 의존 (storage.js 불필요하지만 동일 namespace 키를 공유). -->
+<script src="riding-dashboard/js/cloud-sync.js?v=cloud-415-20260618" defer></script>
 <!-- v2 데이터 주도 스킬 레벨 평가 — 추천·동의 카드 -->
 <script src="assets/js/skill-level.js" defer></script>
 <!-- §171-B cart system — for nav badge. -->
@@ -3164,6 +3168,10 @@
       // DOMContentLoaded 시점엔 uid 미확정이라 처음엔 빈/레거시 목록일 수 있어,
       // auth 해소 후 본인 namespace 목록으로 재렌더해야 옥대표님 4건이 보인다.
       window.addEventListener('dmj-auth-change', function () { init(); });
+
+      // §415 (Sprint 1.1) — cloud pull 이 다른 기기에서 저장한 세션을 로컬
+      // namespace 로 병합하면 최근 라이딩 목록을 다시 그린다 (cross-device sync).
+      window.addEventListener('rd:cloud-synced', function () { init(); });
 
       init();
     })();

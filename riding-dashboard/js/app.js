@@ -42,6 +42,10 @@
     selectedRun: null,          // 선택된 고속 구간 인덱스 — 지도 트랙 강조용
     windSourcesCollapsed: false, // 풍향 추정 소스 패널 접힘 상태
     editState: null, sessionSig: '', windPending: null,
+    /* 권장 풍향이 자동 적용됐는지 — 자동 적용 시 { windDir, confidence,
+       sourceId }, 수동 확정·미설정이면 null. 풍향 소스 패널이 이 값을 보고
+       자동 추정값을 '수동 확정'으로 오표시하지 않도록 한다 (§422). */
+    windAutoApplied: null,
     maneuverFilter: 'all', maneuverShowAll: false,
     timeAxisMode: 'elapsed',
     /* 심박 추이 차트에 속도 곡선을 우축으로 겹쳐 보일지 — 기본 false
@@ -487,6 +491,7 @@
     // 매칭 X 또는 load 실패 시 인트로 화면 그대로 (showError 가 안내).
     var sessMatch = location.search.match(/[?&]session=([A-Za-z0-9_-]+)/);
     if (sessMatch) {
+      pendingDeepLinkSession = sessMatch[1];   /* §415 — cloud pull 후 재시도용 */
       setTimeout(function () { loadSavedSession(sessMatch[1]); }, 50);
     }
   }
@@ -577,6 +582,8 @@
       if (savedTitle) state.sessionName = savedTitle;
       state.editState = session.hasTime ? Storage.loadEditState(state.sessionSig) : null;
       applyCurrentEdits();   // state.session 설정 + 재분석
+      /* §422 — 권장 풍향 자동 적용(높음·보통만). 적용되면 풍향 반영해 재분석. */
+      if (state.windDir == null && autoApplyRecommendedWind()) recompute();
       $('intro-view').hidden = true;
       $('dashboard-view').hidden = false;
       resetAnimMarks();        /* 새 분석 — 카운트업 재시작 (2026-05-26) */
@@ -614,6 +621,8 @@
       if (savedTitle) state.sessionName = savedTitle;
       state.editState = session.hasTime ? Storage.loadEditState(state.sessionSig) : null;
       applyCurrentEdits();   // state.session 설정 + 재분석
+      /* §422 — 권장 풍향 자동 적용(높음·보통만). 적용되면 풍향 반영해 재분석. */
+      if (state.windDir == null && autoApplyRecommendedWind()) recompute();
       $('intro-view').hidden = true;
       $('dashboard-view').hidden = false;
       resetAnimMarks();        /* 새 분석 — 카운트업 재시작 (2026-05-26) */
@@ -644,6 +653,40 @@
       catch (e) { session._windEstMvr = null; }
     }
     return session._windEstMvr;
+  }
+
+  /* §422 — 권장 풍향 자동 적용. 사용자가 아직 풍향을 수동 확정하지 않은
+     세션에 한해, no-go zone + 회전 기하 교차검증의 권장값을 신뢰도 '높음'·
+     '보통'일 때만 자동으로 풍향에 넣는다. '낮음'(리칭 위주 등 추정이 빗나갈
+     수 있는 세션)은 미설정으로 두고 직접 입력을 유도한다 (옥대표님 결정
+     2026-06-18). 수동 확정값은 항상 우선 — 이 함수는 windDir 이 아직 null
+     일 때만 호출하며, 저장 세션 복원 시 저장된 수동 풍향이 그 뒤 confirmWind
+     로 덮어쓴다(restoreSession). state.session·DOM(#wind-note)이 준비된 뒤
+     호출할 것. 적용 시 true 반환 → 호출부가 recompute 로 재분석한다. */
+  function autoApplyRecommendedWind() {
+    state.windAutoApplied = null;
+    if (!state.session || !state.session.hasTime) return false;
+    var ws = An.buildWindSources({
+      manualDir: null,
+      nogo: sessionWindEstimate(state.session),
+      rotation: sessionManeuverEstimate(state.session),
+      weather: null
+    });
+    var r = ws && ws.recommended;
+    if (!r || r.windDir == null) return false;
+    if (r.confidence !== '높음' && r.confidence !== '보통') return false;
+    state.windDir = r.windDir;
+    state.windPending = r.windDir;
+    state.windAutoApplied = {
+      windDir: r.windDir, confidence: r.confidence, sourceId: r.sourceId
+    };
+    var note = $('wind-note');
+    if (note) {
+      note.textContent = i18nT(
+        '✓ 풍향 {deg}° ({dir}) 자동 적용 — 회전 기하·no-go 교차검증 권장값(신뢰도 {conf})입니다. 필요하면 다이얼로 보정 후 “확정”을 다시 누르세요.',
+        { deg: r.windDir, dir: compass(r.windDir), conf: i18nT(r.confidence) });
+    }
+    return true;
   }
 
   function recompute() {
@@ -897,6 +940,22 @@
       if (Storage && Storage.migrateLegacyIfNeeded) Storage.migrateLegacyIfNeeded();
       renderSavedSessions();
     } catch (e) { console.warn('renderSavedSessions on auth-change failed:', e); }
+  });
+
+  /* §415 (Sprint 1.1) — cloud pull 이 끝나면(다른 기기에서 저장한 세션이
+     로컬 namespace 로 병합됨) 세션 패널을 다시 그린다. ?session 딥링크가
+     auth 해소 전에 한 번 실패했더라도(대시보드가 아직 인트로) cloud 동기화
+     후 트랙이 받아질 수 있으므로 1회 재시도한다. */
+  var pendingDeepLinkSession = null;
+  window.addEventListener('rd:cloud-synced', function () {
+    try {
+      renderSavedSessions();
+      if (pendingDeepLinkSession && $('dashboard-view') && $('dashboard-view').hidden) {
+        var id = pendingDeepLinkSession;
+        pendingDeepLinkSession = null;     /* 1회만 재시도 (루프 방지) */
+        loadSavedSession(id);
+      }
+    } catch (e) { console.warn('cloud-synced refresh failed:', e); }
   });
 
   /* 언어 토글 (한↔영) — 세션이 로드돼 있으면 전 대시보드 재렌더하여
@@ -2293,6 +2352,9 @@
   /* 미리보기 값을 실제 풍향으로 확정 — 모든 분석 갱신 */
   function confirmWind() {
     state.windDir = state.windPending;
+    /* §422 — 사용자가 직접 확정·해제하면 더 이상 자동 적용 상태가 아니다
+       (수동 우선). 풍향 소스 패널이 '수동 입력 · 확정'으로 표시하도록. */
+    state.windAutoApplied = null;
     state.selectedManeuvers = [];
     recompute();
     renderWindUI();
@@ -2451,7 +2513,10 @@
     if (!box) return;
     if (!state.session) { box.hidden = true; box.innerHTML = ''; return; }
     var ws = An.buildWindSources({
-      manualDir: state.windDir,
+      /* §422 — 자동 적용된 풍향은 '수동 입력'이 아니다. windAutoApplied 면
+         manualDir 을 비워, 패널이 권장(추정) 소스를 그대로 표시하게 한다
+         (자동값을 '수동 확정'으로 오표시 방지). 수동 확정이면 windDir 전달. */
+      manualDir: state.windAutoApplied ? null : state.windDir,
       nogo: sessionWindEstimate(state.session),
       rotation: sessionManeuverEstimate(state.session),
       weather: null   // 외부 날씨 — API 키 연동 시 채워질 슬롯
@@ -4708,11 +4773,40 @@
       st.textContent = '✓ 세션을 저장했습니다. 아래 “저장된 세션”에서 비교할 수 있습니다.';
       st.className = 'save-status save-status--ok';
       renderSavedSessions();
+      pushSessionToCloud(res.record);   /* §415 — 트랙·메타 Supabase 동기화 (영상 제외) */
     } else {
       st.textContent = '✗ ' + (res.error || '저장에 실패했습니다.');
       st.className = 'save-status save-status--err';
     }
     setTimeout(function () { st.hidden = true; }, 6000);
+  }
+
+  /* §415 (Sprint 1.1) — 저장한 세션을 Supabase 로 올린다. 로컬 저장은 위에서
+     이미 끝났고, 여기는 cross-device 동기화용 백업이라 실패해도 로컬엔 무영향.
+     영상 파일은 cloud 에 올리지 않는다(옥대표님 결정 2026-06-18) — 로컬에
+     영상 blob 이 있는지만 검사해 has_video 플래그로 기록한다. */
+  function pushSessionToCloud(record) {
+    if (!record || !window.RDCloud || typeof RDCloud.pushSession !== 'function') return;
+    var gpx = state.gpxText;
+    var sig = state.sessionSig;
+    var hasVideoP = Promise.resolve(false);
+    if (sig && Storage && typeof Storage.loadVideoBlobs === 'function') {
+      hasVideoP = Storage.loadVideoBlobs(sig)
+        .then(function (blobs) { return !!(blobs && blobs.length); })
+        .catch(function () { return false; });
+    }
+    hasVideoP.then(function (hasVideo) {
+      RDCloud.pushSession(record, gpx, { hasVideo: hasVideo }).then(function (r) {
+        if (!r || r.ok) return;                 /* 성공/no-op(비로그인 등) — 조용히 */
+        var st = $('save-status');              /* 실패만 살짝 안내 (로컬은 안전) */
+        if (st) {
+          st.hidden = false;
+          st.textContent = '✓ 로컬에 저장했습니다. (클라우드 동기화는 나중에 다시 시도됩니다)';
+          st.className = 'save-status save-status--ok';
+          setTimeout(function () { st.hidden = true; }, 6000);
+        }
+      });
+    });
   }
 
   /* 세션 목록 펼침 상태 — 기본은 최근 5개만, '전체보기'로 펼친다. */
@@ -4798,9 +4892,28 @@
     }).join('');
   }
 
-  /* 저장된 세션 다시 보기 — 원본 GPX 를 분석 파이프라인에 재투입해
-     속도·회전·VMG·지도·세션 요약까지 그 세션 기준으로 다시 렌더한다. */
+  /* §415 (Sprint 1.1) — 다시 보기 cloud-aware 래퍼.
+     로컬에 트랙이 있으면 즉시 동기 로드(기존 동작 그대로). 없고 cloud 에
+     올라가 있으면(다른 기기에서 저장한 세션) 먼저 GPX 를 받아 로컬에 채운
+     뒤 로드한다. 다운로드 경로에선 낙관적으로 true 를 돌려준다 — 호출자
+     (showBestRecordSegment)는 같은 기기 로컬 세션이 대부분이라 동기 경로를 탄다. */
   function loadSavedSession(id) {
+    if (Storage.loadTrack(id) || !(window.RDCloud && typeof RDCloud.ensureTrack === 'function')) {
+      return loadSavedSessionLocal(id);
+    }
+    var st = $('save-status');
+    if (st) {
+      st.hidden = false;
+      st.textContent = '☁ 클라우드에서 세션을 불러오는 중…';
+      st.className = 'save-status';
+    }
+    RDCloud.ensureTrack(id).then(function () { loadSavedSessionLocal(id); });
+    return true;
+  }
+
+  /* 저장된 세션 다시 보기(로컬) — 원본 GPX 를 분석 파이프라인에 재투입해
+     속도·회전·VMG·지도·세션 요약까지 그 세션 기준으로 다시 렌더한다. */
+  function loadSavedSessionLocal(id) {
     var list = Storage.listSessions(), rec = null;
     for (var i = 0; i < list.length; i++) {
       if (list[i].id === id) { rec = list[i]; break; }
