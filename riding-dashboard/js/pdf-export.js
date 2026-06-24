@@ -530,12 +530,12 @@
         rank = percentileRank(arr, score);
       }
     }
-    if (score >= 85) {
+    if (score >= 80) {           /* §424 — vpsBand Elite */
       return rank != null
         ? T('오늘 = 시즌 베스트급 (top {p}%)').replace('{p}', 100 - rank)
         : T('오늘 = 우수한 세션 (A 등급)');
     }
-    if (score >= 70) {
+    if (score >= 60) {           /* §424 — vpsBand Advanced */
       if (seasonAvg != null) {
         var dp = Math.round((score - seasonAvg) / seasonAvg * 100);
         return T('오늘 = 시즌 평균 대비 {d}% 빠름')
@@ -543,12 +543,12 @@
       }
       return T('오늘 = 양호한 세션 (B 등급)');
     }
-    if (score >= 55) {
+    if (score >= 40) {           /* §424 — vpsBand Intermediate */
       return rank != null
         ? T('오늘 = 시즌 평균 수준 ({p} percentile)').replace('{p}', rank)
         : T('오늘 = 보통 수준 (C 등급)');
     }
-    if (score >= 40) return T('오늘 = 평균 미달 — 회전 효율 개선 필요');
+    if (score >= 20) return T('오늘 = 평균 미달 — 회전 효율 개선 필요');
     return T('오늘 = 풍속·컨디션 한계');
   }
 
