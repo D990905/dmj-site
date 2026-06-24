@@ -79,14 +79,29 @@
     return (global.RDI18n && global.RDI18n.T) ? global.RDI18n.T(k, v) : k;
   }
 
-  /* --- VPS 튜닝 파라미터 (코치 검증으로 보정 가능) --- */
+  /* --- VPS 튜닝 파라미터 (코치 검증으로 보정 가능) ---
+     §424 (2026-06-24) — SPS magnitude 재보정. DO_NOT_REVERT §424.
+       증상: 동일 GPX 가 Vantage Sailing SPS ~78 인데 우리 dashboard ~22
+       (3.5x 차이). 진단(.repro-424/): 점수를 깎는 지배 인자는 RATIO_FLOOR.
+       기존 풍상 floor 0.5 = "예측 달성가능치의 50% 미만 = 0점" → elite 가
+       예측치의 78% 를 달성해도 (0.78−0.5)/0.5×100 = 56 점으로 압축됐다.
+       Vantage 는 best-percentile 기준 거의 선형(ratio≈score: 0.78 달성 →
+       ~78)으로 환산하는 것으로 보여(공식 비공개 — vantage-sailing.com
+       /technology "filter by performance percentile"), floor 를 0 으로 내려
+       ratio≈score(백분위형)로 정합. 3등급 mock(elite/int/beg)이 풍속
+       12–18kt 전역에서 60–80 / 30–55 / 5–25 에 안착(.repro-424/calib.js).
+       잔존(2차) 요인 = 리프팅 모델이 중풍↑ 에서 풍상 VMG 과대예측
+       (VMG≈풍속, 비물리적; §414 over-amplification 과 동일 뿌리)으로 elite
+       점수가 12→18kt 에서 79→63 으로 드리프트. 단 잠긴 §181 물리(What-if
+       공유, DO_NOT_REVERT §181-C/D/E)라 본 §424 에선 건드리지 않음 — Timo
+       재보정 트랙으로 분리. */
   var VPS = {
     SPEED_WEIGHT: 0.70,               // 직선 속도 가중 (Vantage 문서 기준)
     TURN_WEIGHT: 0.30,                // 회전 가중
-    UPWIND_RATIO_FLOOR: 0.50,         // 풍상 속도: 예측치의 이 비율 이하 = 0점
+    UPWIND_RATIO_FLOOR: 0.00,         // §424 0.50→0.00: ratio≈score (백분위형)
     UPWIND_RATIO_TOP: 1.00,           // 예측치 도달 = 100점
-    DOWNWIND_RATIO_FLOOR: 0.60,       // 풍하 SOG / 풍상 V_boat 이 값 = 0점
-    DOWNWIND_RATIO_TOP: 1.40,         //  〃  이 값 = 100점
+    DOWNWIND_RATIO_FLOOR: 0.00,       // §424 0.60→0.00: ratio≈score (백분위형)
+    DOWNWIND_RATIO_TOP: 1.60,         // §424 1.40→1.60: 풍하 SOG=풍상 Vboat → ~62
     WING_AR_DEFAULT: 4.5,             // 핸드헬드 윙 AR 기본 (계산기 기본값)
     FOIL_AR_DEFAULT: 6.5              // 앞 포일 AR 기본 (미입력 시)
   };
