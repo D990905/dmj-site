@@ -1547,6 +1547,8 @@
     measuredUpwindVmgKt: measuredUpwindVmgKt,
     upwindSpeedScore: upwindSpeedScore,
     downwindSpeedScore: downwindSpeedScore,
+    vpsBand: vpsBand,             /* §424-F — SPS 티어 밴드 canonical */
+    VPS_BANDS: VPS_BANDS,
     runSelfTest: runSelfTest
   };
 
