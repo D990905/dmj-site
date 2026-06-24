@@ -4339,11 +4339,16 @@
       return '<div class="' + cls + '">' + inner + '</div>';
     }
     var s = seg.score, tone = vpsTone(s);
-    var statColor = vpsStatusColor(s) ||
-      (tone === 'hi' ? '#27AE60' : tone === 'mid' ? '#E0A100' : '#C0392B');
+    /* §424-F — SPS 티어 밴드(canonical, coach.js) 색을 단일 출처로 쓴다.
+       80+ Elite(gold) / 60–80 Advanced(green) / 40–60 Intermediate(blue)
+       / 20–40 Foundational(yellow) / 0–20 Learning(orange). coach.js 미로드
+       시에만 기존 status-ramp 폴백. */
+    var band = (window.RDCoach && RDCoach.vpsBand) ? RDCoach.vpsBand(s) : null;
+    var statColor = band ? band.color : (vpsStatusColor(s) ||
+      (tone === 'hi' ? '#27AE60' : tone === 'mid' ? '#E0A100' : '#C0392B'));
     /* 도넛으로 진행 표시 — bar 대신 (Layer 1.5 — Danny 2026-05-26)
        점수 숫자에 data-rd-num 부여 → 카운트업.
-       hi/mid/lo tone 마다 색 다르게. */
+       밴드 티어 색 + 티어 라벨(§424-F). */
     inner += '<div class="vps-tile__donutwrap">' +
       donutSvg(s, 100, statColor,
         { size: isMain ? 150 : 110, stroke: isMain ? 14 : 11 }) +
@@ -4352,6 +4357,8 @@
       ' style="color:' + statColor + '"' +
       ' data-rd-num="' + s + '" data-rd-decimals="0">' + s + '</span>' +
       '<span class="vps-tile__max">/ 100</span>' +
+      (band ? '<span class="vps-tile__tier" style="color:' + band.color + '">' +
+        esc(band.label) + '</span>' : '') +
       '</div></div>';
     /* 비교 델타 — 동일 풍속 영역대(밴드) 평균 대비 (Danny 2026-05-23
        §A-2·A-3). cmp.avg 가 있으면 델타를, 없으면(같은 풍속대 세션 없음)
