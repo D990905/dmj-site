@@ -487,6 +487,15 @@ a { color:var(--sea-deep); }
   font-variant-numeric:tabular-nums;
 }
 
+/* §424-F — SPS 티어 밴드 라벨 (Elite/Advanced/Intermediate/Foundational/
+   Learning). 색은 인라인 style 로 밴드별 지정, 여기선 타이포만. */
+.vps-tile__tier,
+.vps-tile__donutctr .vps-tile__tier {
+  display:block; margin-top:2px;
+  font-size:var(--fs-micro); font-weight:800;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+
 /* (4) NA score — 사이즈는 동일하게 (작아지지 않게) */
 .vps-score--na { font-size:inherit !important; }
 
