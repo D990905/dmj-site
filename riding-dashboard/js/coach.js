@@ -133,6 +133,37 @@
   }
 
   /* ============================================================
+   * §424 — SPS 점수 → 스킬 티어 밴드 (절대 등급 사다리, 표시용 canonical).
+   * 옥대표님 dispatch §424-F. 점수가 0~100 으로 재보정(백분위형)된 뒤
+   * 카드·PDF 가 동일한 임계·색을 쓰도록 단일 출처로 둔다.
+   *   80+    Elite        (gold)
+   *   60–80  Advanced     (green)
+   *   40–60  Intermediate (blue)
+   *   20–40  Foundational (yellow)
+   *   0–20   Learning     (orange)
+   * 하한 포함(>=) 규약: 80→Elite, 60→Advanced … 20→Foundational, 0→Learning.
+   * 색은 표시 레이어가 그대로 쓰거나 자체 팔레트로 매핑할 수 있게 hex 동봉.
+   * 주의 — 이 밴드는 '이번 세션 SPS' 의 절대 등급일 뿐, 메인 사이트의
+   * 스킬 진단 티어(§408 getOverallTier 30/50/70/85)와는 별개 체계다. */
+  var VPS_BANDS = [
+    { min: 80, tier: 'elite',        label: 'Elite',        color: '#D4AF37' },
+    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#1FA055' },
+    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#1F8FFF' },
+    { min: 20, tier: 'foundational', label: 'Foundational', color: '#F2C20E' },
+    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#EC8A2E' }
+  ];
+  function vpsBand(score) {
+    if (score == null || !isFinite(score)) {
+      return { tier: 'na', label: '—', color: '#C7CFD8', min: null };
+    }
+    var s = clamp(score, 0, 100);
+    for (var i = 0; i < VPS_BANDS.length; i++) {
+      if (s >= VPS_BANDS[i].min) return VPS_BANDS[i];
+    }
+    return VPS_BANDS[VPS_BANDS.length - 1];
+  }
+
+  /* ============================================================
    * 실측 풍상 VMG (상위 50% · 양 택 합산, kt) — VPS 속도 점수 앵커/기준값.
    * (What-if 윙 스윕은 별도로 우세 택 상위 20% 앵커 — whatIfAnchorVmgKt 참조.)
    *
