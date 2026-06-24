@@ -490,13 +490,17 @@
      본인 (샘 정 #2) impl — fabrication 0건, state.* / analysis.* / vps.*
      실 필드만 read. 누락 시 graceful fallback. */
 
-  /* score (0-100) → Grade chip { letter, tone } */
+  /* score (0-100) → Grade chip { letter, tone }
+     §424 — cutoff 를 SPS 티어 밴드(coach.js vpsBand: 80/60/40/20)와 정합.
+     A=Elite / B=Advanced / C=Intermediate / D=Foundational / F=Learning.
+     기존 85/70/55/40 은 재보정 전 낮은 점수 분포 기준이라 재보정 후
+     elite(67)가 C 로 떨어지던 문제 해소. */
   function scoreToGrade(score) {
     if (score == null || !isFinite(score)) return { letter: '—', tone: 'mid' };
-    if (score >= 85) return { letter: 'A', tone: 'veryGood' };
-    if (score >= 70) return { letter: 'B', tone: 'good' };
-    if (score >= 55) return { letter: 'C', tone: 'mid' };
-    if (score >= 40) return { letter: 'D', tone: 'bad' };
+    if (score >= 80) return { letter: 'A', tone: 'veryGood' };
+    if (score >= 60) return { letter: 'B', tone: 'good' };
+    if (score >= 40) return { letter: 'C', tone: 'mid' };
+    if (score >= 20) return { letter: 'D', tone: 'bad' };
     return { letter: 'F', tone: 'veryBad' };
   }
 
