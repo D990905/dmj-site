@@ -8878,3 +8878,25 @@ p {
   font-weight: 600;
   color: var(--color-slate, #7E93A8);
 }
+
+/* ── §426 B pivot: 정보 사이트 only (옥대표 2026-07-02) ─────────────────────────
+   회원 기능(로그인/회원가입/마이페이지/회원등급)을 "삭제 없이 표면 hide".
+   주 hide 는 nav-auth.js(런타임)가 하지만, 이 CSS 는 (a) no-flash 방지,
+   (b) nav-auth.js 미로드 페이지(calculator.html·premium.html) 커버 용 백업.
+   재활성화: 이 블록을 삭제하고 nav-auth.js MEMBER_UI_HIDDEN=false 로 되돌린다.
+   ※ 회원 페이지(login/signup/…) 파일·route 는 그대로 보존 — 진입점만 숨김. */
+a[href$="login.html"],
+a[href$="signup.html"],
+a[href$="password-reset.html"],
+a[href$="membership.html"],
+a[href$="profile.html"] {
+  display: none !important;
+}
+/* 메뉴/푸터의 li 래퍼도 함께 숨겨 빈 항목·여백 방지 (:has 미지원 시 anchor 만 숨음) */
+li:has(> a[href$="login.html"]),
+li:has(> a[href$="signup.html"]),
+li:has(> a[href$="password-reset.html"]),
+li:has(> a[href$="membership.html"]),
+li:has(> a[href$="profile.html"]) {
+  display: none !important;
+}
