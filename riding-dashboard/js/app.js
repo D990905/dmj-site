@@ -4820,7 +4820,11 @@
     }
     hasVideoP.then(function (hasVideo) {
       RDCloud.pushSession(record, gpx, { hasVideo: hasVideo }).then(function (r) {
-        if (!r || r.ok) return;                 /* 성공/no-op(비로그인 등) — 조용히 */
+        /* 성공(r.ok) 또는 no-op(r.reason: not-logged-in/no-record 등) 은 조용히.
+           §426 (2026-07-02) — guest-only 모드에선 항상 not-logged-in 이라, 이전엔
+           r.ok=false 라 "클라우드 동기화 나중에" cross-device 안내가 뜨던 회귀 fix.
+           실제 실패(r.error, reason 없음)만 살짝 안내한다 (로컬 저장은 이미 안전). */
+        if (!r || r.ok || r.reason) return;
         var st = $('save-status');              /* 실패만 살짝 안내 (로컬은 안전) */
         if (st) {
           st.hidden = false;
