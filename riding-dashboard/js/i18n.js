@@ -185,6 +185,8 @@
     /* 풍향 확정 안내 / 자동추정 신뢰도 경고 (compass 는 lang-aware) */
     '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.':
       '✓ Wind {deg}° ({dir}) confirmed — applied to tack / gybe, VMG and polar.',
+    '풍상 VMG — 포트 {p} · 스타보드 {s}. 작은 풍향 변화는 합산 평균보다 포트↔스타보드 균형을 주로 바꿉니다.':
+      'Upwind VMG — Port {p} · Starboard {s}. Small wind shifts mostly move the Port↔Starboard balance rather than the combined average.',
     '이 세션은 풍향 자동 추정 신뢰도가 낮습니다{x} — TWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 직접 확인해 주세요.':
       'This session has low confidence in automatic wind estimation{x} — TWA, target polar and % of target may be inaccurate, so verify the wind direction yourself.',
     ' (추정 불가)': ' (cannot estimate)',
