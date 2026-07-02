@@ -51,8 +51,9 @@ function makeSb(captures, data) {
     var b = {
       _table: table, _upsert: null,
       select: function () { return b; },
-      eq: function () { return b; },
+      eq: function (col, val) { (b._eq = b._eq || {})[col] = val; return b; },
       single: function () { return resolveQuery(); },
+      delete: function () { b._delete = true; return b; },
       upsert: function (row, opts) {
         captures.push({ op: 'upsert', table: table, row: row, opts: opts });
         b._upsert = { row: row, opts: opts };
@@ -61,6 +62,10 @@ function makeSb(captures, data) {
       then: function (res, rej) { return resolveQuery().then(res, rej); }
     };
     function resolveQuery() {
+      if (b._delete) {
+        captures.push({ op: 'delete', table: table, eq: b._eq || {} });
+        return Promise.resolve({ data: null, error: null });
+      }
       if (b._upsert) {
         if (table === 'riding_sessions') {
           return Promise.resolve({ data: { id: 'srow-' + b._upsert.row.client_session_id }, error: null });
