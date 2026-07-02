@@ -5154,7 +5154,13 @@
       return;
     }
     var d = e.target.closest('[data-del]');
-    if (d) { Storage.deleteSession(d.getAttribute('data-del')); renderSavedSessions(); return; }
+    if (d) {
+      var delId = d.getAttribute('data-del');
+      Storage.deleteSession(delId);
+      deleteSessionFromCloud(delId);          /* §415-del — cloud 에서도 삭제 */
+      renderSavedSessions();
+      return;
+    }
     /* 커리어 최고 기록 타일 → 그 세션 분석으로 이동 + 기록 구간 강조 */
     var bl = e.target.closest('[data-best-load]');
     if (bl) {
