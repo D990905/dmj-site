@@ -54,6 +54,7 @@
   function sessKey()    { var p = ns(); return p ? p + SESS_SUFFIX : null; }
   function trackKey(id) { var p = ns(); return p ? p + TRACK_SUFFIX + id : null; }
   function migrKey()    { var p = ns(); return p ? p + MIGR_SUFFIX : null; }
+  function tombKey()    { var p = ns(); return p ? p + TOMB_SUFFIX : null; }
 
   /* supabase 클라이언트 — DMJAuth._ensureClient() 로 부팅 보장 후 핸들 반환 */
   function client() {
