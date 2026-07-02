@@ -100,6 +100,29 @@
     } catch (e) { return false; }
   }
 
+  /* ---------- 삭제 tombstone (§415-del) ----------
+     로컬에서 삭제한 세션 id 를 기록한다. cloud 삭제가 오프라인/실패로 끝나도
+     다음 pull 이 그 세션을 로컬에 부활시키지 않게 하고, pull 이 cloud 재삭제를
+     재시도한다. cloud 에서 실제로 사라진 것이 확인되면 tombstone 을 지운다.
+     형태 = { <client_session_id>: <epoch ms> }. */
+  function readTomb() {
+    try {
+      var k = tombKey(); if (!k) return {};
+      var raw = global.localStorage ? global.localStorage.getItem(k) : null;
+      var o = raw ? JSON.parse(raw) : {};
+      return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+    } catch (e) { return {}; }
+  }
+  function writeTomb(o) {
+    try {
+      var k = tombKey(); if (!k) return false;
+      global.localStorage.setItem(k, JSON.stringify(o || {}));
+      return true;
+    } catch (e) { return false; }
+  }
+  function markDeleted(id)   { var o = readTomb(); o[id] = Date.now(); writeTomb(o); }
+  function unmarkDeleted(id) { var o = readTomb(); if (o[id] != null) { delete o[id]; writeTomb(o); } }
+
   /* ---------- 값 정규화 (DB 컬럼 타입 안전) ---------- */
   function numOrNull(v) { return (v != null && isFinite(v)) ? Number(v) : null; }
   function intOrNull(v) { return (v != null && isFinite(v)) ? Math.round(Number(v)) : null; }
