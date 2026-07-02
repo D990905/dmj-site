@@ -90,6 +90,10 @@ function makeSb(captures, data) {
           if (/\.gz$/.test(path)) return Promise.resolve({ data: null, error: { message: 'not found' } });
           var text = (data.trackText != null) ? data.trackText : '<gpx/>';
           return Promise.resolve({ data: new globalThis.Blob([text]), error: null });
+        },
+        remove: function (paths) {
+          captures.push({ op: 'remove', bucket: bucket, paths: paths });
+          return Promise.resolve({ data: [], error: null });
         }
       };
     }
