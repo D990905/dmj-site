@@ -389,8 +389,14 @@
 
   function init() {
     try {
-      renderDesktopNav();
-      renderMobileNav();
+      if (MEMBER_UI_HIDDEN) {
+        // §426 — 회원 UI 표면 hide. 계정 드롭다운은 만들지 않고(render* 스킵)
+        // 진입점 anchor 만 숨긴다. '라이딩 분석' 링크는 아래에서 그대로 주입.
+        hideMemberUI();
+      } else {
+        renderDesktopNav();
+        renderMobileNav();
+      }
       injectRidingDashboardLink();  // 라이딩 분석 게이트 해제 (Danny 2026-05-25)
       // §145-G v9 (Danny 2026-05-14) — installSingleDropdownGuard 항상 실행 (logged out 도 다른 nav dropdown coordination 필요).
       // 이전 (renderDesktopNav 내부 호출) = logged in 만 실행 → logged out 시 multi-open 가드 누락 회귀.
@@ -411,6 +417,9 @@
   // 아직 로그인 상태를 모를 수 있으므로, supabase-auth.js 가 쏘는 'dmj-auth-change'
   // 이벤트에 nav 를 다시 그린다 (로그인/로그아웃 즉시 반영).
   window.addEventListener('dmj-auth-change', function () {
-    try { renderDesktopNav(); renderMobileNav(); } catch (e) {}
+    try {
+      if (MEMBER_UI_HIDDEN) { hideMemberUI(); return; }  // §426 — 회원 UI hide 모드
+      renderDesktopNav(); renderMobileNav();
+    } catch (e) {}
   });
 })();
