@@ -12,17 +12,13 @@
 (function () {
   'use strict';
 
-  // ── §426 B pivot: 정보 사이트 only (옥대표 2026-07-02) ───────────────────────
-  // 배경: Supabase 무료티어 7일 비활동 auto-pause(§425). 옥대표 결정 = 회원 기능을
-  //   "삭제"가 아니라 "표면 hide" 한다 (0 비용/0 관리, 향후 재활성화 가능).
-  // 이 플래그가 true 인 동안:
-  //   - 로그인/회원가입/마이페이지/회원등급 등 회원 진입점(anchor)을 전부 hide
-  //   - 로그인 상태여도 계정 드롭다운을 만들지 않음 (renderDesktopNav/Mobile 스킵)
-  //   - '라이딩 분석' 링크는 그대로 노출 (guest 로 GPX 분석 → localStorage)
-  // 재활성화: 이 값을 false 로 되돌리면 즉시 원상 복구. 코드/route/파일 삭제 없음.
-  //   (짝꿍 플래그: supabase-auth.js MEMBER_MODE_DISABLED, style.css §426 블록,
-  //    profile.html §426 redirect 블록도 함께 되돌리면 완전 복원.)
-  var MEMBER_UI_HIDDEN = true;
+  // ── §427a: §426 B pivot revert (옥대표 2026-07-02 "마이페이지 필요") ─────────
+  // §426 은 Supabase auto-pause(§425) 대응으로 회원 UI 를 표면 hide 했으나, 옥대표
+  //   결정 번복으로 회원 기능을 다시 복원한다. 플래그 = false (원상 복구).
+  //   (짝꿍 flag 도 함께 flip: supabase-auth.js MEMBER_MODE_DISABLED=false,
+  //    style.css §426 블록 제거, profile.html §426 redirect 블록 제거.)
+  //   auto-pause 재발 방지는 §427b keep-alive cron 이 담당.
+  var MEMBER_UI_HIDDEN = false;
 
   // 회원 진입점으로 간주해 hide 할 목적지 파일명 (basename 매칭, ../ 접두 무관).
   var MEMBER_HREF_TARGETS = [
