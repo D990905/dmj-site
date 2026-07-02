@@ -12,6 +12,49 @@
 (function () {
   'use strict';
 
+  // ── §426 B pivot: 정보 사이트 only (옥대표 2026-07-02) ───────────────────────
+  // 배경: Supabase 무료티어 7일 비활동 auto-pause(§425). 옥대표 결정 = 회원 기능을
+  //   "삭제"가 아니라 "표면 hide" 한다 (0 비용/0 관리, 향후 재활성화 가능).
+  // 이 플래그가 true 인 동안:
+  //   - 로그인/회원가입/마이페이지/회원등급 등 회원 진입점(anchor)을 전부 hide
+  //   - 로그인 상태여도 계정 드롭다운을 만들지 않음 (renderDesktopNav/Mobile 스킵)
+  //   - '라이딩 분석' 링크는 그대로 노출 (guest 로 GPX 분석 → localStorage)
+  // 재활성화: 이 값을 false 로 되돌리면 즉시 원상 복구. 코드/route/파일 삭제 없음.
+  //   (짝꿍 플래그: supabase-auth.js MEMBER_MODE_DISABLED, style.css §426 블록,
+  //    profile.html §426 redirect 블록도 함께 되돌리면 완전 복원.)
+  var MEMBER_UI_HIDDEN = true;
+
+  // 회원 진입점으로 간주해 hide 할 목적지 파일명 (basename 매칭, ../ 접두 무관).
+  var MEMBER_HREF_TARGETS = [
+    'login.html', 'signup.html', 'password-reset.html',
+    'membership.html', 'profile.html'
+  ];
+
+  function hrefBasename(a) {
+    var h = a.getAttribute('href') || '';
+    h = h.split('#')[0].split('?')[0];
+    var seg = h.split('/');
+    return seg[seg.length - 1];
+  }
+
+  // 회원 진입점 anchor 전수 hide. li 로 감싸진 경우 li 째 숨겨 빈 항목/여백 방지.
+  function hideMemberUI() {
+    try {
+      var anchors = document.querySelectorAll('a[href]');
+      anchors.forEach(function (a) {
+        if (MEMBER_HREF_TARGETS.indexOf(hrefBasename(a)) === -1) return;
+        a.style.setProperty('display', 'none', 'important');
+        a.setAttribute('data-member-hidden', '');
+        var li = a.closest('li');
+        // li 안에 회원 링크만 있을 때만 li 를 숨긴다 (다른 항목 보존)
+        if (li && li.querySelectorAll('a[href]').length === 1) {
+          li.style.setProperty('display', 'none', 'important');
+          li.setAttribute('data-member-hidden', '');
+        }
+      });
+    } catch (e) { if (window.console) console.warn('hideMemberUI error:', e); }
+  }
+
   // ── 라이딩 분석 로그인 게이트 (Danny 2026-05-25) ─────────────────────────────
   // 배경: 마이페이지 인증은 백엔드 없는 localStorage shim 이라 사실상 로그인이 안 됨
   //   (file:// origin·기기별 격리·crypto.subtle 부재 등). 그 결과 '라이딩 분석'
