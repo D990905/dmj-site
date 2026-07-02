@@ -250,6 +250,48 @@ function sampleRecord(id, over) {
       rP.ok === false && rL.ok === false && rE.ok === false, 'graceful — 로컬 저장 무영향');
   }
 
+  /* ---------- 7) §415-del 삭제 sync ---------- */
+  {
+    /* 7a) 로그인 삭제 → 스토리지 remove + row delete + tombstone 정리 */
+    currentUid = UID;
+    globalThis.localStorage = makeLS();
+    var caps7 = []; currentSb = makeSb(caps7, {});
+    var rD = await RDCloud.deleteSession('rd_del_1');
+    check('deleteSession ok (로그인)', rD && rD.ok === true, JSON.stringify(rD));
+    check('tracks 스토리지 remove 호출 (.gz·평문 둘 다)',
+      caps7.some(function (c) { return c.op === 'remove' && c.bucket === 'tracks' && c.paths && c.paths.length === 2; }));
+    var delCap = caps7.filter(function (c) { return c.op === 'delete' && c.table === 'riding_sessions'; })[0];
+    check('riding_sessions delete 호출 (본인 세션 scoped)',
+      !!delCap && delCap.eq.user_id === UID && delCap.eq.client_session_id === 'rd_del_1', JSON.stringify(delCap));
+    var tomb7 = JSON.parse(globalThis.localStorage.getItem('rd_' + UID + '_cloud_deleted_v1') || '{}');
+    check('cloud 삭제 확정 → tombstone 제거됨', tomb7['rd_del_1'] == null, JSON.stringify(tomb7));
+
+    /* 7b) 비로그인 삭제 → cloud no-op (uid 없어 pull 도 안 돌아 부활 위험 없음) */
+    currentUid = null;
+    globalThis.localStorage = makeLS();
+    var rD2 = await RDCloud.deleteSession('rd_del_2');
+    check('비로그인 deleteSession: reject 없이 {ok:false, not-logged-in}',
+      rD2 && rD2.ok === false && rD2.reason === 'not-logged-in', JSON.stringify(rD2));
+
+    /* 7c) pull 이 tombstone 세션을 로컬에 부활시키지 않고 cloud 재삭제 시도 */
+    currentUid = UID;
+    globalThis.localStorage = makeLS();
+    globalThis.localStorage.setItem('rd_' + UID + '_cloud_deleted_v1', JSON.stringify({ 'rd_ghost': 1718000000000 }));
+    var caps7c = [];
+    currentSb = makeSb(caps7c, { sessions: [
+      { id: 'srow-g', client_session_id: 'rd_ghost', name: 'ghost', metrics: { id: 'rd_ghost' } },
+      { id: 'srow-k', client_session_id: 'rd_keep',  name: 'keep',  metrics: { id: 'rd_keep' } }
+    ], files: [] });
+    await RDCloud.pullSessions();
+    var localAfter = JSON.parse(globalThis.localStorage.getItem('rd_' + UID + '_sessions_v1') || '[]');
+    var idsAfter = localAfter.map(function (s) { return s.id; });
+    check('pull: tombstone 세션은 로컬 병합 제외 (부활 차단)',
+      idsAfter.indexOf('rd_ghost') < 0 && idsAfter.indexOf('rd_keep') >= 0, JSON.stringify(idsAfter));
+    await new Promise(function (r) { setTimeout(r, 0); });   /* fire-and-forget 재삭제 flush */
+    check('pull: tombstone 세션 cloud 재삭제 시도',
+      caps7c.some(function (c) { return c.op === 'delete' && c.table === 'riding_sessions'; }));
+  }
+
   console.log('\n' + '-'.repeat(44));
   console.log('PASS:', pass, ' FAIL:', fail);
   process.exit(fail > 0 ? 1 : 0);
