@@ -35,6 +35,7 @@
   var SESS_SUFFIX  = 'sessions_v1';
   var TRACK_SUFFIX = 'track_v1_';
   var MIGR_SUFFIX  = 'cloud_migrated_v1';
+  var TOMB_SUFFIX  = 'cloud_deleted_v1';   /* §415-del 삭제 tombstone */
 
   /* riding_sessions.sport CHECK 허용값 (0004). 벗어나면 insert 실패하므로
      매핑되지 않는 스포츠는 'other' 로 안전 변환. */
