@@ -345,6 +345,40 @@
   }
 
   /* ============================================================
+   * deleteSession — 세션 1개를 cloud 에서 삭제한다 (로컬 삭제 시 호출).
+   *   1) tracks 버킷의 트랙 파일 제거 (.gz·평문 둘 다, best-effort)
+   *   2) riding_sessions row 삭제 → riding_files 는 FK on delete cascade 로 함께
+   *      삭제된다 (0004: riding_files.session_id references riding_sessions(id)).
+   *   삭제 id 를 먼저 tombstone 에 기록해, 오프라인/실패로 cloud 가 남아도 다음
+   *   pull 이 로컬에 부활시키지 않게 한다. cloud 삭제가 확정되면 tombstone 제거.
+   * 반환 Promise<{ok,...}>. 실패해도 reject 안 함 (로컬 삭제는 이미 완료됨).
+   * ============================================================ */
+  function deleteSession(id) {
+    if (!id) return Promise.resolve({ ok: false, reason: 'no-id' });
+    markDeleted(id);                              /* 먼저 기록 — pull 부활 차단 */
+    var u = uid();
+    if (!u) return Promise.resolve({ ok: false, reason: 'not-logged-in', tombstoned: true });
+    return client().then(function (sb) {
+      /* 스토리지 오브젝트 제거 — 없는 경로여도 무해(best-effort, 실패 무시) */
+      return sb.storage.from(BUCKET)
+        .remove([trackPath(u, id, true), trackPath(u, id, false)])
+        .catch(function () { /* best-effort */ })
+        .then(function () {
+          return sb.from('riding_sessions').delete()
+            .eq('user_id', u).eq('client_session_id', id);   /* 본인 세션만 (RLS 도 강제) */
+        })
+        .then(function (res) {
+          if (res && res.error) throw res.error;
+          unmarkDeleted(id);                      /* cloud 삭제 확정 → tombstone 제거 */
+          return { ok: true };
+        });
+    }).catch(function (e) {
+      console.warn('[RDCloud §415] deleteSession failed', id, e);
+      return { ok: false, error: String((e && e.message) || e), tombstoned: true };
+    });
+  }
+
+  /* ============================================================
    * migrateLocalToCloud — 기존 로컬 전용 세션을 cloud 로 1회 올린다.
    *   업로드는 멱등(upsert)이라 이미 있는 세션은 갱신만 된다. 완료 후
    *   per-user 플래그(rd_<uid>_cloud_migrated_v1) 로 재실행을 막는다.
