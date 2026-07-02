@@ -246,7 +246,11 @@
     }
     $('clear-sessions-btn').addEventListener('click', function () {
       if (confirm('저장된 모든 세션을 삭제할까요?')) {
-        Storage.clearAll(); renderSavedSessions();
+        /* §415-del — clearAll 전에 id 를 모아 cloud 에서도 각각 삭제 */
+        var delIds = (Storage.listSessions() || []).map(function (s) { return s.id; });
+        Storage.clearAll();
+        delIds.forEach(function (id) { deleteSessionFromCloud(id); });
+        renderSavedSessions();
       }
     });
 
