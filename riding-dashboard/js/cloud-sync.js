@@ -478,6 +478,7 @@
     pushSession: pushSession,
     pullSessions: pullSessions,
     ensureTrack: ensureTrack,
+    deleteSession: deleteSession,
     migrateLocalToCloud: migrateLocalToCloud,
     autoSync: autoSync,
     /* 내부 노출 (테스트/디버그용) */
