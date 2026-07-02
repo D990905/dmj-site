@@ -990,9 +990,7 @@
         }
         if (state.windDir != null) {
           var wn = $('wind-note');
-          if (wn) wn.textContent = i18nT(
-            '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.',
-            { deg: state.windDir, dir: compass(state.windDir) });
+          if (wn) wn.textContent = windConfirmNote();
         }
       } catch (e2) { /* 토글 갱신 실패는 무음 — renderDashboard 가 본문은 처리 */ }
     }
