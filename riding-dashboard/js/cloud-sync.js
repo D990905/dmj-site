@@ -294,12 +294,26 @@
       var cloudRecs = (sRes.data || []).map(function (row) {
         return rowToRecord(row, !!trackBySessionRow[row.id]);
       });
-      /* 병합: 로컬 → cloud 덮어쓰기 (cloud-first), id 기준 합집합 */
+      /* §415-del tombstone 반영: 삭제된 세션은 병합에서 제외(부활 차단).
+         아직 cloud 에 남아 있으면 cloud 재삭제를 재시도(비동기), cloud 에서
+         이미 사라졌으면 tombstone 을 정리한다. */
+      var tomb = readTomb();
+      var cloudIds = {};
+      cloudRecs.forEach(function (rec) { if (rec && rec.id) cloudIds[rec.id] = 1; });
+      var tombChanged = false;
+      for (var tid in tomb) {
+        if (!tomb.hasOwnProperty(tid)) continue;
+        if (cloudIds[tid]) { deleteSession(tid); }        /* 아직 cloud 에 있음 → 재삭제 */
+        else { delete tomb[tid]; tombChanged = true; }    /* cloud 에 없음 → tombstone 불필요 */
+      }
+      if (tombChanged) writeTomb(tomb);
+
+      /* 병합: 로컬 → cloud 덮어쓰기 (cloud-first), id 기준 합집합. tombstone 제외. */
       var byId = {};
       readSessions().forEach(function (rec) { if (rec && rec.id) byId[rec.id] = rec; });
       cloudRecs.forEach(function (rec) { if (rec && rec.id) byId[rec.id] = rec; });
       var merged = [];
-      for (var id in byId) { if (byId.hasOwnProperty(id)) merged.push(byId[id]); }
+      for (var id in byId) { if (byId.hasOwnProperty(id) && !tomb[id]) merged.push(byId[id]); }
       merged.sort(function (a, b) { return (a.dateEpoch || 0) - (b.dateEpoch || 0); });
       writeSessions(merged);
       dispatch('rd:cloud-synced', { count: cloudRecs.length, total: merged.length });
