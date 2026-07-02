@@ -34,14 +34,12 @@
   var SUPABASE_KEY = 'sb_publishable_Xt5qEA_0Ar1HWWuecR4AAQ_9qxooFY1';
   var SDK_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
 
-  // ── §426 B pivot: 정보 사이트 only (옥대표 2026-07-02) ───────────────────────
-  // Supabase 무료티어 auto-pause(§425) + 회원 기능 표면 hide 결정에 따라, 페이지
-  // 로드마다 자동으로 client 를 부팅(getSession → paused 프로젝트로 network)하던
-  // init 을 중단한다. 효과: (a) 콘솔 network 에러 제거, (b) 매 페이지 불필요한
-  // Supabase SDK CDN 로드 제거. DMJAuth API(login/currentUser/...)는 그대로 남아
-  // 필요 시 lazy 하게 client 를 띄운다 — 단, 회원 UI 가 hide 라 호출되지 않는다.
-  // 재활성화: 이 값을 false 로 되돌리면 자동 부팅이 즉시 복원된다. (코드 삭제 없음.)
-  var MEMBER_MODE_DISABLED = true;
+  // ── §427a: §426 B pivot revert (옥대표 2026-07-02 "마이페이지 필요") ─────────
+  // §426 은 auto-pause(§425) 대응으로 페이지 로드마다의 client 자동 부팅을 막았으나,
+  // 회원 기능 복원 결정에 따라 auto-boot 을 다시 켠다 (getSession → 세션 복원).
+  // Supabase 가 paused 인 동안엔 network 실패 → graceful fallback(로그인 실패)이며,
+  // 옥대표 dashboard Restore 후 정상 작동. auto-pause 재발 방지 = §427b keep-alive cron.
+  var MEMBER_MODE_DISABLED = false;
 
   var USER_NS_PREFIX = 'dmj_user_';   // localStorage 캐시 prefix
   var ANON_NS_PREFIX = 'dmj_anon_';   // 비로그인 fallback

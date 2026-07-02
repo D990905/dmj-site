@@ -8,18 +8,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<!-- §426 B pivot: 정보 사이트 only (옥대표 2026-07-02) — 마이페이지(회원 전용) 접근 차단.
-     회원 기능은 삭제가 아니라 표면 hide. 이 페이지 직접 접근 시 홈으로 즉시 redirect.
-     재활성화: 아래 블록을 제거하면 마이페이지가 그대로 복원된다 (파일·섹션 전부 보존). -->
-<script>
-(function () {
-  var MEMBER_MODE_DISABLED = true;
-  if (MEMBER_MODE_DISABLED) {
-    try { location.replace('index.html'); }
-    catch (e) { location.href = 'index.html'; }
-  }
-})();
-</script>
+<!-- §427a: §426 B pivot revert (옥대표 2026-07-02 "마이페이지 필요") — 마이페이지
+     접근 차단 redirect 제거. 회원 기능 복원으로 이 페이지 정상 노출. -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0A2540">
 <meta name="robots" content="noindex,nofollow">
