@@ -2400,6 +2400,32 @@
     }
   }
 
+  /* 풍향 확정 안내문을 현재 언어로 생성 — confirmWind 와 rd:langchange
+     핸들러가 공유한다(중복 방지 + 토글 시 상세줄 유실 방지).
+     §410 — 단일 i18nT 템플릿(compass 는 lang-aware → 방위 EN). */
+  function windConfirmNote() {
+    if (state.windDir == null) return i18nT('풍향이 해제되었습니다.');
+    var note = i18nT(
+      '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.',
+      { deg: state.windDir, dir: compass(state.windDir) });
+    /* §428 — 옥대표님 "218→211 바꿔도 미미함". 헤드라인 합산 VMG 는
+       cos(twa+δ)+cos(twa-δ)=2cos(twa)cos(δ) 로 2차 둔감이라 작은 풍향
+       변화에 거의 안 움직인다. 그러나 신호는 포트/스타보드 비대칭에
+       살아 있다(7° 변화에도 택별 ±10-15%, .repro-428 검증). 확정 직후
+       방금 재계산된 택별 풍상 VMG 실측값을 함께 보여, 재계산이 실제로
+       일어났고 변화가 어디에 있는지 사용자가 즉시 확인하게 한다. */
+    var up = state.analysis && state.analysis.wind &&
+             state.analysis.wind.tackSplit && state.analysis.wind.tackSplit.upwind;
+    var pV = up && up.P && up.P.count && up.P.vmg && isFinite(up.P.vmg.avg) ? up.P.vmg.avg : null;
+    var sV = up && up.S && up.S.count && up.S.vmg && isFinite(up.S.vmg.avg) ? up.S.vmg.avg : null;
+    if (pV != null && sV != null) {
+      note += '  ' + i18nT(
+        '풍상 VMG — 포트 {p} · 스타보드 {s}. 작은 풍향 변화는 합산 평균보다 포트↔스타보드 균형을 주로 바꿉니다.',
+        { p: fmtSpeedU(pV), s: fmtSpeedU(sV) });
+    }
+    return note;
+  }
+
   function renderWindUI() {
     var num = $('wind-dir-input'), rng = $('wind-dir-range'), arrow = $('wind-arrow');
     var p = state.windPending, ro = $('wind-readout');
