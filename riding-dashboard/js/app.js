@@ -4824,6 +4824,14 @@
      이미 끝났고, 여기는 cross-device 동기화용 백업이라 실패해도 로컬엔 무영향.
      영상 파일은 cloud 에 올리지 않는다(옥대표님 결정 2026-06-18) — 로컬에
      영상 blob 이 있는지만 검사해 has_video 플래그로 기록한다. */
+  /* §415-del — 로컬 세션 삭제 시 cloud 에서도 삭제(부활 방지). best-effort:
+     비로그인/오프라인이면 RDCloud 가 tombstone 만 남기고, 다음 pull 이 정리한다.
+     로컬 삭제는 이미 완료된 뒤라 실패해도 UX 영향 없음(조용히). */
+  function deleteSessionFromCloud(id) {
+    if (!id || !window.RDCloud || typeof RDCloud.deleteSession !== 'function') return;
+    try { RDCloud.deleteSession(id); } catch (e) {}
+  }
+
   function pushSessionToCloud(record) {
     if (!record || !window.RDCloud || typeof RDCloud.pushSession !== 'function') return;
     var gpx = state.gpxText;
