@@ -2390,31 +2390,7 @@
     renderRuns();   // recompute 가 selectedRun 을 초기화 → 목록 강조도 갱신
     renderSpeedChart();
     renderSessionSummary();
-    if (state.windDir != null) {
-      /* §410 — 확정 안내를 단일 i18nT 템플릿으로(compass 는 lang-aware → 방위 EN).
-         이전엔 PATTERNS 가 프레임만 번역하고 방위 캡처를 한글로 재출력했다. */
-      var note = i18nT(
-        '✓ 풍향 {deg}° ({dir}) 확정 — 택킹/자이빙·VMG·폴라에 반영되었습니다.',
-        { deg: state.windDir, dir: compass(state.windDir) });
-      /* §428 — 옥대표님 "218→211 바꿔도 미미함". 헤드라인 합산 VMG 는
-         cos(twa+δ)+cos(twa-δ)=2cos(twa)cos(δ) 로 2차 둔감이라 작은 풍향
-         변화에 거의 안 움직인다. 그러나 신호는 포트/스타보드 비대칭에
-         살아 있다(7° 변화에도 택별 ±10-15%). 확정 직후 방금 재계산된
-         택별 풍상 VMG 실측값을 함께 보여, 재계산이 실제로 일어났고
-         변화가 어디에 있는지 사용자가 즉시 확인하게 한다. */
-      var up = state.analysis && state.analysis.wind &&
-               state.analysis.wind.tackSplit && state.analysis.wind.tackSplit.upwind;
-      var pV = up && up.P && up.P.count && up.P.vmg && isFinite(up.P.vmg.avg) ? up.P.vmg.avg : null;
-      var sV = up && up.S && up.S.count && up.S.vmg && isFinite(up.S.vmg.avg) ? up.S.vmg.avg : null;
-      if (pV != null && sV != null) {
-        note += '  ' + i18nT(
-          '풍상 VMG — 포트 {p} · 스타보드 {s}. 작은 풍향 변화는 합산 평균보다 포트↔스타보드 균형을 주로 바꿉니다.',
-          { p: fmtSpeedU(pV), s: fmtSpeedU(sV) });
-      }
-      $('wind-note').textContent = note;
-    } else {
-      $('wind-note').textContent = i18nT('풍향이 해제되었습니다.');
-    }
+    $('wind-note').textContent = windConfirmNote();
     /* 리플레이 뷰어가 열려 있으면 새 확정 풍향을 즉시 반영한다 —
        리플레이는 open() 시점 풍향을 캐시하므로 재확정 시 격자·ladder
        rung·세일이 갱신되도록 알린다 (Danny 2026-05-25). 닫혀 있으면
