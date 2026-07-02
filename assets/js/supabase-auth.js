@@ -700,6 +700,11 @@
   // ─────────────────────────────────────────────────────────────────────
   // 8) Init — client 부팅 + OAuth callback 자동 감지
   // ─────────────────────────────────────────────────────────────────────
+  // §426 — 회원 모드 비활성화 시 자동 부팅 스킵 (paused 프로젝트 network·콘솔 에러 방지).
+  if (MEMBER_MODE_DISABLED) {
+    // no-op: DMJAuth API 는 노출돼 있으나 자동으로 client 를 띄우지 않는다.
+    return;
+  }
   ensureClient().then(function () {
     if (cachedSession) {
       // §187 — pull 후 refreshProfile 재실행 (profile_extra 병합 + dmj-auth-change 재통지)
