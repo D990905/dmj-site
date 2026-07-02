@@ -504,7 +504,7 @@
   var METRICS = [
     { key: 'sog',   field: 'speed', label: 'SOG',   unit: 'spd', color: '#33A1FF' },
     { key: 'vmg',   field: 'vmg',   label: 'VMG',   unit: 'spd', color: '#3FD9B6', signed: true },
-    { key: 'twa',   field: 'twa',   label: 'TWA',   unit: 'deg', color: '#FFB02E', fixed: [0, 180] },
+    { key: 'twa',   field: 'twa',   label: 'CWA',   unit: 'deg', color: '#FFB02E', fixed: [0, 180] },
     { key: 'heel',  field: 'heel',  label: 'Heel',  unit: 'deg', color: '#7FD0FF', signed: true },
     { key: 'pitch', field: 'pitch', label: 'Pitch', unit: 'deg', color: '#C9A4FF', signed: true },
     { key: 'hr',    field: 'hr',    label: 'HR',    unit: 'bpm', color: '#FF6B7A' }

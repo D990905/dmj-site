@@ -826,7 +826,7 @@
     if (dTwa < TURN_COACH.ENTRY_TWA_DIFF_DEG) return null;
     var sev = 84 + Math.min(10, (Math.abs(dEntryKt) - TURN_COACH.ENTRY_SPEED_DIFF_KT)
       / TURN_COACH.ENTRY_SPEED_DIFF_KT * 10);
-    var nums = i18nT('진입 SOG 포트 {p} · 스타보드 {s} {u} · 진입 TWA 차 {d}°', {
+    var nums = i18nT('진입 SOG 포트 {p} · 스타보드 {s} {u} · 진입 CWA 차 {d}°', {
       p: tcFmtSpeed(sp.entry, ctx), s: tcFmtSpeed(ss.entry, ctx),
       u: ctx.unit, d: Math.round(dTwa)
     });
@@ -964,7 +964,7 @@
     if (deep < TURN_COACH.DEEP_EXIT_DEG) return null;
     var sev = 88 + Math.min(12, (deep - TURN_COACH.DEEP_EXIT_DEG)
       / TURN_COACH.DEEP_EXIT_DEG * 12);
-    var nums = i18nT('자이빙 탈출 TWA 평균 {x}° (라이더 풍하 평균 {r}°)', {
+    var nums = i18nT('자이빙 탈출 CWA 평균 {x}° (라이더 풍하 평균 {r}°)', {
       x: Math.round(s.xtwa.mean), r: Math.round(ctx.riderDownTwa)
     });
     return tcBuild('R8', 'R8', sev, {}, nums);

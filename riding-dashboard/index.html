@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0A2540">
 <meta name="color-scheme" content="light">
 <title>라이딩 통계 대시보드 — GPX 분석 (Phase 1)</title>
-<meta name="description" content="윙포일·세일링 GPX 트랙 분석 — 속도·택킹/자이빙 효율·VMG·TWA 폴라. 코치 등급 분석.">
+<meta name="description" content="윙포일·세일링 GPX 트랙 분석 — 속도·택킹/자이빙 효율·VMG·CWA 폴라. 코치 등급 분석.">
 <!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
 <script>
 (function(){
@@ -230,7 +230,7 @@
     <div class="intro__hero">
       <h2>GPX 파일 하나로 라이딩을 분석합니다</h2>
       <p>워치·GPS 앱에서 내보낸 트랙을 올리면 속도 분석과 함께
-         <strong>택킹·자이빙 효율, VMG, TWA 폴라</strong>까지 — 일반 GPS 앱이 보여주지 않는
+         <strong>택킹·자이빙 효율, VMG, CWA 폴라</strong>까지 — 일반 GPS 앱이 보여주지 않는
          코치 등급 분석을 바로 확인할 수 있습니다.</p>
     </div>
 
@@ -301,7 +301,7 @@
     <ul class="intro__features">
       <li><strong>Speed Analysis</strong><span>속도 시계열·분포·2초/10초/500m/1해리 베스트·고속 구간</span></li>
       <li><strong>Maneuver Analysis</strong><span>택킹·자이빙 자동 감지 + 진입/최저/탈출 속도·손실·회복</span></li>
-      <li><strong>코치 분석</strong><span>VMG·TWA 폴라·풍향 추정 — 풍향만 입력하면 열립니다</span></li>
+      <li><strong>코치 분석</strong><span>VMG·CWA 폴라·풍향 추정 — 풍향만 입력하면 열립니다</span></li>
     </ul>
     <p class="intro__privacy">분석은 모두 브라우저 안에서 처리되며, 파일은 어디에도 업로드되지 않습니다.</p>
   </section>
@@ -625,7 +625,7 @@
       </div>
     </div>
 
-    <!-- 택 분포 (바이올린) — 포트/스타보드 SOG·VMG·TWA -->
+    <!-- 택 분포 (바이올린) — 포트/스타보드 SOG·VMG·CWA -->
     <div class="card card--violin">
       <div class="card__head"><h3>택 분포 — 포트 · 스타보드</h3>
         <span class="card__hint">가운데 축 기준 좌 = 포트(P) · 우 = 스타보드(S)</span></div>
@@ -640,7 +640,7 @@
                role="group" aria-label="지표 선택">
             <button type="button" data-vmetric="sog" class="is-active">SOG</button>
             <button type="button" data-vmetric="vmg">VMG</button>
-            <button type="button" data-vmetric="twa">TWA</button>
+            <button type="button" data-vmetric="twa">CWA</button>
             <button type="button" data-vmetric="heel">Heel</button>
             <button type="button" data-vmetric="pitch">Pitch</button>
           </div>

@@ -1789,7 +1789,7 @@
     vmg: 'VMG = 풍상·풍하 유효속도(바람 축으로 다가가거나 멀어지는 ' +
       '속도). 풍상·풍하 모두 양수로 저장하므로 높을수록 좋습니다. ' +
       '포트/스타보드 택별 상위 50%·20% 는 높은 값 구간의 시간가중 평균.',
-    twa: 'TWA = 보트 헤딩과 풍향이 이루는 각. 풍상은 작을수록 ' +
+    twa: 'CWA = 보트 헤딩과 풍향이 이루는 각. 풍상은 작을수록 ' +
       '바람에 가깝게 포인팅이라 좋아 \'상위\'가 가장 좁은 각 쪽입니다. ' +
       '풍하는 VMG 최적각이 약 140~150°이고 정풍하(180°)는 오히려 느려 ' +
       '중립으로 두고 크기가 큰(깊은) 각 쪽을 상위로 표시합니다. 포트/' +
@@ -1921,7 +1921,7 @@
     }
     var data = An.computeStatsPanel(a);
     if (!data.rows.length) {
-      body.innerHTML = '<p class="empty-note">풍향을 확정하면 SOG·VMG·TWA ' +
+      body.innerHTML = '<p class="empty-note">풍향을 확정하면 SOG·VMG·CWA ' +
         '통계가, 심박 데이터가 있으면 심박 통계가 이 표에 표시됩니다.</p>';
       return;
     }
@@ -2016,14 +2016,14 @@
         '(풍상 ' + fmtDur(data.upwindTimeSec) + ' · 풍하 ' +
         fmtDur(data.downwindTimeSec) + ' 기준).');
     } else {
-      foot.push('풍향을 확정하면 SOG·VMG·TWA 통계가 이 표에 추가됩니다.');
+      foot.push('풍향을 확정하면 SOG·VMG·CWA 통계가 이 표에 추가됩니다.');
     }
-    foot.push('SOG·VMG·TWA·힐·피치는 풍상/풍하 × 포트/스타보드 4 버킷으로 ' +
+    foot.push('SOG·VMG·CWA·힐·피치는 풍상/풍하 × 포트/스타보드 4 버킷으로 ' +
       '나눠 좌우 택 차이를 함께 봅니다(심박은 좌우 택과 무관해 분할하지 ' +
       '않고 풍상/풍하로만 나눔). 평균·상위 50%·상위 20% 세 구간을 두며, ' +
       '평균은 그 방향(풍상/풍하)의 시간가중 평균, 상위 N% 는 시간가중 ' +
       '구간 평균(단일 GPS 포인트 노이즈 배제)입니다. \'상위\'는 지표의 ' +
-      '좋은 방향 기준이며(SOG·VMG 높은 값, 풍상 TWA 좁은 각), 중립 ' +
+      '좋은 방향 기준이며(SOG·VMG 높은 값, 풍상 CWA 좁은 각), 중립 ' +
       '지표는 크기가 큰 값 쪽입니다. 힐은 포트(−)·스타보드(+) 부호 ' +
       '그대로 표시합니다.');
     html += '<p class="stats-note">' + esc(foot.join(' ')) + '</p>';
@@ -2051,7 +2051,7 @@
       { mode: 'downwind', side: 'P', label: '포트 · 풍하',     cls: 'p' },
       { mode: 'downwind', side: 'S', label: '스타보드 · 풍하', cls: 's' }
     ];
-    var metrics = [['vmg', 'VMG'], ['twa', 'TWA'], ['sog', 'SOG']];
+    var metrics = [['vmg', 'VMG'], ['twa', 'CWA'], ['sog', 'SOG']];
     var blocks = groups.map(function (g) {
       var grp = w[g.mode] && w[g.mode][g.side];
       var rows = metrics.map(function (m) {
@@ -2073,7 +2073,7 @@
     card.innerHTML =
       '<div class="card__head"><h3>세션 평균</h3>' +
       '<span class="card__hint">포트·스타보드 × 풍상·풍하 평균 — ' +
-      'VMG·TWA·SOG · 구간 통계(상위 50%·20%)는 아래 퍼포먼스 통계 표</span>' +
+      'VMG·CWA·SOG · 구간 통계(상위 50%·20%)는 아래 퍼포먼스 통계 표</span>' +
       '</div>' +
       '<div class="savg-strip">' + blocks + '</div>';
   }
@@ -3303,7 +3303,7 @@
      차트 자리에 안내를 띄운다 — 추후 Vakaros .vkx 처럼 heel·pitch 가
      담긴 파일을 올리면 같은 경로로 실제 분포가 자동으로 그려진다. */
   var VIOLIN_METRIC_LABEL = {
-    sog: 'SOG', vmg: 'VMG', twa: 'TWA', heel: '힐(Heel)', pitch: '피치(Pitch)'
+    sog: 'SOG', vmg: 'VMG', twa: 'CWA', heel: '힐(Heel)', pitch: '피치(Pitch)'
   };
   var VIOLIN_POP_LABEL = { all: '전체', top50: '상위 50%', top20: '상위 20%' };
 
@@ -3564,7 +3564,7 @@
 
     /* §410 — 분포 subtitle 전체를 단일 i18nT 템플릿으로(지표·모집단·방향·구간을
        각각 i18nT 변환 후 보간). 한글 enum 이 한 텍스트노드로 합쳐져도 빌드 시 EN. */
-    var twaDesc = (metric === 'twa') ? i18nT(' · TWA = 풍향 대비 진행 각도') : '';
+    var twaDesc = (metric === 'twa') ? i18nT(' · CWA = 풍향 대비 진행 각도') : '';
     note.textContent = i18nT(
       '{m} 분포 · {pop} 모집단 · {dir} {act} 구간 (SOG {kt} kt 이상) · 표본 P {p}개 · S {s}개', {
         m: i18nT(mLabel), pop: i18nT(popLabel),
@@ -3596,7 +3596,7 @@
 
     if (state.windDir == null || !state.session || !state.session.hasTime) {
       showEmpty('풍향을 설정하면 타깃 폴라와 % of target 가 표시됩니다 — ' +
-        'TWA 계산에 풍향이 필요합니다.');
+        'CWA 계산에 풍향이 필요합니다.');
       return;
     }
     var curProfile = An.sessionPolarProfile(state.session, state.windDir);
@@ -3618,7 +3618,7 @@
     var target = An.buildTargetPolar(profiles, { basis: basis });
     if (!target || (target.filledBins + target.interpolatedBins) < 2) {
       showEmpty('타깃 곡선을 만들 표본이 부족합니다 — ' +
-        'TWA 빈별 주행 데이터가 더 필요합니다.');
+        'CWA 빈별 주행 데이터가 더 필요합니다.');
       return;
     }
     var cmp = An.computeTargetComparison(state.session, state.windDir, target);
@@ -3660,17 +3660,17 @@
     var parts = [];
     if (target.basis === 'cumulative') {
       parts.push('타깃 = 저장된 세션 ' + target.sourceSessionCount +
-        '개의 TWA별 개인 베스트(지속 속도 95퍼센타일)입니다.');
+        '개의 CWA별 개인 베스트(지속 속도 95퍼센타일)입니다.');
     } else {
       parts.push('타깃 = 이번 세션 단독 기준입니다(누적 데이터 없음) — ' +
         '세션을 저장하면 다음부터 누적 베스트로 갱신됩니다.');
     }
-    parts.push('곡선 반지름 = TWA별 속도(' + unitLabel() +
+    parts.push('곡선 반지름 = CWA별 속도(' + unitLabel() +
       ') · 파랑 실선 = 이번 세션 포트(P) · 주황 실선 = 스타보드(S) · ' +
       '옅은 점선 = 개인 베스트 타깃(기준). 실선=실제 라이딩, 점선=기준. ' +
       '곡선이나 점에 커서를 올리면 해당 곡선이 강조되고 값이 표시됩니다.');
     parts.push('% of target 타일은 매 순간 속도(시간가중 평균)를 ' +
-      '같은 TWA의 타깃과 비교한 값입니다.');
+      '같은 CWA의 타깃과 비교한 값입니다.');
     if (target.interpolatedBins > 0 || target.sparseBins > 0) {
       var weak = [];
       if (target.interpolatedBins > 0) {
@@ -3706,7 +3706,7 @@
     if (allLow) {
       banner.className = 'tp-banner tp-banner--warn';
       banner.textContent = '⚠ ' + i18nT(
-        '이 세션은 풍향 자동 추정 신뢰도가 낮습니다{x} — TWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 직접 확인해 주세요.',
+        '이 세션은 풍향 자동 추정 신뢰도가 낮습니다{x} — CWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 직접 확인해 주세요.',
         { x: ests.length ? '' : i18nT(' (추정 불가)') });
     } else if (farDelta > 25) {
       banner.className = 'tp-banner tp-banner--warn';
@@ -3717,7 +3717,7 @@
     } else {
       banner.className = 'tp-banner tp-banner--info';
       banner.textContent = '풍향 ' + Math.round(state.windDir) + '° (' +
-        compass(state.windDir) + ') 기준으로 TWA 를 계산했습니다.';
+        compass(state.windDir) + ') 기준으로 CWA 를 계산했습니다.';
     }
   }
 

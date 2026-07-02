@@ -112,7 +112,7 @@
     '{pop} 모집단 — 평균 (실선)': '{pop} population — mean (solid)',
     '{m} 분포 · {pop} 모집단 · {dir} {act} 구간 (SOG {kt} kt 이상) · 표본 P {p}개 · S {s}개':
       '{m} distribution · {pop} population · {dir} {act} segment (SOG {kt} kt or more) · n = P {p} · S {s}',
-    ' · TWA = 풍향 대비 진행 각도': ' · TWA = heading angle relative to wind',
+    ' · CWA = 풍향 대비 진행 각도': ' · CWA = heading angle relative to wind',
     /* 회전 요약 범례 — 세션 베스트({b} 보간) */
     '그라데이션으로 강조된 줄은 {b}입니다 — 택킹·자이빙 각 종류에서 효율 점수가 가장 높은 회전을 표시합니다.':
       'Gradient-highlighted rows are {b} — for each maneuver type (tack / gybe), the highest-efficiency maneuver is shown.',
@@ -146,8 +146,8 @@
     '트랙이 주로 리칭(횡주) 반전이라 풍축을 가로지르는 택·자이브가 적습니다 — 회전 기하 추정의 신뢰도가 낮으니 직접 입력으로 보정해 주세요.':
       'The track is mostly reaching (cross-wind) reversals, with few tacks / gybes crossing the wind axis — maneuver-geometry estimation has low confidence, so correct it with manual input.',
     /* 폴라 · % of target 설명 (이번 세션 단독) */
-    '타깃 = 이번 세션 단독 기준입니다(누적 데이터 없음) — 세션을 저장하면 다음부터 누적 베스트로 갱신됩니다. 곡선 반지름 = TWA별 속도(kt) · 파랑 실선 = 이번 세션 포트(P) · 주황 실선 = 스타보드(S) · 옅은 점선 = 개인 베스트 타깃(기준). 실선=실제 라이딩, 점선=기준. 곡선이나 점에 커서를 올리면 해당 곡선이 강조되고 값이 표시됩니다. % of target 타일은 매 순간 속도(시간가중 평균)를 같은 TWA의 타깃과 비교한 값입니다. 연한 점 빈 13개(표본 60초 미만)는 타깃을 신뢰하기 어려워 % of target 계산에서 제외했습니다.':
-      'Target = this session alone (no cumulative data yet) — once you save sessions, it updates to a cumulative best from then on. Curve radius = speed per TWA (kt) · blue solid = this session Port (P) · orange solid = Starboard (S) · faint dashed = personal-best target (reference). Solid = actual riding, dashed = reference. Hover a curve or point to highlight it and show values. The % of target tile compares each moment’s speed (time-weighted average) with the target at the same TWA. The 13 faint-dot bins (under 60s samples) are excluded from the % of target calculation because their target is not reliable.',
+    '타깃 = 이번 세션 단독 기준입니다(누적 데이터 없음) — 세션을 저장하면 다음부터 누적 베스트로 갱신됩니다. 곡선 반지름 = CWA별 속도(kt) · 파랑 실선 = 이번 세션 포트(P) · 주황 실선 = 스타보드(S) · 옅은 점선 = 개인 베스트 타깃(기준). 실선=실제 라이딩, 점선=기준. 곡선이나 점에 커서를 올리면 해당 곡선이 강조되고 값이 표시됩니다. % of target 타일은 매 순간 속도(시간가중 평균)를 같은 CWA의 타깃과 비교한 값입니다. 연한 점 빈 13개(표본 60초 미만)는 타깃을 신뢰하기 어려워 % of target 계산에서 제외했습니다.':
+      'Target = this session alone (no cumulative data yet) — once you save sessions, it updates to a cumulative best from then on. Curve radius = speed per CWA (kt) · blue solid = this session Port (P) · orange solid = Starboard (S) · faint dashed = personal-best target (reference). Solid = actual riding, dashed = reference. Hover a curve or point to highlight it and show values. The % of target tile compares each moment’s speed (time-weighted average) with the target at the same CWA. The 13 faint-dot bins (under 60s samples) are excluded from the % of target calculation because their target is not reliable.',
     /* 심박 회전 분석 설명 (순항 기준) */
     '순항 기준 심박은 포일링 중이면서 회전 밖인 구간의 시간가중 평균입니다. ‘기술 중 최고’는 심박 반응 지연을 고려해 회전 종료 직후 20초까지 포함한 최고 심박, ‘순항 대비’는 그 값과 순항 기준 심박의 차이입니다. ‘완료 후 회복’은 정점 이후 순항으로 돌아갈 때의 심박 하강폭(bpm)이며 괄호는 집계 표본 수입니다 — 회전이 실제로 심박을 올렸고 다음 회전까지 관찰 시간이 충분한 경우만 셉니다. ‘차이(S−P)’ 는 같은 회전 종류에서 스타보드 택과 포트 택의 순항 대비 상승 차이로, 양수면 스타보드 쪽 심박 반응이 더 큽니다 — 심박은 참고 지표라 좋고 나쁨이 아니라 좌우 균형을 보는 수치입니다. 맨 아래 ‘종합’ 행은 모든 회전을 합산한 값입니다. 세션 회복 지수(bpm/min)는 회복 하강 속도의 평균으로, 높을수록 회전 직후 심박이 빠르게 안정돼 심혈관 회복이 빠르다는 뜻입니다. 세션이 쌓이면 이 지수의 추세로 장기 변화를 봅니다.':
       'Cruise-baseline HR is the time-weighted average of segments that are foiling but outside maneuvers. “Peak in maneuver” is the highest HR including up to 20s after the maneuver ends (to allow for HR response lag); “vs cruise” is the difference between that peak and the cruise baseline. “Post recovery” is the HR drop (bpm) returning to cruise after the peak, and the parentheses show the sample count — only maneuvers that actually raised HR with enough observation time before the next maneuver are counted. “Difference (S−P)” is the gap in cruise-relative rise between the starboard and port tack of the same maneuver type; positive means the starboard side shows a larger HR response — HR is a reference metric, so this is about left/right balance rather than good or bad. The bottom “Overall” row sums all maneuvers. The session recovery index (bpm/min) is the average HR-drop rate during recovery; higher means HR settles faster right after a maneuver, i.e. faster cardiovascular recovery. As sessions accumulate, the trend of this index shows long-term change.',
@@ -187,8 +187,8 @@
       '✓ Wind {deg}° ({dir}) confirmed — applied to tack / gybe, VMG and polar.',
     '풍상 VMG — 포트 {p} · 스타보드 {s}. 작은 풍향 변화는 합산 평균보다 포트↔스타보드 균형을 주로 바꿉니다.':
       'Upwind VMG — Port {p} · Starboard {s}. Small wind shifts mostly move the Port↔Starboard balance rather than the combined average.',
-    '이 세션은 풍향 자동 추정 신뢰도가 낮습니다{x} — TWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 직접 확인해 주세요.':
-      'This session has low confidence in automatic wind estimation{x} — TWA, target polar and % of target may be inaccurate, so verify the wind direction yourself.',
+    '이 세션은 풍향 자동 추정 신뢰도가 낮습니다{x} — CWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을 직접 확인해 주세요.':
+      'This session has low confidence in automatic wind estimation{x} — CWA, target polar and % of target may be inaccurate, so verify the wind direction yourself.',
     ' (추정 불가)': ' (cannot estimate)',
     /* PDF 미리보기 버튼(이모지 접두 포함 정적 HTML 대비) */
     '📄 PDF 미리보기': '📄 PDF preview',
@@ -199,14 +199,14 @@
     /* ---------------- 페이지 메타 / 헤더 ---------------- */
     '라이딩 통계 대시보드 — GPX 분석 (Phase 1)':
       'Riding Stats Dashboard — GPX Analysis (Phase 1)',
-    '윙포일·세일링 GPX 트랙 분석 — 속도·택킹/자이빙 효율·VMG·TWA 폴라. 코치 등급 분석.':
-      'Wingfoil / sailing GPX track analysis — speed, tacking & gybing efficiency, VMG, TWA polar. Coach-grade analysis.',
+    '윙포일·세일링 GPX 트랙 분석 — 속도·택킹/자이빙 효율·VMG·CWA 폴라. 코치 등급 분석.':
+      'Wingfoil / sailing GPX track analysis — speed, tacking & gybing efficiency, VMG, CWA polar. Coach-grade analysis.',
 
     /* ---------------- 인트로 화면 ---------------- */
     'GPX 파일 하나로 라이딩을 분석합니다':
       'Analyze your riding from a single GPX file',
-    '택킹·자이빙 효율, VMG, TWA 폴라':
-      'tacking & gybing efficiency, VMG, TWA polar',
+    '택킹·자이빙 효율, VMG, CWA 폴라':
+      'tacking & gybing efficiency, VMG, CWA polar',
     '1. 스포츠 선택': '1. Choose your sport',
     '스포츠 종류': 'Sport',
     '2. GPX · VKX 파일 업로드': '2. Upload GPX or VKX file',
@@ -228,8 +228,8 @@
     '택킹·자이빙 자동 감지 + 진입/최저/탈출 속도·손실·회복':
       'Auto-detected tacks / gybes with entry / min / exit speed, loss & recovery',
     '코치 분석': 'Coach Analysis',
-    'VMG·TWA 폴라·풍향 추정 — 풍향만 입력하면 열립니다':
-      'VMG · TWA polar · wind estimation — unlocks once you set the wind',
+    'VMG·CWA 폴라·풍향 추정 — 풍향만 입력하면 열립니다':
+      'VMG · CWA polar · wind estimation — unlocks once you set the wind',
 
     /* ---------------- 세션 헤더 ---------------- */
     '세션 제목 — 클릭하면 편집합니다':
@@ -321,8 +321,8 @@
       'Please check the Rider · Gear card and Wind Setting card on the dashboard.',
     '부록 · 방법론': 'Appendix · Methodology',
     '알고리즘 방법론': 'Algorithm methodology',
-    '속도·VMG·TWA·택킹/자이빙 자동 감지는 GPX trkpt 의 시각·좌표 데이터를 Haversine 거리·시간 차분으로 계산합니다. 풍향은 (1) 사용자 입력 (2) no-go 구간 추정 (3) 회전 기하 추정 (4) 외부 기상 데이터 중 사용자가 확정한 소스를 기준으로 사용합니다.':
-      'Speed, VMG, TWA and tack/gybe auto-detection compute from GPX trkpt time/coordinate data via Haversine distance and time differentials. Wind direction uses one of: (1) manual input, (2) no-go segment estimation, (3) turn geometry estimation, or (4) external weather data — whichever source the user has confirmed.',
+    '속도·VMG·CWA·택킹/자이빙 자동 감지는 GPX trkpt 의 시각·좌표 데이터를 Haversine 거리·시간 차분으로 계산합니다. 풍향은 (1) 사용자 입력 (2) no-go 구간 추정 (3) 회전 기하 추정 (4) 외부 기상 데이터 중 사용자가 확정한 소스를 기준으로 사용합니다.':
+      'Speed, VMG, CWA and tack/gybe auto-detection compute from GPX trkpt time/coordinate data via Haversine distance and time differentials. Wind direction uses one of: (1) manual input, (2) no-go segment estimation, (3) turn geometry estimation, or (4) external weather data — whichever source the user has confirmed.',
     '데이터 소스': 'Data sources',
     'GPX 1.1 (xmlns="http://www.topografix.com/GPX/1/1") · Vakaros Atlas 2 .vkx 바이너리 포맷. 모든 분석은 브라우저 안에서 처리되며 파일은 서버로 업로드되지 않습니다.':
       'GPX 1.1 (xmlns="http://www.topografix.com/GPX/1/1") and Vakaros Atlas 2 .vkx binary format. All analysis runs in the browser — files are never uploaded to a server.',
@@ -515,8 +515,8 @@
     '포트 · 풍하': 'Port · Downwind',
     '스타보드 · 풍하': 'Starboard · Downwind',
     '세션 평균': 'Session Averages',
-    '포트·스타보드 × 풍상·풍하 평균 — VMG·TWA·SOG · 구간 통계(상위 50%·20%)는 아래 퍼포먼스 통계 표':
-      'Port·Starboard × Upwind·Downwind averages — VMG·TWA·SOG · tier stats (Top 50% / 20%) in the Performance Stats table below',
+    '포트·스타보드 × 풍상·풍하 평균 — VMG·CWA·SOG · 구간 통계(상위 50%·20%)는 아래 퍼포먼스 통계 표':
+      'Port·Starboard × Upwind·Downwind averages — VMG·CWA·SOG · tier stats (Top 50% / 20%) in the Performance Stats table below',
 
     /* ---------------- VPS / SPS ---------------- */
     '세일링 퍼포먼스 스코어': 'Sailing Performance Score',
@@ -629,18 +629,18 @@
     '분석 중...': 'Analyzing…',
     '파일 형식을 인식하지 못했습니다.':
       'Unrecognized file format.',
-    '풍향을 확정하면 SOG·VMG·TWA 통계가, 심박 데이터가 있으면 심박 통계가 이 표에 표시됩니다.':
-      'Confirming the wind shows SOG / VMG / TWA stats here. HR stats appear if heart rate data is present.',
-    '풍향을 확정하면 SOG·VMG·TWA 통계가 이 표에 추가됩니다.':
-      'Confirming the wind adds SOG / VMG / TWA stats to this table.',
-    'TWA 계산에 풍향이 필요합니다.':
-      'TWA calculation requires a wind direction.',
-    'TWA 빈별 주행 데이터가 더 필요합니다.':
-      'More sailing data per TWA bin is needed.',
+    '풍향을 확정하면 SOG·VMG·CWA 통계가, 심박 데이터가 있으면 심박 통계가 이 표에 표시됩니다.':
+      'Confirming the wind shows SOG / VMG / CWA stats here. HR stats appear if heart rate data is present.',
+    '풍향을 확정하면 SOG·VMG·CWA 통계가 이 표에 추가됩니다.':
+      'Confirming the wind adds SOG / VMG / CWA stats to this table.',
+    'CWA 계산에 풍향이 필요합니다.':
+      'CWA calculation requires a wind direction.',
+    'CWA 빈별 주행 데이터가 더 필요합니다.':
+      'More sailing data per CWA bin is needed.',
     '타깃 폴라를 만들 폴라 데이터가 부족합니다.':
       'Not enough polar data to build a target polar.',
-    '타깃 곡선을 만들 표본이 부족합니다 — TWA 빈별 주행 데이터가 더 필요합니다.':
-      'Not enough samples to build a target curve — more sailing data per TWA bin is needed.',
+    '타깃 곡선을 만들 표본이 부족합니다 — CWA 빈별 주행 데이터가 더 필요합니다.':
+      'Not enough samples to build a target curve — more sailing data per CWA bin is needed.',
 
     /* ---------------- 차트 축 / 캡션 ---------------- */
     '경과 시간 (분:초)': 'Elapsed time (mm:ss)',
@@ -750,8 +750,8 @@
     '{n}초': '{n}s',
 
     /* --- 룰별 narration nums --- */
-    '진입 SOG 포트 {p} · 스타보드 {s} {u} · 진입 TWA 차 {d}°':
-      'Entry SOG — Port {p} · Starboard {s} {u} · ΔTWA {d}°',
+    '진입 SOG 포트 {p} · 스타보드 {s} {u} · 진입 CWA 차 {d}°':
+      'Entry SOG — Port {p} · Starboard {s} {u} · ΔCWA {d}°',
     '진입 SOG 포트 {p} · 스타보드 {s} {u}':
       'Entry SOG — Port {p} · Starboard {s} {u}',
     '{side} 진입 SOG 편차 ±{sd} {u} · 표본 {n}회':
@@ -764,8 +764,8 @@
       'Avg tack entry→wind-axis time {dur}s ({skill} threshold {thr}s)',
     '회전율 봉우리 2개 이상 {a}/{b}회':
       'Multi-peak turn rate {a}/{b}',
-    '자이빙 탈출 TWA 평균 {x}° (라이더 풍하 평균 {r}°)':
-      'Avg gybe exit TWA {x}° (rider downwind avg {r}°)',
+    '자이빙 탈출 CWA 평균 {x}° (라이더 풍하 평균 {r}°)':
+      'Avg gybe exit CWA {x}° (rider downwind avg {r}°)',
     '평균 회전 효율 {eff}/100':
       'Avg turn efficiency {eff}/100',
 
@@ -1100,14 +1100,14 @@
     /* --- 폴라 footnote --- */
     '타깃 폴라를 만들 폴라 데이터가 부족합니다.':
       'Not enough polar data to build a target polar.',
-    '타깃 곡선을 만들 표본이 부족합니다 — TWA 빈별 주행 데이터가 더 필요합니다.':
-      'Not enough samples to build a target curve — more sailing data per TWA bin is needed.',
-    '풍향을 설정하면 타깃 폴라와 % of target 가 표시됩니다 — TWA 계산에 풍향이 필요합니다.':
-      'Set the wind to display target polar and % of target — TWA calculation requires a wind direction.',
+    '타깃 곡선을 만들 표본이 부족합니다 — CWA 빈별 주행 데이터가 더 필요합니다.':
+      'Not enough samples to build a target curve — more sailing data per CWA bin is needed.',
+    '풍향을 설정하면 타깃 폴라와 % of target 가 표시됩니다 — CWA 계산에 풍향이 필요합니다.':
+      'Set the wind to display target polar and % of target — CWA calculation requires a wind direction.',
     '곡선이나 점에 커서를 올리면 해당 곡선이 강조되고 값이 표시됩니다.':
       'Hover a curve or point — that curve is emphasized and its value is displayed.',
-    '% of target 타일은 매 순간 속도(시간가중 평균)를 같은 TWA의 타깃과 비교한 값입니다.':
-      '% of target tiles compare instantaneous speed (time-weighted average) against the target at the same TWA.',
+    '% of target 타일은 매 순간 속도(시간가중 평균)를 같은 CWA의 타깃과 비교한 값입니다.':
+      '% of target tiles compare instantaneous speed (time-weighted average) against the target at the same CWA.',
 
     /* ============================================================
      * Phase 2-C 보강 — 긴 tooltip / footnote / info-panel 텍스트
@@ -1128,8 +1128,8 @@
       'SOG = speed over ground (GPS-derived actual travel speed). Higher is better. Shown per upwind/downwind × port/starboard tack, with the mean and Top 50% / Top 20% (time-weighted averages of the high-value bands). Single-point GPS extremes (noise) are not used.',
     'VMG = 풍상·풍하 유효속도(바람 축으로 다가가거나 멀어지는 속도). 풍상·풍하 모두 양수로 저장하므로 높을수록 좋습니다. 포트/스타보드 택별 상위 50%·20% 는 높은 값 구간의 시간가중 평균.':
       'VMG = velocity made good toward/away from the wind axis. Stored as a positive value for both upwind and downwind, so higher is better. Top 50% / Top 20% per port/starboard tack are time-weighted averages of the high-value bands.',
-    'TWA = 보트 헤딩과 풍향이 이루는 각. 풍상은 작을수록 바람에 가깝게 포인팅이라 좋아 \'상위\'가 가장 좁은 각 쪽입니다. 풍하는 VMG 최적각이 약 140~150°이고 정풍하(180°)는 오히려 느려 중립으로 두고 크기가 큰(깊은) 각 쪽을 상위로 표시합니다. 포트/스타보드 택별로 나눠 좌우 포인팅 차이를 볼 수 있습니다.':
-      'TWA = angle between boat heading and wind direction. Upwind: smaller is better (pointing closer to the wind), so "top" is the narrowest angle. Downwind: VMG optimum is around 140–150° and dead downwind (180°) is actually slower, so it’s treated as neutral and "top" is the deeper angle. Split by port/starboard tack to compare pointing left vs right.',
+    'CWA = 보트 헤딩과 풍향이 이루는 각. 풍상은 작을수록 바람에 가깝게 포인팅이라 좋아 \'상위\'가 가장 좁은 각 쪽입니다. 풍하는 VMG 최적각이 약 140~150°이고 정풍하(180°)는 오히려 느려 중립으로 두고 크기가 큰(깊은) 각 쪽을 상위로 표시합니다. 포트/스타보드 택별로 나눠 좌우 포인팅 차이를 볼 수 있습니다.':
+      'CWA = angle between boat heading and wind direction. Upwind: smaller is better (pointing closer to the wind), so "top" is the narrowest angle. Downwind: VMG optimum is around 140–150° and dead downwind (180°) is actually slower, so it’s treated as neutral and "top" is the deeper angle. Split by port/starboard tack to compare pointing left vs right.',
     '힐(Heel) = 보드 좌우 기울기. 택에 따라 부호가 갈리므로(한 택 −/반대 택 +) 포트·스타보드 버킷으로 나눠 부호 있는 실제 값을 보여 줍니다 — 포트(−)와 스타보드(+)의 크기가 비슷하면 좌우로 대칭되게 기운 것입니다. 평균·상위 50%/20% 는 각 버킷에서 더 크게 기운 구간의 시간가중 평균. 트림 특성이라 좋고 나쁨을 매기지 않습니다.':
       'Heel = lateral board tilt. Sign flips by tack (one tack negative, the other positive), so it’s split into port/starboard buckets and shown with signed values — when |port| ≈ |starboard|, you’re heeling symmetrically. Mean and Top 50% / Top 20% are time-weighted averages of the deeper-heel segments in each bucket. As a trim characteristic, no good/bad rating is applied.',
     '피치(Pitch·트림) = 보드 앞뒤 기울기. 포일링 중에는 대체로 뱃머리 들림(+) 한 방향이라 부호 그대로 평균합니다. 다른 지표처럼 풍상/풍하 × 포트/스타보드 버킷으로 나눠 좌우 택 차이를 함께 봅니다. 상위 50%·20% 는 뱃머리가 더 들린 구간. 트림 특성이라 좋고 나쁨을 매기지 않습니다. 자세 센서가 담긴 .vkx 에서만 표시.':
@@ -1138,8 +1138,8 @@
       'Heart rate = sensor-observed HR. Independent of tack side, so it’s split only by upwind/downwind to align with the SOG split above — letting you compare whether you’re actually working harder when faster on each side. Mean is time-weighted; Top 50% / Top 20% are time-weighted averages of the high-HR bands — representing sustained high-HR segments, not a single peak. As a physical-load reference, no good/bad rating is applied.',
     '풍상·풍하 통계는 풍향 확정 후 주행 표본의 시간가중값입니다 (풍상 {up} · 풍하 {down} 기준).':
       'Upwind / downwind stats are time-weighted over riding samples after the wind is confirmed (upwind {up} · downwind {down}).',
-    'SOG·VMG·TWA·힐·피치는 풍상/풍하 × 포트/스타보드 4 버킷으로 나눠 좌우 택 차이를 함께 봅니다(심박은 좌우 택과 무관해 분할하지 않고 풍상/풍하로만 나눔). 평균·상위 50%·상위 20% 세 구간을 두며, 평균은 그 방향(풍상/풍하)의 시간가중 평균, 상위 N% 는 시간가중 구간 평균(단일 GPS 포인트 노이즈 배제)입니다. \'상위\'는 지표의 좋은 방향 기준이며(SOG·VMG 높은 값, 풍상 TWA 좁은 각), 중립 지표는 크기가 큰 값 쪽입니다. 힐은 포트(−)·스타보드(+) 부호 그대로 표시합니다.':
-      'SOG / VMG / TWA / Heel / Pitch are split into 4 buckets (upwind/downwind × port/starboard) to show tack differences. HR is independent of tack side, so it’s split only by upwind/downwind. Three tiers (Mean / Top 50% / Top 20%): mean is the time-weighted average for that direction; "Top N%" is the time-weighted average over the high-value band (excludes single-point GPS noise). "Top" follows each metric’s "good direction" — high values for SOG / VMG, narrow angle for upwind TWA; for neutral metrics, the deeper-magnitude side. Heel is shown with its native port (−) / starboard (+) sign.',
+    'SOG·VMG·CWA·힐·피치는 풍상/풍하 × 포트/스타보드 4 버킷으로 나눠 좌우 택 차이를 함께 봅니다(심박은 좌우 택과 무관해 분할하지 않고 풍상/풍하로만 나눔). 평균·상위 50%·상위 20% 세 구간을 두며, 평균은 그 방향(풍상/풍하)의 시간가중 평균, 상위 N% 는 시간가중 구간 평균(단일 GPS 포인트 노이즈 배제)입니다. \'상위\'는 지표의 좋은 방향 기준이며(SOG·VMG 높은 값, 풍상 CWA 좁은 각), 중립 지표는 크기가 큰 값 쪽입니다. 힐은 포트(−)·스타보드(+) 부호 그대로 표시합니다.':
+      'SOG / VMG / CWA / Heel / Pitch are split into 4 buckets (upwind/downwind × port/starboard) to show tack differences. HR is independent of tack side, so it’s split only by upwind/downwind. Three tiers (Mean / Top 50% / Top 20%): mean is the time-weighted average for that direction; "Top N%" is the time-weighted average over the high-value band (excludes single-point GPS noise). "Top" follows each metric’s "good direction" — high values for SOG / VMG, narrow angle for upwind CWA; for neutral metrics, the deeper-magnitude side. Heel is shown with its native port (−) / starboard (+) sign.',
 
     /* === EN-mode comprehensive cleanup (Danny 2026-05-26) ===
        잔존 한국어 텍스트 일괄 매핑. tip 정의 · 표 안내문 · empty-state
@@ -1209,8 +1209,8 @@
       'along the wind axis). Both upwind and downwind are stored as positive — higher is better.',
     '포트/스타보드 택별 상위 50%·20% 는 높은 값 구간의 시간가중 평균.':
       'Per-tack top 50%·20% are time-weighted averages of high-value segments.',
-    'TWA = 보트 헤딩과 풍향이 이루는 각. 풍상은 작을수록':
-      'TWA = angle between boat heading and wind direction. Upwind is better when smaller',
+    'CWA = 보트 헤딩과 풍향이 이루는 각. 풍상은 작을수록':
+      'CWA = angle between boat heading and wind direction. Upwind is better when smaller',
     '풍하는 VMG 최적각이 약 140~150°이고 정풍하(180°)는 오히려 느려':
       'Downwind has an optimal VMG angle around 140–150°; dead downwind (180°) is actually slower,',
     '중립으로 두고 크기가 큰(깊은) 각 쪽을 상위로 표시합니다. 포트/':
@@ -1251,7 +1251,7 @@
       'A physical-load reference metric — not rated good or bad.',
     '시각 정보가 없어 퍼포먼스': 'Performance stats unavailable',
     '통계를 계산할 수 없습니다.': 'cannot be computed — no time information.',
-    '풍향을 확정하면 SOG·VMG·TWA': 'Once the wind is confirmed, SOG · VMG · TWA',
+    '풍향을 확정하면 SOG·VMG·CWA': 'Once the wind is confirmed, SOG · VMG · CWA',
     '통계가, 심박 데이터가 있으면 심박 통계가 이 표에 표시됩니다.':
       'stats appear in this table — plus HR stats if HR data is available.',
     '지표 (단위)': 'Metric (unit)',
@@ -1261,22 +1261,22 @@
     '풍상·풍하 통계는 풍향 확정 후 주행 표본의 시간가중값입니다':
       'Upwind / downwind stats are time-weighted over sailing samples after the wind is confirmed',
     '기준).': 'reference).',
-    'SOG·VMG·TWA·힐·피치는 풍상/풍하 × 포트/스타보드 4 버킷으로':
-      'SOG · VMG · TWA · heel · pitch are split into 4 buckets of upwind / downwind × port / starboard',
+    'SOG·VMG·CWA·힐·피치는 풍상/풍하 × 포트/스타보드 4 버킷으로':
+      'SOG · VMG · CWA · heel · pitch are split into 4 buckets of upwind / downwind × port / starboard',
     '나눠 좌우 택 차이를 함께 봅니다(심박은 좌우 택과 무관해 분할하지':
       'to also see left / right tack differences (HR is independent of tack — split only',
     '않고 풍상/풍하로만 나눔). 평균·상위 50%·상위 20% 세 구간을 두며,':
       'by upwind / downwind). Average · top 50% · top 20% are the three sections,',
     '평균은 그 방향(풍상/풍하)의 시간가중 평균, 상위 N% 는 시간가중':
       'average being time-weighted across the direction (upwind / downwind), top N% being',
-    '좋은 방향 기준이며(SOG·VMG 높은 값, 풍상 TWA 좁은 각), 중립':
-      'the good-direction reference for the metric (high SOG · VMG, narrow upwind TWA); neutral',
+    '좋은 방향 기준이며(SOG·VMG 높은 값, 풍상 CWA 좁은 각), 중립':
+      'the good-direction reference for the metric (high SOG · VMG, narrow upwind CWA); neutral',
     '지표는 크기가 큰 값 쪽입니다. 힐은 포트(−)·스타보드(+) 부호':
       'metrics use the larger-magnitude side. Heel keeps the port (−) · starboard (+) sign',
     '그대로 표시합니다.': 'as-is.',
     '포트·스타보드 × 풍상·풍하 평균 —': 'Port · starboard × upwind / downwind averages —',
-    'VMG·TWA·SOG · 구간 통계(상위 50%·20%)는 아래 퍼포먼스 통계 표':
-      'VMG · TWA · SOG · segment stats (top 50% · 20%) shown in the Performance Stats table below',
+    'VMG·CWA·SOG · 구간 통계(상위 50%·20%)는 아래 퍼포먼스 통계 표':
+      'VMG · CWA · SOG · segment stats (top 50% · 20%) shown in the Performance Stats table below',
     '풍상/풍하 주행과 택·자이브가 모두 부족해 풍향을 추정할 수 없습니다.':
       'Not enough upwind / downwind sailing and tacks / gybes to estimate the wind direction.',
     '리칭(횡주) 위주이거나 직진 구간이 적은 세션입니다 — 직접 설정해 주세요.':
@@ -1362,7 +1362,7 @@
     '포트 (P)': 'Port (P)',
     '스타보드 (S)': 'Starboard (S)',
     '모집단 — 평균 (실선)': ' population — mean (solid)',
-    '· TWA = 풍향 대비 진행 각도': '· TWA = angle of travel vs wind direction',
+    '· CWA = 풍향 대비 진행 각도': '· CWA = angle of travel vs wind direction',
     '분포 ·': 'distribution ·',
     '모집단 ·': 'population ·',
     '구간 (SOG': 'segment (SOG',
@@ -1375,34 +1375,34 @@
     '· 주행의': '· of sailing',
     '%만 타깃 보유': '% has target coverage',
     '타깃 = 저장된 세션':
-      'Target = personal-best per TWA bin (sustained-speed 95th percentile) across',
-    '개의 TWA별 개인 베스트(지속 속도 95퍼센타일)입니다.': 'saved sessions.',
+      'Target = personal-best per CWA bin (sustained-speed 95th percentile) across',
+    '개의 CWA별 개인 베스트(지속 속도 95퍼센타일)입니다.': 'saved sessions.',
     '타깃 = 이번 세션 단독 기준입니다(누적 데이터 없음) —':
       'Target = this session only (no accumulated data) —',
     '세션을 저장하면 다음부터 누적 베스트로 갱신됩니다.':
       'save sessions to build a running personal-best target.',
-    '곡선 반지름 = TWA별 속도(': 'Radius = speed per TWA (',
+    '곡선 반지름 = CWA별 속도(': 'Radius = speed per CWA (',
     ') · 파랑 실선 = 이번 세션 포트(P) · 주황 실선 = 스타보드(S) ·':
       ') · blue solid = this session’s Port (P) · orange solid = Starboard (S) ·',
     '옅은 점선 = 개인 베스트 타깃(기준). 실선=실제 라이딩, 점선=기준.':
       'faint dashed = personal-best target (reference). Solid = actual; dashed = reference.',
     '% of target 타일은 매 순간 속도(시간가중 평균)를':
       'The % of target tile compares the time-weighted-average instantaneous speed',
-    '같은 TWA의 타깃과 비교한 값입니다.': 'to the target at the same TWA.',
+    '같은 CWA의 타깃과 비교한 값입니다.': 'to the target at the same CWA.',
     '점선 빈': 'dashed bins',
     '개(표본 없음·보간 추정)': '(no samples — interpolated)',
     '연한 점 빈': 'faint-dot bins',
     '개(표본 60초 미만)': '(under 60s of samples)',
     '는 타깃을 신뢰하기 어려워 % of target 계산에서 제외했습니다.':
       'are excluded from % of target as the target is unreliable.',
-    '— TWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을':
-      '— TWA / target polar / % of target may be inaccurate; please verify',
+    '— CWA·타깃 폴라·% of target 가 부정확할 수 있으니 풍향을':
+      '— CWA / target polar / % of target may be inaccurate; please verify',
     '직접 확인해 주세요.': 'the wind direction.',
     '° 가 자동 추정값과 최대': '° differs by up to',
     '° 차이 납니다 — 풍향이 틀리면 타깃 폴라 전체가 어긋납니다.':
       '° from the auto-estimate — incorrect wind throws off the entire target polar.',
     '풍향을 확인해 주세요.': 'Please verify the wind direction.',
-    ') 기준으로 TWA 를 계산했습니다.': ') was used to compute TWA.',
+    ') 기준으로 CWA 를 계산했습니다.': ') was used to compute CWA.',
     '· 순항 대비': '· vs cruise',
     '회복 표본': 'recovery samples',
     '회 평균 · 클수록 빠른 회복': 'avg — higher = faster recovery',
@@ -1735,8 +1735,8 @@
       'Near-maximal intensity — sustainable only briefly',
     '제외 ✕': 'Excluded ✕',
     '─ 합쳐진 구간 ─': '─ Merged segment ─',
-    '속도·VMG·TWA·택킹/자이빙 자동 감지는 GPX trkpt 의 시각·좌표 데이터를':
-      'Speed · VMG · TWA · auto tack/gybe detection compute from the GPX trkpt time / coordinate data',
+    '속도·VMG·CWA·택킹/자이빙 자동 감지는 GPX trkpt 의 시각·좌표 데이터를':
+      'Speed · VMG · CWA · auto tack/gybe detection compute from the GPX trkpt time / coordinate data',
     'Haversine 거리·시간 차분으로 계산합니다. 풍향은 (1) 사용자 입력 (2) no-go':
       'using Haversine distance and time differentials. Wind direction is sourced from one of: (1) manual input, (2) no-go',
     '구간 추정 (3) 회전 기하 추정 (4) 외부 기상 데이터 중 사용자가 확정한':
@@ -2024,7 +2024,7 @@
     { ko: /^미입력 — 세션 관측 최대값 (\d+) bpm 을 기준으로 합니다\. 본인의 최대 심박수를 입력하시면 더 정확해집니다\.$/,
       en: 'Not entered — using session-observed max of $1 bpm. Enter your max HR for higher accuracy.' },
     { ko: /^타깃 = 저장된 세션 (\d+)개의 TWA별 개인 베스트\(지속 속도 95퍼센타일\)입니다\.$/,
-      en: 'Target = personal-best per TWA bin (sustained-speed 95th percentile) across $1 saved sessions.' },
+      en: 'Target = personal-best per CWA bin (sustained-speed 95th percentile) across $1 saved sessions.' },
     { ko: /^✦ 권장 추정값 (\d+)° \((.+?)\) · 신뢰도 (.+?) — (.+)$/,
       en: '✦ Recommended estimate $1° ($2) · confidence $3 — $4' },
     { ko: /^주행의 (\d+)%만 타깃 보유$/, en: '$1% of sailing has target coverage' },
@@ -2047,7 +2047,7 @@
     { ko: /^풍상·풍하 통계는 풍향 확정 후 주행 표본의 시간가중값입니다 \(풍상 (.+?) · 풍하 (.+?) 기준\)\.$/,
       en: 'Upwind / downwind stats are time-weighted over riding samples after the wind is confirmed (upwind $1 · downwind $2).' },
     { ko: /^타깃 = 저장된 세션 (\d+)개의 TWA별 개인 베스트.*\.$/,
-      en: 'Target = personal-best per TWA bin (sustained-speed 95th percentile) across $1 saved sessions.' },
+      en: 'Target = personal-best per CWA bin (sustained-speed 95th percentile) across $1 saved sessions.' },
     { ko: /^그래프 중간의 옅은 띠는 GPS 장치가 8초 넘게 기록을 멈춘 시간대\(또는 트랙 편집에서 제외한 구간\)입니다 — 이 세션 (\d+)곳\..+$/,
       en: 'The faint bands in the chart mark gaps where the GPS device paused for over 8s (or excluded sections from track editing) — $1 in this session. "HR coverage" measures HR-attached share of recorded points, so it can still be near 100% even with such time gaps — they measure different things.' },
     { ko: /^심박 효율 지수 = 주행 평균 속도\(.+?\) ÷ 평균 심박\(bpm\) × 100 입니다\..*$/,
@@ -2070,7 +2070,7 @@
       en: 'To start gear coaching, more inputs are needed — $1. The what-if is computed against measured upwind VMG, so the wind must be confirmed.' },
     /* 퍼포먼스 통계 패널 — 설명 문단(풍상/풍하 주행시간 보간) */
     { ko: /^풍상·풍하 통계는 풍향 확정 후 주행 표본의 시간가중값입니다 \(풍상 (.+?) · 풍하 (.+?) 기준\)\. SOG·VMG·TWA·힐·피치는.*$/,
-      en: 'Upwind / downwind stats are time-weighted over riding samples after the wind is confirmed (upwind $1 · downwind $2). SOG, VMG, TWA, heel and pitch are split into 4 buckets — upwind/downwind × port/starboard — to compare the two tacks (HR is independent of tack, so it is split only by upwind/downwind). Three ranges are shown — average, top 50% and top 20%: the average is the time-weighted mean of that direction, and the top N% is the time-weighted segment mean (excluding single-GPS-point noise). “Top” follows each metric’s good direction (higher SOG/VMG, narrower upwind TWA); neutral metrics use the larger-magnitude side. Heel is shown with its sign as-is — port (−) and starboard (+).' }
+      en: 'Upwind / downwind stats are time-weighted over riding samples after the wind is confirmed (upwind $1 · downwind $2). SOG, VMG, CWA, heel and pitch are split into 4 buckets — upwind/downwind × port/starboard — to compare the two tacks (HR is independent of tack, so it is split only by upwind/downwind). Three ranges are shown — average, top 50% and top 20%: the average is the time-weighted mean of that direction, and the top N% is the time-weighted segment mean (excluding single-GPS-point noise). “Top” follows each metric’s good direction (higher SOG/VMG, narrower upwind CWA); neutral metrics use the larger-magnitude side. Heel is shown with its sign as-is — port (−) and starboard (+).' }
   ];
 
   function applyPatterns(s) {

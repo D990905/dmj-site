@@ -2016,7 +2016,7 @@
 
     /* --- 호버 툴팁 — 곡선 이름 · 풍각 · 속도 --- */
     function drawPolarTip(c, hp) {
-      var txt = c.label + '  ·  TWA ' + Math.round(hp.twa) + '°  ·  ' +
+      var txt = c.label + '  ·  CWA ' + Math.round(hp.twa) + '°  ·  ' +
         (hp.vMs * conv).toFixed(1) + ' ' + unit;
       ctx.font = cvFont(600, 11);
       var tw = ctx.measureText(txt).width + 14;
