@@ -1077,7 +1077,7 @@
      풍각 아래·심박 위로 둔다 (Danny 검토 2026-05-24 E). */
   var STATS_WIND_METRICS = [
     { metric: 'sog',   label: 'SOG (속도)',          unit: 'speed', split: true },
-    { metric: 'twa',   label: 'TWA',                unit: 'deg',   split: true  },
+    { metric: 'twa',   label: 'CWA',                unit: 'deg',   split: true  },
     { metric: 'vmg',   label: 'VMG (풍상·풍하 유효속도)', unit: 'speed', split: true },
     { metric: 'heel',  label: '힐 (Heel)',           unit: 'deg',   split: true  },
     { metric: 'pitch', label: '피치 (Pitch·트림)',   unit: 'deg',   split: true  },
@@ -1585,7 +1585,7 @@
    * 9d) 풍향(TWD) 추정 — 회전 기하(maneuver geometry) 방식
    *
    * no-go zone 방식(§9c)과 독립된 두 번째 추정기. Njord Analytics 의
-   * 'typical TWA 추론'에 대응한다 — 검출된 택·자이브의 진입/탈출 헤딩과
+   * 'typical CWA 추론'에 대응한다 — 검출된 택·자이브의 진입/탈출 헤딩과
    * 회전 방향으로 풍축을 직접 재구성한다.
    *
    * 원리 — 택은 보트가 풍상축을 가로질러(통과해) 돌고, 자이브는 풍하축을
