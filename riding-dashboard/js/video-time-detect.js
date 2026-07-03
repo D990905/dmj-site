@@ -107,7 +107,7 @@
     while ((m = reClk.exec(s)) !== null) {
       var ch = +m[1], cmi = +m[2], cse = (m[3] != null) ? +m[3] : 0;
       if (inRange(ch, 0, 23) && inRange(cmi, 0, 59) && inRange(cse, 0, 59)) {
-        return { kind: 'clock', h: ch, mi: cmi, s: cse, raw: m[0] };
+        return { kind: 'clock', h: ch, mi: cmi, s: cse, hasSeconds: (m[3] != null), raw: m[0] };
       }
     }
     return null;
