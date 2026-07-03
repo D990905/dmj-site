@@ -314,6 +314,204 @@
   }
 
   /* ============================================================
+   * 4b) 분 전환(rollover) 정밀화 — 초 없는 오버레이도 초 단위 정합 (§429b)
+   * ============================================================
+     오버레이가 "분"까지만 표시해도(예: Insta360 "2026/05/19 15:52", 초 없음)
+     화면의 분이 바뀌는 순간은 정확히 그 분의 :00초다. 그 전환이 일어나는
+     영상 시각 t* 를 이분탐색으로 찾으면, t* 의 실제 벽시계 = 새 분:00 →
+     영상 t=0 의 절대시각을 초 단위로 역산한다. 트랙 데이터는 초 단위라
+     이렇게 하면 자동 정합 오차가 ±1초 수준으로 줄어든다(옥대표 2026-07-03:
+     "트랙은 초단위, 영상도 분 바뀌는 시점이 있으니 가능하게").
+     실측 검증: 이 방식이 한 클립의 서로 다른 두 전환에서 동일한 영상 시작
+     시각(±0.1s)을 역산 → 내부 일관성으로 정확도 확인. */
+
+  /* 오프스크린 <video> 를 연다(File/blob 또는 URL 문자열 공통).
+     resolve { video, cleanup }. blob 이면 object URL 을 만들고 cleanup 이 해제. */
+  function openVideo(source) {
+    var ownUrl = (typeof source !== 'string');
+    var url = ownUrl ? URL.createObjectURL(source) : source;
+    var video = document.createElement('video');
+    video.muted = true; video.preload = 'auto';
+    video.playsInline = true; video.crossOrigin = 'anonymous';
+    video.src = url;
+    function cleanup() {
+      try { video.removeAttribute('src'); video.load(); } catch (e) {}
+      if (ownUrl) { try { URL.revokeObjectURL(url); } catch (e) {} }
+    }
+    return new Promise(function (resolve, reject) {
+      var to = setTimeout(function () { cleanup(); reject(new Error('video meta timeout')); }, 15000);
+      function ready() { clearTimeout(to); resolve({ video: video, cleanup: cleanup }); }
+      if (video.readyState >= 1) ready();
+      else {
+        video.addEventListener('loadeddata', ready, { once: true });
+        video.addEventListener('error', function () {
+          clearTimeout(to); cleanup(); reject(new Error('video load error'));
+        }, { once: true });
+      }
+    });
+  }
+
+  /* 영상시각 t 의 화면 시각을 읽는다(하단밴드→전체 순). hit(frameSec 포함) 또는 null */
+  function readClockAt(video, t, opts) {
+    var regions = (opts && opts.regions) || ['bottom', 'full'];
+    return seekTo(video, t).then(function () {
+      return (function tryR(ri) {
+        if (ri >= regions.length) return Promise.resolve(null);
+        var canvas = drawFrame(video, regions[ri], opts && opts.targetW);
+        if (!canvas) return tryR(ri + 1);
+        return ocrImage(canvas, opts || {}).then(function (text) {
+          var hit = extractDateTime(text);
+          if (hit) { hit.frameSec = t; hit.rawText = text; return hit; }
+          return tryR(ri + 1);
+        }, function () { return tryR(ri + 1); });
+      })(0);
+    });
+  }
+
+  /* datetime hit → 표시된 '분'의 절대 인덱스(60초 단위 정수). 그 외 null.
+     (rollover 정밀화는 절대 날짜가 있는 datetime 오버레이에서만 안전) */
+  function minuteIndexOf(hit) {
+    if (!hit || hit.kind !== 'datetime') return null;
+    var ms = new Date(hit.y, hit.mo - 1, hit.d, hit.h, hit.mi, 0).getTime();
+    return isFinite(ms) ? Math.floor(ms / 60000) : null;
+  }
+
+  /* 순수: 브래킷 (loT[분=hiKey-1], hiT[분=hiKey]) 사이 전환 시각을 이분탐색.
+     readKey(t) → Promise<int|null> (그 시각 프레임의 분 인덱스, 못 읽으면 null).
+     반환: 전환 순간의 추정 영상시각 t* (loT<t*≤hiT, 오차 ≤ tol/2).
+     못 읽는 프레임(모션블러·물보라)은 약간 옆으로 재시도, 그래도 안 되면
+     안전하게 현재 구간 중앙을 반환한다. */
+  function refineTransition(readKey, loT, hiT, hiKey, tol, maxIter) {
+    tol = tol || 0.2; maxIter = maxIter || 14;
+    var iter = 0;
+    function step() {
+      if (hiT - loT <= tol || iter >= maxIter) {
+        return Promise.resolve((loT + hiT) / 2);
+      }
+      iter++;
+      var mid = (loT + hiT) / 2;
+      return readKey(mid).then(function (k) {
+        if (k == null) {
+          return readKey(Math.min(hiT - 1e-3, mid + tol / 2)).then(function (k2) {
+            if (k2 == null) { return (loT + hiT) / 2; }   // 못 읽음 — 중앙값으로 종료
+            if (k2 >= hiKey) hiT = mid; else loT = mid;
+            return step();
+          });
+        }
+        if (k >= hiKey) hiT = mid; else loT = mid;
+        return step();
+      });
+    }
+    return step();
+  }
+
+  /* 열린 video 에서 anchor(분단위 datetime hit)로부터 분 경계를 찾아 이분탐색
+     으로 전환시각을 구하고, 초 단위 정밀 hit 를 반환한다. 경계를 못 찾으면
+     (클립이 한 분 안에서 끝남) null. */
+  function rolloverRefine(video, anchor, opts) {
+    opts = opts || {};
+    var onP = opts.onProgress || function () {};
+    var dur = video.duration || 0;
+    var loKey = minuteIndexOf(anchor);
+    if (loKey == null) return Promise.resolve(null);
+    var step = opts.rolloverStep || 4;
+
+    /* 정방향으로 첫 분 경계 탐색: loT(=마지막 loKey 프레임), hiT(첫 loKey+ 프레임) */
+    function scanFwd() {
+      var loT = anchor.frameSec, t = anchor.frameSec, guard = 0;
+      function nx() {
+        if (t >= dur - 0.05 || guard++ > 60) return Promise.resolve(null);
+        t = Math.min(dur - 0.05, t + step);
+        onP('Finding minute change… ' + t.toFixed(0) + 's');
+        return readClockAt(video, t, opts).then(function (h) {
+          var k = minuteIndexOf(h);
+          if (k == null) return nx();
+          if (k === loKey) { loT = t; return nx(); }
+          if (k > loKey) return { loT: loT, hiT: t, hiKey: k };
+          return nx();                       // k<loKey (뒤로 감) — 무시
+        });
+      }
+      return nx();
+    }
+    /* 역방향(클립이 anchor 분에서 끝나 정방향 경계가 없을 때) */
+    function scanBack() {
+      var hiT = anchor.frameSec, t = anchor.frameSec, guard = 0;
+      function pv() {
+        if (t <= 0.05 || guard++ > 60) return Promise.resolve(null);
+        t = Math.max(0.05, t - step);
+        onP('Finding minute change… ' + t.toFixed(0) + 's');
+        return readClockAt(video, t, opts).then(function (h) {
+          var k = minuteIndexOf(h);
+          if (k == null) return pv();
+          if (k === loKey) { hiT = t; return pv(); }
+          if (k < loKey) return { loT: t, hiT: hiT, hiKey: loKey };
+          return pv();
+        });
+      }
+      return pv();
+    }
+
+    return scanFwd().then(function (br) {
+      if (br) return br;
+      return scanBack();
+    }).then(function (br) {
+      if (!br) return null;                  // 경계 없음 → 정밀화 불가
+      var readKey = function (tt) { return readClockAt(video, tt, opts).then(minuteIndexOf); };
+      onP('Pinning the exact flip…');
+      return refineTransition(readKey, br.loT, br.hiT, br.hiKey,
+        opts.rolloverTol || 0.2, opts.rolloverMaxIter || 14).then(function (tStar) {
+        var wallMs = br.hiKey * 60000;       // 전환 순간의 벽시계 = 새 분:00
+        return {
+          kind: 'datetime', epochMs: wallMs, frameSec: tStar, s: 0,
+          hasSeconds: true, precise: true, confidence: 'high', method: 'ocr-rollover',
+          rollover: { loT: br.loT, hiT: br.hiT, tStar: tStar, newMinuteEpoch: wallMs }
+        };
+      });
+    });
+  }
+
+  /* 영상 시작 시각 감지 오케스트레이터 — anchor 탐색 → (초 있으면 그대로 /
+     초 없는 datetime 이면 rollover 정밀화 / 그 외 분단위 fallback). 열린 video
+     하나로 처리하고 정리한다. 반환 Promise<hit|null> (hit 은 resolveStartElapsed
+     이 소비, confidence·method 포함). */
+  function detectVideoStart(source, opts) {
+    opts = opts || {};
+    if (typeof document === 'undefined') return Promise.resolve(null);
+    var frames = opts.frames || [0.5, 1, 2, 4, 8];
+    var o = {};
+    for (var k in opts) o[k] = opts[k];
+    o.regions = opts.regions || ['bottom', 'full'];
+    return openVideo(source).then(function (ctx) {
+      var video = ctx.video;
+      function findAnchor(i) {
+        if (i >= frames.length) return Promise.resolve(null);
+        var t = frames[i];
+        if (video.duration && t >= video.duration) return findAnchor(i + 1);
+        if (o.onProgress) o.onProgress('Reading frame ' + t.toFixed(1) + 's…');
+        return readClockAt(video, t, o).then(function (h) { return h || findAnchor(i + 1); });
+      }
+      return findAnchor(0).then(function (anchor) {
+        if (!anchor) return null;
+        if (anchor.hasSeconds) {
+          anchor.confidence = (anchor.kind === 'datetime') ? 'medium' : 'low';
+          anchor.method = 'ocr';
+          return anchor;
+        }
+        if (anchor.kind === 'datetime') {
+          return rolloverRefine(video, anchor, o).then(function (ref) {
+            if (ref) return ref;
+            anchor.confidence = 'medium'; anchor.method = 'ocr-minute';  // 분 정밀도만
+            return anchor;
+          });
+        }
+        anchor.confidence = 'low'; anchor.method = 'ocr-minute-clock';
+        return anchor;
+      }).then(function (res) { ctx.cleanup(); return res; },
+        function (e) { ctx.cleanup(); throw e; });
+    }, function () { return null; });
+  }
+
+  /* ============================================================
    * 5) 오케스트레이터 — 메타데이터 → OCR → 수동 (spec §B 형태)
    * ============================================================ */
   /* 파일 메타데이터의 녹화 시각(ms) 을 얻는다. replay.js 가 노출한 순수
