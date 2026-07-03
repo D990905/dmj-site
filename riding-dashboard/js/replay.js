@@ -2533,6 +2533,24 @@
               '(HH:MM:SS) to place the clip</span>' +
           '</div>';
       }
+      /* §429 — 화면 시각 OCR fallback. 데이터에 절대 시각이 있을 때(그래야
+         감지한 시각을 배치로 변환 가능)만, 그리고 파일 메타데이터로 자동
+         배치되지 못한 클립('none' 또는 수동)에 제안한다. 자동배치('auto',
+         메타데이터 high 신뢰)엔 굳이 권하지 않되 되돌릴 여지로 항상 남긴다. */
+      var ocrRow = '';
+      if (startEpoch != null && isFinite(startEpoch) &&
+          typeof global.VideoTimeDetect !== 'undefined') {
+        var ocrHint = (clip.place === 'none')
+          ? 'No recording time in the file — read the clock shown in the video'
+          : 'Or read the clock shown in the video';
+        ocrRow =
+          '<div class="replay-sync__row replay-sync__ocrrow">' +
+            '<button type="button" class="replay-sync__act replay-sync__ocr" ' +
+              'data-clip-ocr="' + clip.id + '">🕑 Detect time from screen (OCR)</button>' +
+            '<span class="replay-sync__ocrstatus" data-clip-ocrstatus="' + clip.id +
+              '">' + escapeHtml(ocrHint) + '</span>' +
+          '</div>';
+      }
       html +=
         '<div class="replay-sync__clip">' +
           '<div class="replay-sync__row replay-sync__row--clip">' +
@@ -2550,6 +2568,7 @@
             '</span>' +
           '</div>' +
           clockRow +
+          ocrRow +
           '<div class="replay-sync__row">' +
             '<span class="replay-sync__lbl">Fine-tune</span>' +
             '<button type="button" class="replay__nudge" data-clip="' + clip.id +
