@@ -105,14 +105,76 @@ function near(name, got, want, tol) {
   eq('clock unresolvable → null', res2, null);
 })();
 
-/* ---------- 6) resolveStartElapsed — 방어 ---------- */
+/* ---------- 6) resolveStartElapsed — 방어 + confidence 전달 ---------- */
 (function () {
   var hit = { kind: 'datetime', epochMs: Date.UTC(2026, 6, 3) };
   eq('no sessionStart → null', resolveStartElapsed(hit, 0, null, null, 0), null);
   eq('null hit → null', resolveStartElapsed(null, 0, 12345, null, 0), null);
+  /* precise(rollover) hit → confidence 'high' 가 그대로 전달 */
+  var ph = { kind: 'datetime', epochMs: 1000000, confidence: 'high' };
+  var pr = resolveStartElapsed(ph, 0, 0, null, 0);
+  eq('precise hit confidence passthrough', pr && pr.confidence, 'high');
 })();
 
+/* ---------- 7) refineTransition — 분 전환 이분탐색 (실측 ground truth) ----------
+   실 영상(Insta360, 439MB) 검증값: 영상 t=0 의 실제 벽시계 = 15:52:44.9 KST.
+   → 15:52→15:53 전환 t≈15.1s, 15:53→15:54 전환 t≈75.1s (실측, ffmpeg+OCR).
+   시뮬레이터 readKey(t) = 그 시각 프레임의 분 인덱스(절대). 전환이 정확히
+   그 시각에 일어나도록 모델링해, 이분탐색이 t* 를 ±0.2s 로 수렴하는지,
+   그리고 서로 다른 두 전환이 같은 영상 시작 시각을 역산하는지 확인한다. */
+var refineTransition = VTD._test.refineTransition;
+async function rolloverTests() {
+  var VIDEO_START_WALL_SEC = 15 * 3600 + 52 * 60 + 44.9;   // 57164.9 (15:52:44.9)
+  /* 절대 분 인덱스: floor((videoStartWall + t)/60). null 모델(물보라 프레임) 옵션 */
+  function makeReader(nullAt) {
+    return function (t) {
+      if (nullAt && Math.abs(t - nullAt) < 0.05) return Promise.resolve(null);
+      return Promise.resolve(Math.floor((VIDEO_START_WALL_SEC + t) / 60));
+    };
+  }
+  var minA = Math.floor((VIDEO_START_WALL_SEC + 15.1) / 60);   // 953 (15:53)
+  var minB = Math.floor((VIDEO_START_WALL_SEC + 75.1) / 60);   // 954 (15:54)
+
+  /* 전환 A: 15:52→15:53, 코스 브래킷 [12,18] */
+  var tA = await refineTransition(makeReader(), 12, 18, minA, 0.2, 14);
+  near('rollover A t* ≈ 15.1s', tA, 15.1, 0.2);
+  var startA = minA * 60 - tA;                    // 역산한 영상 시작 벽시계(초)
+  near('rollover A → video start 15:52:44.9', startA, VIDEO_START_WALL_SEC, 0.2);
+
+  /* 전환 B: 15:53→15:54, 코스 브래킷 [72,78] */
+  var tB = await refineTransition(makeReader(), 72, 78, minB, 0.2, 14);
+  near('rollover B t* ≈ 75.1s', tB, 75.1, 0.2);
+  var startB = minB * 60 - tB;
+  near('rollover B → video start 15:52:44.9', startB, VIDEO_START_WALL_SEC, 0.2);
+
+  /* 내부 일관성: 두 전환이 같은 영상 시작(±0.2s) → 초 단위 정합 증명 */
+  near('two flips agree on video start', startA, startB, 0.2);
+
+  /* 못 읽는 프레임(물보라)이 탐색 구간에 있어도 수렴 */
+  var tN = await refineTransition(makeReader(15.0625), 12, 18, minA, 0.2, 14);
+  near('rollover tolerates unreadable frame', tN, 15.1, 0.35);
+
+  /* minuteIndexOf: datetime 만 인덱스, clock 은 null */
+  var mi = VTD._test.minuteIndexOf;
+  check('minuteIndexOf datetime', mi(extractDateTime('2026/05/19 15:53')) === Math.floor(new Date(2026,4,19,15,53,0).getTime()/60000), '');
+  eq('minuteIndexOf clock → null', mi(extractDateTime('15:53:00')), null);
+
+  /* 실측 end-to-end 배치: 세션 15:15:47 KST 기준, video start 15:52:44.9
+     → clip startElapsed = (15:52:44.9 - 15:15:47) = 2217.9s */
+  process.env.TZ = 'Asia/Seoul';
+  var sessionStart = new Date('2026-05-19T06:15:47.000Z').getTime();   // 15:15:47 KST
+  var preciseHit = { kind: 'datetime', epochMs: minB * 60000, frameSec: tB, confidence: 'high' };
+  var placed = resolveStartElapsed(preciseHit, preciseHit.frameSec, sessionStart, null, 0);
+  near('end-to-end precise startElapsed ≈ 2217.9s', placed && placed.startElapsed, 2217.9, 0.3);
+  eq('end-to-end confidence high', placed && placed.confidence, 'high');
+}
+
 /* ---------- 결과 ---------- */
-lines.forEach(function (l) { console.log(l); });
-console.log('\n§429 video-time OCR:  ' + pass + ' passed, ' + fail + ' failed');
-process.exit(fail ? 1 : 0);
+rolloverTests().then(function () {
+  lines.forEach(function (l) { console.log(l); });
+  console.log('\n§429 video-time OCR:  ' + pass + ' passed, ' + fail + ' failed');
+  process.exit(fail ? 1 : 0);
+}, function (e) {
+  console.log('rollover tests threw:', e && e.stack || e);
+  process.exit(1);
+});
