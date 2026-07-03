@@ -11,6 +11,10 @@
  * ============================================================ */
 'use strict';
 
+/* minuteIndexOf 는 오버레이 벽시계를 로컬 시각으로 해석한다. 실 영상이
+   KST 촬영이므로 로컬을 KST 로 고정해 절대 epoch 계산을 결정적으로 만든다. */
+process.env.TZ = 'Asia/Seoul';
+
 var VTD = require('./js/video-time-detect.js');
 var extractDateTime = VTD._test.extractDateTime;
 var resolveStartElapsed = VTD._test.resolveStartElapsed;
