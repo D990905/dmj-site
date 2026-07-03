@@ -159,11 +159,13 @@ async function rolloverTests() {
   check('minuteIndexOf datetime', mi(extractDateTime('2026/05/19 15:53')) === Math.floor(new Date(2026,4,19,15,53,0).getTime()/60000), '');
   eq('minuteIndexOf clock → null', mi(extractDateTime('15:53:00')), null);
 
-  /* 실측 end-to-end 배치: 세션 15:15:47 KST 기준, video start 15:52:44.9
-     → clip startElapsed = (15:52:44.9 - 15:15:47) = 2217.9s */
-  process.env.TZ = 'Asia/Seoul';
-  var sessionStart = new Date('2026-05-19T06:15:47.000Z').getTime();   // 15:15:47 KST
-  var preciseHit = { kind: 'datetime', epochMs: minB * 60000, frameSec: tB, confidence: 'high' };
+  /* 실측 end-to-end 배치(TZ 무관 UTC 절대 epoch): 세션 시작 06:15:47Z(=15:15:47
+     KST), 전환 순간의 벽시계 15:54:00 KST = 06:54:00Z, frameSec=tB(≈75.1).
+     → video start = 06:54:00Z - 75.1s = 06:52:44.9Z
+     → clip startElapsed = (06:52:44.9 - 06:15:47) = 2217.9s, confidence high */
+  var sessionStart = Date.UTC(2026, 4, 19, 6, 15, 47);
+  var newMinuteEpoch = Date.UTC(2026, 4, 19, 6, 54, 0);            // 15:54:00 KST
+  var preciseHit = { kind: 'datetime', epochMs: newMinuteEpoch, frameSec: tB, confidence: 'high' };
   var placed = resolveStartElapsed(preciseHit, preciseHit.frameSec, sessionStart, null, 0);
   near('end-to-end precise startElapsed ≈ 2217.9s', placed && placed.startElapsed, 2217.9, 0.3);
   eq('end-to-end confidence high', placed && placed.confidence, 'high');
