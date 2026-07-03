@@ -411,10 +411,13 @@
   function rolloverRefine(video, anchor, opts) {
     opts = opts || {};
     var onP = opts.onProgress || function () {};
-    var dur = video.duration || 0;
+    var dur = (video && video.duration) || opts.duration || 0;
     var loKey = minuteIndexOf(anchor);
     if (loKey == null) return Promise.resolve(null);
     var step = opts.rolloverStep || 4;
+    /* 프레임 시각 읽기 — 기본은 실제 <video> OCR. opts.readAt 로 주입하면
+       (Node self-test 등) 실제 seek/OCR 없이 오케스트레이션만 검증 가능. */
+    var readAt = opts.readAt || function (t) { return readClockAt(video, t, opts); };
 
     /* 정방향으로 첫 분 경계 탐색: loT(=마지막 loKey 프레임), hiT(첫 loKey+ 프레임) */
     function scanFwd() {
