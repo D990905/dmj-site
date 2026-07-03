@@ -2590,9 +2590,10 @@
     html +=
       '<div class="replay-sync__row">' +
         '<span class="replay-sync__hint">Each clip is auto-placed by ' +
-          'its recording time. If it\'s off, adjust it above — comparing ' +
-          'the clock in the video with the track timeline (real time) ' +
-          'below makes it easy.</span>' +
+          'its recording time. No recording time in the file? Use ' +
+          '“Detect time from screen (OCR)” to read the clock shown in the ' +
+          'video. If it\'s still off, adjust it above — comparing the clock ' +
+          'in the video with the track timeline (real time) makes it easy.</span>' +
         '<button type="button" class="replay-sync__act" id="replay-sync-redo">' +
           'Re-run auto-align</button>' +
         '<button type="button" class="replay-sync__act" id="replay-video-remove">' +
@@ -2616,6 +2617,11 @@
         if (!R) return;
         var rm = e.target.closest && e.target.closest('.replay-sync__rm');
         if (rm) { removeClip(rm.getAttribute('data-clip-remove')); return; }
+        var oc = e.target.closest && e.target.closest('.replay-sync__ocr');
+        if (oc && oc.getAttribute('data-clip-ocr')) {
+          ocrPlaceClip(clipById(oc.getAttribute('data-clip-ocr')), oc);
+          return;
+        }
         var nb = e.target.closest && e.target.closest('.replay__nudge');
         if (nb && nb.getAttribute('data-clip')) {
           var c = clipById(nb.getAttribute('data-clip'));
