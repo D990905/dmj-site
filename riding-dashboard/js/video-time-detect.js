@@ -130,7 +130,7 @@
     if (hit.kind === 'datetime') {
       var videoStartEpoch = hit.epochMs - frameSec * 1000;
       var se = (videoStartEpoch - sessionStart) / 1000;
-      return { startElapsed: Math.round(se * 10) / 10, confidence: 'medium' };
+      return { startElapsed: Math.round(se * 10) / 10, confidence: hit.confidence || 'medium' };
     }
     if (hit.kind === 'clock' && typeof clockToElapsed === 'function') {
       var pad = function (n) { return (n < 10 ? '0' : '') + n; };
@@ -138,7 +138,7 @@
       var elapsedOfFrame = clockToElapsed(clockStr, sessionStart, curElapsed);
       if (elapsedOfFrame == null || !isFinite(elapsedOfFrame)) return null;
       var st = elapsedOfFrame - frameSec;
-      return { startElapsed: Math.round(st * 10) / 10, confidence: 'low' };
+      return { startElapsed: Math.round(st * 10) / 10, confidence: hit.confidence || 'low' };
     }
     return null;
   }
