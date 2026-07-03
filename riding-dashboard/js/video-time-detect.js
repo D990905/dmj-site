@@ -577,8 +577,10 @@
 
   var VideoTimeDetect = {
     detectRecordingTime: detectRecordingTime,
+    detectVideoStart: detectVideoStart,
     readMP4Metadata: readMP4Metadata,
     ocrFrameTime: ocrFrameTime,
+    rolloverRefine: rolloverRefine,
     ocrImage: ocrImage,
     loadTesseract: loadTesseract,
     extractDateTime: extractDateTime,
@@ -586,6 +588,8 @@
     _test: {
       extractDateTime: extractDateTime,
       resolveStartElapsed: resolveStartElapsed,
+      refineTransition: refineTransition,
+      minuteIndexOf: minuteIndexOf,
       inRange: inRange
     }
   };
