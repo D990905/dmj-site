@@ -95,7 +95,7 @@
         var epochMs = new Date(y, mo - 1, d, h, mi, se).getTime();
         if (isFinite(epochMs)) {
           return { kind: 'datetime', y: y, mo: mo, d: d, h: h, mi: mi, s: se,
-            epochMs: epochMs, raw: m[0] };
+            epochMs: epochMs, hasSeconds: (m[6] != null), raw: m[0] };
         }
       }
     }
