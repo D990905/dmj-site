@@ -426,7 +426,7 @@
         if (t >= dur - 0.05 || guard++ > 60) return Promise.resolve(null);
         t = Math.min(dur - 0.05, t + step);
         onP('Finding minute change… ' + t.toFixed(0) + 's');
-        return readClockAt(video, t, opts).then(function (h) {
+        return readAt(t).then(function (h) {
           var k = minuteIndexOf(h);
           if (k == null) return nx();
           if (k === loKey) { loT = t; return nx(); }
@@ -443,7 +443,7 @@
         if (t <= 0.05 || guard++ > 60) return Promise.resolve(null);
         t = Math.max(0.05, t - step);
         onP('Finding minute change… ' + t.toFixed(0) + 's');
-        return readClockAt(video, t, opts).then(function (h) {
+        return readAt(t).then(function (h) {
           var k = minuteIndexOf(h);
           if (k == null) return pv();
           if (k === loKey) { hiT = t; return pv(); }
