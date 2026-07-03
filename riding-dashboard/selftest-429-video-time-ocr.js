@@ -173,6 +173,39 @@ async function rolloverTests() {
   var placed = resolveStartElapsed(preciseHit, preciseHit.frameSec, sessionStart, null, 0);
   near('end-to-end precise startElapsed ≈ 2217.9s', placed && placed.startElapsed, 2217.9, 0.3);
   eq('end-to-end confidence high', placed && placed.confidence, 'high');
+
+  /* ---------- 8) rolloverRefine — 전체 오케스트레이션(scan+bracket+binary) ----------
+     실 <video>/OCR 대신 readAt 를 주입해 실 영상 타이밍(15:52:44.9 시작,
+     15:52→15:53 @15.1s, 15:53→15:54 @75.1s)을 재현. rolloverRefine 이 실제로
+     경계를 찾아 초 단위로 정밀화하는지 product 함수 그대로 검증. 물보라
+     프레임(null)도 섞어 견고성 확인. */
+  function realFrameReader(nullTimes) {
+    return function (t) {
+      if (nullTimes && nullTimes.some(function (n) { return Math.abs(t - n) < 0.2; })) {
+        return Promise.resolve(null);          // 못 읽는 프레임(모션·물보라)
+      }
+      var wall = VIDEO_START_WALL_SEC + t;     // 초-of-day
+      var hh = Math.floor(wall / 3600) % 24, mm = Math.floor(wall / 60) % 60;
+      return Promise.resolve({ kind: 'datetime', y: 2026, mo: 5, d: 19, h: hh, mi: mm, s: 0, hasSeconds: false });
+    };
+  }
+  var anchor = { kind: 'datetime', y: 2026, mo: 5, d: 19, h: 15, mi: 52, s: 0, hasSeconds: false, frameSec: 0.5 };
+  var fakeVideo = { duration: 132.2 };
+
+  var ref = await VTD.rolloverRefine(fakeVideo, anchor,
+    { duration: 132.2, readAt: realFrameReader([17, 108]), rolloverStep: 4, rolloverTol: 0.2 });
+  check('rolloverRefine returns precise hit', !!ref && ref.method === 'ocr-rollover' && ref.precise === true, JSON.stringify(ref && { method: ref.method, frameSec: ref.frameSec }));
+  near('rolloverRefine t* (first flip) ≈ 15.1s', ref && ref.frameSec, 15.1, 0.25);
+  /* 그 hit → 세션 배치: 영상 시작 15:52:44.9 → startElapsed 2217.9s */
+  var sessK = Date.UTC(2026, 4, 19, 6, 15, 47);
+  var rp = resolveStartElapsed(ref, ref.frameSec, sessK, null, 0);
+  near('rolloverRefine → startElapsed 2217.9s', rp && rp.startElapsed, 2217.9, 0.3);
+  eq('rolloverRefine confidence high', rp && rp.confidence, 'high');
+
+  /* 짧은 클립(경계 없음, 한 분 내에서 끝남) → 정밀화 불가 → null */
+  var shortRef = await VTD.rolloverRefine({ duration: 8 }, anchor,
+    { duration: 8, readAt: realFrameReader(), rolloverStep: 4 });
+  eq('rolloverRefine no-boundary → null', shortRef, null);
 }
 
 /* ---------- 결과 ---------- */
