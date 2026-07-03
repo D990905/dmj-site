@@ -2468,7 +2468,9 @@
       if (b) { b.disabled = false; b.textContent = origLabel || '🕑 Detect time from screen (OCR)'; }
     }
 
-    VTD.ocrFrameTime(clip.url, {
+    /* §429b — detectVideoStart 는 화면 시각을 읽고, 초가 없는 오버레이면
+       '분이 바뀌는 순간'을 이분탐색으로 찾아 초 단위까지 정밀 정합한다. */
+    VTD.detectVideoStart(clip.url, {
       onProgress: function (msg) { setStatus(msg); }
     }).then(function (hit) {
       if (!hit) {
@@ -2483,9 +2485,20 @@
         reenable();
         return;
       }
-      /* 배치 적용 — 수동 배치처럼 저장·복원되게 하고, 출처만 OCR 로 표기 */
+      /* 배치 적용 — 수동 배치처럼 저장·복원되게 하고, 출처·정밀도를 표기.
+         · minute-rollover = 초 단위(±1초) 자동 정합
+         · seconds 있는 오버레이 = 초 단위
+         · 분 단위만 = 사용자가 초를 미세조정하도록 안내 */
       setClipStart(clip, res.startElapsed);
-      clip.placeSource = 'On-screen clock (OCR · ' + res.confidence + ')';
+      var note;
+      if (hit.method === 'ocr-rollover') {
+        note = 'OCR · minute-rollover, ~±1s';
+      } else if (hit.hasSeconds) {
+        note = 'OCR · ' + res.confidence;
+      } else {
+        note = 'OCR · ' + res.confidence + ' · minute only — fine-tune the seconds';
+      }
+      clip.placeSource = 'On-screen clock (' + note + ')';
       buildSyncPanel();
       rebuildTrack();
       seek(R.playT, !R.playing);
