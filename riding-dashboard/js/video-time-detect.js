@@ -459,7 +459,7 @@
       return scanBack();
     }).then(function (br) {
       if (!br) return null;                  // 경계 없음 → 정밀화 불가
-      var readKey = function (tt) { return readClockAt(video, tt, opts).then(minuteIndexOf); };
+      var readKey = function (tt) { return readAt(tt).then(minuteIndexOf); };
       onP('Pinning the exact flip…');
       return refineTransition(readKey, br.loT, br.hiT, br.hiKey,
         opts.rolloverTol || 0.2, opts.rolloverMaxIter || 14).then(function (tStar) {
