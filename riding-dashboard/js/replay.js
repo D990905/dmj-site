@@ -2438,6 +2438,63 @@
       ? 'No absolute time in data session' : 'No recording time info';
   }
 
+  /* §429 — 화면 시각 OCR fallback. 파일 메타데이터로 녹화 시각을 못 얻은
+     클립에 대해, 영상 화면 안 오버레이 시계를 Tesseract 로 읽어 트랙에
+     배치한다. VideoTimeDetect(신규 모듈)가 프레임 캡처·OCR·시각 추출을
+     담당하고, 여기서는 읽어낸 시각을 데이터 경과초로 변환해 배치한다.
+     · datetime(날짜+시각) → 절대 epoch 로 바로 변환.
+     · clock(시각만)     → parseClockToElapsed 로 세션 날짜에 맞춰 변환.
+     결과는 자동 신뢰가 아니므로 사용자가 확인·미세조정할 수 있게 그대로
+     남긴다(수동 미세조정 UI 유지). 감지값은 수동 배치처럼 저장돼 재방문
+     시 복원된다. */
+  function ocrPlaceClip(clip, btn) {
+    if (!clip || !R) return;
+    var VTD = global.VideoTimeDetect;
+    var startEpoch = R.session && R.session.startEpoch;
+    if (!VTD || startEpoch == null || !isFinite(startEpoch)) return;
+    if (btn && btn.disabled) return;                 // 중복 실행 방지
+
+    var box = el('replay-sync');
+    function statusNode() {
+      return box ? box.querySelector('[data-clip-ocrstatus="' + clip.id + '"]') : null;
+    }
+    function setStatus(msg) { var s = statusNode(); if (s) s.textContent = msg; }
+    var origLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Reading…'; }
+    setStatus('Loading OCR engine…');
+
+    function reenable() {
+      var b = box ? box.querySelector('.replay-sync__ocr[data-clip-ocr="' + clip.id + '"]') : btn;
+      if (b) { b.disabled = false; b.textContent = origLabel || '🕑 Detect time from screen (OCR)'; }
+    }
+
+    VTD.ocrFrameTime(clip.url, {
+      onProgress: function (msg) { setStatus(msg); }
+    }).then(function (hit) {
+      if (!hit) {
+        setStatus('Couldn’t read a clock on screen. Enter the start time above manually.');
+        reenable();
+        return;
+      }
+      var res = VTD.resolveStartElapsed(
+        hit, hit.frameSec, startEpoch, parseClockToElapsed, clip.startElapsed);
+      if (!res || !isFinite(res.startElapsed)) {
+        setStatus('Read “' + (hit.raw || '') + '” but couldn’t place it. Enter manually.');
+        reenable();
+        return;
+      }
+      /* 배치 적용 — 수동 배치처럼 저장·복원되게 하고, 출처만 OCR 로 표기 */
+      setClipStart(clip, res.startElapsed);
+      clip.placeSource = 'On-screen clock (OCR · ' + res.confidence + ')';
+      buildSyncPanel();
+      rebuildTrack();
+      seek(R.playT, !R.playing);
+    })['catch'](function () {
+      setStatus('OCR failed to run. Enter the start time above manually.');
+      reenable();
+    });
+  }
+
   /* 모든 클립을 자동 배치 다시 — '자동 정렬 다시' 버튼 */
   function autoPlaceAll() {
     R.clips.forEach(function (c) {
