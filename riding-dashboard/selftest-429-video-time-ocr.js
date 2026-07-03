@@ -42,9 +42,15 @@ function near(name, got, want, tol) {
       h.y === 2026 && h.mo === 7 && h.d === 3 && h.h === 14 && h.mi === 30 && h.s === 22,
       h ? JSON.stringify({ kind: h.kind, y: h.y, mo: h.mo, d: h.d, h: h.h, mi: h.mi, s: h.s }) : 'null');
   });
-  /* 초 생략 datetime */
+  /* 초 생략 datetime — hasSeconds=false 로 표시(rollover 정밀화 트리거) */
   var hns = extractDateTime('2026-07-03 14:30');
   check('datetime no-seconds', !!hns && hns.kind === 'datetime' && hns.s === 0 && hns.mi === 30, JSON.stringify(hns));
+  check('datetime no-seconds hasSeconds=false', hns && hns.hasSeconds === false, JSON.stringify(hns && hns.hasSeconds));
+  var hws = extractDateTime('2026-07-03 14:30:22');
+  check('datetime with-seconds hasSeconds=true', hws && hws.hasSeconds === true, JSON.stringify(hws && hws.hasSeconds));
+  /* 실제 Insta360 오버레이 포맷(공백 구분, 초 없음) */
+  var hi = extractDateTime('2026/05/19 15:52');
+  check('Insta360 fmt (minute only)', !!hi && hi.kind === 'datetime' && hi.mo === 5 && hi.d === 19 && hi.h === 15 && hi.mi === 52 && hi.hasSeconds === false, JSON.stringify(hi));
 })();
 
 /* ---------- 2) extractDateTime — 시각만 (low) ---------- */
