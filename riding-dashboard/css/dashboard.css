@@ -1872,6 +1872,18 @@ input::placeholder { color:var(--text-dim); }
 .replay-sync__act:hover { background:rgba(255,255,255,0.14); }
 #replay-video-remove:hover { background:#C0392B; border-color:#C0392B; }
 
+/* §429 화면 시각 OCR fallback */
+.replay-sync__ocrrow { align-items:center; }
+.replay-sync__ocr {
+  border-color:rgba(51,161,255,0.55);
+  background:rgba(51,161,255,0.14); color:#BEE0FF;
+}
+.replay-sync__ocr:hover:not(:disabled) { background:rgba(51,161,255,0.26); }
+.replay-sync__ocr:disabled { opacity:.6; cursor:progress; }
+.replay-sync__ocrstatus {
+  flex:1; min-width:120px; font-size:.74rem; color:var(--rp-dim);
+}
+
 /* 다중 클립 — 클립별 동기화 블록 (2026-05-23 §B7) */
 .replay__sync { max-height:calc(100vh - 80px); overflow-y:auto; }
 .replay-sync__clip {
