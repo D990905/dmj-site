@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var Geo = window.RDGeo, Gpx = window.RDGpx, Vkx = window.RDVkx, An = window.RDAnalysis;
+  var Geo = window.RDGeo, Gpx = window.RDGpx, Vkx = window.RDVkx, Csv = window.RDCsv, An = window.RDAnalysis;
   var Storage = window.RDStorage, Charts = window.RDCharts;
   var KT = Geo.MS_TO_KNOTS;
 
