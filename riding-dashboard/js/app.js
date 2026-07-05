@@ -529,14 +529,15 @@
   }
 
   /* ---------- 파일 처리 ---------- */
-  /* 확장자로 .gpx ↔ .vkx 파서를 분기한다. .vkx 는 Vakaros Atlas 2 의
-     바이너리 포맷이라 ArrayBuffer 로, .gpx 는 XML 텍스트로 읽는다. */
+  /* 확장자로 .gpx ↔ .vkx ↔ .csv 파서를 분기한다. .vkx 는 Vakaros Atlas 2 의
+     바이너리 포맷이라 ArrayBuffer 로, .gpx·.csv 는 텍스트로 읽는다. */
   function handleFile(file) {
     var isVkx = /\.vkx$/i.test(file.name);
+    var isCsv = /\.csv$/i.test(file.name);
     var isGpx = /\.gpx$/i.test(file.name) ||
                 file.type.indexOf('gpx') !== -1 || file.type.indexOf('xml') !== -1;
-    if (!isVkx && !isGpx) {
-      showError('GPX 또는 VKX 파일만 지원합니다 (.gpx · .vkx). 선택한 파일: ' + file.name);
+    if (!isVkx && !isCsv && !isGpx) {
+      showError('GPX, VKX 또는 CSV 파일만 지원합니다 (.gpx · .vkx · .csv). 선택한 파일: ' + file.name);
       return;
     }
     var reader = new FileReader();
@@ -546,6 +547,11 @@
         processVkx(reader.result, file.name.replace(/\.vkx$/i, ''));
       };
       reader.readAsArrayBuffer(file);   // .vkx 는 바이너리
+    } else if (isCsv) {
+      reader.onload = function () {
+        processCsv(reader.result, file.name.replace(/\.csv$/i, ''));
+      };
+      reader.readAsText(file);          // .csv 는 텍스트
     } else {
       reader.onload = function () {
         processGpx(reader.result, file.name.replace(/\.gpx$/i, ''));
