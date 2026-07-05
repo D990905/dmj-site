@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Epic Korean Arirang EDM Fusion · 아리랑 페스티벌 앤섬</title>
+<meta name="description" content="Web Audio API로 실시간 생성되는 아리랑 × EDM 퓨전 트랙. 심장박동 인트로 → 태평소 빌드업 → 128 BPM 페스티벌 드롭 → 해금 브레이크 → 합창 파이널 드롭.">
+<style>
+  :root{
+    --bg0:#05060f; --bg1:#0b1030; --ink:#eef1ff; --muted:#9aa3d0;
+    --gold:#ffb800; --pink:#ff2e88; --cyan:#22e6ff; --purple:#7a3cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 700px at 50% -10%, #1a1450 0%, transparent 60%),
+      radial-gradient(900px 600px at 90% 20%, #3a0d4e 0%, transparent 55%),
+      radial-gradient(900px 600px at 10% 30%, #06284a 0%, transparent 55%),
+      linear-gradient(180deg,#05060f,#02030a 70%);
+    min-height:100%;
+    display:flex; flex-direction:column; align-items:center;
+    overflow-x:hidden;
+  }
+  .wrap{width:min(960px,92vw); padding:clamp(24px,5vw,56px) 0 80px; text-align:center}
+  .eyebrow{
+    letter-spacing:.42em; text-transform:uppercase; font-size:12px;
+    color:var(--gold); font-weight:700; margin-bottom:14px;
+  }
+  h1{
+    font-size:clamp(32px,7vw,68px); line-height:1.02; font-weight:800;
+    background:linear-gradient(92deg,#fff 0%,var(--cyan) 40%,var(--pink) 72%,var(--gold) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 4px 30px rgba(122,60,255,.35));
+  }
+  .kr{font-size:clamp(18px,3.5vw,26px); margin-top:10px; color:var(--ink); font-weight:600; opacity:.92}
+  .desc{max-width:640px; margin:18px auto 0; color:var(--muted); font-size:15px; line-height:1.7}
+
+  .stage{
+    position:relative; margin:34px auto 0; width:100%;
+    border-radius:22px; overflow:hidden;
+    border:1px solid rgba(122,60,255,.28);
+    background:linear-gradient(180deg,rgba(20,16,64,.55),rgba(6,7,20,.7));
+    box-shadow:0 30px 90px rgba(3,4,20,.7), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  canvas{display:block; width:100%; height:240px}
+
+  .transport{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:16px;
+    padding:22px 20px 26px;
+  }
+  .play{
+    --sz:78px; width:var(--sz); height:var(--sz); border-radius:50%; border:none; cursor:pointer;
+    background:conic-gradient(from 210deg,var(--cyan),var(--purple),var(--pink),var(--gold),var(--cyan));
+    color:#05060f; display:grid; place-items:center; position:relative;
+    box-shadow:0 12px 40px rgba(255,46,136,.4), 0 0 0 6px rgba(255,255,255,.04);
+    transition:transform .15s ease, box-shadow .3s ease;
+  }
+  .play:hover{transform:scale(1.05)}
+  .play:active{transform:scale(.97)}
+  .play svg{width:34px; height:34px; margin-left:3px}
+  .play.playing svg{margin-left:0}
+  .meta{display:flex; flex-direction:column; align-items:flex-start; gap:6px; min-width:220px; text-align:left}
+  .now{font-weight:700; font-size:16px}
+  .now b{color:var(--cyan)}
+  .bar{
+    width:min(560px,80vw); height:8px; border-radius:99px; overflow:hidden;
+    background:rgba(255,255,255,.08);
+  }
+  .bar > i{
+    display:block; height:100%; width:0%;
+    background:linear-gradient(90deg,var(--cyan),var(--pink),var(--gold));
+    transition:width .1s linear;
+  }
+  .time{font-variant-numeric:tabular-nums; color:var(--muted); font-size:13px}
+
+  .sections{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px;
+    margin:26px auto 0; width:100%;
+  }
+  .sec{
+    padding:14px 12px; border-radius:14px; text-align:left;
+    border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.03);
+    transition:.25s ease; position:relative; overflow:hidden;
+  }
+  .sec .n{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
+  .sec .t{font-weight:700; margin-top:4px; font-size:15px}
+  .sec .d{font-size:12px; color:var(--muted); margin-top:3px; line-height:1.4}
+  .sec.active{
+    border-color:transparent; color:#05060f;
+    background:linear-gradient(120deg,var(--cyan),var(--pink));
+    box-shadow:0 12px 34px rgba(255,46,136,.35);
+  }
+  .sec.active .n,.sec.active .d{color:rgba(5,6,15,.78)}
+  .vol{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px}
+  .vol input{accent-color:var(--pink)}
+  .foot{margin-top:34px; color:var(--muted); font-size:12.5px; line-height:1.7}
+  .foot code{color:var(--cyan); background:rgba(34,230,255,.08); padding:1px 6px; border-radius:6px}
+  .hint{margin-top:8px; font-size:12px; color:var(--muted); opacity:.8}
+  a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Web Audio · Live Generative</div>
+  <h1>Epic Korean<br>Arirang EDM Fusion</h1>
+  <div class="kr">아리랑 × 페스티벌 앤섬 · 128 BPM</div>
+  <p class="desc">
+    심장박동과 바람소리, 대금·여성 허밍의 시네마틱 인트로에서 시작해 태평소 리저와 함께 긴장을 쌓고,
+    128 BPM 거대한 드롭에서 EDM 드럼·808 베이스·장구·해금·군중의 함성이 폭발합니다.
+    아리랑 선율은 그대로 살아 축제의 앤섬으로 변신 — 브라우저에서 실시간 합성됩니다.
+  </p>
+
+  <div class="stage">
+    <canvas id="viz" width="1920" height="480"></canvas>
+    <div class="transport">
+      <button class="play" id="play" aria-label="재생 / 정지">
+        <svg id="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <div class="meta">
+        <div class="now">현재: <b id="secName">대기 중</b></div>
+        <div class="bar"><i id="prog"></i></div>
+        <div class="time"><span id="cur">0:00</span> / <span id="dur">0:00</span></div>
+      </div>
+      <label class="vol">🔊 <input id="vol" type="range" min="0" max="100" value="80"></label>
+    </div>
+  </div>
+
+  <div class="sections" id="secGrid"></div>
+
+  <p class="foot">
+    100% 코드 생성 — 오디오 파일 없음. 오실레이터·노이즈·필터·컨볼루션 리버브로 <code>Web Audio API</code>가
+    태평소·해금·대금·장구·북·808·합창을 실시간 신디사이징합니다. 헤드폰 권장 🎧<br>
+    <span class="hint">브라우저 자동재생 정책상 반드시 재생 버튼을 눌러 시작하세요.</span>
+  </p>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- arrangement config ----------
+  const BPM = 128;
+  const SPB = 60 / BPM;          // seconds per beat
+  const BAR = 4 * SPB;           // 4/4 bar
+  // section = [key, label, kr, bars, desc]
+  const SECTIONS = [
+    ["intro",  "Intro",      "시네마틱 인트로", 8,  "심장박동·바람·대금·허밍"],
+    ["build",  "Build-Up",   "빌드업",         8,  "비트박스·리저·태평소"],
+    ["drop1",  "Festival Drop","페스티벌 드롭", 16, "808·장구·북·해금·함성"],
+    ["break",  "Break",      "감성 브레이크",   8,  "솔로 해금"],
+    ["drop2",  "Final Drop", "파이널 드롭",     20, "합창 + 전 악기 폭발"],
+    ["outro",  "Outro",      "여운",           4,  "리버브 테일"],
+  ];
+  // compute absolute bar offsets
+  let barCursor = 0;
+  for (const s of SECTIONS){ s.push(barCursor); barCursor += s[3]; }  // s[5]=startBar
+  const TOTAL_BARS = barCursor;
+  const TOTAL_DUR = TOTAL_BARS * BAR;
+
+  const secOf = b => { let last=SECTIONS[0]; for(const s of SECTIONS){ if(b>=s[5]) last=s; } return last; };
+
+  // ---------- Arirang melody (key of G, authentic pentatonic G A B D E) ----------
+  // [noteName, durBeats]  R = rest.  48 beats = 12 bars.
+  const R = "R";
+  const ARIRANG = [
+    // 아리랑 아리랑 아라리요
+    ["D5",1],["D5",1],["E5",1], ["D5",1],["B4",1],["D5",1], ["D5",1],["B4",1],["A4",1], ["B4",2],[R,1],
+    // 아리랑 고개로 넘어간다
+    ["D5",1],["D5",1],["E5",1], ["D5",1],["B4",1],["D5",1], ["B4",1],["A4",1],["G4",1], ["G4",2],[R,1],
+    // 나를 버리고 가시는 님은
+    ["G4",1],["A4",1],["B4",1], ["B4",1],["D5",1],["B4",1], ["D5",1],["E5",1],["D5",1], ["E5",2],[R,1],
+    // 십리도 못가서 발병난다
+    ["D5",1],["D5",1],["E5",1], ["D5",1],["B4",1],["D5",1], ["B4",1],["A4",1],["G4",1], ["G4",2],[R,1],
+  ];
+
+  // note -> frequency
+  const NOTES = {C:0,"C#":1,D:2,"D#":3,E:4,F:5,"F#":6,G:7,"G#":8,A:9,"A#":10,B:11};
+  function freq(name){
+    if(name===R) return 0;
+    const m = name.match(/^([A-G]#?)(-?\d)$/);
+    const midi = NOTES[m[1]] + (parseInt(m[2],10)+1)*12;
+    return 440 * Math.pow(2,(midi-69)/12);
+  }
+
+  // ---------- audio engine ----------
+  let ctx, master, comp, analyser, noiseBuf, verb, verbGain, dryGain;
+  let playing=false, startAt=0, stopTimer=null, uiTimer=null, rafId=0;
+  const vol = document.getElementById("vol");
+
+  function makeNoise(){
+    const n = ctx.sampleRate*2, b = ctx.createBuffer(1,n,ctx.sampleRate), d=b.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+    return b;
+  }
+  function makeImpulse(sec, decay){
+    const n = ctx.sampleRate*sec, b = ctx.createBuffer(2,n,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const d=b.getChannelData(c);
+      for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/n, decay); }
+    return b;
+  }
+  function distCurve(amount){
+    const n=1024, c=new Float32Array(n), k=amount;
+    for(let i=0;i<n;i++){ const x=i/n*2-1; c[i]=(1+k)*x/(1+k*Math.abs(x)); }
+    return c;
+  }
+
+  function initAudio(){
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = vol.value/100 * 0.9;
+    comp = ctx.createDynamicsCompressor();
+    comp.threshold.value=-14; comp.knee.value=28; comp.ratio.value=12; comp.attack.value=.003; comp.release.value=.25;
+    // reverb bus
+    verb = ctx.createConvolver(); verb.buffer = makeImpulse(3.2, 3.0);
+    verbGain = ctx.createGain(); verbGain.gain.value=0.9;
+    dryGain = ctx.createGain(); dryGain.gain.value=1.0;
+    analyser = ctx.createAnalyser(); analyser.fftSize=2048; analyser.smoothingTimeConstant=.82;
+
+    verb.connect(verbGain).connect(comp);
+    dryGain.connect(comp);
+    comp.connect(master).connect(analyser).connect(ctx.destination);
+    noiseBuf = makeNoise();
+  }
+
+  // route helper: connect a node to dry + reverb send
+  function out(node, rev=0.18){
+    node.connect(dryGain);
+    if(rev>0){ const g=ctx.createGain(); g.gain.value=rev; node.connect(g); g.connect(verb); }
+  }
+
+  // ===== instruments (t = absolute time) =====
+  function heartbeat(t){
+    for(const off of [0,0.28]){
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sine"; o.frequency.setValueAtTime(62,t+off); o.frequency.exponentialRampToValueAtTime(38,t+off+0.18);
+      g.gain.setValueAtTime(0.0001,t+off); g.gain.exponentialRampToValueAtTime(off?0.55:0.85,t+off+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+off+0.5);
+      o.connect(g); out(g,0.25); o.start(t+off); o.stop(t+off+0.55);
+    }
+  }
+  function wind(t,dur,lvl=0.14){
+    const s=ctx.createBufferSource(); s.buffer=noiseBuf; s.loop=true;
+    const bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=600; bp.Q.value=0.7;
+    const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.frequency.value=0.12; lg.gain.value=380;
+    lfo.connect(lg).connect(bp.frequency);
+    const g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+2);
+    g.gain.setValueAtTime(lvl,t+dur-2); g.gain.linearRampToValueAtTime(0.0001,t+dur);
+    s.connect(bp).connect(g); out(g,0.4); s.start(t); s.stop(t+dur); lfo.start(t); lfo.stop(t+dur);
+  }
+  // breathy flute (대금) — soft, vibrato, air noise
+  function flute(t,f,dur,lvl=0.22){
+    if(!f) return;
+    const o=ctx.createOscillator(), o2=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sine"; o2.type="triangle"; o.frequency.value=f; o2.frequency.value=f;
+    const vib=ctx.createOscillator(), vg=ctx.createGain(); vib.frequency.value=5.2; vg.gain.value=f*0.012;
+    vib.connect(vg); vg.connect(o.frequency); vg.connect(o2.frequency);
+    const air=ctx.createBufferSource(); air.buffer=noiseBuf; air.loop=true;
+    const ab=ctx.createBiquadFilter(); ab.type="bandpass"; ab.frequency.value=f*2.4; ab.Q.value=6;
+    const ag=ctx.createGain(); ag.gain.value=lvl*0.12;
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+0.14);
+    g.gain.setValueAtTime(lvl,t+dur*0.6); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    const mix=ctx.createGain(); mix.gain.value=0.5;
+    o.connect(mix); o2.connect(mix); mix.connect(g); air.connect(ab).connect(ag).connect(g);
+    out(g,0.35);
+    o.start(t);o2.start(t);vib.start(t);air.start(t);
+    o.stop(t+dur+.05);o2.stop(t+dur+.05);vib.stop(t+dur+.05);air.stop(t+dur+.05);
+  }
+  // choir / female hum pad
+  function pad(t,freqs,dur,lvl=0.18,type="sine"){
+    freqs.forEach((f,i)=>{
+      const o=ctx.createOscillator(), o2=ctx.createOscillator(), g=ctx.createGain();
+      o.type=type; o2.type=type; o.frequency.value=f; o2.frequency.value=f*1.006;
+      const lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2200;
+      g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl/freqs.length,t+0.6);
+      g.gain.setValueAtTime(lvl/freqs.length,t+dur*0.7); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(lp);o2.connect(lp);lp.connect(g); out(g,0.5);
+      o.start(t);o2.start(t);o.stop(t+dur+.1);o2.stop(t+dur+.1);
+    });
+  }
+  // taepyeongso (태평소) — bright reedy double-reed lead
+  function taepyeongso(t,f,dur,lvl=0.3){
+    if(!f) return;
+    const o=ctx.createOscillator(), g=ctx.createGain(), bp=ctx.createBiquadFilter(), ws=ctx.createWaveShaper();
+    o.type="sawtooth"; o.frequency.value=f; ws.curve=distCurve(8);
+    bp.type="bandpass"; bp.frequency.value=f*3; bp.Q.value=4;
+    const vib=ctx.createOscillator(), vg=ctx.createGain(); vib.frequency.value=6; vg.gain.value=f*0.02;
+    vib.connect(vg).connect(o.frequency);
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+0.03);
+    g.gain.setValueAtTime(lvl,t+dur*0.7); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(ws).connect(bp).connect(g); out(g,0.28);
+    o.start(t);vib.start(t);o.stop(t+dur+.05);vib.stop(t+dur+.05);
+  }
+  // haegeum (해금) — bowed 2-string fiddle, expressive vibrato + slide
+  function haegeum(t,f,dur,lvl=0.28){
+    if(!f) return;
+    const o=ctx.createOscillator(), g=ctx.createGain(), bp=ctx.createBiquadFilter();
+    o.type="sawtooth";
+    o.frequency.setValueAtTime(f*0.985,t); o.frequency.linearRampToValueAtTime(f,t+0.12); // bow-in slide
+    bp.type="bandpass"; bp.frequency.value=f*2.2; bp.Q.value=3;
+    const vib=ctx.createOscillator(), vg=ctx.createGain(); vib.frequency.value=5.6; vg.gain.value=f*0.018;
+    vib.connect(vg).connect(o.frequency);
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+0.18);
+    g.gain.setValueAtTime(lvl,t+dur*0.65); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(bp).connect(g); out(g,0.42);
+    o.start(t);vib.start(t);o.stop(t+dur+.05);vib.stop(t+dur+.05);
+  }
+  // EDM lead saw (Arirang transformed) — supersaw
+  function lead(t,f,dur,lvl=0.22){
+    if(!f) return;
+    const g=ctx.createGain(), lp=ctx.createBiquadFilter();
+    lp.type="lowpass"; lp.frequency.setValueAtTime(f*8,t); lp.Q.value=2;
+    [-12,-5,0,5,12].forEach(c=>{
+      const o=ctx.createOscillator(); o.type="sawtooth"; o.frequency.value=f*Math.pow(2,c/1200*8);
+      const og=ctx.createGain(); og.gain.value=0.2; o.connect(og).connect(lp); o.start(t); o.stop(t+dur+.03);
+    });
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+0.02);
+    g.gain.setValueAtTime(lvl,t+dur*0.8); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    lp.connect(g); out(g,0.2);
+  }
+
+  // drums
+  function kick(t,lvl=1){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(48,t+0.11);
+    g.gain.setValueAtTime(lvl,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.34);
+    o.connect(g); out(g,0); o.start(t); o.stop(t+0.36);
+    // click
+    const c=ctx.createBufferSource(); c.buffer=noiseBuf; const hp=ctx.createBiquadFilter();
+    hp.type="highpass"; hp.frequency.value=1500; const cg=ctx.createGain();
+    cg.gain.setValueAtTime(lvl*0.5,t); cg.gain.exponentialRampToValueAtTime(0.0001,t+0.03);
+    c.connect(hp).connect(cg); out(cg,0); c.start(t); c.stop(t+0.04);
+  }
+  function sub808(t,f,dur,lvl=0.9){
+    if(!f) return;
+    const o=ctx.createOscillator(), g=ctx.createGain(), ws=ctx.createWaveShaper();
+    o.type="sine"; ws.curve=distCurve(2.5);
+    o.frequency.setValueAtTime(f*1.5,t); o.frequency.exponentialRampToValueAtTime(f,t+0.06);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(lvl,t+0.02);
+    g.gain.setValueAtTime(lvl,t+dur*0.6); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(ws).connect(g); out(g,0); o.start(t); o.stop(t+dur+.05);
+  }
+  function snare(t,lvl=0.7){
+    const s=ctx.createBufferSource(); s.buffer=noiseBuf; const bp=ctx.createBiquadFilter();
+    bp.type="highpass"; bp.frequency.value=1200; const g=ctx.createGain();
+    g.gain.setValueAtTime(lvl,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
+    s.connect(bp).connect(g); out(g,0.25); s.start(t); s.stop(t+0.2);
+    const o=ctx.createOscillator(), og=ctx.createGain(); o.type="triangle"; o.frequency.value=190;
+    og.gain.setValueAtTime(lvl*0.5,t); og.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
+    o.connect(og); out(og,0); o.start(t); o.stop(t+0.13);
+  }
+  function hat(t,open=false,lvl=0.3){
+    const s=ctx.createBufferSource(); s.buffer=noiseBuf; const hp=ctx.createBiquadFilter();
+    hp.type="highpass"; hp.frequency.value=7000; const g=ctx.createGain();
+    const d=open?0.16:0.045;
+    g.gain.setValueAtTime(lvl,t); g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    s.connect(hp).connect(g); out(g,0.1); s.start(t); s.stop(t+d+.02);
+  }
+  // janggu / buk — Korean drums (pitched membrane)
+  function janggu(t,hi=true,lvl=0.7){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sine"; const f=hi?230:120;
+    o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(f*0.6,t+0.08);
+    g.gain.setValueAtTime(lvl,t); g.gain.exponentialRampToValueAtTime(0.0001,t+(hi?0.14:0.26));
+    o.connect(g); out(g,0.15); o.start(t); o.stop(t+0.3);
+    const n=ctx.createBufferSource(); n.buffer=noiseBuf; const bp=ctx.createBiquadFilter();
+    bp.type="bandpass"; bp.frequency.value=hi?900:400; const ng=ctx.createGain();
+    ng.gain.setValueAtTime(lvl*0.6,t); ng.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+    n.connect(bp).connect(ng); out(ng,0.1); n.start(t); n.stop(t+0.06);
+  }
+  // riser sweep
+  function riser(t,dur,lvl=0.3){
+    const s=ctx.createBufferSource(); s.buffer=noiseBuf; s.loop=true;
+    const bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.Q.value=1.2;
+    bp.frequency.setValueAtTime(300,t); bp.frequency.exponentialRampToValueAtTime(9000,t+dur);
+    const g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(lvl,t+dur);
+    g.gain.linearRampToValueAtTime(0.0001,t+dur+0.1);
+    s.connect(bp).connect(g); out(g,0.3); s.start(t); s.stop(t+dur+0.15);
+  }
+  function downlifter(t,dur=1.2,lvl=0.35){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sawtooth"; o.frequency.setValueAtTime(1400,t); o.frequency.exponentialRampToValueAtTime(60,t+dur);
+    g.gain.setValueAtTime(lvl,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g); out(g,0.3); o.start(t); o.stop(t+dur+.05);
+  }
+  // crowd chant / cheer swell
+  function crowd(t,dur=1.6,lvl=0.22){
+    const s=ctx.createBufferSource(); s.buffer=noiseBuf; s.loop=true;
+    const bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=1100; bp.Q.value=1.4;
+    const g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(lvl,t+dur*0.4);
+    g.gain.linearRampToValueAtTime(0.0001,t+dur);
+    s.connect(bp).connect(g); out(g,0.4); s.start(t); s.stop(t+dur+.05);
+  }
+  // beatbox-ish vocal perc
+  function beatbox(t,kind){
+    if(kind==="b"){ kick(t,0.7); }
+    else { // "ts"
+      const s=ctx.createBufferSource(); s.buffer=noiseBuf; const hp=ctx.createBiquadFilter();
+      hp.type="highpass"; hp.frequency.value=5000; const g=ctx.createGain();
+      g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.06);
+      s.connect(hp).connect(g); out(g,0.1); s.start(t); s.stop(t+0.07);
+    }
+  }
+
+  // ---------- chord progression (Am F C G) for drops ----------
+  const PROG = [ // per 2 bars
+    {root:"A2", pad:["A3","C4","E4"]},
+    {root:"F2", pad:["F3","A3","C4"]},
+    {root:"C3", pad:["C4","E4","G4"]},
+    {root:"G2", pad:["G3","B3","D4"]},
+  ];
+
+  // play the Arirang melody with a given instrument fn across N bars starting at absolute time
+  function playMelody(inst, startT, bars, lvlScale=1, octShift=0){
+    let beat=0; const totalBeats=bars*4; let idx=0;
+    while(beat<totalBeats){
+      const [nm,db]=ARIRANG[idx%ARIRANG.length];
+      let f=freq(nm); if(f&&octShift) f*=Math.pow(2,octShift);
+      const t=startT+beat*SPB;
+      inst(t,f,db*SPB*0.98,undefined);
+      // note: inst signature (t,f,dur,lvl) — lvl uses default; scale via wrapper below
+      beat+=db; idx++;
+    }
+  }
+  // wrapper to inject level scaling
+  function melodyWith(instFn, lvl){ return (t,f,dur)=>instFn(t,f,dur,lvl); }
+
+  // ---------- master schedule ----------
+  function schedule(t0){
+    // continuous cinematic pad under intro/build
+    for(const [key,,,bars,,startBar] of SECTIONS.map(s=>[s[0],s[1],s[2],s[3],s[4],s[5]])){
+      const t = t0 + startBar*BAR;
+      const dur = bars*BAR;
+
+      if(key==="intro"){
+        wind(t,dur,0.16);
+        // heartbeats every 2 beats, slowing feel
+        for(let b=0;b<bars*4;b+=2) heartbeat(t+b*SPB);
+        // female hum pad — Am then C
+        pad(t, ["A3","C4","E4"].map(freq), dur*0.5, 0.16,"sine");
+        pad(t+dur*0.5, ["C4","E4","G4"].map(freq), dur*0.5, 0.16,"sine");
+        // 대금 flute plays Arirang softly (last 5 bars) an octave down feel
+        playMelody(melodyWith(flute,0.24), t+3*BAR, 5, 1, -0);
+      }
+
+      else if(key==="build"){
+        // sustained pad
+        pad(t, ["A3","C4","E4"].map(freq), dur, 0.14,"sawtooth");
+        // beatbox groove building
+        for(let b=0;b<bars*4;b++){
+          if(b%2===0) beatbox(t+b*SPB,"b");
+          beatbox(t+(b+0.5)*SPB,"ts");
+          if(b>=bars*2) hat(t+b*SPB,false,0.18);
+        }
+        // taepyeongso teasing the melody, upper octave
+        playMelody(melodyWith(taepyeongso,0.22), t+0*BAR, 6, 1, 0);
+        // snare roll accelerating in last 2 bars
+        const rollStart=t+(bars-2)*BAR;
+        let div=1; for(let b=0;b<2*4;){ snare(rollStart+b*SPB,0.35); b+=div; if(b>4) div=0.5; if(b>6) div=0.25; }
+        // big riser last 4 bars
+        riser(t+(bars-4)*BAR, 4*BAR, 0.32);
+      }
+
+      else if(key==="drop1"||key==="drop2"){
+        const isFinal = key==="drop2";
+        downlifter(t,1.0,0.35); crowd(t,2.2,0.24);
+        for(let bar=0;bar<bars;bar++){
+          const bt=t+bar*BAR; const chord=PROG[(bar>>1)%PROG.length];
+          // four-on-floor kick
+          for(let bb=0;bb<4;bb++) kick(bt+bb*SPB, 1.0);
+          // 808 on beat 1 & 3 (+ off-beat push on 4&)
+          sub808(bt, freq(chord.root), SPB*1.6, 0.95);
+          sub808(bt+2*SPB, freq(chord.root), SPB*1.4, 0.9);
+          sub808(bt+3.5*SPB, freq(chord.root)*1.0, SPB*0.5, 0.7);
+          // hats
+          for(let e=0;e<8;e++) hat(bt+e*0.5*SPB, e%2===1, e%2===1?0.14:0.22);
+          // snare/clap on 2 & 4
+          snare(bt+1*SPB,0.7); snare(bt+3*SPB,0.7);
+          // janggu/buk groove (Korean rhythm accents)
+          janggu(bt+0*SPB,false,0.7); janggu(bt+1.5*SPB,true,0.5);
+          janggu(bt+2*SPB,false,0.6); janggu(bt+2.75*SPB,true,0.45); janggu(bt+3.5*SPB,true,0.5);
+          // stab pad chord each bar
+          pad(bt, chord.pad.map(freq), BAR*0.9, isFinal?0.16:0.13, "sawtooth");
+          if(isFinal) pad(bt, chord.pad.map(n=>freq(n)*2), BAR*0.9, 0.10, "sine"); // choir layer up octave
+        }
+        // Arirang melody: EDM supersaw lead + taepyeongso doubling, haegeum answers
+        playMelody(melodyWith(lead, isFinal?0.24:0.2), t, bars, 1, 0);
+        playMelody(melodyWith(taepyeongso, isFinal?0.26:0.22), t, bars, 1, 0);
+        if(isFinal) playMelody(melodyWith(haegeum,0.2), t+BAR, bars-1, 1, -1); // haegeum harmony lower
+        // crowd chant every 4 bars
+        for(let bar=0;bar<bars;bar+=4) crowd(t+bar*BAR, 1.6, 0.18);
+      }
+
+      else if(key==="break"){
+        // sparse — solo haegeum over soft pad + slow kick pulse
+        pad(t, ["A3","C4","E4"].map(freq), dur, 0.12,"sine");
+        for(let bar=0;bar<bars;bar++){
+          if(bar>=bars-2){ // build back a heartbeat + subtle kick
+            kick(t+bar*BAR,0.5); kick(t+bar*BAR+2*SPB,0.5);
+          }
+        }
+        // expressive solo haegeum, rubato-ish (slightly longer notes)
+        playMelody(melodyWith(haegeum,0.3), t, bars, 1, 0);
+        // riser back into final drop (last 2 bars)
+        riser(t+(bars-2)*BAR, 2*BAR, 0.3);
+        crowd(t+(bars-1)*BAR, BAR, 0.16);
+      }
+
+      else if(key==="outro"){
+        downlifter(t,1.4,0.3);
+        pad(t, ["A3","C4","E4","A4"].map(freq), dur, 0.16,"sine");
+        flute(t+BAR, freq("A4"), dur-BAR, 0.2);
+        wind(t, dur, 0.12);
+      }
+    }
+  }
+
+  // ---------- UI ----------
+  const playBtn=document.getElementById("play");
+  const icon=document.getElementById("icon");
+  const secName=document.getElementById("secName");
+  const prog=document.getElementById("prog");
+  const curEl=document.getElementById("cur");
+  const durEl=document.getElementById("dur");
+  const grid=document.getElementById("secGrid");
+  const canvas=document.getElementById("viz");
+  const cx=canvas.getContext("2d");
+
+  const fmt=s=>{s=Math.max(0,s|0);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+  durEl.textContent=fmt(TOTAL_DUR);
+
+  // section cards
+  const cards={};
+  SECTIONS.forEach(s=>{
+    const el=document.createElement("div"); el.className="sec";
+    el.innerHTML=`<div class="n">${s[1]}</div><div class="t">${s[2]}</div><div class="d">${s[4]}</div>`;
+    grid.appendChild(el); cards[s[0]]=el;
+  });
+
+  const PLAY_ICON='<path d="M8 5v14l11-7z"/>';
+  const STOP_ICON='<rect x="7" y="7" width="10" height="10" rx="2"/>';
+
+  function start(){
+    if(!ctx) initAudio();
+    if(ctx.state==="suspended") ctx.resume();
+    startAt = ctx.currentTime + 0.12;
+    schedule(startAt);
+    playing=true; playBtn.classList.add("playing"); icon.innerHTML=STOP_ICON;
+    stopTimer=setTimeout(stop,(TOTAL_DUR+0.6)*1000);
+    drawLoop();
+  }
+  function stop(){
+    playing=false; playBtn.classList.remove("playing"); icon.innerHTML=PLAY_ICON;
+    if(stopTimer) clearTimeout(stopTimer);
+    if(ctx){ try{ctx.close();}catch(e){} ctx=null; }
+    cancelAnimationFrame(rafId);
+    prog.style.width="0%"; curEl.textContent="0:00"; secName.textContent="대기 중";
+    Object.values(cards).forEach(c=>c.classList.remove("active"));
+  }
+  playBtn.addEventListener("click",()=> playing?stop():start());
+  vol.addEventListener("input",()=>{ if(master) master.gain.value=vol.value/100*0.9; });
+
+  function drawLoop(){
+    if(!playing||!ctx){return;}
+    const el=ctx.currentTime-startAt;
+    const p=Math.min(1,el/TOTAL_DUR);
+    prog.style.width=(p*100)+"%"; curEl.textContent=fmt(el);
+    const bar=el/BAR; const s=secOf(bar);
+    secName.textContent=s[2]+" · "+s[1];
+    Object.entries(cards).forEach(([k,c])=>c.classList.toggle("active",k===s[0]));
+
+    // visualizer
+    const N=analyser.frequencyBinCount, data=new Uint8Array(N);
+    analyser.getByteFrequencyData(data);
+    const W=canvas.width,H=canvas.height;
+    cx.clearRect(0,0,W,H);
+    const bars=96, step=Math.floor(N/2/bars);
+    for(let i=0;i<bars;i++){
+      let v=0; for(let j=0;j<step;j++) v+=data[i*step+j]; v/=step;
+      const h=Math.pow(v/255,1.4)*H*0.92;
+      const x=i/bars*W, w=W/bars*0.68;
+      const hue=200 - i*1.6; // cyan->pink->gold sweep
+      const grad=cx.createLinearGradient(0,H,0,H-h);
+      grad.addColorStop(0,`hsla(${hue+40},100%,55%,.25)`);
+      grad.addColorStop(1,`hsla(${hue},100%,65%,1)`);
+      cx.fillStyle=grad;
+      cx.fillRect(x, H-h, w, h);
+      cx.fillRect(x, H-h-3, w, 3); // cap glow
+    }
+    rafId=requestAnimationFrame(drawLoop);
+  }
+
+  // idle canvas shimmer
+  (function idle(){
+    if(playing) return;
+    const W=canvas.width,H=canvas.height,t=Date.now?0:0; // no Date reliance
+    cx.clearRect(0,0,W,H);
+    cx.fillStyle="rgba(122,60,255,.10)";
+    for(let i=0;i<96;i++){ const h=20+40*Math.abs(Math.sin(i*0.5)); cx.fillRect(i/96*W,H-h,W/96*0.68,h);}
+    requestAnimationFrame(idle);
+  })();
+})();
+</script>
+</body>
+</html>
