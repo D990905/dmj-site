@@ -656,6 +656,43 @@
     }
   }
 
+  /* .csv (SailTech 통합 CSV) 처리. csv-parser 가 GPX·VKX 파서와 동일한
+     구조를 돌려주므로 normalizeSession 이후 흐름은 processGpx 와 같다.
+     각 포인트에는 heel·pitch·hr 이 함께 담겨 분석으로 전달된다. */
+  function processCsv(text, name) {
+    try {
+      var parsed = Csv.parseCSV(text);
+      var session = An.normalizeSession(parsed);
+      state.parsed = parsed;
+      state.gpxText = null;
+      state.fullSession = session;
+      state.autoSessionName = autoTitleFrom(name, parsed);
+      state.sessionName = state.autoSessionName;
+      state.windDir = null;
+      state.windPending = null;
+      state.windSpeedKt = null;
+      state.selectedManeuvers = [];
+      state.maneuverFilter = 'all';
+      state.maneuverShowAll = false;
+      state.sessionHasVideoFlag = false;
+      state.sessionRemoteDateEpoch = null;
+      state.sessionSig = sessionSignature(session);
+      var savedTitle = Storage.loadSessionTitle(state.sessionSig);
+      if (savedTitle) state.sessionName = savedTitle;
+      state.editState = session.hasTime ? Storage.loadEditState(state.sessionSig) : null;
+      applyCurrentEdits();
+      if (state.windDir == null && autoApplyRecommendedWind()) recompute();
+      $('intro-view').hidden = true;
+      $('dashboard-view').hidden = false;
+      resetAnimMarks();
+      renderDashboard();
+      window.scrollTo(0, 0);
+      showHeroSummary();
+    } catch (e) {
+      showError(e && e.message ? e.message : 'CSV 파일을 분석하지 못했습니다.');
+    }
+  }
+
   /* 세션의 풍향 자동 추정 결과(신뢰도 포함) — 트랙 구조에만 의존하므로
      세션당 한 번만 계산해 캐시한다. 편집·크롭 세션은 객체가 새로 생성돼
      자연히 다시 계산된다. */
