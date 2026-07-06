@@ -152,14 +152,15 @@
      오를수록 초록에 가까워지는 단일 신호등 램프로 재배치한다:
        Elite=진초록(에메랄드) / Advanced=연초록(라임) / Intermediate=노랑(앰버)
        / Foundational=오렌지 / Learning=레드.
-     §432 v3.1 FINAL (옥대표 스크린샷 명시 순색 + "Elite 더 진하게") — 톤을 최대
-       채도 순색(형광)으로 확정하되 Elite 는 더 깊은 에메랄드로:
-       Elite=#00FF00(진한 에메랄드) / Advanced=#7FFF00(순수 라임) /
-       Intermediate=#FFCC00 / Foundational=#FFA500 / Learning=#FF0000. 이 5색은
-       심박 존(chart-theme.js HR_ZONE)·속도분포(signal5)와 hex 완전 일치한다
-       (SPS Elite=HR Z1 저심박=그린 … SPS Learning=HR Z5 고심박=레드).
-       Elite 를 #00FF66→#00FF00 로 진하게 하며 Advanced(밝은 라임)와 명확히
-       구분됨(luminance ΔL 0.010→0.276) → 상위 tier 무게감 + 색맹 구분도 회복.
+     §432 v3.2 FINAL (옥대표 확정 "트래픽 라이트 자연 rainbow") — 초록→노랑→
+       오렌지→빨강 자연 스펙트럼, 각 tier 명확한 hue 차이:
+       Elite=#00FF00(순수 초록·최상) / Advanced=#7FFF00(chartreuse) /
+       Intermediate=#FFCC00(노랑) / Foundational=#FFA500(오렌지) /
+       Learning=#FF0000(빨강). 이 5색은 심박 존(chart-theme.js HR_ZONE)·
+       속도분포(signal5)와 hex 완전 일치한다 (SPS Elite=HR Z1 저심박=초록 …
+       SPS Learning=HR Z5 고심박=빨강). hue 가 120°→90°→48°→39°→0° 로 단조
+       감소 = rainbow 순서. 인접 tier 는 luminance 또는 hue 로 구분(색맹 대비:
+       Elite↔Advanced 는 hue 30°, Int↔Found 는 luminance 로 뚜렷). v3·v3.1 폐기.
      (밴드 임계값 80/60/40/20 은 §424 lock — 불변. PDF grade-chip 은 이미
      동일한 신호등 램프[green→red]라 tier 별로 정합 — 별도 변경 불필요.) */
   var VPS_BANDS = [
