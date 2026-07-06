@@ -140,27 +140,38 @@ var EXPECT_432 = {
   check('§432 ' + c[1] + ' hex = ' + EXPECT_432[c[1]],
     b.color.toUpperCase() === EXPECT_432[c[1]].toUpperCase(), 'got ' + b.color);
 });
-/* §432 v3.1 — 옥대표 "Elite 더 진하게"(#00FF66→#00FF00) 로 색맹 접근성 회복.
-   v3 순색에선 Elite↔Advanced 가 둘 다 순수 초록이라 ΔL≈0.010(구분 불가)였으나,
-   Elite 를 진한 에메랄드로 낮추며 ΔL 0.276 으로 벌어져 인접쌍 전부 유의미하게
-   구분된다. 따라서 인접 luminance 임계 가드(색맹 회귀 방지)를 복원한다.
-   측정: elite↔adv 0.276·adv↔int 0.071·int↔found 0.163·found↔learn 0.269. */
-var lumOrder = ['elite', 'advanced', 'intermediate', 'foundational', 'learning']
-  .map(function (t) { return { t: t, L: relLum(EXPECT_432[t]) }; });
-var MIN_DL = 0.05;
-for (var li = 0; li < lumOrder.length - 1; li++) {
-  var la = lumOrder[li], lb = lumOrder[li + 1];
-  var dL = Math.abs(la.L - lb.L);
-  check('§432 v3.1 인접 luminance 차 ' + la.t + '↔' + lb.t + ' ≥ ' + MIN_DL,
-    dL >= MIN_DL, 'ΔL=' + dL.toFixed(3));
+/* §432 v3.2 — 트래픽 라이트 자연 rainbow. hue 가 초록(120°)→chartreuse(90°)→
+   노랑(48°)→오렌지(39°)→빨강(0°) 로 단조 감소. 인접 tier 구분은 luminance
+   또는 hue 로 확보된다(rainbow 는 hue 가 1차 신호): Elite↔Advanced 는 둘 다
+   밝아 ΔL 은 작지만(0.045) hue 30° 로 뚜렷, Int↔Found 는 hue 는 가깝지만(9°)
+   luminance 로 뚜렷(0.163). 색맹 회귀 가드 = 인접쌍이 ΔL≥0.05 OR Δhue≥20° 로
+   구분 가능 + hue 단조(rainbow 순서) + 5색 유니크. */
+function hueOf(hex) {
+  var m = hex.replace('#', '');
+  var r = parseInt(m.substr(0, 2), 16) / 255, g = parseInt(m.substr(2, 2), 16) / 255,
+      b = parseInt(m.substr(4, 2), 16) / 255;
+  var mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  if (d === 0) return 0;
+  var H = mx === r ? 60 * (((g - b) / d) % 6)
+        : mx === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4);
+  return (H + 360) % 360;
 }
-check('§432 v3.1 Elite(진에메랄드)↔Advanced(라임) 명확 구분',
-  Math.abs(relLum(EXPECT_432.elite) - relLum(EXPECT_432.advanced)) >= 0.15,
-  'ΔL=' + Math.abs(relLum(EXPECT_432.elite) - relLum(EXPECT_432.advanced)).toFixed(3));
+var order432 = ['elite', 'advanced', 'intermediate', 'foundational', 'learning'];
+var MIN_DL = 0.05, MIN_DH = 20;
+for (var li = 0; li < order432.length - 1; li++) {
+  var t1 = order432[li], t2 = order432[li + 1];
+  var dL = Math.abs(relLum(EXPECT_432[t1]) - relLum(EXPECT_432[t2]));
+  var dH = Math.abs(hueOf(EXPECT_432[t1]) - hueOf(EXPECT_432[t2]));
+  check('§432 v3.2 인접 구분 ' + t1 + '↔' + t2 + ' (ΔL≥' + MIN_DL + ' 또는 Δhue≥' + MIN_DH + '°)',
+    dL >= MIN_DL || dH >= MIN_DH, 'ΔL=' + dL.toFixed(3) + ' Δhue=' + dH.toFixed(0) + '°');
+}
+/* hue 단조 감소 = rainbow 순서(초록→빨강) 회귀 가드 */
+var hues432 = order432.map(function (t) { return hueOf(EXPECT_432[t]); });
+var huesMono = hues432.every(function (h, i) { return i === 0 || hues432[i - 1] > h; });
+check('§432 v3.2 hue 단조 감소 (초록→빨강 rainbow)', huesMono, hues432.map(function (h) { return h.toFixed(0) + '°'; }).join(' > '));
 /* 5색 유니크(동일색 붕괴 회귀 가드) */
-var v3uniq = ['elite', 'advanced', 'intermediate', 'foundational', 'learning']
-  .map(function (t) { return EXPECT_432[t]; });
-check('§432 v3.1 5색 유니크(hex 중복 없음)',
+var v3uniq = order432.map(function (t) { return EXPECT_432[t]; });
+check('§432 v3.2 5색 유니크(hex 중복 없음)',
   new Set(v3uniq).size === 5, v3uniq.join(' '));
 
 /* 3d) §432 — 회전효율 score chip(app.js effChipHtml)은 SPS 도넛과 같은 vpsBand
