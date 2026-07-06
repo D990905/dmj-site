@@ -108,6 +108,43 @@ check('§431 Foundational(30) ≠ Elite(90) 색',
   Coach.vpsBand(30).color !== Coach.vpsBand(90).color,
   'found=' + Coach.vpsBand(30).color + ' elite=' + Coach.vpsBand(90).color);
 
+/* 3c) §432 — 트래픽 라이트 그라디언트 재배치. 긍정=그린, 부정=레드.
+   (a) canonical hex 고정 (신호등 램프 회귀 가드)
+   (b) 인접 밴드 luminance 차 확보 — 색맹(deutan/protan) 사용자도 구분 가능.
+       특히 Advanced(연초록)↔Intermediate(노랑) 이 가장 가까운 쌍이라 명시 검사. */
+function relLum(hex) {                       /* WCAG 상대 휘도 (0~1) */
+  var m = hex.replace('#', '');
+  var rgb = [0, 2, 4].map(function (i) {
+    var c = parseInt(m.substr(i, 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+}
+var EXPECT_432 = {
+  elite: '#059669', advanced: '#22C55E', intermediate: '#EAB308',
+  foundational: '#F97316', learning: '#EF4444'
+};
+[[90, 'elite'], [70, 'advanced'], [50, 'intermediate'],
+ [30, 'foundational'], [10, 'learning']].forEach(function (c) {
+  var b = Coach.vpsBand(c[0]);
+  check('§432 ' + c[1] + ' hex = ' + EXPECT_432[c[1]],
+    b.color.toUpperCase() === EXPECT_432[c[1]].toUpperCase(), 'got ' + b.color);
+});
+/* Elite→…→Learning 순으로 인접 luminance 차 (yellow 가 최고 휘도라 전역 단조는
+   아니지만, 인접쌍은 모두 유의미하게 벌어져야 색맹 판별 가능). */
+var lumOrder = ['elite', 'advanced', 'intermediate', 'foundational', 'learning']
+  .map(function (t) { return { t: t, L: relLum(EXPECT_432[t]) }; });
+var MIN_DL = 0.05;
+for (var li = 0; li < lumOrder.length - 1; li++) {
+  var a = lumOrder[li], nb = lumOrder[li + 1];
+  var dL = Math.abs(a.L - nb.L);
+  check('§432 인접 luminance 차 ' + a.t + '↔' + nb.t + ' ≥ ' + MIN_DL,
+    dL >= MIN_DL, 'ΔL=' + dL.toFixed(3));
+}
+check('§432 Advanced↔Intermediate luminance 구분 (연초록≠노랑)',
+  Math.abs(relLum(EXPECT_432.advanced) - relLum(EXPECT_432.intermediate)) >= MIN_DL,
+  'ΔL=' + Math.abs(relLum(EXPECT_432.advanced) - relLum(EXPECT_432.intermediate)).toFixed(3));
+
 /* 4) floor=0 회귀 가드 */
 check('VPS.UPWIND_RATIO_FLOOR = 0 (§424 백분위형 lock)',
   Coach.VPS.UPWIND_RATIO_FLOOR === 0, 'floor=' + Coach.VPS.UPWIND_RATIO_FLOOR);
