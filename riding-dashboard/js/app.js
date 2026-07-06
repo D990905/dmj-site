@@ -5322,7 +5322,15 @@
     }
     // 스포츠를 먼저 맞춘 뒤 분석 파이프라인을 태운다 (processGpx 는 스포츠를 건드리지 않음)
     if (rec.sport && SPORTS[rec.sport]) state.sport = rec.sport;
-    processGpx(gpx, rec.name || '라이딩 세션');
+    /* §434 — 융합 세션은 컴팩트 JSON 으로 저장돼 있어 heel/pitch/hr 까지
+       복원한다. 그 외(원본 GPX)는 기존 경로. */
+    if (isFusedTrackStr(gpx)) {
+      var fres = deserializeFusedTrack(gpx);
+      if (!fres) { showError('저장된 세션 데이터를 읽지 못했습니다.'); return false; }
+      processFusion(fres, [], []);
+    } else {
+      processGpx(gpx, rec.name || '라이딩 세션');
+    }
     if ($('dashboard-view').hidden) return false;   // 재파싱 실패 — showError 가 이미 표시됨
     /* §423 — 저장 시점에 영상이 있었는지(cloud _hasVideo) + 저장 시각을 보존.
        processGpx 가 위에서 false 로 리셋했으므로 여기서 덮어쓴다. 이 기기에
