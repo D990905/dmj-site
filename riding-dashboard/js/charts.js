@@ -2274,6 +2274,7 @@
     hideCursor: hideCursor,
     sizeCrosshair: sizeCrosshair,
     speedColor: speedColor,
+    speedTierColor: speedTierColor,   /* §432 v2 — 절대속도→5-tier 신호등 */
     mapSpeedColor: mapSpeedColor,
     destroyAll: destroyAll
   };
