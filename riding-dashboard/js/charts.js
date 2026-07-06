@@ -1475,7 +1475,7 @@
           }
         }
       },
-      plugins: [sliceLabels]
+      plugins: [pieShadow, sliceLabels]
     });
     return inst.hist;
   }
