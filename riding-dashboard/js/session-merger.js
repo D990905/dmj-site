@@ -309,6 +309,8 @@
       if (p.heel != null) q.heel = p.heel;
       if (p.pitch != null) q.pitch = p.pitch;
       if (p.gforceX != null) { q.gforceX = p.gforceX; q.gforceY = p.gforceY; q.gforceZ = p.gforceZ; }
+      if (p.gyroX != null) q.gyroX = p.gyroX;
+      if (p.gyroY != null) q.gyroY = p.gyroY;
       if (p.gyroZ != null) q.gyroZ = p.gyroZ;
       return q;
     });
@@ -317,8 +319,8 @@
     var sf = filterSpikes(pts);
     pts = sf.points;
 
-    /* primary 자체 IMU(gforce) → heel/pitch */
-    if (Imu) Imu.annotate(pts);
+    /* primary 자체 IMU → heel/pitch (자이로 있으면 상보필터 보정) */
+    if (Imu) Imu.computeAttitude(pts);
 
     /* ── 도너 선택 ─────────────────────────────────────────── */
     var others = srcs.filter(function (s) { return s !== primary; });
