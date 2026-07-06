@@ -1509,7 +1509,8 @@
           var top = Math.max(Math.min(yLo, yHi), ys.top);
           var bot = Math.min(Math.max(yLo, yHi), ys.bottom);
           if (bot <= top) return;
-          ctx.fillStyle = hexA(color, 0.10);
+          /* §432 v2 — 존 배경 띠 alpha 0.10→0.16 (형광 톤 존 신호 가시성↑). */
+          ctx.fillStyle = hexA(color, 0.16);
           ctx.fillRect(x1, top, x2 - x1, bot - top);
         }
         band(0, zoneData.zones[0].loBpm, HR_ZONE_REST);
