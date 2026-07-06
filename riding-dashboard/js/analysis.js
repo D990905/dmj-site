@@ -1131,9 +1131,15 @@
      렌더러(app.js)는 이 값으로 '상위'가 어느 쪽인지·방향 배지를 정한다. */
   function statsMetricDirection(metric, mode) {
     if (metric === 'sog' || metric === 'vmg') return 'high';
-    /* CWA·AWA 모두 풍상은 작을수록(바람에 가깝게 포인팅) 좋다. 풍하는
-       최적각이 비단조(140–150°)라 중립. */
-    if (metric === 'twa' || metric === 'awa') return (mode === 'upwind') ? 'low' : 'neutral';
+    /* CWA(코스풍각)는 풍상만 작을수록 좋고(포인팅), 풍하는 최적각이
+       비단조(140–150°)라 중립. */
+    if (metric === 'twa') return (mode === 'upwind') ? 'low' : 'neutral';
+    /* AWA(겉보기 풍각)는 속도에 반비례한다 — 빠를수록 겉보기 바람이
+       앞으로 당겨져 작아진다. 그래서 대표(상위)는 '가장 빠르게 활주할
+       때의 겉보기각 = 작은 값'으로, 풍상·풍하 모두 낮은 쪽을 상위로
+       뽑는다. 이렇게 하지 않으면 '상위'가 저속·펌핑 순간의 큰 각(옆에서
+       부는 바람)을 대표로 뽑아 값이 이상해진다(스타보드 풍하 71° 문제). */
+    if (metric === 'awa') return 'low';
     return 'neutral';   // heel · pitch · hr
   }
 
