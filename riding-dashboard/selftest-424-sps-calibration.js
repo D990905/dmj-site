@@ -194,6 +194,52 @@ if (HRZ) {
     String(HRZ.line).toUpperCase() !== EXPECT_432.learning.toUpperCase(), 'line=' + HRZ.line);
 }
 
+/* 3f) §432 v2 — 속도 분포 파이색(charts.speedTierColor)이 절대 속도 → 5-tier
+   신호등(형광) 이산 매핑. 옥대표 "속도분포도 교체". 팔레트는 chart-theme
+   signal5 단일 소스(= SPS·HR 와 일치). 히스토그램 bin=2kt, 경계 2/8/14/18. */
+var SIG = ChartTheme && ChartTheme.signal5 ? ChartTheme.signal5 : null;
+check('§432 chart-theme signal5(5-tier 팔레트) 로드', !!SIG && SIG.length === 5,
+  SIG ? SIG.join(' ') : '없음');
+if (SIG) {
+  /* signal5 순서(레드→에메랄드)가 SPS tier 색과 정합 */
+  var sigToTier = [[0, 'learning'], [1, 'foundational'], [2, 'intermediate'],
+                   [3, 'advanced'], [4, 'elite']];
+  sigToTier.forEach(function (st) {
+    check('§432 signal5[' + st[0] + '] = SPS ' + st[1] + ' 색',
+      SIG[st[0]].toUpperCase() === EXPECT_432[st[1]].toUpperCase(),
+      'sig=' + SIG[st[0]] + ' sps=' + EXPECT_432[st[1]]);
+  });
+}
+if (Charts && typeof Charts.speedTierColor === 'function') {
+  /* 절대 속도 → 형광 tier (빠를수록 초록): 옥대표 지정 구간 대표 속도로 검증 */
+  var speedCases = [
+    [1, 'learning'],      // 0–2 정지·바운스 = 레드
+    [5, 'foundational'],  // 2–8 정체·워터스타트 = 오렌지
+    [11, 'intermediate'], // 8–14 저속 라이딩 = 옐로
+    [15, 'advanced'],     // 14–18 포일링 안정 = 라임
+    [20, 'elite']         // 18+ 포일링 고속 = 에메랄드
+  ];
+  speedCases.forEach(function (sc) {
+    check('§432 속도 ' + sc[0] + 'kt → ' + sc[1] + ' (' + EXPECT_432[sc[1]] + ')',
+      Charts.speedTierColor(sc[0]).toUpperCase() === EXPECT_432[sc[1]].toUpperCase(),
+      'got ' + Charts.speedTierColor(sc[0]));
+  });
+  /* 경계값(2·8·14·18) — 하한 포함(≥) 규칙: 정확히 경계면 위 tier 로 */
+  check('§432 속도 경계 2kt = foundational(오렌지, 하한 포함)',
+    Charts.speedTierColor(2).toUpperCase() === EXPECT_432.foundational.toUpperCase(),
+    'got ' + Charts.speedTierColor(2));
+  check('§432 속도 경계 18kt = elite(에메랄드, 하한 포함)',
+    Charts.speedTierColor(18).toUpperCase() === EXPECT_432.elite.toUpperCase(),
+    'got ' + Charts.speedTierColor(18));
+  /* 순서: 느림=레드 → 빠름=에메랄드 (역전 없음) */
+  check('§432 속도색 순서 레드(느림)→에메랄드(빠름)',
+    Charts.speedTierColor(1).toUpperCase() === EXPECT_432.learning.toUpperCase() &&
+    Charts.speedTierColor(25).toUpperCase() === EXPECT_432.elite.toUpperCase(),
+    'slow=' + Charts.speedTierColor(1) + ' fast=' + Charts.speedTierColor(25));
+} else {
+  check('§432 charts.speedTierColor export', false, '함수 미노출');
+}
+
 /* 4) floor=0 회귀 가드 */
 check('VPS.UPWIND_RATIO_FLOOR = 0 (§424 백분위형 lock)',
   Coach.VPS.UPWIND_RATIO_FLOOR === 0, 'floor=' + Coach.VPS.UPWIND_RATIO_FLOOR);
