@@ -1737,7 +1737,7 @@
       sport: state.sport, windDir: state.windDir, windSpeedKt: state.windSpeedKt,
       vps: vpsMeta(),
       hrRecoveryIndex: skillHrRecoveryIndex(),
-      gpxText: state.gpxText        // '다시 보기'용 원본 GPX
+      gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
     var st = $('save-status');
     st.hidden = false;
@@ -5148,7 +5148,7 @@
       windSpeedKt: state.windSpeedKt,
       vps: vpsMeta(),
       hrRecoveryIndex: skillHrRecoveryIndex(),
-      gpxText: state.gpxText        // '다시 보기'용 원본 GPX
+      gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
     var st = $('save-status');
     st.hidden = false;
