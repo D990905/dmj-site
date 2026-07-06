@@ -139,8 +139,8 @@
    *   80+    Elite        (gold)
    *   60–80  Advanced     (green)
    *   40–60  Intermediate (blue)
-   *   20–40  Foundational (yellow)
-   *   0–20   Learning     (orange)
+   *   20–40  Foundational (orange)   §431
+   *   0–20   Learning     (red)      §431
    * 하한 포함(>=) 규약: 80→Elite, 60→Advanced … 20→Foundational, 0→Learning.
    * 색은 표시 레이어가 그대로 쓰거나 자체 팔레트로 매핑할 수 있게 hex 동봉.
    * 주의 — 이 밴드는 '이번 세션 SPS' 의 절대 등급일 뿐, 메인 사이트의
