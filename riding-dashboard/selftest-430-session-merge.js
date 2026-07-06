@@ -159,6 +159,52 @@ var soloRbCsv = Merger.merge([srcRbCsv]);
 ok(soloRbCsv.fusion.heelCoverage > 0.5, '단일 RaceBox CSV: 자체 IMU→heel 산출');
 ok(!soloRbCsv.parsed.hasHR, '단일 RaceBox CSV: HR 없음 (Waterspeed 미포함, no-op)');
 
+/* ---------- 7. 윙포일 보정 — 상보필터 vs accel-only ---------- */
+console.log('\n[7] 윙포일 IMU 보정 (상보필터 + 게이팅)');
+/* 원본 CSV 포인트에 자이로가 실렸는지 */
+var rawPts = rbCsv.tracks[0].segments[0];
+var gyroN = rawPts.filter(function (p) { return p.gyroX != null && p.gyroY != null; }).length;
+ok(gyroN > rawPts.length * 0.9, 'RaceBox CSV 자이로 3축 저장 (' + gyroN + '/' + rawPts.length + ')');
+
+function heelRateP(pts) {
+  var rr = [];
+  for (var i = 1; i < pts.length; i++) {
+    if (pts[i].heel == null || pts[i - 1].heel == null) continue;
+    var dt = (pts[i].time - pts[i - 1].time) / 1000;
+    if (dt > 0 && dt < 0.2) rr.push(Math.abs(pts[i].heel - pts[i - 1].heel) / dt);
+  }
+  rr.sort(function (a, b) { return a - b; });
+  return rr.length ? rr[Math.floor(0.99 * (rr.length - 1))] : null;
+}
+/* accel-only 기준선 */
+var accelPts = rawPts.map(function (p) {
+  return { time: p.time, gforceX: p.gforceX, gforceY: p.gforceY, gforceZ: p.gforceZ };
+});
+Imu.annotate(accelPts);
+var accelP99 = heelRateP(accelPts);
+/* 상보필터 */
+var compPts = rawPts.map(function (p) {
+  return { time: p.time, gforceX: p.gforceX, gforceY: p.gforceY, gforceZ: p.gforceZ,
+           gyroX: p.gyroX, gyroY: p.gyroY, gyroZ: p.gyroZ };
+});
+Imu.computeAttitude(compPts);
+var compP99 = heelRateP(compPts);
+console.log('    heel 변화율 p99: accel-only=' + accelP99.toFixed(0) + '°/s → 상보필터=' + compP99.toFixed(0) + '°/s');
+ok(compP99 < accelP99 * 0.6, '상보필터가 heel 튐 40%+ 감소 (부드러움)');
+ok(compP99 < 90, '보정 후 heel 변화율 p99 < 90°/s (현실적)');
+
+/* 보정 후 range 여전히 상식 범위 */
+var cbad = 0, cn = 0;
+for (var ci = 0; ci < compPts.length; ci++) {
+  if (compPts[ci].heel != null) { cn++; if (Math.abs(compPts[ci].heel) > 60) cbad++; }
+}
+ok(cn > 0 && cbad / cn < 0.02, '보정 후 heel 98%+ 가 ±60° 이내 (' + cbad + '/' + cn + ')');
+
+/* 융합 결과(res)의 heel 도 보정본인지 — merge 경로 확인 */
+var fusedP99 = heelRateP(res.points);
+console.log('    융합 세션 heel 변화율 p99=' + (fusedP99 != null ? fusedP99.toFixed(0) : 'n/a') + '°/s');
+ok(fusedP99 != null && fusedP99 < 90, '융합 경로에도 보정 적용됨 (p99 < 90)');
+
 /* ---------- 결과 ---------- */
 console.log('\n=== 결과: ' + pass + ' 통과 / ' + fail + ' 실패 ===\n');
 process.exit(fail ? 1 : 0);
