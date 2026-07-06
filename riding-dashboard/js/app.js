@@ -905,68 +905,48 @@
 
   /* §430 — 다중 파일 융합 배너 렌더. 융합 세션이 아니면 숨긴다. */
   function renderFusionBanner() {
+    /* §432 — 옥대표 "이건 안보이게 숨겨": 세션 자동 융합 배너를 UI 에서 완전
+       hide 한다(매 세션 반복되는 정보성 clutter). 융합 성공 여부는 화면 지표
+       자체로 확인 가능하고, 문제 진단이 필요할 때만 상세가 필요하므로 요약은
+       콘솔 로그(console.info)로만 남긴다. 경고(융합 미지원·병합 실패)는
+       console.warn 으로 남겨 개발자 도구에서 확인 가능하게 한다. */
     var el = $('fusion-banner');
-    if (!el) return;
+    if (el) { el.hidden = true; el.innerHTML = ''; }
     var st = state.fusion;
-    if (!st || !st.info) { el.hidden = true; el.innerHTML = ''; return; }
+    if (!st || !st.info) return;
     var f = st.info;
     function pct(x) { return Math.round((x || 0) * 100); }
-    /* §434 — 저장된 융합 세션 다시 보기: 소스 파일이 없으므로 전체 융합
-       리포트 대신 간결한 복원 안내 + 포함 지표만 표시. */
+
     if (f.restored) {
       var chips = [];
       if (f.heelCoverage > 0) chips.push('heel·pitch ' + pct(f.heelCoverage) + '%');
       if (f.hrCoverage > 0) chips.push('심박 ' + pct(f.hrCoverage) + '%');
-      el.innerHTML =
-        '<p class="fusion-banner__title"><span class="fusion-banner__ok">✓</span> ' +
-        i18nT('저장된 융합 세션 다시 보기') +
-        (chips.length ? ' <span class="fb-dim" style="font-weight:400">· ' +
-          esc(chips.join(' · ')) + ' ' + i18nT('포함') + '</span>' : '') + '</p>';
-      el.hidden = false;
+      console.info('[fusion] 저장된 융합 세션 다시 보기' +
+        (chips.length ? ' · ' + chips.join(' · ') + ' 포함' : ''));
       return;
     }
-    function row(k, v) {
-      return '<div class="fusion-banner__row"><span class="fusion-banner__k">' +
-        esc(k) + '</span><span class="fusion-banner__v">' + v + '</span></div>';
-    }
-    function dim(t) { return '<span class="fb-dim">' + esc(t) + '</span>'; }
 
-    var rows = [];
-    rows.push(row(i18nT('Primary 항적'),
-      esc(fusionSrcLabel(f.primary.source)) + ' ' +
-      dim('(' + f.primary.sampleRateHz + ' Hz · ' + (f.primary.pointCount || 0).toLocaleString() + 'pt)')));
-
+    var parts = ['Primary ' + fusionSrcLabel(f.primary.source) +
+      ' (' + f.primary.sampleRateHz + 'Hz · ' + (f.primary.pointCount || 0).toLocaleString() + 'pt)'];
     if (f.imu && f.imu.merged) {
-      rows.push(row(i18nT('IMU 병합'),
-        esc(fusionSrcLabel(f.imu.source)) + ' → heel·pitch ' + dim('(' + pct(f.heelCoverage) + '% 커버)')));
+      parts.push('IMU ' + fusionSrcLabel(f.imu.source) + '→heel·pitch ' + pct(f.heelCoverage) + '%');
     } else if (f.imu && f.imu.own) {
-      rows.push(row('IMU', esc(fusionSrcLabel(f.imu.source)) + ' ' + dim('자체 (' + pct(f.heelCoverage) + '%)')));
+      parts.push('IMU ' + fusionSrcLabel(f.imu.source) + ' 자체 ' + pct(f.heelCoverage) + '%');
     }
-
     if (f.hr && f.hr.merged) {
-      rows.push(row(i18nT('HR 병합'),
-        esc(fusionSrcLabel(f.hr.source)) + ' → ' + i18nT('심박') + ' ' + dim('(' + pct(f.hrCoverage) + '% 커버)')));
+      parts.push('HR ' + fusionSrcLabel(f.hr.source) + '→심박 ' + pct(f.hrCoverage) + '%');
     } else if (f.hr && f.hr.own) {
-      rows.push(row('HR', esc(fusionSrcLabel(f.hr.source)) + ' ' + dim('자체')));
+      parts.push('HR ' + fusionSrcLabel(f.hr.source) + ' 자체');
     }
-
-    if (f.speed) rows.push(row(i18nT('속도원'), esc(fusionSrcLabel(f.speed.source))));
-
-    rows.push(row(i18nT('GPS 스파이크'),
-      (f.spikes.removed || 0).toLocaleString() + 'pt ' + i18nT('제거') + ' ' +
-      dim('(' + ((f.spikes.rate || 0) * 100).toFixed(2) + '%)')));
+    if (f.speed) parts.push('속도원 ' + fusionSrcLabel(f.speed.source));
+    parts.push('스파이크 ' + (f.spikes.removed || 0).toLocaleString() + 'pt (' +
+      ((f.spikes.rate || 0) * 100).toFixed(2) + '%)');
+    console.info('[fusion] 세션 자동 융합 완료 · ' +
+      (f.sources ? f.sources.length : 0) + '개 소스 — ' + parts.join(' · '));
 
     var warns = (st.warnings || []).map(function (w) { return w.file + ': ' + w.error; });
-    (st.skipped || []).forEach(function (n) { warns.push(n + ' — ' + i18nT('융합 미지원(개별 업로드)')); });
-    var warnHtml = warns.length
-      ? '<div class="fusion-banner__warn">⚠ ' + warns.map(esc).join(' · ') + '</div>' : '';
-
-    el.innerHTML =
-      '<p class="fusion-banner__title"><span class="fusion-banner__ok">✓</span> ' +
-        i18nT('세션 자동 융합 완료') +
-        ' <span class="fb-dim" style="font-weight:400">· ' + (f.sources ? f.sources.length : 0) + i18nT('개 소스') + '</span></p>' +
-      '<div class="fusion-banner__grid">' + rows.join('') + '</div>' + warnHtml;
-    el.hidden = false;
+    (st.skipped || []).forEach(function (n) { warns.push(n + ' — 융합 미지원(개별 업로드)'); });
+    if (warns.length) console.warn('[fusion] ⚠ ' + warns.join(' · '));
   }
 
   /* 세션의 풍향 자동 추정 결과(신뢰도 포함) — 트랙 구조에만 의존하므로
