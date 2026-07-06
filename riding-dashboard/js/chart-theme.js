@@ -137,11 +137,11 @@
   /* §432 — 심박 존색을 SPS 5-tier 트래픽 라이트 팔레트와 hex 완전 일치시킨다
      (옥대표 "심박수 높으면 레드 낮으면 그린"). 낮은 심박=컴포트=그린, 높은
      심박=부담=레드. 표준 강도 팔레트(Z1 파랑…)가 아니라 옥대표 명시 결정:
-       Z1 recovery = #00FF00 (= SPS Elite 진초록)
-       Z2 aerobic  = #7FFF00 (= SPS Advanced 연초록)
+       Z1 recovery = #00FF00 (= SPS Elite 순수 초록)
+       Z2 aerobic  = #7FFF00 (= SPS Advanced chartreuse)
        Z3 tempo    = #FFCC00 (= SPS Intermediate 노랑)
        Z4 threshold= #FFA500 (= SPS Foundational 오렌지)
-       Z5 anaerobic= #FF0000 (= SPS Learning 레드)
+       Z5 anaerobic= #FF0000 (= SPS Learning 빨강)
      rest(Z1 미만 휴식)는 훈련 존 밖이라 중립 회색 유지. line(심박 곡선)은
      값 표시용 정체 적색(존 신호 아님)이라 옥대표 지시대로 붉은색 유지. */
   var HR_ZONE = {
