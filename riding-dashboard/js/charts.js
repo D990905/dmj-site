@@ -73,6 +73,19 @@
     if (T && typeof T.statusAt === 'function') return T.statusAt(f);
     return 'rgb(31,143,255)';                                 /* fallback */
   }
+  /* §432 v2 — 속도 분포 파이 색: 절대 속도(kt) → 5-tier 신호등(형광) 이산 매핑.
+     이전 speedColor 는 세션 min/max 로 정규화한 statusAt 연속 램프였다. 옥대표
+     지시 = 절대 속도 기준 포일링 인지 구간(빠를수록 초록):
+       <2 정지·바운스 = 레드(Learning) / 2–8 정체·워터스타트 = 오렌지(Foundational)
+       / 8–14 저속 라이딩 = 옐로(Intermediate) / 14–18 포일링 안정 = 라임(Advanced)
+       / 18+ 포일링 고속 = 에메랄드(Elite). 히스토그램 bin=2kt 라 경계(2·8·14·18)
+       가 bin 에지와 정합. 팔레트는 chart-theme signal5 단일 소스. */
+  var SPEED_TIER = (T && T.signal5) ||
+    ['#F87171', '#FB923C', '#FACC15', '#4ADE80', '#00D97E'];
+  function speedTierColor(kt) {
+    var i = kt < 2 ? 0 : kt < 8 ? 1 : kt < 14 ? 2 : kt < 18 ? 3 : 4;
+    return SPEED_TIER[i];
+  }
 
   /* 지도 트랙 선·범례 — 느림=빨강·중간=주황·빠름=초록. 밝은 OSM 타일
      위에서 또렷하고 산뜻하게 보이도록 채도 높은 밝은 톤을 쓴다. 리플레이
