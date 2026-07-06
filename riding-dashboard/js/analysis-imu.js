@@ -1,27 +1,36 @@
 /* ============================================================
- * analysis-imu.js — IMU(가속도계) → heel·pitch 각도 (§430)
+ * analysis-imu.js — IMU → heel·pitch 자세 추정 + 윙포일 보정 (§430)
  *
- * RaceBox CSV 의 GForceX/Y/Z(g) 를 힐(좌우 기울기)·피치(앞뒤 기울기)
- * 각도로 변환한다. session-merger 가 IMU 소스를 primary 트랙 타임라인에
- * 정합한 뒤 각 포인트에 대해 이 모듈을 호출해 p.heel / p.pitch 를 채운다.
+ * RaceBox CSV 의 GForceX/Y/Z(g) + GyroX/Y/Z(dps) 를 힐(좌우 롤)·피치
+ * (앞뒤) 각도로 변환·보정한다. session-merger 가 IMU 소스에 대해
+ * computeAttitude() 를 부른 뒤 heel/pitch 를 primary 트랙에 정합한다.
  *
- * ── 축 매핑 가정 (v1 — 옥대표님 검증 필요) ──────────────────
- *   RaceBox 부착 방향에 따라 X/Y/Z 물리축이 달라진다. v1 기본 가정:
- *     · GForceX = 진행 방향(앞뒤)
- *     · GForceY = 좌·우(횡)
- *     · GForceZ = 위(중력 방향) — 정지 시 GForceZ ≈ +1.0 g 로 실측 확인
- *   이 가정에서:
- *     heel(deg)  = atan2(GForceY, GForceZ) * 180/π   (좌우 롤)
- *     pitch(deg) = atan2(GForceX, GForceZ) * 180/π   (앞뒤 피치)
+ * ── 왜 가속도계만으로는 안 되나 (옥대표님 지적) ────────────
+ *   가속도계는 '중력 + 선형가속'을 함께 잰다. 윙포일 라이딩 중 펌핑·
+ *   파도 충격·코너 원심력이 중력에 섞여, atan2(Gy,Gz) 같은 정적 공식은
+ *   실 세션에서 heel 변화율 p99 ≈ 172°/s 로 비현실적으로 튄다(실측).
+ *   또 gmag(가속도 크기)가 >1.3g 2.1%, <0.7g 1.4% 로 순수 중력에서
+ *   벗어난다. → 자이로를 융합하지 않으면 힐·피치가 '분리·보정' 안 된
+ *   raw 노이즈로 남는다.
  *
- *   ⚠ 부호(좌현+/우현−)와 축 방향은 옥대표님이 실제 라이딩 감각과
- *   대조해 검증해야 한다. 검증 후 필요하면 AXIS 상수만 뒤집으면 된다
- *   (데이터·다운스트림 변경 없이). Kalman/상보 필터(자이로 융합)는 v1
- *   에서 생략하고 가속도계만 사용 — 순간 가속(코너·충격)에 민감하나
- *   저역통과(중앙값) 평활로 완화한다.
+ * ── 상보 필터(Complementary Filter) + 선형가속 게이팅 ──────
+ *   heel[i]  = (1-β)·(heel[i-1]  + rollRate·dt)  + β·accelHeel
+ *   pitch[i] = (1-β)·(pitch[i-1] + pitchRate·dt) + β·accelPitch
+ *     · 자이로 각속도로 단기 예측(부드러움) + 가속도계로 장기 보정
+ *       (드리프트 제거).  α = τ/(τ+dt) 가 자이로 가중, β=(1-α)·trust.
+ *     · trust = 선형가속 게이팅: gmag 가 1g 에서 멀수록 accel 신뢰↓
+ *       (펌핑·충격 구간에서 자이로 예측에 더 의존) → 튐 억제.
  *
- * 도메인 산식을 지어내지 않는다 — 위 변환은 표준 3축 가속도계 틸트
- * 공식이며 가정(축·부호)은 위에 명시. 검증 전까지 '가정값' 이다.
+ * ── 축·부호 (실 세션 데이터로 검증) ────────────────────────
+ *   물리축: GForceX=전후, Y=좌우, Z=상하(정지 Gz≈+1 실측).
+ *   저역통과(중력) 후 상관분석 결과:
+ *     · heel(roll) 각속도 ↔ +GyroX  (r=0.31, 양)
+ *     · pitch 각속도      ↔ −GyroY  (r=0.18, 음)
+ *   부호가 실제 라이딩 감각과 어긋나면 AXIS 상수만 뒤집으면 된다
+ *   (데이터·다운스트림 무변경). [[feedback_sailing_domain_verify_mandatory]]
+ *
+ * 도메인 산식을 지어내지 않는다 — 상보 필터는 표준 IMU 자세추정 기법,
+ * 축·부호는 위처럼 실 데이터로 확정. 스케일·시정수는 아래 FILTER.
  *
  * 브라우저: RDImu.*  ·  Node: require('./analysis-imu')
  * ============================================================ */
@@ -30,14 +39,24 @@
 
   var RAD2DEG = 180 / Math.PI;
 
-  /* 축 매핑/부호 — 옥대표님 검증 후 여기만 조정.
-     sign 을 -1 로 바꾸면 해당 각도 부호가 반전된다. */
+  /* 축 매핑/부호 — 실 세션 검증값. 라이딩 감각과 어긋나면 여기만 조정. */
   var AXIS = {
-    heelSign: 1,    // atan2(gy, gz) 의 부호 (좌현/우현 방향)
-    pitchSign: 1    // atan2(gx, gz) 의 부호 (앞/뒤 방향)
+    heelSign: 1,        // accel heel = heelSign·atan2(gy, gz)
+    pitchSign: 1,       // accel pitch = pitchSign·atan2(gx, gz)
+    rollGyroAxis: 'gyroX',  pitchGyroAxis: 'gyroY',
+    rollGyroSign: 1,    // heel(roll) 각속도 = +GyroX
+    pitchGyroSign: -1   // pitch 각속도 = −GyroY
   };
 
-  /* GForce(g) → { heel, pitch } (deg). 입력 결측이면 null 필드. */
+  /* 상보 필터 파라미터 */
+  var FILTER = {
+    tauSec: 1.5,     // 자이로 신뢰 시정수 τ. 클수록 부드럽지만 지연↑
+    gGateSpan: 0.5,  // |gmag−1| 이 이 값 이상이면 accel 신뢰=0 (게이팅)
+    maxDtSec: 0.3    // dt 가 이보다 크면(leg 경계) 상태 리셋
+  };
+
+  /* GForce(g) → { heel, pitch } (deg) — 정적(가속도계 전용) 변환.
+     자이로가 없는 소스(.vkx 이미 각도 보유, 정지 측정 등)용 fallback. */
   function gforceToAngles(gx, gy, gz) {
     var heel = null, pitch = null;
     if (gy != null && gz != null && isFinite(gy) && isFinite(gz)) {
@@ -49,8 +68,70 @@
     return { heel: heel, pitch: pitch };
   }
 
-  /* 포인트 배열의 각 원소(gforceX/Y/Z 보유)에 heel/pitch 를 채운다.
-     이미 heel/pitch 가 있으면(다른 소스) 덮지 않는다. 반환: 채운 개수. */
+  /* 상보 필터 자세 추정 — 등간격 시계열(원본 IMU 소스)에서 순차 계산해
+     각 포인트에 heel/pitch 를 채운다. 자이로가 없으면 accel-only 로
+     자동 폴백. 반환: 채운 heel 개수. */
+  function complementaryAttitude(points, opts) {
+    if (!points || !points.length) return 0;
+    var cfg = opts || {};
+    var tau = cfg.tauSec != null ? cfg.tauSec : FILTER.tauSec;
+    var gate = cfg.gGateSpan != null ? cfg.gGateSpan : FILTER.gGateSpan;
+    var maxDt = cfg.maxDtSec != null ? cfg.maxDtSec : FILTER.maxDtSec;
+
+    var heel = null, pitch = null, prevT = null, n = 0;
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      if (!p || p.gforceZ == null) { prevT = null; continue; }
+      if (p.heel != null && p.pitch != null) {   // 이미 채워진 소스는 존중
+        heel = p.heel; pitch = p.pitch;
+        prevT = (p.time != null ? p.time / 1000 : null);
+        continue;
+      }
+      var a = gforceToAngles(p.gforceX, p.gforceY, p.gforceZ);
+      if (a.heel == null) { prevT = null; continue; }
+
+      var t = (p.time != null) ? p.time / 1000 : null;
+      var dt = (prevT != null && t != null) ? (t - prevT) : null;
+
+      var haveGyro = p[AXIS.rollGyroAxis] != null && p[AXIS.pitchGyroAxis] != null;
+
+      if (heel == null || dt == null || !(dt > 0) || dt > maxDt || !haveGyro) {
+        /* 초기화 / gap / 자이로 없음 → accel 값으로 리셋(폴백) */
+        heel = a.heel; pitch = (a.pitch != null ? a.pitch : pitch);
+      } else {
+        var rollRate = AXIS.rollGyroSign * p[AXIS.rollGyroAxis];    // deg/s
+        var pitchRate = AXIS.pitchGyroSign * p[AXIS.pitchGyroAxis];
+        var heelPred = heel + rollRate * dt;
+        var pitchPred = pitch + pitchRate * dt;
+        /* 선형가속 게이팅 — gmag 가 1g 에서 멀수록 accel 신뢰↓ */
+        var gmag = Math.sqrt(p.gforceX * p.gforceX + p.gforceY * p.gforceY +
+                             p.gforceZ * p.gforceZ);
+        var trust = 1 - Math.abs(gmag - 1) / gate;
+        if (trust < 0) trust = 0; else if (trust > 1) trust = 1;
+        var alpha = tau / (tau + dt);          // 자이로 가중
+        var beta = (1 - alpha) * trust;        // accel 보정 가중(게이팅)
+        heel = (1 - beta) * heelPred + beta * a.heel;
+        pitch = (a.pitch != null) ? (1 - beta) * pitchPred + beta * a.pitch : pitchPred;
+      }
+      p.heel = heel; p.pitch = pitch; n++;
+      prevT = t;
+    }
+    return n;
+  }
+
+  /* 진입점 — 소스 포인트에 자세(heel/pitch)를 채운다. 자이로가 있으면
+     상보 필터, 없으면 정적 accel 변환. session-merger 가 IMU 도너에 대해
+     호출한다. 반환: 채운 개수. */
+  function computeAttitude(points, opts) {
+    if (!points || !points.length) return 0;
+    var hasGyro = false;
+    for (var i = 0; i < points.length; i++) {
+      if (points[i] && points[i][AXIS.rollGyroAxis] != null) { hasGyro = true; break; }
+    }
+    return hasGyro ? complementaryAttitude(points, opts) : annotate(points);
+  }
+
+  /* 정적 accel 전용 채우기 (자이로 없는 소스). 반환: 채운 개수. */
   function annotate(points) {
     if (!points || !points.length) return 0;
     var n = 0;
