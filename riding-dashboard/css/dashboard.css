@@ -379,6 +379,10 @@ a { color:var(--sea-deep); }
              border-color var(--t-fast) var(--ease-out);
 }
 .stat:hover { transform:translateY(-2px); box-shadow:var(--shadow-hover); }
+/* §433 — 요약 스트립 핵심 타일: 라벨·굵은 값·보조를 세로로도 가운데
+   정렬해 6개 타일의 굵은 숫자가 한 줄에 나란히 정렬되도록 통일한다
+   (스파크라인 제거로 타일 구조가 동일해져 값 위치가 일치). */
+#summary-strip.stat-strip > .stat { justify-content:center; min-height:104px; }
 .stat-strip--inner .stat {
   background:var(--bg-card-2); box-shadow:none; border-color:var(--border-soft);
 }
