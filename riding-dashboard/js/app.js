@@ -4606,9 +4606,9 @@
     }
     var s = seg.score, tone = vpsTone(s);
     /* §424-F — SPS 티어 밴드(canonical, coach.js) 색을 단일 출처로 쓴다.
-       80+ Elite(gold) / 60–80 Advanced(green) / 40–60 Intermediate(blue)
-       / 20–40 Foundational(yellow) / 0–20 Learning(orange). coach.js 미로드
-       시에만 기존 status-ramp 폴백. */
+       §432 신호등 램프: 80+ Elite(진초록) / 60–80 Advanced(연초록)
+       / 40–60 Intermediate(노랑) / 20–40 Foundational(오렌지)
+       / 0–20 Learning(레드). coach.js 미로드 시에만 기존 status-ramp 폴백. */
     var band = (window.RDCoach && RDCoach.vpsBand) ? RDCoach.vpsBand(s) : null;
     var statColor = band ? band.color : (vpsStatusColor(s) ||
       (tone === 'hi' ? '#27AE60' : tone === 'mid' ? '#E0A100' : '#C0392B'));
