@@ -943,10 +943,12 @@
    *     (sailing telemetry 의 4-bucket 분리 패턴).
    * 4-bucket 분리 (풍상/풍하 × P/S) — Njord Analytics 의 polar split 와 일관.
    * ============================================================ */
-  function computeWindMetrics(session, windDir) {
+  function computeWindMetrics(session, windDir, windSpeedKt) {
     if (!session.hasTime || windDir == null) return null;
     var S = session.samples;
     var wd = ((windDir % 360) + 360) % 360;
+    /* AWA(겉보기 풍각) 계산 가능 여부 — 풍속이 있어야 한다 */
+    var hasTws = windSpeedKt != null && isFinite(windSpeedKt) && windSpeedKt > 0;
     // 4 버킷: 풍상/풍하 × 포트(P)/스타보드(S). 각 원소 {vmg, sog, dt}
     var bk = { upP: [], upS: [], downP: [], downS: [] };
 
