@@ -769,6 +769,7 @@
 
   function resetToIntro() {
     Charts.destroyAll();
+    state.fusion = null;                 /* §430 — 융합 배너 상태 리셋 */
     $('dashboard-view').hidden = true;
     $('intro-view').hidden = false;
     $('file-input').value = '';
