@@ -152,12 +152,14 @@
      오를수록 초록에 가까워지는 단일 신호등 램프로 재배치한다:
        Elite=진초록(에메랄드) / Advanced=연초록(라임) / Intermediate=노랑(앰버)
        / Foundational=오렌지 / Learning=레드.
-     §432 v2 (옥대표 "밝은 형광 느낌") — 톤을 네온 계열로 올린다(Tailwind
-       400~500 대). 방향(신호등)은 그대로, 톤만 밝게. 이 5색은 심박 존
-       팔레트(chart-theme.js HR_ZONE)와 hex 완전 일치한다(SPS Elite=HR Z1
-       recovery=진초록 … SPS Learning=HR Z5 anaerobic=레드). 인접 밴드
-       luminance 차로 색맹(deutan/protan) 구분 — 단, 네온 특성상 Elite↔Advanced
-       (둘 다 초록)는 ΔL 이 가장 좁다(색상[에메랄드↔라임]으로 추가 구분).
+     §432 v3 FINAL (옥대표 스크린샷 명시 순색) — 톤을 최대 채도 순색(형광)으로
+       확정: Elite=#00FF66(네온 에메랄드) / Advanced=#00FF00(순수 라임) /
+       Intermediate=#FFCC00 / Foundational=#FFA500 / Learning=#FF0000. 이 5색은
+       심박 존(chart-theme.js HR_ZONE)·속도분포(signal5)와 hex 완전 일치한다
+       (SPS Elite=HR Z1 저심박=그린 … SPS Learning=HR Z5 고심박=레드).
+       ⚠ 순색 최대 채도라 Elite(#00FF66)↔Advanced(#00FF00) 는 둘 다 순수 초록,
+       luminance 거의 동일 → 색맹 luminance 구분 사실상 불가. 옥대표 명시 결정,
+       접근성은 추후 label 텍스트로 보완(색에 luminance 가드 두지 않음).
      (밴드 임계값 80/60/40/20 은 §424 lock — 불변. PDF grade-chip 은 이미
      동일한 신호등 램프[green→red]라 tier 별로 정합 — 별도 변경 불필요.) */
   var VPS_BANDS = [
