@@ -258,6 +258,15 @@ ok(sdn.bot20 <= sdn.bot50 && sdn.bot50 <= sdn.avg,
    '스타보드 풍하 상위(대표) = 고속 활주 시 작은 AWA (상위20 ≤ 상위50 ≤ 평균)');
 ok(sdn.bot20 < 40, '스타보드 풍하 상위20% AWA < 40° (저속 71° 대표 문제 해결)');
 
+/* ---------- 10. 포일링(활주) 거리 요약 (§433) ---------- */
+console.log('\n[10] 포일링 거리 요약');
+var sum = ana.summary;
+ok(sum.activeDistanceM != null && sum.activeDistanceM >= 0, 'activeDistanceM 산출');
+ok(sum.activeDistanceM <= sum.totalDistanceM + 1, '포일링 거리 ≤ 총 거리');
+ok(sum.activeDistRatio > 0 && sum.activeDistRatio <= 1, '포일링 거리 비율 0~1');
+console.log('    총 거리 ' + (sum.totalDistanceM/1000).toFixed(2) + 'km · 포일링 거리 ' +
+  (sum.activeDistanceM/1000).toFixed(2) + 'km (' + Math.round(sum.activeDistRatio*100) + '%)');
+
 /* ---------- 결과 ---------- */
 console.log('\n=== 결과: ' + pass + ' 통과 / ' + fail + ' 실패 ===\n');
 process.exit(fail ? 1 : 0);
