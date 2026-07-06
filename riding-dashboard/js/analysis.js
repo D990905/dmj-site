@@ -1085,6 +1085,7 @@
   var STATS_WIND_METRICS = [
     { metric: 'sog',   label: 'SOG (속도)',          unit: 'speed', split: true },
     { metric: 'twa',   label: 'CWA',                unit: 'deg',   split: true  },
+    { metric: 'awa',   label: 'AWA (겉보기 풍각)',    unit: 'deg',   split: true  },
     { metric: 'vmg',   label: 'VMG (풍상·풍하 유효속도)', unit: 'speed', split: true },
     { metric: 'heel',  label: '힐 (Heel)',           unit: 'deg',   split: true  },
     { metric: 'pitch', label: '피치 (Pitch·트림)',   unit: 'deg',   split: true  },
