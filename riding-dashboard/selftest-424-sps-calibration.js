@@ -26,6 +26,8 @@ var Coach = require(path.join(DIR, 'js', 'coach.js'));
 /* chart-theme.js 는 module.exports 가 아니라 global.RDChartTheme 에 붙는다. */
 require(path.join(DIR, 'js', 'chart-theme.js'));
 var ChartTheme = global.RDChartTheme || globalThis.RDChartTheme;
+/* charts.js 는 module.exports 로 렌더/색 헬퍼를 노출(DOM 미의존 모듈 평가). */
+var Charts = require(path.join(DIR, 'js', 'charts.js'));
 
 var MS = 1.9438444924406;
 var pass = 0, fail = 0;
