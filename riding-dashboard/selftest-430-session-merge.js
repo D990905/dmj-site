@@ -205,6 +205,33 @@ var fusedP99 = heelRateP(res.points);
 console.log('    융합 세션 heel 변화율 p99=' + (fusedP99 != null ? fusedP99.toFixed(0) : 'n/a') + '°/s');
 ok(fusedP99 != null && fusedP99 < 90, '융합 경로에도 보정 적용됨 (p99 < 90)');
 
+/* ---------- 8. 부분 커버리지 heel 통계 (NaN 회귀 방지) ---------- */
+console.log('\n[8] 통계 패널 heel 버킷 — 부분 커버리지 NaN 방지');
+/* RaceBox CSV 는 GPX 보다 늦게 시작 → 앞부분 ~14 표본에 heel 없음.
+   과거엔 그 null 이 computeTierMeans 평균을 NaN 으로 오염시켜 스타보드
+   힐 통계가 '—' 로 사라졌다. 풍향 추정 후 4 버킷 평균이 전부 유한한지. */
+var wEst = An.estimateWindFromTrack(session);
+var wdUsed = (wEst && wEst.windDir != null) ? wEst.windDir : 210;
+var ana = An.analyzeSession(session, wdUsed);
+var tsplit = ana.wind && ana.wind.tackSplit;
+ok(!!tsplit, '풍향 추정 후 tackSplit 산출 (wind=' + wdUsed + '°)');
+var buckets = [['upwind', 'P'], ['upwind', 'S'], ['downwind', 'P'], ['downwind', 'S']];
+var allFinite = true, report = [];
+buckets.forEach(function (b) {
+  var grp = tsplit && tsplit[b[0]] && tsplit[b[0]][b[1]];
+  if (grp && grp.count && grp.heel) {
+    var finite = isFinite(grp.heel.avg) && isFinite(grp.heel.top50) && isFinite(grp.heel.top20);
+    if (!finite) allFinite = false;
+    report.push(b[0] + '.' + b[1] + '=' + (isFinite(grp.heel.avg) ? grp.heel.avg.toFixed(1) : 'NaN'));
+  }
+});
+console.log('    heel 버킷 평균: ' + report.join(' · '));
+ok(allFinite, '4 버킷 heel 평균·상위50·상위20 모두 유한 (NaN 없음)');
+/* 좌우 부호 일관성 — 포트 양수, 스타보드 음수(또는 반대), 한 택 안에서 일관 */
+var upP = tsplit.upwind.P.heel, upS = tsplit.upwind.S.heel;
+ok(upP && upS && Math.sign(upP.avg) !== Math.sign(upS.avg),
+   '포트·스타보드 heel 부호 반대 (택별 물리 일관): P=' + upP.avg.toFixed(1) + ' S=' + upS.avg.toFixed(1));
+
 /* ---------- 결과 ---------- */
 console.log('\n=== 결과: ' + pass + ' 통과 / ' + fail + ' 실패 ===\n');
 process.exit(fail ? 1 : 0);
