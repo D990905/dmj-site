@@ -1702,7 +1702,8 @@
         datasets: [{
           label: i18nT('머문 시간 (min)'),
           data: rows.map(function (r) { return +(r.sec / 60).toFixed(2); }),
-          backgroundColor: rows.map(function (r) { return r.color; }),
+          /* §432 v2 옵션 A — 막대별 세로 형광 그라데이션(상단 밝음). */
+          backgroundColor: rows.map(function (r) { return barVGrad(r.color); }),
           borderRadius: 3, barPercentage: 0.8, categoryPercentage: 0.82
         }]
       },
