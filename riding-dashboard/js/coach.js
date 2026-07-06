@@ -145,15 +145,20 @@
    * 색은 표시 레이어가 그대로 쓰거나 자체 팔레트로 매핑할 수 있게 hex 동봉.
    * 주의 — 이 밴드는 '이번 세션 SPS' 의 절대 등급일 뿐, 메인 사이트의
    * 스킬 진단 티어(§408 getOverallTier 30/50/70/85)와는 별개 체계다. */
-  /* §431 — 도넛 티어 색은 5단 모두 눈에 확실히 구분돼야 한다. 이전엔
-     Foundational=#F2C20E(황금색)이 Elite=#D4AF37(골드)과 사실상 같은 색으로
-     보여(택킹 31점이 종합 82점 Elite와 동일 골드로 표시) 티어 구분 실패했다.
-     Foundational→오렌지, Learning→레드 로 이동해 골드/초록/파랑/오렌지/레드
-     의 명확한 램프를 만든다. (밴드 임계값 80/60/40/20 은 §424 lock — 불변) */
+  /* §432 — 트래픽 라이트 그라디언트. 긍정=그린, 부정=레드 (옥대표 지시).
+     §431 램프(골드/초록/파랑/오렌지/레드)는 점수 상승 방향과 색 신호가
+     어긋났다 — 79(Advanced)=초록인데 80(Elite)=골드로 "덜 긍정"처럼 보이고,
+     중간(Intermediate)=파랑은 신호등 논리에서 벗어났다. 이제 스코어가
+     오를수록 초록에 가까워지는 단일 신호등 램프로 재배치한다:
+       Elite=진초록(에메랄드) / Advanced=연초록(라임) / Intermediate=노랑(앰버)
+       / Foundational=오렌지 / Learning=레드.
+     인접 밴드는 luminance 차를 확보해 색맹(deutan/protan) 사용자도 구분 가능.
+     (밴드 임계값 80/60/40/20 은 §424 lock — 불변. PDF grade-chip 은 이미
+     동일한 신호등 램프[green→red]라 tier 별로 정합 — 별도 변경 불필요.) */
   var VPS_BANDS = [
-    { min: 80, tier: 'elite',        label: 'Elite',        color: '#D4AF37' },
-    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#1FA055' },
-    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#1F8FFF' },
+    { min: 80, tier: 'elite',        label: 'Elite',        color: '#059669' },
+    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#22C55E' },
+    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#EAB308' },
     { min: 20, tier: 'foundational', label: 'Foundational', color: '#F97316' },
     { min: 0,  tier: 'learning',     label: 'Learning',     color: '#EF4444' }
   ];
