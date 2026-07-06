@@ -4538,6 +4538,39 @@
     return RDChartTheme.statusAt(Math.max(0, Math.min(100, score)) / 100);
   }
 
+  /* §432 — hex → rgba(투명도) / hex 어둡게. 밴드색(vivid)을 배경 틴트로,
+     읽기 편한 어두운 텍스트로 변환하는 데 쓴다. */
+  function hexToRgba(hex, a) {
+    var m = String(hex).replace('#', '');
+    return 'rgba(' + parseInt(m.substr(0, 2), 16) + ',' +
+      parseInt(m.substr(2, 2), 16) + ',' + parseInt(m.substr(4, 2), 16) + ',' + a + ')';
+  }
+  function darkenHex(hex, factor) {          /* factor 0~1 (밝기 비율) */
+    var m = String(hex).replace('#', '');
+    function ch(i) {
+      var v = Math.round(parseInt(m.substr(i, 2), 16) * factor);
+      return ('0' + Math.max(0, Math.min(255, v)).toString(16)).slice(-2);
+    }
+    return '#' + ch(0) + ch(2) + ch(4);
+  }
+
+  /* §432 — 회전효율 score chip 색을 SPS 5-tier 밴드(coach.js vpsBand)와 같은
+     신호등 팔레트로 통일한다. 이전엔 자체 3단(≥70/≥45/그외 = 초록/골드/레드)
+     이라 59·49 처럼 60 미만도 골드로 보여 SPS 도넛과 색이 어긋났다. 이제 도넛과
+     동일하게 score→밴드색: 60-80 연초록·40-60 노랑·20-40 오렌지·0-20 레드.
+     칩은 밴드색을 배경 틴트로, 가독성 위해 어둡게 한 밴드색을 텍스트로 쓴다.
+     coach.js 미로드(구버전·테스트) 시에만 기존 3단 클래스 폴백. */
+  function effChipHtml(score) {
+    var label = (score == null || !isFinite(score)) ? '—' : score;
+    var band = (window.RDCoach && RDCoach.vpsBand) ? RDCoach.vpsBand(score) : null;
+    if (!band || band.min == null) {
+      var cls = score >= 70 ? 'eff--hi' : (score >= 45 ? 'eff--mid' : 'eff--lo');
+      return '<span class="eff ' + cls + '">' + label + '</span>';
+    }
+    return '<span class="eff" style="color:' + darkenHex(band.color, 0.62) +
+      ';background:' + hexToRgba(band.color, 0.16) + '">' + label + '</span>';
+  }
+
   /* 한 점수 카드 타일 — 방향(Upwind / Overall / Downwind)과
      마네버(택킹 / 자이빙) 5개 카드가 모두 이 함수를 공유한다.
      cmp = { avg, count } — 동일 풍속 영역대 평균(없으면 avg=null).
