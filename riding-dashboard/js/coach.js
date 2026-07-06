@@ -161,11 +161,11 @@
      (밴드 임계값 80/60/40/20 은 §424 lock — 불변. PDF grade-chip 은 이미
      동일한 신호등 램프[green→red]라 tier 별로 정합 — 별도 변경 불필요.) */
   var VPS_BANDS = [
-    { min: 80, tier: 'elite',        label: 'Elite',        color: '#00D97E' },
-    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#4ADE80' },
-    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#FACC15' },
-    { min: 20, tier: 'foundational', label: 'Foundational', color: '#FB923C' },
-    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#F87171' }
+    { min: 80, tier: 'elite',        label: 'Elite',        color: '#00FF66' },
+    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#00FF00' },
+    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#FFCC00' },
+    { min: 20, tier: 'foundational', label: 'Foundational', color: '#FFA500' },
+    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#FF0000' }
   ];
   function vpsBand(score) {
     if (score == null || !isFinite(score)) {

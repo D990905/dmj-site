@@ -4106,7 +4106,7 @@
     ? { z1: _RDT.hrZone.z1, z2: _RDT.hrZone.z2, z3: _RDT.hrZone.z3,
         z4: _RDT.hrZone.z4, z5: _RDT.hrZone.z5 }
     /* §432 v2 폴백 — 신호등(낮음=그린 Z1 … 높음=레드 Z5), SPS 팔레트 일치. */
-    : { z1: '#00D97E', z2: '#4ADE80', z3: '#FACC15', z4: '#FB923C', z5: '#F87171' };
+    : { z1: '#00FF66', z2: '#00FF00', z3: '#FFCC00', z4: '#FFA500', z5: '#FF0000' };
   var HR_ZONE_REST_COLOR = (_RDT && _RDT.hrZone) ? _RDT.hrZone.rest : '#8295A8';
 
   function renderHrSection() {

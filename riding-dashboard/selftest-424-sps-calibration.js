@@ -128,8 +128,8 @@ function relLum(hex) {                       /* WCAG 상대 휘도 (0~1) */
 }
 /* §432 v2 — 형광(네온) 팔레트. 방향(신호등)은 동일, 톤만 밝게. */
 var EXPECT_432 = {
-  elite: '#00D97E', advanced: '#4ADE80', intermediate: '#FACC15',
-  foundational: '#FB923C', learning: '#F87171'
+  elite: '#00FF66', advanced: '#00FF00', intermediate: '#FFCC00',
+  foundational: '#FFA500', learning: '#FF0000'
 };
 [[90, 'elite'], [70, 'advanced'], [50, 'intermediate'],
  [30, 'foundational'], [10, 'learning']].forEach(function (c) {
