@@ -1702,8 +1702,12 @@
         datasets: [{
           label: i18nT('머문 시간 (min)'),
           data: rows.map(function (r) { return +(r.sec / 60).toFixed(2); }),
-          /* §432 v2 옵션 A — 막대별 세로 형광 그라데이션(상단 밝음). */
-          backgroundColor: rows.map(function (r) { return barVGrad(r.color); }),
+          /* §432 v2 옵션 A — 막대별 세로 형광 그라데이션(상단 밝음). 단일
+             scriptable 함수로 (배열-of-함수는 Chart.js 가 호출 안 함). */
+          backgroundColor: function (context) {
+            var base = (rows[context.dataIndex] || {}).color || HR_ZONE_REST;
+            return barVGrad(base)(context);
+          },
           borderRadius: 3, barPercentage: 0.8, categoryPercentage: 0.82
         }]
       },
