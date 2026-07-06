@@ -137,15 +137,15 @@
   /* §432 — 심박 존색을 SPS 5-tier 트래픽 라이트 팔레트와 hex 완전 일치시킨다
      (옥대표 "심박수 높으면 레드 낮으면 그린"). 낮은 심박=컴포트=그린, 높은
      심박=부담=레드. 표준 강도 팔레트(Z1 파랑…)가 아니라 옥대표 명시 결정:
-       Z1 recovery = #00CC5C (= SPS Elite 진초록)
-       Z2 aerobic  = #00FF00 (= SPS Advanced 연초록)
+       Z1 recovery = #00FF00 (= SPS Elite 진초록)
+       Z2 aerobic  = #7FFF00 (= SPS Advanced 연초록)
        Z3 tempo    = #FFCC00 (= SPS Intermediate 노랑)
        Z4 threshold= #FFA500 (= SPS Foundational 오렌지)
        Z5 anaerobic= #FF0000 (= SPS Learning 레드)
      rest(Z1 미만 휴식)는 훈련 존 밖이라 중립 회색 유지. line(심박 곡선)은
      값 표시용 정체 적색(존 신호 아님)이라 옥대표 지시대로 붉은색 유지. */
   var HR_ZONE = {
-    z1: '#00CC5C', z2: '#00FF00', z3: '#FFCC00', z4: '#FFA500', z5: '#FF0000',
+    z1: '#00FF00', z2: '#7FFF00', z3: '#FFCC00', z4: '#FFA500', z5: '#FF0000',
     rest: '#8295A8',
     /* 심박 곡선 — 단일 시리즈 정체색(심장=적색 관례). 상태 인코딩 아님. */
     line: '#C0392B'
@@ -156,7 +156,7 @@
      [3]라임(Advanced) [4]에메랄드(Elite). SPS(coach VPS_BANDS)·HR 존(HR_ZONE
      z5→z1)·속도 분포 파이가 공유하는 단일 tier 팔레트 = 대시보드 전역 정합.
      연속 보간용 STATUS(비네온 ramp)와는 의미·용도가 다르므로 섞지 않는다. */
-  var SIGNAL5 = ['#FF0000', '#FFA500', '#FFCC00', '#00FF00', '#00CC5C'];
+  var SIGNAL5 = ['#FF0000', '#FFA500', '#FFCC00', '#7FFF00', '#00FF00'];
 
   /* ============================================================
    * 공통 베이스 — 축 · 격자 · 타이포 · 서피스

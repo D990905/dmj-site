@@ -81,7 +81,7 @@
        / 18+ 포일링 고속 = 에메랄드(Elite). 히스토그램 bin=2kt 라 경계(2·8·14·18)
        가 bin 에지와 정합. 팔레트는 chart-theme signal5 단일 소스. */
   var SPEED_TIER = (T && T.signal5) ||
-    ['#FF0000', '#FFA500', '#FFCC00', '#00FF00', '#00CC5C'];
+    ['#FF0000', '#FFA500', '#FFCC00', '#7FFF00', '#00FF00'];
   function speedTierColor(kt) {
     var i = kt < 2 ? 0 : kt < 8 ? 1 : kt < 14 ? 2 : kt < 18 ? 3 : 4;
     return SPEED_TIER[i];
@@ -119,7 +119,7 @@
     ? { z1: T.hrZone.z1, z2: T.hrZone.z2, z3: T.hrZone.z3,
         z4: T.hrZone.z4, z5: T.hrZone.z5 }
     /* §432 v2 폴백 — 신호등(낮음=그린 Z1 … 높음=레드 Z5), SPS 팔레트 일치. */
-    : { z1: '#00CC5C', z2: '#00FF00', z3: '#FFCC00', z4: '#FFA500', z5: '#FF0000' };
+    : { z1: '#00FF00', z2: '#7FFF00', z3: '#FFCC00', z4: '#FFA500', z5: '#FF0000' };
   var HR_ZONE_REST = (T && T.hrZone) ? T.hrZone.rest : '#8295A8';   /* 휴식 (Z1 미만) */
   var HR_LINE = (T && T.hrZone) ? T.hrZone.line : '#C0392B';        /* 심박 곡선 */
 

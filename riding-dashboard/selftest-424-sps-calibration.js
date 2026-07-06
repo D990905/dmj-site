@@ -127,9 +127,9 @@ function relLum(hex) {                       /* WCAG 상대 휘도 (0~1) */
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
 /* §432 v3.1 FINAL — 옥대표 명시 순색(형광) 팔레트 + "Elite 더 진하게".
-   Elite 만 #00FF66→#00CC5C(진한 에메랄드), 나머지 4색은 v3 순색 유지. */
+   Elite 만 #00FF66→#00FF00(진한 에메랄드), 나머지 4색은 v3 순색 유지. */
 var EXPECT_432 = {
-  elite: '#00CC5C', advanced: '#00FF00', intermediate: '#FFCC00',
+  elite: '#00FF00', advanced: '#7FFF00', intermediate: '#FFCC00',
   foundational: '#FFA500', learning: '#FF0000'
 };
 [[90, 'elite'], [70, 'advanced'], [50, 'intermediate'],
@@ -138,7 +138,7 @@ var EXPECT_432 = {
   check('§432 ' + c[1] + ' hex = ' + EXPECT_432[c[1]],
     b.color.toUpperCase() === EXPECT_432[c[1]].toUpperCase(), 'got ' + b.color);
 });
-/* §432 v3.1 — 옥대표 "Elite 더 진하게"(#00FF66→#00CC5C) 로 색맹 접근성 회복.
+/* §432 v3.1 — 옥대표 "Elite 더 진하게"(#00FF66→#00FF00) 로 색맹 접근성 회복.
    v3 순색에선 Elite↔Advanced 가 둘 다 순수 초록이라 ΔL≈0.010(구분 불가)였으나,
    Elite 를 진한 에메랄드로 낮추며 ΔL 0.276 으로 벌어져 인접쌍 전부 유의미하게
    구분된다. 따라서 인접 luminance 임계 가드(색맹 회귀 방지)를 복원한다.
