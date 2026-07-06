@@ -387,7 +387,7 @@ a { color:var(--sea-deep); }
 #summary-strip.stat-strip > .stat > .stat__spark { margin-top:auto; }
 /* 라벨(트렌드 chip 포함)이 1줄·2줄로 갈려 굵은 값의 높이가 어긋나지 않도록
    라벨 높이를 2줄분으로 예약 — 6개 타일의 값이 같은 높이에 정렬된다. */
-#summary-strip.stat-strip > .stat > .stat__label { min-height:2.6em; align-items:flex-end; align-content:end; }
+#summary-strip.stat-strip > .stat > .stat__label { min-height:3.2em; align-items:flex-end; align-content:end; }
 .stat-strip--inner .stat {
   background:var(--bg-card-2); box-shadow:none; border-color:var(--border-soft);
 }
