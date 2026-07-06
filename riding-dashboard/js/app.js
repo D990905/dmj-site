@@ -531,8 +531,54 @@
   }
 
   /* ---------- 파일 처리 ---------- */
+  /* §430 — 업로드 진입점. 파일 1개면 기존 단일 경로(하위 호환), 여러 개면
+     자동 융합(형식 감지→primary 선택→IMU/HR 시간축 병합)을 돌린다. */
+  function handleFiles(fileList) {
+    var files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+    if (files.length === 1) { handleFile(files[0]); return; }   // 단일 = 기존 경로
+
+    if (!Merger) { showError('융합 모듈을 불러오지 못했습니다. 파일을 하나씩 올려 주세요.'); return; }
+    /* 융합은 텍스트 형식(.gpx·.csv·.tcx)만 — .vkx(바이너리)는 단독 업로드 안내 */
+    var textFiles = [], skipped = [];
+    files.forEach(function (f) {
+      if (/\.(gpx|csv|tcx)$/i.test(f.name)) textFiles.push(f);
+      else skipped.push(f.name);
+    });
+    if (!textFiles.length) {
+      showError('융합 가능한 파일(.gpx · .csv · .tcx)이 없습니다. .vkx 는 하나씩 올려 주세요.');
+      return;
+    }
+    readAllAsText(textFiles, function (loaded, readErr) {
+      if (readErr) { showError('파일을 읽지 못했습니다: ' + readErr); return; }
+      try {
+        var res = Merger.mergeFiles(loaded);
+        processFusion(res, loaded, skipped);
+      } catch (e) {
+        showError(e && e.message ? e.message : '세션 융합에 실패했습니다.');
+      }
+    });
+  }
+
+  /* 여러 파일을 모두 텍스트로 읽어 [{name,text}] 로 콜백. 순서 보존. */
+  function readAllAsText(files, done) {
+    var out = new Array(files.length), remaining = files.length, errored = false;
+    files.forEach(function (f, idx) {
+      var reader = new FileReader();
+      reader.onerror = function () {
+        if (errored) return; errored = true; done(null, f.name);
+      };
+      reader.onload = function () {
+        out[idx] = { name: f.name, text: reader.result };
+        if (--remaining === 0 && !errored) done(out, null);
+      };
+      reader.readAsText(f);
+    });
+  }
+
   /* 확장자로 .gpx ↔ .vkx ↔ .csv 파서를 분기한다. .vkx 는 Vakaros Atlas 2 의
-     바이너리 포맷이라 ArrayBuffer 로, .gpx·.csv 는 텍스트로 읽는다. */
+     바이너리 포맷이라 ArrayBuffer 로, .gpx·.csv 는 텍스트로 읽는다.
+     §430: .csv 는 RaceBox CSV 면 IMU 융합 경로, 아니면 기존 SailTech 경로. */
   function handleFile(file) {
     var isVkx = /\.vkx$/i.test(file.name);
     var isCsv = /\.csv$/i.test(file.name);
