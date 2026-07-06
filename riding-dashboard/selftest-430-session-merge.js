@@ -249,6 +249,15 @@ ok(upAwa > 0 && upAwa < 90 && dnAwa > 0 && dnAwa < 120, 'AWA 값 물리 범위 �
 /* CWA(twa) 는 풍속과 무관하게 동일해야 (AWA 추가가 CWA 훼손 안 함) */
 ok(Math.abs(tsNo.upwind.P.twa.avg - upCwa) < 0.01, 'CWA 는 풍속과 무관 (기존 지표 불변)');
 
+/* 대표(상위)는 고속 활주 시 겉보기각 = 작은 AWA (저속·펌핑 큰 각이 아님).
+   direction='low' 이므로 상위20% ≤ 상위50% ≤ 평균 이어야 한다 —
+   스타보드 풍하 71° 같은 저속 순간이 대표로 뽑히지 않는지 확인. */
+var sdn = tsAwa.downwind.S.awa;
+console.log('    스타보드 풍하 AWA: 평균=' + sdn.avg.toFixed(1) + '° 상위50=' + sdn.bot50.toFixed(1) + '° 상위20=' + sdn.bot20.toFixed(1) + '°');
+ok(sdn.bot20 <= sdn.bot50 && sdn.bot50 <= sdn.avg,
+   '스타보드 풍하 상위(대표) = 고속 활주 시 작은 AWA (상위20 ≤ 상위50 ≤ 평균)');
+ok(sdn.bot20 < 40, '스타보드 풍하 상위20% AWA < 40° (저속 71° 대표 문제 해결)');
+
 /* ---------- 결과 ---------- */
 console.log('\n=== 결과: ' + pass + ' 통과 / ' + fail + ' 실패 ===\n');
 process.exit(fail ? 1 : 0);
