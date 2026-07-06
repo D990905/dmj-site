@@ -7,6 +7,8 @@
 
   var Geo = window.RDGeo, Gpx = window.RDGpx, Vkx = window.RDVkx, Csv = window.RDCsv, An = window.RDAnalysis;
   var Storage = window.RDStorage, Charts = window.RDCharts;
+  /* §430 — 다중 파일 자동 융합 */
+  var Merger = window.RDSessionMerger, RaceboxCSV = window.RDRaceboxCSV;
   var KT = Geo.MS_TO_KNOTS;
 
   /* i18n 변환 헬퍼 — 동적 보간 문자열을 영어 모드에서 영어로.
