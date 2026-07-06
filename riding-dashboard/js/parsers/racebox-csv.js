@@ -112,7 +112,11 @@
     var hasSpeed = col['Speed'] !== undefined;
     var hasGf = col['GForceX'] !== undefined && col['GForceY'] !== undefined &&
                 col['GForceZ'] !== undefined;
-    var hasGyro = col['GyroZ'] !== undefined;
+    /* 자이로 3축 — 상보필터(complementary filter) 입력. heel(roll) 각속도는
+       GyroX, pitch 각속도는 GyroY(부호반전), yaw 는 GyroZ (축·부호는 실
+       세션 데이터로 검증: heel rate↔+GyroX r=0.31, pitch rate↔−GyroY r=0.18). */
+    var hasGyro = col['GyroX'] !== undefined && col['GyroY'] !== undefined &&
+                  col['GyroZ'] !== undefined;
 
     var points = [];
     var skippedBadCoord = 0, skippedNoTime = 0;
@@ -159,8 +163,12 @@
         }
       }
       if (hasGyro) {
-        var gzr = num(f[col['GyroZ']]);
-        if (gzr != null) pt.gyroZ = gzr;
+        var wx = num(f[col['GyroX']]);
+        var wy = num(f[col['GyroY']]);
+        var wz = num(f[col['GyroZ']]);
+        if (wx != null) pt.gyroX = wx;
+        if (wy != null) pt.gyroY = wy;
+        if (wz != null) pt.gyroZ = wz;
       }
 
       points.push(pt);
