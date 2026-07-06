@@ -270,6 +270,8 @@
     category: CATEGORY, categoryColor: categoryColor,
     /* 4) 심박 존색 */
     hrZone: HR_ZONE,
+    /* 5) 5-tier 신호등(형광) 팔레트 — SPS·HR·속도분포 공유 (§432 v2) */
+    signal5: SIGNAL5,
     /* 공통 */
     base: BASE, maneuver: MANEUVER, chrome: CHROME, font: FONT,
     legacy: legacy,
