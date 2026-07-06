@@ -2059,8 +2059,7 @@
     var b = STATS_DIR_BADGE[dir] || STATS_DIR_BADGE.neutral;
     var txt = b.txt;
     if (dir === 'neutral') {
-      var nk = (row.metric === 'twa' || row.metric === 'awa')
-        ? row.metric + '-' + row.mode : row.metric;
+      var nk = (row.metric === 'twa') ? 'twa-' + row.mode : row.metric;
       if (STATS_NEUTRAL_NOTE[nk]) txt = STATS_NEUTRAL_NOTE[nk];
     }
     /* §410 — 풍상/풍하 접두·배지 문구를 i18nT 로 변환(노드가 '풍상 ▼ 낮을수록
