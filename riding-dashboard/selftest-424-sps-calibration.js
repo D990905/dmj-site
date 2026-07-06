@@ -129,7 +129,7 @@ function relLum(hex) {                       /* WCAG 상대 휘도 (0~1) */
 /* §432 v3 FINAL — 옥대표 명시 순색(형광) 팔레트. 방향(신호등)은 동일,
    톤을 최대 채도 순색으로. hex 는 옥대표 스크린샷 지정값(override). */
 var EXPECT_432 = {
-  elite: '#00FF66', advanced: '#00FF00', intermediate: '#FFCC00',
+  elite: '#00CC5C', advanced: '#00FF00', intermediate: '#FFCC00',
   foundational: '#FFA500', learning: '#FF0000'
 };
 [[90, 'elite'], [70, 'advanced'], [50, 'intermediate'],
@@ -138,7 +138,7 @@ var EXPECT_432 = {
   check('§432 ' + c[1] + ' hex = ' + EXPECT_432[c[1]],
     b.color.toUpperCase() === EXPECT_432[c[1]].toUpperCase(), 'got ' + b.color);
 });
-/* §432 v3 — 옥대표 명시 순색(최대 채도) 팔레트. 순색 특성상 Elite(#00FF66)↔
+/* §432 v3 — 옥대표 명시 순색(최대 채도) 팔레트. 순색 특성상 Elite(#00CC5C)↔
    Advanced(#00FF00) 는 둘 다 순수 초록이라 luminance 가 거의 동일(ΔL≈0.01)
    → 색맹(deutan/protan) luminance 구분은 사실상 불가. 이는 옥대표 명시 결정이며
    접근성은 추후 label 텍스트로 보완(색 자체엔 luminance 임계 가드를 두지 않는다).

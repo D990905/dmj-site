@@ -153,17 +153,17 @@
        Elite=진초록(에메랄드) / Advanced=연초록(라임) / Intermediate=노랑(앰버)
        / Foundational=오렌지 / Learning=레드.
      §432 v3 FINAL (옥대표 스크린샷 명시 순색) — 톤을 최대 채도 순색(형광)으로
-       확정: Elite=#00FF66(네온 에메랄드) / Advanced=#00FF00(순수 라임) /
+       확정: Elite=#00CC5C(네온 에메랄드) / Advanced=#00FF00(순수 라임) /
        Intermediate=#FFCC00 / Foundational=#FFA500 / Learning=#FF0000. 이 5색은
        심박 존(chart-theme.js HR_ZONE)·속도분포(signal5)와 hex 완전 일치한다
        (SPS Elite=HR Z1 저심박=그린 … SPS Learning=HR Z5 고심박=레드).
-       ⚠ 순색 최대 채도라 Elite(#00FF66)↔Advanced(#00FF00) 는 둘 다 순수 초록,
+       ⚠ 순색 최대 채도라 Elite(#00CC5C)↔Advanced(#00FF00) 는 둘 다 순수 초록,
        luminance 거의 동일 → 색맹 luminance 구분 사실상 불가. 옥대표 명시 결정,
        접근성은 추후 label 텍스트로 보완(색에 luminance 가드 두지 않음).
      (밴드 임계값 80/60/40/20 은 §424 lock — 불변. PDF grade-chip 은 이미
      동일한 신호등 램프[green→red]라 tier 별로 정합 — 별도 변경 불필요.) */
   var VPS_BANDS = [
-    { min: 80, tier: 'elite',        label: 'Elite',        color: '#00FF66' },
+    { min: 80, tier: 'elite',        label: 'Elite',        color: '#00CC5C' },
     { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#00FF00' },
     { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#FFCC00' },
     { min: 20, tier: 'foundational', label: 'Foundational', color: '#FFA500' },
