@@ -911,6 +911,20 @@
     if (!st || !st.info) { el.hidden = true; el.innerHTML = ''; return; }
     var f = st.info;
     function pct(x) { return Math.round((x || 0) * 100); }
+    /* §434 — 저장된 융합 세션 다시 보기: 소스 파일이 없으므로 전체 융합
+       리포트 대신 간결한 복원 안내 + 포함 지표만 표시. */
+    if (f.restored) {
+      var chips = [];
+      if (f.heelCoverage > 0) chips.push('heel·pitch ' + pct(f.heelCoverage) + '%');
+      if (f.hrCoverage > 0) chips.push('심박 ' + pct(f.hrCoverage) + '%');
+      el.innerHTML =
+        '<p class="fusion-banner__title"><span class="fusion-banner__ok">✓</span> ' +
+        i18nT('저장된 융합 세션 다시 보기') +
+        (chips.length ? ' <span class="fb-dim" style="font-weight:400">· ' +
+          esc(chips.join(' · ')) + ' ' + i18nT('포함') + '</span>' : '') + '</p>';
+      el.hidden = false;
+      return;
+    }
     function row(k, v) {
       return '<div class="fusion-banner__row"><span class="fusion-banner__k">' +
         esc(k) + '</span><span class="fusion-banner__v">' + v + '</span></div>';
