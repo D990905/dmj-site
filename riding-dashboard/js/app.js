@@ -640,6 +640,7 @@
       var session = An.normalizeSession(parsed);
       state.parsed = parsed;
       state.gpxText = text;        // 원본 GPX — 세션 저장 시 '다시 보기'용으로 보관
+      state.fusion = null;         // §430 — 단일 GPX 는 융합 아님
       state.fullSession = session;
       state.autoSessionName = autoTitleFrom(name, parsed);
       state.sessionName = state.autoSessionName;
@@ -683,6 +684,7 @@
       var session = An.normalizeSession(parsed);
       state.parsed = parsed;
       state.gpxText = null;        // .vkx 는 바이너리 — 텍스트 원본 없음
+      state.fusion = null;         // §430 — 단일 VKX 는 융합 아님
       state.fullSession = session;
       state.autoSessionName = autoTitleFrom(name, parsed);
       state.sessionName = state.autoSessionName;
