@@ -976,6 +976,18 @@
            heel·pitch 는 표본에 있을 때만 담아, 추후 Vakaros .vkx
            자세 데이터가 들어오면 바이올린에 자동으로 그려지게 한다. */
         var rec = { sog: sp, twa: twa, dt: dt };
+        /* AWA(겉보기 풍각) — 풍속이 있을 때만. 진풍(TWS)과 보트 속도(V)의
+           표준 벡터 관계로 겉보기 바람 각도를 낸다(같은 속도 단위=kt):
+             AWA = atan2(TWS·sin TWA, TWS·cos TWA + V)
+           포일링 고속에선 겉보기 바람이 앞으로 당겨져 AWA < CWA(twa)가 되고,
+           풍하로 바람보다 빠르면(V>TWS) 정풍하에서도 겉보기 바람이 앞에서
+           불어온다. 부호 없는 0–180° 크기(택 무관). 도메인 표준식. */
+        if (hasTws) {
+          var twaRad = Geo.toRad(twa);
+          var vKt = sp * Geo.MS_TO_KNOTS;
+          rec.awa = Math.atan2(windSpeedKt * Math.sin(twaRad),
+                               windSpeedKt * Math.cos(twaRad) + vKt) * 180 / Math.PI;
+        }
         /* 힐(Heel)은 택에 따라 부호가 갈린다 — 한 택은 +, 반대 택은 −.
            택을 합쳐 평균하면 좌·우가 상쇄돼 무의미하지만, 포트/스타보드
            버킷으로 쪼개면 한 버킷 안에서는 부호가 일관되므로 부호 있는
