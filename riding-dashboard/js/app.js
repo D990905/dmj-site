@@ -4067,7 +4067,8 @@
   var HR_ZONE_COLORS = (_RDT && _RDT.hrZone)
     ? { z1: _RDT.hrZone.z1, z2: _RDT.hrZone.z2, z3: _RDT.hrZone.z3,
         z4: _RDT.hrZone.z4, z5: _RDT.hrZone.z5 }
-    : { z1: '#3D8BD4', z2: '#27AE60', z3: '#E0A100', z4: '#EF7D00', z5: '#C0392B' };
+    /* §432 v2 폴백 — 신호등(낮음=그린 Z1 … 높음=레드 Z5), SPS 팔레트 일치. */
+    : { z1: '#00D97E', z2: '#4ADE80', z3: '#FACC15', z4: '#FB923C', z5: '#F87171' };
   var HR_ZONE_REST_COLOR = (_RDT && _RDT.hrZone) ? _RDT.hrZone.rest : '#8295A8';
 
   function renderHrSection() {
