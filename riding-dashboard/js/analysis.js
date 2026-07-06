@@ -1004,9 +1004,16 @@
          힐은 부호 있는 값으로 집계한다 — 이 group()은 포트(P)·스타보드(S)
          버킷별로도 호출되며, 한 택 안에서는 힐 부호가 일관돼 부호 있는
          평균이 그대로 의미를 갖는다. 택 합산(all) 그룹의 힐은 좌우가
-         상쇄되므로 패널은 all.heel 을 쓰지 않고 P·S 버킷만 표시한다. */
-      if (arr.length && arr[0].heel != null) g.heel = statsBy(arr, 'heel');
-      if (arr.length && arr[0].pitch != null) g.pitch = statsBy(arr, 'pitch');
+         상쇄되므로 패널은 all.heel 을 쓰지 않고 P·S 버킷만 표시한다.
+         §430: 센서 커버리지가 부분적일 수 있으므로(예: RaceBox CSV 가
+         GPX 보다 늦게 시작 → 앞부분 표본에 heel 없음) 첫 표본만 보고
+         버킷 전체를 판단하지 않고, heel 이 담긴 표본만 추려 집계한다 —
+         그렇지 않으면 undefined·null 이 computeTierMeans 의 평균을 NaN 으로
+         오염시켜 통계가 '—' 로 사라진다(심박 처리와 동일한 필터 패턴). */
+      var heelArr = arr.filter(function (o) { return o.heel != null; });
+      if (heelArr.length) g.heel = statsBy(heelArr, 'heel');
+      var pitchArr = arr.filter(function (o) { return o.pitch != null; });
+      if (pitchArr.length) g.pitch = statsBy(pitchArr, 'pitch');
       /* 심박은 센서 드롭아웃으로 일부 표본에 hr 이 없을 수 있어, hr 이
          담긴 표본만 추려 시간가중 구간 평균을 낸다. 좌우 택과 무관해
          패널은 all 그룹의 hr 만 쓰지만(P/S 분할 없음), 코드 경로는
