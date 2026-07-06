@@ -597,7 +597,19 @@
       reader.readAsArrayBuffer(file);   // .vkx 는 바이너리
     } else if (isCsv) {
       reader.onload = function () {
-        processCsv(reader.result, file.name.replace(/\.csv$/i, ''));
+        var text = reader.result;
+        /* RaceBox CSV — 단일이라도 IMU(heel/pitch) 융합 경로로. SailTech
+           통합 CSV 는 기존 processCsv 유지(하위 호환). */
+        if (Merger && RaceboxCSV && RaceboxCSV.looksLike && RaceboxCSV.looksLike(text)) {
+          try {
+            var res = Merger.mergeFiles([{ name: file.name, text: text }]);
+            processFusion(res, [{ name: file.name, text: text }], []);
+          } catch (e) {
+            showError(e && e.message ? e.message : 'RaceBox CSV 를 분석하지 못했습니다.');
+          }
+        } else {
+          processCsv(text, file.name.replace(/\.csv$/i, ''));
+        }
       };
       reader.readAsText(file);          // .csv 는 텍스트
     } else {
