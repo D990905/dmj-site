@@ -1439,7 +1439,7 @@
         '</div></div></div>';
     }
     var sparkHtml = (opts && opts.spark)
-      ? sparklineSvg(opts.spark, opts.color || '#1F8FFF') : '';
+      ? sparklineSvg(opts.spark, opts.color || '#1F8FFF', { markLast: !!opts.markLast }) : '';
     return '<div class="stat"><span class="stat__label">' + label +
       (trendHtml ? trendHtml : '') + '</span>' +
       '<span class="stat__value">' + valHtml + '</span>' +
