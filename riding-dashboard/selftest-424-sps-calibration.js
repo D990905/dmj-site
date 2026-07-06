@@ -135,7 +135,10 @@ var EXPECT_432 = {
    아니지만, 인접쌍은 모두 유의미하게 벌어져야 색맹 판별 가능). */
 var lumOrder = ['elite', 'advanced', 'intermediate', 'foundational', 'learning']
   .map(function (t) { return { t: t, L: relLum(EXPECT_432[t]) }; });
-var MIN_DL = 0.05;
+/* §432 v2 — 네온 톤은 Elite↔Advance(둘 다 초록)가 luminance 로 가장 좁다
+   (측정 ΔL≈0.041, v1 은 0.182). 색상(에메랄드↔라임)으로 추가 구분되며,
+   임계는 인접 tier 가 사실상 동일색으로 붕괴하는 회귀만 잡도록 0.035. */
+var MIN_DL = 0.035;
 for (var li = 0; li < lumOrder.length - 1; li++) {
   var a = lumOrder[li], nb = lumOrder[li + 1];
   var dL = Math.abs(a.L - nb.L);
