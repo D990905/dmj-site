@@ -1013,6 +1013,11 @@
       var g = { vmg: statsBy(arr, 'vmg'), sog: statsBy(arr, 'sog'),
                 twa: statsBy(arr, 'twa'),
                 timeSec: timeOf(arr), count: arr.length, samples: arr };
+      /* AWA(겉보기 풍각) — 풍속이 있어 표본에 awa 가 담긴 경우에만 집계
+         (heel·pitch·hr 과 동일하게 null 필터). 풍속 미입력 세션은 키 자체가
+         생기지 않아 통계 패널이 AWA 행을 만들지 않는다. */
+      var awaArr = arr.filter(function (o) { return o.awa != null; });
+      if (awaArr.length) g.awa = statsBy(awaArr, 'awa');
       /* heel·pitch 는 표본에 실제 데이터가 있을 때만 통계를 산출한다
          (추후 .vkx 대비 — GPX 만 있을 땐 키 자체가 생기지 않는다).
          힐은 부호 있는 값으로 집계한다 — 이 group()은 포트(P)·스타보드(S)
