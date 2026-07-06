@@ -417,7 +417,7 @@
     res.totalDurationSec = S[S.length - 1].t - S[0].t;
     var movingMs = cfg.movingSpeedKt / Geo.MS_TO_KNOTS;
     var activeMs = cfg.activeSpeedKt / Geo.MS_TO_KNOTS;
-    var movingTime = 0, activeTime = 0, instMax = 0;
+    var movingTime = 0, activeTime = 0, instMax = 0, activeDist = 0;
 
     session.legs.forEach(function (leg) {
       for (var i = leg.start + 1; i <= leg.end; i++) {
@@ -425,11 +425,16 @@
         var sp = S[i].speed;
         if (sp > instMax) instMax = sp;
         if (sp >= movingMs) movingTime += dt;
-        if (sp >= activeMs) activeTime += dt;
+        if (sp >= activeMs) { activeTime += dt; activeDist += (S[i].segDist || 0); }
       }
     });
     res.movingTimeSec = movingTime;
     res.activeTimeSec = activeTime;
+    /* 포일링(활주) 거리 — 활주 속도(activeSpeedKt) 이상 구간의 이동 거리.
+       총 거리 대비 비율로 '얼마나 오래 포일 위에 떠서 갔는지'를 본다. */
+    res.activeDistanceM = activeDist;
+    res.activeDistRatio = session.totalDistanceM > 0
+      ? activeDist / session.totalDistanceM : 0;
     /* "최고 속도" = 2초 구간 최고 속도 (GPS 워터스포츠 표준).
        단일 GPS 포인트 순간속도(instMax)는 위치 노이즈로 과대해질 수 있어
        코치 지표로 부적합 → 2초 평균 peak 으로 정의. 이렇게 하면
