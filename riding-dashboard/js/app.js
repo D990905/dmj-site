@@ -756,6 +756,125 @@
     }
   }
 
+  /* §430 — 다중 파일 융합 결과(RDSessionMerger.mergeFiles) 처리. 표준
+     parsed 객체를 돌려받으므로 normalizeSession 이후 흐름은 processGpx 와
+     동일하되, 융합 리포트(state.fusion)를 보관해 배너를 띄운다. primary 가
+     GPX 면 원본 텍스트를 gpxText 로 보관해 '다시 보기'/리플레이를 살린다. */
+  function processFusion(res, loaded, skipped) {
+    try {
+      var parsed = res.parsed;
+      var session = An.normalizeSession(parsed);
+      state.parsed = parsed;
+
+      /* primary GPX 원본 텍스트 보관 (primary 가 CSV 면 null) */
+      var primaryFile = res.fusion && res.fusion.primary && res.fusion.primary.fileName;
+      var gpxText = null;
+      if (primaryFile && loaded) {
+        for (var i = 0; i < loaded.length; i++) {
+          if (loaded[i].name === primaryFile && /\.gpx$/i.test(loaded[i].name)) {
+            gpxText = loaded[i].text; break;
+          }
+        }
+      }
+      state.gpxText = gpxText;
+      state.fusion = { info: res.fusion, warnings: res.warnings || [], skipped: skipped || [] };
+      state.fullSession = session;
+
+      var baseName = deriveFusionName(loaded, res);
+      state.autoSessionName = autoTitleFrom(baseName, parsed);
+      state.sessionName = state.autoSessionName;
+      state.windDir = null;
+      state.windPending = null;
+      state.windSpeedKt = null;
+      state.selectedManeuvers = [];
+      state.maneuverFilter = 'all';
+      state.maneuverShowAll = false;
+      state.sessionHasVideoFlag = false;
+      state.sessionRemoteDateEpoch = null;
+      state.sessionSig = sessionSignature(session);
+      var savedTitle = Storage.loadSessionTitle(state.sessionSig);
+      if (savedTitle) state.sessionName = savedTitle;
+      state.editState = session.hasTime ? Storage.loadEditState(state.sessionSig) : null;
+      applyCurrentEdits();
+      if (state.windDir == null && autoApplyRecommendedWind()) recompute();
+      $('intro-view').hidden = true;
+      $('dashboard-view').hidden = false;
+      resetAnimMarks();
+      renderDashboard();
+      window.scrollTo(0, 0);
+      showHeroSummary();
+    } catch (e) {
+      showError(e && e.message ? e.message : '세션 융합 분석에 실패했습니다.');
+    }
+  }
+
+  /* 융합 세션 기본 이름 — primary 파일명(확장자 제거) 기반 */
+  function deriveFusionName(loaded, res) {
+    var pf = res && res.fusion && res.fusion.primary && res.fusion.primary.fileName;
+    var base = pf || (loaded && loaded[0] && loaded[0].name) || '융합 세션';
+    return base.replace(/\.(gpx|csv|tcx|vkx)$/i, '');
+  }
+
+  /* §430 — 융합 소스 라벨 */
+  var FUSION_SRC_LABELS = {
+    'racebox-gpx': 'RaceBox GPX', 'racebox-csv': 'RaceBox CSV',
+    'waterspeed-gpx': 'Waterspeed GPX', 'garmin-gpx': 'Garmin GPX',
+    'garmin-tcx': 'Garmin TCX', 'generic-gpx': 'GPX', 'sailtech-csv': 'SailTech CSV'
+  };
+  function fusionSrcLabel(s) { return FUSION_SRC_LABELS[s] || s || '—'; }
+
+  /* §430 — 다중 파일 융합 배너 렌더. 융합 세션이 아니면 숨긴다. */
+  function renderFusionBanner() {
+    var el = $('fusion-banner');
+    if (!el) return;
+    var st = state.fusion;
+    if (!st || !st.info) { el.hidden = true; el.innerHTML = ''; return; }
+    var f = st.info;
+    function pct(x) { return Math.round((x || 0) * 100); }
+    function row(k, v) {
+      return '<div class="fusion-banner__row"><span class="fusion-banner__k">' +
+        esc(k) + '</span><span class="fusion-banner__v">' + v + '</span></div>';
+    }
+    function dim(t) { return '<span class="fb-dim">' + esc(t) + '</span>'; }
+
+    var rows = [];
+    rows.push(row(i18nT('Primary 항적'),
+      esc(fusionSrcLabel(f.primary.source)) + ' ' +
+      dim('(' + f.primary.sampleRateHz + ' Hz · ' + (f.primary.pointCount || 0).toLocaleString() + 'pt)')));
+
+    if (f.imu && f.imu.merged) {
+      rows.push(row(i18nT('IMU 병합'),
+        esc(fusionSrcLabel(f.imu.source)) + ' → heel·pitch ' + dim('(' + pct(f.heelCoverage) + '% 커버)')));
+    } else if (f.imu && f.imu.own) {
+      rows.push(row('IMU', esc(fusionSrcLabel(f.imu.source)) + ' ' + dim('자체 (' + pct(f.heelCoverage) + '%)')));
+    }
+
+    if (f.hr && f.hr.merged) {
+      rows.push(row(i18nT('HR 병합'),
+        esc(fusionSrcLabel(f.hr.source)) + ' → ' + i18nT('심박') + ' ' + dim('(' + pct(f.hrCoverage) + '% 커버)')));
+    } else if (f.hr && f.hr.own) {
+      rows.push(row('HR', esc(fusionSrcLabel(f.hr.source)) + ' ' + dim('자체')));
+    }
+
+    if (f.speed) rows.push(row(i18nT('속도원'), esc(fusionSrcLabel(f.speed.source))));
+
+    rows.push(row(i18nT('GPS 스파이크'),
+      (f.spikes.removed || 0).toLocaleString() + 'pt ' + i18nT('제거') + ' ' +
+      dim('(' + ((f.spikes.rate || 0) * 100).toFixed(2) + '%)')));
+
+    var warns = (st.warnings || []).map(function (w) { return w.file + ': ' + w.error; });
+    (st.skipped || []).forEach(function (n) { warns.push(n + ' — ' + i18nT('융합 미지원(개별 업로드)')); });
+    var warnHtml = warns.length
+      ? '<div class="fusion-banner__warn">⚠ ' + warns.map(esc).join(' · ') + '</div>' : '';
+
+    el.innerHTML =
+      '<p class="fusion-banner__title"><span class="fusion-banner__ok">✓</span> ' +
+        i18nT('세션 자동 융합 완료') +
+        ' <span class="fb-dim" style="font-weight:400">· ' + (f.sources ? f.sources.length : 0) + i18nT('개 소스') + '</span></p>' +
+      '<div class="fusion-banner__grid">' + rows.join('') + '</div>' + warnHtml;
+    el.hidden = false;
+  }
+
   /* 세션의 풍향 자동 추정 결과(신뢰도 포함) — 트랙 구조에만 의존하므로
      세션당 한 번만 계산해 캐시한다. 편집·크롭 세션은 객체가 새로 생성돼
      자연히 다시 계산된다. */
