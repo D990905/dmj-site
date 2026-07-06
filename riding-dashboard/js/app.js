@@ -191,10 +191,10 @@
     dz.addEventListener('dragleave', function () { dz.classList.remove('is-over'); });
     dz.addEventListener('drop', function (e) {
       e.preventDefault(); dz.classList.remove('is-over');
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+      if (e.dataTransfer.files && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
     });
     fi.addEventListener('change', function () {
-      if (fi.files && fi.files[0]) handleFile(fi.files[0]);
+      if (fi.files && fi.files.length) handleFiles(fi.files);
     });
 
     $('sample-btn').addEventListener('click', loadSample);
