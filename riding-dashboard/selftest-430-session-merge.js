@@ -232,6 +232,23 @@ var upP = tsplit.upwind.P.heel, upS = tsplit.upwind.S.heel;
 ok(upP && upS && Math.sign(upP.avg) !== Math.sign(upS.avg),
    '포트·스타보드 heel 부호 반대 (택별 물리 일관): P=' + upP.avg.toFixed(1) + ' S=' + upS.avg.toFixed(1));
 
+/* ---------- 9. AWA(겉보기 풍각) ---------- */
+console.log('\n[9] AWA 겉보기 풍각 (풍속 입력 시)');
+var TWS = 15;   // kt 가정
+var anaNoWind = An.analyzeSession(session, wdUsed);           // 풍속 없음
+var anaAwa = An.analyzeSession(session, wdUsed, { windSpeedKt: TWS });
+var tsNo = anaNoWind.wind.tackSplit, tsAwa = anaAwa.wind.tackSplit;
+ok(!tsNo.upwind.P.awa, '풍속 없으면 AWA 미산출 (행 안 생김)');
+ok(!!(tsAwa.upwind.P.awa && tsAwa.downwind.P.awa), '풍속 있으면 AWA 산출');
+/* 물리: 포일링 고속에선 겉보기 바람이 앞으로 당겨져 AWA < CWA */
+var upAwa = tsAwa.upwind.P.awa.avg, upCwa = tsAwa.upwind.P.twa.avg;
+var dnAwa = tsAwa.downwind.P.awa.avg, dnCwa = tsAwa.downwind.P.twa.avg;
+console.log('    풍상 CWA=' + upCwa.toFixed(1) + '° → AWA=' + upAwa.toFixed(1) + '° · 풍하 CWA=' + dnCwa.toFixed(1) + '° → AWA=' + dnAwa.toFixed(1) + '°');
+ok(upAwa < upCwa && dnAwa < dnCwa, 'AWA < CWA (겉보기 바람이 앞으로 당겨짐)');
+ok(upAwa > 0 && upAwa < 90 && dnAwa > 0 && dnAwa < 120, 'AWA 값 물리 범위 내');
+/* CWA(twa) 는 풍속과 무관하게 동일해야 (AWA 추가가 CWA 훼손 안 함) */
+ok(Math.abs(tsNo.upwind.P.twa.avg - upCwa) < 0.01, 'CWA 는 풍속과 무관 (기존 지표 불변)');
+
 /* ---------- 결과 ---------- */
 console.log('\n=== 결과: ' + pass + ' 통과 / ' + fail + ' 실패 ===\n');
 process.exit(fail ? 1 : 0);
