@@ -4627,6 +4627,17 @@
     }
     return '#' + ch(0) + ch(2) + ch(4);
   }
+  /* §432 v2 — hex 를 흰색 쪽으로 pct(0~1) 만큼 밝게. 도넛/막대 그라데이션의
+     상단 밝은 스톱(형광 3D 음영)을 만드는 데 쓴다. */
+  function lightenHex(hex, pct) {
+    var m = String(hex).replace('#', '');
+    function ch(i) {
+      var x = parseInt(m.substr(i, 2), 16);
+      var v = Math.round(x + (255 - x) * pct);
+      return ('0' + Math.max(0, Math.min(255, v)).toString(16)).slice(-2);
+    }
+    return '#' + ch(0) + ch(2) + ch(4);
+  }
 
   /* §432 — 회전효율 score chip 색을 SPS 5-tier 밴드(coach.js vpsBand)와 같은
      신호등 팔레트로 통일한다. 이전엔 자체 3단(≥70/≥45/그외 = 초록/골드/레드)
