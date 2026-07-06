@@ -3396,7 +3396,7 @@
         bestTackIdx: bestTackIdx, bestGybeIdx: bestGybeIdx,
         groups: maneuverGroupStats(maneuvers)
       },
-      wind: computeWindMetrics(session, windDir),
+      wind: computeWindMetrics(session, windDir, opts.windSpeedKt),
       polar: computePolar(session, windDir),
       /* 심박수 분석 — 추이·요약·효율. HR 이 없으면 { hasHR:false }.
          존 분포는 사용자 입력 최대심박에 의존하므로 UI 가
