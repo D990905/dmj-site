@@ -169,6 +169,29 @@ check('§432 회전효율 59 = 골드(Elite색) 아님',
   Coach.vpsBand(59).color.toUpperCase() !== EXPECT_432.elite.toUpperCase() &&
   Coach.vpsBand(59).tier === 'intermediate', 'got ' + Coach.vpsBand(59).color);
 
+/* 3e) §432 — 심박 존색(chart-theme HR_ZONE)이 SPS 5-tier 와 hex 완전 일치.
+   옥대표 "심박 높으면 레드 낮으면 그린": Z1 recovery=SPS Elite(그린) …
+   Z5 anaerobic=SPS Learning(레드). 두 팔레트 drift 회귀 가드. */
+var HRZ = ChartTheme && ChartTheme.hrZone ? ChartTheme.hrZone : null;
+check('§432 chart-theme HR_ZONE 로드', !!HRZ, HRZ ? 'ok' : 'RDChartTheme.hrZone 없음');
+if (HRZ) {
+  var zoneToTier = [['z1', 90], ['z2', 70], ['z3', 50], ['z4', 30], ['z5', 10]];
+  zoneToTier.forEach(function (zt) {
+    var hrHex = String(HRZ[zt[0]]).toUpperCase();
+    var spsHex = Coach.vpsBand(zt[1]).color.toUpperCase();
+    check('§432 HR ' + zt[0].toUpperCase() + ' = SPS ' + Coach.vpsBand(zt[1]).tier + ' 색 일치',
+      hrHex === spsHex, 'HR=' + hrHex + ' SPS=' + spsHex);
+  });
+  /* 방향 확인 — Z1(낮은 심박)=그린(Elite), Z5(높은 심박)=레드(Learning) */
+  check('§432 HR Z1(recovery)=그린(SPS Elite)',
+    String(HRZ.z1).toUpperCase() === EXPECT_432.elite.toUpperCase(), 'z1=' + HRZ.z1);
+  check('§432 HR Z5(anaerobic)=레드(SPS Learning)',
+    String(HRZ.z5).toUpperCase() === EXPECT_432.learning.toUpperCase(), 'z5=' + HRZ.z5);
+  /* 심박 곡선(line)은 존 신호 아님 — 붉은색 유지(옥대표 지시), 존색과 분리 */
+  check('§432 HR line(심박곡선) = 존색 아닌 정체 적색 유지',
+    String(HRZ.line).toUpperCase() !== EXPECT_432.learning.toUpperCase(), 'line=' + HRZ.line);
+}
+
 /* 4) floor=0 회귀 가드 */
 check('VPS.UPWIND_RATIO_FLOOR = 0 (§424 백분위형 lock)',
   Coach.VPS.UPWIND_RATIO_FLOOR === 0, 'floor=' + Coach.VPS.UPWIND_RATIO_FLOOR);
