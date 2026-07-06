@@ -120,9 +120,10 @@ function relLum(hex) {                       /* WCAG 상대 휘도 (0~1) */
   });
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
+/* §432 v2 — 형광(네온) 팔레트. 방향(신호등)은 동일, 톤만 밝게. */
 var EXPECT_432 = {
-  elite: '#059669', advanced: '#22C55E', intermediate: '#EAB308',
-  foundational: '#F97316', learning: '#EF4444'
+  elite: '#00D97E', advanced: '#4ADE80', intermediate: '#FACC15',
+  foundational: '#FB923C', learning: '#F87171'
 };
 [[90, 'elite'], [70, 'advanced'], [50, 'intermediate'],
  [30, 'foundational'], [10, 'learning']].forEach(function (c) {
