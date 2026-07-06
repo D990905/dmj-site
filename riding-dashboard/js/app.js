@@ -727,6 +727,7 @@
       var session = An.normalizeSession(parsed);
       state.parsed = parsed;
       state.gpxText = null;
+      state.fusion = null;         // §430 — SailTech CSV 단일은 융합 아님
       state.fullSession = session;
       state.autoSessionName = autoTitleFrom(name, parsed);
       state.sessionName = state.autoSessionName;
