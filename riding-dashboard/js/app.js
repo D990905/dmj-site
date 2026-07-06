@@ -1608,31 +1608,69 @@
       }
     } catch (e) { /* noop — 시각 chip 만 영향 */ }
 
-    /* §433 (옥대표 2026-07-06) — 요약 스트립 재구성: 풍향 타일 제거,
-       포일링(활주) 거리 추가, 6개 핵심 타일을 스파크라인 없이 가운데
-       정렬로 통일한다. 순서: 총거리 · 포일링거리(총거리 대비 %) ·
-       총시간 · 포일링시간(총시간 대비 %) · 최고속도 · 평균속도. */
+    /* §433/§435 — 요약 스트립: 풍향 제거, 포일링(활주) 거리 추가, 6개 핵심
+       타일. 순서: 총거리 · 포일링거리(총거리 대비 %) · 총시간 ·
+       포일링시간(총시간 대비 %) · 최고속도 · 평균속도.
+       §435 (옥대표 2026-07-06) — 각 타일 하단에 '저장된 과거 세션 + 이번
+       세션'을 시간순으로 이은 지표별 트렌드 스파크라인(그라디언트 선)을
+       달아 그 지표가 어떻게 변해가는지 보여준다. 현재 세션은 강조점. */
+    var allSessions = [];
+    try { allSessions = (window.Storage && Storage.listSessions) ? (Storage.listSessions() || []) : []; }
+    catch (e) { allSessions = []; }
+    var curEp2 = state.session.startEpoch || 0;
+    var pastSessions = allSessions.filter(function (r) {
+      return Math.abs((r.dateEpoch || 0) - curEp2) > 10000;   // 자기 자신 제외
+    });
+    /* 지표 추출자(getVal)로 과거 세션 시리즈를 만들고 이번 세션값을 끝에
+       붙인다. 값이 2개 미만이면(비교 불가) 스파크라인 생략. */
+    function trendSpark(getVal, curVal) {
+      var series = [];
+      for (var i = 0; i < pastSessions.length; i++) {
+        var v = getVal(pastSessions[i]);
+        if (v != null && isFinite(v)) series.push(v);
+      }
+      if (curVal != null && isFinite(curVal)) series.push(curVal);
+      return series.length >= 2 ? series : null;
+    }
+    /* 과거 레코드의 포일링 시간 — activeTimeSec 없으면 비율×총시간 폴백 */
+    function recActiveTime(r) {
+      if (r.activeTimeSec != null) return r.activeTimeSec;
+      if (r.activeRatio != null && r.durationSec) return r.activeRatio * r.durationSec;
+      return null;
+    }
+
     var actLabel = foiling ? '포일링' : '플레이닝';
     var html = statTile('총 거리 (km)',
       (s.totalDistanceM / 1000).toFixed(2),
       null,
-      { trend: prev ? deltaTrend(prev.distanceM / 1000, s.totalDistanceM / 1000) : null });
+      { trend: prev ? deltaTrend(prev.distanceM / 1000, s.totalDistanceM / 1000) : null,
+        spark: trendSpark(function (r) { return r.distanceM; }, s.totalDistanceM),
+        markLast: true });
     if (s.hasTime) {
       html += statTile(actLabel + ' 거리 (km)',
         (s.activeDistanceM / 1000).toFixed(2),
-        '총 거리 대비 ' + Math.round(s.activeDistRatio * 100) + '%');
+        '총 거리 대비 ' + Math.round(s.activeDistRatio * 100) + '%',
+        { spark: trendSpark(function (r) { return r.activeDistanceM; }, s.activeDistanceM),
+          markLast: true });
       html += statTile('총 시간 (min:sec)', fmtDurCompact(s.totalDurationSec),
         '이동 ' + fmtDurCompact(s.movingTimeSec),
-        { trend: prev ? deltaTrend(prev.movingTimeSec, s.movingTimeSec) : null });
+        { trend: prev ? deltaTrend(prev.movingTimeSec, s.movingTimeSec) : null,
+          spark: trendSpark(function (r) { return r.durationSec; }, s.totalDurationSec),
+          markLast: true });
       html += statTile(actLabel + ' 시간 (min:sec)',
         fmtDurCompact(s.activeTimeSec),
-        '총 시간 대비 ' + Math.round(s.activeRatio * 100) + '%');
+        '총 시간 대비 ' + Math.round(s.activeRatio * 100) + '%',
+        { spark: trendSpark(recActiveTime, s.activeTimeSec), markLast: true });
       html += statTile('최고 속도 (' + u + ')', fmtSpeed(s.maxSpeedMs),
         '2초 구간 최고',
-        { trend: prev ? deltaTrend(prev.maxSpeedMs, s.maxSpeedMs) : null });
+        { trend: prev ? deltaTrend(prev.maxSpeedMs, s.maxSpeedMs) : null,
+          spark: trendSpark(function (r) { return r.maxSpeedMs; }, s.maxSpeedMs),
+          markLast: true });
       html += statTile('평균 속도 (' + u + ')', fmtSpeed(s.avgSpeedMovingMs),
         '이동 중',
-        { trend: prev ? deltaTrend(prev.avgSpeedMovingMs, s.avgSpeedMovingMs) : null });
+        { trend: prev ? deltaTrend(prev.avgSpeedMovingMs, s.avgSpeedMovingMs) : null,
+          spark: trendSpark(function (r) { return r.avgSpeedMovingMs; }, s.avgSpeedMovingMs),
+          markLast: true });
     }
     $('summary-strip').innerHTML = html;
   }
