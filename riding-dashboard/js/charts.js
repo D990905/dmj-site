@@ -2171,6 +2171,33 @@
     }
     return hex;
   }
+  /* §432 v2 — hex 를 흰색 쪽으로 pct(0~1) 밝게 (막대 형광 그라데이션 상단 스톱). */
+  function lightenHex(hex, pct) {
+    if (hex[0] !== '#' || hex.length !== 7) return hex;
+    var n = parseInt(hex.slice(1), 16);
+    function ch(x) { return Math.round(x + (255 - x) * pct); }
+    var r = ch((n >> 16) & 255), g = ch((n >> 8) & 255), b = ch(n & 255);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+  /* §432 v2 옵션 A — 가로 막대에 세로(상단 밝고 하단 base) 그라데이션을 입혀
+     형광 3D 음영을 준다. Chart.js scriptable backgroundColor 로, 각 막대 자신의
+     픽셀 y-범위에 그라데이션을 건다. 레이아웃 전(geometry 미정)엔 solid 폴백. */
+  function barVGrad(baseColor) {
+    return function (context) {
+      var ch = context.chart, area = ch.chartArea;
+      if (!area) return baseColor;
+      var meta = ch.getDatasetMeta(context.datasetIndex);
+      var el = meta && meta.data && meta.data[context.dataIndex];
+      if (!el) return baseColor;
+      var h = el.height || (el.width) || 0;      /* 가로막대 두께 */
+      var top = el.y - h / 2, bot = el.y + h / 2;
+      if (!(bot > top)) return baseColor;
+      var g = ch.ctx.createLinearGradient(0, top, 0, bot);
+      g.addColorStop(0, lightenHex(baseColor, 0.34));
+      g.addColorStop(1, baseColor);
+      return g;
+    };
+  }
   function mmss(sec) {
     sec = Math.max(0, Math.round(sec));
     var m = Math.floor(sec / 60), s = sec % 60;
