@@ -4652,8 +4652,13 @@
       var cls = score >= 70 ? 'eff--hi' : (score >= 45 ? 'eff--mid' : 'eff--lo');
       return '<span class="eff ' + cls + '">' + label + '</span>';
     }
+    /* §432 v2 (옥대표 "약간의 음영") — 옵션 B: inset 음영 + subtle glow 로
+       칩에 살짝 입체·형광 느낌. 텍스트는 가독 위해 어둡게 한 밴드색. */
+    var shadow = 'inset 0 -2px 4px ' + hexToRgba(band.color, 0.28) +
+      ',0 1px 2px rgba(10,37,64,0.10)';
     return '<span class="eff" style="color:' + darkenHex(band.color, 0.62) +
-      ';background:' + hexToRgba(band.color, 0.16) + '">' + label + '</span>';
+      ';background:' + hexToRgba(band.color, 0.18) +
+      ';box-shadow:' + shadow + '">' + label + '</span>';
   }
 
   /* 한 점수 카드 타일 — 방향(Upwind / Overall / Downwind)과
