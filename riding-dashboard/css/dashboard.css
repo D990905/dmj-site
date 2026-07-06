@@ -329,6 +329,29 @@ a { color:var(--sea-deep); }
   background:rgba(224,161,0,.16); color:var(--warn-ink);
 }
 
+/* ---------- §430 다중 파일 융합 배너 ---------- */
+.fusion-banner {
+  font-size:.86rem; padding:14px 16px; border-radius:12px; margin-bottom:14px;
+  background:rgba(31,143,255,.10); border:1px solid rgba(31,143,255,.28);
+  color:var(--ink, #16324f);
+}
+.fusion-banner__title {
+  font-weight:700; font-size:.95rem; margin:0 0 8px; display:flex;
+  align-items:center; gap:7px; color:#1F8FFF;
+}
+.fusion-banner__grid {
+  display:grid; gap:6px 18px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  margin:0;
+}
+.fusion-banner__row { display:flex; gap:7px; align-items:baseline; }
+.fusion-banner__k { color:var(--muted,#5b7089); min-width:96px; flex:0 0 auto; }
+.fusion-banner__v { font-weight:600; }
+.fusion-banner__v .fb-dim { font-weight:400; color:var(--muted,#5b7089); }
+.fusion-banner__warn {
+  margin-top:8px; font-size:.8rem; color:var(--warn-ink,#8a6d00);
+}
+.fusion-banner__ok { color:#1a9d63; }
+
 /* ---------- 스탯 스트립 ---------- */
 .stat-strip {
   display:grid; gap:10px; margin-bottom:14px;
