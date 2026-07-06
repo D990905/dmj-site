@@ -5178,7 +5178,7 @@
 
   function pushSessionToCloud(record) {
     if (!record || !window.RDCloud || typeof RDCloud.pushSession !== 'function') return;
-    var gpx = state.gpxText;
+    var gpx = trackTextForSave();   // §434 — 융합 세션은 컴팩트 JSON 로 cloud 동기화
     var sig = state.sessionSig;
     var hasVideoP = Promise.resolve(false);
     if (sig && Storage && typeof Storage.loadVideoBlobs === 'function') {
