@@ -1451,8 +1451,9 @@
   /* sparklineSvg — 미니 영역(area) 그라데이션 차트.
      values 배열을 viewBox 0..100 x 0..32 에 맞춰 정규화. 30 점이 넘어가면
      균등 추출. 데이터 1개 이하면 빈 문자열. (Layer 1.5 — Danny 2026-05-26) */
-  function sparklineSvg(values, color) {
+  function sparklineSvg(values, color, opts) {
     if (!values || values.length < 2) return '';
+    opts = opts || {};
     var n = values.length;
     var STEP = Math.max(1, Math.floor(n / 64));
     var pts = [];
@@ -1469,15 +1470,22 @@
     var span = hi - lo || 1;
     var W = 100, H = 32;
     var stepX = W / (pts.length - 1);
-    var d = '', area = '';
+    var d = '', area = '', lastX = 0, lastY = 0;
     for (var k = 0; k < pts.length; k++) {
-      var x = (k * stepX).toFixed(2);
-      var y = (H - ((pts[k] - lo) / span) * (H - 4) - 2).toFixed(2);
-      d += (k === 0 ? 'M' : 'L') + x + ',' + y;
-      area += (k === 0 ? 'M' : 'L') + x + ',' + y;
+      var x = (k * stepX);
+      var y = (H - ((pts[k] - lo) / span) * (H - 4) - 2);
+      d += (k === 0 ? 'M' : 'L') + x.toFixed(2) + ',' + y.toFixed(2);
+      area += (k === 0 ? 'M' : 'L') + x.toFixed(2) + ',' + y.toFixed(2);
+      lastX = x; lastY = y;
     }
     area += 'L' + W + ',' + H + 'L0,' + H + 'Z';
     var gradId = 'rd-spark-' + Math.random().toString(36).slice(2, 8);
+    /* §435 — 현재(마지막) 세션 지점에 강조 점. 트렌드에서 '이번 세션이
+       여기'를 한눈에 보이게 한다. markLast 옵션일 때만. */
+    var dot = opts.markLast
+      ? '<circle cx="' + lastX.toFixed(2) + '" cy="' + lastY.toFixed(2) + '" r="2.4" ' +
+        'fill="' + color + '" stroke="#fff" stroke-width="1" vector-effect="non-scaling-stroke"/>'
+      : '';
     return '<svg class="stat__spark" viewBox="0 0 ' + W + ' ' + H + '" ' +
       'preserveAspectRatio="none" aria-hidden="true">' +
       '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
@@ -1487,6 +1495,7 @@
       '<path d="' + area + '" fill="url(#' + gradId + ')"/>' +
       '<path d="' + d + '" fill="none" stroke="' + color +
       '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+      dot +
       '</svg>';
   }
 
