@@ -1112,7 +1112,9 @@
      렌더러(app.js)는 이 값으로 '상위'가 어느 쪽인지·방향 배지를 정한다. */
   function statsMetricDirection(metric, mode) {
     if (metric === 'sog' || metric === 'vmg') return 'high';
-    if (metric === 'twa') return (mode === 'upwind') ? 'low' : 'neutral';
+    /* CWA·AWA 모두 풍상은 작을수록(바람에 가깝게 포인팅) 좋다. 풍하는
+       최적각이 비단조(140–150°)라 중립. */
+    if (metric === 'twa' || metric === 'awa') return (mode === 'upwind') ? 'low' : 'neutral';
     return 'neutral';   // heel · pitch · hr
   }
 
