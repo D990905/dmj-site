@@ -157,6 +157,9 @@
    * DOMParser 재분석 결과가 완전히 동일하다 ('다시 보기' 무손실 압축). */
   function compactGpx(text) {
     if (typeof text !== 'string') return text;
+    /* §434 — 융합 세션은 XML 이 아니라 컴팩트 JSON(RDFUSED1) 으로 저장된다.
+       XML 공백 압축을 적용하면 JSON 이 손상되므로 XML 일 때만 압축한다. */
+    if (text.charAt(0) !== '<') return text.trim();
     return text.replace(/>\s+</g, '><').trim();
   }
   /* 트랙 저장 — 용량 초과 시 오래된 트랙부터 비우며 재시도한다.
