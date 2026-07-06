@@ -217,7 +217,10 @@
 
   var Imu = {
     AXIS: AXIS,
+    FILTER: FILTER,
     gforceToAngles: gforceToAngles,
+    complementaryAttitude: complementaryAttitude,
+    computeAttitude: computeAttitude,
     annotate: annotate,
     medianSmooth: medianSmooth,
     heelHistogram: heelHistogram,
