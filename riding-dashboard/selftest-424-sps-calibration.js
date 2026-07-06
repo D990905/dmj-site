@@ -126,7 +126,8 @@ function relLum(hex) {                       /* WCAG 상대 휘도 (0~1) */
   });
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
-/* §432 v2 — 형광(네온) 팔레트. 방향(신호등)은 동일, 톤만 밝게. */
+/* §432 v3 FINAL — 옥대표 명시 순색(형광) 팔레트. 방향(신호등)은 동일,
+   톤을 최대 채도 순색으로. hex 는 옥대표 스크린샷 지정값(override). */
 var EXPECT_432 = {
   elite: '#00FF66', advanced: '#00FF00', intermediate: '#FFCC00',
   foundational: '#FFA500', learning: '#FF0000'
