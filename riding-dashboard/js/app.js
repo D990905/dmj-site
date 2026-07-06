@@ -2563,6 +2563,17 @@
       renderSummaryStrip();
       if (state.analysis) renderSessionSummary();   // VPS·what-if 는 풍속 의존
     });
+    /* 풍속이 확정(blur·Enter)되면 AWA(겉보기 풍각)가 달라지므로, 풍향이
+       설정된 세션은 분석을 다시 돌려 통계 패널·바이올린을 갱신한다.
+       'input'(매 키 입력)이 아니라 'change'에서만 재분석해 71k 샘플
+       재계산이 타이핑을 끊지 않게 한다. */
+    $('wind-speed-input').addEventListener('change', function () {
+      if (state.analysis && state.session && state.windDir != null) {
+        recompute();
+        renderStatsPanel();
+        renderViolin();
+      }
+    });
     $('wind-clear-btn').addEventListener('click', function () { setWindPending(null); });
     $('wind-confirm-btn').addEventListener('click', confirmWind);
     $('wind-estimate-btn').addEventListener('click', function () {
