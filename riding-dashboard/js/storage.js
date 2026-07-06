@@ -247,6 +247,9 @@
       maxSpeedMs: s.maxSpeedMs || 0,
       avgSpeedMovingMs: s.avgSpeedMovingMs || 0,
       activeRatio: s.activeRatio || 0,
+      /* §435 — 포일링(활주) 거리·시간 세션 트렌드 스파크라인용. */
+      activeDistanceM: s.activeDistanceM != null ? s.activeDistanceM : null,
+      activeTimeSec: s.activeTimeSec != null ? s.activeTimeSec : null,
       peak2sMs: pk(analysis.peaks, 2),
       peak10sMs: pk(analysis.peaks, 10),
       best500mMs: db(analysis.distanceBests, 500),
