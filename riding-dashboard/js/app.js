@@ -1521,35 +1521,32 @@
       }
     } catch (e) { /* noop — 시각 chip 만 영향 */ }
 
+    /* §433 (옥대표 2026-07-06) — 요약 스트립 재구성: 풍향 타일 제거,
+       포일링(활주) 거리 추가, 6개 핵심 타일을 스파크라인 없이 가운데
+       정렬로 통일한다. 순서: 총거리 · 포일링거리(총거리 대비 %) ·
+       총시간 · 포일링시간(총시간 대비 %) · 최고속도 · 평균속도. */
+    var actLabel = foiling ? '포일링' : '플레이닝';
     var html = statTile('총 거리 (km)',
       (s.totalDistanceM / 1000).toFixed(2),
       null,
-      { spark: sparkCum,
-        trend: prev ? deltaTrend(prev.distanceM / 1000, s.totalDistanceM / 1000) : null });
+      { trend: prev ? deltaTrend(prev.distanceM / 1000, s.totalDistanceM / 1000) : null });
     if (s.hasTime) {
-      /* Layer 2.0 — 시간 값은 컴팩트 콜론 포맷(mm:ss)으로 줄바꿈 방지.
-         Sparkline 색은 모든 타일 동일 sea blue (mockup 일관성 패턴). */
-      html += statTile('이동 시간 (min:sec)', fmtDurCompact(s.movingTimeSec),
-        '전체 ' + fmtDurCompact(s.totalDurationSec),
+      html += statTile(actLabel + ' 거리 (km)',
+        (s.activeDistanceM / 1000).toFixed(2),
+        '총 거리 대비 ' + Math.round(s.activeDistRatio * 100) + '%');
+      html += statTile('총 시간 (min:sec)', fmtDurCompact(s.totalDurationSec),
+        '이동 ' + fmtDurCompact(s.movingTimeSec),
         { trend: prev ? deltaTrend(prev.movingTimeSec, s.movingTimeSec) : null });
+      html += statTile(actLabel + ' 시간 (min:sec)',
+        fmtDurCompact(s.activeTimeSec),
+        '총 시간 대비 ' + Math.round(s.activeRatio * 100) + '%');
       html += statTile('최고 속도 (' + u + ')', fmtSpeed(s.maxSpeedMs),
         '2초 구간 최고',
-        { spark: sparkSpeed,
-          trend: prev ? deltaTrend(prev.maxSpeedMs, s.maxSpeedMs) : null });
+        { trend: prev ? deltaTrend(prev.maxSpeedMs, s.maxSpeedMs) : null });
       html += statTile('평균 속도 (' + u + ')', fmtSpeed(s.avgSpeedMovingMs),
         '이동 중',
-        { spark: sparkSpeed,
-          trend: prev ? deltaTrend(prev.avgSpeedMovingMs, s.avgSpeedMovingMs) : null });
-      html += statTile((foiling ? '포일링' : '플레이닝') + ' 시간 (min:sec)',
-        fmtDurCompact(s.activeTimeSec),
-        Math.round(s.activeRatio * 100) + '% 비율');
+        { trend: prev ? deltaTrend(prev.avgSpeedMovingMs, s.avgSpeedMovingMs) : null });
     }
-    html += statTile('풍향 (°)',
-      state.windDir != null ? String(state.windDir) : '미입력',
-      state.windDir != null
-        ? (compass(state.windDir) +
-           (state.windSpeedKt != null ? ' · 풍속 ' + state.windSpeedKt + ' kt' : ''))
-        : '');
     $('summary-strip').innerHTML = html;
   }
 
