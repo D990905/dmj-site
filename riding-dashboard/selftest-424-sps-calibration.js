@@ -145,6 +145,23 @@ check('§432 Advanced↔Intermediate luminance 구분 (연초록≠노랑)',
   Math.abs(relLum(EXPECT_432.advanced) - relLum(EXPECT_432.intermediate)) >= MIN_DL,
   'ΔL=' + Math.abs(relLum(EXPECT_432.advanced) - relLum(EXPECT_432.intermediate)).toFixed(3));
 
+/* 3d) §432 — 회전효율 score chip(app.js effChipHtml)은 SPS 도넛과 같은 vpsBand
+   신호등 팔레트를 쓴다. 이전 자체 3단(≥70/≥45)이라 59·49 도 골드로 보이던
+   버그를 회귀 가드. 칩은 score→vpsBand(score).color 를 그대로 쓰므로 이 밴드
+   계약이 곧 칩 색이다. 옥대표 관측 케이스로 검증. */
+[[68, 'advanced'], [59, 'intermediate'], [49, 'intermediate'],
+ [43, 'intermediate'], [38, 'foundational'], [29, 'foundational'],
+ [0, 'learning']].forEach(function (c) {
+  var b = Coach.vpsBand(c[0]);
+  check('§432 회전효율 chip ' + c[0] + ' → ' + c[1] + ' (' + EXPECT_432[c[1]] + ')',
+    b.tier === c[1] && b.color.toUpperCase() === EXPECT_432[c[1]].toUpperCase(),
+    'got ' + b.tier + ' ' + b.color);
+});
+/* 60 미만은 절대 elite/advanced-초록 골드가 아니어야 함 (옥대표 지적 핵심) */
+check('§432 회전효율 59 = 골드(Elite색) 아님',
+  Coach.vpsBand(59).color.toUpperCase() !== EXPECT_432.elite.toUpperCase() &&
+  Coach.vpsBand(59).tier === 'intermediate', 'got ' + Coach.vpsBand(59).color);
+
 /* 4) floor=0 회귀 가드 */
 check('VPS.UPWIND_RATIO_FLOOR = 0 (§424 백분위형 lock)',
   Coach.VPS.UPWIND_RATIO_FLOOR === 0, 'floor=' + Coach.VPS.UPWIND_RATIO_FLOOR);
