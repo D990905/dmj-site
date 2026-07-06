@@ -1378,13 +1378,12 @@
              ' ' + unit;
     });
     var mins = bins.map(function (b) { return b.seconds / 60; });
-    /* bin 범위 (minKt) 정규화 — 12kt 이상 분포가 5 앵커 ramp 전체를 사용
-       (그렇지 않으면 라임~초록만 나옴). 첫 live bin 의 fromKt 가 minKt. */
-    var minKt = (liveBins.length && liveBins[0].fromKt != null)
-      ? liveBins[0].fromKt : 0;
+    /* §432 v2 — 슬라이스 색 = 절대 속도 → 5-tier 신호등(형광) 이산 매핑.
+       (이전엔 세션 min/max 정규화 연속 램프. 이제 절대 속도 기준이라 저속
+       세션은 초록 조각이 안 나오는 게 정상 = "빠를수록 초록" 정직 표현.) */
     var colors = bins.map(function (b) {
       var mid = b.isOther ? b.otherSpeed : (b.fromKt + b.toKt) / 2;
-      return speedColor(mid, maxKt, minKt);
+      return speedTierColor(mid);
     });
     var pcts = bins.map(function (b) { return b.seconds / totalSec * 100; });
 
