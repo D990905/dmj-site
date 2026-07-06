@@ -1482,22 +1482,6 @@
     var foiling = SPORTS[state.sport].foiling;
     var u = unitLabel();
 
-    /* Layer 1.5 — KPI 시계열 미니 sparkline 데이터 추출.
-       state.session.samples 의 속도·거리 progression 을 100점 이하로 균등
-       추출한다. 분석에 영향 없는 시각 전용 (Danny 2026-05-26). */
-    var sparkSpeed = [], sparkCum = [];
-    var totalSec = 0, sCount = 0;
-    if (state.session && state.session.samples && state.session.hasTime) {
-      var samps = state.session.samples;
-      var stride = Math.max(1, Math.floor(samps.length / 80));
-      for (var i = 0; i < samps.length; i += stride) {
-        var sp = samps[i].speed;
-        if (sp != null && isFinite(sp)) sparkSpeed.push(sp);
-        sparkCum.push(samps[i].cumDist || 0);
-      }
-      sCount = sparkCum.length;
-    }
-
     /* 트렌드 chip — 저장된 세션이 있으면 이전 세션 대비 비교 (Layer 1.5).
        Storage.loadSessions 가 시간 역순 정렬 가정. 이번 세션과 동일 시그니처는
        제외한다(다시 보기 시 자기 자신과 비교 방지). */
