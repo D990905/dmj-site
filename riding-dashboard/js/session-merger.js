@@ -331,7 +331,9 @@
       var imuDonor = pickDonor(srcs, primary, function (s) { return s.hasImu; });
       if (imuDonor) {
         var dpts = imuDonor.points.slice();
-        if (Imu) Imu.annotate(dpts);
+        /* 도너 원본(등간격 IMU 타임라인)에서 상보필터 보정 후, 매끈해진
+           heel/pitch 를 primary 시각으로 선형보간 정합 */
+        if (Imu) Imu.computeAttitude(dpts);
         var heelCh = makeChannel(dpts, 'heel');
         var pitchCh = makeChannel(dpts, 'pitch');
         var mHeel = 0;
