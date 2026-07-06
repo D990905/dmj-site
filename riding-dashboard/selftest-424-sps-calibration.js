@@ -98,6 +98,16 @@ bandCases.forEach(function (c) {
   check('vpsBand(' + c[0] + ') = ' + c[1], b.tier === c[1], 'color ' + b.color);
 });
 
+/* 3b) §431 — 5 티어 도넛 색이 서로 모두 구분돼야 함 (Foundational=Elite 골드
+   충돌 회귀 가드). 5개 밴드 대표 점수의 색을 뽑아 전부 유니크한지 검사. */
+var tierColors = [90, 70, 50, 30, 10].map(function (s) { return Coach.vpsBand(s).color; });
+var uniqColors = tierColors.filter(function (c, i) { return tierColors.indexOf(c) === i; });
+check('§431 5 티어 도넛 색 전부 구분 (중복 없음)',
+  uniqColors.length === 5, tierColors.join(' '));
+check('§431 Foundational(30) ≠ Elite(90) 색',
+  Coach.vpsBand(30).color !== Coach.vpsBand(90).color,
+  'found=' + Coach.vpsBand(30).color + ' elite=' + Coach.vpsBand(90).color);
+
 /* 4) floor=0 회귀 가드 */
 check('VPS.UPWIND_RATIO_FLOOR = 0 (§424 백분위형 lock)',
   Coach.VPS.UPWIND_RATIO_FLOOR === 0, 'floor=' + Coach.VPS.UPWIND_RATIO_FLOOR);
