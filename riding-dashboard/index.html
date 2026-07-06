@@ -238,18 +238,18 @@
       <label class="field-label">1. 스포츠 선택</label>
       <div class="sport-chips" id="sport-chips" role="radiogroup" aria-label="스포츠 종류"></div>
 
-      <label class="field-label" style="margin-top:18px;">2. GPX · VKX · CSV 파일 업로드</label>
+      <label class="field-label" style="margin-top:18px;">2. GPX · CSV · TCX · VKX 파일 업로드</label>
       <div class="dropzone" id="drop-zone" tabindex="0" role="button"
-           aria-label="GPX, VKX 또는 CSV 파일을 끌어다 놓거나 선택">
+           aria-label="GPX, CSV, TCX 또는 VKX 파일을 끌어다 놓거나 선택 — 여러 개 동시 가능">
         <svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">
           <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke="#1F8FFF" stroke-width="2"
                 fill="none" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" stroke="#7E93A8"
                 stroke-width="2" fill="none" stroke-linecap="round"/>
         </svg>
-        <p class="dropzone__main">GPX · VKX · CSV 파일을 여기에 끌어다 놓으세요</p>
-        <p class="dropzone__sub">또는 클릭해서 파일 선택 · .gpx · .vkx (Vakaros Atlas 2) · .csv (SailTech)</p>
-        <input type="file" id="file-input" accept=".gpx,.vkx,.csv,application/gpx+xml,text/xml,text/csv,application/octet-stream" hidden>
+        <p class="dropzone__main">파일을 여기에 끌어다 놓으세요 · 여러 개 동시 가능</p>
+        <p class="dropzone__sub">RaceBox(GPX·CSV) · Waterspeed · Garmin(GPX·TCX) · Vakaros(.vkx) — 여러 파일을 함께 넣으면 심박·힐·피칭을 자동 싱크해 가장 고품질 항적으로 융합합니다</p>
+        <input type="file" id="file-input" accept=".gpx,.vkx,.csv,.tcx,application/gpx+xml,text/xml,text/csv,application/octet-stream" multiple hidden>
       </div>
       <div class="intro__actions">
         <button type="button" class="btn btn--accent" id="sample-btn">
@@ -345,6 +345,9 @@
     </div>
     <p id="save-status" class="save-status" hidden></p>
     <p id="data-notice" class="data-notice" hidden></p>
+
+    <!-- §430 다중 파일 융합 결과 배너 — 여러 파일 자동 융합 시에만 표시 -->
+    <div id="fusion-banner" class="fusion-banner" hidden></div>
 
     <!-- 요약 스탯 스트립 -->
     <div class="stat-strip" id="summary-strip"></div>
