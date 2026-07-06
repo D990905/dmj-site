@@ -1387,6 +1387,22 @@
     });
     var pcts = bins.map(function (b) { return b.seconds / totalSec * 100; });
 
+    /* §432 v2 — 파이 slice 에 은은한 음영(SPS 도넛·chip 정합). arc 그리기 직전
+       soft drop-shadow 를 켜고, 라벨 그리기 전에 반드시 끈다(순서: pieShadow 가
+       sliceLabels 보다 앞 → afterDatasetsDraw 에서 먼저 restore 되어 % 글자엔
+       그림자 안 붙음). 흰 1.5px 슬라이스 경계는 유지해 이웃 슬라이스 seam 방지. */
+    var pieShadow = {
+      id: 'pieShadow',
+      beforeDatasetsDraw: function (c) {
+        var x = c.ctx;
+        x.save();
+        x.shadowColor = 'rgba(10,37,64,0.16)';
+        x.shadowBlur = 6;
+        x.shadowOffsetY = 2;
+      },
+      afterDatasetsDraw: function (c) { c.ctx.restore(); }
+    };
+
     /* 슬라이스 위에 비율(%) 직접 표기 — datalabels 플러그인 없이
        afterDatasetsDraw 에서 호(arc) 중심에 그린다. 너무 작은
        슬라이스(<7%)는 글자가 겹치므로 생략(범례·툴팁으로 확인). */
