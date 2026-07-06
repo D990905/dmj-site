@@ -152,15 +152,20 @@
      오를수록 초록에 가까워지는 단일 신호등 램프로 재배치한다:
        Elite=진초록(에메랄드) / Advanced=연초록(라임) / Intermediate=노랑(앰버)
        / Foundational=오렌지 / Learning=레드.
-     인접 밴드는 luminance 차를 확보해 색맹(deutan/protan) 사용자도 구분 가능.
+     §432 v2 (옥대표 "밝은 형광 느낌") — 톤을 네온 계열로 올린다(Tailwind
+       400~500 대). 방향(신호등)은 그대로, 톤만 밝게. 이 5색은 심박 존
+       팔레트(chart-theme.js HR_ZONE)와 hex 완전 일치한다(SPS Elite=HR Z1
+       recovery=진초록 … SPS Learning=HR Z5 anaerobic=레드). 인접 밴드
+       luminance 차로 색맹(deutan/protan) 구분 — 단, 네온 특성상 Elite↔Advanced
+       (둘 다 초록)는 ΔL 이 가장 좁다(색상[에메랄드↔라임]으로 추가 구분).
      (밴드 임계값 80/60/40/20 은 §424 lock — 불변. PDF grade-chip 은 이미
      동일한 신호등 램프[green→red]라 tier 별로 정합 — 별도 변경 불필요.) */
   var VPS_BANDS = [
-    { min: 80, tier: 'elite',        label: 'Elite',        color: '#059669' },
-    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#22C55E' },
-    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#EAB308' },
-    { min: 20, tier: 'foundational', label: 'Foundational', color: '#F97316' },
-    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#EF4444' }
+    { min: 80, tier: 'elite',        label: 'Elite',        color: '#00D97E' },
+    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#4ADE80' },
+    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#FACC15' },
+    { min: 20, tier: 'foundational', label: 'Foundational', color: '#FB923C' },
+    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#F87171' }
   ];
   function vpsBand(score) {
     if (score == null || !isFinite(score)) {
