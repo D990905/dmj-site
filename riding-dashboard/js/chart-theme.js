@@ -151,7 +151,7 @@
     line: '#C0392B'
   };
 
-  /* §432 v2 — 5-tier 신호등(형광) 팔레트 canonical, 낮음/나쁨→높음/좋음 순서.
+  /* §432 v3 — 5-tier 신호등(순색·형광) 팔레트 canonical, 낮음/나쁨→높음/좋음 순서.
      [0]레드(Learning) [1]오렌지(Foundational) [2]옐로(Intermediate)
      [3]라임(Advanced) [4]에메랄드(Elite). SPS(coach VPS_BANDS)·HR 존(HR_ZONE
      z5→z1)·속도 분포 파이가 공유하는 단일 tier 팔레트 = 대시보드 전역 정합.
