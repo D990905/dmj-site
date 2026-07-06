@@ -815,6 +815,86 @@
     return base.replace(/\.(gpx|csv|tcx|vkx)$/i, '');
   }
 
+  /* §434 (옥대표 "저장했는데 왜 다시 못 봄") — 융합 세션 컴팩트 직렬화.
+     RaceBox 원본 GPX(압축 후 8.1MB)는 localStorage 트랙 상한(8MB)을 넘겨
+     '요약본 · 다시 보기 불가' 였고, 설령 저장돼도 원본 GPX 재파싱은 병합된
+     heel/pitch/hr 을 잃는다(RaceBox GPX 엔 IMU·HR 없음). 그래서 융합 세션은
+     정규화 샘플을 ~1Hz 로 솎아 speed·heel·pitch·hr 까지 담은 컴팩트 JSON
+     (수백 KB)으로 저장한다 — 대시보드·리플레이는 1Hz 로도 동일 재현된다
+     (분석이 내부적으로 1Hz 기준이라 무손실에 가깝다). */
+  var FUSED_TRACK_MARKER = 'RDFUSED1';
+  function isFusedTrackStr(str) {
+    return typeof str === 'string' && str.slice(0, FUSED_TRACK_MARKER.length) === FUSED_TRACK_MARKER;
+  }
+  function serializeFusedTrack(session, name) {
+    try {
+      var S = session && session.samples;
+      if (!S || S.length < 2 || !session.hasTime) return null;
+      var t0 = session.startEpoch || 0;
+      var pts = [], lastT = -Infinity;
+      for (var i = 0; i < S.length; i++) {
+        var s = S[i];
+        /* 첫·끝 샘플과 leg 경계는 항상 유지, 그 사이는 ~1Hz 로 솎음 */
+        if (!(i === 0 || i === S.length - 1 || (s.t - lastT) >= 0.9)) continue;
+        lastT = s.t;
+        pts.push([
+          Math.round(s.t * 1000),
+          Math.round(s.lat * 1e6) / 1e6,
+          Math.round(s.lng * 1e6) / 1e6,
+          s.speed != null ? Math.round(s.speed * 100) / 100 : null,
+          s.heel  != null ? Math.round(s.heel  * 10) / 10 : null,
+          s.pitch != null ? Math.round(s.pitch * 10) / 10 : null,
+          s.hr    != null ? Math.round(s.hr) : null
+        ]);
+      }
+      if (pts.length < 2) return null;
+      return FUSED_TRACK_MARKER + '\n' +
+        JSON.stringify({ t0: t0, name: name || session.trackName || '', pts: pts });
+    } catch (e) { return null; }
+  }
+  function deserializeFusedTrack(str) {
+    try {
+      var obj = JSON.parse(str.slice(str.indexOf('\n') + 1));
+      var t0 = obj.t0 || 0;
+      var points = obj.pts.map(function (a) {
+        return { lat: a[1], lng: a[2], ele: null, time: t0 + a[0],
+                 speed: a[3], heel: a[4], pitch: a[5], hr: a[6] };
+      });
+      var n = points.length, withHR = 0, withHeel = 0, withSpeed = 0;
+      points.forEach(function (p) {
+        if (p.hr != null) withHR++;
+        if (p.heel != null) withHeel++;
+        if (p.speed != null) withSpeed++;
+      });
+      var nm = obj.name || '융합 세션';
+      var parsed = {
+        tracks: [{ name: nm, segments: [points] }],
+        pointCount: n, trackName: nm, hasTime: true,
+        speedSource: withSpeed >= n * 0.5 ? 'device' : 'derived',
+        hasHR: withHR >= 1, hrPointCount: withHR,
+        hasAttitude: withHeel >= n * 0.5
+      };
+      var fusion = {
+        restored: true,
+        primary: { source: 'restored', creator: '', sampleRateHz: 1, pointCount: n, fileName: nm },
+        imu: withHeel ? { merged: false, own: true, source: 'restored', pointCount: withHeel } : null,
+        hr:  withHR   ? { merged: false, own: true, source: 'restored', pointCount: withHR } : null,
+        speed: { source: 'restored', pointCount: withSpeed, own: true },
+        spikes: { removed: 0, rate: 0 }, finalPointCount: n,
+        heelCoverage: n ? withHeel / n : 0, hrCoverage: n ? withHR / n : 0, sources: []
+      };
+      return { parsed: parsed, fusion: fusion };
+    } catch (e) { return null; }
+  }
+  /* 저장에 쓸 트랙 문자열 — 융합 세션은 컴팩트 JSON, 그 외는 원본 GPX. */
+  function trackTextForSave() {
+    if (state.fusion && state.session) {
+      var f = serializeFusedTrack(state.session, state.sessionName);
+      if (f) return f;
+    }
+    return state.gpxText;
+  }
+
   /* §430 — 융합 소스 라벨 */
   var FUSION_SRC_LABELS = {
     'racebox-gpx': 'RaceBox GPX', 'racebox-csv': 'RaceBox CSV',
