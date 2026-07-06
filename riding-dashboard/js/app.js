@@ -3115,7 +3115,6 @@
 
     var html = shown.map(function (r) {
       var m = r.m, i = r.i, tm = TYPE_META[m.type];
-      var effCls = m.efficiency >= 70 ? 'eff--hi' : (m.efficiency >= 45 ? 'eff--mid' : 'eff--lo');
       // 베스트 회전 — 인라인 태그 대신 행 전체를 그라데이션으로 하이라이트
       // (# 컬럼 폭 정상화 · 좌측 공백 제거). 의미는 목록 위 범례로 안내.
       var rowCls = [];
@@ -3133,7 +3132,7 @@
         '<td>' + Math.round(m.lossDisplayPct) + '</td>' +
         '<td>' + m.durationSec.toFixed(0) + '</td>' +
         '<td>' + (m.recoverySec != null ? m.recoverySec.toFixed(1) : '—') + '</td>' +
-        '<td><span class="eff ' + effCls + '">' + m.efficiency + '</span></td>' +
+        '<td>' + effChipHtml(m.efficiency) + '</td>' +
         '</tr>';
     }).join('');
     $('maneuver-tbody').innerHTML = html ||
