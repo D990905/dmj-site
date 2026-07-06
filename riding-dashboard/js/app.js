@@ -2007,7 +2007,6 @@
   /* neutral 지표 배지 문구 — 좋고 나쁨이 없는 이유. */
   var STATS_NEUTRAL_NOTE = {
     'twa-downwind': '중립 · 최적각 ≈140–150°',
-    'awa-downwind': '중립 · 겉보기 바람 참고',
     heel:  '중립 · 좌우 트림',
     pitch: '중립 · 앞뒤 트림',
     hr:    '중립 · 신체 부하 참고'
