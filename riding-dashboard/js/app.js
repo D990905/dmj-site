@@ -4688,11 +4688,14 @@
     var dash = circ * pct;
     var gradId = 'rd-donut-grad-' + Math.random().toString(36).slice(2, 8);
     var trackColor = opts.trackColor || 'rgba(10,37,64,.06)';
-    /* 그라데이션 — 시작 색은 살짝 옅게, 끝은 진하게 (mockup soft tone) */
-    var c2 = opts.lightColor || color;
+    /* §432 v2 옵션 A — 세로 그라데이션(상단 밝고 하단 base)으로 형광 3D 음영.
+       상단 스톱은 밴드색을 흰색 쪽으로 밝힌 값, 하단은 base 색. lightColor 를
+       명시로 넘기면 그 값을 상단으로 쓴다(하위호환). */
+    var isHex = /^#[0-9a-fA-F]{6}$/.test(String(color));
+    var cTop = opts.lightColor || (isHex ? lightenHex(color, 0.28) : color);
     var grad =
-      '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0%" stop-color="' + c2 + '" stop-opacity="0.85"/>' +
+      '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="' + cTop + '" stop-opacity="1"/>' +
       '<stop offset="100%" stop-color="' + color + '" stop-opacity="1"/>' +
       '</linearGradient></defs>';
     return '<svg class="rd-donut" viewBox="0 0 ' + size + ' ' + size + '" ' +
