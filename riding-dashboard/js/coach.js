@@ -145,12 +145,17 @@
    * 색은 표시 레이어가 그대로 쓰거나 자체 팔레트로 매핑할 수 있게 hex 동봉.
    * 주의 — 이 밴드는 '이번 세션 SPS' 의 절대 등급일 뿐, 메인 사이트의
    * 스킬 진단 티어(§408 getOverallTier 30/50/70/85)와는 별개 체계다. */
+  /* §431 — 도넛 티어 색은 5단 모두 눈에 확실히 구분돼야 한다. 이전엔
+     Foundational=#F2C20E(황금색)이 Elite=#D4AF37(골드)과 사실상 같은 색으로
+     보여(택킹 31점이 종합 82점 Elite와 동일 골드로 표시) 티어 구분 실패했다.
+     Foundational→오렌지, Learning→레드 로 이동해 골드/초록/파랑/오렌지/레드
+     의 명확한 램프를 만든다. (밴드 임계값 80/60/40/20 은 §424 lock — 불변) */
   var VPS_BANDS = [
     { min: 80, tier: 'elite',        label: 'Elite',        color: '#D4AF37' },
     { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#1FA055' },
     { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#1F8FFF' },
-    { min: 20, tier: 'foundational', label: 'Foundational', color: '#F2C20E' },
-    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#EC8A2E' }
+    { min: 20, tier: 'foundational', label: 'Foundational', color: '#F97316' },
+    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#EF4444' }
   ];
   function vpsBand(score) {
     if (score == null || !isFinite(score)) {
