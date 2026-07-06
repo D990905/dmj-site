@@ -778,6 +778,7 @@
   /* ---------- 대시보드 렌더 ---------- */
   function renderDashboard() {
     renderSessionHeader();
+    renderFusionBanner();     /* §430 — 다중 파일 융합 배너 (융합 세션만) */
     renderSummaryStrip();
     renderMapAndLegend();
     renderSpeedChart();
