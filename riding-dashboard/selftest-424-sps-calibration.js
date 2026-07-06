@@ -138,23 +138,25 @@ var EXPECT_432 = {
   check('§432 ' + c[1] + ' hex = ' + EXPECT_432[c[1]],
     b.color.toUpperCase() === EXPECT_432[c[1]].toUpperCase(), 'got ' + b.color);
 });
-/* Elite→…→Learning 순으로 인접 luminance 차 (yellow 가 최고 휘도라 전역 단조는
-   아니지만, 인접쌍은 모두 유의미하게 벌어져야 색맹 판별 가능). */
+/* §432 v3 — 옥대표 명시 순색(최대 채도) 팔레트. 순색 특성상 Elite(#00FF66)↔
+   Advanced(#00FF00) 는 둘 다 순수 초록이라 luminance 가 거의 동일(ΔL≈0.01)
+   → 색맹(deutan/protan) luminance 구분은 사실상 불가. 이는 옥대표 명시 결정이며
+   접근성은 추후 label 텍스트로 보완(색 자체엔 luminance 임계 가드를 두지 않는다).
+   따라서 v2 의 인접 ΔL 임계 가드는 제거하고, (1) 5색 유니크(§431 가드 유지) +
+   (2) 측정 ΔL 을 정보로 출력해 트레이드오프를 투명하게 남긴다. */
 var lumOrder = ['elite', 'advanced', 'intermediate', 'foundational', 'learning']
   .map(function (t) { return { t: t, L: relLum(EXPECT_432[t]) }; });
-/* §432 v2 — 네온 톤은 Elite↔Advance(둘 다 초록)가 luminance 로 가장 좁다
-   (측정 ΔL≈0.041, v1 은 0.182). 색상(에메랄드↔라임)으로 추가 구분되며,
-   임계는 인접 tier 가 사실상 동일색으로 붕괴하는 회귀만 잡도록 0.035. */
-var MIN_DL = 0.035;
+var dlInfo = [];
 for (var li = 0; li < lumOrder.length - 1; li++) {
-  var a = lumOrder[li], nb = lumOrder[li + 1];
-  var dL = Math.abs(a.L - nb.L);
-  check('§432 인접 luminance 차 ' + a.t + '↔' + nb.t + ' ≥ ' + MIN_DL,
-    dL >= MIN_DL, 'ΔL=' + dL.toFixed(3));
+  dlInfo.push(lumOrder[li].t + '↔' + lumOrder[li + 1].t + ' ΔL=' +
+    Math.abs(lumOrder[li].L - lumOrder[li + 1].L).toFixed(3));
 }
-check('§432 Advanced↔Intermediate luminance 구분 (연초록≠노랑)',
-  Math.abs(relLum(EXPECT_432.advanced) - relLum(EXPECT_432.intermediate)) >= MIN_DL,
-  'ΔL=' + Math.abs(relLum(EXPECT_432.advanced) - relLum(EXPECT_432.intermediate)).toFixed(3));
+console.log('  INFO §432v3 인접 luminance(정보): ' + dlInfo.join(' · '));
+/* 순색 5색이 그래도 서로 다른 hex 인지(동일색 붕괴 회귀 가드)는 유지 */
+var v3uniq = ['elite', 'advanced', 'intermediate', 'foundational', 'learning']
+  .map(function (t) { return EXPECT_432[t]; });
+check('§432 v3 5색 유니크(hex 중복 없음)',
+  new Set(v3uniq).size === 5, v3uniq.join(' '));
 
 /* 3d) §432 — 회전효율 score chip(app.js effChipHtml)은 SPS 도넛과 같은 vpsBand
    신호등 팔레트를 쓴다. 이전 자체 3단(≥70/≥45)이라 59·49 도 골드로 보이던
