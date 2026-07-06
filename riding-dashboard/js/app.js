@@ -941,6 +941,7 @@
        (Danny 검토 2026-05-23). 편집이 없으면 둘이 같은 객체라 무영향. */
     state.analysis = An.analyzeSession(state.session, state.windDir,
       { windConfidence: est ? est.confidence : null,
+        windSpeedKt: state.windSpeedKt,     /* AWA(겉보기 풍각) 계산용 풍속 */
         fullSession: state.fullSession });
     /* 분석을 다시 돌리면 고속 구간 배열이 새로 만들어진다 — 선택 인덱스를
        초기화해 지도 강조가 옛 구간을 가리키지 않게 한다. */
