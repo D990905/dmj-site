@@ -4795,12 +4795,14 @@
     var band = (window.RDCoach && RDCoach.vpsBand) ? RDCoach.vpsBand(s) : null;
     var statColor = band ? band.color : (vpsStatusColor(s) ||
       (tone === 'hi' ? '#27AE60' : tone === 'mid' ? '#E0A100' : '#C0392B'));
-    /* §433 — 링 안 점수·티어 라벨은 흰 배경 위 순색 형광이라 대비가 낮아
-       "79/81/82" 를 읽기 어려웠다(옥대표 "식별 안 됨"). 티어 정체성은 지키되
-       가독을 위해 밴드색을 어둡게(0.58) 한 톤을 텍스트에 쓴다 — 도넛 rim/링과
-       같은 hue 라 시각 정합, 형광 hex 5색은 lock. */
+    /* §433 v4 — 링 안 점수는 최대 가독을 위해 tier 색과 무관한 dark grey
+       (#374151) 로 통일한다(옥대표 "식별 안 됨"). v4 팔레트에서 Elite·Advanced
+       가 동일 hex(#50AE33)라 밴드색 기반 숫자색은 두 티어가 같아지므로, 중립
+       그레이가 더 명확. 티어 라벨은 밴드색을 어둡게(0.58) 해 tier tint 유지
+       (Elite/Advanced 는 라벨 텍스트로 구분). 도넛 shape(rim/shadow)이 티어색
+       역할을 대신한다. */
     var isHexStat = /^#[0-9a-fA-F]{6}$/.test(String(statColor));
-    var numColor = isHexStat ? darkenHex(statColor, 0.58) : statColor;
+    var numColor = '#374151';
     /* 도넛으로 진행 표시 — bar 대신 (Layer 1.5 — Danny 2026-05-26)
        점수 숫자에 data-rd-num 부여 → 카운트업.
        밴드 티어 색 + 티어 라벨(§424-F). */
