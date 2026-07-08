@@ -132,13 +132,13 @@ function relLum(hex) {                       /* WCAG 상대 휘도 (0~1) */
   });
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
-/* §432 v3.2 FINAL — 옥대표 확정 "트래픽 라이트 자연 rainbow". 초록→노랑→오렌지
-   →빨강 자연 스펙트럼, 각 tier 명확한 hue 차이. Elite=#00FF00(순수초록·최상)
-   / Advanced=#7FFF00(chartreuse) / Intermediate=#FFCC00 / Foundational=#FFA500
-   / Learning=#FF0000. v3·v3.1 폐기(override). */
+/* §433 v4 — 옥대표 "이 색깔로 그대로"(2026-07-08). Apple 이모지(🟢🟡🟠🔴)
+   픽셀 샘플색. Elite=#50AE33(emoji green) / Advanced=#50AE33(Elite 와 동일) /
+   Intermediate=#F9DA4A(warm yellow) / Foundational=#D78A32(burnt orange) /
+   Learning=#C23328(brick red). §432 rainbow(순색 형광) override. */
 var EXPECT_432 = {
-  elite: '#00FF00', advanced: '#7FFF00', intermediate: '#FFCC00',
-  foundational: '#FFA500', learning: '#FF0000'
+  elite: '#50AE33', advanced: '#50AE33', intermediate: '#F9DA4A',
+  foundational: '#D78A32', learning: '#C23328'
 };
 [[90, 'elite'], [70, 'advanced'], [50, 'intermediate'],
  [30, 'foundational'], [10, 'learning']].forEach(function (c) {
