@@ -1541,9 +1541,17 @@
           var top = Math.max(Math.min(yLo, yHi), ys.top);
           var bot = Math.min(Math.max(yLo, yHi), ys.bottom);
           if (bot <= top) return;
-          /* §432 v2 — 존 배경 띠 alpha 0.10→0.16 (형광 톤 존 신호 가시성↑). */
+          /* §432 v2 — 존 배경 띠 alpha 0.10→0.16 (형광 톤 존 신호 가시성↑).
+             §433 (옥대표 "윤곽 보이게") — 인접 존 띠 색이 붙어 보여, 상단
+             경계에 얇은 dashed 라인으로 존 구분을 또렷하게(형광 hex 불변). */
           ctx.fillStyle = hexA(color, 0.16);
           ctx.fillRect(x1, top, x2 - x1, bot - top);
+          ctx.save();
+          ctx.strokeStyle = hexA(darkenHex(color, 0.62), 0.45);
+          ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
+          ctx.beginPath(); ctx.moveTo(x1, top + 0.5); ctx.lineTo(x2, top + 0.5);
+          ctx.stroke();
+          ctx.restore();
         }
         band(0, zoneData.zones[0].loBpm, HR_ZONE_REST);
         zoneData.zones.forEach(function (z) {
