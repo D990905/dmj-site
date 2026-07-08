@@ -2232,13 +2232,16 @@
     var r = ch((n >> 16) & 255), g = ch((n >> 8) & 255), b = ch(n & 255);
     return 'rgb(' + r + ',' + g + ',' + b + ')';
   }
-  /* §433 — hex 를 factor(0~1) 만큼 어둡게 (막대·slice 윤곽 테두리용). */
+  /* §433 — hex 를 factor(0~1) 만큼 어둡게 (막대·slice 윤곽 테두리용).
+     hexA 로 다시 alpha 를 씌울 수 있게 '#rrggbb' 로 반환한다. */
   function darkenHex(hex, factor) {
     if (hex[0] !== '#' || hex.length !== 7) return hex;
     var n = parseInt(hex.slice(1), 16);
-    function ch(x) { return Math.max(0, Math.min(255, Math.round(x * factor))); }
-    return 'rgb(' + ch((n >> 16) & 255) + ',' + ch((n >> 8) & 255) + ',' +
-      ch(n & 255) + ')';
+    function ch(x) {
+      var v = Math.max(0, Math.min(255, Math.round(x * factor)));
+      return ('0' + v.toString(16)).slice(-2);
+    }
+    return '#' + ch((n >> 16) & 255) + ch((n >> 8) & 255) + ch(n & 255);
   }
   /* §432 v2 옵션 A — 가로 막대에 세로(상단 밝고 하단 base) 그라데이션을 입혀
      형광 3D 음영을 준다. Chart.js scriptable backgroundColor 로, 각 막대 자신의
