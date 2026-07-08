@@ -1741,6 +1741,13 @@
             var base = (rows[context.dataIndex] || {}).color || HR_ZONE_REST;
             return barVGrad(base)(context);
           },
+          /* §433 (옥대표 "윤곽 보이게") — 순색 형광 막대 끝 경계가 흐려
+             윤곽 위해 막대 자기 색을 어둡게 한 1px 테두리를 두른다. */
+          borderColor: function (context) {
+            var base = (rows[context.dataIndex] || {}).color || HR_ZONE_REST;
+            return darkenHex(base, 0.62);
+          },
+          borderWidth: 1, borderSkipped: false,
           borderRadius: 3, barPercentage: 0.8, categoryPercentage: 0.82
         }]
       },
