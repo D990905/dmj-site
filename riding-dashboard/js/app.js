@@ -4680,12 +4680,18 @@
       var cls = score >= 70 ? 'eff--hi' : (score >= 45 ? 'eff--mid' : 'eff--lo');
       return '<span class="eff ' + cls + '">' + label + '</span>';
     }
-    /* §432 v2 (옥대표 "약간의 음영") — 옵션 B: inset 음영 + subtle glow 로
-       칩에 살짝 입체·형광 느낌. 텍스트는 가독 위해 어둡게 한 밴드색. */
-    var shadow = 'inset 0 -2px 4px ' + hexToRgba(band.color, 0.28) +
-      ',0 1px 2px rgba(10,37,64,0.10)';
-    return '<span class="eff" style="color:' + darkenHex(band.color, 0.62) +
-      ';background:' + hexToRgba(band.color, 0.18) +
+    /* §432 v2 (옥대표 "약간의 음영") — inset 음영 + subtle glow 로 칩에 살짝
+       입체·형광 느낌. 텍스트는 가독 위해 어둡게 한 밴드색.
+       §433 (옥대표 "윤곽 보이게") — 순색 틴트 칩이 흰 배경과 경계가 흐려
+       윤곽을 세운다: 밴드색을 어둡게 한 1px 테두리 + inset 하이라이트로
+       버튼 같은 입체 경계. 형광 hex 는 불변. */
+    var border = '1px solid ' + hexToRgba(band.color, 0.55);
+    var shadow = 'inset 0 1px 0 rgba(255,255,255,0.35)' +
+      ',inset 0 -2px 4px ' + hexToRgba(band.color, 0.28) +
+      ',0 1px 2px rgba(10,37,64,0.12)';
+    return '<span class="eff" style="color:' + darkenHex(band.color, 0.58) +
+      ';background:' + hexToRgba(band.color, 0.20) +
+      ';border:' + border +
       ';box-shadow:' + shadow + '">' + label + '</span>';
   }
 
