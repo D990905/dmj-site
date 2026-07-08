@@ -4714,33 +4714,55 @@
     var circ = 2 * Math.PI * r;
     var pct = Math.max(0, Math.min(1, (value || 0) / (max || 100)));
     var dash = circ * pct;
-    var gradId = 'rd-donut-grad-' + Math.random().toString(36).slice(2, 8);
+    var uid = Math.random().toString(36).slice(2, 8);
+    var gradId = 'rd-donut-grad-' + uid;
+    var shadId = 'rd-donut-shad-' + uid;
     var trackColor = opts.trackColor || 'rgba(10,37,64,.06)';
     /* §432 v2 옵션 A — 세로 그라데이션(상단 밝고 하단 base)으로 형광 3D 음영.
        상단 스톱은 밴드색을 흰색 쪽으로 밝힌 값, 하단은 base 색. lightColor 를
        명시로 넘기면 그 값을 상단으로 쓴다(하위호환). */
     var isHex = /^#[0-9a-fA-F]{6}$/.test(String(color));
     var cTop = opts.lightColor || (isHex ? lightenHex(color, 0.28) : color);
-    var grad =
-      '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
-      '<stop offset="0%" stop-color="' + cTop + '" stop-opacity="1"/>' +
-      '<stop offset="100%" stop-color="' + color + '" stop-opacity="1"/>' +
-      '</linearGradient></defs>';
-    return '<svg class="rd-donut" viewBox="0 0 ' + size + ' ' + size + '" ' +
-      'width="' + size + '" height="' + size + '" aria-hidden="true">' +
-      grad +
-      /* 배경 트랙 */
-      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" ' +
-      'fill="none" stroke="' + trackColor + '" stroke-width="' + stroke + '"/>' +
-      /* 진행 호 — 12시 방향에서 시계방향. transform 으로 -90° 회전 */
-      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" ' +
-      'fill="none" stroke="url(#' + gradId + ')" stroke-width="' + stroke + '" ' +
+    /* §433 (옥대표 "음영 넣어 윤곽 보이게, 식별 안 됨") — 순색 형광 링이
+       흰 배경 위에서 경계가 blur 돼 인접 티어(특히 Elite #00FF00 ↔ Advanced
+       #7FFF00 두 초록)가 붙어 보였다. 두 겹으로 윤곽을 세운다:
+       (1) rim — 진행 호보다 살짝 두껍게(+2.4px) 같은 색을 어둡게 한 테두리를
+           먼저 깔아 링 양쪽에 뚜렷한 다크 아웃라인을 만든다(형광 hex 불변).
+       (2) feDropShadow — 링 전체를 카드에서 살짝 띄워 입체감(3D)을 준다.
+       §432 의 5개 형광 hex(#00FF00/#7FFF00/#FFCC00/#FFA500/#FF0000)는 lock. */
+    var rimColor = isHex ? darkenHex(color, 0.55) : color;
+    var arcGeom =
       'stroke-linecap="round" ' +
       'stroke-dasharray="' + circ.toFixed(2) + '" ' +
       'stroke-dashoffset="' + (circ - dash).toFixed(2) + '" ' +
       'transform="rotate(-90 ' + cx + ' ' + cy + ')" ' +
-      'style="transition:stroke-dashoffset .9s var(--ease-out)">' +
-      '</circle>' +
+      'style="transition:stroke-dashoffset .9s var(--ease-out)"';
+    var defs =
+      '<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="' + cTop + '" stop-opacity="1"/>' +
+      '<stop offset="100%" stop-color="' + color + '" stop-opacity="1"/>' +
+      '</linearGradient>' +
+      '<filter id="' + shadId + '" x="-25%" y="-25%" width="150%" height="150%">' +
+      '<feDropShadow dx="0" dy="1.1" stdDeviation="1.1" ' +
+      'flood-color="rgba(10,37,64,0.30)"/></filter></defs>';
+    return '<svg class="rd-donut" viewBox="0 0 ' + size + ' ' + size + '" ' +
+      'width="' + size + '" height="' + size + '" aria-hidden="true">' +
+      defs +
+      /* 배경 트랙 */
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" ' +
+      'fill="none" stroke="' + trackColor + '" stroke-width="' + stroke + '"/>' +
+      /* 진행 호 그룹 — rim(다크 윤곽) 위에 그라데이션 호. 그룹에 drop-shadow
+         를 걸어 링 전체가 한 겹의 그림자로 카드에서 떠 보이게(3D). 12시에서
+         시계방향, transform 으로 -90° 회전. */
+      '<g filter="url(#' + shadId + ')">' +
+      (isHex && pct > 0 ?
+        '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" ' +
+        'stroke="' + rimColor + '" stroke-width="' + (stroke + 2.4) + '" ' +
+        arcGeom + '></circle>' : '') +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" ' +
+      'stroke="url(#' + gradId + ')" stroke-width="' + stroke + '" ' +
+      arcGeom + '></circle>' +
+      '</g>' +
       '</svg>';
   }
 
