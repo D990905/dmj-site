@@ -4789,6 +4789,12 @@
     var band = (window.RDCoach && RDCoach.vpsBand) ? RDCoach.vpsBand(s) : null;
     var statColor = band ? band.color : (vpsStatusColor(s) ||
       (tone === 'hi' ? '#27AE60' : tone === 'mid' ? '#E0A100' : '#C0392B'));
+    /* §433 — 링 안 점수·티어 라벨은 흰 배경 위 순색 형광이라 대비가 낮아
+       "79/81/82" 를 읽기 어려웠다(옥대표 "식별 안 됨"). 티어 정체성은 지키되
+       가독을 위해 밴드색을 어둡게(0.58) 한 톤을 텍스트에 쓴다 — 도넛 rim/링과
+       같은 hue 라 시각 정합, 형광 hex 5색은 lock. */
+    var isHexStat = /^#[0-9a-fA-F]{6}$/.test(String(statColor));
+    var numColor = isHexStat ? darkenHex(statColor, 0.58) : statColor;
     /* 도넛으로 진행 표시 — bar 대신 (Layer 1.5 — Danny 2026-05-26)
        점수 숫자에 data-rd-num 부여 → 카운트업.
        밴드 티어 색 + 티어 라벨(§424-F). */
@@ -4797,10 +4803,11 @@
         { size: isMain ? 150 : 110, stroke: isMain ? 14 : 11 }) +
       '<div class="vps-tile__donutctr">' +
       '<span class="vps-tile__score vps-score--' + tone + '"' +
-      ' style="color:' + statColor + '"' +
+      ' style="color:' + numColor + '"' +
       ' data-rd-num="' + s + '" data-rd-decimals="0">' + s + '</span>' +
       '<span class="vps-tile__max">/ 100</span>' +
-      (band ? '<span class="vps-tile__tier" style="color:' + band.color + '">' +
+      (band ? '<span class="vps-tile__tier" style="color:' +
+        (isHexStat ? darkenHex(band.color, 0.58) : band.color) + '">' +
         esc(band.label) + '</span>' : '') +
       '</div></div>';
     /* 비교 델타 — 동일 풍속 영역대(밴드) 평균 대비 (Danny 2026-05-23
