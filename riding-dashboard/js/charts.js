@@ -1434,8 +1434,11 @@
           label: i18nT('체류 시간'),
           data: mins.map(function (v) { return +v.toFixed(3); }),
           backgroundColor: colors,
+          /* §433 (옥대표 "윤곽 보이게") — 인접 속도 티어(특히 두 초록)의
+             경계가 붙어 보여 조각 간 흰 갭을 1.5→2px 로 넓혀 slice 윤곽을
+             또렷하게. 형광 hex(signal5) 는 불변. */
           borderColor: '#FFFFFF',
-          borderWidth: 1.5
+          borderWidth: 2
         }]
       },
       options: {
