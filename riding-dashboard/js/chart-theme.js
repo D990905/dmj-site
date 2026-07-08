@@ -137,26 +137,30 @@
   /* §432 — 심박 존색을 SPS 5-tier 트래픽 라이트 팔레트와 hex 완전 일치시킨다
      (옥대표 "심박수 높으면 레드 낮으면 그린"). 낮은 심박=컴포트=그린, 높은
      심박=부담=레드. 표준 강도 팔레트(Z1 파랑…)가 아니라 옥대표 명시 결정:
-       Z1 recovery = #00FF00 (= SPS Elite 순수 초록)
-       Z2 aerobic  = #7FFF00 (= SPS Advanced chartreuse)
-       Z3 tempo    = #FFCC00 (= SPS Intermediate 노랑)
-       Z4 threshold= #FFA500 (= SPS Foundational 오렌지)
-       Z5 anaerobic= #FF0000 (= SPS Learning 빨강)
+       Z1 recovery = #50AE33 (= SPS Elite emoji green)
+       Z2 aerobic  = #50AE33 (= SPS Advanced, Elite 와 동일 hex)
+       Z3 tempo    = #F9DA4A (= SPS Intermediate warm yellow)
+       Z4 threshold= #D78A32 (= SPS Foundational burnt orange)
+       Z5 anaerobic= #C23328 (= SPS Learning brick red)
      rest(Z1 미만 휴식)는 훈련 존 밖이라 중립 회색 유지. line(심박 곡선)은
      값 표시용 정체 적색(존 신호 아님)이라 옥대표 지시대로 붉은색 유지. */
   var HR_ZONE = {
-    z1: '#00FF00', z2: '#7FFF00', z3: '#FFCC00', z4: '#FFA500', z5: '#FF0000',
+    z1: '#50AE33', z2: '#50AE33', z3: '#F9DA4A', z4: '#D78A32', z5: '#C23328',
     rest: '#8295A8',
     /* 심박 곡선 — 단일 시리즈 정체색(심장=적색 관례). 상태 인코딩 아님. */
     line: '#C0392B'
   };
 
-  /* §432 v3.2 — 5-tier 트래픽라이트 rainbow 팔레트 canonical, 낮음/나쁨→높음/좋음.
-     [0]빨강(Learning) [1]오렌지(Foundational) [2]노랑(Intermediate)
-     [3]chartreuse(Advanced) [4]순수초록(Elite). SPS(coach VPS_BANDS)·HR 존(HR_ZONE
-     z5→z1)·속도 분포 파이가 공유하는 단일 tier 팔레트 = 대시보드 전역 정합.
-     연속 보간용 STATUS(비네온 ramp)와는 의미·용도가 다르므로 섞지 않는다. */
-  var SIGNAL5 = ['#FF0000', '#FFA500', '#FFCC00', '#7FFF00', '#00FF00'];
+  /* §433 v4 — 5-tier 트래픽라이트 팔레트 canonical, 낮음/나쁨→높음/좋음.
+     옥대표 2026-07-08 "이 색깔로 그대로" — Apple 이모지(🟢🟡🟠🔴) 픽셀 샘플색.
+     [0]brick red(Learning) [1]burnt orange(Foundational) [2]warm yellow
+     (Intermediate) [3]emoji green(Advanced) [4]emoji green(Elite).
+     ⚠ Elite·Advanced 는 옥대표 지시대로 동일 hex(#50AE33) — 색 구분은 §433
+     도넛 rim 아웃라인·drop-shadow·링 굵기(shape 정의)로 보완. 후속 조정 여지
+     있음(옥대표 verify 후 Elite 만 살짝 변형 가능). SPS(coach VPS_BANDS)·HR 존
+     (HR_ZONE z5→z1)·속도 분포 파이가 공유하는 단일 tier 팔레트. 연속 보간용
+     STATUS(별도 ramp)와는 의미·용도가 다르므로 섞지 않는다. */
+  var SIGNAL5 = ['#C23328', '#D78A32', '#F9DA4A', '#50AE33', '#50AE33'];
 
   /* ============================================================
    * 공통 베이스 — 축 · 격자 · 타이포 · 서피스
