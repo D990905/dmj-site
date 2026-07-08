@@ -166,19 +166,27 @@ var order432 = ['elite', 'advanced', 'intermediate', 'foundational', 'learning']
 var MIN_DL = 0.05, MIN_DH = 20;
 for (var li = 0; li < order432.length - 1; li++) {
   var t1 = order432[li], t2 = order432[li + 1];
+  if (t1 === 'elite' && t2 === 'advanced') {
+    /* v4: Elite=Advanced 동일 hex(옥대표 "그대로") — 색 구분 대신 도넛
+       shape(rim·drop-shadow)로 구분. 동일함을 명시 encode. */
+    check('§433 v4 elite=advanced 동일(옥대표 지시, 색 구분은 shape 담당)',
+      EXPECT_432.elite === EXPECT_432.advanced, EXPECT_432.elite);
+    continue;
+  }
   var dL = Math.abs(relLum(EXPECT_432[t1]) - relLum(EXPECT_432[t2]));
   var dH = Math.abs(hueOf(EXPECT_432[t1]) - hueOf(EXPECT_432[t2]));
-  check('§432 v3.2 인접 구분 ' + t1 + '↔' + t2 + ' (ΔL≥' + MIN_DL + ' 또는 Δhue≥' + MIN_DH + '°)',
+  check('§433 v4 인접 구분 ' + t1 + '↔' + t2 + ' (ΔL≥' + MIN_DL + ' 또는 Δhue≥' + MIN_DH + '°)',
     dL >= MIN_DL || dH >= MIN_DH, 'ΔL=' + dL.toFixed(3) + ' Δhue=' + dH.toFixed(0) + '°');
 }
-/* hue 단조 감소 = rainbow 순서(초록→빨강) 회귀 가드 */
+/* hue 비증가 = 신호등 순서(초록→빨강) 회귀 가드. v4 는 elite=advanced 로 hue
+   동일 구간이 있어 strict > 대신 >= 사용. */
 var hues432 = order432.map(function (t) { return hueOf(EXPECT_432[t]); });
-var huesMono = hues432.every(function (h, i) { return i === 0 || hues432[i - 1] > h; });
-check('§432 v3.2 hue 단조 감소 (초록→빨강 rainbow)', huesMono, hues432.map(function (h) { return h.toFixed(0) + '°'; }).join(' > '));
-/* 5색 유니크(동일색 붕괴 회귀 가드) */
+var huesMono = hues432.every(function (h, i) { return i === 0 || hues432[i - 1] >= h; });
+check('§433 v4 hue 비증가 (초록→빨강 신호등 순서)', huesMono, hues432.map(function (h) { return h.toFixed(0) + '°'; }).join(' ≥ '));
+/* 색군 유니크: v4 는 Elite=Advanced 로 4개 (동일색 붕괴 아닌 의도된 중복). */
 var v3uniq = order432.map(function (t) { return EXPECT_432[t]; });
-check('§432 v3.2 5색 유니크(hex 중복 없음)',
-  new Set(v3uniq).size === 5, v3uniq.join(' '));
+check('§433 v4 색군 4개 (Elite=Adv 의도 중복 제외 유니크)',
+  new Set(v3uniq).size === 4, v3uniq.join(' '));
 
 /* 3d) §432 — 회전효율 score chip(app.js effChipHtml)은 SPS 도넛과 같은 vpsBand
    신호등 팔레트를 쓴다. 이전 자체 3단(≥70/≥45)이라 59·49 도 골드로 보이던
