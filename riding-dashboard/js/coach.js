@@ -154,9 +154,11 @@
        / Foundational=오렌지 / Learning=레드.
      §432 v3.2 FINAL (옥대표 확정 "트래픽 라이트 자연 rainbow") — 초록→노랑→
        오렌지→빨강 자연 스펙트럼, 각 tier 명확한 hue 차이:
-       Elite=#00FF00(순수 초록·최상) / Advanced=#7FFF00(chartreuse) /
-       Intermediate=#FFCC00(노랑) / Foundational=#FFA500(오렌지) /
-       Learning=#FF0000(빨강). 이 5색은 심박 존(chart-theme.js HR_ZONE)·
+     §433 v4 (옥대표 2026-07-08 "이 색깔로 그대로" — Apple 이모지 픽셀 샘플):
+       Elite=#50AE33(emoji green·최상) / Advanced=#50AE33(Elite 와 동일 hex) /
+       Intermediate=#F9DA4A(warm yellow) / Foundational=#D78A32(burnt orange) /
+       Learning=#C23328(brick red). ⚠ Elite=Advanced 동일색은 옥대표 지시 —
+       §433 도넛 rim/shadow(shape 정의)로 구분 보완. 이 5색은 HR 존(chart-theme.js HR_ZONE)·
        속도분포(signal5)와 hex 완전 일치한다 (SPS Elite=HR Z1 저심박=초록 …
        SPS Learning=HR Z5 고심박=빨강). hue 가 120°→90°→48°→39°→0° 로 단조
        감소 = rainbow 순서. 인접 tier 는 luminance 또는 hue 로 구분(색맹 대비:
@@ -164,11 +166,11 @@
      (밴드 임계값 80/60/40/20 은 §424 lock — 불변. PDF grade-chip 은 이미
      동일한 신호등 램프[green→red]라 tier 별로 정합 — 별도 변경 불필요.) */
   var VPS_BANDS = [
-    { min: 80, tier: 'elite',        label: 'Elite',        color: '#00FF00' },
-    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#7FFF00' },
-    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#FFCC00' },
-    { min: 20, tier: 'foundational', label: 'Foundational', color: '#FFA500' },
-    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#FF0000' }
+    { min: 80, tier: 'elite',        label: 'Elite',        color: '#50AE33' },
+    { min: 60, tier: 'advanced',     label: 'Advanced',     color: '#50AE33' },
+    { min: 40, tier: 'intermediate', label: 'Intermediate', color: '#F9DA4A' },
+    { min: 20, tier: 'foundational', label: 'Foundational', color: '#D78A32' },
+    { min: 0,  tier: 'learning',     label: 'Learning',     color: '#C23328' }
   ];
   function vpsBand(score) {
     if (score == null || !isFinite(score)) {
