@@ -104,13 +104,19 @@ bandCases.forEach(function (c) {
   check('vpsBand(' + c[0] + ') = ' + c[1], b.tier === c[1], 'color ' + b.color);
 });
 
-/* 3b) §431 — 5 티어 도넛 색이 서로 모두 구분돼야 함 (Foundational=Elite 골드
-   충돌 회귀 가드). 5개 밴드 대표 점수의 색을 뽑아 전부 유니크한지 검사. */
+/* 3b) §433 v4 — 5 티어 색. ⚠ 옥대표 "이 색깔로 그대로"(2026-07-08) 지시로
+   Elite=Advanced 동일 hex(#50AE33). 따라서 "5색 전부 유니크"는 더는 요구하지
+   않고 (i) Elite=Advanced 동일(의도) (ii) 나머지는 초록과 구분되는 4색군
+   (iii) §431 원 버그(Foundational=Elite 골드 충돌) 재발 없음 을 가드한다.
+   두 초록(Elite/Advanced) 시각 구분은 §433 도넛 shape(rim·drop-shadow)가 담당. */
 var tierColors = [90, 70, 50, 30, 10].map(function (s) { return Coach.vpsBand(s).color; });
+check('§433 v4 Elite=Advanced 동일 hex (옥대표 "그대로")',
+  tierColors[0] === tierColors[1] && tierColors[0].toUpperCase() === '#50AE33',
+  'elite=' + tierColors[0] + ' adv=' + tierColors[1]);
 var uniqColors = tierColors.filter(function (c, i) { return tierColors.indexOf(c) === i; });
-check('§431 5 티어 도넛 색 전부 구분 (중복 없음)',
-  uniqColors.length === 5, tierColors.join(' '));
-check('§431 Foundational(30) ≠ Elite(90) 색',
+check('§433 v4 구분 색군 4개 (Elite=Adv 의도 중복 제외 전부 유니크)',
+  uniqColors.length === 4, tierColors.join(' '));
+check('§431 Foundational(30) ≠ Elite(90) 색 (원 골드충돌 회귀 가드)',
   Coach.vpsBand(30).color !== Coach.vpsBand(90).color,
   'found=' + Coach.vpsBand(30).color + ' elite=' + Coach.vpsBand(90).color);
 
