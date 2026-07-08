@@ -1,22 +1,23 @@
 /* ============================================================
- * selftest-433-donut-outline.js — §433 도넛·chip 음영·윤곽 강화 검증
+ * selftest-433-donut-outline.js — §433 도넛·chip 음영·윤곽 강화 + v4 팔레트
  *
- * 배경(옥대표 2026-07-08): §432 v3.2 rainbow 라이브 후 실사용에서
- * "색깔에 음영을 넣어 윤곽이 보이게 — 잘 식별이 안 된다". 흰 배경 위
- * 순색 형광 링이 경계가 흐려 인접 티어(특히 Elite #00FF00 ↔ Advanced
- * #7FFF00 두 초록)가 붙어 보이고, 링 안 숫자(79/81/82)도 순색이라
- * 읽기 어려웠다. §433 = hex 5색은 그대로 두고(§432 lock) 윤곽/음영만 강화:
- *   - 도넛: 진행 호에 어두운 rim(테두리) + drop-shadow(3D)
- *   - 링 안 숫자·티어 라벨: 밴드색을 어둡게 한 톤(가독)
- *   - 회전효율 chip: 1px 다크 테두리 + inset 하이라이트
- *   - 속도 파이/HR 막대/HR 존 띠: 조각 간 갭·다크 아웃라인·dashed 경계
+ * 배경(옥대표 2026-07-08): §432 rainbow 라이브 후 "색깔에 음영을 넣어
+ * 윤곽이 보이게 — 잘 식별이 안된다". 이후 "이 색깔로 그대로"(11:15) — Apple
+ * 이모지 픽셀 샘플색으로 팔레트 override(v4). §433 = v4 팔레트 적용 + 윤곽/
+ * 음영 강화(도넛 rim·drop-shadow, 숫자 dark grey, chip 테두리, 파이 갭 등).
+ *
+ * v4 팔레트(옥대표 verbatim, elite→learning):
+ *   Elite #50AE33 · Advanced #50AE33(동일) · Intermediate #F9DA4A ·
+ *   Foundational #D78A32 · Learning #C23328
+ * ⚠ Elite=Advanced 동일 hex 는 옥대표 지시 — 색 구분은 도넛 shape(rim/shadow)
+ *   로 보완. 이 selftest 는 그 결정을 명시적으로 encode(우발적 divergence 감지).
  *
  * 검증:
- *  1) §432 hex lock — coach VPS_BANDS · chart-theme SIGNAL5 5색 canonical 불변.
- *  2) rim(darken 0.55)이 밴드 fill 보다 뚜렷이 어둡다 (윤곽 대비 ≥ 1.6:1).
- *  3) 링 안 숫자색(darken 0.58)이 흰 배경 위 가독 (WCAG 대비 ≥ 3.0:1).
- *  4) darken 이 hue 를 뒤집지 않는다 (rim 이 fill 과 같은 계열 — 색 정합).
- *  5) darkenHex 출력이 유효한 '#rrggbb'.
+ *  1) v4 팔레트 정합 — coach VPS_BANDS · chart-theme SIGNAL5 = canonical.
+ *  2) Elite=Advanced 동일 hex (옥대표 지시 encode).
+ *  3) rim(darken 0.55)이 밴드 fill 보다 뚜렷이 어둡다 (윤곽 대비 ≥ 1.6:1).
+ *  4) 링 안 숫자 dark grey(#374151)가 흰 배경 위 고가독 (WCAG ≥ 4.5:1).
+ *  5) darken 이 hue 를 뒤집지 않는다 (rim = fill 계열).
  *
  *   실행:  node selftest-433-donut-outline.js
  * ============================================================ */
@@ -33,9 +34,7 @@ function check(name, ok, info) {
   console.log(' ', ok ? 'PASS' : 'FAIL', '', name, info ? '· ' + info : '');
 }
 
-/* app.js / charts.js 의 darkenHex 와 동일 공식(factor 0~1, 채널 곱).
-   selftest 는 브라우저 IIFE 를 require 할 수 없어 공식만 복제해 canonical
-   밴드색에 적용, 불변식을 검증한다. 공식이 바뀌면 이 복제도 갱신할 것. */
+/* app.js / charts.js 의 darkenHex 와 동일 공식(factor 0~1, 채널 곱). */
 function darkenHex(hex, factor) {
   var m = String(hex).replace('#', '');
   function ch(i) {
@@ -49,7 +48,6 @@ function rgb(hex) {
   return [parseInt(m.substr(0, 2), 16), parseInt(m.substr(2, 2), 16),
     parseInt(m.substr(4, 2), 16)];
 }
-/* WCAG 상대 휘도 + 대비비 */
 function lum(hex) {
   var c = rgb(hex).map(function (v) {
     var s = v / 255;
@@ -73,50 +71,49 @@ function hueOf(hex) {
   return h;
 }
 
-/* --- canonical 팔레트 (§432 lock) --- */
-var LOCK = ['#00FF00', '#7FFF00', '#FFCC00', '#FFA500', '#FF0000'];
+/* --- v4 canonical 팔레트 (옥대표 "그대로", elite→learning) --- */
+var V4 = ['#50AE33', '#50AE33', '#F9DA4A', '#D78A32', '#C23328'];
+var NUM_GREY = '#374151';                 /* 링 안 숫자 (app.js vpsTile) */
 var BANDS = Coach.VPS_BANDS || (Coach.RDCoach && Coach.RDCoach.VPS_BANDS);
-var bandColors = BANDS.filter(function (b) { return b.min != null; })
-  .sort(function (a, b) { return a.min - b.min; })   /* learning→elite */
+var bandTop = BANDS.filter(function (b) { return b.min != null; })
+  .sort(function (a, b) { return b.min - a.min; })   /* elite→learning */
   .map(function (b) { return b.color; });
-/* learning→elite 순서를 elite→learning(LOCK 순)로 뒤집어 비교 */
-var bandTop = bandColors.slice().reverse();
 
-/* ---- 1) §432 hex lock ---- */
-check('coach VPS_BANDS 5색 = §432 canonical',
-  JSON.stringify(bandTop) === JSON.stringify(LOCK), bandTop.join(' '));
-check('chart-theme SIGNAL5 = §432 canonical (learning→elite)',
-  JSON.stringify(ChartTheme.signal5) === JSON.stringify(LOCK.slice().reverse()),
+/* ---- 1) v4 팔레트 정합 ---- */
+check('coach VPS_BANDS = v4 이모지 팔레트',
+  JSON.stringify(bandTop) === JSON.stringify(V4), bandTop.join(' '));
+check('chart-theme SIGNAL5 = v4 (learning→elite)',
+  JSON.stringify(ChartTheme.signal5) === JSON.stringify(V4.slice().reverse()),
   (ChartTheme.signal5 || []).join(' '));
 
-/* ---- 2) rim 이 fill 보다 뚜렷이 어둡다 (윤곽 대비) ---- */
-LOCK.forEach(function (c) {
+/* ---- 2) Elite=Advanced 동일 hex (옥대표 지시 encode) ---- */
+check('Elite = Advanced 동일 hex (옥대표 "그대로")',
+  bandTop[0] === bandTop[1] && bandTop[0] === '#50AE33', bandTop[0]);
+
+/* ---- 3) rim 이 fill 보다 뚜렷이 어둡다 (윤곽 대비) ---- */
+V4.forEach(function (c, i) {
+  if (i === 1) return;                      /* Advanced = Elite 중복, 1회만 */
   var rim = darkenHex(c, 0.55);
   var cr = contrast(c, rim);
   check('rim 윤곽 대비 ≥ 1.6:1 — ' + c, cr >= 1.6,
     c + '→' + rim + ' (' + cr.toFixed(2) + ':1)');
 });
 
-/* ---- 3) 링 안 숫자 흰 배경 위 가독 (WCAG ≥ 3.0) ---- */
-LOCK.forEach(function (c) {
-  var num = darkenHex(c, 0.58);
-  var cr = contrast(num, '#FFFFFF');
-  check('숫자 가독(vs 흰배경) ≥ 3.0:1 — ' + c, cr >= 3.0,
-    c + '→' + num + ' (' + cr.toFixed(2) + ':1)');
-});
+/* ---- 4) 링 안 숫자(dark grey) 흰 배경 위 고가독 ---- */
+check('숫자 #374151 가독(vs 흰배경) ≥ 4.5:1',
+  contrast(NUM_GREY, '#FFFFFF') >= 4.5,
+  NUM_GREY + ' (' + contrast(NUM_GREY, '#FFFFFF').toFixed(2) + ':1)');
 
-/* ---- 4) darken 이 hue 를 뒤집지 않음 (rim·숫자 = fill 계열) ---- */
-LOCK.forEach(function (c) {
-  if (c === '#FF0000') return;             /* 순수빨강 hue=0, 회귀 없음 */
-  var dh = hueOf(darkenHex(c, 0.55)), oh = hueOf(c);
+/* ---- 5) darken 이 hue 를 뒤집지 않음 (rim = fill 계열) ---- */
+V4.forEach(function (c, i) {
+  if (i === 1) return;
+  var oh = hueOf(c);
+  if (Math.max.apply(null, rgb(c)) === Math.min.apply(null, rgb(c))) return;
+  var dh = hueOf(darkenHex(c, 0.55));
   var dd = Math.abs(dh - oh); if (dd > 180) dd = 360 - dd;
   check('darken hue 정합(≤12°) — ' + c, dd <= 12,
     'hue ' + oh.toFixed(0) + '°→' + dh.toFixed(0) + '° (Δ' + dd.toFixed(1) + '°)');
 });
 
-/* ---- 5) darkenHex 출력이 유효 hex ---- */
-check('darkenHex 출력 = #rrggbb',
-  LOCK.every(function (c) { return /^#[0-9a-f]{6}$/.test(darkenHex(c, 0.58)); }));
-
-console.log('\n  §433 donut/chip outline —', pass, 'passed,', fail, 'failed');
+console.log('\n  §433 v4 donut/chip outline —', pass, 'passed,', fail, 'failed');
 if (fail) process.exit(1);
