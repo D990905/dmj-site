@@ -1034,6 +1034,7 @@
   /* ---------- 대시보드 렌더 ---------- */
   function renderDashboard() {
     renderSessionHeader();
+    populateGhostPicker();      /* §436 — 비교 세션 목록 갱신 */
     renderFusionBanner();     /* §430 — 다중 파일 융합 배너 (융합 세션만) */
     renderSummaryStrip();
     renderMapAndLegend();
@@ -1947,6 +1948,52 @@
      리플레이 뷰어는 RDCharts.renderMap 으로 지도(inst.map)를 가져가
      자체 화면에 그린다 — GPS 트랙 전체화면과 같은 패턴. 닫을 때
      대시보드 지도를 복원한다. */
+  /* §436 — 리플레이 비교 세션(고스트) 선택기.
+     원본 트랙이 남아 있는(hasTrack) 세션만 후보. 현재 세션은 제외한다.
+     option 은 textContent 로 넣는다 — 세션 이름은 사용자 입력이라
+     innerHTML 로 조립하면 안 된다. */
+  function populateGhostPicker() {
+    var sel = $('replay-ghost-sel');
+    if (!sel) return;
+    var keep = sel.value;
+    var list = [];
+    try { list = (window.Storage && Storage.listSessions) ? (Storage.listSessions() || []) : []; }
+    catch (e) { list = []; }
+    while (sel.firstChild) sel.removeChild(sel.firstChild);
+    var none = document.createElement('option');
+    none.value = ''; none.textContent = '비교 세션 없음';
+    sel.appendChild(none);
+    var n = 0;
+    list.forEach(function (r) {
+      if (!r || !r.hasTrack) return;
+      if (state.sessionSig && r.sig === state.sessionSig) return;   // 자기 자신 제외
+      var o = document.createElement('option');
+      o.value = r.id;
+      o.textContent = r.name || '라이딩 세션';
+      sel.appendChild(o);
+      n++;
+    });
+    sel.hidden = (n === 0);
+    if (keep) sel.value = keep;
+    if (sel.selectedIndex < 0) sel.selectedIndex = 0;
+  }
+
+  /* 선택된 세션 id 로 고스트용 세션 객체를 만든다 (state 를 건드리지 않는
+     순수 경로 — parseGPX → normalizeSession). 융합 세션(컴팩트 JSON)은
+     별도 복원이 필요해 이번 범위 밖이며 null 을 돌려준다. */
+  function buildGhostSession(id) {
+    if (!id) return null;
+    var gpx = null;
+    try { gpx = Storage.loadTrack(id); } catch (e) { gpx = null; }
+    if (!gpx) return null;
+    if (typeof isFusedTrackStr === 'function' && isFusedTrackStr(gpx)) return null;
+    try {
+      var gs = An.normalizeSession(Gpx.parseGPX(gpx));
+      if (!gs || !gs.samples || !gs.samples.length || !gs.hasTime) return null;
+      return gs;
+    } catch (e) { return null; }
+  }
+
   function enterReplay() {
     if (!state.session || !state.analysis) return;
     if (!state.session.hasTime) {
@@ -1957,9 +2004,26 @@
       showError('리플레이 모듈을 불러오지 못했습니다.');
       return;
     }
+    /* §436 — 비교 세션이 선택돼 있으면 고스트로 함께 재생한다. */
+    var ghostOpt = null;
+    var gsel = $('replay-ghost-sel');
+    var gid = (gsel && !gsel.hidden) ? gsel.value : '';
+    if (gid) {
+      var gsess = buildGhostSession(gid);
+      if (!gsess) {
+        showError('선택한 비교 세션의 트랙을 불러오지 못했습니다. 비교 없이 재생합니다.');
+      } else {
+        var gname = '비교 세션';
+        var gopt = gsel.options[gsel.selectedIndex];
+        if (gopt && gopt.textContent) gname = gopt.textContent;
+        ghostOpt = { session: gsess, label: gname, color: '#B86BFF', mode: 'start' };
+      }
+    }
+
     RDReplay.open({
       session: state.session,
       analysis: state.analysis,
+      ghost: ghostOpt,
       windDir: state.windDir,
       unit: state.unit,
       sessionSig: state.sessionSig,

@@ -484,6 +484,11 @@
         <h3>GPS 트랙</h3>
         <div class="card__head-right">
           <span class="card__hint">색상 = 속도(빨강 느림·초록 빠름) · 마커 = 택킹/자이빙</span>
+          <select id="replay-ghost-sel" class="btn btn--sm btn--ghost"
+                  aria-label="리플레이에서 함께 볼 비교 세션" hidden
+                  style="padding-right:1.6em">
+            <option value="">비교 세션 없음</option>
+          </select>
           <button type="button" class="btn btn--sm btn--primary" id="replay-btn">
             ▶ 라이딩 리플레이
           </button>
@@ -849,7 +854,7 @@
 <script src="js/charts.js?v=v433v4-emoji-20260708"></script>
 <!-- 라이딩 리플레이 뷰어 (지도·영상 동기 재생) -->
 <script src="js/video-time-detect.js?v=video-ocr-429b-20260703"></script>
-<script src="js/replay.js?v=video-ocr-429b-20260703"></script>
+<script src="js/replay.js?v=ghost-replay-436-20260827"></script>
 <!-- 리프팅 계산기 (물리 모델 — VPS·Coach Danny 레퍼런스) -->
 <script src="../assets/js/lift-calculator.js"></script>
 <!-- Coach Danny 엔진 (VPS · what-if) -->
@@ -860,7 +865,7 @@
      (초기 페이지 로드 영향 0). (Danny 2026-05-26) -->
 <script src="js/pdf-export.js"></script>
 <!-- 앱 -->
-<script src="js/app.js?v=v433v4-emoji-20260708"></script>
+<script src="js/app.js?v=ghost-replay-436-20260827"></script>
 <!-- 메인 사이트 헤더·내비 동작 (헤더 스크롤·모바일 메뉴·계정 드롭다운) -->
 <script src="../assets/js/main.js"></script>
 <!-- §171-B cart system — auth-shim + cart.js for nav badge (메인과 동일).

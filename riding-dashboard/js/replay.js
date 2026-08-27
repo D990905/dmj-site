@@ -135,6 +135,51 @@
     };
   }
 
+  /* 두 세션을 primary 경과시간 축에 맞춘다.
+     clock: 각 세션 samples[0].t 의 실제 차이를 보존한다.
+     start: 두 시작점을 같은 경과 0초로 둔다. */
+  function alignGhost(primarySession, ghostSession, mode) {
+    mode = mode === 'start' ? 'start' : 'clock';
+    var ps = primarySession && primarySession.samples;
+    var gs = ghostSession && ghostSession.samples;
+    if (!ps || !ps.length || !gs || !gs.length) {
+      return { offsetSec: 0, mode: mode, overlapSec: 0 };
+    }
+    var p0 = ps[0].t, p1 = ps[ps.length - 1].t;
+    var g0 = gs[0].t, g1 = gs[gs.length - 1].t;
+    var offsetSec = mode === 'clock' ? g0 - p0 : 0;
+    var pDur = Math.max(0, p1 - p0);
+    var gDur = Math.max(0, g1 - g0);
+    var overlapSec = Math.max(0,
+      Math.min(pDur, offsetSec + gDur) - Math.max(0, offsetSec));
+    return { offsetSec: offsetSec, mode: mode, overlapSec: overlapSec };
+  }
+
+  /* primary 기준 경과초를 ghost 샘플 시각으로 변환해 보간한다.
+     clock offset 이 양수면 ghost 가 그만큼 늦게 시작한다. 범위 밖 또는
+     잘못된 입력은 예외 없이 null. */
+  function ghostStateAt(ghostSession, elapsedSec, offsetSec) {
+    var samples = ghostSession && ghostSession.samples;
+    if (!samples || !samples.length || !isFinite(elapsedSec)) return null;
+    offsetSec = isFinite(offsetSec) ? offsetSec : 0;
+    var target = samples[0].t + elapsedSec - offsetSec;
+    var lastT = samples[samples.length - 1].t;
+    if (target < samples[0].t || target > lastT) return null;
+    return interpAtTime(samples, target, Infinity);
+  }
+
+  /* 기본과 고스트가 같은 Y축을 쓰도록 지표 범위를 합친다.
+     축이 다르면 같은 속도가 서로 다른 높이에 그려져 "누가 더 빠른가" 가
+     거짓이 된다 — 비교 기능에서는 정확도 문제다. fixed 축(twa)은 그대로. */
+  function mergeGhostRange(def, range, ghostSamples) {
+    if (!def || !range || !ghostSamples || !ghostSamples.length) return range;
+    if (def.fixed) return range;
+    var gs = buildSeries(ghostSamples, def.field);
+    if (!gs.count) return range;
+    var gr = computeRange(def, gs);
+    return [Math.min(range[0], gr[0]), Math.max(range[1], gr[1])];
+  }
+
   /* 어떤 미니그래프 지표가 실제 데이터를 가졌는지 검출.
      vmg·twa 는 풍향 확정 시에만 채워지고(analysis computeWindMetrics),
      heel·pitch 는 .vkx 자세 데이터, hr 은 GPX HR 확장에 있을 때만 존재. */
@@ -751,6 +796,13 @@
       /* 하단 — 가로 메인 트랙 스트립 */
       '<div class="replay__trackrow">' +
         '<div class="replay__trackwrap">' +
+          (R.ghost ?
+            '<div id="replay-track-labels" aria-label="Replay riders" ' +
+              'style="position:absolute;z-index:2;left:12px;top:3px;' +
+              'display:flex;gap:12px;pointer-events:none;font:600 10px system-ui,sans-serif">' +
+              '<span id="replay-primary-label"></span>' +
+              '<span id="replay-ghost-label"></span>' +
+            '</div>' : '') +
           '<canvas id="replay-track" class="replay__track"></canvas>' +
         '</div>' +
         '<div class="replay__trackctl">' +
@@ -766,6 +818,14 @@
       '</div>';
 
     document.body.appendChild(v);
+    if (R.ghost) {
+      var labels = el('replay-track-labels');
+      var pl = el('replay-primary-label');
+      var gl = el('replay-ghost-label');
+      if (labels && labels.parentNode) labels.parentNode.style.position = 'relative';
+      if (pl) { pl.textContent = '● ' + R.title; pl.style.color = '#FFFFFF'; }
+      if (gl) { gl.textContent = '● ' + R.ghost.label; gl.style.color = R.ghost.color; }
+    }
     return v;
   }
 
@@ -932,6 +992,7 @@
 
       var series = buildSeries(R.samples, def.field);
       var range = computeRange(def, series);
+      if (R.ghost) range = mergeGhostRange(def, range, R.ghost.session.samples);
       card.innerHTML =
         '<div class="replay-graph__head">' +
           '<span class="replay-graph__label">' + def.label + '</span>' +
@@ -1255,6 +1316,51 @@
       ctx.stroke();
     });
 
+    /* 고스트 속도 궤적 — 같은 primary 시간축에 점선으로 겹친다. 지도에
+       공간 궤적도 별도로 표시하지만, 하단 replay-track 만 봐도 두 주자의
+       진행과 현재 위치를 비교할 수 있게 한다. */
+    R.ghostTrackScale = null;
+    if (R.ghost) {
+      var ghostSamples = R.ghost.session.samples;
+      /* 기본 SOG 곡선과 반드시 같은 축을 쓴다 (mergeGhostRange 로 이미
+         고스트 최고속까지 포함된 범위다). 자체 축을 만들면 안 된다. */
+      var sogG = null;
+      R.graphs.forEach(function (gg) {
+        if (gg.def && gg.def.key === 'sog' && gg.state === 'data') sogG = gg;
+      });
+      var gvmin = sogG ? sogG.vmin : 0;
+      var gvmax = sogG ? sogG.vmax : 1;
+      var gspan = (gvmax - gvmin) || 1;
+      function ghostPrimaryTime(s) {
+        return R.t0 + R.ghost.align.offsetSec + (s.t - ghostSamples[0].t);
+      }
+      function ghostY(speed) {
+        return padT + plotH - (clamp(speed, gvmin, gvmax) - gvmin) / gspan * plotH;
+      }
+      R.ghostTrackScale = { vmin: gvmin, vmax: gvmax };
+      ctx.save();
+      ctx.strokeStyle = R.ghost.color;
+      ctx.globalAlpha = 0.9;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = 'round';
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      var ghostPen = false;
+      for (var gi = 0; gi < ghostSamples.length; gi++) {
+        var gp = ghostSamples[gi];
+        var gt = ghostPrimaryTime(gp);
+        if (gt < winLo || gt > winHi || gp.speed == null || !isFinite(gp.speed)) {
+          ghostPen = false;
+          continue;
+        }
+        var gtx = xFor(gt), gty = ghostY(gp.speed);
+        if (!ghostPen) { ctx.moveTo(gtx, gty); ghostPen = true; }
+        else ctx.lineTo(gtx, gty);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
     // 회전(택/자이브) 마커 — 창 안의 것만
     var mans = (R.analysis && R.analysis.maneuvers) || [];
     mans.forEach(function (m) {
@@ -1324,6 +1430,21 @@
     ctx.beginPath();
     ctx.moveTo(x - 4, p.y - 6); ctx.lineTo(x + 4, p.y - 6); ctx.lineTo(x, p.y - 1);
     ctx.closePath(); ctx.fill();
+
+    /* 고스트가 이 primary 경과시각에 존재할 때만 현재점 표시. */
+    if (R.ghost && R.ghostState && R.ghostTrackScale &&
+        R.ghostState.speed != null && isFinite(R.ghostState.speed)) {
+      var mvmin = R.ghostTrackScale.vmin, mvmax = R.ghostTrackScale.vmax;
+      var mspan = (mvmax - mvmin) || 1;
+      var gy = p.y + p.h -
+        (clamp(R.ghostState.speed, mvmin, mvmax) - mvmin) / mspan * p.h;
+      ctx.save();
+      ctx.fillStyle = R.ghost.color;
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(x, gy, 4.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
   }
 
   /* "깔끔한" 시간 눈금 값 배열 */
@@ -1531,8 +1652,17 @@
       icon: icon, interactive: false, keyboard: false, zIndexOffset: 1000
     }).addTo(R.map);
 
+    if (R.ghost) {
+      R.mapGhostPlayhead = L.circleMarker(
+        [R.ghost.session.samples[0].lat, R.ghost.session.samples[0].lng], {
+          radius: 7, color: '#FFFFFF', weight: 2,
+          fillColor: R.ghost.color, fillOpacity: 0, opacity: 0
+        }).addTo(R.map);
+    }
+
     R.mapTrack = [];
     R.mapMans = [];
+    R.mapGhostTrack = [];
     updateMapWindow();
   }
 
@@ -1550,7 +1680,10 @@
     (R.mapMans || []).forEach(function (ly) {
       try { R.map.removeLayer(ly); } catch (e) {}
     });
-    R.mapTrack = []; R.mapMans = [];
+    (R.mapGhostTrack || []).forEach(function (ly) {
+      try { R.map.removeLayer(ly); } catch (e) {}
+    });
+    R.mapTrack = []; R.mapMans = []; R.mapGhostTrack = [];
 
     var i0 = sampleIndexAtTime(R.samples, lo);
     var i1 = sampleIndexAtTime(R.samples, hi);
@@ -1570,6 +1703,26 @@
       pts.push([p0.lat, p0.lng]);
     }
     if (R.samples[i1]) pts.push([R.samples[i1].lat, R.samples[i1].lng]);
+
+    // 고스트 공간 궤적 — primary 창에 겹치는 구간만 고유색 점선으로.
+    if (R.ghost) {
+      var gs = R.ghost.session.samples;
+      var ghostPts = [];
+      for (var gi = 0; gi < gs.length; gi++) {
+        var primaryT = R.t0 + R.ghost.align.offsetSec + (gs[gi].t - gs[0].t);
+        if (primaryT >= lo && primaryT <= hi &&
+            isFinite(gs[gi].lat) && isFinite(gs[gi].lng)) {
+          ghostPts.push([gs[gi].lat, gs[gi].lng]);
+        }
+      }
+      if (ghostPts.length > 1) {
+        var ghostLine = L.polyline(ghostPts, {
+          color: R.ghost.color, weight: 3, opacity: 0.82, dashArray: '8 6'
+        }).addTo(R.map);
+        R.mapGhostTrack.push(ghostLine);
+        Array.prototype.push.apply(pts, ghostPts);
+      }
+    }
 
     // 회전 마커 — 범위 안의 것만
     var mans = (R.analysis && R.analysis.maneuvers) || [];
@@ -1681,6 +1834,16 @@
     /* 보드 바우 끝 선 — 보드가 움직였으니 풍향 축·ladder rung 을 새
        위치로 다시 그린다(토글 꺼진 선은 drawBoardLines 가 건너뛴다). */
     drawBoardLines();
+  }
+
+  function updateGhostPlayhead(st) {
+    if (!R.map || !R.mapGhostPlayhead) return;
+    if (!st || !isFinite(st.lat) || !isFinite(st.lng)) {
+      R.mapGhostPlayhead.setStyle({ opacity: 0, fillOpacity: 0 });
+      return;
+    }
+    R.mapGhostPlayhead.setLatLng([st.lat, st.lng]);
+    R.mapGhostPlayhead.setStyle({ opacity: 1, fillOpacity: 0.95 });
   }
 
   function recenterMap() {
@@ -2835,10 +2998,14 @@
     R.playT = playT;
     var st = interpAtTime(R.samples, playT, GAP_SEC);
     R.curState = st;
+    R.ghostState = R.ghost
+      ? ghostStateAt(R.ghost.session, playT - R.t0, R.ghost.align.offsetSec)
+      : null;
 
     updateRider(playT, st);
     drawMiniGraphs(playT, st);
     updateMapPlayhead(st);
+    updateGhostPlayhead(R.ghostState);
 
     // 트랙 줌 창이 좁을 때 — 재생 헤드가 가장자리에 닿으면 페이지 이동
     if (R.dur - R.trackSpan > 0.001) {
@@ -3123,6 +3290,18 @@
     var shown = {};
     metricSlots.forEach(function (s) { shown[s.def.key] = true; });
 
+    var ghost = null;
+    if (opts.ghost && opts.ghost.session && opts.ghost.session.samples &&
+        opts.ghost.session.samples.length) {
+      var ghostMode = opts.ghost.mode === 'start' ? 'start' : 'clock';
+      ghost = {
+        session: opts.ghost.session,
+        label: opts.ghost.label || opts.ghost.session.trackName || 'Ghost',
+        color: opts.ghost.color || '#B86BFF'
+      };
+      ghost.align = alignGhost(session, ghost.session, ghostMode);
+    }
+
     var maxKt = 0;
     if (opts.analysis && opts.analysis.summary && opts.analysis.summary.maxSpeedMs) {
       maxKt = opts.analysis.summary.maxSpeedMs * KT;
@@ -3136,6 +3315,7 @@
 
     R = {
       session: session, analysis: opts.analysis || {}, samples: samples,
+      ghost: ghost, ghostState: null, ghostTrackScale: null,
       windDir: windDir,
       unit: opts.unit === 'kmh' ? 'kmh' : 'kt',
       sessionSig: opts.sessionSig || '',
@@ -3152,6 +3332,7 @@
       hasData: hasData, metricSlots: metricSlots, shown: shown,
       graphs: [],
       map: null, mapPlayhead: null, mapTrack: [], mapMans: [],
+      mapGhostPlayhead: null, mapGhostTrack: [],
       mapFollow: true, mapUserMoved: false, mapLinked: true, _mapProg: false,
       mapTrackMode: false,    // F — 보드 추적(매 프레임 recenter) on/off
       showWindAxis: true,     // 보드 바우 끝 풍향 축 선(검정) 표시
@@ -3300,6 +3481,9 @@
       lerpNum: lerpNum,
       sampleState: sampleState,
       interpAtTime: interpAtTime,
+      alignGhost: alignGhost,
+      ghostStateAt: ghostStateAt,
+      mergeGhostRange: mergeGhostRange,
       detectMetrics: detectMetrics,
       buildMetricSlots: buildMetricSlots,
       videoTimeForElapsed: videoTimeForElapsed,
