@@ -980,8 +980,122 @@
     renderCoach(analysis, vps, whatIf);
   }
 
+  /* ---------- 다중 파일 융합 (§430 재사용) ---------- */
+  /* RaceBox 25Hz 로 트랙을, Waterspeed 로 심박을 — 같은 세션을 서로 다른
+     기기가 따로 기록했을 때 하나로 합친다. primary 는 샘플레이트가 높은
+     쪽이 자동 선택된다 (pickPrimary). */
+  function readAllAsText(files, done) {
+    var out = new Array(files.length), remaining = files.length, failed = false;
+    if (!remaining) return done([], null);
+    files.forEach(function (f, i) {
+      var r = new FileReader();
+      r.onerror = function () { if (!failed) { failed = true; done(null, f.name); } };
+      r.onload = function () {
+        out[i] = { name: f.name, text: String(r.result) };
+        if (--remaining === 0 && !failed) done(out, null);
+      };
+      r.readAsText(f);
+    });
+  }
+
+  function renderFusionBanner(fusion, warnings, fileNames) {
+    var host = $('fusion-banner');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    if (!fusion) return;
+    var box = el('div', 'card mb-3');
+    var b = el('div', 'card-body py-2');
+    var head = el('div', 'd-flex align-items-center gap-2 flex-wrap');
+    var tag = el('span', 'badge bg-blue', 'Merged');
+    head.appendChild(tag);
+    var p = fusion.primary || {};
+    head.appendChild(el('span', null,
+      'Track from ' + (p.fileName || 'primary')
+      + (p.sampleRateHz ? ' · ' + p.sampleRateHz.toFixed(1) + ' Hz' : '')
+      + (p.pointCount ? ' · ' + p.pointCount.toLocaleString() + ' points' : '')));
+    b.appendChild(head);
+
+    var lines = el('div', 'mt-1 text-secondary');
+    lines.style.fontSize = '.8125rem';
+    var parts = [];
+    if (fusion.hr && fusion.hr.merged) {
+      parts.push('heart rate from ' + (fusion.hr.fileName || fusion.hr.source)
+        + (fusion.hrCoverage != null ? ' (' + Math.round(fusion.hrCoverage * 100) + '% coverage)' : ''));
+    }
+    if (fusion.imu && fusion.imu.merged) {
+      parts.push('board attitude from ' + (fusion.imu.fileName || fusion.imu.source));
+    }
+    lines.textContent = parts.length
+      ? 'Merged in: ' + parts.join(' · ')
+      : 'No extra channels merged — single source only.';
+    b.appendChild(lines);
+
+    if (fileNames && fileNames.length > 1) {
+      var fl = el('div', 'mt-1 text-secondary');
+      fl.style.fontSize = '.75rem';
+      fl.textContent = fileNames.length + ' files: ' + fileNames.join(', ');
+      b.appendChild(fl);
+    }
+    if (warnings && warnings.length) {
+      var w = el('div', 'mt-1');
+      w.style.fontSize = '.8125rem';
+      w.style.color = 'var(--tblr-warning)';
+      w.textContent = 'Skipped: ' + warnings.map(function (x) {
+        return x.file + ' (' + x.error + ')'; }).join(' · ');
+      b.appendChild(w);
+    }
+    box.appendChild(b); host.appendChild(box);
+  }
+
+  function loadFiles(fileList) {
+    var files = [].slice.call(fileList || []);
+    if (!files.length) return;
+    var textLike = files.filter(function (f) { return /\.(gpx|csv|tcx)$/i.test(f.name); });
+    if (!textLike.length) {
+      $('hdr-title').textContent = 'Unsupported file type';
+      $('hdr-date').textContent = 'Upload .gpx, .csv or .tcx';
+      return;
+    }
+    readAllAsText(textLike, function (loaded, err) {
+      if (err) { $('hdr-title').textContent = 'Could not read ' + err; return; }
+      /* 파일이 하나여도 융합 경로를 태운다 — 포맷 감지가 여기 있다
+         (RaceBox CSV 는 GPX 파서로는 못 읽는다). */
+      if (!window.RDSessionMerger) {
+        if (loaded.length === 1) return loadGpxText(loaded[0].text,
+          loaded[0].name.replace(/\.[^.]+$/, ''));
+        $('hdr-title').textContent = 'Merger unavailable';
+        return;
+      }
+      try {
+        var res = RDSessionMerger.mergeFiles(loaded);
+        var session = An.normalizeSession(res.parsed);
+        var est = null;
+        try { est = An.estimateWindFromTrack(session); } catch (e2) { est = null; }
+        var wd = est && est.windDir != null ? est.windDir : null;
+        var analysis = An.analyzeSession(session, wd,
+          est ? { windConfidence: est.confidence } : {});
+        var primary = res.fusion && res.fusion.primary;
+        var name = (primary && primary.fileName)
+          ? primary.fileName.replace(/\.[^.]+$/, '')
+          : loaded[0].name.replace(/\.[^.]+$/, '');
+        CUR.gpxText = null;
+        loaded.forEach(function (l) {
+          if (primary && l.name === primary.fileName && /\.gpx$/i.test(l.name)) CUR.gpxText = l.text;
+        });
+        show(session, analysis, name, est);
+        renderFusionBanner(res.fusion, res.warnings,
+          loaded.map(function (l) { return l.name; }));
+      } catch (e) {
+        $('hdr-title').textContent = 'Merge failed';
+        $('hdr-date').textContent = (e && e.message) ? e.message : String(e);
+        if (window.console) console.error('[v2] merge', e);
+      }
+    });
+  }
+
   function loadGpxText(text, name) {
     CUR.gpxText = text;
+    renderFusionBanner(null);
     var parsed = Gpx.parseGPX(text);
     var session = An.normalizeSession(parsed);
     /* 풍향이 없으면 택/자이브 분류·VMG·폴라가 전부 잠긴다.
@@ -1055,11 +1169,16 @@
       applyWind(CUR.est ? null : undefined, CUR.est ? 're-estimate' : 'keep');
     });
     $('v2-file').addEventListener('change', function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var r = new FileReader();
-      r.onload = function () { loadGpxText(String(r.result), f.name.replace(/\.gpx$/i, '')); };
-      r.readAsText(f);
+      loadFiles(e.target.files);
+    });
+    /* 드래그앤드롭도 받는다 — 파일 여러 개를 한 번에 던지는 게 자연스럽다 */
+    ['dragover', 'drop'].forEach(function (ev) {
+      document.addEventListener(ev, function (e) {
+        e.preventDefault();
+        if (ev === 'drop' && e.dataTransfer && e.dataTransfer.files) {
+          loadFiles(e.dataTransfer.files);
+        }
+      });
     });
     fetch('sample/sample-songjeong-busan.gpx')
       .then(function (r) { return r.text(); })

@@ -45,8 +45,8 @@
           <div class="col-auto ms-auto">
             <div class="btn-list">
               <label class="btn btn-primary">
-                Upload GPX
-                <input type="file" id="v2-file" accept=".gpx" hidden>
+                Upload files
+                <input type="file" id="v2-file" accept=".gpx,.csv,.tcx" multiple hidden>
               </label>
               <button type="button" class="btn" id="btn-replay">▶ Replay</button>
               <button type="button" class="btn" id="btn-save">Save session</button>
@@ -59,6 +59,8 @@
 
     <div class="page-body">
       <div class="container-xl">
+
+        <div id="fusion-banner"></div>
 
         <!-- 라이더 입력 — SPS 산출에 필요 -->
         <div class="card mb-3">
@@ -195,6 +197,11 @@
 
 <script src="js/geo.js"></script>
 <script src="js/gpx-parser.js"></script>
+<script src="js/csv-parser.js"></script>
+<script src="js/parsers/racebox-csv.js"></script>
+<script src="js/analysis-imu.js"></script>
+<script src="js/analysis-hr.js"></script>
+<script src="js/session-merger.js"></script>
 <script src="js/analysis.js"></script>
 <script src="js/storage.js"></script>
 <script src="vendor/uPlot.iife.min.js?v=1.6.32"></script>
