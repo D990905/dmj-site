@@ -1,0 +1,680 @@
+/* replay-only.css — dashboard.css 에서 리플레이 오버레이 규칙만 추출.
+   v2.html 이 dashboard.css 전체를 불러오면 Tabler 와 충돌하므로 분리한다.
+   생성물이며 직접 수정하지 마라. */
+/* ============================================================
+ * Layer 2.0 — 일관성 정리 패스 (Danny 2026-05-26)
+ * ------------------------------------------------------------
+ * 흩어진 typography·색·여백을 *덧칠 없이 통일*. 이 블록은 dashboard.css
+ * 끝에 두어 위쪽의 ad-hoc 선언을 모두 오버라이드한다.
+ *
+ * 1) value 노드는 4 사이즈만 — hero / xl / lg / md.
+ * 2) value 노드는 weight 800 + tracking -0.025em + tabular-nums + line-height 1.05 강제.
+ * 3) value 줄바꿈 금지 — white-space:nowrap (라벨에 단위 명시 가정).
+ * 4) 라벨·캡션은 3 사이즈만 — label / foot / micro.
+ *
+ * 리플레이 뷰어(.replay) 는 다크 전용 스코프라 이 블록 영향 X
+ * (선택자에서 .replay scope 미포함).
+ * ============================================================ */
+
+/* (1) 값 노드 공통 스타일 — 단일 mixin 효과. 사이즈는 별도 규칙으로. */
+.stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v,
+.stats-val,
+.vps-tile__score,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time {
+  font-weight:800;
+  letter-spacing:-.025em;
+  line-height:1.05;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+/* ============================================================
+ * 라이딩 리플레이 뷰어 — Video Viewer (전면 재설계 2026-05-23)
+ * ------------------------------------------------------------
+ * 의도적으로 다크 테마이다. 영상을 화면 배경에 흐리게(blur) 깔고
+ * 그 위에 모든 정보·기능을 오버레이하는 몰입형 재생 표면이다.
+ * 색은 .replay 스코프 안 토큰으로 한정한다. js/replay.js 와 짝.
+ * ============================================================ */
+.replay {
+  --rp-bg:#0A0F18;            /* 최심 배경 (영상 없을 때) */
+  --rp-panel:rgba(14,20,31,0.78);   /* 오버레이 패널 */
+  --rp-panel-2:rgba(255,255,255,0.07);
+  --rp-line:rgba(255,255,255,0.13);
+  --rp-text:#ECF1F7;
+  --rp-dim:#9DACBD;
+  --rp-accent:#33A1FF;
+  --rp-accent-dim:rgba(51,161,255,0.18);
+  position:fixed; inset:0; z-index:4500;
+  background:var(--rp-bg); color:var(--rp-text);
+  display:flex; flex-direction:column; overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+    "Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+.replay[hidden] { display:none; }
+/* ---------- 배경 — 영상 블러 + 스크림 ---------- */
+/* blur 는 영상이 비치되 오버레이 가독성을 해치지 않을 만큼만 — Danny
+   검토 2026-05-23 §B1: 34px 는 영상이 거의 안 보였다. 14px 로 낮추고
+   brightness 도 0.66→0.82 로 올려 배경 영상이 또렷이 비치게 한다. */
+.replay__blur {
+  position:absolute; inset:0; width:100%; height:100%;
+  z-index:0; object-fit:cover;
+  filter:blur(14px) saturate(1.12) brightness(0.82);
+  transform:scale(1.12);
+}
+.replay__scrim {
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 38%,
+    rgba(10,15,24,0.18) 0%,rgba(10,15,24,0.62) 78%,rgba(10,15,24,0.86) 100%);
+}
+/* ---------- 상단 바 ---------- */
+.replay__bar {
+  position:relative; z-index:20;
+  display:flex; align-items:center; gap:12px;
+  padding:9px 14px;
+  background:linear-gradient(180deg,rgba(8,12,20,0.86),rgba(8,12,20,0.30));
+}
+.replay__exit {
+  flex:0 0 auto;
+  display:inline-flex; align-items:center; gap:5px;
+  background:transparent; border:0; cursor:pointer;
+  color:var(--rp-text); font-size:.92rem; font-weight:700;
+  font-family:inherit; padding:7px 9px; border-radius:8px;
+}
+.replay__exit:hover { background:var(--rp-panel-2); }
+.replay__exit span { font-size:1.3rem; line-height:1; }
+.replay__chips {
+  display:flex; gap:6px; flex-wrap:wrap; flex:1;
+  justify-content:center;
+}
+.replay__chip {
+  background:var(--rp-panel-2); color:var(--rp-dim);
+  border:1.5px solid transparent; border-radius:999px;
+  padding:5px 13px; font-size:.78rem; font-weight:700;
+  cursor:pointer; font-family:inherit; backdrop-filter:blur(6px);
+  transition:background .14s,color .14s,border-color .14s;
+}
+.replay__chip:hover { color:var(--rp-text); }
+.replay__chip.is-on {
+  background:var(--rp-accent-dim); color:#A9D6FF;
+  border-color:var(--rp-accent);
+}
+.replay__chip--nowind { opacity:.55; }
+.replay__chip--nowind.is-on { opacity:1; }
+.replay__tools { flex:0 0 auto; display:flex; align-items:center; gap:7px; }
+.replay__upload {
+  display:inline-flex; align-items:center; gap:5px; cursor:pointer;
+  background:var(--rp-accent); color:#fff;
+  border-radius:8px; padding:7px 12px;
+  font-size:.8rem; font-weight:700;
+}
+.replay__upload:hover { background:#1F8AEC; }
+.replay__layout {
+  display:inline-flex; background:var(--rp-panel-2);
+  border:1px solid var(--rp-line); border-radius:8px; overflow:hidden;
+}
+.replay__lay {
+  background:transparent; border:0; cursor:pointer; font-family:inherit;
+  color:var(--rp-dim); font-size:.78rem; font-weight:700; padding:6px 11px;
+}
+.replay__lay:hover:not(:disabled) { color:var(--rp-text); }
+.replay__lay.is-on { background:var(--rp-accent-dim); color:#A9D6FF; }
+.replay__lay:disabled { opacity:.34; cursor:not-allowed; }
+.replay__tool {
+  width:34px; height:34px; flex:0 0 auto;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:8px;
+  font-size:.86rem; font-weight:700; cursor:pointer; font-family:inherit;
+}
+#replay-sync-btn { width:auto; padding:0 11px; font-size:.78rem; }
+.replay__tool:hover { background:rgba(255,255,255,0.14); }
+.replay__close-x {
+  width:34px; height:34px; flex:0 0 auto;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1.5px solid var(--rp-line); border-radius:8px;
+  font-size:1rem; line-height:1; cursor:pointer; font-family:inherit;
+  transition:background .14s,border-color .14s;
+}
+.replay__close-x:hover { background:#C0392B; border-color:#C0392B; }
+.replay__close-x:focus-visible,
+.replay__tool:focus-visible,
+.replay__lay:focus-visible {
+  outline:2px solid var(--rp-accent); outline-offset:2px;
+}
+/* ---------- 동기화 패널 ---------- */
+.replay__sync {
+  position:absolute; top:54px; right:14px; z-index:40;
+  width:min(560px,calc(100vw - 28px));
+  background:var(--rp-panel); backdrop-filter:blur(14px);
+  border:1px solid var(--rp-line); border-radius:12px;
+  box-shadow:0 16px 44px rgba(0,0,0,0.5);
+  padding:11px 13px;
+}
+.replay__sync[hidden] { display:none; }
+.replay-sync__row {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  margin-top:9px;
+}
+.replay-sync__row--top { margin-top:0; }
+.replay-sync__name { font-weight:800; font-size:.85rem; }
+.replay-sync__badge {
+  font-size:.72rem; font-weight:800; padding:3px 8px; border-radius:999px;
+}
+.replay-sync__badge--ok { background:rgba(39,174,96,0.22); color:#5FD693; }
+.replay-sync__badge--manual { background:rgba(224,161,0,0.22); color:#F0C040; }
+.replay-sync__src { font-size:.74rem; color:var(--rp-dim); flex:1; }
+.replay-sync__close {
+  width:24px; height:24px; flex:0 0 auto; cursor:pointer;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:6px; font-family:inherit;
+}
+.replay-sync__lbl { font-size:.78rem; font-weight:700; color:var(--rp-dim); }
+.replay-sync__range { flex:1; min-width:120px; accent-color:var(--rp-accent); }
+.replay-sync__num {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:.76rem; color:var(--rp-dim);
+}
+.replay-sync__num input {
+  width:64px; background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:6px;
+  padding:4px 6px; font-family:inherit; font-size:.8rem;
+}
+.replay-sync__hint { flex:1; font-size:.76rem; color:var(--rp-dim); }
+.replay__nudge {
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:7px;
+  padding:5px 9px; font-size:.74rem; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+.replay__nudge:hover { background:rgba(255,255,255,0.14); }
+.replay-sync__act {
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:7px;
+  padding:5px 10px; font-size:.74rem; font-weight:700;
+  cursor:pointer; font-family:inherit;
+}
+.replay-sync__act:hover { background:rgba(255,255,255,0.14); }
+#replay-video-remove:hover { background:#C0392B; border-color:#C0392B; }
+/* §429 화면 시각 OCR fallback */
+.replay-sync__ocrrow { align-items:center; }
+.replay-sync__ocr {
+  border-color:rgba(51,161,255,0.55);
+  background:rgba(51,161,255,0.14); color:#BEE0FF;
+}
+.replay-sync__ocr:hover:not(:disabled) { background:rgba(51,161,255,0.26); }
+.replay-sync__ocr:disabled { opacity:.6; cursor:progress; }
+.replay-sync__ocrstatus {
+  flex:1; min-width:120px; font-size:.74rem; color:var(--rp-dim);
+}
+/* 다중 클립 — 클립별 동기화 블록 (2026-05-23 §B7) */
+.replay__sync { max-height:calc(100vh - 80px); overflow-y:auto; }
+.replay-sync__clip {
+  margin-top:9px; padding:8px 9px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--rp-line); border-radius:9px;
+}
+.replay-sync__row--clip { margin-top:0; }
+.replay-sync__live {
+  font-size:.7rem; font-weight:800; color:#5FD693;
+}
+.replay-sync__times { gap:14px; }
+.replay-sync__time {
+  display:flex; flex-direction:column; gap:1px;
+  font-size:.76rem; color:var(--rp-text); flex:1; min-width:130px;
+}
+.replay-sync__time b {
+  font-size:.66rem; font-weight:700; color:var(--rp-dim);
+  letter-spacing:.02em;
+}
+.replay-sync__cnum {
+  width:74px; background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:6px;
+  padding:4px 6px; font-family:inherit; font-size:.8rem;
+}
+/* 클립 시작 시각 HH:MM:SS 직접 입력 (§C1) */
+.replay-sync__ctime {
+  width:104px; background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-accent); border-radius:6px;
+  padding:5px 8px; font-family:inherit; font-size:.92rem; font-weight:700;
+  letter-spacing:.02em; font-variant-numeric:tabular-nums; text-align:center;
+}
+.replay-sync__ctime:focus {
+  outline:2px solid var(--rp-accent); outline-offset:1px;
+}
+.replay-sync__chmss { font-size:.7rem; color:var(--rp-dim); }
+/* ---------- 무대 — 좌측 컬럼 · 중앙 스테이지 · 미니그래프 ----------
+   공통 멘탈모델: 좌측 컬럼 맨 위엔 항상 컴팩트 데이터 패널, 그 아래
+   타일엔 '중앙 스테이지에 없는 것'을 둔다. 영상·지도 패널은 JS
+   setLayout 이 좌측 컬럼 ↔ 중앙 스테이지로 옮긴다 — 좌측 컬럼은
+   어느 모드든 340px 고정폭이라 데이터 패널이 가로로 늘어나지 않는다
+   (나란히 뷰 버그 수정). 모바일은 세로 스택으로 reflow 한다(아래
+   @media). 다크 테마는 유지한다 (Danny 검토 2026-05-24 — 3 뷰 보정). */
+.replay__stage {
+  position:relative; z-index:10;
+  flex:1; min-height:0; display:flex;
+}
+/* 좌우 교환(⇄) — 좌측 컬럼과 중앙 스테이지의 가로 순서를 바꾼다.
+   나란히 뷰는 스테이지는 그대로 두고 중앙의 영상·지도만 교환한다. */
+.replay--swap .replay__stage { flex-direction:row-reverse; }
+.replay--both.replay--swap .replay__stage { flex-direction:row; }
+.replay--both.replay--swap .replay__cstage { flex-direction:row-reverse; }
+/* 좌측 컬럼 — 어느 모드든 340px 고정폭. 위=데이터 패널, (영상·지도
+   뷰)에선 그 아래에 타일 1개. 두 타일은 같은 규격으로 위아래로 쌓인다. */
+.replay__lcol {
+  position:relative; z-index:2;
+  flex:0 0 340px;
+  display:flex; flex-direction:column; gap:10px; padding:10px;
+  min-width:0; min-height:0;
+  border-right:1px solid var(--rp-line);
+}
+.replay--swap .replay__lcol {
+  border-right:0; border-left:1px solid var(--rp-line);
+}
+/* 중앙 스테이지 — 남는 폭을 모두 채운다. 나란히 뷰에서는 영상·지도
+   두 패널을 좌우 반반(세로 높이 동일)으로 담는다. */
+.replay__cstage {
+  flex:1; min-width:0; min-height:0; display:flex;
+}
+/* 영상 뷰 — 우측 미니그래프 레일(absolute · width 288 + right 12 = 300px)
+   이 중앙 스테이지 오른쪽을 덮는다. 그만큼 스테이지에 우측 패딩을 줘,
+   영상이 그래프를 뺀 '실제로 보이는' 영역 기준으로 좌우 가운데에 오게
+   한다(패딩 없으면 전체 스테이지 기준 중앙 → 그래프에 가려 오른쪽으로
+   밀려 보인다). 영상 뷰에만 적용 — 나란히·지도 뷰는 건드리지 않는다
+   (Danny 2026-05-24). */
+.replay--video .replay__cstage { padding-right:300px; }
+.replay__vpanel, .replay__mpanel {
+  position:relative; min-width:0; min-height:0;
+  /* z-index 로 스태킹 컨텍스트를 만들어 Leaflet 내부 z-index(타일·
+     컨트롤)가 미니그래프 위로 새어 나오지 않게 한다. */
+  z-index:1;
+}
+/* 좌측 컬럼 안의 패널 = 타일 — 데이터 패널과 완전히 같은 규격(너비
+   동일, 모서리 곡선 동일). 높이 분배는 아래 규칙이 정한다. */
+.replay__lcol > .replay__rider,
+.replay__lcol > .replay__vpanel,
+.replay__lcol > .replay__mpanel,
+.replay__lcol > .replay__stats {
+  min-height:0; min-width:0;
+  border:1px solid var(--rp-line);
+  border-radius:13px;
+}
+/* 좌측 컬럼 분배 — 위 타일(데이터 패널)은 내용 높이만큼만, 아래 타일은
+   남는 공간을 전부 차지한다. 3개 뷰 모드(영상·나란히·지도) 모두 동일
+   — 위는 항상 데이터 패널, 아래는 모드별로 지도/영상/세션 요약 타일.
+   50/50 균등 분배는 짧은 화면에서 아래 타일 내용이 넘쳐 스크롤바를
+   띄웠다 → 내용 기준 분배로 두 타일 모두 스크롤 없이 한 화면에 담는다
+   (Danny 2026-05-24). */
+.replay__lcol > .replay__rider { flex:0 0 auto; }
+.replay__lcol > .replay__vpanel,
+.replay__lcol > .replay__mpanel,
+.replay__lcol > .replay__stats { flex:1 1 auto; }
+/* 영상·지도 타일은 내용을 클립한다(데이터 패널은 자체 규칙에서
+   overflow 를 다룬다). */
+.replay__lcol > .replay__vpanel,
+.replay__lcol > .replay__mpanel { overflow:hidden; }
+/* 중앙 스테이지 안의 패널 = 스테이지를 꽉 채운다(나란히는 반반). */
+.replay__cstage > .replay__vpanel,
+.replay__cstage > .replay__mpanel { flex:1 1 0; min-height:0; min-width:0; }
+.replay__vpanel {
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.replay__video {
+  max-width:100%; max-height:100%; width:100%; height:100%;
+  object-fit:contain;
+}
+/* 영상이 메인 스테이지를 단독으로 쓸 때만 전체 프레임 보존(contain).
+   나란히·지도 뷰처럼 영상이 반쪽/타일이면 칸을 꽉 채운다(cover —
+   영상 양옆 크롭 허용, 세로 높이를 지도와 맞추기 위함). */
+.replay--both .replay__cstage .replay__video,
+.replay--map  .replay__lcol   .replay__video { object-fit:cover; }
+.replay__vpanel--vout .replay__video { opacity:.32; }
+.replay__nohint {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  max-width:330px; text-align:center; line-height:1.6;
+  font-size:.9rem; color:var(--rp-text);
+  background:var(--rp-panel); backdrop-filter:blur(10px);
+  border:1px solid var(--rp-line); border-radius:14px; padding:20px 22px;
+}
+.replay__nohint[hidden] { display:none; }
+.replay__nohint small { color:var(--rp-dim); font-size:.78rem; }
+/* §423 — 영상 없음 안내 배너 (cross-device). nohint 와 같은 자리·톤이되
+   아이콘·업로드 버튼·닫기를 갖춘 더 구체적인 안내. */
+.replay__vmissing {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  max-width:360px; text-align:center; line-height:1.6;
+  color:var(--rp-text); background:var(--rp-panel); backdrop-filter:blur(10px);
+  border:1px solid var(--rp-line); border-radius:14px; padding:22px 24px; z-index:7;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.replay__vmissing[hidden] { display:none; }
+.replay__vmissing-icon { font-size:2rem; line-height:1; }
+.replay__vmissing-title { font-size:1rem; font-weight:700; }
+.replay__vmissing-body { margin:0; font-size:.86rem; color:var(--rp-text); }
+.replay__vmissing-at { margin:0; font-size:.76rem; color:var(--rp-dim); }
+.replay__vmissing-acts {
+  display:flex; flex-direction:column; gap:8px; align-items:center;
+  margin-top:6px; width:100%;
+}
+.replay__vmissing-up { cursor:pointer; }
+.replay__vmissing-skip {
+  background:none; border:none; color:var(--rp-dim); cursor:pointer;
+  font-size:.8rem; text-decoration:underline; padding:2px 6px;
+}
+.replay__vmissing-skip:hover { color:var(--rp-text); }
+/* z-index 필수 — Leaflet 컨테이너가 스태킹 컨텍스트를 형성하지 않으면
+   내부 pane(타일 z200·오버레이 z400·마커 z600)이 부모 컨텍스트로 새어
+   나와 풍향 격자(z5)·ladder rung(z6) 위를 덮는다. z-index:1 로 컨텍스트를
+   만들어 Leaflet 내용을 가두면 격자·rung 이 지도 위에 보인다 — 대시보드
+   .map 과 동일 (Danny 2026-05-25: 격자·rung 미표시 버그 수정). */
+.replay__map { position:absolute; inset:0; background:#162132; z-index:1; }
+/* 풍향 모눈 격자 — 지도 타일 위, 맵 컨트롤(z 600) 아래. 클릭은 통과
+   시킨다(지도 드래그·줌 방해 X). 옅은 선이라 트랙·마커가 비쳐 보인다.
+   canvas 는 대체 요소(replaced element)라 position:absolute;inset:0 만으로는
+   고유 크기(300×150)에 머문다 — width/height:100% 를 명시해 패널을 덮게
+   한다(.wind-grid 와 동일 이유). 누락 시 sizeWindGrid 가 clientWidth 를
+   매번 dpr 배로 키워 캔버스가 무한 팽창한다. */
+.replay__windgrid {
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; z-index:5;
+}
+/* ladder rung 캔버스 — 풍향 격자(z 5) 위, 맵 컨트롤(z 600) 아래.
+   보드 추적 모드에서 보드를 지나는 풍상 레드라인을 이 레이어에 그린다. */
+.replay__ladder {
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  pointer-events:none; z-index:6;
+}
+.replay__mapctl {
+  position:absolute; left:10px; bottom:10px; z-index:600;
+  display:flex; gap:6px;
+}
+/* 보드 추적 토글이 켜졌을 때 — 강조(아센트) (F · Danny 2026-05-24) */
+.replay__mapbtn.is-on {
+  background:var(--rp-accent-dim); color:#A9D6FF; border-color:var(--rp-accent);
+}
+.replay__mapbtn {
+  background:var(--rp-panel); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:8px;
+  padding:6px 10px; font-size:.76rem; font-weight:700;
+  cursor:pointer; font-family:inherit; backdrop-filter:blur(8px);
+}
+.replay__mapbtn:hover { background:rgba(255,255,255,0.16); }
+.replay__mapbtn--ico {
+  padding:6px; min-width:32px; text-align:center;
+  font-size:.95rem; line-height:1;
+}
+/* ---------- 좌측 컬럼 상단 타일 — 라이더 데이터 패널 ----------
+   타일 규격(크기·테두리·모서리)은 위의 .replay__rider,.replay__mpanel
+   공용 규칙이 정한다. 여기서는 패널 고유의 배경·여백만 둔다. */
+/* 데이터 패널·세션 요약 타일 — 두 타일이 한 세트로 보이도록 배경·
+   여백·타이포·정렬을 공유한다 (Danny 검토 2026-05-24 A 보정). */
+.replay__rider,
+.replay__stats {
+  position:relative; z-index:18;
+  background:linear-gradient(180deg,rgba(8,13,22,0.82),rgba(8,13,22,0.58));
+  backdrop-filter:blur(8px);
+  padding:13px 14px;
+  /* 가로는 클립(둥근 모서리 유지). 세로는 내용이 타일을 채우도록
+     레이아웃을 잡아 스크롤바가 뜨지 않게 한다(아래 flex 규칙). auto 는
+     아주 좁은 화면용 안전장치일 뿐 보통은 동작하지 않는다. */
+  overflow:hidden auto;
+}
+.replay__rider[hidden], .replay__stats[hidden] { display:none; }
+/* 타일 헤더 — 데이터 패널 이름 / '세션 요약' 동일 규격 */
+.replay-rider__name,
+.replay-stats__hd {
+  font-size:1.04rem; font-weight:800; letter-spacing:-.01em; color:#fff;
+}
+.replay-stats__hd { margin-bottom:5px; }
+.replay-rider__clock {
+  font-size:.72rem; color:var(--rp-dim); margin:1px 0 10px;
+  font-variant-numeric:tabular-nums;
+}
+.replay-rider__metrics { display:flex; flex-direction:column; gap:7px; }
+.replay-rider__m,
+.replay-stats__row { display:flex; align-items:baseline; gap:8px; }
+.replay-stats__row { padding:2px 0; }
+/* 라벨 — 두 타일 공통 규격(흰색·동일 크기·굵기·폭)이라 값 열이 두
+   타일에서 같은 x 에 정렬된다 (Danny 검토 ④ 흰색 통일 + A 보정). */
+.replay-rider__lbl,
+.replay-stats__k {
+  font-size:.72rem; font-weight:800; flex:0 0 66px;
+  letter-spacing:.02em; color:#fff;
+}
+/* 값 — 두 타일 공통(동일 크기·굵기·tabular-nums). */
+.replay-rider__num,
+.replay-stats__v {
+  font-size:1.2rem; font-weight:800; color:#fff; line-height:1.1;
+  font-variant-numeric:tabular-nums;
+}
+/* 단위 — 두 타일 공통. */
+.replay-rider__u,
+.replay-stats__v small {
+  font-size:.7rem; font-weight:600; color:var(--rp-dim);
+}
+/* 세션 요약 — 구간 소제목('세션' · '택킹 · 자이빙') */
+.replay-stats__sec {
+  font-size:.63rem; font-weight:800; letter-spacing:.06em;
+  color:var(--rp-dim); text-transform:uppercase;
+  margin:7px 0 2px; padding-top:6px;
+  border-top:1px solid var(--rp-line);
+}
+/* 세션 요약 — 행 우측의 부가값(성공률 등) */
+.replay-stats__x {
+  margin-left:auto; font-size:.7rem; font-weight:600; color:var(--rp-dim);
+  font-variant-numeric:tabular-nums;
+}
+/* ---------- 우측 미니그래프 레일 ----------
+   top:56px — 우상단 고정 KO/EN 토글(.rd-langtoggle top:23 + height ~26 = 하단 ~49px,
+   Danny 2026-06-03 nav 정렬 fix)이 첫 번째 미니 그래프 카드 상단을 덮지 않도록 비워 둔다.
+   (Danny 2026-05-26 → 2026-06-03 토글 재배치 반영) */
+.replay__graphs {
+  position:absolute; top:56px; right:12px; bottom:12px; z-index:16;
+  width:288px; max-width:42vw;
+  display:flex; flex-direction:column; gap:8px;
+  overflow-y:auto; padding-right:2px;
+}
+.replay-graph {
+  flex:1 1 0; min-height:74px;
+  display:flex; flex-direction:column;
+  background:var(--rp-panel); backdrop-filter:blur(8px);
+  border:1px solid var(--rp-line); border-radius:10px; overflow:hidden;
+}
+.replay-graph[hidden] { display:none; }
+.replay-graph__head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:5px 10px 3px; flex:0 0 auto;
+}
+.replay-graph__label {
+  font-size:.72rem; font-weight:800; letter-spacing:.04em;
+}
+.replay-graph__val {
+  font-size:.8rem; font-weight:800; color:#fff;
+  font-variant-numeric:tabular-nums;
+}
+.replay-graph__val--muted { color:var(--rp-dim); font-weight:700; font-size:.7rem; }
+.replay-graph__cv { flex:1; min-height:0; width:100%; display:block; }
+.replay-graph--nowind { background:rgba(30,43,61,0.7); border-style:dashed; }
+.replay-graph__note {
+  flex:1; min-height:0; display:flex; align-items:center;
+  padding:6px 11px; font-size:.74rem; line-height:1.5; color:var(--rp-dim);
+}
+.replay-graph__note b { color:#A9D6FF; font-weight:700; }
+.replay-graph__empty {
+  color:var(--rp-dim); font-size:.82rem; line-height:1.6;
+  padding:14px; text-align:center;
+}
+/* ---------- 스크러버 행 (지도 바로 아래) ---------- */
+.replay__scrubrow {
+  position:relative; z-index:20;
+  display:flex; align-items:center; gap:13px;
+  padding:9px 26px;
+  background:linear-gradient(180deg,rgba(8,12,20,0.32),rgba(8,12,20,0.74));
+}
+.replay__btn {
+  width:38px; height:38px; flex:0 0 auto; border-radius:999px;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1.5px solid var(--rp-line); cursor:pointer;
+  font-size:1rem; line-height:1; font-family:inherit;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.replay__btn:hover { background:rgba(255,255,255,0.14); }
+.replay__btn--play {
+  width:46px; height:46px; font-size:1.12rem;
+  background:var(--rp-accent); border-color:var(--rp-accent); color:#fff;
+}
+.replay__btn--play:hover { background:#1F8AEC; }
+.replay__btn--play.is-playing {
+  background:var(--rp-panel-2); border-color:var(--rp-line); color:var(--rp-text);
+}
+.replay__clock {
+  font-size:.84rem; font-weight:700; color:var(--rp-text);
+  font-variant-numeric:tabular-nums; min-width:106px; flex:0 0 auto;
+}
+.replay__scrub {
+  -webkit-appearance:none; appearance:none;
+  flex:1; height:8px; margin:0; border-radius:999px;
+  background:rgba(255,255,255,0.16); cursor:pointer;
+}
+.replay__scrub::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:16px; height:16px; border-radius:50%;
+  background:#fff; border:2px solid var(--rp-accent); cursor:pointer;
+}
+.replay__scrub::-moz-range-thumb {
+  width:14px; height:14px; border-radius:50%;
+  background:#fff; border:2px solid var(--rp-accent); cursor:pointer;
+}
+.replay__scrub::-moz-range-track { background:transparent; }
+.replay__speed { display:flex; gap:4px; flex:0 0 auto; }
+.replay__spd {
+  background:var(--rp-panel-2); color:var(--rp-dim);
+  border:1.5px solid transparent; border-radius:7px;
+  padding:5px 8px; font-size:.74rem; font-weight:800;
+  cursor:pointer; font-family:inherit; font-variant-numeric:tabular-nums;
+}
+.replay__spd:hover { color:var(--rp-text); }
+.replay__spd.is-active {
+  background:var(--rp-accent-dim); color:#A9D6FF; border-color:var(--rp-accent);
+}
+/* ---------- 하단 메인 트랙 스트립 ---------- */
+.replay__trackrow {
+  position:relative; z-index:20;
+  display:flex; align-items:stretch; gap:10px;
+  padding:8px 14px 11px;
+  background:linear-gradient(180deg,rgba(8,12,20,0.74),rgba(8,12,20,0.92));
+}
+.replay__trackwrap { flex:1; min-width:0; }
+.replay__track {
+  width:100%; height:84px; display:block; cursor:pointer;
+  touch-action:none;
+}
+.replay__trackctl {
+  flex:0 0 auto; display:flex; align-items:center; gap:6px;
+}
+.replay__tbtn {
+  width:32px; height:32px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--rp-panel-2); color:var(--rp-text);
+  border:1px solid var(--rp-line); border-radius:7px;
+  font-size:1rem; font-weight:800; cursor:pointer; font-family:inherit;
+}
+.replay__tbtn:hover { background:rgba(255,255,255,0.14); }
+.replay__tspan {
+  font-size:.74rem; font-weight:700; color:var(--rp-dim);
+  min-width:54px; text-align:center; font-variant-numeric:tabular-nums;
+}
+.replay__tlink {
+  background:var(--rp-panel-2); color:var(--rp-dim);
+  border:1.5px solid var(--rp-line); border-radius:7px;
+  padding:6px 10px; font-size:.74rem; font-weight:700;
+  cursor:pointer; font-family:inherit; white-space:nowrap;
+}
+.replay__tlink.is-on {
+  background:var(--rp-accent-dim); color:#A9D6FF; border-color:var(--rp-accent);
+}
+.replay__bar { flex-wrap:wrap; }
+.replay__chips { order:3; flex-basis:100%; justify-content:flex-start; }
+.replay__graphs { width:232px; }
+.replay-rider__num { font-size:1.3rem; }
+/* 769~920px — 좌측 컬럼을 약간 좁혀 중앙 공간을 확보한다(전 모드 공통) */
+  .replay__lcol { flex:0 0 290px; }
+/* 그래프 레일이 232px 로 좁아지므로 영상 뷰 우측 패딩도 맞춘다(232+12) */
+  .replay--video .replay__cstage { padding-right:244px; }
+.replay__stage { flex-direction:column; overflow-y:auto; }
+.replay--swap .replay__stage { flex-direction:column; }
+.replay--both.replay--swap .replay__cstage { flex-direction:column; }
+/* 세로 스택 순서 — 중앙 스테이지 → 좌측 컬럼 → 미니그래프 */
+  .replay__cstage { order:1; }
+.replay__lcol { order:2; border-right:0; border-left:0; }
+.replay__graphs { order:3; }
+/* 데스크톱 폭·방향 규칙 무효화 — 모바일은 전부 전체 폭·세로 컬럼 */
+  .replay__lcol { flex:0 0 auto; flex-direction:column; }
+.replay__cstage { flex:0 0 auto; flex-direction:column; }
+/* 모바일은 그래프가 인-플로우(겹침 없음) — 영상 뷰 우측 패딩 해제 */
+  .replay--video .replay__cstage { padding-right:0; }
+/* 중앙 스테이지 패널 — 세로 스택, 각 42vh */
+  .replay__cstage > .replay__vpanel,
+  .replay__cstage > .replay__mpanel { flex:0 0 42vh; min-height:42vh; }
+/* 좌측 컬럼 타일(데이터 패널·영상·지도) — 세로 스택, 각 32vh */
+  .replay__lcol > .replay__rider,
+  .replay__lcol > .replay__vpanel,
+  .replay__lcol > .replay__mpanel { flex:0 0 32vh; min-height:32vh; }
+/* 미니그래프 — 세로 스택 마지막에 인-플로우 가로 타일로 */
+  .replay__graphs {
+    position:static; width:auto; max-width:none; flex:0 0 auto;
+    flex-direction:row; flex-wrap:wrap; padding:8px; gap:8px;
+  }
+.replay-graph { flex:1 1 150px; min-height:96px; }
+.replay__scrubrow { padding:8px 12px; gap:9px; }
+.replay__clock { min-width:0; }
+.replay-graph { flex:1 1 100%; }
+/* §198-B (Alex Park 2026-06-04) — playback clock time-mode toggle.
+   chart axis 의 .time-toggle 컴포넌트(line 142-153) 재사용 — 일관성·재사용성.
+   replay__scrubrow flex 안 자연 배치 (clock 옆). 모바일 패딩만 축소. */
+.replay__timetoggle { flex:0 0 auto; }
+.replay__timetoggle button {
+  /* tap target 보존 (WCAG 2.5.8 — 24×24 CSS px). */
+  min-height:28px;
+}
+/* 모바일 — toggle 버튼 압축 (scrubber 폭 확보) */
+  .replay__timetoggle button { padding:4px 8px; font-size:0.72rem; }
+/* ============================================================
+ * Layer 2.0 — FINAL OVERRIDE PASS (Danny 2026-05-26)
+ * ------------------------------------------------------------
+ * 파일 끝 위치 — 위쪽에 산발적으로 흩어진 ad-hoc font-size 들을 *마지막에*
+ * 덮어쓰기로 통일. 위쪽의 동등 specificity 선언과 충돌 시 cascade 마지막
+ * 규칙(이 블록)이 이긴다. !important 는 사용 안 함 — 정상 cascade 로만
+ * 일관성 강제. 리플레이 뷰어(.replay) 는 스코프 격리되어 영향 X.
+ *
+ * 4 사이즈 토큰만 허용 — hero / xl / lg / md. 그 외 값 노드는 모두 lg 로.
+ * ============================================================ */
+
+/* (1) 모든 value 노드 — 공통 스타일 강제 */
+.stat__value,
+.stat__value--donut,
+.metric__val,
+.career-tile__val,
+.savg-v,
+.dm__v,
+.stats-val,
+.vps-tile__score,
+.wsrc-rec__val,
+.wsrc__val,
+.hr-zone-row__time,
+.eff,
+.run-row__main strong,
+.bw-card__head,
+.mvc-mean {
+  font-weight:800;
+  letter-spacing:-.025em;
+  line-height:1.05;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
