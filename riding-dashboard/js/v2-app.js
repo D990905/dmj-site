@@ -213,8 +213,83 @@
         { label: 'Speed', stroke: THEME.accent, width: 1.4,
           fill: 'rgba(77,171,247,0.14)',
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } }
-      ]
+      ],
+      hooks: {
+        /* 드래그로 구간 선택 → 제외. uPlot 의 select 는 확대에 쓰이지만
+           여기서는 편집 도구로 쓴다 (확대는 필요 없고 잘라내기가 필요하다). */
+        setSelect: [function (u) {
+          if (!u.select || u.select.width < 4) return;
+          var a0 = u.posToVal(u.select.left, 'x');
+          var a1 = u.posToVal(u.select.left + u.select.width, 'x');
+          u.setSelect({ left: 0, width: 0, top: 0, height: 0 }, false);
+          addExclusion(Math.min(a0, a1), Math.max(a0, a1));
+        }]
+      }
     }, [xs, ys], host), host);
+    renderEditBar();
+  }
+
+  /* ---------- 트랙 편집 (구간 제외 · 되돌리기) ---------- */
+  /* 편집은 항상 원본(fullSession)에 적용한다 — 편집본에 또 편집하면
+     구간 좌표가 어긋난다. */
+  function addExclusion(fromElapsed, toElapsed) {
+    if (!CUR.fullSession) return;
+    var t0 = CUR.fullSession.samples[0].t;
+    CUR.edit = CUR.edit || { excludeRanges: [] };
+    CUR.edit.excludeRanges.push({ from: t0 + fromElapsed, to: t0 + toElapsed });
+    reapplyEdits();
+  }
+  function removeExclusion(i) {
+    if (!CUR.edit || !CUR.edit.excludeRanges) return;
+    CUR.edit.excludeRanges.splice(i, 1);
+    reapplyEdits();
+  }
+  function resetEdits() { CUR.edit = null; reapplyEdits(); }
+
+  function reapplyEdits() {
+    if (!CUR.fullSession) return;
+    var base = CUR.fullSession, sess = base;
+    var hasEdit = CUR.edit && CUR.edit.excludeRanges && CUR.edit.excludeRanges.length;
+    if (hasEdit) {
+      try { sess = An.applyEdits(base, CUR.edit); }
+      catch (e) { CUR.edit = null; sess = base; }
+    }
+    var est = CUR.est;
+    var wd = CUR.windDir != null ? CUR.windDir : (est && est.windDir);
+    var a = An.analyzeSession(sess, wd, est ? { windConfidence: est.confidence } : {});
+    show(sess, a, CUR.name, est, base);
+  }
+
+  function renderEditBar() {
+    var host = $('edit-bar');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    var ranges = (CUR.edit && CUR.edit.excludeRanges) || [];
+    var hint = el('div', 'text-secondary');
+    hint.style.fontSize = '.8125rem';
+    hint.textContent = ranges.length
+      ? ranges.length + ' segment' + (ranges.length > 1 ? 's' : '') + ' excluded — '
+        + 'distance, speed and turn analysis are recomputed without them.'
+      : 'Drag across the chart to exclude a segment (rest, drift, drive home).';
+    host.appendChild(hint);
+    if (!ranges.length) return;
+    var t0 = CUR.fullSession ? CUR.fullSession.samples[0].t : 0;
+    var list = el('div', 'd-flex flex-wrap gap-2 mt-2 align-items-center');
+    ranges.forEach(function (r, i) {
+      var chip = el('span', 'badge bg-orange-lt d-inline-flex align-items-center gap-2');
+      chip.appendChild(el('span', 'num',
+        fmtClock(r.from - t0) + ' – ' + fmtClock(r.to - t0)));
+      var x = el('button', 'btn btn-sm btn-ghost-secondary p-0 px-1', '✕');
+      x.type = 'button';
+      x.addEventListener('click', function () { removeExclusion(i); });
+      chip.appendChild(x);
+      list.appendChild(chip);
+    });
+    var reset = el('button', 'btn btn-sm', 'Restore full track');
+    reset.type = 'button';
+    reset.addEventListener('click', resetEdits);
+    list.appendChild(reset);
+    host.appendChild(list);
   }
 
   /* ---------- 회전 표 ---------- */
@@ -326,6 +401,13 @@
   function confLabel(c) {
     return ({ '높음': 'high', '보통': 'medium', '낮음': 'low' })[c] || String(c);
   }
+  /* 엔진 문구를 사전에 태워 영어로 바꾼다. 사전에 없으면 원문 그대로 —
+     그때는 한글이 보이므로 사전에 항목을 추가해야 한다는 신호다. */
+  function tr(txt) {
+    if (!txt) return '';
+    try { return (window.RDI18n && RDI18n.T) ? RDI18n.T(txt) : txt; }
+    catch (e) { return txt; }
+  }
 
   /* ---------- 환경 (풍향 · VMG · 폴라) ---------- */
   function renderEnvironment(a, est) {
@@ -358,7 +440,7 @@
     src.style.fontSize = '.8125rem';
     src.textContent = est
       ? 'Currently ' + Math.round(a.windDir) + '° from track estimate · confidence '
-        + confLabel(est.confidence) + (est.note ? ' · ' + est.note : '')
+        + confLabel(est.confidence) + (est.note ? ' · ' + tr(est.note) : '')
       : 'Currently ' + Math.round(a.windDir) + '° (manual)';
     c4.appendChild(src); row.appendChild(c4);
 
@@ -470,11 +552,42 @@
     }
     host.appendChild(card);
 
-    /* 퍼포먼스 통계 — SOG·VMG·CWA 를 상풍/하풍 · 포트/스타보드로 쪼갠 표 */
+    /* 퍼포먼스 통계 — 지표 × 방향(풍상/풍하) 행, 포트/스타보드 열.
+       ⚠ 엔진 행은 내부 구조체다 (key·tier50basis·direction 등). 그대로
+       뿌리면 표가 아니라 덤프가 된다. 라벨도 엔진은 한글로 준다 —
+       이 페이지는 영어이므로 metric 코드에서 자체 라벨을 만든다.
+       그리고 speed 계열 값은 m/s 다. 반드시 노트로 변환한다. */
     if (!An.computeStatsPanel) return;
     var sp = null;
     try { sp = An.computeStatsPanel(a); } catch (e) { sp = null; }
     if (!sp || !sp.rows || !sp.rows.length) return;
+
+    var METRIC_LABEL = {
+      sog:  ['Speed (SOG)', 'kt'],
+      vmg:  ['VMG', 'kt'],
+      twa:  ['Course wind angle', '°'],
+      awa:  ['Apparent wind angle', '°'],
+      heel: ['Heel', '°'],
+      pitch:['Pitch', '°'],
+      hr:   ['Heart rate', 'bpm']
+    };
+    function fmtVal(row, v) {
+      if (v == null || !isFinite(v)) return '—';
+      if (row.unit === 'speed') return (v * KT).toFixed(1);
+      if (row.unit === 'bpm') return String(Math.round(v));
+      return v.toFixed(0);
+    }
+
+    /* metric → mode → side 로 접는다 */
+    var byMetric = {}, order = [];
+    sp.rows.forEach(function (r) {
+      if (!byMetric[r.metric]) { byMetric[r.metric] = {}; order.push(r.metric); }
+      var m = byMetric[r.metric];
+      var mode = r.mode || 'all';
+      if (!m[mode]) m[mode] = {};
+      m[mode][r.side || '-'] = r;
+    });
+
     var c2 = el('div', 'card mt-3');
     var h2 = el('div', 'card-header');
     h2.appendChild(el('h3', 'card-title', 'Performance statistics'));
@@ -483,23 +596,66 @@
     c2.appendChild(h2);
     var wrap2 = el('div', 'table-responsive');
     var t2 = el('table', 'table table-vcenter card-table table-sm');
-    var keys = Object.keys(sp.rows[0]);
-    var th2 = el('thead'), htr2 = el('tr');
-    keys.forEach(function (k, i) {
-      htr2.appendChild(el('th', i ? 'text-end' : null, k));
+
+    var th2 = el('thead');
+    var r1 = el('tr');
+    var thM = el('th', null, 'Metric'); thM.rowSpan = 2; r1.appendChild(thM);
+    var thD = el('th', null, 'Direction'); thD.rowSpan = 2; r1.appendChild(thD);
+    var thP = el('th', 'text-center', 'Port'); thP.colSpan = 3; r1.appendChild(thP);
+    var thS = el('th', 'text-center', 'Starboard'); thS.colSpan = 3; r1.appendChild(thS);
+    th2.appendChild(r1);
+    var r2 = el('tr');
+    ['Avg', 'Best 50%', 'Best 20%', 'Avg', 'Best 50%', 'Best 20%'].forEach(function (x) {
+      r2.appendChild(el('th', 'text-end lab', x));
     });
-    th2.appendChild(htr2); t2.appendChild(th2);
+    th2.appendChild(r2); t2.appendChild(th2);
+
     var tb2 = el('tbody');
-    sp.rows.forEach(function (r) {
-      var tr = el('tr');
-      keys.forEach(function (k, i) {
-        var v = r[k];
-        tr.appendChild(el('td', i ? 'text-end num' : null,
-          v == null ? '—' : (typeof v === 'number' ? (Math.abs(v) < 10 ? v.toFixed(1) : v.toFixed(0)) : String(v))));
+    order.forEach(function (metric) {
+      var modes = byMetric[metric];
+      var label = METRIC_LABEL[metric] || [metric, ''];
+      var modeKeys = Object.keys(modes);
+      modeKeys.forEach(function (mode, mi) {
+        var tr = el('tr');
+        if (mi === 0) {
+          var tdM = el('td');
+          tdM.rowSpan = modeKeys.length;
+          tdM.appendChild(el('div', null, label[0]));
+          tdM.appendChild(el('div', 'lab', label[1]));
+          tr.appendChild(tdM);
+        }
+        tr.appendChild(el('td', null,
+          mode === 'upwind' ? 'Upwind' : mode === 'downwind' ? 'Downwind' : 'All'));
+        ['P', 'S'].forEach(function (side) {
+          var row = modes[mode][side] || modes[mode]['-'];
+          /* hr 처럼 좌우 구분이 없는 지표는 한 값을 양쪽에 두지 않고
+             포트 칸에만 넣고 스타보드는 비운다 */
+          var isShared = !modes[mode][side] && modes[mode]['-'];
+          if (isShared && side === 'S') {
+            tr.appendChild(el('td', 'text-end text-secondary', '—'));
+            tr.appendChild(el('td', 'text-end text-secondary', '—'));
+            tr.appendChild(el('td', 'text-end text-secondary', '—'));
+            return;
+          }
+          if (!row) {
+            tr.appendChild(el('td', 'text-end text-secondary', '—'));
+            tr.appendChild(el('td', 'text-end text-secondary', '—'));
+            tr.appendChild(el('td', 'text-end text-secondary', '—'));
+            return;
+          }
+          tr.appendChild(el('td', 'text-end num', fmtVal(row, row.avg)));
+          tr.appendChild(el('td', 'text-end num', fmtVal(row, row.tier50)));
+          tr.appendChild(el('td', 'text-end num', fmtVal(row, row.tier20)));
+        });
+        tb2.appendChild(tr);
       });
-      tb2.appendChild(tr);
     });
     t2.appendChild(tb2); wrap2.appendChild(t2); c2.appendChild(wrap2);
+    var f2 = el('div', 'card-footer text-secondary');
+    f2.style.fontSize = '.8125rem';
+    f2.textContent = 'Averages are time-weighted. "Best" tiers reject noise — for wind angles '
+      + 'that means the lowest angles upwind, the highest downwind.';
+    c2.appendChild(f2);
     host.appendChild(c2);
   }
 
@@ -748,6 +904,124 @@
     lh.appendChild(card2);
   }
 
+  /* ---------- 자세 (힐 · 피치) ---------- */
+  var ATT_REASON = {
+    'sensor-moved-during-session':
+      'The sensor moved during the session — rest periods disagree by more than 25°. '
+      + 'This happens when it comes off the board (for example carried on the body).',
+    'implausible-after-calibration':
+      'Calibrated pitch is outside a physically possible range, so the sensor was not '
+      + 'lying flat on the board.',
+    'no-rest-window':
+      'No moment was found where the board floated still, so there is nothing to zero against. '
+      + 'A RaceBox export in Bike Mode also removes the lateral axis heel needs.',
+    'no-board-reference': 'No board reference found.'
+  };
+
+  function renderAttitude(session, analysis, fusion) {
+    var host = $('attitude-body');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+
+    var cal = fusion && fusion.attitude;
+    var S = (session.samples || []).filter(function (p) {
+      return p.heel != null && p.pitch != null && p.speed != null && p.speed * KT > 10;
+    });
+
+    if (!S.length) {
+      var box = el('div', 'alert alert-warning');
+      box.appendChild(el('div', 'fw-bold', 'Board attitude is not available for this session'));
+      var why = (cal && cal.reason && ATT_REASON[cal.reason]) || ATT_REASON['no-board-reference'];
+      box.appendChild(el('div', 'mt-1', why));
+      box.appendChild(el('div', 'mt-2',
+        'Speed, distance, turns and VMG are unaffected — only heel and pitch are missing.'));
+      host.appendChild(box);
+      return;
+    }
+
+    /* 보정 근거 */
+    var note = el('div', 'alert alert-info');
+    note.textContent = 'Zeroed against ' + cal.windows + ' moment'
+      + (cal.windows > 1 ? 's' : '')
+      + (cal.basis === 'fall' ? ' where the board floated still after a fall'
+                              : ' of very low speed')
+      + ' — heel ' + cal.heelOffset.toFixed(1) + '°, pitch ' + cal.pitchOffset.toFixed(1)
+      + '° removed as mounting offset.';
+    host.appendChild(note);
+
+    function pct(arr, f) {
+      var v = arr.slice().sort(function (a, b) { return a - b; });
+      return v[Math.floor(v.length * f)];
+    }
+    function statRow(label, vals, unit) {
+      var col = el('div', 'col-md-6');
+      var card = el('div', 'card h-100');
+      var h = el('div', 'card-header');
+      h.appendChild(el('h3', 'card-title', label));
+      h.appendChild(el('div', 'card-actions lab', 'while riding · 10 kt+'));
+      card.appendChild(h);
+      var b = el('div', 'card-body');
+      var dl = el('div', 'datagrid');
+      [['p5', 0.05], ['p25', 0.25], ['median', 0.5], ['p75', 0.75], ['p95', 0.95]].forEach(function (q) {
+        var d = el('div', 'datagrid-item');
+        d.appendChild(el('div', 'datagrid-title lab', q[0]));
+        d.appendChild(el('div', 'datagrid-content num', pct(vals, q[1]).toFixed(1) + unit));
+        dl.appendChild(d);
+      });
+      b.appendChild(dl);
+      card.appendChild(b); col.appendChild(card); return col;
+    }
+    var heels = S.map(function (p) { return p.heel; });
+    var pitches = S.map(function (p) { return p.pitch; });
+    var row = el('div', 'row row-cards');
+    row.appendChild(statRow('Heel', heels, '°'));
+    row.appendChild(statRow('Pitch', pitches, '°'));
+    host.appendChild(row);
+
+    /* 좌우 비대칭 — 한쪽 택으로 더 깊게 눕는지 */
+    var left = heels.filter(function (v) { return v < 0; });
+    var right = heels.filter(function (v) { return v > 0; });
+    if (left.length > 50 && right.length > 50) {
+      var lDeep = Math.abs(pct(left, 0.05)), rDeep = pct(right, 0.95);
+      var card2 = el('div', 'card mt-3');
+      var h2 = el('div', 'card-header');
+      h2.appendChild(el('h3', 'card-title', 'Left / right balance'));
+      card2.appendChild(h2);
+      var b2 = el('div', 'card-body');
+      var bar = el('div', 'd-flex align-items-center gap-2');
+      var lp = Math.round(left.length / heels.length * 100);
+      var seg1 = el('div'); seg1.style.cssText =
+        'height:14px;border-radius:3px 0 0 3px;background:#e03131;width:' + lp + '%';
+      var seg2 = el('div'); seg2.style.cssText =
+        'height:14px;border-radius:0 3px 3px 0;background:#2f9e44;width:' + (100 - lp) + '%';
+      var wrap = el('div', 'flex-grow-1 d-flex');
+      wrap.appendChild(seg1); wrap.appendChild(seg2);
+      bar.appendChild(wrap);
+      b2.appendChild(bar);
+      var dl2 = el('div', 'datagrid mt-3');
+      function it(k, v) {
+        var d = el('div', 'datagrid-item');
+        d.appendChild(el('div', 'datagrid-title lab', k));
+        d.appendChild(el('div', 'datagrid-content num', v));
+        dl2.appendChild(d);
+      }
+      it('Time heeled left', lp + '%');
+      it('Time heeled right', (100 - lp) + '%');
+      it('Deepest left', lDeep.toFixed(1) + '°');
+      it('Deepest right', rDeep.toFixed(1) + '°');
+      it('Difference', Math.abs(lDeep - rDeep).toFixed(1) + '°');
+      b2.appendChild(dl2);
+      card2.appendChild(b2);
+      var f2 = el('div', 'card-footer text-secondary');
+      f2.style.fontSize = '.8125rem';
+      f2.textContent = Math.abs(lDeep - rDeep) > 8
+        ? 'One side is more than 8° deeper — worth checking whether that tack also loses more speed.'
+        : 'Both sides are within 8° of each other.';
+      card2.appendChild(f2);
+      host.appendChild(card2);
+    }
+  }
+
   /* ---------- 코칭 (SPS 분해 · 윙 what-if) ---------- */
   function segCard(title, seg, tone) {
     var col = el('div', 'col-md-4');
@@ -937,7 +1211,8 @@
     show(CUR.session, a, CUR.name, est);
   }
 
-  function show(session, analysis, name, est) {
+  function show(session, analysis, name, est, fullSession) {
+    CUR.fullSession = fullSession || CUR.fullSession || session;
     CUR.session = session; CUR.name = name; CUR.est = est;
     CUR.windDir = analysis.windDir;
     CUR.analysis = analysis;
@@ -969,15 +1244,63 @@
     renderTurnExtras(analysis);
     renderPerfExtra(analysis);
     renderSessions();
+    populateReplayGhost();
     renderPhysiology(analysis);
     renderEnvironment(analysis, est);
     renderTrack(session, analysis);
+    renderAttitude(session, analysis, CUR.fusion);
     var whatIf = null;
     if (window.RDCoach && RDCoach.computeWhatIf) {
       try { whatIf = RDCoach.computeWhatIf(analysis, riderFromForm(), windSpeedFromForm()); }
       catch (e) { whatIf = null; }
     }
     renderCoach(analysis, vps, whatIf);
+  }
+
+  /* 세션 시그니처 — 영상 blob·싱크 오프셋을 이 키로 저장한다.
+     예전 페이지(app.js sessionSignature)와 동일한 식이어야 같은 영상이
+     두 페이지에서 함께 보인다. */
+  function sessionSig(sess) {
+    if (!sess) return '';
+    var sum = CUR.analysis && CUR.analysis.summary;
+    var pts = sess.samples ? sess.samples.length : 0;
+    var dist = sum ? sum.totalDistanceM : 0;
+    return pts + '_' + Math.round(dist || 0) + '_' + (sess.startEpoch || 0);
+  }
+
+  /* §436 비교 세션(고스트) — 저장된 세션 중 고른 것을 함께 재생 */
+  function buildGhost() {
+    var sel = $('replay-ghost');
+    if (!sel || sel.hidden || !sel.value || !Store || !Store.loadTrack) return null;
+    var gpx = null;
+    try { gpx = Store.loadTrack(sel.value); } catch (e) { gpx = null; }
+    if (!gpx) return null;
+    try {
+      var gs = An.normalizeSession(Gpx.parseGPX(gpx));
+      if (!gs || !gs.samples || !gs.samples.length || !gs.hasTime) return null;
+      var opt = sel.options[sel.selectedIndex];
+      return { session: gs, label: (opt && opt.textContent) || 'Comparison',
+               color: '#B86BFF', mode: 'start' };
+    } catch (e) { return null; }
+  }
+
+  function populateReplayGhost() {
+    var sel = $('replay-ghost');
+    if (!sel) return;
+    var keep = sel.value;
+    while (sel.firstChild) sel.removeChild(sel.firstChild);
+    var none = document.createElement('option');
+    none.value = ''; none.textContent = 'No comparison';
+    sel.appendChild(none);
+    var n = 0;
+    listSessions().forEach(function (r) {
+      if (!r || !r.hasTrack) return;
+      var o = document.createElement('option');
+      o.value = r.id; o.textContent = r.name || 'Session';
+      sel.appendChild(o); n++;
+    });
+    sel.hidden = (n === 0);
+    if (keep) sel.value = keep;
   }
 
   /* ---------- 다중 파일 융합 (§430 재사용) ---------- */
@@ -1078,10 +1401,12 @@
         var name = (primary && primary.fileName)
           ? primary.fileName.replace(/\.[^.]+$/, '')
           : loaded[0].name.replace(/\.[^.]+$/, '');
+        CUR.edit = null; CUR.fullSession = null;
         CUR.gpxText = null;
         loaded.forEach(function (l) {
           if (primary && l.name === primary.fileName && /\.gpx$/i.test(l.name)) CUR.gpxText = l.text;
         });
+        CUR.fusion = res.fusion;
         show(session, analysis, name, est);
         renderFusionBanner(res.fusion, res.warnings,
           loaded.map(function (l) { return l.name; }));
@@ -1095,6 +1420,7 @@
 
   function loadGpxText(text, name) {
     CUR.gpxText = text;
+    CUR.edit = null; CUR.fullSession = null; CUR.fusion = null;
     renderFusionBanner(null);
     var parsed = Gpx.parseGPX(text);
     var session = An.normalizeSession(parsed);
@@ -1109,6 +1435,13 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    /* 이 페이지는 영어다. 엔진이 돌려주는 안내문(풍향 추정 노트 등)은
+       i18n 사전을 타므로 언어를 먼저 영어로 고정해야 한글이 새지 않는다. */
+    try { localStorage.setItem('dmj_rd_lang', 'en'); } catch (e) {}
+    if (window.RDI18n && RDI18n.T) {
+      /* 이미 로드된 사전의 현재 언어도 맞춘다 */
+      try { document.documentElement.lang = 'en'; } catch (e) {}
+    }
     initTabs();
     var rp = $('btn-replay');
     if (rp) rp.addEventListener('click', function () {
@@ -1116,10 +1449,19 @@
       if (!CUR.session.hasTime) { rp.textContent = 'No time data';
         setTimeout(function () { rp.textContent = '▶ Replay'; }, 1800); return; }
       try {
+        /* 예전 페이지가 넘기던 옵션을 전부 맞춘다. sessionSig 가 없으면
+           영상 업로드·싱크 상태가 저장되지 않고, hasVideoFlag 가 없으면
+           '이 기기에 영상 없음' 안내(§423)가 뜨지 않는다. */
         RDReplay.open({
-          session: CUR.session, analysis: CUR.analysis,
-          windDir: CUR.windDir, unit: 'kt',
+          session: CUR.session,
+          analysis: CUR.analysis,
+          ghost: buildGhost(),
+          windDir: CUR.windDir,
+          unit: 'kt',
+          sessionSig: sessionSig(CUR.session),
           title: CUR.name || 'Session',
+          hasVideoFlag: CUR.hasVideoFlag || false,
+          videoUploadedAt: CUR.videoUploadedAt || null,
           onClose: function () {}
         });
       } catch (e) {
@@ -1189,4 +1531,17 @@
         if (window.console) console.error('[v2] sample load failed', err);
       });
   });
+  /* 편집을 코드에서도 걸 수 있게 최소 API 를 연다 — 자동 검증과
+     추후 딥링크(공유 URL 에 제외 구간 담기)에 쓴다. */
+  window.RDV2 = {
+    addExclusion: addExclusion,
+    removeExclusion: removeExclusion,
+    resetEdits: resetEdits,
+    getEdit: function () { return CUR.edit; },
+    getSummary: function () {
+      var s2 = CUR.analysis && CUR.analysis.summary;
+      return s2 ? { distanceM: s2.totalDistanceM, movingSec: s2.movingTimeSec,
+                    maxMs: s2.maxSpeedMs, points: CUR.session.samples.length } : null;
+    }
+  };
 })();

@@ -139,12 +139,205 @@
       var p = points[i];
       if (!p) continue;
       if (p.heel != null && p.pitch != null) continue;
+      /* ⚠ RaceBox Bike Mode 의 LeanAngle 은 '보드 힐' 이 아니다.
+         오토바이용 코너링 기울기라 직진 중에는 0 에 가깝다.
+         실측 검증(2026-08-30): |LeanAngle| vs |yaw rate| 상관 r=0.378,
+         선회 중 중앙 3.5°/직진 중 2.3°. 같은 장비의 일반 모드 세션은
+         힐이 ±30~44° 로 나온다. 그러므로 힐로 쓰지 않는다.
+         힐은 GForceY 가 있어야 나온다 → Bike Mode 를 끄고 내보내야 한다. */
       if (p.gforceZ == null) continue;
       var a = gforceToAngles(p.gforceX, p.gforceY, p.gforceZ);
       if (p.heel == null && a.heel != null) { p.heel = a.heel; n++; }
       if (p.pitch == null && a.pitch != null) p.pitch = a.pitch;
     }
     return n;
+  }
+
+  /* ---------- 장착 자세 보정 (§444) ----------
+     센서를 붙이는 면·각도가 세션마다 달라지면 atan2 로 얻은 각도는
+     '기기 장착 자세 + 보드 자세' 다. 절대값이 세션 간 비교 불가가 된다.
+
+     0점 기준 = 보드가 물 위에 평평히 떠 있는 순간. 라이더가 떨어져
+     보드만 떠 있을 때가 그렇다. 그 구간을 저속 지속구간으로 찾는다.
+     파도로 흔들리므로 자이로가 조용할 필요는 없다 — 중앙값이 흔들림을
+     걸러낸다.
+
+     구간이 여럿이면 서로 비교한다. 값이 크게 갈리면 기기가 세션 도중
+     움직인 것이다(실측 2026-08-30 13:15: 한 구간 힐 +8.1°, 다른 구간
+     +73.9° — 센서가 보드에서 떨어져 가슴에 있었다). 그때는 보정하지
+     않고 자세를 통째로 버린다. 그럴듯한 거짓값이 없는 값보다 나쁘다. */
+  var REST_MAX_KT = 3;          /* 이 속도 미만을 '떠 있음' 후보로 */
+  var REST_MIN_SEC = 8;         /* 이만큼 지속돼야 구간으로 인정 */
+  var MAX_WINDOW_SPREAD_DEG = 25;  /* 구간 간 편차가 이보다 크면 기기가 움직인 것 */
+  var KT = 1.94384;
+
+  function median(arr) {
+    if (!arr || !arr.length) return null;
+    var v = arr.slice().sort(function (a, b) { return a - b; });
+    return v[v.length >> 1];
+  }
+  function spread(arr) {
+    if (!arr || arr.length < 2) return 0;
+    return Math.max.apply(null, arr) - Math.min.apply(null, arr);
+  }
+
+  /* 추락 후 '보드만 떠 있는' 구간 — 가장 신뢰할 수 있는 0점.
+     옥대표 설명 + 실측(2026-08-30 12:32, 03:59:34)으로 확인한 신호:
+       고속 주행 → 물에 빠짐 → 보드가 뒤집히며 요동 → 평평하게 안정
+       → 라이더가 올라타며 다시 기울어짐 → 재가속
+     추락 직후 몇 초는 보드가 뒤집혀 있어(힐 −60°) 그대로 쓰면 0점이
+     완전히 틀린다. SETTLE_SEC 만큼 건너뛴 뒤 SAMPLE_SEC 만 본다.
+     실측: 0~5초 힐 −60~−17°, 6초부터 +3°/+1°/+2° 로 안정. */
+  var FALL_FROM_KT = 10;    /* 이 속도 이상에서 */
+  var FALL_TO_KT = 4;       /* 이 아래로 떨어지면 추락 */
+  var FALL_WITHIN_SEC = 5;  /* 이 시간 안에 */
+  var SETTLE_SEC = 6;       /* 보드가 평평해질 때까지 버리는 시간 */
+  var SAMPLE_SEC = 8;       /* 그 뒤 이만큼을 0점 표본으로 */
+
+  function fallWindows(points, hz) {
+    var out = [];
+    var lim = Math.round(hz * FALL_WITHIN_SEC);
+    var skip = Math.round(hz * SETTLE_SEC);
+    var take = Math.round(hz * SAMPLE_SEC);
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      if (!p || p.speed == null || p.speed * KT < FALL_FROM_KT) continue;
+      var j = i, end = Math.min(points.length, i + lim);
+      while (j < end && points[j].speed * KT >= FALL_TO_KT) j++;
+      if (j >= end) continue;                    /* 충분히 안 떨어짐 */
+      var a = j + skip, b = Math.min(points.length, a + take);
+      if (b - a < Math.round(hz * 3)) { i = j; continue; }
+      var seg = [];
+      for (var k = a; k < b; k++) {
+        var q = points[k];
+        /* 표본 도중 다시 빨라지면(올라타서 출발) 거기서 끊는다 */
+        if (!q || q.speed == null || q.speed * KT > FALL_TO_KT + 2) break;
+        if (q.heel != null) seg.push(q);
+      }
+      if (seg.length >= Math.round(hz * 3)) out.push(seg);
+      i = b;
+    }
+    return out;
+  }
+
+  /* 저속 지속구간(=보드가 떠 있는 구간) 목록 */
+  function restWindows(points) {
+    if (!points || points.length < 2) return [];
+    var span = (points[points.length - 1].time - points[0].time) / 1000;
+    var hz = span > 0 ? points.length / span : 1;
+    var minLen = Math.max(10, Math.round(hz * REST_MIN_SEC));
+    var out = [], cur = [];
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      var slow = p && p.speed != null && p.speed * KT < REST_MAX_KT && p.heel != null;
+      if (slow) cur.push(p);
+      else { if (cur.length >= minLen) out.push(cur); cur = []; }
+    }
+    if (cur.length >= minLen) out.push(cur);
+    return out;
+  }
+
+  /* 반환: { ok, heelOffset, pitchOffset, windows, used, dropped, reason } */
+  /* 구간이 서로 안 맞는다고 세션을 통째로 버리면 안 된다. 보드는 실제로
+     뒤집힌 채 뜨기도 한다(실측 2026-07-05: 구간3 힐 +95.4° 피치 -163.0°
+     = 완전히 전복). 그런 구간만 버리고 나머지로 0점을 잡는다.
+     중앙값에서 OUTLIER_DEG 넘게 떨어진 구간을 이상치로 본다. */
+  var OUTLIER_DEG = 30;
+
+  function calibration(points) {
+    var span = points && points.length > 1
+      ? (points[points.length - 1].time - points[0].time) / 1000 : 0;
+    var hz = span > 0 ? points.length / span : 1;
+    /* 추락 구간이 있으면 그것만 쓴다 — 보드만 떠 있는 상태가 보장된다.
+       없으면 일반 저속 구간으로 물러선다(해변 대기 등이 섞일 수 있다). */
+    var wins = fallWindows(points, hz);
+    var basis = 'fall';
+    if (!wins.length) { wins = restWindows(points); basis = 'low-speed'; }
+    if (!wins.length) {
+      return { ok: false, reason: 'no-rest-window', windows: 0, used: 0,
+               heelOffset: 0, pitchOffset: 0 };
+    }
+    var cands = [];
+    wins.forEach(function (w) {
+      var h = median(w.map(function (x) { return x.heel; })
+                      .filter(function (x) { return x != null && isFinite(x); }));
+      var pt = median(w.map(function (x) { return x.pitch; })
+                       .filter(function (x) { return x != null && isFinite(x); }));
+      if (h != null && pt != null) cands.push({ heel: h, pitch: pt });
+    });
+    if (!cands.length) {
+      return { ok: false, reason: 'no-rest-window', windows: wins.length, used: 0,
+               heelOffset: 0, pitchOffset: 0 };
+    }
+    /* 피치 중앙값을 기준으로 이상치 구간을 걸러낸다 — 피치가 힐보다
+       안정적이다(실측: 정상 세션 구간 간 편차 피치 3.7~6.5°, 힐 8.6~15.1°). */
+    var pMed0 = median(cands.map(function (c) { return c.pitch; }));
+    var kept = cands.filter(function (c) { return Math.abs(c.pitch - pMed0) <= OUTLIER_DEG; });
+    if (!kept.length) kept = cands;
+    return {
+      ok: true, reason: 'ok', basis: basis,
+      windows: wins.length, used: kept.length, dropped: cands.length - kept.length,
+      heelOffset: median(kept.map(function (c) { return c.heel; })) || 0,
+      pitchOffset: median(kept.map(function (c) { return c.pitch; })) || 0,
+      heelSpread: spread(kept.map(function (c) { return c.heel; })),
+      pitchSpread: spread(kept.map(function (c) { return c.pitch; }))
+    };
+  }
+
+  /* 보정 결과가 물리적으로 말이 되는지 확인한다. 0점 구간이 하나뿐이면
+     구간 간 비교를 못 하므로(실측 13:15) 결과 쪽에서 한 번 더 거른다.
+     주행 중 피치 중앙값이 이 범위를 넘으면 보드가 하늘이나 물속을 보고
+     있다는 뜻이라 측정이 잘못된 것이다. */
+  var MAX_RIDING_PITCH_DEG = 20;
+  var MIN_RIDING_KT = 10;
+
+  function sanityCheck(points) {
+    var v = [];
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      if (p && p.pitch != null && isFinite(p.pitch) &&
+          p.speed != null && p.speed * KT > MIN_RIDING_KT) v.push(p.pitch);
+    }
+    if (v.length < 50) return { ok: true, ridingPitchMedian: null };
+    var m = median(v);
+    return { ok: Math.abs(m) <= MAX_RIDING_PITCH_DEG, ridingPitchMedian: m };
+  }
+
+  /* 0점을 빼서 '보드가 평평할 때 = 0°' 로 만든다. 원본은 *Raw 로 남긴다. */
+  function calibrateAttitude(points) {
+    var cal = calibration(points);
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      if (!p) continue;
+      if (!cal.ok) {
+        if (p.heel != null) { p.heelRaw = p.heel; p.heel = null; }
+        if (p.pitch != null) { p.pitchRaw = p.pitch; p.pitch = null; }
+        continue;
+      }
+      if (p.heel != null && isFinite(p.heel)) {
+        if (p.heelRaw == null) p.heelRaw = p.heel;
+        p.heel = p.heel - cal.heelOffset;
+      }
+      if (p.pitch != null && isFinite(p.pitch)) {
+        if (p.pitchRaw == null) p.pitchRaw = p.pitch;
+        p.pitch = p.pitch - cal.pitchOffset;
+      }
+    }
+    if (cal.ok) {
+      var sane = sanityCheck(points);
+      cal.ridingPitchMedian = sane.ridingPitchMedian;
+      if (!sane.ok) {
+        cal.ok = false;
+        cal.reason = 'implausible-after-calibration';
+        for (var m2 = 0; m2 < points.length; m2++) {
+          var r = points[m2];
+          if (!r) continue;
+          if (r.heel != null) { if (r.heelRaw == null) r.heelRaw = r.heel; r.heel = null; }
+          if (r.pitch != null) { if (r.pitchRaw == null) r.pitchRaw = r.pitch; r.pitch = null; }
+        }
+      }
+    }
+    return cal;
   }
 
   /* 중앙값(median) 저역통과 — 순간 가속 노이즈 완화용.
@@ -223,6 +416,11 @@
     computeAttitude: computeAttitude,
     annotate: annotate,
     medianSmooth: medianSmooth,
+    restWindows: restWindows,
+    fallWindows: fallWindows,
+    sanityCheck: sanityCheck,
+    calibration: calibration,
+    calibrateAttitude: calibrateAttitude,
     heelHistogram: heelHistogram,
     stats: stats
   };

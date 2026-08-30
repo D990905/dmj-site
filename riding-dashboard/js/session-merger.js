@@ -322,6 +322,7 @@
     /* primary 자체 IMU → heel/pitch (자이로 있으면 상보필터 보정) */
     if (Imu) Imu.computeAttitude(pts);
 
+
     /* ── 도너 선택 ─────────────────────────────────────────── */
     var others = srcs.filter(function (s) { return s !== primary; });
 
@@ -394,6 +395,14 @@
 
     /* 최종 플래그 */
     var withSpeed = countField(pts, 'speed');
+    /* §444 — 센서를 붙이는 면·각도가 세션마다 달라지므로 0점을 잡는다.
+       추락 직후 보드만 떠 있는 구간을 찾아 그때를 0° 로 본다.
+       ⚠ 반드시 도너 병합이 끝난 뒤에 한다. 앞에서 하면 보정이 heel 을
+       지웠을 때 아래 'heel 미보유 → 도너에서 채움' 경로가 발동해
+       보정 안 된 값으로 되살아난다 (실제로 겪은 버그). */
+    var attitudeCal = null;
+    if (Imu && Imu.calibrateAttitude) attitudeCal = Imu.calibrateAttitude(pts);
+
     var withHeel = countField(pts, 'heel');
     var withHR = countField(pts, 'hr');
     var speedSource = (withSpeed >= pts.length * 0.5) ? 'device' : 'derived';
@@ -410,6 +419,14 @@
       hasAttitude: withHeel >= pts.length * 0.5,
       _fusion: buildFusion(srcs, primary, imuInfo, hrInfo, speedInfo, sf, pts.length, withHeel, withHR)
     };
+    /* 자세 보정 결과를 융합 정보에 실어 화면이 사유를 표시할 수 있게 한다.
+       보정이 자세를 폐기했으면 hasAttitude 도 내려야 한다 — withHeel 은
+       폐기 전에 센 값이라 그대로 두면 '자세 있음' 으로 남는다. */
+    if (parsed._fusion) parsed._fusion.attitude = attitudeCal;
+    if (attitudeCal && !attitudeCal.ok) {
+      parsed.hasAttitude = false;
+      if (parsed._fusion) parsed._fusion.attitudeRejected = attitudeCal.reason;
+    }
     return { parsed: parsed, fusion: parsed._fusion, points: pts };
   }
 

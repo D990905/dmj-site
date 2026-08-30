@@ -110,8 +110,15 @@
     }
 
     var hasSpeed = col['Speed'] !== undefined;
-    var hasGf = col['GForceX'] !== undefined && col['GForceY'] !== undefined &&
-                col['GForceZ'] !== undefined;
+    /* RaceBox 'Bike Mode' 는 Cornering G(Y축)를 LeanAngle(도)로 바꿔치기하고
+       열 위치도 Lap 뒤로 옮긴다. 그래서 GForceY 가 아예 없다.
+         일반 모드 : GForceX,GForceY,GForceZ,Lap,GyroX,GyroY,GyroZ
+         바이크 모드: GForceX,GForceZ,Lap,LeanAngle,GyroX,GyroY,GyroZ
+       LeanAngle 은 기기가 직접 낸 기울기라 가로G에서 유도하는 것보다 낫다.
+       X·Z 는 그대로 있으므로 피치는 여전히 계산된다. */
+    var hasLean = col['LeanAngle'] !== undefined;
+    var hasGf = col['GForceX'] !== undefined && col['GForceZ'] !== undefined;
+    var hasGy = col['GForceY'] !== undefined;
     /* 자이로 3축 — 상보필터(complementary filter) 입력. heel(roll) 각속도는
        GyroX, pitch 각속도는 GyroY(부호반전), yaw 는 GyroZ (축·부호는 실
        세션 데이터로 검증: heel rate↔+GyroX r=0.31, pitch rate↔−GyroY r=0.18). */
@@ -155,11 +162,20 @@
       /* IMU 원본 — heel/pitch 변환은 analysis-imu 가 담당 */
       if (hasGf) {
         var gx = num(f[col['GForceX']]);
-        var gy = num(f[col['GForceY']]);
+        var gy = hasGy ? num(f[col['GForceY']]) : null;
         var gz = num(f[col['GForceZ']]);
-        if (gx != null && gy != null && gz != null) {
-          pt.gforceX = gx; pt.gforceY = gy; pt.gforceZ = gz;
+        if (gx != null && gz != null) {
+          pt.gforceX = gx; pt.gforceZ = gz;
+          if (gy != null) pt.gforceY = gy;
           withImu++;
+        }
+      }
+      /* 기기 실측 기울기 — 있으면 heel 을 유도하지 않고 이 값을 쓴다 */
+      if (hasLean) {
+        var la = num(f[col['LeanAngle']]);
+        if (la != null) {
+          pt.leanAngle = la;
+          if (!hasGf) withImu++;
         }
       }
       if (hasGyro) {
@@ -190,6 +206,9 @@
       hasTime: true,
       speedSource: withSpeed >= points.length * 0.5 ? 'device' : 'derived',
       hasImu: withImu >= points.length * 0.5,
+      /* Bike Mode = GForceY 가 LeanAngle 로 대체된 내보내기.
+         이 모드에서는 힐(가로 기울기)을 복원할 수 없다. */
+      bikeMode: hasLean && !hasGy,
       imuPointCount: withImu,
       hasHR: false,
       hrPointCount: 0,
