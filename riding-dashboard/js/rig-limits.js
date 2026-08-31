@@ -74,21 +74,34 @@
     return Math.sqrt(2 * totalMassKg * G / (RHO_WATER * A * cl)) * KT;
   }
 
-  /* 라이더가 버틸 수 있는 옆힘(N) = m·g·tan(라이더 기울기).
-     지렛대는 **라이더 질량만** — 보드·포일은 발밑에 매달려 모멘트에
-     거의 기여하지 않는다.
+  /* 버틸 수 있는 옆힘(N) — 일직선 힘 균형.
 
-     ⚠ 여기 넣는 각도는 **보드 힐이 아니라 라이더가 바깥으로 누운 각도**다.
-     하네스를 쓰면 라이더는 보드가 기운 것보다 훨씬 더 바깥으로 매달릴 수
-     있다. 실측이 그걸 말한다 — 옥대표 보드 힐 중앙값은 35~37° 인데
-     22kt/4.5 에서 버티는 옆힘은 체중의 160%(= 라이더 기울기 58°) 다.
-     두 각도를 같은 값으로 쓰면 강풍 구간이 "불가능" 으로 나온다
-     (라이드 50cm 가정 시 22kt 가 한계의 118% 로 계산됐다).
+     옥대표(2026-08-31): "라이더 기울기와 포일 마스트 기울기가 일직선이어야
+     하중을 실을 수 있어. 최대한 한 라인에 있어야 하지."
 
-     보드 힐은 팁 여유(기하)를 정하고, 라이더 기울기는 힘 용량을 정한다.
-     둘은 하네스 길이·자세로 벌어진다. leanDeg 를 따로 받는 이유다. */
-  function sideForceCapacityN(riderMassKg, leanDeg) {
-    return riderMassKg * G * Math.tan(deg2rad(leanDeg));
+     그 상태에서는 포일 양력 L 이 그 라인 방향(수직에서 θ)으로 서고,
+       수직성분 L·cosθ = M·g      (전체 무게를 든다)
+       수평성분 L·sinθ = 옆힘
+     → tanθ = 옆힘 / (M·g),  **M 은 라이더 + 장비 전체**.
+
+     ⚠ 앞서 나는 이걸 라이팅 모멘트로 보고 **라이더 질량만** 썼다. 틀렸다.
+     지렛대 문제가 아니라 양력 벡터가 기우는 힘 균형 문제이고, 그때 드는
+     것은 시스템 전체 무게다. 라이더만 쓰면 필요 각도가 과대평가되어
+     22kt 구간이 "기하적으로 불가능" 으로 나온다(118%).
+
+     전체 무게로 다시 재면 옥대표 선택이 아귀가 맞는다:
+       10kt/6.5 → 17°   12kt/6.0 → 24°   14kt/5.5 → 31°
+       18kt/5.0 → 45°   22kt/4.5 → 55°
+     그리고 강풍일수록 낮게 타므로(라이드 ↓) 기하 여유가 늘어 55° 가
+     확보된다 — 시스템이 스스로 정합적이다. */
+  function sideForceCapacityN(totalMassKg, leanDeg) {
+    return totalMassKg * G * Math.tan(deg2rad(leanDeg));
+  }
+
+  /* 이 옆힘을 버티려면 몇 도로 누워야 하나 (일직선 가정) */
+  function requiredLeanDeg(sideForceN, totalMassKg) {
+    if (!(totalMassKg > 0)) return null;
+    return Math.atan(sideForceN / (totalMassKg * G)) * 180 / Math.PI;
   }
 
   /* 장비·수면 조합의 한계를 한 번에.
@@ -115,8 +128,9 @@
       maxHeelDeg: heelMax,
       /* 어느 쪽이 먼저 막는가 — 장비를 바꿔야 할 방향을 알려준다 */
       bindingConstraint: binding,
-      sideForceCapacityN: opts.riderMassKg
-        ? sideForceCapacityN(opts.riderMassKg, heelMax) : null,
+      /* 일직선 가정 — 전체 무게가 든다(§471) */
+      sideForceCapacityN: opts.totalMassKg
+        ? sideForceCapacityN(opts.totalMassKg, heelMax) : null,
       minFlyingSpeedKt: opts.totalMassKg
         ? minFlyingSpeedKt(opts.totalMassKg, sel.frontWing.areaCm2, opts.clMax) : null
     };
@@ -187,6 +201,7 @@
     maxHeelFoil: maxHeelFoil, maxHeelWing: maxHeelWing,
     minFlyingSpeedKt: minFlyingSpeedKt,
     sideForceCapacityN: sideForceCapacityN,
+    requiredLeanDeg: requiredLeanDeg,
     analyze: analyze, recommendWing: recommendWing,
     DEFAULT_RIDE_HEIGHT_CM: DEFAULT_RIDE_HEIGHT_CM,
     DEFAULT_HAND_HEIGHT_CM: DEFAULT_HAND_HEIGHT_CM
