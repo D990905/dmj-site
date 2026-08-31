@@ -119,13 +119,18 @@
        높게 잡으면(가슴) 윙 팁이 수면에서 멀어져 **힐 여유가 커진다**.
        낮게 끌어내리면 힘이 아래로 실려 **보드를 누르지만 팁 여유를 잃는다**.
      heightFrac 는 키 대비 보드 위 높이 비율(인체계측 근사). */
+  /* 인체계측 근사 — 보드 위에 선 상태의 높이 / 키.
+     ⚠ 옥대표 교정(2026-08-31): "가슴으로 올린다는 아니고 약간 위로
+     올리는 거지, 명치 아래 정도." 처음에 가슴(0.72)으로 잡았던 것을
+     명치 아래(0.64)로 낮춘다 — 175cm 기준 126cm 가 아니라 112cm 다.
+     허리(102cm) 대비 10cm 위지 24cm 위가 아니다. */
   var HARNESS = [
-    { id: 'chest', label: 'Chest (overpowered)', heightFrac: 0.72,
-      note: 'more heel headroom — the wing sits high and clear' },
+    { id: 'raised', label: 'Raised (below sternum)', heightFrac: 0.64,
+      note: 'overpowered — hips back, upper body forward, dragged along' },
     { id: 'waist', label: 'Waist (normal)', heightFrac: 0.58,
       note: 'the usual position' },
     { id: 'low',   label: 'Pulled low (full power)', heightFrac: 0.50,
-      note: 'loads the board downward but costs tip clearance' }
+      note: 'loads the wing force downward onto the board' }
   ];
 
   /* 수면 상태 — 팁이 파도에 닿지 않으려면 남겨야 할 여유(cm).
