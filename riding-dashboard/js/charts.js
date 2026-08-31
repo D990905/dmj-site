@@ -1678,13 +1678,19 @@
             suggestedMin: opts.yMin, suggestedMax: opts.yMax,
             grid: { color: THEME.grid }
           },
-          y1: speedData ? {
-            position: 'right',
-            title: { display: true, text: i18nT('속도 ({u})', {u: speedUnit}) },
-            beginAtZero: true,
-            /* 좌·우축 grid 가 겹쳐 보이지 않도록 우축 grid 는 끈다 */
-            grid: { drawOnChartArea: false }
-          } : undefined
+          /* 속도 overlay 가 꺼져 있으면 y1 키 자체를 넣지 않는다.
+             `y1: undefined` 로 두면 Chart.js 가 스케일 설정을 검사하다
+             'Invalid scale configuration for scale: y1' 을 콘솔에 남긴다
+             (차트는 그려지지만 매 렌더마다 경고가 쌓인다). */
+          ...(speedData ? {
+            y1: {
+              position: 'right',
+              title: { display: true, text: i18nT('속도 ({u})', {u: speedUnit}) },
+              beginAtZero: true,
+              /* 좌·우축 grid 가 겹쳐 보이지 않도록 우축 grid 는 끈다 */
+              grid: { drawOnChartArea: false }
+            }
+          } : {})
         },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         onResize: function () { sizeCrosshair(); },

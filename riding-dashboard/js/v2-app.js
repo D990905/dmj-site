@@ -1292,13 +1292,23 @@
     wrap.style.maxHeight = '420px'; wrap.style.overflowY = 'auto';
     var t = el('table', 'table table-vcenter card-table table-sm');
     var th = el('thead'), htr = el('tr');
-    ['#', 'Type', 'Side', 'Time', 'Loss', 'Recovery', 'Eff', 'Turn rate'].forEach(function (x, i) {
-      htr.appendChild(el('th', i > 2 ? 'text-end' : null, x));
-    });
+    ['#', 'Type', 'Side', 'Time', 'Loss', 'Recovery', 'Eff', 'Basis', 'Turn rate']
+      .forEach(function (x, i) {
+        htr.appendChild(el('th', i > 2 ? 'text-end' : null, x));
+      });
     th.appendChild(htr); t.appendChild(th);
     var tb = el('tbody');
     mans.forEach(function (m, i) {
       var tr = el('tr');
+      /* §454 — 행을 눌러 회전을 고른다(다중 선택 토글). 고른 회전은
+         위쪽 상세 카드에 지표와 속도 곡선으로 펼쳐진다. */
+      tr.style.cursor = 'pointer';
+      if (TURNSEL.indexOf(i) >= 0) tr.className = 'table-active';
+      tr.addEventListener('click', function () {
+        var pos = TURNSEL.indexOf(i);
+        if (pos < 0) TURNSEL.push(i); else TURNSEL.splice(pos, 1);
+        renderTurnExtras(a);
+      });
       tr.appendChild(el('td', 'num', String(i + 1)));
       var badge = el('span', 'badge',
         m.type === 'tack' ? 'Tack' : m.type === 'gybe' ? 'Gybe' : 'Turn');
@@ -1313,15 +1323,227 @@
         m.recoverySec == null ? '—' : m.recoverySec.toFixed(1) + ' s'));
       tr.appendChild(el('td', 'text-end num',
         m.efficiency == null ? '—' : String(Math.round(m.efficiency))));
+      /* §454 — 자이브는 VMG 기준, 택은 SOG 기준으로 손실·효율을 낸다.
+         기준을 안 적으면 SOG 진입/최저/탈출 옆의 VMG 손실이 모순처럼
+         읽힌다(최저 속도가 진입보다 빠른데 손실 100% 같은 경우). */
+      tr.appendChild(el('td', 'text-end text-secondary',
+        m.effBasis === 'vmg' ? 'VMG' : 'SOG'));
       tr.appendChild(el('td', 'text-end num',
         m.avgTurnRateDegSec == null ? '—' : m.avgTurnRateDegSec.toFixed(1) + '°/s'));
       tb.appendChild(tr);
     });
     t.appendChild(tb); wrap.appendChild(t); card2.appendChild(wrap);
+    var fn = el('div', 'card-footer text-secondary');
+    fn.style.fontSize = '.8125rem';
+    fn.textContent = 'Click a row to open it below; click again to deselect. '
+      + 'Loss and efficiency use VMG when the wind angle is reliable (usually gybes) '
+      + 'and plain speed otherwise \u2014 the Basis column says which, so a VMG loss '
+      + 'next to rising speed is not a contradiction.';
+    card2.appendChild(fn);
     lh.appendChild(card2);
 
     renderTurnGroups(host, a);
     renderTurnCoaching(host, a);
+    renderTurnDetail(host, a);
+  }
+
+  /* §454 선택한 회전 — 표에서 고른 회전들의 상세.
+     하나면 지표 전부, 여럿이면 나란히 비교. 속도 곡선은 회전 정점(apex)
+     을 0 초로 맞춰 겹친다 — 시각이 다른 회전을 같은 자로 보려면 정점을
+     맞춰야 한다. */
+  var TURNSEL = [];
+
+  function renderTurnDetail(host, a) {
+    var mans = a.maneuvers || [];
+    var sel = TURNSEL.filter(function (i) { return mans[i]; })
+                     .sort(function (x, y) { return x - y; });
+    if (!sel.length) return;
+    var picked = sel.map(function (i) { return mans[i]; });
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title',
+      picked.length === 1 ? 'Turn #' + (sel[0] + 1) : sel.length + ' turns selected'));
+    var act = el('div', 'card-actions');
+    var clr = el('button', 'btn btn-sm btn-ghost-secondary', 'Clear selection');
+    clr.type = 'button';
+    clr.addEventListener('click', function () { TURNSEL.length = 0; renderTurnExtras(a); });
+    act.appendChild(clr);
+    head.appendChild(act);
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    if (picked.length === 1) {
+      var m = picked[0];
+      var grid = el('div', 'row row-cards');
+      function cell(label, val, sub) {
+        var col = el('div', 'col-6 col-md-3');
+        var c = el('div', 'card'), b = el('div', 'card-body');
+        b.appendChild(el('div', 'lab', label));
+        b.appendChild(el('div', 'kpi__val num mt-1', val));
+        if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+        c.appendChild(b); col.appendChild(c); return col;
+      }
+      function kt(v) { return v == null ? '\u2014' : (v * KT).toFixed(1) + ' kt'; }
+      grid.appendChild(cell('Entry speed', kt(m.entrySpeedMs)));
+      grid.appendChild(cell('Lowest', kt(m.minSpeedMs)));
+      grid.appendChild(cell('Exit speed', kt(m.exitSpeedMs)));
+      grid.appendChild(cell(
+        m.effBasis === 'vmg' ? 'VMG loss' : 'Speed loss',
+        m.lossDisplayPct == null ? '\u2014' : Math.round(m.lossDisplayPct) + '%',
+        m.effBasis === 'vmg'
+          ? 'measured on VMG, not raw speed'
+          : 'against ' + kt(m.refSpeedMs)));
+      grid.appendChild(cell('Turn angle',
+        m.turnAngle == null ? '\u2014' : Math.round(m.turnAngle) + '\u00b0'));
+      grid.appendChild(cell('Turn rate',
+        m.avgTurnRateDegSec == null ? '\u2014' : m.avgTurnRateDegSec.toFixed(1) + '\u00b0/s',
+        m.maxTurnRateDegSec != null ? 'peak ' + m.maxTurnRateDegSec.toFixed(1) : ''));
+      grid.appendChild(cell('Duration',
+        m.durationSec == null ? '\u2014' : m.durationSec.toFixed(0) + ' s'));
+      grid.appendChild(cell('Recovery',
+        m.recoverySec == null ? 'not regained' : m.recoverySec.toFixed(1) + ' s',
+        'back to cruising speed'));
+      body.appendChild(grid);
+
+      /* §454 — 속도와 VMG 는 갈릴 수 있다. 자이브는 VMG 기준으로 채점하는데
+         SOG 는 올라가면서 VMG 는 무너지는 회전이 실제로 나온다(넓게 돌아
+         풍하로 너무 흘렀거나 나쁜 각도로 나온 경우). 그때 "잘한 회전" 이라고
+         쓰면 거짓이 되므로, 두 지표가 갈리면 갈렸다고 말한다. */
+      var spedUp = (m.minSpeedMs != null && m.entrySpeedMs != null
+                    && m.minSpeedMs >= m.entrySpeedMs);
+      var scoredBad = (m.lossDisplayPct != null && m.lossDisplayPct >= 30);
+      var scoredGood = (m.lossDisplayPct != null && m.lossDisplayPct < 8);
+      if (spedUp && scoredBad && m.effBasis === 'vmg') {
+        body.appendChild(el('div', 'alert alert-warning mt-3',
+          'Raw speed held up through this turn \u2014 the lowest speed was above the '
+          + 'entry speed \u2014 but VMG collapsed. That is the signature of turning too '
+          + 'wide or exiting on a poor angle: fast through the water, little progress '
+          + 'in the direction that counts.'));
+      } else if (spedUp) {
+        body.appendChild(el('div', 'alert alert-success mt-3',
+          'The lowest speed through this turn was higher than the entry speed \u2014 '
+          + 'you accelerated through it rather than losing speed.'));
+      } else if (scoredGood) {
+        body.appendChild(el('div', 'alert alert-success mt-3',
+          (m.effBasis === 'vmg' ? 'Almost no VMG lost' : 'Almost no speed lost')
+          + ' \u2014 a clean turn.'));
+      }
+    } else {
+      var wrap = el('div', 'table-responsive');
+      var t = el('table', 'table table-vcenter card-table table-sm');
+      var th = el('thead'), htr = el('tr');
+      ['#', 'Type', 'Side', 'Entry', 'Lowest', 'Exit', 'Loss', 'Recovery', 'Eff', 'Basis']
+        .forEach(function (x, i) {
+          htr.appendChild(el('th', i > 2 ? 'text-end' : null, x));
+        });
+      th.appendChild(htr); t.appendChild(th);
+      var tb2 = el('tbody');
+      picked.forEach(function (m, k) {
+        var tr = el('tr');
+        tr.appendChild(el('td', 'num', String(sel[k] + 1)));
+        tr.appendChild(el('td', null, m.type === 'tack' ? 'Tack' : 'Gybe'));
+        tr.appendChild(el('td', null,
+          m.side === 'P' ? 'Port' : m.side === 'S' ? 'Stbd' : '\u2014'));
+        [m.entrySpeedMs, m.minSpeedMs, m.exitSpeedMs].forEach(function (v) {
+          tr.appendChild(el('td', 'text-end num',
+            v == null ? '\u2014' : (v * KT).toFixed(1)));
+        });
+        tr.appendChild(el('td', 'text-end num',
+          m.lossDisplayPct == null ? '\u2014' : Math.round(m.lossDisplayPct) + '%'));
+        tr.appendChild(el('td', 'text-end num',
+          m.recoverySec == null ? '\u2014' : m.recoverySec.toFixed(1) + ' s'));
+        tr.appendChild(el('td', 'text-end num',
+          m.efficiency == null ? '\u2014' : String(Math.round(m.efficiency))));
+        tr.appendChild(el('td', 'text-end text-secondary',
+          m.effBasis === 'vmg' ? 'VMG' : 'SOG'));
+        tb2.appendChild(tr);
+      });
+      t.appendChild(tb2); wrap.appendChild(t); body.appendChild(wrap);
+    }
+
+    /* 속도 곡선 — apex 를 0 으로 맞춰 겹친다 */
+    var plotHost = el('div', 'chart-host mt-3');
+    plotHost.style.height = '220px';
+    body.appendChild(plotHost);
+    card.appendChild(body);
+    host.appendChild(card);
+    drawTurnCurves(plotHost, picked, sel);
+  }
+
+  /* apex 정렬 속도 곡선. 회전 전후 여유를 두고 잘라 "들어가서 나오기까지"
+     한 장면으로 본다. */
+  function drawTurnCurves(hostEl, picked, sel) {
+    if (!window.uPlot || !CUR.session) return;
+    var S = CUR.session.samples || [];
+    if (!S.length) return;
+    var PAD_SEC = 12;
+    var series = [], tMin = 0, tMax = 0;
+    picked.forEach(function (m) {
+      var apexT = S[m.apexIdx] ? S[m.apexIdx].t : null;
+      if (apexT == null) return;
+      var pts = [];
+      for (var i = 0; i < S.length; i++) {
+        var dt = S[i].t - apexT;
+        if (dt < -PAD_SEC) continue;
+        if (dt > PAD_SEC) break;
+        if (S[i].speed == null) continue;
+        pts.push([dt, S[i].speed * KT]);
+      }
+      if (pts.length < 3) return;
+      tMin = Math.min(tMin, pts[0][0]);
+      tMax = Math.max(tMax, pts[pts.length - 1][0]);
+      series.push({ m: m, pts: pts });
+    });
+    if (!series.length) { hostEl.textContent = 'No speed samples around these turns.'; return; }
+
+    /* 공통 x 격자 위로 각 곡선을 옮긴다 — uPlot 은 단일 x 배열을 쓴다. */
+    var STEP = 0.5, xs = [];
+    for (var x = Math.floor(tMin); x <= Math.ceil(tMax); x += STEP) xs.push(x);
+    var data = [xs];
+    var opts = [];
+    series.forEach(function (sr, k) {
+      var ys = xs.map(function (xv) {
+        var best = null, bd = Infinity;
+        for (var j = 0; j < sr.pts.length; j++) {
+          var d = Math.abs(sr.pts[j][0] - xv);
+          if (d < bd) { bd = d; best = sr.pts[j][1]; }
+        }
+        return bd <= STEP ? best : null;
+      });
+      data.push(ys);
+      opts.push({
+        label: '#' + (sel[k] + 1) + ' ' + (sr.m.type === 'tack' ? 'tack' : 'gybe')
+             + (sr.m.side === 'P' ? ' P' : sr.m.side === 'S' ? ' S' : ''),
+        stroke: sr.m.side === 'P' ? '#e03131' : '#2f9e44',
+        width: 1.6,
+        value: function (u, v) { return v == null ? '\u2014' : v.toFixed(1) + ' kt'; }
+      });
+    });
+
+    track(new uPlot({
+      width: hostEl.clientWidth || 860, height: 200, padding: [12, 14, 4, 6],
+      cursor: { drag: { x: true, y: false } },
+      scales: { x: { time: false } },
+      axes: [
+        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+          font: '11px "IBM Plex Mono", monospace',
+          values: function (u, ticks) {
+            return ticks.map(function (v) {
+              return (v > 0 ? '+' : '') + v.toFixed(0) + ' s';
+            });
+          } },
+        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+          font: '11px "IBM Plex Mono", monospace', size: 44,
+          values: function (u, ticks) {
+            return ticks.map(function (v) { return v.toFixed(0) + ' kt'; });
+          } }
+      ],
+      series: [{ label: 'From apex',
+                 value: function (u, v) {
+                   return v == null ? '\u2014' : (v > 0 ? '+' : '') + v.toFixed(1) + ' s';
+                 } }].concat(opts)
+    }, data, hostEl), hostEl);
   }
 
   /* §453 회전 그룹 통계 — 개수만으로는 어느 쪽이 약한지 알 수 없다.
@@ -1376,8 +1598,10 @@
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
     var f = el('div', 'card-footer text-secondary');
     f.style.fontSize = '.8125rem';
-    f.textContent = 'Groups with only two or three turns move a lot on one bad turn — '
-      + 'read the count before the average.';
+    f.textContent = 'Groups with only two or three turns move a lot on one bad turn \u2014 '
+      + 'read the count before the average. Efficiency and loss are measured on VMG '
+      + 'where the wind angle is reliable (usually gybes) and on plain speed otherwise, '
+      + 'so the two turn types are not on an identical scale.';
     card.appendChild(f);
     host.appendChild(card);
   }

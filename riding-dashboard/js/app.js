@@ -8,7 +8,8 @@
   var Geo = window.RDGeo, Gpx = window.RDGpx, Vkx = window.RDVkx, Csv = window.RDCsv, An = window.RDAnalysis;
   var Storage = window.RDStorage, Charts = window.RDCharts;
   /* §430 — 다중 파일 자동 융합 */
-  var Merger = window.RDSessionMerger, RaceboxCSV = window.RDRaceboxCSV;
+  var Merger = window.RDSessionMerger, RaceboxCSV = window.RDRaceboxCSV,
+      WaterspeedCSV = window.RDWaterspeedCSV;
   var KT = Geo.MS_TO_KNOTS;
 
   /* i18n 변환 헬퍼 — 동적 보간 문자열을 영어 모드에서 영어로.
@@ -622,14 +623,18 @@
     } else if (isCsv) {
       reader.onload = function () {
         var text = reader.result;
-        /* RaceBox CSV — 단일이라도 IMU(heel/pitch) 융합 경로로. SailTech
-           통합 CSV 는 기존 processCsv 유지(하위 호환). */
-        if (Merger && RaceboxCSV && RaceboxCSV.looksLike && RaceboxCSV.looksLike(text)) {
+        /* RaceBox·Waterspeed CSV — 단일이라도 융합 경로로 보낸다
+           (RaceBox 는 IMU heel/pitch, Waterspeed 는 1Hz 심박이 붙는다).
+           SailTech 통합 CSV 는 기존 processCsv 유지(하위 호환). */
+        var isMergerCsv =
+          (RaceboxCSV && RaceboxCSV.looksLike && RaceboxCSV.looksLike(text)) ||
+          (WaterspeedCSV && WaterspeedCSV.looksLike && WaterspeedCSV.looksLike(text));
+        if (Merger && isMergerCsv) {
           try {
             var res = Merger.mergeFiles([{ name: file.name, text: text }]);
             processFusion(res, [{ name: file.name, text: text }], []);
           } catch (e) {
-            showError(e && e.message ? e.message : 'RaceBox CSV 를 분석하지 못했습니다.');
+            showError(e && e.message ? e.message : 'CSV 를 분석하지 못했습니다.');
           }
         } else {
           processCsv(text, file.name.replace(/\.csv$/i, ''));
