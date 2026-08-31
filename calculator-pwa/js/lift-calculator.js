@@ -308,9 +308,20 @@
       foil_ar: 6.5, wing_area_m2: 5.0, wing_ar: 4.5
     });
     check('§176: 상급 10kt 5.0m² feasible', up_advanced.feasible === true);
-    check('§176-E: 상급 풍상 속도 8-22 kt 합리적 범위 (TWA 50°)',
-      up_advanced.V_boat_kt >= 8 && up_advanced.V_boat_kt <= 22);
-    check('§176-E: 상급 tack 50° (5° 균등 TWA)', up_advanced.tack_angle_deg === 50);
+    /* §483 — 이 케이스(10kt · 5.0㎡ · 80kg all-up)는 **의도적으로 언더파워**다.
+       옥대표 실사용표는 10kt 이하에서 6.5㎡ 다. 몸 항력을 넣기 전 모델은
+       이 언더파워 조합에도 8kt 이상을 냈고, 옛 검사는 그 낙관을 그대로
+       못박고 있었다. 지금은 4.7kt — 사실상 포일이 안 뜨는 영역이고 그게
+       맞다. 그래서 '합리적 범위' 검사는 **제대로 크기를 맞춘 윙**으로 옮긴다. */
+    var up_sized = upwindSpeed({
+      v_wind_kt: 10, m_rider_kg: 70, gear_kg: 10, skill: '상급',
+      foil_ar: 6.5, wing_area_m2: 6.5, wing_ar: 4.5
+    });
+    check('§483: 상급 10kt 6.5㎡(적정 사이즈) 풍상 속도 8-22 kt',
+      up_sized.V_boat_kt >= 8 && up_sized.V_boat_kt <= 22);
+    check('§483: 언더파워(5.0㎡)는 적정(6.5㎡)보다 느리다',
+      up_advanced.V_boat_kt < up_sized.V_boat_kt);
+    check('§483: 상급 tack 58° (실측 기반)', up_advanced.tack_angle_deg === 58);
 
     // 14) 선수 라이더 (η=0.95, tack=42°) > 상급
     var up_pro = upwindSpeed({
@@ -321,7 +332,8 @@
     // race-context 표준 = VMG (Velocity Made Good upwind) 로 monotonicity 검증.
     check('§176-E: 선수 풍상 VMG > 상급 VMG (스킬 ↑ → VMG ↑)',
       up_pro.V_vmg_kt > up_advanced.V_vmg_kt);
-    check('§176-E: 선수 tack 45° (5° 균등 TWA min)', up_pro.tack_angle_deg === 45);
+    check('§483: 선수 tack 56° (Formula Kite T1 50.6° 보다 넓게)',
+      up_pro.tack_angle_deg === 56);
 
     // 15) 입문 (η=0.45, tack=60°) — 10kt 5m² 로 풍상 불가 또는 매우 낮음
     var up_novice = upwindSpeed({
@@ -331,7 +343,7 @@
     // §176-E: VMG 기준 monotonicity (동일 이유 — SOG 비교는 다른 tack 각이라 invalid).
     check('§176-E: 입문 풍상 VMG < 상급 VMG (스킬 ↓ → VMG ↓)',
       up_novice.V_vmg_kt < up_advanced.V_vmg_kt);
-    check('§176-E: 입문 tack 65°', up_novice.tack_angle_deg === 65);
+    check('§483: 입문 tack 78°', up_novice.tack_angle_deg === 78);
 
     // 16) 풍속 ↑ → 풍상 속도 ↑
     var up_strong_wind = upwindSpeed({
@@ -805,10 +817,26 @@
        §181-D (Danny 2026-05-22) 에서 실효 지속 peak 1.00 으로 재보정 — 스팬방향
        트위스트·능동 디파워·3D 유한스팬 효과로 2D peak 보다 낮음. 상세는 아래
        §181-D 블록(WING_CD0_PARASITIC 선언부 위쪽) 참조. */
+  /* §483 (2026-09-01) — 풍상 택 각도를 **실측**으로 다시 잡는다.
+     ────────────────────────────────────────────────────────────
+     옛 표(상급 50°·선수 45°)는 올림픽 카이트포일 수준의 포인팅이다.
+     동료심사 GPS 연구에서 Formula Kite 최상위(T1)가 배속 19.2kt·VMG
+     12.2kt → TWA 50.6°, 최하위(T3)조차 54.7° 다. 윙포일은 카이트보다
+     넓게 간다 — 손윙은 유효 면적이 작고 라이더 몸이 큰 항력원이다.
+
+     옥대표 8/31 실측(TWD 218°): 풍상 평균 CWA 70.1°, 지속 20초창 중
+     VMG 상위군이 55~62°에 몰린다(p95 창 = 58°). 즉 잘 나갈 때가 58°다.
+
+     새 표는 그 실측과 카이트 기준선 사이에 놓는다:
+       선수 56° (카이트 T1 50.6° 보다 넓게 — 윙포일이 더 빠를 수는 없다)
+       상급 58° (옥대표 최상 지속 구간과 일치)
+       중급 64° · 초급 70° · 입문 78°
+     검증: 이 표로 전 풍속·전 스킬 최대 풍상 VMG = 14.3kt. 옥대표
+     "윙포일에서 VMG 14노트 넘는 건 프로도 거의 못 본다" 와 맞는다. */
   var TACK_ANGLE_DEG = {
-    '입문': 65, '초급': 60, '중급': 55,
-    '상급': 50, '선수': 45, '상급-선수': 47
-  };
+    '입문': 78, '초급': 70, '중급': 64,
+    '상급': 58, '선수': 56, '상급-선수': 57
+  }
   var CL_WING_MAX = 1.00;   // §181-D (Danny 2026-05-22) — 1.2→1.00 재보정. DO_NOT_REVERT §181-D
 
   var PREF_FACTOR = {
@@ -939,6 +967,30 @@
        별도 시스템인 wingSizeOptimal(Danny 매트릭스 경험식)은 변경 없음. */
   var WING_CD0_PARASITIC = 0.04;   // §181 — 윙 형상 항력 계수
 
+  /* §483 (2026-09-01) — 라이더·보드 공기저항 CdA (m²). **빠져 있던 물리항.**
+     ────────────────────────────────────────────────────────────
+     이 모델의 저항은 지금까지 포일 항력(D_foil = M·g / L/D_foil) 하나뿐이었다.
+     12kt·상급 운항점에서 그 값이 25 N 인데, 같은 순간 라이더 몸에 걸리는
+     공기저항은 겉보기 풍속 29.8kt(15.3 m/s)에서 90 N 이 넘는다 — **세고 있던
+     항의 네 배가 통째로 빠져 있었다.** 그래서 모델이 풍상 배 속도를
+     20.6kt(12kt 바람)로, 풍상 VMG 를 13.0kt 로 냈다.
+
+     실측 대조 (§483 조사):
+       · 올림픽 Formula Kite 최상위(T1) 11~15kt 에서 풍상 VMG 12.2±1.4kt,
+         배 속도 19.2±1.2kt  (동료심사 GPS 연구, PMC7830054)
+       · 옥대표 8/31 실측 10~14kt: 풍상 배속 상위50% 17.8kt, VMG 상위50%
+         7.8kt, 20초창 p95 9.3kt
+     즉 모델은 취미 윙포일러를 올림픽 카이트 최상위보다 빠르게 놓고 있었다.
+     옥대표 지적("VMG 14노트 이상은 프로도 거의 못 본다")이 정확했다.
+
+     값의 근거: 선 자세 성인의 전면적 0.55~0.7 m², 인체 Cd 1.0~1.15.
+     윙포일러는 하네스에 기대 상체를 약간 낮추므로 유효 전면적 0.45~0.6 m²,
+     여기에 보드 측면·수면 위 마스트 windage 를 더해 CdA ≈ 0.65 m².
+     자전거 문헌의 직립 라이더 CdA(0.4 m²)보다 큰데, 윙포일러는 몸을
+     웅크리지 않고 팔을 벌려 윙을 들고 있기 때문이다.
+     p.rider_cda_m2 로 개별 조정 가능. */
+  var RIDER_CDA_M2 = 0.65;
+
   /* §181-E (Danny 2026-05-22) — 선수 커브 풍속 민감도 완만화:
      WING_HEEL_COUPLE_EXP 0 → −1.2,  WING_AREA_REF_M2 5.5 → 7.5.
      DO_NOT_REVERT §181-E.
@@ -1032,6 +1084,9 @@
 
     var CL_eff_max = clMax * eta;
     var D_foil = mTotal * CONST.G / LDfoil_eff;        // forward foil drag (N), L=Mg
+    /* §483 — 라이더·보드 공기저항 면적. 0 을 주면 예전(몸 항력 없음) 거동. */
+    var cdaBody = (p.rider_cda_m2 != null && Number(p.rider_cda_m2) >= 0)
+      ? Number(p.rider_cda_m2) : RIDER_CDA_M2;
 
     // §181 — heel 측면력 한계. H_max = M·g·tan(θ_heel).
     // §181 v2: WING_HEEL_COUPLE_EXP=0 → heelCouple=1 (윙 면적 결합 비활성).
@@ -1060,13 +1115,17 @@
       //   양력 추력 계수      = CL·(sin β − cos β/LD_wing)   [유도저항 포함]
       //   윙 형상저항 전방성분 = CD0_WING·cos β               [면적 ∝, V_app² 가중]
       var liftThrustCoeff = CL * (sin_b - cos_b / LDwing_eff);
-      var thrustCoeff = liftThrustCoeff - WING_CD0_PARASITIC * cos_b;
+      /* §483 — 라이더·보드 공기저항 (전방 성분 cos β) */
+      var bodyCoeff = cdaBody / wingArea;
+      var thrustCoeff = liftThrustCoeff - WING_CD0_PARASITIC * cos_b
+                        - bodyCoeff * cos_b;
       var T = (thrustCoeff > 0 && CL > 0) ? (q * thrustCoeff) : 0;
       var D_wing = q * WING_CD0_PARASITIC;              // 윙 형상 항력 (∥ V_app, N)
+      var D_body = q * bodyCoeff;                       // 라이더·보드 공기저항 (N)
       var H = q * CL * cos_b;
       return {
         V_a: V_a, beta: beta, sin_b: sin_b, cos_b: cos_b,
-        CL: CL, T: T, H: H, D_wing: D_wing,
+        CL: CL, T: T, H: H, D_wing: D_wing, D_body: D_body,
         depowered: (CL < CL_eff_max - 1e-6),
         valid: true
       };
@@ -1130,7 +1189,20 @@
       side_force_max_base_N: Math.round(H_max_base * 10) / 10,   // §181 — heel 결합 전
       heel_couple_factor: Math.round(heelCouple * 1000) / 1000,  // §181 — (A/A_ref)^0.5
       D_foil_N: Math.round(D_foil * 10) / 10,
-      D_wing_N: Math.round((bestState.D_wing || 0) * 10) / 10,   // §181 — 윙 형상 항력
+      D_wing_N: Math.round((bestState.D_wing || 0) * 10) / 10,
+      D_body_N: Math.round((bestState.D_body || 0) * 10) / 10,
+      /* §483 — 검증 범위 밖 표시. 이 모델을 맞춘 근거는 실측 두 개뿐이다:
+         옥대표 GPS(10~14kt)와 Formula Kite 동료심사 연구(11~15kt). 8~22kt
+         밖은 외삽이고, 특히 25kt 위에서는 대조할 관측이 없다.
+         '아무도 그 바람에서 풍상 레이스를 안 하니 데이터가 없다' 를 모델이
+         모르는 척하면 안 된다 — 억지로 상수를 맞춰 꼬리를 눌러 봤지만
+         그러면 실측이 있는 구간(12kt VMG 8.1→6.0)이 망가졌다. 그래서
+         숫자를 조작하는 대신 **외삽이라고 말한다.**
+         기준: 풍상 VMG 14.5kt 초과(옥대표 "프로도 거의 못 본다") 또는
+         VMG/풍속 0.94 초과(Formula Kite T1 실측 상한) 또는 풍속 22kt 초과. */
+      beyond_validated_range: !!(
+        V_vmg_kt > 14.5 || (V_t_kt > 0 && V_vmg_kt / V_t_kt > 0.94) || V_t_kt > 22),
+      rider_cda_m2: cdaBody,   // §181 — 윙 형상 항력
       LD_wing_eff: Math.round(LDwing_eff * 100) / 100,
       LD_foil_eff: Math.round(LDfoil_eff * 100) / 100,
       eta: eta,

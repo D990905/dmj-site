@@ -51,10 +51,23 @@ function findPeak(curve) {
  * spec §5-1 expected range — ± 0.5 m² tolerance.
  * (rider.weightKg 만, 장비 무게 +10 가산은 §181 모델 내부) */
 var cases = [
-  /* Case 1 — Timo (Danny anchor §181-D) */
+  /* Case 1 — Timo (Danny anchor §181-D).
+     §483 (2026-09-01) — 기대 범위를 [5.5,6.5]·boundary:false 에서
+     [5.5,7.4]·boundary:true 로 넓힌다. 이유를 남긴다:
+       · 옛 범위는 라이더 공기저항이 빠져 있던 모델로 만든 것이다. 몸
+         항력(14kt·상급에서 87N, 포일 항력의 3.5배)을 넣으면 그 항력은
+         윙 면적과 무관하므로, 그걸 이겨내려면 더 큰 윙이 유리해진다 —
+         약·중풍에서 최적 면적이 커지는 건 물리적으로 옳은 방향이다.
+       · 이 케이스의 조건(중급·AR6.5)은 앵커의 실제 조건(옥대표 = 상급·
+         AR13.7)과 다르다. 느린 라이더 + 항력 큰 저AR 포일이면 같은
+         12kt 라도 더 큰 윙이 필요하다.
+       · 모델의 공력 최적이 옥대표 실사용(12kt 6.0㎡)보다 큰 건 남아 있고,
+         그 차이는 물리가 아니라 무게·핸들링이다(본인 표현: "무겁기도 하고
+         커서 불편해서 좀 피하는 편"). 그 간극은 selftest-480 이 상한
+         +2.0㎡ 로 따로 못박아 감시한다 — 여기서 억지로 맞추지 않는다. */
   { id: 1, label: 'Danny anchor 12kt/중급/AR6.5',
     m: 70, kt: 12, foilAR: 6.5, skill: '중급',
-    expected: [5.5, 6.5], boundary: false },
+    expected: [5.5, 7.4], boundary: true },
   /* Case 2 — Timo (옥대표님 coaching 직관) */
   { id: 2, label: '14kt/상급/AR6.5',
     m: 70, kt: 14, foilAR: 6.5, skill: '상급',
