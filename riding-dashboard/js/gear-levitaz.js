@@ -18,6 +18,8 @@
       ar: 12.9, weightG: 1170, item: 'G467114' },
     { id: 'r6v1', label: 'Levitaz R6 V1', areaCm2: 479, spanCm: 80,
       ar: 13.7, weightG: 1248, item: 'G461562' },
+    /* V3 = 530 cm² · 옥대표 확인 2026-08-31.
+       쿼버가 면적 순이 아님에 주의: V2(430) < V1(479) < V3(530). */
     { id: 'r6v3', label: 'Levitaz R6 V3', areaCm2: 530, spanCm: 87,
       ar: 14.3, weightG: 1322, item: 'G472585' }
   ];
