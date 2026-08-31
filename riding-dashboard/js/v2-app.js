@@ -18,8 +18,24 @@
     var w = parseFloat(($('in-weight') || {}).value);
     var wing = parseFloat(($('in-wing') || {}).value);
     var sk = ($('in-skill') || {}).value;
-    return { weightKg: isFinite(w) ? w : null, wingM2: isFinite(wing) ? wing : null,
-             skill: sk || null };
+    var r = { weightKg: isFinite(w) ? w : null, wingM2: isFinite(wing) ? wing : null,
+              skill: sk || null };
+    /* §482 — 고른 앞 포일의 실제 종횡비를 성능 모델에 넘긴다.
+       옥대표: "바람이랑 윙사이즈만 보면 안되고 포일의 면적이나 종횡비를
+       같이 봐야해." 장비 선택기는 R6 V1/V2/V3 의 AR(13.7·12.9·14.3)과
+       면적을 이미 알고 있었는데, 코치는 그걸 못 받아 프로필 기본값
+       6.5(일반 프리라이드 포일)로 계산하고 있었다 — 포일을 바꿔도
+       예측이 한 톨도 안 변했다는 뜻이다.
+       ⚠ 예측 풍상 VMG 가 올라가므로(약풍 +2kt, 중강풍 +0.7kt) 같은
+       주행이라도 SPS 는 내려간다. 점수가 짜진 게 아니라 기준이 제
+       장비로 맞춰진 것이고, 코치 패널이 어느 포일로 쟀는지 표기한다. */
+    try {
+      if (window.RDGear) {
+        var f = RDGear.byId(RDGear.FRONT_WINGS, gearSelection().frontWing);
+        if (f && f.ar > 0) { r.foilAR = f.ar; r.foilAreaCm2 = f.areaCm2; r.foilLabel = f.label; }
+      }
+    } catch (e) {}
+    return r;
   }
   function windSpeedFromForm() {
     var v = parseFloat(($('in-windspeed') || {}).value);
@@ -3865,9 +3881,11 @@
       Math.round(lim.maxHeelDeg) + '°',
       'before the ' + (lim.bindingConstraint === 'foil' ? 'foil tip surfaces'
                                                         : 'wing tip catches')));
+    /* §471 옥대표 교정 — 일직선이면 라이더+장비 전체 무게가 버틴다.
+       (예전 라벨은 "rider mass only" 였는데 계산은 이미 전체 무게였다) */
     grid.appendChild(tile('Side force you can hold',
       lim.sideForceCapacityN != null ? Math.round(lim.sideForceCapacityN) + ' N' : '—',
-      'rider mass only — the rig hangs below'));
+      'you and the rig, leaning in line'));
     grid.appendChild(tile('All-up weight',
       (rider + rig).toFixed(0) + ' kg',
       rider + ' kg you + ' + rig.toFixed(1) + ' kg gear'));
@@ -3931,9 +3949,17 @@
 
     /* 1) SPS 분해 — 총점만 보여주면 무엇을 고쳐야 할지 알 수 없다 */
     host.appendChild(el('h3', 'mb-2', 'Sailing Performance Score'));
+    /* §482 — 어떤 포일로 예측했는지 밝힌다. 포일 종횡비가 예측 VMG 를
+       크게 바꾸는데(AR 6.5 → 13.7 은 약풍에서 +2kt) 그걸 안 적으면
+       점수가 왜 움직였는지 알 길이 없다. */
+    var basisR = riderFromForm();
     host.appendChild(el('div', 'text-secondary mb-3',
       'Speed is scored against what the lift calculator predicts is achievable '
-      + 'for your weight, wing and skill in these conditions.'));
+      + 'for your weight, wing and skill in these conditions'
+      + (basisR.foilLabel
+          ? ', on your ' + basisR.foilLabel + ' (aspect ratio ' + basisR.foilAR + ')'
+          : '')
+      + '.'));
     if (!vps || vps.ok === false) {
       var warn = el('div', 'alert alert-warning');
       warn.textContent = 'Score unavailable'

@@ -160,7 +160,11 @@
     var wings = opts.wings || [];
     var side = opts.sideForceAt;          /* function(areaM2) -> N */
     if (typeof side !== 'function') return null;
-    var riderN = opts.riderMassKg * G;
+    /* §482 — 필요 힐도 전체 무게로 잰다. 같은 파일의 sideForceCapacityN
+       은 이미 §471 대로 전체 무게를 쓰는데 여기만 라이더 체중이라
+       한 파일 안에서 두 기준이 섞여 있었다. totalMassKg 를 주면 그걸,
+       없으면 예전처럼 riderMassKg 를 쓴다(호출부 호환). */
+    var riderN = (opts.totalMassKg > 0 ? opts.totalMassKg : opts.riderMassKg) * G;
     var safety = opts.safetyDeg || 0;
 
     var rows = wings.map(function (w) {
