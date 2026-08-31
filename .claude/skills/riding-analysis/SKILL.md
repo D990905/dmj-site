@@ -78,6 +78,8 @@ node .claude/skills/riding-analysis/scripts/analyze.js <파일...> [--legs] [--j
   SAP 의 기동 HMM 실제 구현(Viterbi + Forward-Backward 신뢰도)
 - **Gain/Loss · VMC · 기동 손실**: `references/gain-loss.md` — ladder rung,
   Sailnjord 의 검출·분석 창 실제 파라미터, 손실 계산 3종
+- **장비·체격 기준값**: `references/rider-equipment.md` — 체중 72kg(슈트포함)·
+  최대심박 194·마스트 112cm·Levitaz R6 3종·PPC Sonic 5.0. 계산 전 여기부터 본다
 - **출처와 라이선스**: `references/sources.md` — 직접 확인한 것과 확인 못 한 것
 - 함정 목록과 과거 실측치: `references/pitfalls.md`
 - 과거 분석: `outputs/racebox-analysis-2026-07-04/README.md`

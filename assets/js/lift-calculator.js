@@ -966,6 +966,10 @@
        8kt 9.5→9.5 · 10kt 7.5→7.5 · 12kt 5.25→6.25 · 14kt 3.75→5.25 ·
        16kt 3.0→4.5 · 18kt 2.25→4.0 · 20kt 2.0→3.0  (전 구간 단조·역U 유지)
        §181-C V_boat 18.1kt 불변 · runSelfTest 62/62 · matrix PASS. */
+  /* §464 — 지속 가능한 옆힘 / 라이더 체중. 실측 앵커: 옥대표 10~14kt
+     5.0㎡ 주행 시 0.56. 여유를 둬 0.60. 다른 체급 검증 전까지 잠정값. */
+  var SUSTAINABLE_SIDE_FORCE_RATIO = 0.60;
+
   var WING_AREA_REF_M2 = 7.5;      // §181-E (Danny 2026-05-22) — 5.5→7.5, heel 결합 피벗
   var WING_HEEL_COUPLE_EXP = -1.2; // §181-E (Danny 2026-05-22) — 0→−1.2, 풍속 민감도 완만화. DO_NOT_REVERT §181-E
 
@@ -1429,8 +1433,46 @@
     if (!curve.optimum) {
       return { feasible: false, error: 'no_feasible_wing', curve: curve };
     }
-    // performance = VMG 곡선 정점
-    var performance = curve.optimum.area_m2;
+    /* §464 (2026-08-31) — 지속 가능한 옆힘 한계.
+       ────────────────────────────────────────────────────────────
+       모델의 VMG 곡선 정점만 쓰면 라이더가 물리적으로 버틸 수 없는 윙을
+       추천하게 된다. 실측 대조에서 드러난 문제 —
+
+         12kt · 75kg · 상급 · AR6.5
+           곡선 정점 7.0㎡ → 필요한 옆힘 690N = 체중의 94%
+           옥대표 실사용 5.0㎡ → 410N = 체중의 56%
+
+       옆힘은 라이더가 팔과 몸으로 계속 버텨야 하는 힘이다. 체중의 90%를
+       한 시간 넘게 버틸 수는 없다. 모델의 heel-cap(H_max = m·g·tanθ)은
+       순간 균형만 보고 지속 가능성을 보지 않는다 — 상급 39° 에서
+       tan 39° = 0.81 이라 체중의 81% 까지 허용한다.
+
+       앵커는 실측이다. 옥대표는 10~14kt 에서 5.0㎡ 로 79~96% 포일링을
+       유지한다. 그 조건의 소요 옆힘이 체중의 0.56 배다. 여기에 약간의
+       여유를 둔 0.60 을 지속 한계로 잡는다.
+
+       ⚠ 이 값은 한 라이더의 실측에서 나왔다. 다른 체급·장비에서 검증되지
+       않았으므로 opts.max_side_force_ratio 로 조정 가능하게 둔다.
+       ──────────────────────────────────────────────────────────── */
+    var forceRatio = (opts.max_side_force_ratio > 0)
+      ? Number(opts.max_side_force_ratio) : SUSTAINABLE_SIDE_FORCE_RATIO;
+    var riderWeightN = Number(p.m_rider_kg) * CONST.G;
+    var forceCapN = riderWeightN * forceRatio;
+
+    /* 곡선 정점 — 공력만 본 값(참고용으로 함께 돌려준다) */
+    var aeroOptimum = curve.optimum.area_m2;
+
+    /* 지속 가능한 옆힘 안에서의 최적 — 이것이 실제 추천 */
+    var sustainable = null;
+    curve.points.forEach(function (q) {
+      if (!q.feasible || !(q.V_vmg_kt > 0)) return;
+      var d = upwindSpeed(Object.assign({}, p, { wing_area_m2: q.area_m2 }));
+      if (!d || !d.feasible) return;
+      if (!(d.side_force_N <= forceCapN)) return;
+      if (!sustainable || q.V_vmg_kt > sustainable.V_vmg_kt) sustainable = q;
+    });
+    var forceLimited = !!(sustainable && sustainable.area_m2 < aeroOptimum);
+    var performance = sustainable ? sustainable.area_m2 : aeroOptimum;
     // 풍상 주행 가능한 최소 윙 (practical floor — 이 미만은 풍상 불가)
     var feas = curve.points.filter(function (q) { return q.feasible; });
     var minFeasible = feas.length
@@ -1449,6 +1491,12 @@
       gust: gust,
       gust_offset_m2: gustOffset,
       peak_raw_m2: performance,
+      /* §464 — 공력 정점과 옆힘 한계를 구분해 돌려준다. 화면이 "왜 더 큰
+         윙을 안 권하는지" 를 말할 수 있어야 한다. */
+      aero_optimum_m2: aeroOptimum,
+      force_limited: forceLimited,
+      max_side_force_ratio: forceRatio,
+      side_force_cap_N: Math.round(forceCapN),
       min_feasible_m2: Math.round(minFeasible * 100) / 100,
       performance_vmg_kt: (perfDetail && perfDetail.feasible) ? perfDetail.V_vmg_kt : null,
       practical_vmg_kt: (pracDetail && pracDetail.feasible) ? pracDetail.V_vmg_kt : null,

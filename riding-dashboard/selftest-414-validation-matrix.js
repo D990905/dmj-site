@@ -81,12 +81,19 @@ var cases = [
 ];
 
 cases.forEach(function (c) {
+  /* ⚠ upwindCurve(p, opts) — 면적 범위는 **두 번째** 인자다.
+     한 덩어리로 넘기면 범위가 통째로 무시되고 기본값(3.0~8.0㎡, 0.25 step)
+     이 쓰인다. 그러면 곡선이 8.0 까지 뻗어 peak 가 7.5·8.0 으로 나오고,
+     요청한 상한 7.4 를 넘는 값이 '실패' 로 보고됐다. 실제 대시보드
+     호출부(coach.js)는 처음부터 두 인자를 올바로 쓰고 있었다 — 이 테스트만
+     틀렸다(§464). */
   var curve = Lift.upwindCurve({
     v_wind_kt: c.kt,
     m_rider_kg: c.m,
     skill: c.skill,
     foil_ar: c.foilAR,
-    wing_ar: 4.0,
+    wing_ar: 4.0
+  }, {
     area_min_m2: 2.5,
     area_max_m2: 7.4,
     step_m2: 0.5
@@ -125,9 +132,8 @@ console.log('PASS:', pass, ' FAIL:', fail);
 console.log('\n=== ★ Case 6 (옥대표님 verbatim) detail ===');
 var c6 = Lift.upwindCurve({
   v_wind_kt: 10, m_rider_kg: 70, skill: '상급',
-  foil_ar: 6.5, wing_ar: 4.0,
-  area_min_m2: 2.5, area_max_m2: 7.4, step_m2: 0.5
-});
+  foil_ar: 6.5, wing_ar: 4.0
+}, { area_min_m2: 2.5, area_max_m2: 7.4, step_m2: 0.5 });
 if (c6 && c6.points) {
   console.log('Wing(m²)  | V_vmg(kt) | feasible');
   c6.points.forEach(function (p) {

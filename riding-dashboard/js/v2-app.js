@@ -3294,9 +3294,142 @@
     card.appendChild(b); col.appendChild(card); return col;
   }
 
+  /* §465 장비 선택 — 바람만으로는 윙 크기를 답할 수 없다.
+     포일 면적이 이륙 속도를, 포일 스팬과 마스트가 벤틸레이션 한계를,
+     핸드윙 스팬이 팁 접촉 한계를, 수면 상태가 그 두 여유를 정한다.
+     선택은 라이더 프로필에 저장돼 다음 세션에 그대로 쓰인다. */
+  function gearSelection() {
+    var rp = {};
+    try { rp = (window.RDStorage && RDStorage.loadRider) ? (RDStorage.loadRider() || {}) : {}; }
+    catch (e) {}
+    var g = rp.gear || {};
+    var D = RDGear.DEFAULT;
+    return {
+      frontWing: g.frontWing || D.frontWing,
+      rearWing: g.rearWing || D.rearWing,
+      mast: g.mast || D.mast,
+      handWing: g.handWing || D.handWing,
+      board: g.board || D.board,
+      surface: g.surface || D.surface
+    };
+  }
+
+  function saveGear(patch) {
+    var rp = {};
+    try { rp = (window.RDStorage && RDStorage.loadRider) ? (RDStorage.loadRider() || {}) : {}; }
+    catch (e) {}
+    rp.gear = Object.assign({}, gearSelection(), patch);
+    try { RDStorage.saveRider(rp); } catch (e) {}
+  }
+
+  function renderGearPicker(host) {
+    if (!window.RDGear || !window.RDRigLimits) return;
+    var sel = gearSelection();
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Your gear today'));
+    head.appendChild(el('div', 'card-actions lab',
+      'foil area sets take-off, spans set how far you can heel'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+    var row = el('div', 'row g-2');
+
+    function pick(label, key, list, fmt, cls) {
+      var col = el('div', cls || 'col-6 col-md-4');
+      col.appendChild(el('label', 'form-label lab', label));
+      var s = el('select', 'form-select');
+      list.forEach(function (o) {
+        var op = document.createElement('option');
+        op.value = o.id; op.textContent = fmt(o);
+        if (o.id === sel[key]) op.selected = true;
+        s.appendChild(op);
+      });
+      s.addEventListener('change', function () {
+        var p = {}; p[key] = s.value; saveGear(p);
+        renderCoach(CUR.analysis, CUR.vps, CUR.whatIf);
+      });
+      col.appendChild(s);
+      return col;
+    }
+    row.appendChild(pick('Front wing', 'frontWing', RDGear.FRONT_WINGS,
+      function (o) { return o.label + '  ' + o.areaCm2 + 'cm² / ' + o.spanCm + 'cm'; }));
+    row.appendChild(pick('Mast', 'mast', RDGear.MASTS,
+      function (o) { return o.label + '  ' + o.lengthCm + 'cm'; }));
+    row.appendChild(pick('Hand wing', 'handWing', RDGear.HAND_WINGS,
+      function (o) { return o.label + '  span ' + (o.spanCm / 100).toFixed(2) + 'm'; }));
+    row.appendChild(pick('Rear wing', 'rearWing', RDGear.REAR_WINGS,
+      function (o) { return o.label + '  ' + o.spanCm + 'cm'; }));
+    row.appendChild(pick('Water state', 'surface', RDGear.SURFACE,
+      function (o) { return o.label; }));
+    body.appendChild(row);
+
+    /* 이 조합이 만드는 한계 */
+    var rider = null;
+    try {
+      var r = RDStorage.loadRider() || {};
+      rider = r.weightKg || null;
+    } catch (e) {}
+    if (!rider) {
+      body.appendChild(el('div', 'text-secondary mt-3',
+        'Enter your weight (with wetsuit) in the Training load tab to see what '
+        + 'this setup can hold.'));
+      card.appendChild(body); host.appendChild(card); return;
+    }
+    var rig = RDGear.rigMassKg(sel);
+    var lim = RDRigLimits.analyze({
+      mast: RDGear.byId(RDGear.MASTS, sel.mast),
+      frontWing: RDGear.byId(RDGear.FRONT_WINGS, sel.frontWing),
+      handWing: RDGear.byId(RDGear.HAND_WINGS, sel.handWing),
+      board: RDGear.byId(RDGear.BOARDS, sel.board) || RDGear.BOARDS[0],
+      surface: RDGear.byId(RDGear.SURFACE, sel.surface)
+    }, { riderMassKg: rider, totalMassKg: rider + rig });
+
+    var grid = el('div', 'row row-cards mt-3');
+    function tile(label, val, sub) {
+      var col = el('div', 'col-6 col-md-3');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', label));
+      b.appendChild(el('div', 'kpi__val num mt-1', val));
+      if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      c.appendChild(b); col.appendChild(c); return col;
+    }
+    grid.appendChild(tile('Take-off speed',
+      lim.minFlyingSpeedKt != null ? lim.minFlyingSpeedKt.toFixed(1) + ' kt' : '—',
+      'set by foil area'));
+    grid.appendChild(tile('Heel available',
+      Math.round(lim.maxHeelDeg) + '°',
+      'before the ' + (lim.bindingConstraint === 'foil' ? 'foil tip surfaces'
+                                                        : 'wing tip catches')));
+    grid.appendChild(tile('Side force you can hold',
+      lim.sideForceCapacityN != null ? Math.round(lim.sideForceCapacityN) + ' N' : '—',
+      'rider mass only — the rig hangs below'));
+    grid.appendChild(tile('All-up weight',
+      (rider + rig).toFixed(0) + ' kg',
+      rider + ' kg you + ' + rig.toFixed(1) + ' kg gear'));
+    body.appendChild(grid);
+
+    var note = el('div', 'text-secondary mt-3');
+    note.style.fontSize = '.8125rem';
+    note.textContent = 'Heeling the board tilts the foil from vertical toward '
+      + 'horizontal, which is how it resists the wing’s side pull — so more '
+      + 'heel means more wing you can hold. Two things stop you: the foil tip '
+      + 'breaking the surface (ventilation) and the wing tip catching the water. '
+      + 'Rough water eats the margin on both, which is why the same wing that is '
+      + 'fine on flat water is unusable in chop. On this setup the '
+      + (lim.bindingConstraint === 'foil' ? 'foil' : 'wing')
+      + ' runs out first at ' + lim.surface.toLowerCase() + '.';
+    body.appendChild(note);
+
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
   function renderCoach(a, vps, whatIf) {
     var host = $('coach-body');
     while (host.firstChild) host.removeChild(host.firstChild);
+
+    renderGearPicker(host);
 
     /* 1) SPS 분해 — 총점만 보여주면 무엇을 고쳐야 할지 알 수 없다 */
     host.appendChild(el('h3', 'mb-2', 'Sailing Performance Score'));
@@ -3489,6 +3622,9 @@
       try { whatIf = RDCoach.computeWhatIf(analysis, riderFromForm(), windSpeedFromForm()); }
       catch (e) { whatIf = null; }
     }
+    /* §465 — 장비 선택이 바뀌면 코치 탭만 다시 그린다. 그때 쓰려고
+       whatIf 를 남겨 둔다(예전에는 CUR 에 없어 undefined 가 넘어갔다). */
+    CUR.whatIf = whatIf;
     renderCoach(analysis, vps, whatIf);
   }
 
