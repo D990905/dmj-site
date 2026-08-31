@@ -96,8 +96,14 @@
             return [2, 5, 10, 30, 60, 120, 300, 600, 1800]
               .filter(function (t) { return t >= lo && t <= hi; });
           },
+          /* 로그 축의 uPlot 기본 filter 는 10의 거듭제곱이 아닌 눈금을
+             null 로 지워버린다. 우리는 splits 를 사람이 읽는 값으로
+             직접 정했으므로 그 필터를 무력화한다 — 그러지 않으면
+             지워진 자리에 'null s' 가 찍힌다. */
+          filter: function (self, splits) { return splits; },
           values: function (self, ticks) {
             return ticks.map(function (t) {
+              if (t == null || !isFinite(t)) return null;
               if (t < 60) return t + ' s';
               if (t < 3600) return (t / 60) + ' min';
               return (t / 3600) + ' h';

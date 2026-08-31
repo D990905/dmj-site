@@ -596,10 +596,20 @@
     var c4 = el('div', 'col');
     var src = el('div', 'text-secondary', '');
     src.style.fontSize = '.8125rem';
-    src.textContent = est
-      ? 'Currently ' + Math.round(a.windDir) + '° from track estimate · confidence '
-        + confLabel(est.confidence) + (est.note ? ' · ' + tr(est.note) : '')
-      : 'Currently ' + Math.round(a.windDir) + '° (manual)';
+    /* 엔진 note 는 값을 끼워 만든 한글 문장이라 사전 번역이 안 된다
+       (§452). 배너에는 구조화된 필드로 만든 영문만 쓰고, 자세한 근거는
+       아래 'Wind direction sources' 표가 담당한다. */
+    if (!est) {
+      src.textContent = 'Currently ' + Math.round(a.windDir) + '° (manual)';
+    } else {
+      var line = 'Currently ' + Math.round(a.windDir) + '° from track estimate '
+        + '· confidence ' + confLabel(est.confidence);
+      if (est.agreement) {
+        line += ' · two methods ' + (est.agreement.agree ? 'agree within ' : 'differ by ')
+              + est.agreement.deltaDeg + '°';
+      }
+      src.textContent = line;
+    }
     c4.appendChild(src); row.appendChild(c4);
 
     cb.appendChild(row); ctl.appendChild(cb); host.appendChild(ctl);
@@ -665,6 +675,202 @@
         { grid: THEME.grid, dim: THEME.dim, port: '#e03131', starboard: '#2f9e44',
           size: Math.min(400, polarHost.clientWidth || 380) });
     }
+
+    renderTargetComparison(host, a);
+    renderWindSources(host, a);
+  }
+
+  /* §452 % of target — 오늘 속도를 "내가 낼 수 있다고 확인된 속도" 와
+     비교한다. 기준선은 저장된 세션들의 각도별 상위 5% 를 누적한 개인
+     베스트 곡선이고, 저장분이 없으면 이 세션 자신이 기준이 된다
+     (그 경우 100% 근처가 나오는 게 당연하므로 근거를 함께 적는다). */
+  function renderTargetComparison(host, a) {
+    if (!An.sessionPolarProfile || !An.buildTargetPolar || !CUR.session) return;
+    if (a.windDir == null) return;
+    var cur;
+    try { cur = An.sessionPolarProfile(CUR.session, a.windDir); } catch (e) { return; }
+    if (!cur) return;
+
+    /* 저장된 다른 세션의 폴라 프로파일 누적 — 같은 시작 시각은 같은
+       세션이므로 뺀다(자기 자신과 비교하면 항상 100%). */
+    var saved = [], curEpoch = CUR.session.startEpoch || 0;
+    try {
+      (window.RDStorage ? RDStorage.listSessions() : []).forEach(function (rec) {
+        if (!rec.polarProfile || !rec.polarProfile.bins) return;
+        if (curEpoch && rec.dateEpoch === curEpoch) return;
+        saved.push(rec.polarProfile);
+      });
+    } catch (e) {}
+    var basis = saved.length ? 'cumulative' : 'single-session';
+    var target;
+    try {
+      target = An.buildTargetPolar(saved.length ? saved : [cur], { basis: basis });
+    } catch (e) { return; }
+    if (!target || (target.filledBins + target.interpolatedBins) < 2) return;
+
+    var cmp;
+    try { cmp = An.computeTargetComparison(CUR.session, a.windDir, target); } catch (e) { return; }
+    if (!cmp) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Percent of target'));
+    head.appendChild(el('div', 'card-actions lab',
+      basis === 'cumulative'
+        ? ('target from ' + saved.length + ' saved session' + (saved.length > 1 ? 's' : ''))
+        : 'target from this session only'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    /* 기준선이 이 세션 자신이면 "내 오늘 최고 대비 오늘 평균" 이라
+       세션 내부 일관성을 보는 것이고, 저장분이 쌓이면 "개인 최고 대비"
+       가 된다. 둘은 읽는 의미가 다르므로 반드시 밝힌다. */
+    if (basis === 'single-session') {
+      body.appendChild(el('div', 'alert alert-info',
+        'No other saved sessions yet, so the target is this session\u2019s own best '
+        + '5% at each wind angle. That reads as consistency within today \u2014 how '
+        + 'close your average was to your best. Save sessions and it becomes a '
+        + 'personal-best comparison across days.'));
+    }
+
+    var row = el('div', 'row row-cards');
+    [['Upwind', cmp.upwind], ['Downwind', cmp.downwind]].forEach(function (pair) {
+      var col = el('div', 'col-md-6');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', pair[0] + ' % of target'));
+      var side = pair[1];
+      if (!side || side.pctOfTarget == null) {
+        b.appendChild(el('div', 'kpi__val num mt-1', '\u2014'));
+        b.appendChild(el('div', 'kpi__sub mt-1', 'no comparable segments'));
+      } else {
+        b.appendChild(el('div', 'kpi__val num mt-1',
+          Math.round(side.pctOfTarget) + '%'));
+        var sub = (side.comparedTimeSec >= 60
+          ? Math.round(side.comparedTimeSec / 60) + ' min'
+          : Math.round(side.comparedTimeSec) + ' s') + ' compared';
+        if (side.coverage < 0.995) {
+          sub += ' \u00b7 target exists for ' + Math.round(side.coverage * 100) + '% of it';
+        }
+        b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      }
+      c.appendChild(b); col.appendChild(c); row.appendChild(col);
+    });
+    body.appendChild(row);
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* §452 풍향 추정 — 두 독립 추정(노고존 · 회전 기하)을 돌려 융합한다.
+     하나만 쓰면 그 방식의 약점이 곧 결과가 된다: 노고존만 쓰던 때
+     8/30 세션이 '신뢰도 낮음' 이었는데 회전 기하는 '높음' 이었고 두 값이
+     5° 안에서 일치했다(§449). 개별 추정치는 CUR 에 남겨 소스 비교표가
+     쓴다. */
+  function estimateWind(session) {
+    var nogo = null, rot = null;
+    try { nogo = An.estimateWindFromTrack ? An.estimateWindFromTrack(session) : null; }
+    catch (e) { nogo = null; }
+    try { rot = An.estimateWindFromManeuvers ? An.estimateWindFromManeuvers(session) : null; }
+    catch (e) { rot = null; }
+    CUR.windNogo = nogo; CUR.windRotation = rot;
+    if (!An.buildWindSources) return nogo || rot;
+    var ws = null;
+    try { ws = An.buildWindSources({ nogo: nogo, rotation: rot }); } catch (e) { ws = null; }
+    var rec = ws && ws.recommended;
+    if (!rec || rec.windDir == null) return nogo || rot;
+    return {
+      windDir: rec.windDir, confidence: rec.confidence, note: rec.note,
+      sourceId: rec.sourceId, agreement: ws.agreement
+    };
+  }
+
+  /* §452 풍향 소스 비교 — 추정은 방식마다 약점이 다르다. 두 독립 추정을
+     나란히 두고 얼마나 어긋나는지 보여주면, 하나만 믿는 것보다 낫다.
+     (§449: 노고존만 쓰던 때 8/30 세션이 '낮음' 이었는데 회전 기하는
+     '높음' 이었고 두 값은 5° 안에서 일치했다.) */
+  function renderWindSources(host, a) {
+    if (!An.buildWindSources) return;
+    var nogo = CUR.windNogo || null, rot = CUR.windRotation || null;
+    if (!nogo && !rot) return;
+    var ws;
+    try {
+      ws = An.buildWindSources({
+        manualDir: CUR.manualWindDir != null ? CUR.manualWindDir : null,
+        nogo: nogo, rotation: rot
+      });
+    } catch (e) { return; }
+    if (!ws) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Wind direction sources'));
+    if (ws.agreement) {
+      head.appendChild(el('div', 'card-actions lab',
+        'two estimates differ by ' + ws.agreement.deltaDeg + '\u00b0'));
+    }
+    card.appendChild(head);
+
+    var wrap = el('div', 'table-responsive');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Source', 'Direction', 'Confidence', 'How it works'].forEach(function (x, i) {
+      htr.appendChild(el('th', i === 1 || i === 2 ? 'text-end' : null, x));
+    });
+    th.appendChild(htr); t.appendChild(th);
+    var LABEL = {
+      manual: 'Entered by you', nogo: 'No-go zone', rotation: 'Turn geometry',
+      weather: 'Weather service', lineup: 'Line-up capture', imu: 'Watch IMU'
+    };
+    var HOW = {
+      manual: 'What you typed in — treated as confirmed.',
+      nogo: 'The empty wedge in the heading histogram: you cannot sail straight into wind.',
+      rotation: 'Bisector of entry and exit headings across every detected tack and gybe.',
+      weather: 'Not connected yet.',
+      lineup: 'Not captured for this session.',
+      imu: 'Not available.'
+    };
+    var tb = el('tbody');
+    ws.sources.forEach(function (src) {
+      if (src.windDir == null && src.available === false && src.id !== 'weather') return;
+      var tr = el('tr');
+      var isRec = ws.recommended && ws.recommended.sourceId === src.id;
+      if (isRec) tr.className = 'table-active';
+      var nameTd = el('td', null, LABEL[src.id] || src.id);
+      if (isRec) nameTd.appendChild(el('span', 'badge bg-blue-lt ms-2', 'used'));
+      tr.appendChild(nameTd);
+      tr.appendChild(el('td', 'text-end num',
+        src.windDir == null ? '\u2014' : Math.round(src.windDir) + '\u00b0'));
+      /* 엔진 신뢰도는 한글('높음')이다 — 이 페이지는 영어라 변환한다. */
+      tr.appendChild(el('td', 'text-end',
+        src.confidence ? confLabel(src.confidence) : '\u2014'));
+      tr.appendChild(el('td', 'text-secondary', HOW[src.id] || ''));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
+
+    /* 엔진 note 는 값을 끼워 만든 한글 문장이라 사전으로 번역되지 않는다.
+       구조화된 필드(agreement·confidence)에서 영문을 직접 만든다. */
+    var msg = null;
+    if (ws.agreement) {
+      msg = ws.agreement.agree
+        ? ('The two independent estimates agree within '
+           + ws.agreement.deltaDeg + '\u00b0.')
+        : ('The two independent estimates disagree by '
+           + ws.agreement.deltaDeg + '\u00b0 \u2014 check the track and set the '
+           + 'direction yourself if you know it.');
+      if (ws.recommended && ws.recommended.confidence === '\ub0ae\uc74c') {
+        msg += ' Both methods are weak on this session, so treat VMG, wind angle '
+             + 'and the polar as indicative only.';
+      }
+    } else if (ws.recommended) {
+      msg = 'Only one estimate could be made for this session.';
+    }
+    if (msg) {
+      var f = el('div', 'card-footer text-secondary');
+      f.style.fontSize = '.8125rem';
+      f.textContent = msg;
+      card.appendChild(f);
+    }
+    host.appendChild(card);
   }
 
   /* ---------- 고속 구간 (Run) · 퍼포먼스 통계 ---------- */
@@ -672,6 +878,8 @@
     var host = $('perf-extra');
     if (!host) return;
     while (host.firstChild) host.removeChild(host.firstChild);
+
+    renderTackDistribution(host, a);
 
     /* §450 Speed splits — mean-max 곡선이 모양을 보여주고, 이 표가 그
        곡선의 앵커 값을 숫자로 준다. Waterspeed 의 'Best Speed Splits'
@@ -882,6 +1090,7 @@
         'No saved sessions yet. Use "Save session" in the header to start building a season trend.'));
       return;
     }
+    renderCareer(host);
     var card = el('div', 'card');
     var h = el('div', 'card-header');
     h.appendChild(el('h3', 'card-title', 'Saved sessions'));
@@ -1110,6 +1319,275 @@
     });
     t.appendChild(tb); wrap.appendChild(t); card2.appendChild(wrap);
     lh.appendChild(card2);
+
+    renderTurnCoaching(host, a);
+  }
+
+  /* §452 커리어 — 저장된 세션을 통틀어 누적과 개인 최고. 한 세션만
+     보면 오늘이 좋았는지 알 수 없다. 개인 최고는 그 기록이 나온 날짜를
+     함께 적어야 의미가 있다(언제부터 안 깨졌는지). */
+  function renderCareer(host) {
+    if (!window.RDStorage || !RDStorage.careerStats) return;
+    var career, pb;
+    try {
+      career = RDStorage.careerStats();
+      pb = RDStorage.personalBests ? RDStorage.personalBests() : null;
+    } catch (e) { return; }
+    if (!career || !career.sessionCount) return;
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Career totals'));
+    head.appendChild(el('div', 'card-actions lab',
+      career.sessionCount + ' saved session' + (career.sessionCount > 1 ? 's' : '')));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    var row = el('div', 'row row-cards');
+    function tile(label, val, sub) {
+      var col = el('div', 'col-6 col-md-3');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', label));
+      b.appendChild(el('div', 'kpi__val num mt-1', val));
+      if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      c.appendChild(b); col.appendChild(c); return col;
+    }
+    row.appendChild(tile('Total distance',
+      (career.totalDistanceM / 1000).toFixed(1) + ' km', 'across all sessions'));
+    row.appendChild(tile('Total time',
+      fmtClock(career.totalMovingSec || 0), 'moving time'));
+    row.appendChild(tile('Sessions', String(career.sessionCount), 'saved'));
+    row.appendChild(tile('Average speed',
+      career.avgSpeedMs != null ? (career.avgSpeedMs * KT).toFixed(1) + ' kt' : '\u2014',
+      'total distance \u00f7 total time'));
+    body.appendChild(row);
+
+    /* 개인 최고 — 값과 함께 언제 나왔는지 */
+    var defs = [
+      ['maxSpeedMs', 'Top speed', 'speed'],
+      ['peak10sMs', 'Best 10 s', 'speed'],
+      ['best500mMs', 'Best 500 m', 'speed'],
+      ['distanceM', 'Longest ride', 'dist']
+    ];
+    var rows = defs.map(function (d) {
+      var rec = pb && pb[d[0]];
+      return (rec && rec.value) ? { def: d, rec: rec } : null;
+    }).filter(Boolean);
+
+    if (rows.length) {
+      var wrap = el('div', 'table-responsive mt-3');
+      var t = el('table', 'table table-vcenter card-table table-sm');
+      var th = el('thead'), htr = el('tr');
+      ['Personal best', 'Value', 'Set on', 'Session'].forEach(function (x, i) {
+        htr.appendChild(el('th', i === 1 ? 'text-end' : null, x));
+      });
+      th.appendChild(htr); t.appendChild(th);
+      var tb = el('tbody');
+      rows.forEach(function (r) {
+        var tr = el('tr');
+        tr.appendChild(el('td', null, r.def[1]));
+        tr.appendChild(el('td', 'text-end num',
+          r.def[2] === 'speed'
+            ? (r.rec.value * KT).toFixed(1) + ' kt'
+            : (r.rec.value / 1000).toFixed(2) + ' km'));
+        var d = r.rec.dateEpoch ? new Date(r.rec.dateEpoch) : null;
+        tr.appendChild(el('td', 'num text-secondary',
+          d ? d.toISOString().slice(0, 10) : '\u2014'));
+        tr.appendChild(el('td', 'text-secondary', r.rec.sessionName || '\u2014'));
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    }
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* §452 택별 분포 — 통계표는 평균·상위 50/20% 라는 '점' 을 주고,
+     이 그림은 '퍼짐' 을 준다. 같은 평균이라도 고르게 낸 속도와 몰아친
+     속도는 다른 문제다. 포트·스타보드를 위아래로 맞대어 좌우 비대칭을
+     한눈에 본다(§421 이후 계속 문제였던 부분). */
+  var TDIST = { metric: 'sog', mode: 'upwind' };
+
+  function renderTackDistribution(host, a) {
+    var ts = a.wind && a.wind.tackSplit;
+    if (!ts) return;
+
+    var card = el('div', 'card');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Distribution by tack'));
+    var act = el('div', 'card-actions d-flex gap-2');
+
+    function pick(list, key, cur, onPick) {
+      var sel = el('select', 'form-select form-select-sm');
+      sel.style.width = 'auto';
+      list.forEach(function (o) {
+        var op = document.createElement('option');
+        op.value = o[0]; op.textContent = o[1];
+        if (o[0] === cur) op.selected = true;
+        sel.appendChild(op);
+      });
+      sel.addEventListener('change', function () { onPick(sel.value); });
+      return sel;
+    }
+    act.appendChild(pick([['sog', 'Speed'], ['vmg', 'VMG'], ['twa', 'Wind angle']],
+      'metric', TDIST.metric, function (v) {
+        TDIST.metric = v; renderPerfExtra(a);
+      }));
+    act.appendChild(pick([['upwind', 'Upwind'], ['downwind', 'Downwind']],
+      'mode', TDIST.mode, function (v) {
+        TDIST.mode = v; renderPerfExtra(a);
+      }));
+    head.appendChild(act);
+    card.appendChild(head);
+
+    var body = el('div', 'card-body');
+    var side = ts[TDIST.mode];
+    var P = (side && side.P && side.P.samples) || [];
+    var S = (side && side.S && side.S.samples) || [];
+    if (!P.length && !S.length) {
+      body.appendChild(el('div', 'text-secondary',
+        'No sustained ' + TDIST.mode + ' sailing in this session.'));
+      card.appendChild(body); host.appendChild(card); return;
+    }
+
+    var M = TDIST.metric;
+    /* 값 변환 — 속도·VMG 는 m/s 라 kt 로, 풍각은 절대값(부호는 택 구분). */
+    function val(x) {
+      var v = x[M];
+      if (v == null || !isFinite(v)) return null;
+      if (M === 'twa') return Math.abs(v);
+      return Math.abs(v) * KT;
+    }
+    var pv = P.map(val).filter(function (v) { return v != null; });
+    var sv = S.map(val).filter(function (v) { return v != null; });
+    var all = pv.concat(sv);
+    if (!all.length) {
+      body.appendChild(el('div', 'text-secondary', 'No samples for this metric.'));
+      card.appendChild(body); host.appendChild(card); return;
+    }
+
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
+    if (!(hi > lo)) { hi = lo + 1; }
+    var NB = 26, w = (hi - lo) / NB;
+    function hist(arr) {
+      var h = new Array(NB).fill(0);
+      arr.forEach(function (v) {
+        var i = Math.min(NB - 1, Math.floor((v - lo) / w));
+        h[i]++;
+      });
+      var mx = Math.max.apply(null, h) || 1;
+      return h.map(function (c) { return c / mx; });
+    }
+    var hp = hist(pv), hs = hist(sv);
+
+    /* 두 히스토그램을 같은 축에 위아래로 — 포트는 위, 스타보드는 아래 */
+    var W = 640, H = 150, MID = H / 2, PAD = 26;
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + (H + PAD));
+    svg.setAttribute('width', '100%');
+    svg.style.maxWidth = W + 'px';
+    function bars(h, up, color) {
+      var bw = W / NB;
+      h.forEach(function (f, i) {
+        if (!(f > 0)) return;
+        var bh = f * (MID - 6);
+        var r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        r.setAttribute('x', (i * bw + 0.8).toFixed(1));
+        r.setAttribute('width', (bw - 1.6).toFixed(1));
+        r.setAttribute('y', (up ? MID - bh : MID).toFixed(1));
+        r.setAttribute('height', bh.toFixed(1));
+        r.setAttribute('fill', color);
+        r.setAttribute('opacity', '0.85');
+        svg.appendChild(r);
+      });
+    }
+    bars(hp, true, '#e03131');     /* 포트 = 적색 (국제 관례) */
+    bars(hs, false, '#2f9e44');    /* 스타보드 = 녹색 */
+    var axis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    axis.setAttribute('x1', 0); axis.setAttribute('x2', W);
+    axis.setAttribute('y1', MID); axis.setAttribute('y2', MID);
+    axis.setAttribute('stroke', THEME.grid);
+    svg.appendChild(axis);
+    [0, 0.5, 1].forEach(function (f) {
+      var tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tx.setAttribute('x', (f * W).toFixed(0));
+      tx.setAttribute('y', H + 16);
+      tx.setAttribute('fill', THEME.dim);
+      tx.setAttribute('font-size', '11');
+      tx.setAttribute('font-family', '"IBM Plex Mono", monospace');
+      tx.setAttribute('text-anchor', f === 0 ? 'start' : (f === 1 ? 'end' : 'middle'));
+      tx.textContent = (lo + f * (hi - lo)).toFixed(M === 'twa' ? 0 : 1)
+        + (M === 'twa' ? '\u00b0' : ' kt');
+      svg.appendChild(tx);
+    });
+    body.appendChild(svg);
+
+    var leg = el('div', 'd-flex gap-4 mt-2');
+    function chip(color, label, arr) {
+      var d = el('div', 'd-flex align-items-center gap-2');
+      var sw = el('span', 'zone-sw'); sw.style.background = color;
+      d.appendChild(sw);
+      var med = null;
+      if (arr.length) {
+        var v = arr.slice().sort(function (x, y) { return x - y; });
+        med = v[v.length >> 1];
+      }
+      d.appendChild(el('span', 'text-secondary',
+        label + ' \u00b7 ' + arr.length + ' samples'
+        + (med != null ? ' \u00b7 median ' + med.toFixed(1) : '')));
+      return d;
+    }
+    leg.appendChild(chip('#e03131', 'Port (above)', pv));
+    leg.appendChild(chip('#2f9e44', 'Starboard (below)', sv));
+    body.appendChild(leg);
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* §452 회전 코칭 — 규칙 엔진(RDCoach.computeTurnCoaching)이 이 세션의
+     모든 회전을 보고 진단·조언을 낸다. 기존 대시보드는 회전을 클릭해야
+     떴지만, 여기서는 세션 전체를 한 번에 넘겨 "오늘 회전에서 가장 큰
+     문제" 를 바로 보여준다. 문구는 i18n 사전을 타므로 영어로 나온다. */
+  function renderTurnCoaching(host, a) {
+    if (!window.RDCoach || !RDCoach.computeTurnCoaching) return;
+    var mans = a.maneuvers || [];
+    if (!mans.length) return;
+    var res;
+    try {
+      res = RDCoach.computeTurnCoaching(mans, a.windDir, a, riderFromForm(),
+        { toSpeed: function (ms) { return ms * KT; }, speedUnit: 'kt' });
+    } catch (e) { return; }
+    if (!res || !res.ok) return;
+    var comments = res.comments || [];
+    if (!comments.length && !res.guard) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Turn coaching'));
+    head.appendChild(el('div', 'card-actions lab', mans.length + ' turns reviewed'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    if (res.headline) {
+      body.appendChild(el('div', 'fw-bold mb-3', tr(res.headline)));
+    }
+    /* guard = 표본 부족 등으로 진단을 보류한 사유. 조언보다 먼저 보여야
+       사용자가 "왜 항목이 적은지" 를 안다. */
+    if (res.guard) {
+      body.appendChild(el('div', 'alert alert-info', tr(res.guard)));
+    }
+    var TONE = { warn: 'alert alert-warning', bad: 'alert alert-danger',
+                 good: 'alert alert-success' };
+    comments.forEach(function (c) {
+      var box = el('div', (TONE[c.status] || 'alert alert-info') + ' mb-2');
+      box.appendChild(el('div', 'fw-bold', tr(c.title)));
+      if (c.numbers) box.appendChild(el('div', 'num mt-1', tr(c.numbers)));
+      box.appendChild(el('div', 'mt-1', tr(c.diagnosis)));
+      if (c.advice) box.appendChild(el('div', 'mt-1 text-secondary', tr(c.advice)));
+      body.appendChild(box);
+    });
+    card.appendChild(body);
+    host.appendChild(card);
   }
 
   /* ---------- 자세 (힐 · 피치) ---------- */
@@ -1547,7 +2025,7 @@
       return;
     }
     if (mode === 're-estimate') {
-      try { est = An.estimateWindFromTrack(CUR.session); } catch (e) { est = null; }
+      est = estimateWind(CUR.session);
       dir = est && est.windDir != null ? est.windDir : null;
     } else { est = null; }
     var a = An.analyzeSession(CUR.session, dir,
@@ -1561,7 +2039,6 @@
     CUR.session = session; CUR.name = name; CUR.est = est;
     CUR.windDir = analysis.windDir;
     CUR.analysis = analysis;
-    CUR.vps = vps;
     plots.length = 0;
     $('hdr-title').textContent = name || 'Session';
     var d = session.startEpoch ? new Date(session.startEpoch) : null;
@@ -1574,6 +2051,11 @@
         vps = RDCoach.computeVPS(analysis, riderFromForm(), analysis.windDir, windSpeedFromForm());
       } catch (e) { vps = null; }
     }
+    /* §452 — CUR.vps 는 여기서 담는다. 예전에는 이 계산보다 위에서
+       담았는데, var 호이스팅 때문에 항상 undefined 가 들어가 세션을
+       저장해도 SPS 가 null 로 기록됐다(시즌 흐름·저장 목록에서 SPS 가
+       늘 비어 있던 원인). */
+    CUR.vps = vps;
     renderKpis(analysis, vps);
     var note = $('rider-note');
     if (note) note.textContent = (vps && vps.ok === false && vps.missing)
@@ -1737,8 +2219,7 @@
       try {
         var res = RDSessionMerger.mergeFiles(loaded);
         var session = An.normalizeSession(res.parsed);
-        var est = null;
-        try { est = An.estimateWindFromTrack(session); } catch (e2) { est = null; }
+        var est = estimateWind(session);
         var wd = est && est.windDir != null ? est.windDir : null;
         var analysis = An.analyzeSession(session, wd,
           est ? { windConfidence: est.confidence } : {});
@@ -1771,9 +2252,7 @@
     var session = An.normalizeSession(parsed);
     /* 풍향이 없으면 택/자이브 분류·VMG·폴라가 전부 잠긴다.
        트랙에서 자동 추정해 기본값으로 쓰고, 추정임을 화면에 밝힌다. */
-    var est = null;
-    try { est = An.estimateWindFromTrack ? An.estimateWindFromTrack(session) : null; }
-    catch (e) { est = null; }
+    var est = estimateWind(session);
     var wd = est && est.windDir != null ? est.windDir : null;
     var analysis = An.analyzeSession(session, wd, est ? { windConfidence: est.confidence } : {});
     show(session, analysis, name, est);
