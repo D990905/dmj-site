@@ -133,6 +133,32 @@ ok(sumProg.upwindGainM > sumNoProg.upwindGainM,
 ok(sumProg.sustainedUpwindM === sumNoProg.upwindGainM,
    '지속 레그 값도 따로 보존한다');
 
+console.log('\n[6c] §461 연습 세션 판정');
+/* 25초 이상 지속 레그가 주행 시간을 얼마나 덮는지로 가른다.
+   실측: 8/31 자이브 연습 13% · 8/30 12:32 71% · 8/29 63%. */
+var drillPts = line(0, 8, 400);
+drillPts.forEach(function (p, i) {
+  var phase = Math.floor(i / 15) % 2;     /* 15초마다 방향 전환 */
+  p.twa = phase ? 45 : 135;
+  p.vmg = phase ? 5.6 : -5.6;
+});
+var drillSess = mkSession(drillPts);
+var drillLegs = GL.legGains(drillSess, 0, { minSec: 25, minKt: 5 });
+var drillShape = GL.sessionShape(drillSess, 0, drillLegs, { minKt: 5 });
+ok(drillShape.isDrillLike === true,
+   '15초마다 도는 트랙 → 연습형',
+   (drillShape.sustainedShare * 100).toFixed(0) + '%');
+
+var runPts = line(0, 8, 400);
+runPts.forEach(function (p) { p.twa = 45; p.vmg = 5.6; });
+var runSess = mkSession(runPts);
+var runLegs = GL.legGains(runSess, 0, { minSec: 25, minKt: 5 });
+var runShape = GL.sessionShape(runSess, 0, runLegs, { minKt: 5 });
+ok(runShape.isDrillLike === false,
+   '끊김 없는 긴 주행 → 주행형',
+   (runShape.sustainedShare * 100).toFixed(0) + '%');
+ok(runShape.planingSec > 300, '주행 시간을 잰다', Math.round(runShape.planingSec));
+
 console.log('\n[7] 순손실(B) 은 부족분(A) 을 넘을 수 없다');
 /* B = Σ(vref−v)dt, A = Σmax(0,vref−v)dt — 같은 표본이면 정의상 B ≤ A.
    다른 출처(엔진 VMG vs 위치)를 섞거나 B 를 vref×경과시간 으로 따로

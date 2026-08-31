@@ -314,6 +314,34 @@
     return { upwindM: up, downwindM: down, upwindSec: upSec, downwindSec: downSec };
   }
 
+  /* ---------- 세션 성격 판정 ----------
+     같은 지표라도 "코스를 달린 세션" 과 "회전 연습 세션" 은 읽는 법이
+     다르다. 연습에서는 계속 도는 것이 목적이므로 회전 손실을 '손해' 로
+     부르면 안 된다 — 그건 연습의 비용이지 실수가 아니다.
+
+     판정: 지속 레그(25초+)에 쓴 시간이 주행 시간의 일부에 그치면
+     "짧게 끊어 도는 세션" 이다. 8/31 실측 10%, 8/30 세션들은 40~70%. */
+  function sessionShape(session, twd, legs, opts) {
+    opts = opts || {};
+    var minKt = opts.minKt != null ? opts.minKt : 12;
+    var S = (session && session.samples) || [];
+    var planingSec = 0;
+    for (var i = 1; i < S.length; i++) {
+      var dt = S[i].t - S[i - 1].t;
+      if (!(dt > 0) || dt > 5) continue;
+      if (S[i].speed != null && S[i].speed * KT >= minKt) planingSec += dt;
+    }
+    var legSec = (legs || []).reduce(function (a, l) { return a + l.durationSec; }, 0);
+    var ratio = planingSec > 0 ? legSec / planingSec : 0;
+    return {
+      planingSec: planingSec,
+      sustainedLegSec: legSec,
+      sustainedShare: ratio,
+      /* 임계 0.25 — 8/31(0.10) 과 8/30(0.4~0.7) 사이에서 넉넉히 가른다. */
+      isDrillLike: ratio < 0.25
+    };
+  }
+
   /* ---------- 요약 ---------- */
   function summarize(losses, legs, progress) {
     var byType = {};
@@ -386,7 +414,8 @@
 
   var API = {
     ladderRung: ladderRung, maneuverLoss: maneuverLoss,
-    legGains: legGains, zoneProgress: zoneProgress, summarize: summarize,
+    legGains: legGains, zoneProgress: zoneProgress, sessionShape: sessionShape,
+    summarize: summarize,
     EXCL_SEC: EXCL_SEC, REF_SEC: REF_SEC, TAIL_SEC: TAIL_SEC
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

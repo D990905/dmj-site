@@ -1304,7 +1304,7 @@
      잰다 — 워터스피드 Ultra 의 Gain/Loss 에 대응. */
   function renderGainLoss(host, a) {
     if (!window.RDGainLoss || !CUR.session || a.windDir == null) return;
-    var L, legs, sum;
+    var L, legs, sum, shape = null;
     try {
       L = RDGainLoss.maneuverLoss(CUR.session, a.maneuvers || [], a.windDir);
       legs = RDGainLoss.legGains(CUR.session, a.windDir);
@@ -1314,16 +1314,34 @@
       var prog = RDGainLoss.zoneProgress
         ? RDGainLoss.zoneProgress(CUR.session, a.windDir) : null;
       sum = RDGainLoss.summarize(L, legs, prog);
+      shape = RDGainLoss.sessionShape
+        ? RDGainLoss.sessionShape(CUR.session, a.windDir, legs) : null;
     } catch (e) { return; }
     if (!sum) return;
 
+    /* §461 — 계속 도는 연습 세션에서는 회전이 목적이지 실수가 아니다.
+       그런 세션에 "손실" 이라고 쓰면 연습의 비용을 실책으로 읽게 만든다.
+       판정은 지속 레그가 주행 시간의 얼마를 덮는지로 한다. */
+    var drill = !!(shape && shape.isDrillLike);
+
     var card = el('div', 'card mt-3');
     var head = el('div', 'card-header');
-    head.appendChild(el('h3', 'card-title', 'Gain and loss'));
+    head.appendChild(el('h3', 'card-title',
+      drill ? 'What the turns cost' : 'Gain and loss'));
     head.appendChild(el('div', 'card-actions lab',
       'distance along the wind axis'));
     card.appendChild(head);
     var body = el('div', 'card-body');
+
+    if (drill) {
+      body.appendChild(el('div', 'alert alert-info',
+        'Only ' + Math.round(shape.sustainedShare * 100) + '% of your planing time '
+        + 'was spent on a straight run of 25 seconds or more, so this reads as a '
+        + 'turning session rather than sailing a course. The numbers below are '
+        + 'still the cost of each turn, but in a drill that cost is the price of '
+        + 'the repetition, not a mistake \u2014 the useful figure is the cost per '
+        + 'turn and whether it falls as the session goes on, not the total.'));
+    }
 
     var row = el('div', 'row row-cards');
     function tile(label, val, sub, tone) {
@@ -1344,14 +1362,29 @@
     /* 라벨을 분명히 — 이 값은 거리이지 속도 감소율이 아니다. 예전에는
        "% of upwind gain" 이라고만 적어 "출구 속도가 그만큼 느려졌다" 로
        읽혔다(옥대표 지적). */
-    row.appendChild(tile('Ground lost in tacks', m(sum.tackLossM),
-      sum.tackLossPct != null
-        ? 'equals ' + sum.tackLossPct.toFixed(0) + '% of the ground made upwind'
-        : '', '#e8590c'));
-    row.appendChild(tile('Ground lost in gybes', m(sum.gybeLossM),
-      sum.gybeLossPct != null
-        ? 'equals ' + sum.gybeLossPct.toFixed(0) + '% of the ground made downwind'
-        : '', '#e8590c'));
+    /* 연습 세션이면 총합보다 회전당 비용이 읽을 값이다. */
+    function grp(type) {
+      var g = (sum.groups || []).filter(function (x) { return x.type === type; });
+      var n = g.reduce(function (t2, x) { return t2 + x.count; }, 0);
+      var tot = g.reduce(function (t2, x) { return t2 + x.totalVmgLossM; }, 0);
+      return { n: n, avg: n ? tot / n : null, total: tot };
+    }
+    var gt = grp('tack'), gg = grp('gybe');
+    if (drill) {
+      row.appendChild(tile('Cost per tack', m(gt.avg),
+        gt.n ? gt.n + ' tacks measured' : 'none measured', '#e8590c'));
+      row.appendChild(tile('Cost per gybe', m(gg.avg),
+        gg.n ? gg.n + ' gybes measured' : 'none measured', '#e8590c'));
+    } else {
+      row.appendChild(tile('Ground lost in tacks', m(sum.tackLossM),
+        sum.tackLossPct != null
+          ? 'equals ' + sum.tackLossPct.toFixed(0) + '% of the ground made upwind'
+          : '', '#e8590c'));
+      row.appendChild(tile('Ground lost in gybes', m(sum.gybeLossM),
+        sum.gybeLossPct != null
+          ? 'equals ' + sum.gybeLossPct.toFixed(0) + '% of the ground made downwind'
+          : '', '#e8590c'));
+    }
     body.appendChild(row);
 
     /* 그룹별 — 어느 회전이 제일 비싼가 */
@@ -2088,6 +2121,7 @@
     card2.appendChild(fn);
     lh.appendChild(card2);
 
+    renderTurnProgression(host, a);
     renderTurnGroups(host, a);
     renderTurnCoaching(host, a);
     renderTurnDetail(host, a);
@@ -2290,6 +2324,174 @@
                    return v == null ? '\u2014' : (v > 0 ? '+' : '') + v.toFixed(1) + ' s';
                  } }].concat(opts)
     }, data, hostEl), hostEl);
+  }
+
+  /* §461 회전 연습 추이 — 세션을 4등분해 회전 품질이 어떻게 변했나.
+     연습 세션에서는 "얼마나 멀리 갔나" 가 아니라 "회전이 늘었나" 가
+     유일하게 의미 있는 질문이다.
+
+     품질이 떨어진 구간이 나오면 **조건이 바뀐 건지 사람이 지친 건지**를
+     같이 본다 — 활주 시간과 심박이 함께 떨어졌으면 바람이 죽은 것이고,
+     심박이 유지된 채 품질만 떨어졌으면 피로다. 이 구분을 안 하면 바람이
+     죽은 걸 기량 저하로 오독한다(8/31 실측: 4구간 심박 150→123). */
+  function renderTurnProgression(host, a) {
+    var mans = (a.maneuvers || []).filter(function (m) {
+      return m.type === 'tack' || m.type === 'gybe';
+    });
+    if (mans.length < 12) return;
+    var S = (CUR.session && CUR.session.samples) || [];
+    if (!S.length) return;
+    var t0 = S[0].t, tN = S[S.length - 1].t, span = tN - t0;
+    if (!(span > 0)) return;
+
+    var Q = 4, buckets = [];
+    for (var q = 0; q < Q; q++) {
+      buckets.push({ turns: [], planingSec: 0, hrSum: 0, hrN: 0 });
+    }
+    mans.forEach(function (m) {
+      var qi = Math.min(Q - 1, Math.floor(m.tSec / span * Q));
+      if (qi >= 0) buckets[qi].turns.push(m);
+    });
+    for (var i = 1; i < S.length; i++) {
+      var dt = S[i].t - S[i - 1].t;
+      if (!(dt > 0) || dt > 5) continue;
+      var qj = Math.min(Q - 1, Math.floor((S[i].t - t0) / span * Q));
+      var bk = buckets[qj];
+      if (S[i].speed != null && S[i].speed * KT >= 12) bk.planingSec += dt;
+      if (S[i].hr != null) { bk.hrSum += S[i].hr; bk.hrN++; }
+    }
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'How the turns went over the session'));
+    head.appendChild(el('div', 'card-actions lab',
+      mans.length + ' turns, split into quarters'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+    var wrap = el('div', 'table-responsive');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Quarter', 'Turns', 'Efficiency', 'Entry', 'Lowest', 'Exit',
+     'Stayed on foil', 'Planing', 'Avg HR'].forEach(function (x, i) {
+      htr.appendChild(el('th', i ? 'text-end' : null, x));
+    });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+    function mean(arr, f) {
+      var v = arr.map(f).filter(function (x) { return x != null && isFinite(x); });
+      return v.length ? v.reduce(function (p2, c) { return p2 + c; }, 0) / v.length : null;
+    }
+    var rows = [];
+    buckets.forEach(function (bk, q) {
+      var n = bk.turns.length;
+      var r = {
+        q: q, n: n,
+        eff: mean(bk.turns, function (m) { return m.efficiency; }),
+        foil: bk.turns.filter(function (m) { return m.foilKept; }).length,
+        entry: mean(bk.turns, function (m) { return m.entrySpeedMs; }),
+        low: mean(bk.turns, function (m) { return m.minSpeedMs; }),
+        exit: mean(bk.turns, function (m) { return m.exitSpeedMs; }),
+        planingSec: bk.planingSec,
+        hr: bk.hrN ? bk.hrSum / bk.hrN : null
+      };
+      rows.push(r);
+      var tr = el('tr');
+      tr.appendChild(el('td', null, (q + 1) + ' of 4'));
+      tr.appendChild(el('td', 'text-end num', String(n)));
+      tr.appendChild(el('td', 'text-end num',
+        r.eff == null ? '—' : Math.round(r.eff)));
+      [r.entry, r.low, r.exit].forEach(function (v) {
+        tr.appendChild(el('td', 'text-end num',
+          v == null ? '—' : (v * KT).toFixed(1)));
+      });
+      tr.appendChild(el('td', 'text-end num', n ? (r.foil + '/' + n) : '—'));
+      tr.appendChild(el('td', 'text-end num', fmtClock(r.planingSec)));
+      tr.appendChild(el('td', 'text-end num',
+        r.hr == null ? '—' : Math.round(r.hr)));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+
+    var first = rows[0], last = rows[rows.length - 1];
+    var withEff = rows.filter(function (r) { return r.eff != null; });
+    var best = withEff.slice().sort(function (x, y) { return y.eff - x.eff; })[0];
+    var msgs = [];
+    if (first.eff != null && best && best.q !== 0 && best.eff - first.eff >= 8) {
+      msgs.push('Turn efficiency rose from ' + Math.round(first.eff)
+        + ' in the first quarter to ' + Math.round(best.eff) + ' by quarter '
+        + (best.q + 1) + '. The warm-up is real — count the opening turns of a '
+        + 'session as warm-up, not as your level.');
+    }
+    /* 마지막 구간이 나빠졌는지는 효율만으로 판단하면 안 된다. 효율은
+       상대 지표라 조건이 나빠져도 잘 안 움직인다 — 실제로 8/31 4구간은
+       효율이 3점밖에 안 떨어졌지만 포일 유지가 22/24 → 7/12 로 무너졌다.
+       포일 유지율·진입 속도까지 함께 본다. */
+    function foilRate(r) { return r.n ? r.foil / r.n : null; }
+    var bestFoil = null;
+    withEff.forEach(function (r) {
+      var fr = foilRate(r);
+      if (fr != null && (bestFoil == null || fr > bestFoil.rate)) {
+        bestFoil = { rate: fr, r: r };
+      }
+    });
+    var lastFoil = foilRate(last);
+    var effDrop = (last.eff != null && best) ? best.eff - last.eff : 0;
+    var foilDrop = (bestFoil && lastFoil != null) ? bestFoil.rate - lastFoil : 0;
+    var entryDrop = (best && best.entry != null && last.entry != null)
+      ? (best.entry - last.entry) * KT : 0;
+    var degraded = (effDrop >= 8) || (foilDrop >= 0.25) || (entryDrop >= 2);
+
+    if (degraded) {
+      var planingDrop = best.planingSec > 0
+        ? 1 - (last.planingSec / best.planingSec) : 0;
+      var hrDrop = (best.hr != null && last.hr != null) ? (best.hr - last.hr) : null;
+      var what = [];
+      if (foilDrop >= 0.15 && lastFoil != null) {
+        what.push('turns holding the foil fell to ' + last.foil + ' of ' + last.n);
+      }
+      if (entryDrop >= 1.5) {
+        what.push('entry speed dropped ' + entryDrop.toFixed(1) + ' kt');
+      }
+      if (effDrop >= 8) what.push('efficiency fell ' + Math.round(effDrop) + ' points');
+      var lead = 'By the last quarter ' + (what.length ? what.join(' and ') : 'turn quality fell')
+        + '. ';
+      if (planingDrop > 0.35 && hrDrop != null && hrDrop > 12) {
+        msgs.push(lead + 'Planing time also fell ' + Math.round(planingDrop * 100)
+          + '% and average heart rate dropped ' + Math.round(hrDrop) + ' bpm. '
+          + 'Struggling harder for less would push heart rate up \u2014 both falling '
+          + 'together points at the wind dying rather than you fading.');
+      } else if (hrDrop != null && hrDrop < 5) {
+        msgs.push(lead + 'Heart rate held up through it, which reads as fatigue '
+          + 'rather than conditions \u2014 the useful part of a session can end '
+          + 'before the time does.');
+      } else {
+        msgs.push(lead + 'Planing time went from ' + fmtClock(best.planingSec)
+          + ' to ' + fmtClock(last.planingSec) + ' and average heart rate from '
+          + (best.hr != null ? Math.round(best.hr) : '\u2014') + ' to '
+          + (last.hr != null ? Math.round(last.hr) : '\u2014')
+          + ' \u2014 read those together before blaming technique.');
+      }
+    }
+
+    /* 진입 대비 탈출 — "속도가 죽어서 살려내기 힘들다" 는 체감이 여기 남는다. */
+    var loss = withEff.map(function (r) {
+      return (r.entry != null && r.exit != null) ? (r.entry - r.exit) * KT : null;
+    }).filter(function (v) { return v != null; });
+    if (loss.length) {
+      var avgLoss = loss.reduce(function (x, y) { return x + y; }, 0) / loss.length;
+      if (avgLoss >= 2) {
+        msgs.push('Across the session a turn ended about '
+          + avgLoss.toFixed(1) + ' kt slower than it started. In light wind that is '
+          + 'the hard part \u2014 there is little power to rebuild speed with, so '
+          + 'the exit angle matters more than usual: bear away further before '
+          + 'sheeting in, and accept a wider turn to keep the foil flying.');
+      }
+    }
+    msgs.forEach(function (mm) {
+      body.appendChild(el('div', 'alert alert-info mt-3', mm));
+    });
+    card.appendChild(body);
+    host.appendChild(card);
   }
 
   /* §453 회전 그룹 통계 — 개수만으로는 어느 쪽이 약한지 알 수 없다.
