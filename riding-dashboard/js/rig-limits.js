@@ -26,7 +26,10 @@
   /* 라이드 높이 — 보드 바닥이 수면 위로 뜬 높이(cm).
      실측이 어려워 기본값을 둔다. 이 값이 커질수록 잠긴 마스트가 짧아져
      힐 여유가 줄어든다. */
-  var DEFAULT_RIDE_HEIGHT_CM = 30;
+  /* 옥대표 실측 추정 50cm+ (2026-08-31). 마스트 113cm 중 63cm 만 잠긴다.
+     이 값이 힐 한계를 크게 좌우한다 — 30cm 면 윙이, 50cm 면 포일이 먼저
+     막는다. 즉 높이 타는 사람일수록 포일 스팬이 병목이 된다. */
+  var DEFAULT_RIDE_HEIGHT_CM = 50;
   /* 손 높이 — 보드 위로 라이더가 윙을 잡고 있는 높이(cm). */
   var DEFAULT_HAND_HEIGHT_CM = 110;
 
@@ -71,12 +74,21 @@
     return Math.sqrt(2 * totalMassKg * G / (RHO_WATER * A * cl)) * KT;
   }
 
-  /* 힐 θ 에서 라이더가 버틸 수 있는 옆힘(N).
+  /* 라이더가 버틸 수 있는 옆힘(N) = m·g·tan(라이더 기울기).
      지렛대는 **라이더 질량만** — 보드·포일은 발밑에 매달려 모멘트에
-     거의 기여하지 않는다. 여기에 장비 무게를 더하면 용량이 부풀어
-     실제보다 큰 윙을 권하게 된다. */
-  function sideForceCapacityN(riderMassKg, heelDeg) {
-    return riderMassKg * G * Math.tan(deg2rad(heelDeg));
+     거의 기여하지 않는다.
+
+     ⚠ 여기 넣는 각도는 **보드 힐이 아니라 라이더가 바깥으로 누운 각도**다.
+     하네스를 쓰면 라이더는 보드가 기운 것보다 훨씬 더 바깥으로 매달릴 수
+     있다. 실측이 그걸 말한다 — 옥대표 보드 힐 중앙값은 35~37° 인데
+     22kt/4.5 에서 버티는 옆힘은 체중의 160%(= 라이더 기울기 58°) 다.
+     두 각도를 같은 값으로 쓰면 강풍 구간이 "불가능" 으로 나온다
+     (라이드 50cm 가정 시 22kt 가 한계의 118% 로 계산됐다).
+
+     보드 힐은 팁 여유(기하)를 정하고, 라이더 기울기는 힘 용량을 정한다.
+     둘은 하네스 길이·자세로 벌어진다. leanDeg 를 따로 받는 이유다. */
+  function sideForceCapacityN(riderMassKg, leanDeg) {
+    return riderMassKg * G * Math.tan(deg2rad(leanDeg));
   }
 
   /* 장비·수면 조합의 한계를 한 번에.
