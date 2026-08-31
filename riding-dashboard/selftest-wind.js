@@ -103,11 +103,16 @@ if (gnNogo && gnRot) {
 /* ---------- 3) 다중 소스 결합 구조 ---------- */
 console.log('\n[3] buildWindSources — 다중 소스 구조 + 교차검증');
 var ws = An.buildWindSources({ manualDir: null, nogo: gnNogo, rotation: gnRot });
-check('소스 4종(수동·no-go·회전기하·외부날씨)을 모두 담는다',
-  ws.sources.length === 4, '개수=' + ws.sources.length);
-var ids = ws.sources.map(function (s) { return s.id; }).join(',');
-check('소스 id 순서가 manual,nogo,rotation,weather 다',
-  ids === 'manual,nogo,rotation,weather', 'ids=' + ids);
+/* 소스 목록은 채널이 늘어날 수 있다(lineup·imu 추가됨). 그래서 개수·
+   순서를 박아두지 않고 "필수 4종이 들어 있는가"로 검사한다 — 위치를
+   박아두면 채널 추가마다 무관한 테스트가 깨진다. */
+var ids = ws.sources.map(function (s) { return s.id; });
+check('필수 소스 4종(수동·no-go·회전기하·외부날씨)이 모두 있다',
+  ['manual', 'nogo', 'rotation', 'weather'].every(function (k) {
+    return ids.indexOf(k) >= 0;
+  }), 'ids=' + ids.join(','));
+check('수동 소스가 맨 앞이다 (확정값 우선 표시)',
+  ids[0] === 'manual', 'ids=' + ids.join(','));
 var weather = ws.sources.filter(function (s) { return s.id === 'weather'; })[0];
 check('외부 날씨 슬롯이 미리 자리잡혀 있다 (available=false)',
   weather && weather.available === false, 'available=' + (weather && weather.available));
@@ -136,12 +141,46 @@ var wsManual = An.buildWindSources({ manualDir: 210, nogo: gnNogo, rotation: gnR
 check('수동 확정값이 권장 소스가 된다',
   wsManual.recommended && wsManual.recommended.sourceId === 'manual',
   'sourceId=' + (wsManual.recommended && wsManual.recommended.sourceId));
+function srcById(ws, id) {
+  return ws.sources.filter(function (s) { return s.id === id; })[0] || {};
+}
 check('수동 소스가 확정값(210°)을 담는다',
-  wsManual.sources[0].id === 'manual' && wsManual.sources[0].windDir === 210,
-  'windDir=' + wsManual.sources[0].windDir);
+  srcById(wsManual, 'manual').windDir === 210,
+  'windDir=' + srcById(wsManual, 'manual').windDir);
 check('수동이 있어도 no-go·회전기하 소스는 비교용으로 유지된다',
-  wsManual.sources[1].windDir != null && wsManual.sources[2].windDir != null,
-  'nogo=' + wsManual.sources[1].windDir + ' rotation=' + wsManual.sources[2].windDir);
+  srcById(wsManual, 'nogo').windDir != null &&
+  srcById(wsManual, 'rotation').windDir != null,
+  'nogo=' + srcById(wsManual, 'nogo').windDir +
+  ' rotation=' + srcById(wsManual, 'rotation').windDir);
+
+/* ---------- 5b) §449 리칭 판정 — 윙포일 TWA 대역으로 교정 ---------- */
+console.log('\n[5b] §449 — 리칭 세션과 정상 세션을 TWA 대역으로 가른다');
+/* 예전 판정은 "풍향 반대편 90° 윈도(|TWA| 135~180°) 점유율 < 14%" 였다.
+   그 창은 딥 다운윈드 전용인데 윙포일은 풍하를 TWA 120~140° 로 달리므로
+   정상 세션까지 리칭으로 몰려 신뢰도가 상시 '낮음' 이 됐다. 이제 리칭
+   대역(|TWA| 70~110°) 점유율로 가른다. */
+if (sjNogo) {
+  check('송정(리칭 왕복) — 리칭 대역이 지배적이다',
+    sjNogo.reachFrac > 0.45, 'reachFrac=' + sjNogo.reachFrac);
+  check('송정 — reciprocal=true 로 신뢰도가 낮게 잡힌다',
+    sjNogo.reciprocal === true && sjNogo.confidence === '낮음',
+    'reciprocal=' + sjNogo.reciprocal + ' conf=' + sjNogo.confidence);
+}
+if (gnNogo) {
+  check('강릉(풍상·풍하 왕복) — 리칭 대역이 희박하다',
+    gnNogo.reachFrac < 0.20, 'reachFrac=' + gnNogo.reachFrac);
+  check('강릉 — reciprocal=false',
+    gnNogo.reciprocal === false, 'reciprocal=' + gnNogo.reciprocal);
+  check('강릉 — 풍상·풍하 비중이 둘 다 잡힌다',
+    gnNogo.upwindFrac > 0.12 && gnNogo.downwindFrac > 0.10,
+    'up=' + gnNogo.upwindFrac + ' down=' + gnNogo.downwindFrac);
+}
+/* 세 비중의 합은 1 이다 — 대역 정의가 서로 겹치거나 비지 않는다. */
+if (gnNogo) {
+  var sum = gnNogo.upwindFrac + gnNogo.downwindFrac + gnNogo.reachFrac;
+  check('풍상+풍하+리칭 = 1 (대역이 빠짐없이 나뉜다)',
+    Math.abs(sum - 1) < 0.01, 'sum=' + sum.toFixed(3));
+}
 
 /* ---------- 6) 회귀 — 기존 분석 파이프라인 무손상 ---------- */
 console.log('\n[6] 회귀 — analyzeSession 이 풍향 유무와 무관하게 동작');

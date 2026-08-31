@@ -35,8 +35,21 @@ function loadOne(file) {
   var text = fs.readFileSync(file, 'utf8');
   var res = Merger.mergeFiles([{ name: path.basename(file), text: text }]);
   var session = An.normalizeSession(res.parsed);
-  var est = null;
-  try { est = An.estimateWindFromTrack(session); } catch (e) {}
+  /* 풍향은 두 독립 추정(노고존 · 회전 기하)을 융합해 쓴다. 하나만 쓰면
+     그 방식의 약점이 그대로 결과가 된다 — 실제로 노고존만 쓰던 때
+     8/30 세션이 '신뢰도 낮음' 으로 나왔으나 회전 기하는 '높음' 이었고
+     두 값이 5° 안에서 일치했다(§449). */
+  var nogo = null, rot = null;
+  try { nogo = An.estimateWindFromTrack(session); } catch (e) {}
+  try { rot = An.estimateWindFromManeuvers(session); } catch (e) {}
+  var fused = null;
+  try { fused = An.buildWindSources({ nogo: nogo, rotation: rot }); } catch (e) {}
+  var rec = fused && fused.recommended ? fused.recommended : null;
+  var est = rec
+    ? { windDir: rec.windDir, confidence: rec.confidence, note: rec.note,
+        sourceId: rec.sourceId, nogo: nogo, rotation: rot,
+        agreement: fused.agreement }
+    : (nogo || rot);
   var wd = est && est.windDir != null ? est.windDir : null;
   var analysis = An.analyzeSession(session, wd, est ? { windConfidence: est.confidence } : {});
   return { file: path.basename(file), session: session, analysis: analysis,
@@ -107,8 +120,23 @@ function report(r, opts) {
     '  최고 ' + f1(s.maxSpeedMs * KT, ' kt') +
     '  평균 ' + f1(s.avgSpeedMovingMs * KT, ' kt') +
     '  회전 ' + ((a.maneuvers || []).length) + '회');
-  console.log('  풍향 ' + (a.windDir != null ? Math.round(a.windDir) + '°' : '—') +
-    (r.est ? ' (추정, 신뢰도 ' + r.est.confidence + ')' : ''));
+  /* 풍향은 근거까지 같이 적는다 — 신뢰도가 낮으면 이 아래 모든 수치를
+     단정하면 안 되기 때문이다(SKILL.md 규칙 7). */
+  var wl = '  풍향 ' + (a.windDir != null ? Math.round(a.windDir) + '°' : '—');
+  if (r.est) {
+    wl += ' (추정, 신뢰도 ' + r.est.confidence;
+    if (r.est.nogo && r.est.rotation) {
+      wl += ' — 노고존 ' + Math.round(r.est.nogo.windDir) + '°/' +
+            r.est.nogo.confidence + ' · 회전기하 ' +
+            Math.round(r.est.rotation.windDir) + '°/' + r.est.rotation.confidence +
+            (r.est.agreement ? ' · 차이 ' + r.est.agreement.deltaDeg + '°' : '');
+    }
+    wl += ')';
+  }
+  console.log(wl);
+  if (r.est && r.est.confidence === '낮음') {
+    console.log('  ⚠ 풍향 신뢰도가 낮다 — 아래 VMG·풍각·폴라는 단정하지 말 것');
+  }
   if (at) {
     console.log('  자세 ' + (at.ok ? '사용 가능 — 0점 힐 ' + f1(at.heelOffset, '°') +
       ' 피치 ' + f1(at.pitchOffset, '°') + ', IQR ' + f1(at.heelIqr, '°')

@@ -1625,9 +1625,32 @@
 
     // 신뢰도 — total 대비 비율로 판정
     var cleanNoGo = ww[bestC] / total;          // 풍상 윈도가 비어 있는 정도
-    var downwindFrac = ww[oppC] / total;        // 풍하쪽 90° 윈도 점유
+
+    /* §449 — 풍상·풍하가 실제로 있었는지는 TWA 로 본다.
+       예전에는 풍하를 '풍향 반대편 90° 윈도(=|TWA| 135~180°)' 점유율로
+       쟀는데, 그 창은 딥 다운윈드 전용이다. 윙포일은 포일 효율 때문에
+       풍하를 TWA 120~140° 브로드리치로 달리므로 그 창에 거의 안 들어온다
+       (실측: 딥 다운윈드 1.1% vs 풍하 전체 30%). 그래서 제대로 풍상·풍하를
+       왕복한 세션까지 '리칭 위주'로 몰려 신뢰도가 상시 '낮음' 이 됐다.
+       이제 |TWA|<70° 를 풍상, |TWA|>110° 를 풍하로 보고 둘 다 있는지 센다. */
+    function twaFracAbove(axisDeg, loDeg, hiDeg) {
+      var f = 0;
+      for (var b = 0; b < N; b++) {
+        var twa = Math.abs(((b * BIN - axisDeg + 540) % 360) - 180);
+        if (twa >= loDeg && twa <= hiDeg) f += sm[b];
+      }
+      return total > 0 ? f / total : 0;
+    }
+    var upwindFrac   = twaFracAbove(twd, 0, 70);
+    var downwindFrac = twaFracAbove(twd, 110, 180);
+    /* 나머지(|TWA| 70~110°)가 리칭 대역이다. 리칭에 시간이 몰린 세션은
+       풍축을 가로질러 달린 적이 없어 풍상·풍하 기하가 성립하지 않는다.
+       실측 대비: 송정 0.66(리칭 왕복) · 강릉 0.01 · 8/30 0.28(정상). */
+    var reachFrac = Math.max(0, 1 - upwindFrac - downwindFrac);
     var conf, note = null;
-    var reciprocal = downwindFrac < 0.14;        // 풍하가 희박 = 리칭/한축 위주
+    /* 리칭이 지배하거나, 풍상·풍하 중 한쪽이 사실상 비어 있으면 약하다. */
+    var reciprocal = (reachFrac > 0.45) ||
+                     (upwindFrac < 0.12) || (downwindFrac < 0.10);
     if (cleanNoGo > 0.13) {
       conf = '낮음';
       note = '뚜렷한 무항주(no-go) 구역이 없어 풍향 자동 추정이 불확실합니다 — ' +
@@ -1651,6 +1674,11 @@
       noGoWidthDeg: noGoWidthDeg,
       minSailAngleDeg: Math.round(noGoWidthDeg / 2),
       reciprocal: reciprocal,
+      /* §449 — 판정 근거를 그대로 내보낸다(화면·테스트에서 검증 가능하게) */
+      upwindFrac: Math.round(upwindFrac * 1000) / 1000,
+      downwindFrac: Math.round(downwindFrac * 1000) / 1000,
+      reachFrac: Math.round(reachFrac * 1000) / 1000,
+      cleanNoGo: Math.round(cleanNoGo * 1000) / 1000,
       /* 산출 풍향의 그리드 ±45° 정렬도 — 지도 그리드 glint 와 공유 척도 */
       alignmentScore: tackAlignment(session, finalWd, hh).score
     };
