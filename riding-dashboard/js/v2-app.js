@@ -676,8 +676,122 @@
           size: Math.min(400, polarHost.clientWidth || 380) });
     }
 
+    renderGainLoss(host, a);
     renderTargetComparison(host, a);
     renderWindSources(host, a);
+  }
+
+  /* §456 Gain/Loss — "얼마나 빨랐나" 가 아니라 "바람 쪽으로 얼마나
+     나아갔나". 풍상 레그에서 옆으로 아무리 멀리 갔어도 바람 축 진행이
+     같으면 이득은 0 이다. 회전 손실은 그 진행을 몇 미터 까먹었는지로
+     잰다 — 워터스피드 Ultra 의 Gain/Loss 에 대응. */
+  function renderGainLoss(host, a) {
+    if (!window.RDGainLoss || !CUR.session || a.windDir == null) return;
+    var L, legs, sum;
+    try {
+      L = RDGainLoss.maneuverLoss(CUR.session, a.maneuvers || [], a.windDir);
+      legs = RDGainLoss.legGains(CUR.session, a.windDir);
+      sum = RDGainLoss.summarize(L, legs);
+    } catch (e) { return; }
+    if (!sum) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Gain and loss'));
+    head.appendChild(el('div', 'card-actions lab',
+      'distance along the wind axis'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    var row = el('div', 'row row-cards');
+    function tile(label, val, sub, tone) {
+      var col = el('div', 'col-6 col-md-3');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', label));
+      var v = el('div', 'kpi__val num mt-1', val);
+      if (tone) v.style.color = tone;
+      b.appendChild(v);
+      if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      c.appendChild(b); col.appendChild(c); return col;
+    }
+    function m(x) { return x == null ? '\u2014' : Math.round(x).toLocaleString() + ' m'; }
+    row.appendChild(tile('Upwind gained', m(sum.upwindGainM), 'toward the wind'));
+    row.appendChild(tile('Downwind gained', m(sum.downwindGainM), 'away from the wind'));
+    row.appendChild(tile('Lost in tacks', m(sum.tackLossM),
+      sum.tackLossPct != null ? sum.tackLossPct.toFixed(1) + '% of upwind gain' : '',
+      '#e8590c'));
+    row.appendChild(tile('Lost in gybes', m(sum.gybeLossM),
+      sum.gybeLossPct != null ? sum.gybeLossPct.toFixed(1) + '% of downwind gain' : '',
+      '#e8590c'));
+    body.appendChild(row);
+
+    /* 그룹별 — 어느 회전이 제일 비싼가 */
+    if (sum.groups && sum.groups.length) {
+      var wrap = el('div', 'table-responsive mt-3');
+      var t = el('table', 'table table-vcenter card-table table-sm');
+      var th = el('thead'), htr = el('tr');
+      ['Turn', 'Count', 'Avg cost', 'Total cost', 'Net of gains']
+        .forEach(function (x, i) {
+          htr.appendChild(el('th', i ? 'text-end' : null, x));
+        });
+      th.appendChild(htr); t.appendChild(th);
+      var tb = el('tbody');
+      sum.groups.forEach(function (g) {
+        var tr = el('tr');
+        tr.appendChild(el('td', null,
+          (g.type === 'gybe' ? 'Gybe' : 'Tack') +
+          (g.side === 'P' ? ' \u00b7 port' : g.side === 'S' ? ' \u00b7 starboard' : '')));
+        tr.appendChild(el('td', 'text-end num', String(g.count)));
+        tr.appendChild(el('td', 'text-end num', m(g.avgVmgLossM)));
+        tr.appendChild(el('td', 'text-end num', m(g.totalVmgLossM)));
+        tr.appendChild(el('td', 'text-end num text-secondary', m(g.avgPathLossM)));
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    }
+
+    /* 목표 반대로 간 회전 — 같은 손실이라도 "느렸다" 와 "거꾸로 갔다" 는
+       고칠 것이 다르다. */
+    var wrong = (L || []).filter(function (x) {
+      return x.ok && !x.zoneConflict && x.wrongWaySec > 3;
+    });
+    if (wrong.length) {
+      body.appendChild(el('div', 'alert alert-warning mt-3',
+        wrong.length + ' turn' + (wrong.length > 1 ? 's' : '')
+        + ' went backwards relative to the objective for more than 3 seconds '
+        + '(rounding up out of a gybe, or stalling head-to-wind in a tack). '
+        + 'That is a different fault from simply being slow \u2014 it is the exit '
+        + 'angle, not the speed.'));
+    }
+
+    /* 못 센 회전 — 합계가 전부인 것처럼 읽히지 않게 밝힌다 */
+    var missing = [];
+    Object.keys(sum.notComputed || {}).forEach(function (k) {
+      var LABEL = {
+        'not-sailing': 'the boat was barely moving before and after',
+        'no-reference-window': 'they sit at the very start or end of the session',
+        'no-boundaries': 'the engine could not bound the turn'
+      };
+      missing.push(sum.notComputed[k] + ' because ' + (LABEL[k] || k));
+    });
+    if (sum.skippedAmbiguous) {
+      missing.push(sum.skippedAmbiguous + ' because the measured wind angle '
+        + 'disagreed with the turn type');
+    }
+    var f = el('div', 'card-footer text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'Counted ' + sum.countedTurns + ' of '
+      + ((a.maneuvers || []).length) + ' turns'
+      + (missing.length ? ' \u2014 skipped ' + missing.join('; ') + '.' : '.')
+      + ' Cost is the ground you fell behind your own best pace \u2014 measured '
+      + 'from position, from the moment the turn starts until you get that pace '
+      + 'back (the better of your before or after pace). "Net of gains" subtracts '
+      + 'any moments inside that window where you beat the pace, so it is always '
+      + 'the smaller number; a wide gap between the two means you clawed a lot '
+      + 'back on the exit.';
+    card.appendChild(body);
+    card.appendChild(f);
+    host.appendChild(card);
   }
 
   /* §452 % of target — 오늘 속도를 "내가 낼 수 있다고 확인된 속도" 와

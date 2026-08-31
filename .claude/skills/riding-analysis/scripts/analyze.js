@@ -11,6 +11,8 @@ global.window = global;
 var Geo = require(path.join(ROOT, 'js/geo.js'));            global.RDGeo = Geo;
 global.RDRaceboxCSV = require(path.join(ROOT, 'js/parsers/racebox-csv.js'));
 global.RDWaterspeedCSV = require(path.join(ROOT, 'js/parsers/waterspeed-csv.js'));
+var GainLoss = null;
+try { GainLoss = require(path.join(ROOT, 'js/analysis-gainloss.js')); } catch (e) {}
 global.RDImu = require(path.join(ROOT, 'js/analysis-imu.js'));
 try { global.RDCsv = require(path.join(ROOT, 'js/csv-parser.js')); } catch (e) {}
 var Merger = require(path.join(ROOT, 'js/session-merger.js'));
@@ -141,6 +143,22 @@ function report(r, opts) {
     console.log('  자세 ' + (at.ok ? '사용 가능 — 0점 힐 ' + f1(at.heelOffset, '°') +
       ' 피치 ' + f1(at.pitchOffset, '°') + ', IQR ' + f1(at.heelIqr, '°')
       : '사용 불가 [' + at.reason + ']'));
+  }
+  /* §456 Gain/Loss — 바람 축 진행과 회전 손실. 속도보다 이게 실전 지표다. */
+  if (GainLoss && a.windDir != null) {
+    try {
+      var gl = GainLoss.summarize(
+        GainLoss.maneuverLoss(r.session, a.maneuvers || [], a.windDir),
+        GainLoss.legGains(r.session, a.windDir));
+      if (gl && gl.countedTurns) {
+        console.log('  이득 풍상 ' + Math.round(gl.upwindGainM) + 'm · 풍하 ' +
+          Math.round(gl.downwindGainM) + 'm  |  회전 손실 택 ' +
+          Math.round(gl.tackLossM) + 'm(' + (gl.tackLossPct || 0).toFixed(1) +
+          '%) 자이브 ' + Math.round(gl.gybeLossM) + 'm(' +
+          (gl.gybeLossPct || 0).toFixed(1) + '%)  [' + gl.countedTurns + '/' +
+          ((a.maneuvers || []).length) + '회전 산출]');
+      }
+    } catch (e) {}
   }
   if (Stab) {
     var st = Stab.analyze(r.session);
