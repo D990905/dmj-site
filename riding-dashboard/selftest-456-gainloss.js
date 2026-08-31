@@ -159,6 +159,41 @@ ok(runShape.isDrillLike === false,
    (runShape.sustainedShare * 100).toFixed(0) + '%');
 ok(runShape.planingSec > 300, '주행 시간을 잰다', Math.round(runShape.planingSec));
 
+console.log('\n[6d] §462 바람이 자리 문제였나 시간 문제였나');
+/* 위치와 시간이 엉키기 쉬우므로 시간 구간을 고정한 채 구역을 비교한다.
+   여기서는 두 경우를 합성해 각각 올바로 갈리는지 본다. */
+function grid(spec) {
+  /* spec(tSec, cellIdx) -> speedMs.
+     두 구역을 오가되 **한쪽에 더 오래 머문다**(100초 중 60:40).
+     같은 시간을 반반 쓰면 구간별 표본이 이봉분포가 되어 중앙값이 두 값
+     사이를 튀고, 자리 차이가 시간 차이처럼 보인다 — 픽스처의 함정이다. */
+  var pts = [];
+  for (var t = 0; t <= 800; t++) {
+    var cell = (t % 100) < 60 ? 0 : 1;
+    var sp = spec(t, cell);
+    pts.push({ t: t, lat: 35 + (cell ? 0.004 : 0), lng: 129 + t * 1e-6,
+               speed: sp, heading: 0, twa: 45, vmg: sp * 0.7 });
+  }
+  return { samples: pts, hasTime: true, legs: [{ start: 0, end: pts.length - 1 }] };
+}
+/* (a) 자리에 따라 다름 — 구역 1 이 항상 4 m/s 빠르다 */
+var placeSess = grid(function (t, cell) { return cell ? 12 : 8; });
+var wp = GL.windVariation(placeSess, { minKt: 6, minCellSec: 60, cellM: 200 });
+ok(wp.ok, '자리형 세션 분석됨', wp.reason);
+ok(wp.dominant === 'place', "자리 차이가 크면 dominant='place'",
+   'place ' + (wp.placeSpreadKt || 0).toFixed(1) + ' / time ' + (wp.timeSpreadKt || 0).toFixed(1));
+
+/* (b) 시간에 따라 다름 — 어느 구역이든 후반에 느려진다 */
+var timeSess = grid(function (t) { return t < 400 ? 11 : 7; });
+var wt = GL.windVariation(timeSess, { minKt: 6, minCellSec: 60, cellM: 200 });
+ok(wt.dominant === 'time', "시간 차이가 크면 dominant='time'",
+   'place ' + (wt.placeSpreadKt || 0).toFixed(1) + ' / time ' + (wt.timeSpreadKt || 0).toFixed(1));
+
+/* (c) 시간 교란이 자리 차이로 오독되지 않는다 — (b) 에서 자리 차이는 0 */
+ok((wt.placeSpreadKt || 0) < 0.6,
+   '시간에만 변화가 있으면 자리 차이는 0 에 가깝다',
+   (wt.placeSpreadKt || 0).toFixed(2) + 'kt');
+
 console.log('\n[7] 순손실(B) 은 부족분(A) 을 넘을 수 없다');
 /* B = Σ(vref−v)dt, A = Σmax(0,vref−v)dt — 같은 표본이면 정의상 B ≤ A.
    다른 출처(엔진 VMG vs 위치)를 섞거나 B 를 vref×경과시간 으로 따로

@@ -705,6 +705,7 @@
     }
 
     renderGainLoss(host, a);
+    renderWindVariation(host, a);
     renderTargetComparison(host, a);
     renderWindSources(host, a);
   }
@@ -1295,6 +1296,123 @@
       tb.appendChild(trr);
     });
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
+    host.appendChild(card);
+  }
+
+  /* §462 바람이 자리 문제였나 시간 문제였나 — 다음 세션의 전략이 갈린다.
+     "바람 있는 데를 찾아다녔다" 는 노력이 값을 했는지 확인해 준다. */
+  function renderWindVariation(host, a) {
+    if (!window.RDGainLoss || !RDGainLoss.windVariation || !CUR.session) return;
+    var w;
+    try { w = RDGainLoss.windVariation(CUR.session); } catch (e) { return; }
+    if (!w || !w.ok) return;
+    if (w.placeSpreadKt == null && w.timeSpreadKt == null) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Was the wind about where, or about when?'));
+    head.appendChild(el('div', 'card-actions lab', w.cellM + ' m squares'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    var row = el('div', 'row row-cards');
+    function tile(label, val, sub) {
+      var col = el('div', 'col-6 col-md-3');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', label));
+      b.appendChild(el('div', 'kpi__val num mt-1', val));
+      if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      c.appendChild(b); col.appendChild(c); return col;
+    }
+    row.appendChild(tile('Across the water',
+      w.placeSpreadKt != null ? w.placeSpreadKt.toFixed(1) + ' kt' : '—',
+      'fastest minus slowest area, at the same time'));
+    row.appendChild(tile('Across the session',
+      w.timeSpreadKt != null ? w.timeSpreadKt.toFixed(1) + ' kt' : '—',
+      'best quarter minus worst'));
+    row.appendChild(tile('Areas you passed through',
+      w.briefCellMedKt != null ? w.briefCellMedKt.toFixed(1) + ' kt' : '—',
+      w.briefCells + ' squares, under 90 s each'));
+    row.appendChild(tile('Areas you stayed in',
+      w.stayedCellMedKt != null ? w.stayedCellMedKt.toFixed(1) + ' kt' : '—',
+      w.stayedCells + ' squares, 3 min or more'));
+    body.appendChild(row);
+
+    /* 구간별 속도 — 시간 축의 변화 */
+    if (w.byTime && w.byTime.length >= 2) {
+      var wrap = el('div', 'table-responsive mt-3');
+      var t = el('table', 'table table-vcenter card-table table-sm');
+      var th = el('thead'), htr = el('tr');
+      ['Quarter', 'Median planing speed', 'Areas compared', 'Spread across areas']
+        .forEach(function (x, i) {
+          htr.appendChild(el('th', i ? 'text-end' : null, x));
+        });
+      th.appendChild(htr); t.appendChild(th);
+      var tb = el('tbody');
+      w.byTime.forEach(function (r) {
+        var sp = (w.perQuarter || []).filter(function (x) {
+          return x.quarter === r.quarter;
+        })[0];
+        var tr = el('tr');
+        tr.appendChild(el('td', null, r.quarter + ' of 4'));
+        tr.appendChild(el('td', 'text-end num', r.med.toFixed(1) + ' kt'));
+        tr.appendChild(el('td', 'text-end num', sp ? String(sp.cells) : '—'));
+        tr.appendChild(el('td', 'text-end num',
+          sp ? sp.spreadKt.toFixed(1) + ' kt' : 'too few'));
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    }
+
+    /* 판정 */
+    var verdict = null;
+    if (w.dominant === 'time') {
+      verdict = { tone: 'alert-info', head: 'It was about when, not where.',
+        body: 'At any one point in the session the areas you sailed differed by only '
+          + w.placeSpreadKt.toFixed(1) + ' kt, while the whole area changed by '
+          + w.timeSpreadKt.toFixed(1) + ' kt from the best quarter to the worst. '
+          + 'Hunting for a windier patch had little to find — the wind was even '
+          + 'across the water and simply faded. On a day like this the payoff is in '
+          + 'timing: get the volume done while it is blowing rather than moving '
+          + 'around looking for more.' };
+    } else if (w.dominant === 'place') {
+      verdict = { tone: 'alert-success', head: 'It was about where.',
+        body: 'Areas differed by ' + w.placeSpreadKt.toFixed(1) + ' kt at the same '
+          + 'moment, more than the session drifted over time. Finding the better '
+          + 'patch and working it was worth the effort here.' };
+    } else if (w.placeSpreadKt != null && w.timeSpreadKt != null) {
+      verdict = { tone: 'alert-info', head: 'Neither dominated.',
+        body: 'Place and time moved the speed by about the same amount, so nothing '
+          + 'here argues strongly for either strategy.' };
+    }
+    if (verdict) {
+      var v = el('div', 'alert ' + verdict.tone + ' mt-3');
+      v.appendChild(el('div', 'fw-bold', verdict.head));
+      v.appendChild(el('div', 'mt-1', verdict.body));
+      body.appendChild(v);
+    }
+
+    /* 선택 편향 — "차이가 없다" 는 결론이 회피가 잘 통해서일 수도 있다 */
+    if (w.avoidanceEvident === true) {
+      body.appendChild(el('div', 'alert alert-warning mt-2',
+        'The squares you only passed through were slower than the ones you stayed '
+        + 'in, so you were reading the water and avoiding the dead patches. The '
+        + '"no difference" reading above is partly a result of that choice.'));
+    } else if (w.avoidanceEvident === false && w.dominant === 'time') {
+      body.appendChild(el('div', 'text-secondary mt-2',
+        'The squares you passed through briefly were no slower than the ones you '
+        + 'stayed in, so this is not a case of successfully dodging dead patches '
+        + '— there were not many to dodge.'));
+    }
+
+    var f = el('div', 'card-footer text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'Areas are ' + w.cellM + ' m squares and only those with at '
+      + 'least three minutes of planing are compared, with the time window held '
+      + 'fixed so a fading breeze cannot masquerade as a bad patch. Gusts smaller '
+      + 'or shorter than that will not show up here.';
+    card.appendChild(body);
+    card.appendChild(f);
     host.appendChild(card);
   }
 

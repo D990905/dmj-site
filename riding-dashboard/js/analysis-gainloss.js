@@ -314,6 +314,118 @@
     return { upwindM: up, downwindM: down, upwindSec: upSec, downwindSec: downSec };
   }
 
+  /* ---------- 바람이 자리에 따라 달랐나, 시간에 따라 달랐나 ----------
+     §462. "바람 있는 데를 찾아다녔다" 는 노력이 실제로 값을 했는지를
+     가른다. 답이 갈리면 다음 세션의 전략이 달라진다 —
+       · 자리에 따라 다르다  → 좋은 구역을 찾아 지키는 게 이득
+       · 시간에 따라 다르다  → 어디 있든 같으니, 바람 있을 때 몰아 타야 한다
+
+     ⚠ 위치와 시간은 엉키기 쉽다. 세션 후반에 바람이 죽었는데 그때 마침
+     다른 구역에 있었다면, 그 구역이 나쁜 것처럼 보인다(실제로 8/31
+     자이브 효율은 구역별로 86 vs 50 이었지만 최저 구역 9개 중 5개가
+     바람 죽은 마지막 구간 것이었다). 그래서 **시간 구간을 고정한 채**
+     구역을 비교한다.
+
+     그리고 선택 편향을 함께 본다 — 나쁜 구역을 잘 피해 다녔다면 "차이
+     없음" 이 당연하다. 짧게 지나친 구역이 오래 머문 구역보다 느렸는지로
+     확인한다. */
+  function windVariation(session, opts) {
+    opts = opts || {};
+    var CELL = opts.cellM || 300;
+    var minKt = opts.minKt || 6;
+    var Q = opts.quarters || 4;
+    var minCellSec = opts.minCellSec || 180;
+    var S = (session && session.samples) || [];
+    if (S.length < 100) return { ok: false, reason: 'too-short' };
+
+    var lat0 = S[0].lat, lng0 = S[0].lng;
+    var mPerLng = 111320 * Math.cos(lat0 * Math.PI / 180);
+    function cellKey(p) {
+      return Math.round(((p.lng - lng0) * mPerLng) / CELL) + ',' +
+             Math.round(((p.lat - lat0) * 111132) / CELL);
+    }
+    var t0 = S[0].t, span = S[S.length - 1].t - t0;
+    if (!(span > 0)) return { ok: false, reason: 'no-time' };
+
+    /* 구간 × 구역별 속도 표본 */
+    var byQ = [], allCells = {};
+    for (var q = 0; q < Q; q++) byQ.push({});
+    for (var i = 1; i < S.length; i++) {
+      var dt = S[i].t - S[i - 1].t;
+      if (!(dt > 0) || dt > 5) continue;
+      var p = S[i];
+      if (p.speed == null || p.speed * KT < minKt) continue;
+      var qi = Math.min(Q - 1, Math.floor((p.t - t0) / span * Q));
+      var k = cellKey(p);
+      (byQ[qi][k] = byQ[qi][k] || []).push(p.speed * KT);
+      var ac = allCells[k] = allCells[k] || { sec: 0, sp: [] };
+      ac.sec += dt; ac.sp.push(p.speed * KT);
+    }
+    function med(v) {
+      if (!v.length) return null;
+      var a = v.slice().sort(function (x, y) { return x - y; });
+      return a[a.length >> 1];
+    }
+
+    /* 시간을 고정한 채 구역 간 최대 격차 */
+    var spreads = [];
+    byQ.forEach(function (cells, qi) {
+      var rows = Object.keys(cells)
+        .filter(function (k) { return cells[k].length >= minCellSec; })
+        .map(function (k) { return { key: k, med: med(cells[k]) }; });
+      if (rows.length < 2) return;
+      rows.sort(function (a, b) { return b.med - a.med; });
+      spreads.push({
+        quarter: qi + 1, cells: rows.length,
+        spreadKt: rows[0].med - rows[rows.length - 1].med,
+        bestKey: rows[0].key, worstKey: rows[rows.length - 1].key
+      });
+    });
+
+    /* 시간에 따른 변화 — 구간별 전체 중앙 속도 */
+    var byTime = byQ.map(function (cells, qi) {
+      var all = [];
+      Object.keys(cells).forEach(function (k) { all = all.concat(cells[k]); });
+      return { quarter: qi + 1, med: med(all), samples: all.length };
+    }).filter(function (r) { return r.med != null; });
+    var timeSpread = byTime.length >= 2
+      ? Math.max.apply(null, byTime.map(function (r) { return r.med; })) -
+        Math.min.apply(null, byTime.map(function (r) { return r.med; }))
+      : null;
+
+    /* 선택 편향 점검 — 짧게 지나친 구역 vs 오래 머문 구역 */
+    var brief = [], stayed = [];
+    Object.keys(allCells).forEach(function (k) {
+      var c = allCells[k], m = med(c.sp);
+      if (m == null) return;
+      if (c.sec < 90) brief.push(m);
+      else if (c.sec >= 180) stayed.push(m);
+    });
+    var briefMed = med(brief), stayedMed = med(stayed);
+
+    var placeSpread = spreads.length
+      ? spreads.reduce(function (a, s) { return Math.max(a, s.spreadKt); }, 0)
+      : null;
+
+    return {
+      ok: true,
+      cellM: CELL,
+      perQuarter: spreads,
+      byTime: byTime,
+      placeSpreadKt: placeSpread,
+      timeSpreadKt: timeSpread,
+      briefCellMedKt: briefMed, briefCells: brief.length,
+      stayedCellMedKt: stayedMed, stayedCells: stayed.length,
+      /* 회피가 통했다면 짧게 지나친 곳이 더 느려야 한다. */
+      avoidanceEvident: (briefMed != null && stayedMed != null)
+        ? (stayedMed - briefMed) > 1.0 : null,
+      dominant: (placeSpread != null && timeSpread != null)
+        ? (placeSpread > timeSpread + 0.5 ? 'place'
+           : (timeSpread > placeSpread + 0.5 ? 'time' : 'neither'))
+        : null
+    };
+  }
+
   /* ---------- 세션 성격 판정 ----------
      같은 지표라도 "코스를 달린 세션" 과 "회전 연습 세션" 은 읽는 법이
      다르다. 연습에서는 계속 도는 것이 목적이므로 회전 손실을 '손해' 로
@@ -415,6 +527,7 @@
   var API = {
     ladderRung: ladderRung, maneuverLoss: maneuverLoss,
     legGains: legGains, zoneProgress: zoneProgress, sessionShape: sessionShape,
+    windVariation: windVariation,
     summarize: summarize,
     EXCL_SEC: EXCL_SEC, REF_SEC: REF_SEC, TAIL_SEC: TAIL_SEC
   };
