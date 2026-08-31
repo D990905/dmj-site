@@ -1712,7 +1712,21 @@
       sel.addEventListener('change', function () { onPick(sel.value); });
       return sel;
     }
-    act.appendChild(pick([['sog', 'Speed'], ['vmg', 'VMG'], ['twa', 'Wind angle']],
+    /* 힐·피치는 자세 데이터가 있는 세션에서만 고를 수 있다. 없는데
+       메뉴에 두면 골랐을 때 빈 화면이 나온다. */
+    var hasAtt = ['upwind', 'downwind'].some(function (mk) {
+      var g = ts[mk];
+      return ['P', 'S'].some(function (sd) {
+        var arr = g && g[sd] && g[sd].samples;
+        return arr && arr.length && arr[0].heel != null;
+      });
+    });
+    var metricOpts = [['sog', 'Speed'], ['vmg', 'VMG'], ['twa', 'Wind angle']];
+    if (hasAtt) metricOpts.push(['heel', 'Heel'], ['pitch', 'Pitch']);
+    if (!hasAtt && (TDIST.metric === 'heel' || TDIST.metric === 'pitch')) {
+      TDIST.metric = 'sog';
+    }
+    act.appendChild(pick(metricOpts,
       'metric', TDIST.metric, function (v) {
         TDIST.metric = v; renderPerfExtra(a);
       }));
@@ -1734,11 +1748,15 @@
     }
 
     var M = TDIST.metric;
-    /* 값 변환 — 속도·VMG 는 m/s 라 kt 로, 풍각은 절대값(부호는 택 구분). */
+    /* 값 변환 — 속도·VMG 는 m/s 라 kt 로, 각도는 도 그대로.
+       힐은 부호가 곧 좌우 기울기라 절대값으로 크기만 본다(포트/스타보드
+       구분은 이미 위/아래 분리가 담당한다). 피치는 부호가 노즈업/다운을
+       뜻하므로 부호를 살린다 — 절대값을 씌우면 두 상태가 겹쳐버린다. */
     function val(x) {
       var v = x[M];
       if (v == null || !isFinite(v)) return null;
-      if (M === 'twa') return Math.abs(v);
+      if (M === 'pitch') return v;
+      if (M === 'twa' || M === 'heel') return Math.abs(v);
       return Math.abs(v) * KT;
     }
     var pv = P.map(val).filter(function (v) { return v != null; });
@@ -1799,8 +1817,9 @@
       tx.setAttribute('font-size', '11');
       tx.setAttribute('font-family', '"IBM Plex Mono", monospace');
       tx.setAttribute('text-anchor', f === 0 ? 'start' : (f === 1 ? 'end' : 'middle'));
-      tx.textContent = (lo + f * (hi - lo)).toFixed(M === 'twa' ? 0 : 1)
-        + (M === 'twa' ? '\u00b0' : ' kt');
+      var isDeg = (M === 'twa' || M === 'heel' || M === 'pitch');
+      tx.textContent = (lo + f * (hi - lo)).toFixed(isDeg ? 0 : 1)
+        + (isDeg ? '\u00b0' : ' kt');
       svg.appendChild(tx);
     });
     body.appendChild(svg);
@@ -1815,9 +1834,10 @@
         var v = arr.slice().sort(function (x, y) { return x - y; });
         med = v[v.length >> 1];
       }
+      var unit = (M === 'twa' || M === 'heel' || M === 'pitch') ? '\u00b0' : ' kt';
       d.appendChild(el('span', 'text-secondary',
         label + ' \u00b7 ' + arr.length + ' samples'
-        + (med != null ? ' \u00b7 median ' + med.toFixed(1) : '')));
+        + (med != null ? ' \u00b7 median ' + med.toFixed(1) + unit : '')));
       return d;
     }
     leg.appendChild(chip('#e03131', 'Port (above)', pv));
