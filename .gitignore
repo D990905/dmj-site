@@ -29,3 +29,7 @@ assets/images/products/*/_raw/
 # §209 (Alex Park #4 · 2026-06-06) — _ci_site/ = CI build cache (pr-check.yml rsync staging).
 # 105 file 누적 = local-only build artifact. push 안 함. git status 정돈.
 _ci_site/
+
+# 대용량 샘플 영상 — GitHub 100MB 제한. 로컬 재생/검증용으로만 둔다.
+riding-dashboard/sample/*.mp4
+riding-dashboard/sample/*.mov
