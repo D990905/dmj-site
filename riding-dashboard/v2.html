@@ -21,6 +21,15 @@
          color: var(--tblr-secondary); font-family: "IBM Plex Mono", monospace; }
   .u-legend { font-size: .75rem; }
   .chart-host { min-height: 280px; }
+  /* §473 세로 스택 — 판 사이 경계선 하나로 묶어 보이게, x축은 맨 아래만 */
+  #chart-timeline { min-height: 0; }
+  .rd-stack-panel + .rd-stack-panel { border-top: 1px solid rgba(139,152,165,0.16); }
+  /* uPlot 기본 선택 음영은 검정 7% 라 다크 배경에서 안 보인다 — 밝은 쪽으로 */
+  #chart-timeline .u-select {
+    background: rgba(77,171,247,0.16);
+    border-left: 1px solid rgba(77,171,247,0.55);
+    border-right: 1px solid rgba(77,171,247,0.55);
+  }
 </style>
 </head>
 <body>
@@ -149,8 +158,11 @@
                   <div class="col-12">
                     <div class="card">
                       <div class="card-header"><h3 class="card-title">Session timeline</h3>
-                        <div class="card-actions lab">speed over elapsed time</div></div>
-                      <div class="card-body"><div id="chart-timeline" class="chart-host"></div></div>
+                        <div class="card-actions lab">drag to select a range · one shared time axis</div></div>
+                      <div class="card-body">
+                        <div id="chart-timeline" class="chart-host"></div>
+                        <div id="timeline-readout" class="mt-2 lab"></div>
+                      </div>
                       <div class="card-footer"><div id="edit-bar"></div></div>
                     </div>
                   </div>
@@ -158,8 +170,18 @@
               </div>
 
               <div id="tab-track" class="tab-pane" role="tabpanel">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                  <div class="btn-group btn-group-sm" role="group" id="map-mode">
+                    <button type="button" class="btn btn-sm active" data-mode="speed">Speed</button>
+                    <button type="button" class="btn btn-sm" data-mode="shift">Wind shift</button>
+                    <button type="button" class="btn btn-sm" data-mode="tack">Tack</button>
+                    <button type="button" class="btn btn-sm" data-mode="loss">Turn loss</button>
+                  </div>
+                  <span class="lab" id="map-mode-note"></span>
+                </div>
                 <div id="map-host" style="height:460px;border-radius:4px;overflow:hidden"></div>
                 <div id="map-legend" class="d-flex flex-wrap gap-3 mt-2 lab"></div>
+                <div id="map-caveat" class="lab mt-1" style="opacity:.7"></div>
               </div>
 
               <div id="tab-turns" class="tab-pane" role="tabpanel">
@@ -243,6 +265,11 @@
 <script src="js/charts.js?v=auto-463"></script>
 <script src="js/replay.js?v=auto-463"></script>
 <script src="js/map-v2.js?v=map-441"></script>
+<script src="js/map-tactical.js?v=tact-472b"></script>
+<script src="js/chart-stack.js?v=stack-473c"></script>
+<script src="js/bin-table.js?v=bin-477"></script>
+<script src="js/correlation.js?v=corr-478"></script>
+<script src="js/formula.js?v=formula-479"></script>
 <script src="js/v2-app.js?v=auto-463"></script>
 </body>
 </html>

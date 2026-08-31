@@ -1305,6 +1305,7 @@
           twaCenter: (b + 0.5) * binDeg,
           count: list.length,
           p95Ms: list.length ? Geo.percentile(list, 95) : 0,
+          p90Ms: list.length ? Geo.percentile(list, 90) : 0,
           avgMs: list.length ? sum / list.length : 0
         };
       });
@@ -1338,7 +1339,10 @@
     return {
       binDeg: polar.binDeg,
       bins: polar.combined.map(function (bn) {
-        return { count: bn.count, p95Ms: bn.p95Ms };
+        /* §475 — p90 도 함께 남긴다. p95 는 '가장 좋았던 순간' 이라
+           풍속대별 폴라 격자에서는 표본이 조금만 얇아도 튄다. 격자는
+           p90 을 쓰고, 기존 타깃 폴라는 p95 를 그대로 쓴다. */
+        return { count: bn.count, p95Ms: bn.p95Ms, p90Ms: bn.p90Ms };
       })
     };
   }
@@ -1418,6 +1422,269 @@
       filledBins: filled, interpolatedBins: interp,
       emptyBins: empty, sparseBins: sparse
     };
+  }
+
+  /* ============================================================
+   * 8b-2) 풍속대 × 풍각 폴라 격자 (§475)
+   *
+   * 폴라 하나에 모든 날을 섞으면 그건 폴라가 아니라 평균이다. 8노트에
+   * 낸 각도와 20노트에 낸 각도는 다른 배의 것처럼 다르다. Njord 가
+   * TWS 버킷을 나누는 이유가 그것이다.
+   *
+   * 우리는 순간 풍속을 재지 못한다. 대신 세션마다 라이더가 적어 둔
+   * 풍속이 있다. 그래서 **세션 단위로** 풍속대에 넣는다 — 한 세션 안의
+   * 돌풍/소강은 이 격자가 구분하지 못한다는 뜻이고, 그건 표기한다.
+   *
+   * 셀 값 = 그 풍속대에 속한 세션들의 빈별 p90 을 표본 수로 가중평균한
+   * 것이다. 퍼센타일을 평균내는 건 일반적으로는 편법이지만, 여기서는
+   * 이미 풍속으로 묶어 비슷한 날들만 모았기 때문에 성립한다. 그래도
+   * 셀마다 세션 수와 표본 수를 함께 돌려주어 얇은 셀을 숨기지 않는다.
+   * ============================================================ */
+
+  var TWS_BUCKETS = [
+    { key: 'lt10',  label: '< 10 kt',  min: 0,  max: 10 },
+    { key: '10_14', label: '10–14 kt', min: 10, max: 14 },
+    { key: '14_18', label: '14–18 kt', min: 14, max: 18 },
+    { key: 'gte18', label: '18+ kt',   min: 18, max: 1e9 }
+  ];
+
+  function twsBucketFor(windSpeedKt) {
+    if (windSpeedKt == null || !isFinite(windSpeedKt)) return null;
+    for (var i = 0; i < TWS_BUCKETS.length; i++) {
+      if (windSpeedKt >= TWS_BUCKETS[i].min && windSpeedKt < TWS_BUCKETS[i].max) {
+        return TWS_BUCKETS[i];
+      }
+    }
+    return null;
+  }
+
+  /* entries : [{ windSpeedKt, profile:{binDeg, bins:[{count,p90Ms,p95Ms}]} }]
+     opts.minCellSamples : 셀을 채우는 최소 누적 표본(기본 30)
+     반환 { binDeg, nBins, buckets:[{key,label,cells:[...],sessionCount}],
+            unbucketed } */
+  function buildPolarGrid(entries, opts) {
+    opts = opts || {};
+    var minCell = opts.minCellSamples != null ? opts.minCellSamples : 30;
+    var list = (entries || []).filter(function (e) {
+      return e && e.profile && e.profile.bins && e.profile.bins.length;
+    });
+    if (!list.length) return null;
+    var binDeg = list[0].profile.binDeg || DEFAULTS.polarBinDeg;
+    var nBins = Math.ceil(180 / binDeg);
+    var unbucketed = 0;
+
+    var buckets = TWS_BUCKETS.map(function (b) {
+      var cells = [];
+      for (var i = 0; i < nBins; i++) {
+        cells.push({ twaCenter: (i + 0.5) * binDeg, speedMs: null,
+                     sampleCount: 0, sessionCount: 0, thin: false });
+      }
+      return { key: b.key, label: b.label, min: b.min, max: b.max,
+               cells: cells, sessionCount: 0 };
+    });
+    var byKey = {};
+    buckets.forEach(function (b) { byKey[b.key] = b; });
+
+    list.forEach(function (e) {
+      var b = twsBucketFor(e.windSpeedKt);
+      if (!b) { unbucketed++; return; }
+      var tgt = byKey[b.key];
+      tgt.sessionCount++;
+      e.profile.bins.forEach(function (bn, i) {
+        if (i >= nBins || !bn || !bn.count) return;
+        /* p90 이 없는 옛 기록은 p95 로 대신한다 — 값이 조금 높게 잡히지만
+           빈 셀로 두는 것보다 낫고, 그 사실은 legacy 로 표시한다. */
+        var v = (bn.p90Ms != null && bn.p90Ms > 0) ? bn.p90Ms : bn.p95Ms;
+        if (!(v > 0)) return;
+        var c = tgt.cells[i];
+        c.speedMs = (c.speedMs == null)
+          ? v
+          : (c.speedMs * c.sampleCount + v * bn.count) / (c.sampleCount + bn.count);
+        c.sampleCount += bn.count;
+        c.sessionCount++;
+        if (bn.p90Ms == null) c.legacy = true;
+      });
+    });
+
+    buckets.forEach(function (b) {
+      b.cells.forEach(function (c) {
+        if (c.sampleCount < minCell) { c.speedMs = null; c.thin = true; }
+      });
+      b.filled = b.cells.filter(function (c) { return c.speedMs != null; }).length;
+    });
+
+    return { binDeg: binDeg, nBins: nBins, buckets: buckets,
+             unbucketed: unbucketed, sourceSessionCount: list.length };
+  }
+
+  /* ============================================================
+   * 8c) 타깃 퍼센타일 밴드 (§474) — **고르는 지표 ≠ 보여주는 지표**
+   *
+   * 8b) 의 타깃 폴라에는 두 가지 낙관 편향이 있다.
+   *   (1) 빈마다 '세션별 p95 의 최댓값' 을 쓴다 → 각 풍각의 최고 기록을
+   *       서로 다른 날에서 긁어모은 포락선이다. 어느 하루도 그 곡선을
+   *       달린 적이 없다.
+   *   (2) 고르는 지표와 보여주는 지표가 같다 → 빈 안에서 속도 p95 를
+   *       뽑아 속도 목표로 쓴다. 그러면 "최고 속도" 와 "최고 각도" 를
+   *       각각 따로 뽑아 동시에 요구하게 되는데, 그 둘은 같이 일어나지
+   *       않는다.
+   *
+   * 그래서 여기서는 Njord 의 방식을 따른다:
+   *   · 세션을 짧은 **창**(기본 20초)으로 자른다. 창 하나가 "그때 실제로
+   *     동시에 일어난 일" 의 최소 단위다.
+   *   · **VMG 로 고르고, 속도와 각도는 그때 값을 그대로 보여준다.**
+   *     상위 25% 창의 평균 속도·평균 CWA 는 실제로 함께 나온 조합이다.
+   *   · 한 점이 아니라 **75~95 퍼센타일 밴드**로 낸다. p95 하나만
+   *     주면 "늘 최고여야 한다" 가 되지만, p75 는 좋은 날의 하한이라
+   *     오늘을 놓을 자리가 생긴다.
+   *
+   * 저장은 상위 keepFraction(기본 0.30) 창만 남긴다 — 타깃에 쓰이는 건
+   * 그것뿐이고, 전량을 localStorage 에 넣을 이유가 없다. 대신 원래
+   * 창이 몇 개였는지(total)를 함께 남겨, 여러 세션을 합칠 때 전체
+   * 분포 기준 퍼센타일을 되찾을 수 있게 한다.
+   * ============================================================ */
+
+  /* 한 세션 → 존별 상위 창 목록.
+     반환 { windowSec, keepFraction, upwind:{total, kept:[{v,s,a}]}, downwind:{...} }
+     v = VMG kt (목표 방향으로 양수), s = 속도 kt, a = |CWA| °. */
+  function sessionTargetWindows(session, windDir, opts) {
+    opts = opts || {};
+    if (!session || !session.hasTime || windDir == null) return null;
+    var winSec = opts.windowSec || 20;
+    var keepFrac = opts.keepFraction != null ? opts.keepFraction : 0.30;
+    var minKt = opts.minSpeedKt != null ? opts.minSpeedKt : 8;
+    var S = session.samples;
+    var wd = ((windDir % 360) + 360) % 360;
+    var zones = { upwind: [], downwind: [] };
+
+    (session.legs || []).forEach(function (leg) {
+      var cur = null;
+      function close() {
+        if (!cur) return;
+        /* 창이 충분히 길고 한 존에만 머물렀을 때만 인정한다 — 존을
+           넘나든 창은 택 전환이 섞인 것이라 '지속 성능' 이 아니다. */
+        if (cur.dt >= winSec * 0.8 && cur.n >= 5) {
+          var sp = cur.spDt / cur.dt, tw = cur.twaDt / cur.dt;
+          var vmg = sp * Math.abs(Math.cos(Geo.toRad(tw)));
+          zones[cur.zone].push({
+            v: Math.round(vmg * Geo.MS_TO_KNOTS * 100) / 100,
+            s: Math.round(sp * Geo.MS_TO_KNOTS * 100) / 100,
+            a: Math.round(tw * 10) / 10
+          });
+        }
+        cur = null;
+      }
+      for (var i = leg.start + 1; i <= leg.end; i++) {
+        var sp0 = S[i].speed, dt = S[i].t - S[i - 1].t;
+        if (dt <= 0 || S[i].heading == null || sp0 == null ||
+            sp0 * Geo.MS_TO_KNOTS < minKt) { close(); continue; }
+        var twa = Math.abs(Geo.angleDiff(wd, S[i].heading));
+        var zone = twa < 90 ? 'upwind' : 'downwind';
+        if (cur && (cur.zone !== zone || cur.dt >= winSec)) close();
+        if (!cur) cur = { zone: zone, dt: 0, spDt: 0, twaDt: 0, n: 0 };
+        cur.dt += dt; cur.spDt += sp0 * dt; cur.twaDt += twa * dt; cur.n++;
+      }
+      close();
+    });
+
+    function keep(list) {
+      var sorted = list.slice().sort(function (a, b) { return b.v - a.v; });
+      var k = Math.max(1, Math.round(sorted.length * keepFrac));
+      return { total: sorted.length, kept: sorted.slice(0, Math.min(k, sorted.length)) };
+    }
+    if (!zones.upwind.length && !zones.downwind.length) return null;
+    return {
+      windowSec: winSec, keepFraction: keepFrac,
+      upwind: keep(zones.upwind), downwind: keep(zones.downwind)
+    };
+  }
+
+  /* 여러 세션의 창 목록 → 존별 75/90/95 퍼센타일 밴드.
+     퍼센타일은 **전체 분포** 기준이다. 저장된 건 상위 일부뿐이므로,
+     total 을 합쳐 전체 개수 N 을 복원하고 상위에서 센 순위로 되찾는다.
+     남긴 범위 밖의 퍼센타일은 null 로 돌려준다 — 모르는 건 모른다고 한다.
+
+     각 퍼센타일에서 속도·각도는 **그 근처 창들의 평균**이다(±2.5%p).
+     VMG 로 고르고 속도·각도는 따라온 값을 그대로 쓴다. */
+  function buildTargetBand(windowSets, opts) {
+    opts = opts || {};
+    var levels = opts.levels || [75, 90, 95];
+    var halfBand = opts.halfBandPct != null ? opts.halfBandPct : 2.5;
+    var sets = (windowSets || []).filter(function (w) { return w && (w.upwind || w.downwind); });
+    if (!sets.length) return null;
+
+    function zoneBand(zoneKey) {
+      var pooled = [], N = 0;
+      sets.forEach(function (w) {
+        var z = w[zoneKey];
+        if (!z || !z.kept) return;
+        N += z.total || z.kept.length;
+        pooled = pooled.concat(z.kept);
+      });
+      if (!pooled.length || N < 1) return null;
+      pooled.sort(function (a, b) { return b.v - a.v; });   /* 내림차순 */
+      var K = pooled.length;
+
+      function atPct(p) {
+        /* 전체 N 개 중 상위에서 r 번째 = 퍼센타일 p */
+        var r = (1 - p / 100) * N;
+        if (r > K) return null;                    /* 남긴 범위 밖 */
+        var lo = Math.max(0, Math.floor((1 - (p + halfBand) / 100) * N));
+        var hi = Math.min(K, Math.ceil((1 - (p - halfBand) / 100) * N));
+        if (hi <= lo) { lo = Math.max(0, Math.min(K - 1, Math.floor(r))); hi = lo + 1; }
+        var sl = pooled.slice(lo, hi);
+        if (!sl.length) return null;
+        function mean(k) {
+          var t = 0;
+          sl.forEach(function (x) { t += x[k]; });
+          return t / sl.length;
+        }
+        return {
+          pct: p, n: sl.length,
+          vmgKt: mean('v'), speedKt: mean('s'), twaDeg: mean('a'),
+          beyondKept: false
+        };
+      }
+
+      var out = { totalWindows: N, keptWindows: K, levels: {} };
+      levels.forEach(function (p) { out.levels[p] = atPct(p); });
+      return out;
+    }
+
+    var up = zoneBand('upwind'), down = zoneBand('downwind');
+    if (!up && !down) return null;
+    return {
+      upwind: up, downwind: down,
+      sourceSessionCount: sets.length,
+      windowSec: sets[0].windowSec || 20,
+      basis: opts.basis || (sets.length > 1 ? 'cumulative' : 'single-session')
+    };
+  }
+
+  /* 오늘의 지속 성능이 밴드 어디에 놓이는가.
+     오늘 값 = 이 세션 창들의 상위 25% 평균 VMG(= "좋았던 순간들"),
+     비교 대상 = 밴드의 p90. 평균끼리 비교하면 오늘의 나쁜 구간이
+     타깃의 좋은 구간과 겨루게 되어 항상 지므로, 같은 성격끼리 맞춘다.
+     반환 { upwind:{todayVmgKt, targetVmgKt, pct, ...}, downwind:{...} } */
+  function compareToTargetBand(todayWindows, band, opts) {
+    opts = opts || {};
+    if (!todayWindows || !band) return null;
+    var lvl = opts.level || 90;
+    function zone(k) {
+      var z = todayWindows[k], b = band[k];
+      if (!z || !z.kept || !z.kept.length || !b || !b.levels[lvl]) return null;
+      var t = b.levels[lvl];
+      var n = z.kept.length, sum = 0, sp = 0, ang = 0;
+      z.kept.forEach(function (x) { sum += x.v; sp += x.s; ang += x.a; });
+      var todayV = sum / n;
+      return {
+        todayVmgKt: todayV, todaySpeedKt: sp / n, todayTwaDeg: ang / n,
+        targetVmgKt: t.vmgKt, targetSpeedKt: t.speedKt, targetTwaDeg: t.twaDeg,
+        targetPct: lvl, windows: n,
+        pct: t.vmgKt > 0 ? (todayV / t.vmgKt) * 100 : null
+      };
+    }
+    return { upwind: zone('upwind'), downwind: zone('downwind'), level: lvl };
   }
 
   /* % of target — 현재 세션의 매 순간 성능이 타깃 폴라의 몇 %인지.
@@ -3495,6 +3762,9 @@
       },
       wind: computeWindMetrics(session, windDir, opts.windSpeedKt),
       polar: computePolar(session, windDir),
+      /* §474 타깃 창 — 저장해 두면 다음 세션의 타깃 밴드 재료가 된다.
+         풍향이 없으면 CWA 를 못 내므로 null. */
+      targetWindows: sessionTargetWindows(session, windDir),
       /* 심박수 분석 — 추이·요약·효율. HR 이 없으면 { hasHR:false }.
          존 분포는 사용자 입력 최대심박에 의존하므로 UI 가
          computeHrZones 를 따로 호출한다. */
@@ -3519,6 +3789,12 @@
     sessionPolarProfile: sessionPolarProfile,
     buildTargetPolar: buildTargetPolar,
     computeTargetComparison: computeTargetComparison,
+    sessionTargetWindows: sessionTargetWindows,
+    buildTargetBand: buildTargetBand,
+    compareToTargetBand: compareToTargetBand,
+    TWS_BUCKETS: TWS_BUCKETS,
+    twsBucketFor: twsBucketFor,
+    buildPolarGrid: buildPolarGrid,
     headingHistogram: headingHistogram,
     tackAlignment: tackAlignment,
     estimateWindFromTrack: estimateWindFromTrack,

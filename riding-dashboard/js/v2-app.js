@@ -191,69 +191,22 @@
   }
 
   /* ---------- 세션 시계열 ---------- */
-  /* 다운샘플 때문에 레그 끝 인덱스를 정확히 밟지 못할 수 있다 —
-     두 표본 사이에 레그 경계가 있었는지로 판단한다. */
-  function anyLegEndBetween(legEnd, a, b) {
-    for (var i = a; i < b; i++) if (legEnd[i]) return true;
-    return false;
-  }
-
-  function renderTimeline(session) {
+  var stackInst = null;
+  function renderTimeline(session, analysis) {
     var host = $('chart-timeline');
     var S = session.samples || [];
-    if (!S.length || !window.uPlot) { host.textContent = 'No data'; return; }
-    var t0 = S[0].t;
-    var step = Math.max(1, Math.floor(S.length / 1800));   /* 과밀 방지 다운샘플 */
-    /* §459 — 기록 공백과 제외 구간에서는 선을 끊는다. 예전에는 두 점을
-       그냥 이어서, 지워버린 10분이 완만한 사선으로 남아 마치 그 시간에
-       타고 있었던 것처럼 보였다(옥대표 지적). 레그 경계마다 null 을
-       하나 끼워 uPlot 이 선을 끊게 한다. */
-    var legEnd = {};
-    (session.legs || []).forEach(function (lg) { legEnd[lg.end] = true; });
-    var gapSec = (session.cfg && session.cfg.gapThresholdSec) || 8;
-    var xs = [], ys = [];
-    var prevT = null, prevIdx = null;
-    for (var i = 0; i < S.length; i += step) {
-      var tt = S[i].t - t0;
-      var broke = (prevT != null) &&
-        ((tt - prevT) > Math.max(gapSec, step * 2) ||
-         (prevIdx != null && anyLegEndBetween(legEnd, prevIdx, i)));
-      if (broke) { xs.push(prevT + 0.001); ys.push(null); }
-      xs.push(tt);
-      ys.push(S[i].speed != null && isFinite(S[i].speed) ? S[i].speed * KT : null);
-      prevT = tt; prevIdx = i;
+    if (!host) return;
+    if (stackInst) { try { stackInst.destroy(); } catch (e) {} stackInst = null; }
+    if (!S.length || !window.uPlot || !window.RDChartStack) {
+      host.textContent = 'No data'; return;
     }
-    while (host.firstChild) host.removeChild(host.firstChild);
-    track(new uPlot({
-      width: host.clientWidth || 900, height: 268, padding: [12, 14, 4, 6],
-      cursor: { drag: { x: true, y: false } },
-      scales: { x: { time: false } },
-      axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
-          font: '11px "IBM Plex Mono", monospace',
-          values: function (u, t) { return t.map(function (v) { return fmtClock(v); }); } },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
-          font: '11px "IBM Plex Mono", monospace', size: 40,
-          values: function (u, t) { return t.map(function (v) { return v.toFixed(0); }); } }
-      ],
-      series: [
-        { label: 'Elapsed', value: function (u, v) { return v == null ? '—' : fmtClock(v); } },
-        { label: 'Speed', stroke: THEME.accent, width: 1.4, spanGaps: false,
-          fill: 'rgba(77,171,247,0.14)',
-          value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } }
-      ],
-      hooks: {
-        /* 드래그로 구간 선택 → 제외. uPlot 의 select 는 확대에 쓰이지만
-           여기서는 편집 도구로 쓴다 (확대는 필요 없고 잘라내기가 필요하다). */
-        setSelect: [function (u) {
-          if (!u.select || u.select.width < 4) return;
-          var a0 = u.posToVal(u.select.left, 'x');
-          var a1 = u.posToVal(u.select.left + u.select.width, 'x');
-          u.setSelect({ left: 0, width: 0, top: 0, height: 0 }, false);
-          addExclusion(Math.min(a0, a1), Math.max(a0, a1));
-        }]
-      }
-    }, [xs, ys], host), host);
+    /* §473 — 지표마다 판을 나누되 x축(시간)은 하나로 공유한다. 두 축을
+       한 판에 겹치면 교차점이 뜻을 갖는 것처럼 보이지만 아무 뜻도 없다. */
+    stackInst = RDChartStack.render(host, session, analysis, {
+      theme: THEME,
+      readoutHost: $('timeline-readout'),
+      onExclude: function (a, b) { addExclusion(a, b); }
+    });
     renderEditBar();
   }
 
@@ -298,7 +251,8 @@
     hint.textContent = ranges.length
       ? ranges.length + ' segment' + (ranges.length > 1 ? 's' : '') + ' excluded — '
         + 'distance, speed and turn analysis are recomputed without them.'
-      : 'Drag across the chart to exclude a segment (rest, drift, drive home).';
+      : 'Drag across any panel to select a range \u2014 the averages for that '
+        + 'stretch appear under the chart, with the option to exclude it.';
     host.appendChild(hint);
     if (!ranges.length) return;
     var t0 = CUR.fullSession ? CUR.fullSession.samples[0].t : 0;
@@ -704,6 +658,9 @@
           size: Math.min(400, polarHost.clientWidth || 380) });
     }
 
+    renderPolarGrid(host, a);
+    renderBinTable(host, a);
+    renderCorrelation(host, a);
     renderGainLoss(host, a);
     renderWindVariation(host, a);
     renderTargetComparison(host, a);
@@ -1614,82 +1571,575 @@
     host.appendChild(card);
   }
 
-  /* §452 % of target — 오늘 속도를 "내가 낼 수 있다고 확인된 속도" 와
-     비교한다. 기준선은 저장된 세션들의 각도별 상위 5% 를 누적한 개인
-     베스트 곡선이고, 저장분이 없으면 이 세션 자신이 기준이 된다
-     (그 경우 100% 근처가 나오는 게 당연하므로 근거를 함께 적는다). */
-  function renderTargetComparison(host, a) {
-    if (!An.sessionPolarProfile || !An.buildTargetPolar || !CUR.session) return;
-    if (a.windDir == null) return;
-    var cur;
-    try { cur = An.sessionPolarProfile(CUR.session, a.windDir); } catch (e) { return; }
-    if (!cur) return;
-
-    /* 저장된 다른 세션의 폴라 프로파일 누적 — 같은 시작 시각은 같은
-       세션이므로 뺀다(자기 자신과 비교하면 항상 100%). */
-    var saved = [], curEpoch = CUR.session.startEpoch || 0;
+  /* 라이더 프로필의 최대심박 — 없으면 null(HR 축이 비활성). */
+  function riderMaxHr() {
     try {
-      (window.RDStorage ? RDStorage.listSessions() : []).forEach(function (rec) {
-        if (!rec.polarProfile || !rec.polarProfile.bins) return;
-        if (curEpoch && rec.dateEpoch === curEpoch) return;
-        saved.push(rec.polarProfile);
-      });
-    } catch (e) {}
-    var basis = saved.length ? 'cumulative' : 'single-session';
-    var target;
-    try {
-      target = An.buildTargetPolar(saved.length ? saved : [cur], { basis: basis });
-    } catch (e) { return; }
-    if (!target || (target.filledBins + target.interpolatedBins) < 2) return;
+      var rp = (window.RDStorage && RDStorage.loadRider) ? RDStorage.loadRider() : null;
+      return (rp && rp.maxHr > 0) ? rp.maxHr : null;
+    } catch (e) { return null; }
+  }
 
-    var cmp;
-    try { cmp = An.computeTargetComparison(CUR.session, a.windDir, target); } catch (e) { return; }
-    if (!cmp) return;
-
+  /* §477 2차원 지표 격자 — 1차원 요약으로는 안 갈리는 질문이 있다.
+     *스타보드 풍상에서만* 느린가, *후반에만* 각이 벌어지는가. 축 둘을
+     고르고 지표 하나를 채우면 그게 한 화면에 놓인다. */
+  var binState = { rowDim: 'zone', colDim: 'tack', metric: 'vmg',
+                   formula: 'speed / hr * 100' };
+  function renderBinTable(host, a) {
+    if (!window.RDBinTable || !CUR.session) return;
     var card = el('div', 'card mt-3');
     var head = el('div', 'card-header');
-    head.appendChild(el('h3', 'card-title', 'Percent of target'));
-    head.appendChild(el('div', 'card-actions lab',
-      basis === 'cumulative'
-        ? ('target from ' + saved.length + ' saved session' + (saved.length > 1 ? 's' : ''))
-        : 'target from this session only'));
+    head.appendChild(el('h3', 'card-title', 'Bin table'));
     card.appendChild(head);
     var body = el('div', 'card-body');
 
-    /* 기준선이 이 세션 자신이면 "내 오늘 최고 대비 오늘 평균" 이라
-       세션 내부 일관성을 보는 것이고, 저장분이 쌓이면 "개인 최고 대비"
-       가 된다. 둘은 읽는 의미가 다르므로 반드시 밝힌다. */
-    if (basis === 'single-session') {
-      body.appendChild(el('div', 'alert alert-info',
-        'No other saved sessions yet, so the target is this session\u2019s own best '
-        + '5% at each wind angle. That reads as consistency within today \u2014 how '
-        + 'close your average was to your best. Save sessions and it becomes a '
-        + 'personal-best comparison across days.'));
+    var maxHr = riderMaxHr();
+    var ctlOpts = { windDir: a.windDir, maxHr: maxHr, minSpeedKt: 8 };
+
+    /* 쓸 수 없는 축은 목록에서 빼는 게 아니라 비활성으로 남긴다 —
+       빠져 있으면 "그런 축은 없다" 로 읽히고, 왜 못 쓰는지 못 알려준다. */
+    function dimDisabled(d) {
+      if (d.key === 'tack' && a.windDir == null) return 'needs a wind direction';
+      if ((d.key === 'twa' || d.key === 'zone') && a.windDir == null) return 'needs a wind direction';
+      if (d.key === 'hrzone' && !maxHr) return 'needs your max heart rate';
+      return null;
+    }
+    function metDisabled(m) {
+      if ((m.key === 'vmg' || m.key === 'twa') && a.windDir == null) return 'needs a wind direction';
+      if (m.key === 'hr' && !(a.hr && a.hr.hasHR)) return 'no heart-rate data';
+      return null;
     }
 
-    var row = el('div', 'row row-cards');
-    [['Upwind', cmp.upwind], ['Downwind', cmp.downwind]].forEach(function (pair) {
-      var col = el('div', 'col-md-6');
-      var c = el('div', 'card'), b = el('div', 'card-body');
-      b.appendChild(el('div', 'lab', pair[0] + ' % of target'));
-      var side = pair[1];
-      if (!side || side.pctOfTarget == null) {
-        b.appendChild(el('div', 'kpi__val num mt-1', '\u2014'));
-        b.appendChild(el('div', 'kpi__sub mt-1', 'no comparable segments'));
-      } else {
-        b.appendChild(el('div', 'kpi__val num mt-1',
-          Math.round(side.pctOfTarget) + '%'));
-        var sub = (side.comparedTimeSec >= 60
-          ? Math.round(side.comparedTimeSec / 60) + ' min'
-          : Math.round(side.comparedTimeSec) + ' s') + ' compared';
-        if (side.coverage < 0.995) {
-          sub += ' \u00b7 target exists for ' + Math.round(side.coverage * 100) + '% of it';
+    var bar = el('div', 'd-flex flex-wrap align-items-end gap-2 mb-3');
+    function mkSelect(label, list, cur, disabledFn, onChange) {
+      var wrap = el('div');
+      wrap.appendChild(el('div', 'lab mb-1', label));
+      var sel = el('select', 'form-select form-select-sm');
+      sel.style.width = 'auto';
+      list.forEach(function (d) {
+        var o = document.createElement('option');
+        o.value = d.key;
+        var why = disabledFn(d);
+        o.textContent = d.label + (why ? ' — ' + why : '');
+        o.disabled = !!why;
+        if (d.key === cur) o.selected = true;
+        sel.appendChild(o);
+      });
+      sel.addEventListener('change', function () { onChange(sel.value); });
+      wrap.appendChild(sel);
+      return wrap;
+    }
+    function redraw() {
+      var h = $('bin-table-host');
+      if (h) drawBinGrid(h, a, ctlOpts);
+    }
+    bar.appendChild(mkSelect('Rows', RDBinTable.DIMENSIONS, binState.rowDim,
+      dimDisabled, function (v) { binState.rowDim = v; redraw(); }));
+    bar.appendChild(mkSelect('Columns', RDBinTable.DIMENSIONS, binState.colDim,
+      dimDisabled, function (v) { binState.colDim = v; redraw(); }));
+    /* §479 — 미리 정해 둔 지표만 보여주면 라이더가 궁금한 것의 절반은
+       영원히 못 본다. 마지막 항목은 직접 적는 수식이다. */
+    var metricList = RDBinTable.METRICS.slice();
+    if (window.RDFormula) metricList.push({ key: '__derived', label: 'Custom formula…' });
+    bar.appendChild(mkSelect('Metric', metricList, binState.metric,
+      metDisabled, function (v) {
+        binState.metric = v;
+        var fb = $('bin-formula');
+        if (fb) fb.style.display = (v === '__derived') ? '' : 'none';
+        redraw();
+      }));
+    body.appendChild(bar);
+
+    if (window.RDFormula) body.appendChild(buildFormulaBar(redraw));
+
+    var tblHost = el('div'); tblHost.id = 'bin-table-host';
+    body.appendChild(tblHost);
+    card.appendChild(body);
+    host.appendChild(card);
+    drawBinGrid(tblHost, a, ctlOpts);
+  }
+
+  /* 수식 입력줄. 오류는 입력 옆에 바로 붙인다 — 표가 조용히 비어 있는
+     것보다 "17번째 글자에서 막혔다" 가 훨씬 낫다. */
+  function buildFormulaBar(redraw) {
+    var wrap = el('div', 'mb-3');
+    wrap.id = 'bin-formula';
+    wrap.style.display = (binState.metric === '__derived') ? '' : 'none';
+    var row = el('div', 'd-flex flex-wrap align-items-center gap-2');
+    var inp = el('input', 'form-control form-control-sm');
+    inp.type = 'text';
+    inp.style.maxWidth = '360px';
+    inp.value = binState.formula;
+    inp.spellcheck = false;
+    var msg = el('span', 'lab');
+    function apply() {
+      binState.formula = inp.value;
+      var c = RDFormula.compile(inp.value);
+      msg.textContent = c.ok ? '' : c.error;
+      msg.style.color = c.ok ? '' : '#e03131';
+      redraw();
+    }
+    inp.addEventListener('change', apply);
+    inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') apply(); });
+    var btn = el('button', 'btn btn-sm', 'Apply');
+    btn.type = 'button';
+    btn.addEventListener('click', apply);
+    row.appendChild(inp); row.appendChild(btn); row.appendChild(msg);
+    wrap.appendChild(row);
+    var help = el('div', 'text-secondary mt-1');
+    help.style.fontSize = '.8125rem';
+    help.textContent = 'Variables: ' + RDFormula.VARIABLES.map(function (v) { return v.key; }).join(', ')
+      + '.  Functions: ' + RDFormula.FUNCTION_NAMES.join(', ')
+      + '.  Speeds are knots, angles degrees. Samples where a variable is missing '
+      + 'are left out rather than counted as zero.';
+    wrap.appendChild(help);
+    return wrap;
+  }
+
+  /* 현재 수식을 bin-table 이 쓸 수 있는 지표로 감싼다. */
+  function derivedMetric() {
+    if (!window.RDFormula || !CUR.session) return null;
+    var c = RDFormula.compile(binState.formula);
+    if (!c.ok) return null;
+    var S = CUR.session.samples || [];
+    var ctx = { t0: S.length ? S[0].t : 0 };
+    return { label: binState.formula, unit: '', dp: 2,
+             value: function (p) { return c.value(p, ctx); } };
+  }
+
+  function drawBinGrid(hostEl, a, ctlOpts) {
+    while (hostEl.firstChild) hostEl.removeChild(hostEl.firstChild);
+    var t;
+    try {
+      t = RDBinTable.build(CUR.session, {
+        rowDim: binState.rowDim, colDim: binState.colDim, metric: binState.metric,
+        derived: binState.metric === '__derived' ? derivedMetric() : null,
+        windDir: ctlOpts.windDir, maxHr: ctlOpts.maxHr, minSpeedKt: ctlOpts.minSpeedKt
+      });
+    } catch (e) { t = null; }
+    if (!t || !t.rows.length || !t.cols.length) {
+      hostEl.appendChild(el('div', 'text-secondary',
+        binState.metric === '__derived'
+          ? 'That formula produced no values — check it above.'
+          : 'Nothing to show for those two axes — no sustained riding falls in both.'));
+      return;
+    }
+
+    /* 색은 표 전체에서의 상대값. 시간·비중 지표는 큰 값이 곧 좋은 게
+       아니지만, 어디가 몰려 있는지는 색으로 읽는 게 빠르다. */
+    var vals = [];
+    t.grid.forEach(function (r) { r.forEach(function (c) { if (c.value != null) vals.push(c.value); }); });
+    var lo = vals.length ? Math.min.apply(null, vals) : 0;
+    var hi = vals.length ? Math.max.apply(null, vals) : 1;
+
+    var wrap = el('div', 'table-responsive');
+    var tbl = el('table', 'table table-sm table-vcenter mb-1');
+    var thead = el('thead'), hr = el('tr');
+    hr.appendChild(el('th', null, t.rowDim.label));
+    t.cols.forEach(function (c) { hr.appendChild(el('th', 'text-end', c.label)); });
+    hr.appendChild(el('th', 'text-end', 'all'));
+    thead.appendChild(hr); tbl.appendChild(thead);
+
+    var tb = el('tbody');
+    t.grid.forEach(function (row, i) {
+      var tr = el('tr');
+      tr.appendChild(el('td', null, t.rows[i].label));
+      row.forEach(function (c) {
+        var td = el('td', 'text-end num');
+        if (c.value == null) {
+          td.className += ' text-secondary';
+          td.textContent = c.empty ? '' : (Math.round(c.seconds) + 's');
+          if (!c.empty) td.title = 'only ' + Math.round(c.seconds)
+            + 's here — under the ' + t.minSeconds + 's minimum, so no average is shown';
+        } else {
+          td.textContent = c.value.toFixed(t.metric.dp);
+          var f = hi > lo ? (c.value - lo) / (hi - lo) : 1;
+          td.style.background = 'rgba(77,171,247,' + (0.05 + f * 0.28).toFixed(3) + ')';
+          td.title = fmtClock(c.seconds) + ' in this cell';
         }
-        b.appendChild(el('div', 'kpi__sub mt-1', sub));
-      }
-      c.appendChild(b); col.appendChild(c); row.appendChild(col);
+        tr.appendChild(td);
+      });
+      var rt = t.rowTotals[i];
+      tr.appendChild(el('td', 'text-end num text-secondary',
+        rt.value == null ? '' : rt.value.toFixed(t.metric.dp)));
+      tb.appendChild(tr);
     });
-    body.appendChild(row);
+    var trT = el('tr');
+    trT.style.borderTop = '2px solid rgba(139,152,165,0.3)';
+    trT.appendChild(el('td', 'text-secondary', 'all'));
+    t.colTotals.forEach(function (x) {
+      trT.appendChild(el('td', 'text-end num text-secondary',
+        x.value == null ? '' : x.value.toFixed(t.metric.dp)));
+    });
+    trT.appendChild(el('td'));
+    tb.appendChild(trT);
+    tbl.appendChild(tb); wrap.appendChild(tbl);
+    hostEl.appendChild(wrap);
+
+    var f = el('div', 'text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = t.metric.label + (t.metric.unit ? ' in ' + t.metric.unit : '')
+      + ', time-weighted, riding above 8 kt only. Cells with less than '
+      + t.minSeconds + 's show the seconds instead of an average. '
+      + 'The "all" row and column are the margins — a cell only means something '
+      + 'if it differs from them.';
+    hostEl.appendChild(f);
+  }
+
+  /* §475 풍속대 × 풍각 격자 — 폴라 하나에 모든 날을 섞으면 그건 폴라가
+     아니라 평균이다. 8노트의 각도와 20노트의 각도는 다른 배의 것처럼
+     다르다. 순간 풍속은 못 재므로 세션에 적어 둔 풍속으로 세션째 묶는다
+     — 한 세션 안의 돌풍·소강은 이 격자가 구분하지 못하고, 그건 밝힌다. */
+  function renderPolarGrid(host, a) {
+    if (!An.buildPolarGrid || !window.RDStorage) return;
+    var entries = [];
+    var curEpoch = CUR.session && CUR.session.startEpoch;
+    try {
+      RDStorage.listSessions().forEach(function (rec) {
+        if (!rec.polarProfile || !rec.polarProfile.bins) return;
+        if (rec.windSpeedKt == null) return;
+        entries.push({ windSpeedKt: rec.windSpeedKt, profile: rec.polarProfile,
+                       dateEpoch: rec.dateEpoch });
+      });
+    } catch (e) {}
+    /* 지금 열려 있는 세션도 넣는다 — 저장 전이라도 오늘이 격자에 보여야
+       "오늘은 어느 칸인가" 를 읽을 수 있다. */
+    var wsNow = windSpeedFromForm ? windSpeedFromForm() : null;
+    var profNow = null;
+    if (wsNow != null && a.polar && An.sessionPolarProfile && CUR.session &&
+        a.windDir != null) {
+      try { profNow = An.sessionPolarProfile(CUR.session, a.windDir); } catch (e) {}
+      if (profNow) {
+        entries = entries.filter(function (x) { return x.dateEpoch !== curEpoch; });
+        entries.push({ windSpeedKt: wsNow, profile: profNow, dateEpoch: curEpoch });
+      }
+    }
+    if (entries.length < 1) return;
+    var grid;
+    try { grid = An.buildPolarGrid(entries); } catch (e) { return; }
+    if (!grid) return;
+    var live = grid.buckets.filter(function (b) { return b.filled > 0; });
+    if (!live.length) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Polar by wind strength'));
+    head.appendChild(el('div', 'card-actions lab',
+      '90th-percentile speed · ' + grid.sourceSessionCount + ' session'
+      + (grid.sourceSessionCount > 1 ? 's' : '')));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    /* 어느 각도까지 보여줄지 — 실제로 채워진 빈만. 빈 칸을 줄줄이
+       늘어놓으면 표가 데이터보다 커진다. */
+    var used = {};
+    grid.buckets.forEach(function (b) {
+      b.cells.forEach(function (c, i) { if (c.speedMs != null) used[i] = true; });
+    });
+    var cols = Object.keys(used).map(Number).sort(function (x, y) { return x - y; });
+    if (!cols.length) return;
+
+    var wrap = el('div', 'table-responsive');
+    var tbl = el('table', 'table table-sm table-vcenter mb-1');
+    var thead = el('thead'), hr = el('tr');
+    hr.appendChild(el('th', null, 'Wind'));
+    cols.forEach(function (i) {
+      hr.appendChild(el('th', 'text-end',
+        Math.round(grid.buckets[0].cells[i].twaCenter) + '°'));
+    });
+    hr.appendChild(el('th', 'text-end', 'sessions'));
+    thead.appendChild(hr); tbl.appendChild(thead);
+
+    /* 셀 색은 같은 행 안에서의 상대 속도 — 행끼리 비교하는 표가 아니라
+       "이 바람에서 어느 각도가 빠른가" 를 읽는 표다. */
+    var tb = el('tbody');
+    live.forEach(function (b) {
+      var vals = b.cells.filter(function (c) { return c.speedMs != null; })
+                        .map(function (c) { return c.speedMs; });
+      var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+      var tr = el('tr');
+      tr.appendChild(el('td', null, b.label));
+      cols.forEach(function (i) {
+        var c = b.cells[i];
+        var td = el('td', 'text-end num');
+        if (c.speedMs == null) {
+          td.textContent = c.sampleCount ? '·' : '';
+          td.className += ' text-secondary';
+          if (c.sampleCount) td.title = c.sampleCount + ' samples — too few to trust';
+        } else {
+          td.textContent = (c.speedMs * KT).toFixed(1);
+          var f = hi > lo ? (c.speedMs - lo) / (hi - lo) : 1;
+          td.style.background = 'rgba(77,171,247,' + (0.06 + f * 0.26).toFixed(3) + ')';
+          td.title = c.sampleCount + ' samples · ' + c.sessionCount + ' session'
+            + (c.sessionCount > 1 ? 's' : '') + (c.legacy ? ' · older record, p95' : '');
+        }
+        tr.appendChild(td);
+      });
+      tr.appendChild(el('td', 'text-end num', String(b.sessionCount)));
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb); wrap.appendChild(tbl); body.appendChild(wrap);
+
+    var f = el('div', 'text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'Speeds in knots. Sessions are bucketed by the wind strength you '
+      + 'entered, so gusts and lulls inside one session all land in the same bucket — '
+      + 'this grid separates days, not moments. A dot means samples exist but too few '
+      + 'to report.'
+      + (grid.unbucketed ? '  ' + grid.unbucketed + ' saved session'
+          + (grid.unbucketed > 1 ? 's have' : ' has') + ' no wind speed recorded.' : '');
+    body.appendChild(f);
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* §478 상관 보기 — 표로는 안 나오고 산점도로 나오는 질문들.
+     점은 표본이 아니라 20초 창이다(이웃 표본은 서로 독립이 아니다).
+     r 옆에 항상 n·기울기·시간 교란을 붙인다 — r 하나만 크게 써 두면
+     세기와 크기를, 상관과 인과를 섞어 읽게 된다. */
+  var corrState = { xKey: 'twa', yKey: 'speed', zone: 'up' };
+  function renderCorrelation(host, a) {
+    if (!window.RDCorrelation || !CUR.session) return;
+    var W;
+    try { W = RDCorrelation.windows(CUR.session, {}); } catch (e) { return; }
+    if (!W || W.length < 5) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Relationships'));
+    head.appendChild(el('div', 'card-actions lab',
+      W.length + ' windows of 20s'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    function fieldDisabled(f) {
+      if ((f.key === 'vmg' || f.key === 'twa') && a.windDir == null) return 'needs a wind direction';
+      if (f.key === 'hr' && !(a.hr && a.hr.hasHR)) return 'no heart-rate data';
+      return null;
+    }
+    var bar = el('div', 'd-flex flex-wrap align-items-end gap-2 mb-3');
+    function sel(label, list, cur, disFn, onChange) {
+      var wrap = el('div');
+      wrap.appendChild(el('div', 'lab mb-1', label));
+      var s2 = el('select', 'form-select form-select-sm');
+      s2.style.width = 'auto';
+      list.forEach(function (f) {
+        var o = document.createElement('option');
+        o.value = f.key;
+        var why = disFn ? disFn(f) : null;
+        o.textContent = f.label + (why ? ' — ' + why : '');
+        o.disabled = !!why;
+        if (f.key === cur) o.selected = true;
+        s2.appendChild(o);
+      });
+      s2.addEventListener('change', function () { onChange(s2.value); });
+      wrap.appendChild(s2);
+      return wrap;
+    }
+    bar.appendChild(sel('X', RDCorrelation.FIELDS, corrState.xKey, fieldDisabled,
+      function (v) { corrState.xKey = v; drawCorr(a, W); }));
+    bar.appendChild(sel('Y', RDCorrelation.FIELDS, corrState.yKey, fieldDisabled,
+      function (v) { corrState.yKey = v; drawCorr(a, W); }));
+    bar.appendChild(sel('Where', [{ key: 'all', label: 'Whole session' },
+                                  { key: 'up', label: 'Upwind only' },
+                                  { key: 'down', label: 'Downwind only' }],
+      corrState.zone, null, function (v) { corrState.zone = v; drawCorr(a, W); }));
+    body.appendChild(bar);
+
+    var plotHost = el('div'); plotHost.id = 'corr-plot';
+    plotHost.style.minHeight = '260px';
+    body.appendChild(plotHost);
+    var noteHost = el('div'); noteHost.id = 'corr-note'; noteHost.className = 'mt-2';
+    body.appendChild(noteHost);
+    card.appendChild(body);
+    host.appendChild(card);
+    drawCorr(a, W);
+  }
+
+  var corrPlot = null;
+  function drawCorr(a, W) {
+    var plotHost = $('corr-plot'), noteHost = $('corr-note');
+    if (!plotHost || !noteHost) return;
+    while (noteHost.firstChild) noteHost.removeChild(noteHost.firstChild);
+    var res;
+    try {
+      res = RDCorrelation.analyze(CUR.session, {
+        xKey: corrState.xKey, yKey: corrState.yKey, zone: corrState.zone, windows: W
+      });
+    } catch (e) { res = null; }
+    if (corrPlot) { try { corrPlot.destroy(); } catch (e) {} corrPlot = null; }
+    while (plotHost.firstChild) plotHost.removeChild(plotHost.firstChild);
+    if (!res || !res.fit) {
+      plotHost.appendChild(el('div', 'text-secondary',
+        'Fewer than five windows match — nothing worth fitting a line through.'));
+      return;
+    }
+
+    var xs = res.points.map(function (w) { return w[res.x.key]; });
+    var ys = res.points.map(function (w) { return w[res.y.key]; });
+    /* 산점도는 x 정렬이 필요하다(uPlot 은 x 가 오름차순이어야 한다). */
+    var order = xs.map(function (_, i) { return i; })
+                  .sort(function (i, j) { return xs[i] - xs[j]; });
+    var sx = order.map(function (i) { return xs[i]; });
+    var sy = order.map(function (i) { return ys[i]; });
+    var fitY = sx.map(function (v) { return res.fit.intercept + res.fit.slope * v; });
+
+    if (window.uPlot) {
+      corrPlot = new uPlot({
+        width: plotHost.clientWidth || 640, height: 260, padding: [12, 14, 4, 6],
+        cursor: { drag: { x: false, y: false } },
+        legend: { show: false },
+        scales: { x: { time: false } },
+        axes: [
+          { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+            font: '11px "IBM Plex Mono", monospace',
+            values: function (u, t) {
+              return t.map(function (v) { return v.toFixed(0) + res.x.unit; });
+            } },
+          { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+            font: '11px "IBM Plex Mono", monospace', size: 46,
+            values: function (u, t) { return t.map(function (v) { return v.toFixed(1); }); } }
+        ],
+        series: [
+          { label: res.x.label },
+          { label: res.y.label, stroke: 'rgba(77,171,247,0.9)', width: 0,
+            points: { show: true, size: 6, stroke: 'rgba(77,171,247,0.9)',
+                      fill: 'rgba(77,171,247,0.35)' } },
+          { label: 'fit', stroke: '#f76707', width: 1.6, points: { show: false } }
+        ]
+      }, [sx, sy, fitY], plotHost);
+      track(corrPlot, plotHost);
+    }
+
+    noteHost.appendChild(el('div', null, RDCorrelation.describe(res)));
+    /* 경고는 결과와 같은 자리에 둔다 — 각주로 내리면 아무도 안 읽는다. */
+    if (res.identity) {
+      noteHost.appendChild(el('div', 'alert alert-warning mt-2',
+        'These two are linked by definition — VMG is speed times the cosine of CWA. '
+        + 'The correlation here comes from the arithmetic, not from your sailing. '
+        + 'The slope is still worth reading: it says what a degree of angle is '
+        + 'actually worth in VMG.'));
+    } else if (res.timeConfounded) {
+      noteHost.appendChild(el('div', 'alert alert-warning mt-2',
+        'Both of these also drift with time in this session (r = '
+        + res.xVsTime.r.toFixed(2) + ' and ' + res.yVsTime.r.toFixed(2)
+        + ' against elapsed time). If the wind built or died, that alone would '
+        + 'produce this relationship. Compare windows from the same part of the '
+        + 'session before concluding anything.'));
+    }
+    var f = el('div', 'text-secondary mt-2');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'Each dot is a 20-second window of riding above 8 kt, not a single '
+      + 'GPS sample — neighbouring samples are not independent, and using them raw '
+      + 'would make any relationship look far more certain than it is.';
+    noteHost.appendChild(f);
+  }
+
+  /* §474 타깃 밴드 — "내가 낼 수 있다고 확인된 성능" 과 오늘을 비교한다.
+     예전 카드는 풍각 빈마다 역대 최고를 긁어모은 포락선과 겨뤘다.
+     그 곡선은 어느 하루도 달린 적이 없고, 최고 속도와 최고 각도를
+     동시에 요구한다. 여기서는 20초 창을 VMG 로 고르고 속도·각도는
+     그때 값을 그대로 보여준다 — 실제로 함께 나온 조합이다. 그리고
+     한 점이 아니라 75~95 퍼센타일 밴드로 낸다. */
+  function renderTargetComparison(host, a) {
+    if (!An.sessionTargetWindows || !An.buildTargetBand || !CUR.session) return;
+    if (a.windDir == null) return;
+    var today = a.targetWindows;
+    if (!today) return;
+
+    /* 저장된 다른 세션의 창을 모은다 — 같은 시작 시각은 같은 세션이므로 뺀다
+       (자기 자신과 비교하면 항상 100%). 예전 기록에는 targetWindows 가
+       없다 — 그건 그냥 재료가 없는 것이고, 그 사실을 카드에 밝힌다. */
+    var sets = [], curEpoch = CUR.session.startEpoch || 0, older = 0;
+    try {
+      (window.RDStorage ? RDStorage.listSessions() : []).forEach(function (rec) {
+        if (curEpoch && rec.dateEpoch === curEpoch) return;
+        if (rec.targetWindows) sets.push(rec.targetWindows); else older++;
+      });
+    } catch (e) {}
+    var basis = sets.length ? 'cumulative' : 'single-session';
+    var band;
+    try { band = An.buildTargetBand(sets.length ? sets : [today], { basis: basis }); }
+    catch (e) { return; }
+    if (!band) return;
+    var cmp = An.compareToTargetBand(today, band, { level: 90 });
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Target band'));
+    head.appendChild(el('div', 'card-actions lab',
+      basis === 'cumulative'
+        ? ('from ' + sets.length + ' saved session' + (sets.length > 1 ? 's' : ''))
+        : 'from this session only'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    if (basis === 'single-session') {
+      body.appendChild(el('div', 'alert alert-info',
+        'No other saved sessions carry target windows yet, so the band is built from '
+        + 'today alone — it reads as consistency within today, not a personal best. '
+        + (older ? older + ' older session' + (older > 1 ? 's were' : ' was')
+                   + ' saved before this was recorded, so they cannot contribute. ' : '')
+        + 'Save a few more and it becomes a cross-day comparison.'));
+    }
+
+    ['upwind', 'downwind'].forEach(function (zk) {
+      var b = band[zk];
+      if (!b) return;
+      var sec = el('div', 'mb-3');
+      var t = el('div', 'lab mb-1');
+      t.textContent = (zk === 'upwind' ? 'Upwind' : 'Downwind')
+        + ' · ' + b.totalWindows + ' windows of ' + band.windowSec + 's';
+      sec.appendChild(t);
+
+      var tbl = el('table', 'table table-sm table-vcenter mb-1');
+      var thead = el('thead');
+      var hr = el('tr');
+      ['Percentile', 'VMG', 'Speed', 'CWA'].forEach(function (h, i) {
+        var th = el('th', i ? 'text-end' : null, h);
+        hr.appendChild(th);
+      });
+      thead.appendChild(hr); tbl.appendChild(thead);
+      var tb = el('tbody');
+      [75, 90, 95].forEach(function (p) {
+        var L = b.levels[p];
+        var tr = el('tr');
+        tr.appendChild(el('td', null, 'p' + p));
+        if (!L) {
+          var td = el('td', 'text-end text-secondary', 'not enough history');
+          td.colSpan = 3; tr.appendChild(td);
+        } else {
+          tr.appendChild(el('td', 'text-end num', L.vmgKt.toFixed(1) + ' kt'));
+          tr.appendChild(el('td', 'text-end num', L.speedKt.toFixed(1) + ' kt'));
+          tr.appendChild(el('td', 'text-end num', Math.round(L.twaDeg) + '°'));
+        }
+        tb.appendChild(tr);
+      });
+      var c = cmp && cmp[zk];
+      if (c) {
+        var tr2 = el('tr');
+        tr2.style.borderTop = '2px solid rgba(139,152,165,0.3)';
+        tr2.appendChild(el('td', null, 'today (best 30%)'));
+        tr2.appendChild(el('td', 'text-end num', c.todayVmgKt.toFixed(1) + ' kt'));
+        tr2.appendChild(el('td', 'text-end num', c.todaySpeedKt.toFixed(1) + ' kt'));
+        tr2.appendChild(el('td', 'text-end num', Math.round(c.todayTwaDeg) + '°'));
+        tb.appendChild(tr2);
+      }
+      tbl.appendChild(tb);
+      sec.appendChild(tbl);
+      if (c && c.pct != null) {
+        sec.appendChild(el('div', 'lab',
+          'Today is ' + Math.round(c.pct) + '% of your p90 VMG target.'));
+      }
+      body.appendChild(sec);
+    });
+
+    var f = el('div', 'text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'Windows are picked by VMG; the speed and angle shown are whatever '
+      + 'came with them, so each row is a combination you actually rode. Picking the '
+      + 'fastest speed and the tightest angle separately would give a target no one has '
+      + 'ever sailed.';
+    body.appendChild(f);
     card.appendChild(body);
     host.appendChild(card);
   }
@@ -3568,33 +4018,128 @@
   }
 
   /* ---------- 트랙 지도 ---------- */
-  var mapInst = null;
-  function renderTrack(session, analysis) {
-    var host = $('map-host');
-    if (!host || !window.RDMapV2) return;
-    if (mapInst && mapInst.map) { try { mapInst.map.remove(); } catch (e) {} }
-    mapInst = RDMapV2.render(host, session, analysis, { height: 460 });
-    var lg = $('map-legend');
-    while (lg.firstChild) lg.removeChild(lg.firstChild);
-    if (!mapInst) return;
-    var prev = 0;
-    mapInst.tiers.forEach(function (t) {
-      var item = el('span', 'd-inline-flex align-items-center gap-1');
-      var sw = el('span'); sw.style.cssText =
-        'width:14px;height:6px;border-radius:2px;background:' + t.c;
-      item.appendChild(sw);
-      item.appendChild(el('span', null, t.max > 1000 ? prev + '+ kt' : prev + '–' + t.max + ' kt'));
-      lg.appendChild(item); prev = t.max;
-    });
-    var m = el('span', 'd-inline-flex align-items-center gap-1 ms-2');
-    var d1 = el('span'); d1.style.cssText = 'width:8px;height:8px;border-radius:50%;background:#4dabf7';
-    m.appendChild(d1); m.appendChild(el('span', null, 'tack'));
-    lg.appendChild(m);
-    var g = el('span', 'd-inline-flex align-items-center gap-1');
-    var d2 = el('span'); d2.style.cssText = 'width:8px;height:8px;border-radius:50%;background:#f76707';
-    g.appendChild(d2); g.appendChild(el('span', null, 'gybe'));
-    lg.appendChild(g);
+  var mapInst = null, mapMode = 'speed', mapCtx = null;
+
+  function mapSwatch(color, w, h, round) {
+    var sw = el('span');
+    sw.style.cssText = 'width:' + w + 'px;height:' + h + 'px;background:' + color +
+      ';border-radius:' + (round ? '50%' : '2px');
+    return sw;
   }
+  function legendItem(sw, text) {
+    var it = el('span', 'd-inline-flex align-items-center gap-1');
+    it.appendChild(sw); it.appendChild(el('span', null, text));
+    return it;
+  }
+
+  function renderTrack(session, analysis) {
+    mapCtx = { session: session, analysis: analysis };
+    var host = $('map-host');
+    if (!host) return;
+    if (mapInst && mapInst.map) { try { mapInst.map.remove(); } catch (e) {} }
+    mapInst = null;
+    var lg = $('map-legend'), note = $('map-mode-note'), cav = $('map-caveat');
+    if (lg) while (lg.firstChild) lg.removeChild(lg.firstChild);
+    if (note) note.textContent = '';
+    if (cav) cav.textContent = '';
+
+    /* 모드 버튼 상태 — 풍향이 없으면 전술 모드는 쓸 수 없다. */
+    var haveWind = analysis && analysis.windDir != null;
+    var group = $('map-mode');
+    if (group) {
+      Array.prototype.forEach.call(group.querySelectorAll('button'), function (b) {
+        var m = b.getAttribute('data-mode');
+        var off = (m !== 'speed') && !haveWind;
+        b.disabled = off;
+        b.title = off ? 'Needs a wind direction' : '';
+        b.classList.toggle('active', m === mapMode);
+      });
+    }
+    if (!haveWind && mapMode !== 'speed') mapMode = 'speed';
+
+    if (mapMode === 'speed') {
+      if (!window.RDMapV2) return;
+      mapInst = RDMapV2.render(host, session, analysis, { height: 460 });
+      if (!mapInst || !lg) return;
+      if (note) note.textContent = 'colour = boat speed';
+      var prev = 0;
+      mapInst.tiers.forEach(function (t) {
+        lg.appendChild(legendItem(mapSwatch(t.c, 14, 6),
+          t.max > 1000 ? prev + '+ kt' : prev + '\u2013' + t.max + ' kt'));
+        prev = t.max;
+      });
+      lg.appendChild(legendItem(mapSwatch('#4dabf7', 8, 8, true), 'tack'));
+      lg.appendChild(legendItem(mapSwatch('#f76707', 8, 8, true), 'gybe'));
+      return;
+    }
+
+    if (!window.RDMapTactical) return;
+
+    /* §476 회전 손실 — 표는 "얼마나" 를 알려주지만 "어디서" 를 못 알려준다.
+       같은 자이브라도 코스 한쪽 끝에서만 무너진다면 그건 기술이 아니라
+       그 자리의 바람·파도일 수 있다. */
+    if (mapMode === 'loss') {
+      var losses = [];
+      if (window.RDGainLoss && analysis.windDir != null) {
+        try { losses = RDGainLoss.maneuverLoss(session, analysis.maneuvers || [],
+                                               analysis.windDir) || []; }
+        catch (e) { losses = []; }
+      }
+      mapInst = RDMapTactical.renderLoss(host, session, analysis,
+        { height: 460, losses: losses });
+      if (!mapInst) return;
+      if (note) note.textContent = 'circle area = distance lost in the turn';
+      lg.appendChild(legendItem(mapSwatch('#4dabf7', 10, 10, true), 'tack'));
+      lg.appendChild(legendItem(mapSwatch('#f76707', 10, 10, true), 'gybe'));
+      var ls = mapInst.stats;
+      if (cav) {
+        cav.textContent = ls.scored + ' of ' + (ls.scored + ls.unscored)
+          + ' turns had a measurable loss, ' + Math.round(ls.totalLossM)
+          + ' m in total (biggest ' + Math.round(mapInst.maxLossM) + ' m). '
+          + 'Hollow circles are turns where there was no steady run either side to '
+          + 'measure against \u2014 they are drawn, not hidden, so the map does not '
+          + 'read as if you never turned there.';
+      }
+      return;
+    }
+
+    mapInst = RDMapTactical.render(host, session, analysis,
+      { height: 460, mode: mapMode === 'tack' ? 'tack' : 'shift' });
+    if (!mapInst) return;
+
+    if (mapMode === 'tack') {
+      if (note) note.textContent = 'colour = which tack \u00b7 width = wind pressure';
+      lg.appendChild(legendItem(mapSwatch(RDMapTactical.tackColor('P'), 14, 6), 'port'));
+      lg.appendChild(legendItem(mapSwatch(RDMapTactical.tackColor('S'), 14, 6), 'starboard'));
+    } else {
+      if (note) note.textContent = 'colour = wind shift \u00b7 width = wind pressure';
+      lg.appendChild(legendItem(mapSwatch(RDMapTactical.shiftColor(-10), 14, 6), 'lifted'));
+      lg.appendChild(legendItem(mapSwatch(RDMapTactical.shiftColor(0), 14, 6), 'as usual'));
+      lg.appendChild(legendItem(mapSwatch(RDMapTactical.shiftColor(10), 14, 6), 'headed'));
+    }
+    lg.appendChild(legendItem(mapSwatch('#8b98a5', 14, 2), 'lull'));
+    lg.appendChild(legendItem(mapSwatch('#8b98a5', 14, 6), 'gust'));
+
+    var st = mapInst.stats;
+    if (st && st.n && cav) {
+      var pct = function (v) { return Math.round(v / st.n * 100) + '%'; };
+      cav.textContent = 'Shifts: ' + pct(st.lift) + ' lifted, ' + pct(st.header) +
+        ' headed. Pressure: ' + pct(st.gust) + ' above / ' + pct(st.lull) + ' below your usual. ' +
+        'Inferred from the track \u2014 no wind instrument, so lost trim or a wave reads the same way.';
+    }
+  }
+
+  function bindMapMode() {
+    var g = document.getElementById('map-mode');
+    if (!g) { document.addEventListener('DOMContentLoaded', bindMapMode, { once: true }); return; }
+    g.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button[data-mode]');
+      if (!b || b.disabled) return;
+      mapMode = b.getAttribute('data-mode');
+      if (mapCtx) renderTrack(mapCtx.session, mapCtx.analysis);
+    });
+  }
+  bindMapMode();
 
   /* ---------- 전체 ---------- */
   var CUR = { session: null, name: null, est: null };
@@ -3654,7 +4199,7 @@
       if (mm && mm.plot) track(mm.plot, $('chart-meanmax'));
     }
     renderHistogram(analysis);
-    renderTimeline(session);
+    renderTimeline(session, analysis);
     renderTurns(analysis);
     renderTurnExtras(analysis);
     renderPerfExtra(analysis);

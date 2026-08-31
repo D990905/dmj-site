@@ -211,7 +211,10 @@
     return {
       binDeg: polar.binDeg,
       bins: polar.combined.map(function (bn) {
-        return { count: bn.count, p95Ms: Math.round(bn.p95Ms * 1000) / 1000 };
+        return { count: bn.count,
+                 p95Ms: Math.round(bn.p95Ms * 1000) / 1000,
+                 /* §475 풍속대 폴라 격자용 — p95 는 표본이 얇으면 튄다 */
+                 p90Ms: bn.p90Ms != null ? Math.round(bn.p90Ms * 1000) / 1000 : null };
       })
     };
   }
@@ -278,6 +281,9 @@
          analysis.js buildTargetPolar() 가 이 레코드들을 누적해
          개인 베스트 타깃 곡선을 만든다. */
       polarProfile: extractPolarProfile(analysis),
+      /* §474 타깃 창 — 상위 30% 만 저장한다(타깃 계산에 쓰이는 건 그것뿐).
+         2시간 세션이 창 ~350개 → 저장 ~105개 × 3숫자 ≈ 2KB. */
+      targetWindows: analysis.targetWindows || null,
       /* VPS — meta.vps 로 전달 (분석에는 없는 라이더 입력 기반 점수).
          산출 불가 시 null. SPS 카드 5장(풍상·풍하·종합·택킹·자이빙)의
          '동일 풍속 영역대 평균 대비' 델타 비교에 쓰인다 (windSpeedKt
