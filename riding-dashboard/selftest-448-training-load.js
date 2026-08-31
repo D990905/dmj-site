@@ -122,5 +122,28 @@ ok(a2.ratio > 0.7 && a2.ratio < 1.4,
 
 ok(St.deleteWorkout(St.listWorkouts()[0].id).ok, '삭제');
 
+console.log('\n[7] §463 라이딩 부하 자동 기록');
+/* "세션 저장" 을 눌러야만 원장에 들어가면 훈련부하 추세가 빈다.
+   파일을 열기만 해도 남기되, 같은 라이딩을 두 번 세지 않아야 한다. */
+var SIG = '5926_47250_1788000000000';
+ok(St.recordRideLoad({ sig: SIG, dateEpoch: now - 2 * DAY,
+                       name: 'Ride A', AU: 180, method: 'banister' }).ok,
+   '자동 기록 저장');
+ok(St.listRideLoads().length === 1, '1건', St.listRideLoads().length);
+var again = St.recordRideLoad({ sig: SIG, dateEpoch: now - 2 * DAY,
+                                name: 'Ride A', AU: 126, method: 'banister' });
+ok(again.ok && again.replaced === true,
+   '같은 시그니처는 덮어쓴다 — 최대심박을 고치면 부하가 다시 계산된다');
+ok(St.listRideLoads().length === 1, '중복 생기지 않음', St.listRideLoads().length);
+ok(St.listRideLoads()[0].AU === 126, '최신 값이 남는다', St.listRideLoads()[0].AU);
+
+var led2 = St.loadLedger();
+var autoRows = led2.filter(function (x) { return x.kind === 'ride' && x.saved === false; });
+ok(autoRows.length === 1, '원장에 자동 기록이 들어간다', autoRows.length);
+ok(autoRows[0].trimp === 126, '부하 값이 실린다', autoRows[0].trimp);
+
+ok(!St.recordRideLoad({ sig: SIG }).ok, 'AU 없으면 거부');
+ok(St.deleteRideLoad(SIG).ok && St.listRideLoads().length === 0, '삭제');
+
 console.log('\n=== 결과: ' + P + ' PASS / ' + F + ' FAIL ===');
 process.exit(F ? 1 : 0);

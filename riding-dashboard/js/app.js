@@ -561,6 +561,7 @@
   function handleFiles(fileList) {
     var files = Array.prototype.slice.call(fileList || []);
     if (!files.length) return;
+    state.isDemo = false;
     if (files.length === 1) { handleFile(files[0]); return; }   // 단일 = 기존 경로
 
     if (!Merger) { showError('융합 모듈을 불러오지 못했습니다. 파일을 하나씩 올려 주세요.'); return; }
@@ -650,6 +651,9 @@
   }
 
   function loadSample() {
+    /* §463 — 데모 세션은 훈련부하 원장에 넣지 않는다. 남의 라이딩이
+       내 체력 추세가 되면 안 된다. */
+    state.isDemo = true;
     var name = '샘플 — 부산 송정 (실측 GPX)';
     if (window.RD_SAMPLE_GPX) {
       processGpx(window.RD_SAMPLE_GPX, name);
@@ -1062,6 +1066,7 @@
 
   /* ---------- 대시보드 렌더 ---------- */
   function renderDashboard() {
+    autoRecordRideLoad();     /* §463 — 열기만 해도 훈련부하 원장에 남긴다 */
     renderSessionHeader();
     populateGhostPicker();      /* §436 — 비교 세션 목록 갱신 */
     renderFusionBanner();     /* §430 — 다중 파일 융합 배너 (융합 세션만) */
@@ -1809,6 +1814,7 @@
       vps: vpsMeta(),
       hrRecoveryIndex: skillHrRecoveryIndex(),
       workload: sessionWorkload(),   // §448 — 훈련부하 AU + 산출 방식
+      sig: state.sessionSig,         // §463 자동 기록분과 중복 방지
       gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
     var st = $('save-status');
@@ -4715,6 +4721,26 @@
   /* 저장 메타용 스킬-심박수 회복 지수 — 회전 후 심박 회복 속도(bpm/분).
      세션이 쌓이면 progression 그래프에서 장기 추세를 본다. HR 미기록·
      회복 표본 부족이면 null (Danny 검토 2026-05-23). */
+  /* §463 — 파일을 열기만 해도 라이딩 부하를 원장에 남긴다. "세션 저장" 을
+     눌러야만 들어가면 훈련부하 추세가 빈다 — 부하는 기록하려고 타는 게
+     아니라 탔으니까 생기는 것이다. 세션 시그니처로 중복을 막는다. */
+  function autoRecordRideLoad() {
+    if (!Storage || !Storage.recordRideLoad || !state.session) return;
+    if (state.isDemo) return;            /* 데모 세션 제외 */
+    var w = sessionWorkload();
+    if (w.trimp == null) return;         /* 안정시 심박·성별 미입력 */
+    var sig = state.sessionSig || sessionSignature(state.session);
+    if (!sig) return;
+    try {
+      Storage.recordRideLoad({
+        sig: sig,
+        dateEpoch: state.session.startEpoch || Date.now(),
+        name: state.sessionName || '라이딩 세션',
+        AU: w.trimp, method: w.method
+      });
+    } catch (e) {}
+  }
+
   /* §448 — 이 세션의 훈련부하(AU). analysis.computeWorkload 의 3-tier
      (심박 Banister / MET / 체감강도) 중 입력이 되는 것으로 자동 분기한다.
      라이딩 세션은 Tier 1 이 목표이며, 안정시 심박·성별이 없으면 null 이
@@ -5388,6 +5414,7 @@
       vps: vpsMeta(),
       hrRecoveryIndex: skillHrRecoveryIndex(),
       workload: sessionWorkload(),   // §448 — 훈련부하 AU + 산출 방식
+      sig: state.sessionSig,         // §463 자동 기록분과 중복 방지
       gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
     var st = $('save-status');

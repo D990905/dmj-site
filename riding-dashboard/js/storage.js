@@ -48,6 +48,11 @@
      세션(K_SESSIONS)과 분리해 둔다: 트랙도 분석도 없고, 부하만
      같은 원장에 합쳐 CTL/ATL/TSB 를 만든다. */
   function K_WORKOUTS()    { return nsPrefix() + 'workouts_v1'; }
+  /* §463 라이딩 부하 자동 기록 — 파일을 열기만 해도 심박에서 부하가
+     계산되면 원장에 남긴다. 세션을 '저장' 하지 않아도 훈련부하 추세가
+     비지 않게 하려는 것. 세션 시그니처를 키로 써서 같은 파일을 여러 번
+     열어도 한 번만 센다. */
+  function K_RIDELOADS()   { return nsPrefix() + 'rideloads_v1'; }
   function videoDbName()   { return nsPrefix() + 'video_blobs_v1'; }
 
   /* §412 — legacy(전역) → uid namespace 1회 마이그레이션 플래그 (브라우저 전역).
@@ -300,7 +305,10 @@
          Banister scale 로 정렬돼 있어 trimp 필드에 그대로 담는다.
          loadMethod 로 어떤 근거였는지 남겨 화면에서 구분해 표시한다.
          meta.trimp 를 직접 준 호출부(구경로)가 우선. */
-      loadMethod: (meta.workload && meta.workload.method) || null
+      loadMethod: (meta.workload && meta.workload.method) || null,
+      /* §463 — 세션 시그니처. 자동 기록된 부하와 저장된 세션이 같은
+         라이딩인지 가리는 데 쓴다(중복 계상 방지). */
+      sig: meta.sig ? String(meta.sig) : null
     };
   }
 
@@ -624,6 +632,59 @@
   /* 체중·스킬은 거의 안 바뀌고 윙·포일도 자주 안 바뀌므로, 한 번
      입력하면 다음 세션에 자동으로 채워지도록 브라우저에 저장한다.
      ("같은 입력 반복" 회피 — 코치가 매 세션 재입력하지 않게.) */
+  /* ---------- §463 라이딩 부하 자동 기록 ---------- */
+  var MAX_RIDELOADS = 400;
+
+  function readRideLoads() {
+    try {
+      var raw = global.localStorage ? global.localStorage.getItem(K_RIDELOADS()) : null;
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+
+  /* e = { sig, dateEpoch, name, AU, method }
+     같은 sig 가 이미 있으면 덮어쓴다 — 라이더 프로필(최대심박 등)이
+     바뀌어 부하가 다시 계산되면 최신 값이 맞다. */
+  function recordRideLoad(e) {
+    if (!e || !e.sig || e.AU == null || !isFinite(e.AU)) {
+      return { ok: false, error: 'invalid' };
+    }
+    var arr = readRideLoads();
+    var i = -1;
+    for (var k = 0; k < arr.length; k++) {
+      if (arr[k].sig === String(e.sig)) { i = k; break; }
+    }
+    var rec = {
+      sig: String(e.sig),
+      dateEpoch: e.dateEpoch || Date.now(),
+      name: e.name || 'Ride',
+      AU: Number(e.AU),
+      method: e.method || null,
+      savedAt: Date.now()
+    };
+    if (i >= 0) arr[i] = rec; else arr.push(rec);
+    arr.sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
+    if (arr.length > MAX_RIDELOADS) arr = arr.slice(arr.length - MAX_RIDELOADS);
+    try {
+      global.localStorage.setItem(K_RIDELOADS(), JSON.stringify(arr));
+      return { ok: true, count: arr.length, replaced: i >= 0 };
+    } catch (err) {
+      return { ok: false, error: (err && err.message) || 'save failed' };
+    }
+  }
+
+  function listRideLoads() { return readRideLoads(); }
+
+  function deleteRideLoad(sig) {
+    var arr = readRideLoads().filter(function (r) { return r.sig !== String(sig); });
+    try {
+      global.localStorage.setItem(K_RIDELOADS(), JSON.stringify(arr));
+      return { ok: true };
+    } catch (e) { return { ok: false }; }
+  }
+
   /* ---------- §457 육상 운동 ---------- */
   var MAX_WORKOUTS = 400;
 
@@ -682,12 +743,26 @@
      맞춰 준다. 라이딩은 trimp, 육상은 AU — 둘 다 같은 Banister scale
      로 정렬돼 있다(analysis.computeWorkload 주석 참조). */
   function loadLedger() {
-    var out = [];
+    var out = [], savedSigs = {};
     readAll().forEach(function (r) {
+      if (r.sig) savedSigs[String(r.sig)] = true;
       if (r.trimp != null && isFinite(r.trimp)) {
         out.push({ dateEpoch: r.dateEpoch, trimp: r.trimp,
-                   kind: 'ride', name: r.name, method: r.loadMethod || null });
+                   kind: 'ride', name: r.name, method: r.loadMethod || null,
+                   saved: true });
       }
+    });
+    /* 자동 기록분 — 이미 '저장된 세션' 으로 들어온 것은 뺀다(중복 방지).
+       저장 레코드에 sig 가 없던 옛 기록은 날짜로 한 번 더 거른다. */
+    var savedDays = {};
+    out.forEach(function (r) {
+      savedDays[new Date(r.dateEpoch).toISOString().slice(0, 16)] = true;
+    });
+    readRideLoads().forEach(function (r) {
+      if (savedSigs[r.sig]) return;
+      if (savedDays[new Date(r.dateEpoch).toISOString().slice(0, 16)]) return;
+      out.push({ dateEpoch: r.dateEpoch, trimp: r.AU, kind: 'ride',
+                 name: r.name, method: r.method, sig: r.sig, saved: false });
     });
     readWorkouts().forEach(function (w) {
       if (w.AU != null && isFinite(w.AU)) {
@@ -1398,6 +1473,9 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     loadVideoBlobs: loadVideoBlobs,
     removeVideoBlob: removeVideoBlob,
     clearVideoBlobs: clearVideoBlobs,
+    recordRideLoad: recordRideLoad,
+    listRideLoads: listRideLoads,
+    deleteRideLoad: deleteRideLoad,
     saveWorkout: saveWorkout,
     listWorkouts: listWorkouts,
     deleteWorkout: deleteWorkout,

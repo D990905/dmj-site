@@ -710,6 +710,28 @@
     renderWindSources(host, a);
   }
 
+  /* §463 — 파일을 열기만 해도 라이딩 부하를 원장에 남긴다.
+     "세션 저장" 을 눌러야만 들어가면 훈련부하 추세가 비게 된다 — 부하는
+     기록을 남기려고 타는 게 아니라 탔으니까 생기는 것이다.
+     같은 파일을 여러 번 열어도 세션 시그니처로 한 번만 센다. 라이더
+     프로필이 바뀌어 부하가 다시 계산되면 최신 값으로 덮어쓴다. */
+  function autoRecordRideLoad() {
+    if (!window.RDStorage || !RDStorage.recordRideLoad || !CUR.session) return;
+    if (CUR.isDemo) return;              /* 데모 세션은 원장에 넣지 않는다 */
+    var w = v2SessionWorkload();
+    if (w.trimp == null) return;          /* 안정시 심박 등 입력 부족 */
+    var sig = sessionSig(CUR.session);
+    if (!sig) return;
+    try {
+      RDStorage.recordRideLoad({
+        sig: sig,
+        dateEpoch: CUR.session.startEpoch || Date.now(),
+        name: CUR.name || 'Ride',
+        AU: w.trimp, method: w.method
+      });
+    } catch (e) {}
+  }
+
   /* §458 — 이 세션의 훈련부하. v2 에서 저장할 때도 기존 대시보드와
      같은 값이 기록돼야 한다(예전에는 v2 저장분만 부하가 null 이었다).
      안정시 심박·성별이 없으면 null 이 되고, 그 사실은 훈련부하 탭이
@@ -1280,7 +1302,15 @@
       var badge = el('span', 'badge', x.kind === 'ride' ? 'Ride' : 'Land');
       badge.style.background = x.kind === 'ride' ? '#4dabf7' : '#82c91e';
       badge.style.color = '#0b1220';
-      var td = el('td'); td.appendChild(badge); trr.appendChild(td);
+      var td = el('td'); td.appendChild(badge);
+      /* 저장하지 않고 열기만 한 라이딩도 부하는 센다 — 그 사실을 밝혀서
+         "저장 안 했는데 왜 있지" 가 되지 않게 한다. */
+      if (x.kind === 'ride' && x.saved === false) {
+        var auto = el('span', 'badge bg-secondary-lt ms-1', 'auto');
+        auto.title = 'Recorded when you opened the file, without saving the session';
+        td.appendChild(auto);
+      }
+      trr.appendChild(td);
       trr.appendChild(el('td', 'text-end num', Math.round(x.trimp)));
       trr.appendChild(el('td', 'text-secondary', METHOD[x.method] || '\u2014'));
       var act = el('td');
@@ -1291,6 +1321,13 @@
           RDStorage.deleteWorkout(x.id); renderTraining();
         });
         act.appendChild(del);
+      } else if (x.kind === 'ride' && x.saved === false && x.sig) {
+        var delR = el('button', 'btn btn-sm btn-ghost-danger', 'Remove');
+        delR.type = 'button';
+        delR.addEventListener('click', function () {
+          RDStorage.deleteRideLoad(x.sig); renderTraining();
+        });
+        act.appendChild(delR);
       }
       trr.appendChild(act);
       tb.appendChild(trr);
@@ -3425,6 +3462,7 @@
        저장해도 SPS 가 null 로 기록됐다(시즌 흐름·저장 목록에서 SPS 가
        늘 비어 있던 원인). */
     CUR.vps = vps;
+    autoRecordRideLoad();
     renderKpis(analysis, vps);
     var note = $('rider-note');
     if (note) note.textContent = (vps && vps.ok === false && vps.missing)
@@ -3688,6 +3726,7 @@
             gybe: CUR.vps.overall && CUR.vps.overall.gybeScore
           } : null,
           workload: v2SessionWorkload(),   // §458 훈련부하 AU + 산출 방식
+          sig: sessionSig(CUR.session),    // §463 자동 기록분과 중복 방지
           gpxText: CUR.gpxText
         }, CUR.analysis);
         if (res && res.ok) {
@@ -3711,6 +3750,7 @@
       applyWind(CUR.est ? null : undefined, CUR.est ? 're-estimate' : 'keep');
     });
     $('v2-file').addEventListener('change', function (e) {
+      CUR.isDemo = false;
       loadFiles(e.target.files);
     });
     /* 드래그앤드롭도 받는다 — 파일 여러 개를 한 번에 던지는 게 자연스럽다 */
@@ -3718,13 +3758,19 @@
       document.addEventListener(ev, function (e) {
         e.preventDefault();
         if (ev === 'drop' && e.dataTransfer && e.dataTransfer.files) {
+          CUR.isDemo = false;
           loadFiles(e.dataTransfer.files);
         }
       });
     });
     fetch('sample/sample-songjeong-busan.gpx')
       .then(function (r) { return r.text(); })
-      .then(function (t) { loadGpxText(t, 'Songjeong, Busan'); })
+      .then(function (t) {
+        /* §463 — 데모 세션은 훈련부하 원장에 넣지 않는다. 페이지를 열
+           때마다 자동으로 실려 남의 라이딩이 내 체력 추세가 되어버린다. */
+        CUR.isDemo = true;
+        loadGpxText(t, 'Songjeong, Busan');
+      })
       .catch(function (err) {
         $('hdr-title').textContent = 'Could not load the sample session';
         $('hdr-date').textContent = String(err && err.message ? err.message : err);
