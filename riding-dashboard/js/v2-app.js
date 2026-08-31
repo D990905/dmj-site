@@ -1320,7 +1320,66 @@
     t.appendChild(tb); wrap.appendChild(t); card2.appendChild(wrap);
     lh.appendChild(card2);
 
+    renderTurnGroups(host, a);
     renderTurnCoaching(host, a);
+  }
+
+  /* §453 회전 그룹 통계 — 개수만으로는 어느 쪽이 약한지 알 수 없다.
+     효율·손실·회복을 택별로 갈라 본다. 효율은 회전 후 속도를 얼마나
+     되찾았는가(%), 손실은 회전 동안 잃은 속도의 비율, 회복은 순항
+     속도로 돌아오기까지 걸린 시간이다. 표본이 2~3 개인 그룹은 평균이
+     흔들리므로 개수를 함께 적는다. */
+  function renderTurnGroups(host, a) {
+    var g = a.maneuverStats && a.maneuverStats.groups;
+    if (!g) return;
+    var rows = [];
+    [['tack', 'Tack'], ['gybe', 'Gybe']].forEach(function (t) {
+      var grp = g[t[0]];
+      if (!grp) return;
+      [['all', 'both'], ['P', 'port'], ['S', 'starboard']].forEach(function (sd) {
+        var v = grp[sd[0]];
+        if (!v || !v.count) return;
+        rows.push({ label: t[1] + ' \u00b7 ' + sd[1], isAll: sd[0] === 'all', v: v });
+      });
+    });
+    if (!rows.length) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Turn quality by group'));
+    head.appendChild(el('div', 'card-actions lab',
+      'efficiency = speed recovered after the turn'));
+    card.appendChild(head);
+    var wrap = el('div', 'table-responsive');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Group', 'Count', 'Efficiency', 'Top 50%', 'Top 20%', 'Speed loss', 'Recovery']
+      .forEach(function (x, i) {
+        htr.appendChild(el('th', i ? 'text-end' : null, x));
+      });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+    rows.forEach(function (r) {
+      var tr = el('tr');
+      if (r.isAll) tr.className = 'table-active';
+      tr.appendChild(el('td', null, r.label));
+      tr.appendChild(el('td', 'text-end num', String(r.v.count)));
+      function pct(x) { return x == null ? '\u2014' : Math.round(x) + '%'; }
+      tr.appendChild(el('td', 'text-end num', pct(r.v.effAvg)));
+      tr.appendChild(el('td', 'text-end num', pct(r.v.effTop50)));
+      tr.appendChild(el('td', 'text-end num', pct(r.v.effTop20)));
+      tr.appendChild(el('td', 'text-end num', pct(r.v.lossAvg)));
+      tr.appendChild(el('td', 'text-end num',
+        r.v.recAvg == null ? '\u2014' : r.v.recAvg.toFixed(1) + ' s'));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
+    var f = el('div', 'card-footer text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'Groups with only two or three turns move a lot on one bad turn — '
+      + 'read the count before the average.';
+    card.appendChild(f);
+    host.appendChild(card);
   }
 
   /* §452 커리어 — 저장된 세션을 통틀어 누적과 개인 최고. 한 세션만
