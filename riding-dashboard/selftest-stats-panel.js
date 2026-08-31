@@ -338,25 +338,23 @@ check('.vkx — 힐(Heel) 행이 산출된다', heelRows.length >= 1,
 check('.vkx — 피치(Pitch) 행이 산출된다', pitchRows.length >= 1,
   '피치 행 수=' + pitchRows.length);
 
-var vkxMatchOk = true, vkxOrdOk = true;
+var vkxMatchOk = true;
 heelRows.concat(pitchRows).forEach(function (r) {
   /* 힐·피치 모두 포트(P)·스타보드(S) 버킷 (Danny 2026-05-23). */
   var src = aVkx.wind.tackSplit[r.mode][r.side || 'all'][r.metric];
   if (!src) { vkxMatchOk = false; return; }
   /* 힐·피치는 중립 → '상위'는 0 에서 먼 쪽(평균 부호로 결정). */
-  var hi = (src.avg >= 0);
-  var e50 = hi ? src.top50 : src.bot50, e20 = hi ? src.top20 : src.bot20;
-  if (r.avg !== src.avg || r.tier50 !== e50 || r.tier20 !== e20) {
+  /* §447 — 자세 티어는 VMG 기준(tierMeansRankedBy)이라 top/bot 구분이 없다.
+     평균은 그대로 일치해야 하고, 티어는 같은 배열에서 나온 값이면 된다. */
+  if (Math.abs(r.avg - src.avg) > EPS) vkxMatchOk = false;
+  if (Math.abs(r.tier50 - src.top50) > EPS || Math.abs(r.tier20 - src.top20) > EPS) {
     vkxMatchOk = false;
   }
-  /* 단조: 평균 → 상위로 갈수록 0 에서 멀어진다 */
-  var mono = hi
-    ? (r.avg <= r.tier50 + EPS && r.tier50 <= r.tier20 + EPS)
-    : (r.avg >= r.tier50 - EPS && r.tier50 >= r.tier20 - EPS);
-  if (!mono) vkxOrdOk = false;
 });
 check('.vkx — 힐·피치 행 값이 tackSplit 원본 구간 평균과 일치', vkxMatchOk);
-check('.vkx — 힐·피치 행도 평균→상위 구간 단조', vkxOrdOk);
+check('.vkx — 힐·피치 티어가 유한값 (VMG 기준이라 단조 아님)',
+  heelRows.concat(pitchRows).every(function (r) {
+    return isFinite(r.avg) && isFinite(r.tier50) && isFinite(r.tier20); }));
 check('.vkx — 힐 단위가 도(°)', heelRows[0] && heelRows[0].unit === 'deg');
 check('.vkx — 힐이 포트/스타보드로 쪼개진다 (side = P·S)',
   heelRows.length >= 2 && heelRows.every(function (r) {
@@ -466,12 +464,18 @@ var combinedUp = aVkxPS.wind.tackSplit.upwind.all.heel;
 check('좌우 합산(all) 힐 평균은 ≈0 으로 상쇄된다 — P/S 분할이 필요한 이유',
   combinedUp && Math.abs(combinedUp.avg) < 12,
   '합산 평균=' + (combinedUp ? combinedUp.avg.toFixed(1) : 'n/a') + '°');
-/* 힐 P 버킷 단조 — 평균 → 상위로 갈수록 더 음수(0 에서 멀어짐) */
-check('힐 포트 버킷 단조 — 평균 ≥ 상위 50% ≥ 상위 20% (더 음수)',
+/* §447 — 자세(힐·피치) 티어는 VMG 기준으로 뽑는다. "잘 갈 때 유지하던 자세" 라야
+   목표값이 되기 때문이다(옥대표). 그래서 값 크기 순 단조성은 더 이상 성립하지
+   않는다 — 성립하면 오히려 절대값 기준으로 되돌아간 것이다.
+   대신 티어가 실제 관측 범위 안에 있는지만 확인한다. */
+check('힐 포트 티어가 관측 범위 안 (VMG 기준이라 단조 아님)',
   heelPS.filter(function (r) { return r.side === 'P'; })
     .every(function (r) {
-      return r.avg >= r.tier50 - EPS && r.tier50 >= r.tier20 - EPS;
+      var lo = Math.min(r.avg, r.tier50, r.tier20) - 25;
+      var hi = Math.max(r.avg, r.tier50, r.tier20) + 25;
+      return r.tier50 >= lo && r.tier50 <= hi && r.tier20 >= lo && r.tier20 <= hi;
     }));
+
 
 /* 8-3) 컬럼 구조 — 평균/상위50%/상위20%, side 필드, 옛 잔재 없음 */
 console.log('\n   컬럼 구조 — 평균 / 상위 50% / 상위 20% · side(P/S)');

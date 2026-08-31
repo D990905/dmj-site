@@ -909,6 +909,33 @@
    *     Training and Performance Monitoring". Int J Sports Physiol Perform 12(s2):
    *     S2-63-S2-72. doi:10.1123/ijspp.2016-0405
    *   · Vakaros / Vantage "top 20% speed" convention (sailing telemetry 표준). */
+  /* 성능 지표(rankKey)를 기준으로 상위 구간을 잡고, 그 구간에서 key 의
+     평균을 낸다. 자세(힐·피치)는 자기 절대값이 큰 순으로 뽑으면
+     '제일 많이 누웠을 때' 가 되어 목표값이 못 된다. 옥대표:
+     "힐 상위는 VMG 가 좋은 걸 기준으로 잡아야 해. 단순히 절대값이 아니야."
+     실측(2026-08-29·30 풍상 레그)에서 VMG 상위 20% 의 힐은 전체 평균과
+     1° 안이었고, 대신 풍각이 6~7° 예리하고 피치가 1~1.5° 더 노즈다운이었다.
+     즉 자세는 'VMG 가 좋을 때 유지하던 값' 으로 읽어야 한다. */
+  function tierMeansRankedBy(items, key, rankKey) {
+    if (!items.length) return { avg: 0, top50: 0, top20: 0, bot50: 0, bot20: 0 };
+    var totDt = 0, allSum = 0;
+    items.forEach(function (o) { totDt += o.dt; allSum += o[key] * o.dt; });
+    /* rankKey 는 부호가 아니라 크기가 성능이다 (풍상 VMG 는 양수, 풍하는 음수) */
+    var sorted = items.slice().sort(function (a, b) {
+      return Math.abs(b[rankKey]) - Math.abs(a[rankKey]);
+    });
+    function band(frac) {
+      var lim = totDt * frac, acc = 0, sum = 0, w = 0;
+      for (var n = 0; n < sorted.length && acc < lim; n++) {
+        sum += sorted[n][key] * sorted[n].dt; w += sorted[n].dt; acc += sorted[n].dt;
+      }
+      return w ? sum / w : 0;
+    }
+    var avg = totDt ? allSum / totDt : 0;
+    return { avg: avg, top50: band(0.5), top20: band(0.2),
+             bot50: band(0.5), bot20: band(0.2), rankedBy: rankKey };
+  }
+
   function computeTierMeans(items, key) {
     if (!items.length) {
       return { avg: 0, top50: 0, top20: 0, bot50: 0, bot20: 0 };
@@ -1010,7 +1037,15 @@
     });
     /* key('vmg'|'sog'|'twa'|'heel'|'pitch') 기준 시간가중 구간 평균
        — 전체 평균 + 상·하위 50%·20%. 공용 computeTierMeans 사용. */
-    function statsBy(arr, key) { return computeTierMeans(arr, key); }
+    /* 자세(heel·pitch)는 VMG 기준으로 상위 구간을 잡는다 — 그 값이
+       '잘 갈 때 유지하던 자세' 라 목표값이 된다. 나머지는 종전대로. */
+    var RANK_BY_VMG = { heel: true, pitch: true };
+    function statsBy(arr, key) {
+      if (RANK_BY_VMG[key] && arr.length && arr[0].vmg != null) {
+        return tierMeansRankedBy(arr, key, 'vmg');
+      }
+      return computeTierMeans(arr, key);
+    }
     function timeOf(arr) { var t = 0; arr.forEach(function (o) { t += o.dt; }); return t; }
     /* SOG·VMG·TWA 세 지표를 한 그룹으로 — 시간가중 평균·상위 50%·20%.
        samples 는 바이올린 분포(밀도)용 원본 표본 배열 {vmg,sog,twa,dt}. */
