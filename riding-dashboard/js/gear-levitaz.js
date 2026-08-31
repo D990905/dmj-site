@@ -45,13 +45,18 @@
      즉 큰 사이즈로 갈수록 팁 접촉 위험이 비례해 늘지는 않는다 —
      추천 로직이 이 비선형성을 알아야 한다. */
   var HAND_WINGS = [
+    /* ⚠ 4.0 은 PPC 공식 스펙표에 없다(Sonic FDS 는 5.0 부터). 옥대표가
+       계산 범위에 넣으라 해 5.0~6.0 구간의 기울기(1㎡ 당 스팬 +31cm)로
+       외삽했다. 실물 스팬을 재면 그 값으로 교체할 것. */
+    { id: 'sonic_40', label: 'PPC Sonic 4.0', areaM2: 4.0, spanCm: 300,
+      chordCm: 177, estimated: true },
     { id: 'sonic_50', label: 'PPC Sonic 5.0', areaM2: 5.0, spanCm: 330, chordCm: 202 },
     { id: 'sonic_55', label: 'PPC Sonic 5.5', areaM2: 5.5, spanCm: 346, chordCm: 212 },
     { id: 'sonic_60', label: 'PPC Sonic 6.0', areaM2: 6.0, spanCm: 361, chordCm: 222 },
     { id: 'sonic_65', label: 'PPC Sonic 6.5', areaM2: 6.5, spanCm: 369, chordCm: 236 },
     { id: 'sonic_70', label: 'PPC Sonic 7.0', areaM2: 7.0, spanCm: 383, chordCm: 244 },
-    { id: 'sonic_74', label: 'PPC Sonic 7.4', areaM2: 7.4, spanCm: 384, chordCm: 255 },
-    { id: 'sonic_80', label: 'PPC Sonic 8.0', areaM2: 8.0, spanCm: 385, chordCm: 264 }
+    { id: 'sonic_74', label: 'PPC Sonic 7.4', areaM2: 7.4, spanCm: 384, chordCm: 255 }
+    /* 8.0(스팬 385cm)은 옥대표 지시로 계산 범위에서 제외 */
   ];
 
   /* 보드 — 두께는 손 높이(힐 시 윙 팁 클리어런스) 계산에 쓴다. */

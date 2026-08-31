@@ -3357,7 +3357,12 @@
     row.appendChild(pick('Mast', 'mast', RDGear.MASTS,
       function (o) { return o.label + '  ' + o.lengthCm + 'cm'; }));
     row.appendChild(pick('Hand wing', 'handWing', RDGear.HAND_WINGS,
-      function (o) { return o.label + '  span ' + (o.spanCm / 100).toFixed(2) + 'm'; }));
+      function (o) {
+        /* 스팬이 추정값이면 그렇다고 적는다 — 이 값이 힐 한계를 정하므로
+           확정치와 섞이면 안 된다. */
+        return o.label + '  span ' + (o.spanCm / 100).toFixed(2) + 'm'
+          + (o.estimated ? ' (est.)' : '');
+      }));
     row.appendChild(pick('Rear wing', 'rearWing', RDGear.REAR_WINGS,
       function (o) { return o.label + '  ' + o.spanCm + 'cm'; }));
     row.appendChild(pick('Water state', 'surface', RDGear.SURFACE,
