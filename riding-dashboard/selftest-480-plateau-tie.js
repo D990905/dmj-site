@@ -56,29 +56,49 @@ var top = Math.max.apply(null, vmgs);
 var tied = cS.points.filter(function (p) {
   return p.feasible && Math.abs(p.V_vmg_kt - top) <= 0.05;
 });
-/* §483 이후 22kt 실사용 조건에서는 평탄구간이 사라졌다 — 몸 항력이
-   들어가면서 V_b 가 모델 상한(35kt)에 더는 닿지 않기 때문이다. 규칙
-   자체는 그대로 지켜야 하므로, 평탄구간을 **인위적으로 만들어** 검사한다
-   (상한에 닿도록 아주 센 바람). 실사용역에서 안 걸린다고 규칙을 지우면
-   나중에 상한에 닿는 조건이 생겼을 때 조용히 되살아난다. */
-var cFlat = curve(Lift, { v_wind_kt: 45, m_rider_kg: 72, skill: '선수',
-                          foil_ar: 13.7, wing_ar: 4.5 }, 2.5, 7.4);
-var vF = cFlat.points.filter(function (p) { return p.feasible; })
-                     .map(function (p) { return p.V_vmg_kt; });
-var topF = Math.max.apply(null, vF);
-var tiedF = cFlat.points.filter(function (p) {
-  return p.feasible && Math.abs(p.V_vmg_kt - topF) <= 0.05;
+/* §484 — 평탄구간이 **어디에도 없어졌다.** §483/§484 로 항력을 채우고
+   각도를 원복하자 풍상 배속이 22~23kt 에서 정점을 찍고 다시 내려간다.
+   모델 상한 UPWIND_VB_CAP_KT(35kt)에 이제 어떤 조건으로도 닿지 않는다.
+   즉 §480 이 고쳤던 '평탄구간에서 가장 작은 윙을 고르는' 버그는 애초에
+   과대예측 모델이 만든 것이었다. 규칙은 코드에 남겨 두되(상한이 다시
+   낮아지거나 물리가 바뀌면 되살아난다), 검증은 두 가지로 바꾼다:
+     (1) 실제로 상한에 안 닿는다 — 이게 §483 수정이 살아 있다는 증거다
+     (2) 혹시 평탄구간이 생기면 큰 윙이 잡힌다 (조건부) */
+var capReached = false;
+[20, 25, 30, 40, 60].forEach(function (kt) {
+  ['상급', '선수'].forEach(function (sk) {
+    [3, 4, 5, 6, 7].forEach(function (a) {
+      var d = Lift.upwindSpeed({ v_wind_kt: kt, m_rider_kg: 72, skill: sk,
+                                 foil_ar: 13.7, wing_ar: 4.5, wing_area_m2: a });
+      if (d && d.feasible && d.capped) capReached = true;
+    });
+  });
 });
-ok('강풍에서 동점 면적이 둘 이상 (평탄구간 존재)', tiedF.length >= 2,
-   tiedF.map(function (p) { return p.area_m2; }).join(','));
-ok('정점 = 평탄구간의 가장 큰 윙',
-   cFlat.optimum.area_m2 === Math.max.apply(null, tiedF.map(function (p) { return p.area_m2; })),
-   'optimum=' + cFlat.optimum.area_m2);
-ok('예전 규칙이었다면 가장 작은 윙이 잡혔다 (회귀 대조)',
-   oldPeak(cFlat).area_m2 < cFlat.optimum.area_m2,
-   '옛 ' + oldPeak(cFlat).area_m2 + ' → 새 ' + cFlat.optimum.area_m2);
-ok('정점 VMG 는 그대로 최댓값 (정점 값을 바꾼 게 아니다)',
-   Math.abs(cFlat.optimum.V_vmg_kt - topF) <= 1e-9);
+ok('모델 속도 상한(35kt)에 더는 닿지 않는다 (§483 항력 수정이 살아 있다)',
+   capReached === false);
+
+/* 평탄구간이 생기는 조건을 넓게 훑어 본다 — 있으면 규칙을 검증한다. */
+var flat = null;
+[20, 25, 30, 40, 60].forEach(function (kt) {
+  if (flat) return;
+  ['상급', '선수'].forEach(function (sk) {
+    if (flat) return;
+    var c = curve(Lift, { v_wind_kt: kt, m_rider_kg: 72, skill: sk,
+                          foil_ar: 13.7, wing_ar: 4.5 }, 2.5, 7.4);
+    if (!c.optimum) return;
+    var tie = c.points.filter(function (p) {
+      return p.feasible && Math.abs(p.V_vmg_kt - c.optimum.V_vmg_kt) <= 0.05;
+    });
+    if (tie.length >= 2) flat = { c: c, tie: tie };
+  });
+});
+if (flat) {
+  ok('평탄구간이 생기면 가장 큰 윙이 잡힌다',
+     flat.c.optimum.area_m2 ===
+     Math.max.apply(null, flat.tie.map(function (p) { return p.area_m2; })));
+} else {
+  ok('평탄구간이 아예 생기지 않는다 (동점 규칙 휴면 — 정상)', true);
+}
 
 /* ---------- 2) 옥대표 실사용과 대조 ---------- */
 /* 72kg·상급·foil AR 6.5 · 옥대표 실사용: 10→6.5 12→6.0 14→5.5 18→5.0 22→4.5.

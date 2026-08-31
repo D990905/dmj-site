@@ -81,12 +81,15 @@ ok('몸 항력은 윙 크기와 무관 → 큰 윙이 상대적으로 유리',
    '5㎡ ' + w5.V_boat_kt.toFixed(1) + 'kt < 8㎡ ' + w8.V_boat_kt.toFixed(1) + 'kt');
 
 /* ---------- 2) 택 각도 ---------- */
-ok('상급 58° (옥대표 지속 구간 실측)', d14.tack_angle_deg === 58);
-ok('선수 56° — Formula Kite T1 실측 50.6° 보다 넓다',
-   up(null, 14, '선수').tack_angle_deg === 56);
-ok('중급 64° · 입문 78°',
-   up(null, 14, '중급').tack_angle_deg === 64 &&
-   up(null, 14, '입문', { wing_area_m2: 8.0 }).tack_angle_deg === 78);
+/* §484 — §483 이 58° 로 넓혔던 걸 원복했다. 7/5 세션(바람 ~20kt)의 최고
+   20초창이 **배속 20.1kt @ CWA 48°** 였고 상위 창들이 48·51·52·53° 에
+   몰린다. 8/31(옥대표: "바람이 지랄같아서 제대로 타지도 못했다")의 58° 로
+   능력치를 정한 게 잘못이었다. */
+ok('상급 50° (7/5 실측 48~53° 와 정합)', d14.tack_angle_deg === 50);
+ok('선수 45°', up(null, 14, '선수').tack_angle_deg === 45);
+ok('중급 55° · 입문 65°',
+   up(null, 14, '중급').tack_angle_deg === 55 &&
+   up(null, 14, '입문', { wing_area_m2: 8.0 }).tack_angle_deg === 65);
 ok('스킬이 높을수록 각이 좁다 (단조)',
    up(null, 14, '선수').tack_angle_deg < up(null, 14, '상급').tack_angle_deg &&
    up(null, 14, '상급').tack_angle_deg < up(null, 14, '중급').tack_angle_deg);
@@ -155,13 +158,22 @@ ok('VMG/풍속 ≤ 0.94 (Formula Kite 실측 상한)', maxRatio <= 0.94,
 /* ---------- 5) 옥대표 8/31 실측 대조 ---------- */
 /* TWS 10~14kt · 72kg · 6.0㎡ · R6 V1(AR13.7) · 상급
    풍상 배속 상위50% 17.8kt · VMG 상위50% 7.8kt · 20초창 p95 VMG 9.3kt */
-var m12 = up(null, 12, '상급'), m14 = up(null, 14, '상급');
-ok('12kt/상급 VMG 가 실측 상위50%(7.8kt) 근처 (±1.5)',
-   Math.abs(m12.V_vmg_kt - 7.8) <= 1.5, m12.V_vmg_kt.toFixed(1));
-ok('14kt/상급 VMG 가 실측 창p95(9.3kt) 근처 (±1.5)',
-   Math.abs(m14.V_vmg_kt - 9.3) <= 1.5, m14.V_vmg_kt.toFixed(1));
-ok('14kt/상급 배속이 실측 상위50%(17.8kt) 근처 (±2.5)',
-   Math.abs(m14.V_boat_kt - 17.8) <= 2.5, m14.V_boat_kt.toFixed(1));
+/* §484 — 앵커를 7/5 세션으로 옮긴다. 8/31 은 바람이 나빠 '달성 가능치'
+   기준이 못 된다. 7/5: 바람 ~20kt(옥대표 기억), 5.0㎡, 최고 20초창
+   배속 20.1kt @ 48° → VMG 13.4kt.
+   ⚠ 두 세션 모두 풍속이 **눈대중**이다(계기 없음, ±4~5kt). 그래서
+   속도-풍속 곡선의 **기울기**는 아직 맞출 근거가 없다 — 지금 모델은
+   12kt 13.1kt → 20kt 21.9kt 로 오르는데, 옥대표 실측 최고는 두 세션이
+   19~20kt 로 거의 평평하다. 둘 중 하나가 틀렸는지, 아니면 강풍에서
+   본인이 안 밀어붙이는 것인지는 **풍속 실측 없이는 못 가린다.**
+   여기서는 20kt 앵커만 못박고 기울기는 열어 둔다. */
+var m20 = up(null, 20, '상급', { wing_area_m2: 5.0, gear_kg: 10.7 });
+ok('20kt/상급/5.0㎡ 배속이 실측 20.1kt 근처 (±2.5)',
+   Math.abs(m20.V_boat_kt - 20.1) <= 2.5, m20.V_boat_kt.toFixed(1));
+ok('20kt/상급/5.0㎡ VMG 가 실측 13.4kt 근처 (±1.5)',
+   Math.abs(m20.V_vmg_kt - 13.4) <= 1.5, m20.V_vmg_kt.toFixed(1));
+ok('모델 각도(50°)가 실측 최고창 각도(48°) 와 3° 이내',
+   Math.abs(m20.tack_angle_deg - 48) <= 3, String(m20.tack_angle_deg));
 
 /* ---------- 6) 단조성 ---------- */
 var vs = [10, 12, 14, 16, 18, 20].map(function (kt) { return up(null, kt, '상급').V_boat_kt; });

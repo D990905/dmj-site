@@ -280,10 +280,22 @@ check('VPS.UPWIND_RATIO_FLOOR = 0 (§424 백분위형 lock)',
 check('VPS.DOWNWIND_RATIO_FLOOR = 0 (§424 백분위형 lock)',
   Coach.VPS.DOWNWIND_RATIO_FLOOR === 0, 'floor=' + Coach.VPS.DOWNWIND_RATIO_FLOOR);
 
-/* 5) ratio≈score 직접 확인 (floor=0 효과) — upwindSpeedScore(0.78)≈78 */
-check('upwindSpeedScore(0.78) ≈ 78 (백분위형)',
-  Math.abs(Coach.upwindSpeedScore(0.78) - 78) < 1,
-  '= ' + Coach.upwindSpeedScore(0.78).toFixed(1));
+/* 5) §424 의 핵심 lock 은 **floor=0** 이다 — 그게 elite 의 0.78 을 56점으로
+   압축하던 원인이었다(Vantage 78 대비 3.5배 괴리). floor 은 위에서 이미
+   0 으로 못박았고, 여기서는 압축이 없다는 성질 자체를 확인한다:
+   ratio 가 0 이면 0점, 선형이며, floor 구간이 없다.
+   ⚠ TOP 은 §484 에서 1.00 → 1.20 으로 옮겼다(예측기가 약·중풍에서
+   보수적이 되어 실측이 예측을 넘는 구간이 생겼다). 그래서 "ratio≈score"
+   는 더 이상 성립하지 않는다 — 대신 **선형·무압축**만 지킨다. */
+check('upwindSpeedScore 는 선형이고 압축 구간이 없다',
+  Math.abs(Coach.upwindSpeedScore(0) - 0) < 1e-9 &&
+  Math.abs(Coach.upwindSpeedScore(0.6) - Coach.upwindSpeedScore(0.3) * 2) < 1e-6,
+  '0→' + Coach.upwindSpeedScore(0).toFixed(1) +
+  ' 0.3→' + Coach.upwindSpeedScore(0.3).toFixed(1) +
+  ' 0.6→' + Coach.upwindSpeedScore(0.6).toFixed(1));
+check('예측치 도달(ratio=1.0)이 83점 이상 — 압축 시절(56점)로 회귀 방지',
+  Coach.upwindSpeedScore(1.0) >= 83,
+  '= ' + Coach.upwindSpeedScore(1.0).toFixed(1));
 
 console.log('\n' + '-'.repeat(48));
 console.log('PASS:', pass, ' FAIL:', fail);
