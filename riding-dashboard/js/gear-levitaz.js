@@ -54,7 +54,7 @@
 
   /* 보드 — 두께는 손 높이(힐 시 윙 팁 클리어런스) 계산에 쓴다. */
   var BOARDS = [
-    { id: 'board_default', label: 'Board', thicknessCm: 12, weightKg: 7, verified: false }
+    { id: 'board_default', label: 'Board', thicknessCm: 12, weightKg: 4.8 }
   ];
 
   /* 수면 상태 — 팁이 파도에 닿지 않으려면 남겨야 할 여유(cm).
@@ -64,6 +64,9 @@
     { id: 'chop',   label: 'Choppy', foilMarginCm: 25, wingMarginCm: 30 },
     { id: 'wavy',   label: 'Wavy',   foilMarginCm: 40, wingMarginCm: 50 }
   ];
+
+  /* 핸드윙 무게 — 제조사 미공개. 옥대표 실측 약 3 kg(5㎡ 기준). */
+  var HAND_WING_MASS_KG = 3.0;
 
   function byId(list, id) {
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
@@ -81,8 +84,8 @@
     if (r) g += r.weightG;
     if (m) g += m.weightG;
     var kg = g / 1000;
-    kg += (b && b.weightKg) ? b.weightKg : 7;
-    kg += 3;                     /* 핸드윙 — 제조사 미공개, 5㎡ 기준 추정 */
+    kg += (b && b.weightKg) ? b.weightKg : 4.8;
+    kg += HAND_WING_MASS_KG;
     return kg;
   }
 
