@@ -38,7 +38,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <!-- 메인 사이트 헤더·내비 스타일 — dashboard.css 를 뒤에 두어 대시보드 본문 스타일이 우선한다 -->
 <link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526">
-<link rel="stylesheet" href="css/dashboard.css?v=trend-435-20260706">
+<link rel="stylesheet" href="css/dashboard.css?v=load-448-20260831">
 </head>
 <body>
 
@@ -698,6 +698,25 @@
                inputmode="numeric" autocomplete="off">
         <span class="hr-maxhr__note" id="hr-maxhr-note"></span>
       </div>
+      <!-- §448 훈련부하 — 안정시 심박·성별은 Banister TRIMP 산출에 필수.
+           둘 중 하나라도 비면 세션 부하가 null 이 되어 CTL/ATL/TSB 가
+           전부 0 이 된다. 그래서 값이 없으면 아래 안내를 띄운다. -->
+      <div class="hr-maxhr">
+        <label for="hr-resthr-input">안정시 심박수 (bpm)</label>
+        <input type="number" id="hr-resthr-input" min="30" max="120" step="1"
+               inputmode="numeric" autocomplete="off">
+        <span class="hr-maxhr__note">아침 기상 직후 안정 상태에서 잰 값</span>
+      </div>
+      <div class="hr-maxhr">
+        <label for="hr-sex-input">성별</label>
+        <select id="hr-sex-input">
+          <option value="">선택 안 함</option>
+          <option value="male">남성</option>
+          <option value="female">여성</option>
+        </select>
+        <span class="hr-maxhr__note">훈련부하 계수(Banister)에만 사용</span>
+      </div>
+      <div class="hr-maxhr__warn" id="hr-load-warn" hidden></div>
     </div>
 
     <!-- 분석 3-1 · 세션 중 심박 추이 -->
@@ -838,11 +857,16 @@
 <script src="js/csv-parser.js"></script>
 <!-- §430 다중 파일 자동 융합 (RaceBox CSV + IMU/HR 병합) — analysis.js 앞에 로드 -->
 <script src="js/parsers/racebox-csv.js?v=fusion-430b-20260706"></script>
+<!-- §448 Waterspeed 앱 CSV — 1Hz 심박(훈련부하·HR 도너) -->
+<script src="js/parsers/waterspeed-csv.js?v=load-448-20260831"></script>
 <script src="js/analysis-imu.js?v=fusion-430b-20260706"></script>
 <script src="js/analysis-hr.js?v=fusion-430-20260706"></script>
-<script src="js/session-merger.js?v=fusion-430b-20260706"></script>
-<script src="js/analysis.js?v=summary-433-20260706"></script>
-<script src="js/storage.js?v=trend-435-20260706"></script>
+<script src="js/session-merger.js?v=load-448-20260831"></script>
+<!-- §448 훈련부하 — MET 라이브러리. analysis.computeWorkload Tier 2 가
+     global.RDSportMET 을 참조하므로 analysis.js 보다 먼저 로드한다. -->
+<script src="js/sport-met.js?v=load-448-20260831"></script>
+<script src="js/analysis.js?v=load-448-20260831"></script>
+<script src="js/storage.js?v=load-448-20260831"></script>
 <!-- §415 (Sprint 1.1) — 트랙·메타 Supabase 동기화 (영상 제외). 저장 시 cloud
      업로드, 로그인 시 cloud pull, 다시 보기 시 트랙 lazy 다운로드. DMJAuth 의존. -->
 <script src="js/cloud-sync.js?v=cloud-415-20260618"></script>
@@ -865,7 +889,7 @@
      (초기 페이지 로드 영향 0). (Danny 2026-05-26) -->
 <script src="js/pdf-export.js"></script>
 <!-- 앱 -->
-<script src="js/app.js?v=ghost-replay-436-20260827"></script>
+<script src="js/app.js?v=load-448-20260831"></script>
 <!-- 메인 사이트 헤더·내비 동작 (헤더 스크롤·모바일 메뉴·계정 드롭다운) -->
 <script src="../assets/js/main.js"></script>
 <!-- §171-B cart system — auth-shim + cart.js for nav badge (메인과 동일).

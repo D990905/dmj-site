@@ -10,6 +10,7 @@ var ROOT = path.resolve(__dirname, '../../../../riding-dashboard');
 global.window = global;
 var Geo = require(path.join(ROOT, 'js/geo.js'));            global.RDGeo = Geo;
 global.RDRaceboxCSV = require(path.join(ROOT, 'js/parsers/racebox-csv.js'));
+global.RDWaterspeedCSV = require(path.join(ROOT, 'js/parsers/waterspeed-csv.js'));
 global.RDImu = require(path.join(ROOT, 'js/analysis-imu.js'));
 try { global.RDCsv = require(path.join(ROOT, 'js/csv-parser.js')); } catch (e) {}
 var Merger = require(path.join(ROOT, 'js/session-merger.js'));

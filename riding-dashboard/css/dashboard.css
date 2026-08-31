@@ -752,13 +752,21 @@ a { color:var(--sea-deep); }
   border:1px solid var(--border-soft); border-radius:10px; padding:11px 13px;
 }
 .hr-maxhr label { font-size:.78rem; font-weight:700; color:var(--text); }
-.hr-maxhr input {
+.hr-maxhr input, .hr-maxhr select {
   width:96px; font-family:inherit; font-size:.9rem; font-weight:600;
   border:1.5px solid var(--border); border-radius:8px; padding:7px 9px;
   color:var(--text); background:var(--bg-input);
 }
-.hr-maxhr input:focus { outline:none; border-color:var(--sea); }
+.hr-maxhr select { width:auto; }
+.hr-maxhr input:focus, .hr-maxhr select:focus { outline:none; border-color:var(--sea); }
 .hr-maxhr__note { font-size:.74rem; color:var(--text-mid); flex:1 1 220px; line-height:1.5; }
+/* 부하 산출 불가 안내 — 경고가 아니라 안내이므로 톤을 낮춘다.
+   타입/라운딩은 스케일 값(12px · 8px)으로 — selftest-design-lint 기준. */
+.hr-maxhr__warn {
+  margin-top:9px; font-size:12px; line-height:1.55; color:var(--text-mid);
+  background:var(--bg-sunk); border:1px dashed var(--border);
+  border-radius:8px; padding:9px 12px;
+}
 
 .hr-zone-legend { display:grid; gap:7px; margin-top:13px; }
 .hr-zone-row {

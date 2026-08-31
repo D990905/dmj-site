@@ -47,16 +47,18 @@
   'use strict';
 
   /* 의존 모듈 — 브라우저는 전역, Node 는 require 주입(setDeps) */
-  var Gpx, RaceboxCSV, Csv, Imu;
+  var Gpx, RaceboxCSV, WaterspeedCSV, Csv, Imu;
   function resolveDeps() {
     Gpx        = Gpx        || global.RDGpx;
     RaceboxCSV = RaceboxCSV || global.RDRaceboxCSV;
+    WaterspeedCSV = WaterspeedCSV || global.RDWaterspeedCSV;
     Csv        = Csv        || global.RDCsv;
     Imu        = Imu        || global.RDImu;
   }
   function setDeps(d) {
     if (d.Gpx) Gpx = d.Gpx;
     if (d.RaceboxCSV) RaceboxCSV = d.RaceboxCSV;
+    if (d.WaterspeedCSV) WaterspeedCSV = d.WaterspeedCSV;
     if (d.Csv) Csv = d.Csv;
     if (d.Imu) Imu = d.Imu;
   }
@@ -72,6 +74,12 @@
     var raceboxCsv = (RaceboxCSV && RaceboxCSV.looksLike && RaceboxCSV.looksLike(text));
     if (raceboxCsv) {
       return { format: 'racebox-csv', source: 'racebox-csv', creator: 'RaceBox' };
+    }
+    /* §448 Waterspeed 앱 CSV — 1Hz 심박이 실려 있어 훈련부하·HR 도너로
+       쓴다. RaceBox 는 Latitude/Longitude, Waterspeed 는 Lat/Long 이라
+       헤더가 겹치지 않는다. */
+    if (WaterspeedCSV && WaterspeedCSV.looksLike && WaterspeedCSV.looksLike(text)) {
+      return { format: 'waterspeed-csv', source: 'waterspeed-csv', creator: 'Waterspeed' };
     }
     if (/\.csv$/.test(lower) || (Csv && Csv.looksLikeCSV && Csv.looksLikeCSV(text))) {
       if (/^#\s*SailTech/i.test(head) || (Csv && Csv.looksLikeCSV && Csv.looksLikeCSV(text))) {
@@ -153,6 +161,9 @@
     if (det.format === 'racebox-csv') {
       if (!RaceboxCSV) throw new Error('RaceBox CSV 파서를 사용할 수 없습니다.');
       parsed = RaceboxCSV.parse(file.text);
+    } else if (det.format === 'waterspeed-csv') {
+      if (!WaterspeedCSV) throw new Error('Waterspeed CSV 파서를 사용할 수 없습니다.');
+      parsed = WaterspeedCSV.parse(file.text);
     } else if (det.format === 'sailtech-csv') {
       if (!Csv) throw new Error('CSV 파서를 사용할 수 없습니다.');
       parsed = Csv.parseCSV(file.text);

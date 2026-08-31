@@ -288,7 +288,15 @@
          caller (app.js) 가 meta.trimp 로 전달. HR 미기록·rider profile
          부족 세션은 null. computeFitnessTrend (CTL/ATL/TSB) 가 이 필드를
          일별 합산해 EWMA 계산한다. */
-      trimp: (meta.trimp != null) ? meta.trimp : null
+      trimp: (meta.trimp != null) ? meta.trimp
+           : (meta.workload && meta.workload.trimp != null) ? meta.workload.trimp
+           : null,
+      /* §448 — meta.workload = app.js sessionWorkload() 결과.
+         AU 는 3-tier(심박 Banister / MET / 체감강도) 어느 쪽이든 같은
+         Banister scale 로 정렬돼 있어 trimp 필드에 그대로 담는다.
+         loadMethod 로 어떤 근거였는지 남겨 화면에서 구분해 표시한다.
+         meta.trimp 를 직접 준 호출부(구경로)가 우선. */
+      loadMethod: (meta.workload && meta.workload.method) || null
     };
   }
 

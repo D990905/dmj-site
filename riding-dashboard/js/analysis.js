@@ -2448,7 +2448,11 @@
                    비교해 속도 변화가 아닌 순수 심혈관 드리프트를
                    본다. 낮을수록 같은 강도를 잘 유지한 것. */
   function computeHrEfficiency(session) {
-    var S = session.samples, cfg = session.cfg;
+    var S = session.samples;
+    /* normalizeSession 을 거친 세션은 cfg 를 항상 갖지만, 이 함수는
+       analyzeHr → computeTRIMP 경로에서 직접 불리기도 한다. cfg 없이
+       불리면 여기서 터지므로 기본값으로 방어한다. */
+    var cfg = session.cfg || DEFAULTS;
     var KTc = Geo.MS_TO_KNOTS;
     var movingMs = cfg.movingSpeedKt / KTc;
     var res = { available: false, scatter: [], trend: [], drift: { available: false } };

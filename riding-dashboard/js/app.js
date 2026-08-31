@@ -65,7 +65,9 @@
     /* 라이더·장비 (VPS·Coach Danny 입력) — Storage 에서 마지막 값 복원.
        maxHr = 심박 존 분석용 최대 심박수(bpm). null 이면 세션 관측
        최대값을 기본으로 쓴다. 한 번 입력하면 다음 세션에 자동 적용. */
-    rider: { weightKg: null, skill: '중급', wingM2: null, foilAR: null, maxHr: null },
+    rider: { weightKg: null, skill: '중급', wingM2: null, foilAR: null, maxHr: null,
+             /* §448 훈련부하 — Banister TRIMP 에 필수. 없으면 세션 AU 가 null. */
+             restHr: null, sex: null },
     vps: null, whatif: null,
     /* skillHr = computeSkillHr 결과 — 스킬-심박수 분석 카드용. 저장 시
        세션 회복 지수를 레코드에 함께 담아 장기 추세에 쓴다. */
@@ -176,7 +178,9 @@
         skill: savedRider.skill || '중급',
         wingM2: (savedRider.wingM2 != null) ? savedRider.wingM2 : null,
         foilAR: (savedRider.foilAR != null) ? savedRider.foilAR : null,
-        maxHr: (savedRider.maxHr != null) ? savedRider.maxHr : null
+        maxHr: (savedRider.maxHr != null) ? savedRider.maxHr : null,
+        restHr: (savedRider.restHr != null) ? savedRider.restHr : null,
+        sex: savedRider.sex || null
       };
     }
 
@@ -398,6 +402,26 @@
           renderHrZonesAndTrend();
         }
       }, 280));
+    }
+
+    /* §448 — 안정시 심박·성별. 훈련부하(Banister TRIMP) 산출에만 쓰이며
+       존 분석에는 영향이 없다. 그래서 재렌더 대신 안내문만 갱신한다. */
+    var hrRestEl = $('hr-resthr-input');
+    if (hrRestEl) {
+      hrRestEl.addEventListener('input', debounce(function () {
+        var v = parseInt(hrRestEl.value, 10);
+        state.rider.restHr = (isFinite(v) && v >= 30 && v <= 120) ? v : null;
+        Storage.saveRider(state.rider);
+        renderTrainingLoadWarning();
+      }, 280));
+    }
+    var hrSexEl = $('hr-sex-input');
+    if (hrSexEl) {
+      hrSexEl.addEventListener('change', function () {
+        state.rider.sex = hrSexEl.value || null;
+        Storage.saveRider(state.rider);
+        renderTrainingLoadWarning();
+      });
     }
 
     // 바이올린 — 풍상/풍하 토글
@@ -1779,6 +1803,7 @@
       sport: state.sport, windDir: state.windDir, windSpeedKt: state.windSpeedKt,
       vps: vpsMeta(),
       hrRecoveryIndex: skillHrRecoveryIndex(),
+      workload: sessionWorkload(),   // §448 — 훈련부하 AU + 산출 방식
       gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
     var st = $('save-status');
@@ -4174,6 +4199,17 @@
       input.placeholder = String(hr.defaultMaxHr);
     }
 
+    /* §448 — 안정시 심박·성별 복원 */
+    var restEl = $('hr-resthr-input');
+    if (restEl && document.activeElement !== restEl) {
+      restEl.value = (state.rider.restHr != null) ? state.rider.restHr : '';
+    }
+    var sexEl = $('hr-sex-input');
+    if (sexEl && document.activeElement !== sexEl) {
+      sexEl.value = state.rider.sex || '';
+    }
+    renderTrainingLoadWarning();
+
     renderHrZonesAndTrend();
     renderHrEfficiencyCard(hr);
     renderSkillHrCard();
@@ -4326,6 +4362,27 @@
   /* 심박 요약 스탯 — 평균(시간가중)·최고·최저·기록률.
      기록률 문구는 '기록된 포인트 중 심박 포함 비율' 임을 분모·분자로
      명확히 한다 — 그래프 시간 공백과 혼동되지 않게 (Danny 2026-05-23 §D). */
+  /* §448 훈련부하 안내 — Banister TRIMP 는 안정시 심박과 성별이 모두
+     있어야 산출된다. 하나라도 없으면 세션 부하가 null 로 저장되고,
+     그 위에 얹힌 CTL/ATL/TSB·훈련 추천이 전부 조용히 죽는다.
+     그래서 "왜 훈련부하가 안 나오는지"를 사용자에게 알려준다. */
+  function renderTrainingLoadWarning() {
+    var el = $('hr-load-warn');
+    if (!el) return;
+    var r = state.rider || {};
+    var miss = [];
+    if (!(r.restHr > 0)) miss.push('안정시 심박수');
+    if (!r.sex) miss.push('성별');
+    if (!miss.length) {
+      el.hidden = true;
+      el.textContent = '';
+      return;
+    }
+    el.hidden = false;
+    el.textContent = miss.join(' · ') + ' 을(를) 입력하면 이 세션의 훈련부하가 '
+      + '계산되어 장기 추세(체력·피로·컨디션)에 반영됩니다.';
+  }
+
   function renderHrSummaryStrip(hr) {
     var box = $('hr-summary-strip');
     if (!box) return;
@@ -4653,6 +4710,21 @@
   /* 저장 메타용 스킬-심박수 회복 지수 — 회전 후 심박 회복 속도(bpm/분).
      세션이 쌓이면 progression 그래프에서 장기 추세를 본다. HR 미기록·
      회복 표본 부족이면 null (Danny 검토 2026-05-23). */
+  /* §448 — 이 세션의 훈련부하(AU). analysis.computeWorkload 의 3-tier
+     (심박 Banister / MET / 체감강도) 중 입력이 되는 것으로 자동 분기한다.
+     라이딩 세션은 Tier 1 이 목표이며, 안정시 심박·성별이 없으면 null 이
+     되어 장기 추세에 반영되지 않는다(그 경우 화면에 안내를 띄운다).
+     반환: { trimp, method } — 산출 불가 시 { trimp: null, method: null } */
+  function sessionWorkload() {
+    if (!An || typeof An.computeWorkload !== 'function') {
+      return { trimp: null, method: null };
+    }
+    if (!state.session) return { trimp: null, method: null };
+    var w = An.computeWorkload(state.session, state.rider || {});
+    if (!w || w.AU == null) return { trimp: null, method: null };
+    return { trimp: w.AU, method: w.method };
+  }
+
   function skillHrRecoveryIndex() {
     return (state.skillHr && state.skillHr.recoveryIndex != null)
       ? state.skillHr.recoveryIndex : null;
@@ -5310,6 +5382,7 @@
       windSpeedKt: state.windSpeedKt,
       vps: vpsMeta(),
       hrRecoveryIndex: skillHrRecoveryIndex(),
+      workload: sessionWorkload(),   // §448 — 훈련부하 AU + 산출 방식
       gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
     var st = $('save-status');
