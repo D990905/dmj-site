@@ -33,9 +33,54 @@ function sd(a) { if (a.length < 2) return null; var m = avg(a);
 function f1(v, u) { return v == null ? '—' : v.toFixed(1) + (u || ''); }
 function f0(v, u) { return v == null ? '—' : v.toFixed(0) + (u || ''); }
 
+/* Node 에는 DOMParser 가 없어 브라우저용 GPX 파서를 쓸 수 없다.
+   trkpt 만 뽑는 최소 파서 — 심박(ns3:hr / gpxtpx:hr)과 속도 확장도 읽는다. */
+function parseGpxNode(xml) {
+  var pts = [];
+  var re = /<trkpt[^>]*lat="([-\d.]+)"[^>]*lon="([-\d.]+)"[^>]*>([\s\S]*?)<\/trkpt>/g;
+  var m;
+  while ((m = re.exec(xml))) {
+    var inner = m[3];
+    var tM = inner.match(/<time>([^<]+)<\/time>/);
+    var eM = inner.match(/<ele>([^<]+)<\/ele>/);
+    var sM = inner.match(/<speed>([^<]+)<\/speed>/);
+    var hM = inner.match(/<(?:ns3:|gpxtpx:)?hr>([\d.]+)<\//);
+    var pt = {
+      lat: parseFloat(m[1]), lng: parseFloat(m[2]),
+      ele: eM ? parseFloat(eM[1]) : null,
+      time: tM ? new Date(tM[1]) : null,
+      speed: sM ? parseFloat(sM[1]) : null
+    };
+    if (hM) {
+      var hv = parseFloat(hM[1]);
+      if (hv >= 30 && hv <= 240) pt.hr = hv;
+    }
+    pts.push(pt);
+  }
+  if (pts.length < 2) throw new Error('GPX 에서 트랙 포인트를 찾지 못했습니다.');
+  var withTime = pts.filter(function (p) { return p.time != null; }).length;
+  var withSpeed = pts.filter(function (p) { return p.speed != null; }).length;
+  var withHr = pts.filter(function (p) { return p.hr != null; }).length;
+  var cM = xml.match(/creator="([^"]*)"/);
+  return {
+    source: 'gpx', tracks: [{ name: 'gpx', segments: [pts] }],
+    pointCount: pts.length, trackName: 'GPX',
+    hasTime: withTime >= pts.length * 0.5,
+    speedSource: withSpeed >= pts.length * 0.5 ? 'device' : 'derived',
+    hasImu: false, imuPointCount: 0,
+    hasHR: withHr >= pts.length * 0.5, hrPointCount: withHr,
+    creator: cM ? cM[1] : 'GPX'
+  };
+}
+
 function loadOne(file) {
   var text = fs.readFileSync(file, 'utf8');
-  var res = Merger.mergeFiles([{ name: path.basename(file), text: text }]);
+  var res;
+  if (/^\s*<\?xml|<gpx/i.test(text.slice(0, 400))) {
+    res = { parsed: parseGpxNode(text), fusion: null };
+  } else {
+    res = Merger.mergeFiles([{ name: path.basename(file), text: text }]);
+  }
   var session = An.normalizeSession(res.parsed);
   /* 풍향은 두 독립 추정(노고존 · 회전 기하)을 융합해 쓴다. 하나만 쓰면
      그 방식의 약점이 그대로 결과가 된다 — 실제로 노고존만 쓰던 때

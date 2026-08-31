@@ -419,10 +419,17 @@
     var activeMs = cfg.activeSpeedKt / Geo.MS_TO_KNOTS;
     var movingTime = 0, activeTime = 0, instMax = 0, activeDist = 0;
 
+    /* §459 — 분석 대상 시간은 레그 길이의 합이다. totalDurationSec 은
+       첫 샘플~마지막 샘플의 벽시계라 **제외한 구간과 기록 공백이 그대로
+       들어간다**. 그걸 분모로 쓰면 구간을 지울수록 포일링 비율이 희석돼
+       "지웠는데 수치가 더 나빠지는" 일이 생긴다(옥대표 지적).
+       공백이 없는 세션에서는 두 값이 같으므로 기존 결과는 그대로다. */
+    var analyzedTime = 0;
     session.legs.forEach(function (leg) {
       for (var i = leg.start + 1; i <= leg.end; i++) {
         var dt = S[i].t - S[i - 1].t;
         var sp = S[i].speed;
+        analyzedTime += dt;
         if (sp > instMax) instMax = sp;
         if (sp >= movingMs) movingTime += dt;
         if (sp >= activeMs) { activeTime += dt; activeDist += (S[i].segDist || 0); }
@@ -430,6 +437,9 @@
     });
     res.movingTimeSec = movingTime;
     res.activeTimeSec = activeTime;
+    res.analyzedDurationSec = analyzedTime;
+    /* 제외·공백으로 빠진 시간 — 화면이 "총 시간" 과 구분해 보여줄 수 있게. */
+    res.excludedSec = Math.max(0, res.totalDurationSec - analyzedTime);
     /* 포일링(활주) 거리 — 활주 속도(activeSpeedKt) 이상 구간의 이동 거리.
        총 거리 대비 비율로 '얼마나 오래 포일 위에 떠서 갔는지'를 본다. */
     res.activeDistanceM = activeDist;
@@ -444,9 +454,11 @@
     res.maxSpeedIdx = pk2.startIdx;
     res.instantMaxSpeedMs = instMax;   // 참고용 — 노이즈 포함 순간 최고
     res.avgSpeedMovingMs = movingTime > 0 ? session.totalDistanceM / movingTime : 0;
-    res.avgSpeedOverallMs = res.totalDurationSec > 0
-      ? session.totalDistanceM / res.totalDurationSec : 0;
-    res.activeRatio = res.totalDurationSec > 0 ? activeTime / res.totalDurationSec : 0;
+    /* 비율·평균의 분모는 분석 대상 시간이다 — 지운 구간은 분모에서도
+       빠져야 지운 효과가 정직하게 반영된다. */
+    var denom = analyzedTime > 0 ? analyzedTime : res.totalDurationSec;
+    res.avgSpeedOverallMs = denom > 0 ? session.totalDistanceM / denom : 0;
+    res.activeRatio = denom > 0 ? activeTime / denom : 0;
     return res;
   }
 
@@ -2398,9 +2410,16 @@
       editApplied: { trimStart: trimStart, trimEnd: trimEnd, excludeRanges: excludes.slice() }
     };
     var cum = 0, legStart = 0;
+    /* §459 — 레그는 (a) 제외로 인덱스가 끊긴 곳과 (b) 원래 기록 공백
+       두 곳 모두에서 나뉘어야 한다. 예전에는 (a)만 봤는데, 원본 샘플은
+       공백을 사이에 두고도 인덱스가 이어져 있어 편집 후 레그가 뭉개졌다
+       (실측: 39개 → 2개). 그러면 원래 공백 9분이 다시 분석 시간에 들어가
+       "구간을 지웠는데 포일링 비율이 떨어지는" 현상이 난다. */
+    var gapSec = (session.cfg && session.cfg.gapThresholdSec) || DEFAULTS.gapThresholdSec;
     for (var k = 0; k < keptIdx.length; k++) {
       var idx = keptIdx[k], s = S[idx];
       var contiguous = (k > 0 && keptIdx[k - 1] === idx - 1);
+      if (contiguous && (s.t - S[keptIdx[k - 1]].t) > gapSec) contiguous = false;
       if (k > 0 && !contiguous) {
         ed.legs.push({ start: legStart, end: k - 1 });
         legStart = k;

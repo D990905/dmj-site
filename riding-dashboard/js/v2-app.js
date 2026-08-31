@@ -145,9 +145,16 @@
       s.totalDistanceM != null ? (s.totalDistanceM / 1000).toFixed(2) : '—', 'km',
       dPct == null ? '' : dPct + '% on foil'));
     host.appendChild(kpiCard('Foiling time', fmtClock(s.activeTimeSec), '',
-      tPct == null ? '' : tPct + '% of total'));
+      tPct == null ? '' : tPct + '% of time analysed'));
+    /* §459 — 분모는 '분석 대상 시간'이다. 기록 공백과 제외 구간을 뺀
+       값으로, 이게 있어야 구간을 지운 효과가 정직하게 보인다.
+       벽시계와 다르면 얼마가 빠졌는지 함께 적는다. */
+    var analyzed = (s.analyzedDurationSec != null)
+      ? s.analyzedDurationSec : s.totalDurationSec;
+    var dropped = s.excludedSec || 0;
     host.appendChild(kpiCard('Moving time', fmtClock(s.movingTimeSec), '',
-      'of ' + fmtClock(s.totalDurationSec)));
+      'of ' + fmtClock(analyzed)
+      + (dropped > 30 ? '  \u00b7 ' + fmtClock(dropped) + ' removed' : '')));
 
   }
 
@@ -184,16 +191,37 @@
   }
 
   /* ---------- 세션 시계열 ---------- */
+  /* 다운샘플 때문에 레그 끝 인덱스를 정확히 밟지 못할 수 있다 —
+     두 표본 사이에 레그 경계가 있었는지로 판단한다. */
+  function anyLegEndBetween(legEnd, a, b) {
+    for (var i = a; i < b; i++) if (legEnd[i]) return true;
+    return false;
+  }
+
   function renderTimeline(session) {
     var host = $('chart-timeline');
     var S = session.samples || [];
     if (!S.length || !window.uPlot) { host.textContent = 'No data'; return; }
     var t0 = S[0].t;
     var step = Math.max(1, Math.floor(S.length / 1800));   /* 과밀 방지 다운샘플 */
+    /* §459 — 기록 공백과 제외 구간에서는 선을 끊는다. 예전에는 두 점을
+       그냥 이어서, 지워버린 10분이 완만한 사선으로 남아 마치 그 시간에
+       타고 있었던 것처럼 보였다(옥대표 지적). 레그 경계마다 null 을
+       하나 끼워 uPlot 이 선을 끊게 한다. */
+    var legEnd = {};
+    (session.legs || []).forEach(function (lg) { legEnd[lg.end] = true; });
+    var gapSec = (session.cfg && session.cfg.gapThresholdSec) || 8;
     var xs = [], ys = [];
+    var prevT = null, prevIdx = null;
     for (var i = 0; i < S.length; i += step) {
-      xs.push(S[i].t - t0);
+      var tt = S[i].t - t0;
+      var broke = (prevT != null) &&
+        ((tt - prevT) > Math.max(gapSec, step * 2) ||
+         (prevIdx != null && anyLegEndBetween(legEnd, prevIdx, i)));
+      if (broke) { xs.push(prevT + 0.001); ys.push(null); }
+      xs.push(tt);
       ys.push(S[i].speed != null && isFinite(S[i].speed) ? S[i].speed * KT : null);
+      prevT = tt; prevIdx = i;
     }
     while (host.firstChild) host.removeChild(host.firstChild);
     track(new uPlot({
@@ -210,7 +238,7 @@
       ],
       series: [
         { label: 'Elapsed', value: function (u, v) { return v == null ? '—' : fmtClock(v); } },
-        { label: 'Speed', stroke: THEME.accent, width: 1.4,
+        { label: 'Speed', stroke: THEME.accent, width: 1.4, spanGaps: false,
           fill: 'rgba(77,171,247,0.14)',
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } }
       ],
@@ -681,6 +709,23 @@
     renderWindSources(host, a);
   }
 
+  /* §458 — 이 세션의 훈련부하. v2 에서 저장할 때도 기존 대시보드와
+     같은 값이 기록돼야 한다(예전에는 v2 저장분만 부하가 null 이었다).
+     안정시 심박·성별이 없으면 null 이 되고, 그 사실은 훈련부하 탭이
+     안내한다. */
+  function v2SessionWorkload() {
+    if (!An || typeof An.computeWorkload !== 'function' || !CUR.session) {
+      return { trimp: null, method: null };
+    }
+    var rp = {};
+    try { rp = (window.RDStorage && RDStorage.loadRider) ? (RDStorage.loadRider() || {}) : {}; }
+    catch (e) { rp = {}; }
+    var w = null;
+    try { w = An.computeWorkload(CUR.session, rp); } catch (e) { w = null; }
+    if (!w || w.AU == null) return { trimp: null, method: null };
+    return { trimp: w.AU, method: w.method };
+  }
+
   /* ===================== §457 훈련부하 =====================
      라이딩과 육상 운동을 하나의 원장에 합쳐 체력(CTL)·피로(ATL)·
      컨디션(TSB) 추세를 내고, 오늘 무엇을 할지 제안한다.
@@ -744,11 +789,98 @@
     var ledger = RDStorage.loadLedger();
     var rp = riderProfile();
 
+    renderPhysioInputs(host, rp);
     renderLoadInputsNotice(host, rp, ledger);
     renderTrainingState(host, ledger);
     renderWorkoutForm(host, rp);
     renderTodaySuggestion(host, ledger, rp);
     renderLedgerTable(host, ledger);
+  }
+
+  /* §458 생리 입력 — 최대심박·안정시심박·성별·체중.
+     이 네 개가 심박 존과 훈련부하의 전제다. 예전에는 기존 대시보드의
+     심박 카드에만 있어서, v2 만 쓰는 사람은 넣을 방법이 없었다.
+     저장소를 공유하므로 어느 쪽에서 넣든 양쪽에 적용된다.
+
+     ⚠ 최대심박은 **실측값**을 넣어야 한다. 비워 두면 그 세션의 관측
+     최대를 쓰는데, 그러면 범위가 눌려 존이 통째로 위로 밀린다
+     (실측: 관측 174 로 보면 Z5 54.5%, 실측 194 로 보면 Z5 0%). */
+  /* 최대심박이 바뀌면 심박 존도 다시 그려야 한다 — 존 경계가 %HRmax
+     기준이라 이 값 하나로 전부 이동한다. 훈련부하 탭만 갱신하면 두
+     화면이 서로 다른 최대심박으로 그려진 채 남는다. */
+  function afterPhysioChange() {
+    renderTraining();
+    if (CUR.analysis) {
+      try { renderPhysiology(CUR.analysis); } catch (e) {}
+    }
+  }
+
+  function renderPhysioInputs(host, rp) {
+    var card = el('div', 'card');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Your numbers'));
+    head.appendChild(el('div', 'card-actions lab',
+      'shared with the old dashboard'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+    var row = el('div', 'row g-2 align-items-end');
+
+    function num(label, key, min, max, hint) {
+      var col = el('div', 'col-6 col-md-3');
+      col.appendChild(el('label', 'form-label lab', label));
+      var i = el('input', 'form-control');
+      i.type = 'number'; i.min = String(min); i.max = String(max);
+      i.value = (rp[key] != null) ? rp[key] : '';
+      i.addEventListener('change', function () {
+        var v = parseFloat(i.value);
+        var cur = {};
+        try { cur = RDStorage.loadRider() || {}; } catch (e) {}
+        cur[key] = (isFinite(v) && v >= min && v <= max) ? v : null;
+        try { RDStorage.saveRider(cur); } catch (e) {}
+        afterPhysioChange();
+      });
+      col.appendChild(i);
+      if (hint) col.appendChild(el('div', 'form-hint', hint));
+      return col;
+    }
+    row.appendChild(num('Max heart rate', 'maxHr', 100, 240,
+      'measured, not 220 minus age'));
+    row.appendChild(num('Resting heart rate', 'restHr', 30, 120,
+      'on waking, lying still'));
+
+    var sexCol = el('div', 'col-6 col-md-3');
+    sexCol.appendChild(el('label', 'form-label lab', 'Sex'));
+    var sexSel = el('select', 'form-select');
+    [['', 'Not set'], ['male', 'Male'], ['female', 'Female']].forEach(function (o) {
+      var op = document.createElement('option');
+      op.value = o[0]; op.textContent = o[1];
+      if ((rp.sex || '') === o[0]) op.selected = true;
+      sexSel.appendChild(op);
+    });
+    sexSel.addEventListener('change', function () {
+      var cur = {};
+      try { cur = RDStorage.loadRider() || {}; } catch (e) {}
+      cur.sex = sexSel.value || null;
+      try { RDStorage.saveRider(cur); } catch (e) {}
+      afterPhysioChange();
+    });
+    sexCol.appendChild(sexSel);
+    sexCol.appendChild(el('div', 'form-hint', 'used by the load coefficient only'));
+    row.appendChild(sexCol);
+
+    row.appendChild(num('Weight (kg)', 'weightKg', 30, 200,
+      'for activity-based load'));
+    body.appendChild(row);
+
+    if (!(rp.maxHr > 0)) {
+      body.appendChild(el('div', 'alert alert-warning mt-3',
+        'Without a measured max heart rate every session falls back to its own '
+        + 'highest reading, which compresses the range and pushes the zones '
+        + 'upward \u2014 a hard session can read as if most of it was anaerobic '
+        + 'when it was not.'));
+    }
+    card.appendChild(body);
+    host.appendChild(card);
   }
 
   /* 부하가 왜 비어 있는지 — 라이딩 세션은 안정시 심박·성별이 있어야
@@ -3220,10 +3352,13 @@
             tack: CUR.vps.overall && CUR.vps.overall.tackScore,
             gybe: CUR.vps.overall && CUR.vps.overall.gybeScore
           } : null,
+          workload: v2SessionWorkload(),   // §458 훈련부하 AU + 산출 방식
           gpxText: CUR.gpxText
         }, CUR.analysis);
         if (res && res.ok) {
           renderSessions();
+          /* 저장하면 부하 원장에 들어가므로 훈련부하 탭도 갱신한다. */
+          renderTraining();
           sb.textContent = 'Saved';
         } else {
           sb.textContent = 'Save failed';
