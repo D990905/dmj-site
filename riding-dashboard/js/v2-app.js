@@ -941,12 +941,12 @@
 
     /* 보정 근거 */
     var note = el('div', 'alert alert-info');
-    note.textContent = 'Zeroed against ' + cal.windows + ' moment'
-      + (cal.windows > 1 ? 's' : '')
-      + (cal.basis === 'fall' ? ' where the board floated still after a fall'
-                              : ' of very low speed')
+    note.textContent = 'Zeroed against ' + (cal.samples || 0).toLocaleString()
+      + ' of the quietest low-speed samples'
       + ' — heel ' + cal.heelOffset.toFixed(1) + '°, pitch ' + cal.pitchOffset.toFixed(1)
-      + '° removed as mounting offset.';
+      + '° removed as mounting offset'
+      + (cal.heelIqr != null ? ' (heel spread in those moments: ' + cal.heelIqr.toFixed(1) + '°)' : '')
+      + '.';
     host.appendChild(note);
 
     function pct(arr, f) {
@@ -1012,11 +1012,25 @@
       it('Difference', Math.abs(lDeep - rDeep).toFixed(1) + '°');
       b2.appendChild(dl2);
       card2.appendChild(b2);
+      /* 옥대표(윙포일 실무): 좌우 힐 차이는 실제로 커봐야 3° 전후다.
+         그보다 크게 나오면 스타일·해상 상태이거나 0점이 어긋난 것이다.
+         대칭을 강제로 맞추지는 않는다 — 실제로 비대칭일 수 있다. */
+      var diff = Math.abs(lDeep - rDeep);
       var f2 = el('div', 'card-footer text-secondary');
       f2.style.fontSize = '.8125rem';
-      f2.textContent = Math.abs(lDeep - rDeep) > 8
-        ? 'One side is more than 8° deeper — worth checking whether that tack also loses more speed.'
-        : 'Both sides are within 8° of each other.';
+      if (diff <= 3) {
+        f2.textContent = 'Within 3° — balanced, and a sign the zero point is sound.';
+      } else if (diff <= 8) {
+        f2.textContent = 'Sides differ by ' + diff.toFixed(1) + '°. Real left/right difference is '
+          + 'usually about 3° at most, so this is worth a look — it can be style or sea state, '
+          + 'or the zero point may be slightly off.';
+        f2.style.color = 'var(--tblr-warning)';
+      } else {
+        f2.textContent = 'Sides differ by ' + diff.toFixed(1) + '°, well beyond the ~3° that is '
+          + 'normal. The zero point is probably wrong — the board may never have floated flat '
+          + 'in this session. Treat the absolute heel numbers with caution.';
+        f2.style.color = 'var(--tblr-danger)';
+      }
       card2.appendChild(f2);
       host.appendChild(card2);
     }

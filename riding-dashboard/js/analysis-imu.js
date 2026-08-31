@@ -237,50 +237,64 @@
     return out;
   }
 
-  /* 반환: { ok, heelOffset, pitchOffset, windows, used, dropped, reason } */
-  /* 구간이 서로 안 맞는다고 세션을 통째로 버리면 안 된다. 보드는 실제로
-     뒤집힌 채 뜨기도 한다(실측 2026-07-05: 구간3 힐 +95.4° 피치 -163.0°
-     = 완전히 전복). 그런 구간만 버리고 나머지로 0점을 잡는다.
-     중앙값에서 OUTLIER_DEG 넘게 떨어진 구간을 이상치로 본다. */
-  var OUTLIER_DEG = 30;
+  /* 0점 추정 — 저속 표본을 전부 모아 그중 자이로가 조용한 쪽만 쓴다.
+
+     처음엔 '추락 직후 한 구간' 을 썼는데 실측에서 무너졌다. 옥대표 설명대로
+     점프 후 추락은 라이더가 보드에 붙어 있어 기준이 못 되고, 걸려서 급정지한
+     경우라야 보드만 뜬다. 그런데 실제 세션에는 급정지가 거의 없었다 —
+     감속이 9~14초로 완만하고, 멈춘 뒤에도 자이로 17~32 로 계속 흔들려
+     보드가 한 번도 가만히 뜨지 않았다. 그래서 8초짜리 창 하나를 고르면
+     그 창이 기울어진 순간에 걸릴 때 0점이 통째로 밀린다
+     (2026-08-29: 창 기준 +15.3° vs 실제 ~+0.6°).
+
+     저속 표본 수천 개를 모아 중앙값을 잡으면 흔들림이 상쇄된다. 실측:
+       8/29  풀링 +2.2° / 조용30% +0.6°  (창 방식 +15.3°)
+       8/30  풀링 +1.3° / 조용30% +1.4°  (창 방식 +0.2°)
+     조용30% 쪽이 두 세션 모두 안정적이라 이것을 쓴다. */
+  var QUIET_FRACTION = 0.3;    /* 저속 표본 중 자이로 하위 이 비율만 사용 */
+  var MIN_ZERO_SAMPLES = 200;
+
+  function gyroMag(p) {
+    return Math.sqrt((p.gyroX || 0) * (p.gyroX || 0) +
+                     (p.gyroY || 0) * (p.gyroY || 0) +
+                     (p.gyroZ || 0) * (p.gyroZ || 0));
+  }
 
   function calibration(points) {
-    var span = points && points.length > 1
-      ? (points[points.length - 1].time - points[0].time) / 1000 : 0;
-    var hz = span > 0 ? points.length / span : 1;
-    /* 추락 구간이 있으면 그것만 쓴다 — 보드만 떠 있는 상태가 보장된다.
-       없으면 일반 저속 구간으로 물러선다(해변 대기 등이 섞일 수 있다). */
-    var wins = fallWindows(points, hz);
-    var basis = 'fall';
-    if (!wins.length) { wins = restWindows(points); basis = 'low-speed'; }
-    if (!wins.length) {
-      return { ok: false, reason: 'no-rest-window', windows: 0, used: 0,
+    var slow = [];
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      if (!p || p.heel == null || !isFinite(p.heel)) continue;
+      if (p.speed == null || p.speed * KT >= REST_MAX_KT) continue;
+      slow.push(p);
+    }
+    if (slow.length < MIN_ZERO_SAMPLES) {
+      return { ok: false, reason: 'no-rest-window', samples: slow.length,
                heelOffset: 0, pitchOffset: 0 };
     }
-    var cands = [];
-    wins.forEach(function (w) {
-      var h = median(w.map(function (x) { return x.heel; })
-                      .filter(function (x) { return x != null && isFinite(x); }));
-      var pt = median(w.map(function (x) { return x.pitch; })
-                       .filter(function (x) { return x != null && isFinite(x); }));
-      if (h != null && pt != null) cands.push({ heel: h, pitch: pt });
-    });
-    if (!cands.length) {
-      return { ok: false, reason: 'no-rest-window', windows: wins.length, used: 0,
+    /* 자이로가 조용한 쪽 = 라이더가 올라타 있지 않고 보드만 떠 있는 시간 */
+    var gs = slow.map(gyroMag).sort(function (a, b) { return a - b; });
+    var cut = gs[Math.floor(gs.length * QUIET_FRACTION)];
+    var quiet = slow.filter(function (q) { return gyroMag(q) <= cut; });
+    if (quiet.length < MIN_ZERO_SAMPLES / 2) quiet = slow;
+
+    var hVals = quiet.map(function (q) { return q.heel; })
+                     .filter(function (v) { return v != null && isFinite(v); });
+    var pVals = quiet.map(function (q) { return q.pitch; })
+                     .filter(function (v) { return v != null && isFinite(v); });
+    if (!hVals.length || !pVals.length) {
+      return { ok: false, reason: 'no-rest-window', samples: quiet.length,
                heelOffset: 0, pitchOffset: 0 };
     }
-    /* 피치 중앙값을 기준으로 이상치 구간을 걸러낸다 — 피치가 힐보다
-       안정적이다(실측: 정상 세션 구간 간 편차 피치 3.7~6.5°, 힐 8.6~15.1°). */
-    var pMed0 = median(cands.map(function (c) { return c.pitch; }));
-    var kept = cands.filter(function (c) { return Math.abs(c.pitch - pMed0) <= OUTLIER_DEG; });
-    if (!kept.length) kept = cands;
+    /* 불확실도 — 조용 구간 안에서도 힐이 크게 흔들리면 0점을 덜 믿어야 한다 */
+    var hs = hVals.slice().sort(function (a, b) { return a - b; });
+    var iqr = hs[Math.floor(hs.length * 0.75)] - hs[Math.floor(hs.length * 0.25)];
     return {
-      ok: true, reason: 'ok', basis: basis,
-      windows: wins.length, used: kept.length, dropped: cands.length - kept.length,
-      heelOffset: median(kept.map(function (c) { return c.heel; })) || 0,
-      pitchOffset: median(kept.map(function (c) { return c.pitch; })) || 0,
-      heelSpread: spread(kept.map(function (c) { return c.heel; })),
-      pitchSpread: spread(kept.map(function (c) { return c.pitch; }))
+      ok: true, reason: 'ok', basis: 'quiet-low-speed',
+      samples: quiet.length, slowSamples: slow.length,
+      heelOffset: median(hVals) || 0,
+      pitchOffset: median(pVals) || 0,
+      heelIqr: iqr
     };
   }
 
