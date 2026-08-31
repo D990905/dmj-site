@@ -110,11 +110,72 @@
     };
   }
 
+  /* ---------- 윙 사이즈 추천 (§468) ----------
+     옥대표 실사용을 그대로 재현하는 규칙을 찾았다.
+
+       풍속   실사용   필요힐   가능힐   여유
+       10kt   6.5㎡     19°      47°     27°
+       12kt   6.0㎡     28°      48°     20°
+       14kt   5.5㎡     35°      51°     15°
+       18kt   5.0㎡     49°      54°      5°
+       22kt   4.5㎡     58°      58°      0°
+
+     여유가 단조 감소해 22kt 에서 정확히 0 이 된다. 즉 선택 규칙은
+     **필요한 힐이 기하 한계 안에 들어오는 가장 큰 윙** 이다.
+     약풍에서 여유가 큰 것은 그보다 큰 윙이 없기 때문이지 여유를 남기려는
+     것이 아니다.
+
+     필요 힐 = atan(윙 옆힘 / 라이더 무게).
+     가능 힐 = min(윙 팁 접촉 한계, 포일 벤틸레이션 한계).
+
+     safetyDeg 는 한계에 딱 붙지 않도록 남기는 각도. 0 이면 옥대표 실사용과
+     일치하고, 키우면 보수적으로 간다. */
+  function recommendWing(opts) {
+    var wings = opts.wings || [];
+    var side = opts.sideForceAt;          /* function(areaM2) -> N */
+    if (typeof side !== 'function') return null;
+    var riderN = opts.riderMassKg * G;
+    var safety = opts.safetyDeg || 0;
+
+    var rows = wings.map(function (w) {
+      var F = side(w.areaM2);
+      if (F == null || !isFinite(F) || F <= 0) return null;
+      var reqDeg = Math.atan(F / riderN) * 180 / Math.PI;
+      var hw = maxHeelWing(w.spanCm, opts.rideHeightCm, opts.boardThicknessCm,
+                           opts.handHeightCm, opts.wingMarginCm);
+      var hf = maxHeelFoil(opts.mastCm, opts.foilSpanCm, opts.rideHeightCm,
+                           opts.foilMarginCm);
+      var avail = Math.min(hw, hf);
+      return {
+        areaM2: w.areaM2, label: w.label, estimated: !!w.estimated,
+        requiredHeelDeg: reqDeg,
+        availableHeelDeg: avail,
+        limitedBy: (hw <= hf) ? 'wing' : 'foil',
+        marginDeg: avail - reqDeg,
+        fits: (avail - reqDeg) >= safety
+      };
+    }).filter(Boolean);
+
+    /* 들어맞는 것 중 가장 큰 윙 */
+    var best = null;
+    rows.forEach(function (r) {
+      if (!r.fits) return;
+      if (!best || r.areaM2 > best.areaM2) best = r;
+    });
+    /* 하나도 안 맞으면 여유가 가장 덜 부족한 것(= 가장 작은 윙) */
+    if (!best && rows.length) {
+      best = rows.reduce(function (a, b) {
+        return b.marginDeg > a.marginDeg ? b : a;
+      });
+    }
+    return { rows: rows, recommended: best };
+  }
+
   var API = {
     maxHeelFoil: maxHeelFoil, maxHeelWing: maxHeelWing,
     minFlyingSpeedKt: minFlyingSpeedKt,
     sideForceCapacityN: sideForceCapacityN,
-    analyze: analyze,
+    analyze: analyze, recommendWing: recommendWing,
     DEFAULT_RIDE_HEIGHT_CM: DEFAULT_RIDE_HEIGHT_CM,
     DEFAULT_HAND_HEIGHT_CM: DEFAULT_HAND_HEIGHT_CM
   };

@@ -3310,7 +3310,8 @@
       mast: g.mast || D.mast,
       handWing: g.handWing || D.handWing,
       board: g.board || D.board,
-      surface: g.surface || D.surface
+      surface: g.surface || D.surface,
+      harness: g.harness || D.harness
     };
   }
 
@@ -3365,6 +3366,8 @@
       }));
     row.appendChild(pick('Rear wing', 'rearWing', RDGear.REAR_WINGS,
       function (o) { return o.label + '  ' + o.spanCm + 'cm'; }));
+    row.appendChild(pick('Harness', 'harness', RDGear.HARNESS,
+      function (o) { return o.label; }));
     row.appendChild(pick('Water state', 'surface', RDGear.SURFACE,
       function (o) { return o.label; }));
     body.appendChild(row);
@@ -3382,13 +3385,19 @@
       card.appendChild(body); host.appendChild(card); return;
     }
     var rig = RDGear.rigMassKg(sel);
+    /* 하네스를 어디에 두느냐가 윙 높이를 바꾸고, 그게 팁 여유를 바꾼다.
+       옥대표: 오버면 가슴으로 올려 끌려가듯, 풀파워면 엉덩이로 내려
+       윙 힘을 아래로 실어 보드를 누른다 — 후자는 팁 여유를 잃는다. */
+    var riderH = 175;
+    try { riderH = (RDStorage.loadRider() || {}).heightCm || 175; } catch (e) {}
+    var handH = RDGear.harnessHeightCm(riderH, sel.harness);
     var lim = RDRigLimits.analyze({
       mast: RDGear.byId(RDGear.MASTS, sel.mast),
       frontWing: RDGear.byId(RDGear.FRONT_WINGS, sel.frontWing),
       handWing: RDGear.byId(RDGear.HAND_WINGS, sel.handWing),
       board: RDGear.byId(RDGear.BOARDS, sel.board) || RDGear.BOARDS[0],
       surface: RDGear.byId(RDGear.SURFACE, sel.surface)
-    }, { riderMassKg: rider, totalMassKg: rider + rig });
+    }, { riderMassKg: rider, totalMassKg: rider + rig, handHeightCm: handH });
 
     var grid = el('div', 'row row-cards mt-3');
     function tile(label, val, sub) {
@@ -3413,6 +3422,40 @@
       (rider + rig).toFixed(0) + ' kg',
       rider + ' kg you + ' + rig.toFixed(1) + ' kg gear'));
     body.appendChild(grid);
+
+    /* §469 — 이 바람에서 뭘 쓸지. 기준은 옥대표 본인의 선택표이고,
+       물리는 "그 조합이 한계에 얼마나 붙어 있는지" 를 경고로 얹는다.
+       다섯 점으로 물리 규칙을 맞추려다 실패했고(저풍=최소·강풍=최대),
+       외운 곡선을 물리인 척 내놓지 않기 위해 이렇게 나눈다. */
+    var windKt = windSpeedFromForm();
+    if (windKt > 0 && RDGear.wingForWind) {
+      var suggested = RDGear.wingForWind(windKt);
+      var chosen = RDGear.byId(RDGear.HAND_WINGS, sel.handWing);
+      var box = el('div', 'alert ' +
+        (chosen && Math.abs(chosen.areaM2 - suggested) < 0.01 ? 'alert-success' : 'alert-info')
+        + ' mt-3');
+      box.appendChild(el('div', 'fw-bold',
+        'At ' + windKt + ' kt you normally ride ' + suggested.toFixed(1) + ' m²'));
+      if (chosen && Math.abs(chosen.areaM2 - suggested) >= 0.01) {
+        box.appendChild(el('div', 'mt-1',
+          'You have ' + chosen.areaM2.toFixed(1) + ' m² selected above.'));
+      }
+      /* 고른 윙이 기하 한계에 얼마나 붙었나 */
+      if (chosen) {
+        var hw = RDRigLimits.maxHeelWing(chosen.spanCm, lim.rideHeightCm,
+          (RDGear.byId(RDGear.BOARDS, sel.board) || RDGear.BOARDS[0]).thicknessCm,
+          handH, RDGear.byId(RDGear.SURFACE, sel.surface).wingMarginCm);
+        var hf = RDRigLimits.maxHeelFoil(RDGear.byId(RDGear.MASTS, sel.mast).lengthCm,
+          RDGear.byId(RDGear.FRONT_WINGS, sel.frontWing).spanCm,
+          lim.rideHeightCm, RDGear.byId(RDGear.SURFACE, sel.surface).foilMarginCm);
+        var avail = Math.min(hw, hf);
+        box.appendChild(el('div', 'mt-1 text-secondary',
+          'Geometry allows ' + Math.round(avail) + '° of heel with this setup on '
+          + lim.surface.toLowerCase() + ' water, limited by the '
+          + (hw <= hf ? 'wing tip' : 'foil tip') + '.'));
+      }
+      body.appendChild(box);
+    }
 
     var note = el('div', 'text-secondary mt-3');
     note.style.fontSize = '.8125rem';

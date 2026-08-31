@@ -44,24 +44,88 @@
      주목: 7.0 이상은 스팬이 거의 안 늘고(3.83→3.85 m) 코드만 커진다.
      즉 큰 사이즈로 갈수록 팁 접촉 위험이 비례해 늘지는 않는다 —
      추천 로직이 이 비선형성을 알아야 한다. */
+  /* 옥대표 실제 선택표 (2026-08-31 본인 확인).
+     ────────────────────────────────────────────────────────────
+     이걸 추천의 **기준선**으로 쓴다. 물리 모델로 이 표를 재현하려
+     시도했으나 되지 않았다 —
+
+       풍속   최소필요윙   실사용   기하최대
+       12kt     6.0         6.0      6.5
+       14kt     4.0         5.5      6.5
+       18kt     4.0         5.0      5.5
+       22kt     4.0         4.5      4.5
+
+     저풍에서는 최소를, 강풍에서는 최대를 고른다. 단일 물리 규칙으로
+     떨어지지 않는다. 본인 설명이 이유를 말해준다 —
+
+       "약풍에서 좀 더 큰 걸 써도 될 것 같은데 무겁기도 하고 커서
+        불편해서 피하는 편이야. 좀 작게 쓰는 편이야 전반적으로.
+        겉보기 바람이 있으면 작아도 달리면서 파워가 생기니까."
+
+     즉 무게·취급성 선호와 겉보기 바람 활용이 섞인 판단이고, 정상상태
+     VMG 모델은 그걸 표현하지 못한다. 다섯 점으로 곡선을 맞추면 그건
+     맞춘 게 아니라 외운 것이므로, 표를 그대로 쓰고 물리는 **한계
+     경고**로만 쓴다(예: "초피에서 이 조합은 힐 한계의 91%").
+     ──────────────────────────────────────────────────────────── */
+  var WIND_TO_WING = [
+    { maxKt: 10, areaM2: 6.5 },
+    { maxKt: 12, areaM2: 6.0 },
+    { maxKt: 16, areaM2: 5.5 },
+    { maxKt: 20, areaM2: 5.0 },
+    { maxKt: 99, areaM2: 4.5 }
+  ];
+
+  function wingForWind(windKt) {
+    for (var i = 0; i < WIND_TO_WING.length; i++) {
+      if (windKt <= WIND_TO_WING[i].maxKt) return WIND_TO_WING[i].areaM2;
+    }
+    return WIND_TO_WING[WIND_TO_WING.length - 1].areaM2;
+  }
+
   var HAND_WINGS = [
     /* ⚠ 4.0 은 PPC 공식 스펙표에 없다(Sonic FDS 는 5.0 부터). 옥대표가
        계산 범위에 넣으라 해 5.0~6.0 구간의 기울기(1㎡ 당 스팬 +31cm)로
        외삽했다. 실물 스팬을 재면 그 값으로 교체할 것. */
+    /* 4.0 · 4.5 는 옥대표 특별 주문 제작품 — 공식 스펙표에 없다.
+       5.0~6.0 기울기(1㎡ 당 스팬 +31cm)로 외삽했다. 실물을 재면 교체할 것.
+       이 스팬이 힐 한계를 직접 정하므로 추정임을 UI 에 표시한다. */
     { id: 'sonic_40', label: 'PPC Sonic 4.0', areaM2: 4.0, spanCm: 300,
-      chordCm: 177, estimated: true },
+      chordCm: 177, estimated: true, custom: true },
+    { id: 'sonic_45', label: 'PPC Sonic 4.5', areaM2: 4.5, spanCm: 315,
+      chordCm: 190, estimated: true, custom: true },
     { id: 'sonic_50', label: 'PPC Sonic 5.0', areaM2: 5.0, spanCm: 330, chordCm: 202 },
     { id: 'sonic_55', label: 'PPC Sonic 5.5', areaM2: 5.5, spanCm: 346, chordCm: 212 },
     { id: 'sonic_60', label: 'PPC Sonic 6.0', areaM2: 6.0, spanCm: 361, chordCm: 222 },
     { id: 'sonic_65', label: 'PPC Sonic 6.5', areaM2: 6.5, spanCm: 369, chordCm: 236 },
-    { id: 'sonic_70', label: 'PPC Sonic 7.0', areaM2: 7.0, spanCm: 383, chordCm: 244 },
-    { id: 'sonic_74', label: 'PPC Sonic 7.4', areaM2: 7.4, spanCm: 384, chordCm: 255 }
-    /* 8.0(스팬 385cm)은 옥대표 지시로 계산 범위에서 제외 */
+    /* 보유 쿼버는 4.0~6.5 여섯 장이다(옥대표 확인). 7.0·7.4·8.0 은
+       PPC 라인업에 있지만 보유하지 않아 추천 대상에서 뺀다 — 없는 걸
+       권하면 추천이 아니다. */
   ];
 
   /* 보드 — 두께는 손 높이(힐 시 윙 팁 클리어런스) 계산에 쓴다. */
   var BOARDS = [
     { id: 'board_default', label: 'Board', thicknessCm: 12, weightKg: 4.8 }
+  ];
+
+  /* 하네스 위치 — 윙을 잡는 높이가 힐 여유를 바꾼다.
+     옥대표 설명(2026-08-31):
+       "윙이 커지거나 바람이 오버면 가슴쪽으로 하네스를 올리는 게 편하다.
+        엉덩이를 빼고 상체를 주면서 끌려가듯이 타기가 편해.
+        풀파워일 때는 엉덩이쪽으로 최대한 내려서 윙을 아래로 끌어내려
+        힘이 아래로 실리게 한다. 윙의 힘이 아래로 실려야 보드를
+        안정적으로 누를 수가 있다."
+
+     기하로 보면 맞바꿈이다 —
+       높게 잡으면(가슴) 윙 팁이 수면에서 멀어져 **힐 여유가 커진다**.
+       낮게 끌어내리면 힘이 아래로 실려 **보드를 누르지만 팁 여유를 잃는다**.
+     heightFrac 는 키 대비 보드 위 높이 비율(인체계측 근사). */
+  var HARNESS = [
+    { id: 'chest', label: 'Chest (overpowered)', heightFrac: 0.72,
+      note: 'more heel headroom — the wing sits high and clear' },
+    { id: 'waist', label: 'Waist (normal)', heightFrac: 0.58,
+      note: 'the usual position' },
+    { id: 'low',   label: 'Pulled low (full power)', heightFrac: 0.50,
+      note: 'loads the board downward but costs tip clearance' }
   ];
 
   /* 수면 상태 — 팁이 파도에 닿지 않으려면 남겨야 할 여유(cm).
@@ -99,10 +163,18 @@
   var API = {
     FRONT_WINGS: FRONT_WINGS, REAR_WINGS: REAR_WINGS, MASTS: MASTS,
     HAND_WINGS: HAND_WINGS, BOARDS: BOARDS, SURFACE: SURFACE,
+    HARNESS: HARNESS,
+    WIND_TO_WING: WIND_TO_WING, wingForWind: wingForWind,
+    /* 하네스 높이(보드 위 cm) — 키에서 낸다 */
+    harnessHeightCm: function (riderHeightCm, harnessId) {
+      var h = byId(HARNESS, harnessId) || byId(HARNESS, 'waist');
+      return Math.round((riderHeightCm || 175) * h.heightFrac);
+    },
     byId: byId, rigMassKg: rigMassKg,
     /* 기본 선택 — 옥대표 상용 세팅 */
     DEFAULT: { frontWing: 'r6v1', rearWing: 'rear_v1', mast: 'mast_v1',
-               handWing: 'sonic_50', board: 'board_default', surface: 'chop' }
+               handWing: 'sonic_50', board: 'board_default', surface: 'chop',
+               harness: 'waist' }
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else global.RDGear = API;
