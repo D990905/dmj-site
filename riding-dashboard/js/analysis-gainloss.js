@@ -286,8 +286,36 @@
     return out;
   }
 
+  /* ---------- 방향별 총 진행량 ----------
+     legGains 는 "지속 레그" 만 센다(25초 이상). 회전이 잦은 세션에서는
+     그 조건을 통과하는 시간이 세션의 10% 밖에 안 될 수 있다(실측 8/31:
+     95회전 · 지속레그 17개 11분 / 분석 112분).
+
+     회전 손실은 모든 회전을 세므로, 그 손실을 지속레그 진행량으로 나누면
+     분자와 분모가 서로 다른 세션을 재게 된다 — 실제로 80% 라는 무의미한
+     값이 나왔다. 백분율의 분모는 **주행 중 모든 표본**의 방향별 진행량을
+     쓴다. */
+  function zoneProgress(session, twd, opts) {
+    opts = opts || {};
+    var minKt = opts.minKt != null ? opts.minKt : 12;
+    var S = (session && session.samples) || [];
+    var rung = ladderRung(session, twd);
+    if (!rung) return { upwindM: 0, downwindM: 0, upwindSec: 0, downwindSec: 0 };
+    var up = 0, down = 0, upSec = 0, downSec = 0;
+    for (var i = 1; i < S.length; i++) {
+      var dt = S[i].t - S[i - 1].t;
+      if (!(dt > 0) || dt > 5) continue;
+      if (S[i].twa == null || S[i].speed == null) continue;
+      if (S[i].speed * KT < minKt) continue;
+      var twa = Math.abs(S[i].twa), d = rung[i] - rung[i - 1];
+      if (twa < 70) { up += d; upSec += dt; }
+      else if (twa > 110) { down += -d; downSec += dt; }
+    }
+    return { upwindM: up, downwindM: down, upwindSec: upSec, downwindSec: downSec };
+  }
+
   /* ---------- 요약 ---------- */
-  function summarize(losses, legs) {
+  function summarize(losses, legs, progress) {
     var byType = {};
     var skipped = 0, counted = 0, reasons = {};
     (losses || []).forEach(function (l) {
@@ -325,10 +353,14 @@
       if (g.type === 'gybe') gybeLoss += g.totalVmgLossM;
       else tackLoss += g.totalVmgLossM;
     });
-    var upGain = 0, downGain = 0;
+    /* 백분율의 분모 — progress 가 주어지면 그것을 쓴다(주행 전 구간).
+       없으면 레그 합으로 물러나되, 그 경우 분모가 세션 일부만 덮는다. */
+    var legUp = 0, legDown = 0;
     (legs || []).forEach(function (l) {
-      if (l.zone === 'upwind') upGain += l.gainM; else downGain += l.gainM;
+      if (l.zone === 'upwind') legUp += l.gainM; else legDown += l.gainM;
     });
+    var upGain = progress ? progress.upwindM : legUp;
+    var downGain = progress ? progress.downwindM : legDown;
     return {
       groups: groups,
       tackLossM: tackLoss,
@@ -336,6 +368,11 @@
       totalTurnLossM: tackLoss + gybeLoss,
       upwindGainM: upGain,
       downwindGainM: downGain,
+      /* 지속 레그(25초+)만의 진행량 — 레그 품질을 볼 때 쓴다.
+         회전이 잦으면 이 값은 세션의 일부만 덮는다. */
+      sustainedUpwindM: legUp,
+      sustainedDownwindM: legDown,
+      basis: progress ? 'all-planing' : 'sustained-legs',
       /* 각 회전이 그 방향의 진행을 몇 % 깎았나 — "택을 줄여야 하나" 의 근거 */
       tackLossPct: upGain > 0 ? (tackLoss / upGain) * 100 : null,
       gybeLossPct: downGain > 0 ? (gybeLoss / downGain) * 100 : null,
@@ -349,7 +386,7 @@
 
   var API = {
     ladderRung: ladderRung, maneuverLoss: maneuverLoss,
-    legGains: legGains, summarize: summarize,
+    legGains: legGains, zoneProgress: zoneProgress, summarize: summarize,
     EXCL_SEC: EXCL_SEC, REF_SEC: REF_SEC, TAIL_SEC: TAIL_SEC
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;

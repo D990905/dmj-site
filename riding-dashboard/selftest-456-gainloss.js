@@ -100,6 +100,39 @@ ok(typeof sum.countedTurns === 'number', '실제로 센 회전 수 보고', sum.
 ok(sum.tackLossPct === null || sum.tackLossPct >= 0,
    '택 손실 %는 풍상 진행 대비로만 낸다(합산 아님)');
 
+console.log('\n[6b] §460 백분율의 분모는 주행 전 구간이다');
+/* legGains 는 25초 이상 지속 레그만 센다. 회전이 잦으면 그 조건을
+   통과하는 시간이 세션의 10% 밖에 안 되는데(실측 8/31: 95회전, 지속레그
+   11분 / 분석 112분), 손실은 모든 회전을 세므로 분자·분모가 다른 세션을
+   재게 된다. 실제로 24% 인 값이 80% 로 나왔다. */
+var longRun = line(0, 8, 400);
+longRun.forEach(function (p) { p.twa = 45; p.vmg = 5.6; });
+/* 20초짜리 조각으로만 이루어진 트랙 — 지속 레그 조건(25초)을 못 넘는다 */
+var choppy = line(0, 8, 400);
+choppy.forEach(function (p, i) {
+  var phase = Math.floor(i / 20) % 2;
+  p.twa = phase ? 45 : 95;              /* 20초마다 풍상↔리칭 */
+  p.vmg = phase ? 5.6 : 0;
+});
+var chopSess = mkSession(choppy);
+var chopLegs = GL.legGains(chopSess, 0, { minSec: 25, minKt: 5 });
+var chopProg = GL.zoneProgress(chopSess, 0, { minKt: 5 });
+ok(chopLegs.length === 0,
+   '20초 조각뿐이면 지속 레그는 0개', chopLegs.length);
+ok(chopProg.upwindM > 100,
+   '그래도 풍상 진행은 실제로 있었다 — zoneProgress 가 그걸 잡는다',
+   Math.round(chopProg.upwindM) + 'm');
+var sumNoProg = GL.summarize([], chopLegs);
+var sumProg = GL.summarize([], chopLegs, chopProg);
+ok(sumNoProg.basis === 'sustained-legs' && sumProg.basis === 'all-planing',
+   'basis 로 어느 분모를 썼는지 밝힌다',
+   sumNoProg.basis + ' / ' + sumProg.basis);
+ok(sumProg.upwindGainM > sumNoProg.upwindGainM,
+   '전 구간 분모가 지속 레그 분모보다 크다',
+   Math.round(sumProg.upwindGainM) + ' vs ' + Math.round(sumNoProg.upwindGainM));
+ok(sumProg.sustainedUpwindM === sumNoProg.upwindGainM,
+   '지속 레그 값도 따로 보존한다');
+
 console.log('\n[7] 순손실(B) 은 부족분(A) 을 넘을 수 없다');
 /* B = Σ(vref−v)dt, A = Σmax(0,vref−v)dt — 같은 표본이면 정의상 B ≤ A.
    다른 출처(엔진 VMG vs 위치)를 섞거나 B 를 vref×경과시간 으로 따로

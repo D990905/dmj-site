@@ -1308,7 +1308,12 @@
     try {
       L = RDGainLoss.maneuverLoss(CUR.session, a.maneuvers || [], a.windDir);
       legs = RDGainLoss.legGains(CUR.session, a.windDir);
-      sum = RDGainLoss.summarize(L, legs);
+      /* 백분율 분모는 주행 전 구간의 방향별 진행량이다. 지속 레그만
+         쓰면 회전이 잦은 세션에서 분모가 세션의 10% 밖에 안 덮어
+         손실이 80% 처럼 부풀어 보인다(§460). */
+      var prog = RDGainLoss.zoneProgress
+        ? RDGainLoss.zoneProgress(CUR.session, a.windDir) : null;
+      sum = RDGainLoss.summarize(L, legs, prog);
     } catch (e) { return; }
     if (!sum) return;
 
@@ -1332,14 +1337,21 @@
       c.appendChild(b); col.appendChild(c); return col;
     }
     function m(x) { return x == null ? '\u2014' : Math.round(x).toLocaleString() + ' m'; }
-    row.appendChild(tile('Upwind gained', m(sum.upwindGainM), 'toward the wind'));
-    row.appendChild(tile('Downwind gained', m(sum.downwindGainM), 'away from the wind'));
-    row.appendChild(tile('Lost in tacks', m(sum.tackLossM),
-      sum.tackLossPct != null ? sum.tackLossPct.toFixed(1) + '% of upwind gain' : '',
-      '#e8590c'));
-    row.appendChild(tile('Lost in gybes', m(sum.gybeLossM),
-      sum.gybeLossPct != null ? sum.gybeLossPct.toFixed(1) + '% of downwind gain' : '',
-      '#e8590c'));
+    row.appendChild(tile('Ground made upwind', m(sum.upwindGainM),
+      'measured along the wind axis'));
+    row.appendChild(tile('Ground made downwind', m(sum.downwindGainM),
+      'measured along the wind axis'));
+    /* 라벨을 분명히 — 이 값은 거리이지 속도 감소율이 아니다. 예전에는
+       "% of upwind gain" 이라고만 적어 "출구 속도가 그만큼 느려졌다" 로
+       읽혔다(옥대표 지적). */
+    row.appendChild(tile('Ground lost in tacks', m(sum.tackLossM),
+      sum.tackLossPct != null
+        ? 'equals ' + sum.tackLossPct.toFixed(0) + '% of the ground made upwind'
+        : '', '#e8590c'));
+    row.appendChild(tile('Ground lost in gybes', m(sum.gybeLossM),
+      sum.gybeLossPct != null
+        ? 'equals ' + sum.gybeLossPct.toFixed(0) + '% of the ground made downwind'
+        : '', '#e8590c'));
     body.appendChild(row);
 
     /* 그룹별 — 어느 회전이 제일 비싼가 */
@@ -1400,7 +1412,10 @@
     f.textContent = 'Counted ' + sum.countedTurns + ' of '
       + ((a.maneuvers || []).length) + ' turns'
       + (missing.length ? ' \u2014 skipped ' + missing.join('; ') + '.' : '.')
-      + ' Cost is the ground you fell behind your own best pace \u2014 measured '
+      + ' These are distances, not speed drops: a turn costing 40 m means you '
+      + 'ended up 40 m further from where you were heading than if you had held '
+      + 'your pace through it. Cost is the ground you fell behind your own best '
+      + 'pace \u2014 measured '
       + 'from position, from the moment the turn starts until you get that pace '
       + 'back (the better of your before or after pace). "Net of gains" subtracts '
       + 'any moments inside that window where you beat the pace, so it is always '

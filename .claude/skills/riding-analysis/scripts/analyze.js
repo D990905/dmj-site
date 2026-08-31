@@ -194,7 +194,8 @@ function report(r, opts) {
     try {
       var gl = GainLoss.summarize(
         GainLoss.maneuverLoss(r.session, a.maneuvers || [], a.windDir),
-        GainLoss.legGains(r.session, a.windDir));
+        GainLoss.legGains(r.session, a.windDir),
+        GainLoss.zoneProgress ? GainLoss.zoneProgress(r.session, a.windDir) : null);
       if (gl && gl.countedTurns) {
         console.log('  이득 풍상 ' + Math.round(gl.upwindGainM) + 'm · 풍하 ' +
           Math.round(gl.downwindGainM) + 'm  |  회전 손실 택 ' +
