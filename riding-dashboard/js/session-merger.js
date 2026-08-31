@@ -320,6 +320,10 @@
       if (p.heel != null) q.heel = p.heel;
       if (p.pitch != null) q.pitch = p.pitch;
       if (p.gforceX != null) { q.gforceX = p.gforceX; q.gforceY = p.gforceY; q.gforceZ = p.gforceZ; }
+      /* LeanAngle 은 옮기지 않는다 — RaceBox Bike Mode 의 LeanAngle 은
+         오토바이 코너링 기울기라 보드 힐이 아니다(실측 r=0.378 vs yaw
+         rate, analysis-imu.js 참조). 대신 bikeMode 플래그를 결과에
+         실어 화면이 "왜 자세가 없는지" 를 정확히 말하게 한다. */
       if (p.gyroX != null) q.gyroX = p.gyroX;
       if (p.gyroY != null) q.gyroY = p.gyroY;
       if (p.gyroZ != null) q.gyroZ = p.gyroZ;
@@ -428,6 +432,13 @@
       hasHR: withHR >= 1,
       hrPointCount: withHR,
       hasAttitude: withHeel >= pts.length * 0.5,
+      /* §451 — 어느 소스든 Bike Mode 로 내보낸 게 있으면 표시한다.
+         Bike Mode 는 가로 G(GForceY)를 LeanAngle 로 대체하므로 힐을
+         복원할 수 없다. 이 플래그가 없으면 화면이 "자세 없음" 이라고만
+         하고 사용자는 다음에 뭘 바꿔야 할지 알 수 없다. */
+      bikeMode: srcs.some(function (x) {
+        return x && x.parsed && x.parsed.bikeMode === true;
+      }),
       _fusion: buildFusion(srcs, primary, imuInfo, hrInfo, speedInfo, sf, pts.length, withHeel, withHR)
     };
     /* 자세 보정 결과를 융합 정보에 실어 화면이 사유를 표시할 수 있게 한다.
@@ -437,6 +448,13 @@
     if (attitudeCal && !attitudeCal.ok) {
       parsed.hasAttitude = false;
       if (parsed._fusion) parsed._fusion.attitudeRejected = attitudeCal.reason;
+    }
+    /* §451 — Bike Mode 라면 사유를 그것으로 덮어쓴다. 보정기는 '정지
+       구간을 못 찾음(no-rest-window)' 이라고 보고하지만, 정지 구간이
+       있었더라도 가로 G 가 없어 힐은 어차피 안 나온다. 사용자에게는
+       "다음엔 Bike Mode 를 끄고 내보내라" 가 실제로 필요한 안내다. */
+    if (parsed.bikeMode && !parsed.hasAttitude && parsed._fusion) {
+      parsed._fusion.attitudeRejected = 'bike-mode';
     }
     return { parsed: parsed, fusion: parsed._fusion, points: pts };
   }

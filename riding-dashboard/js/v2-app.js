@@ -394,7 +394,165 @@
       ]
     }, [xs, ys], plot), plot);
     renderHrTiers(host, hr.tiers, hr.maxBpm);
+    renderHrZones(host);
     renderHrEfficiency(host, hr.efficiency);
+    renderSkillHr(host, a);
+  }
+
+  /* §450 심박 존 — 세션을 강도별로 나눈 시간 분포. 평균 심박 하나로는
+     "고르게 중강도" 와 "쉬었다 몰아쳤다" 가 구분되지 않는다.
+     경계는 %HRmax 기준이고, 사용자가 최대심박을 넣지 않으면 그 세션의
+     관측 최대를 쓴다 — 그러면 존이 위로 눌리므로 근거를 함께 적는다. */
+  function renderHrZones(host) {
+    if (!An.computeHrZones || !CUR.session) return;
+    /* 최대심박은 저장된 라이더 프로필에서 가져온다 — 기존 대시보드에서
+       한 번 입력하면 여기서도 그대로 쓰인다. 없으면 엔진이 관측 최대로
+       대체하고 그 사실을 maxHrSource 로 알려준다. */
+    var maxHr = null;
+    try {
+      var rp = (window.RDStorage && RDStorage.loadRider) ? RDStorage.loadRider() : null;
+      if (rp && rp.maxHr) maxHr = rp.maxHr;
+    } catch (e) {}
+    var z;
+    try { z = An.computeHrZones(CUR.session, maxHr); } catch (e) { return; }
+    if (!z || !z.hasHR || !z.zones || !z.zones.length) return;
+    var total = z.totalSec || z.zones.reduce(function (t, x) { return t + x.seconds; }, 0);
+    if (!(total > 0)) return;
+
+    var ZL = { z1: 'Z1 Recovery', z2: 'Z2 Aerobic', z3: 'Z3 Tempo',
+               z4: 'Z4 Threshold', z5: 'Z5 Anaerobic' };
+    var ZC = { z1: '#4299e1', z2: '#38a169', z3: '#d69e2e',
+               z4: '#dd6b20', z5: '#e53e3e' };
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Time in heart-rate zones'));
+    head.appendChild(el('div', 'card-actions lab',
+      'max HR ' + z.maxHrUsed + ' bpm · ' +
+      (z.maxHrSource === 'user' ? 'entered' : 'observed in this session')));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    /* 가로 누적 막대 — 존별 비중을 한 줄로 */
+    var bar = el('div', 'zone-bar');
+    z.zones.forEach(function (x) {
+      if (!(x.seconds > 0)) return;
+      var seg = el('div', 'zone-bar__seg');
+      seg.style.width = (100 * x.seconds / total) + '%';
+      seg.style.background = ZC[x.key];
+      seg.title = ZL[x.key] + ' — ' + fmtClock(x.seconds);
+      bar.appendChild(seg);
+    });
+    body.appendChild(bar);
+
+    var wrap = el('div', 'table-responsive mt-3');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Zone', 'Range', 'Time', 'Share'].forEach(function (x, i) {
+      htr.appendChild(el('th', i ? 'text-end' : null, x));
+    });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+    z.zones.forEach(function (x) {
+      var tr = el('tr');
+      var nameTd = el('td');
+      var sw = el('span', 'zone-sw');
+      sw.style.background = ZC[x.key];
+      nameTd.appendChild(sw);
+      nameTd.appendChild(document.createTextNode(ZL[x.key]));
+      tr.appendChild(nameTd);
+      tr.appendChild(el('td', 'text-end num text-secondary',
+        x.loBpm + '–' + x.hiBpm + ' bpm'));
+      tr.appendChild(el('td', 'text-end num', fmtClock(x.seconds)));
+      tr.appendChild(el('td', 'text-end num',
+        (100 * x.seconds / total).toFixed(1) + '%'));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* 엔진의 회전 그룹 라벨은 한글이다(택킹 · 스타보드). 이 페이지는
+     영어이므로 type/side 코드에서 직접 만든다. */
+  function turnLabel(g) {
+    var t = g.type === 'gybe' ? 'Gybe' : 'Tack';
+    var side = g.side === 'P' ? 'port' : (g.side === 'S' ? 'starboard' : null);
+    return side ? (t + ' · ' + side) : t;
+  }
+
+  /* §450 회전–심박 — 회전이 심박을 얼마나 올리고 얼마나 빨리 내려오는가.
+     회복 지수(bpm/분)가 높을수록 심혈관 회복이 빠르다. 세션이 쌓이면
+     장기 추세로 본다. 회전이 심박을 올리지 않은 경우(워밍업 등)는
+     엔진이 회복 집계에서 뺀다. */
+  function renderSkillHr(host, a) {
+    if (!An.computeSkillHr || !CUR.session) return;
+    var sk;
+    try { sk = An.computeSkillHr(CUR.session, a.maneuvers || []); } catch (e) { return; }
+    if (!sk || !sk.hasHR) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Turn effort & recovery'));
+    head.appendChild(el('div', 'card-actions lab',
+      (sk.analyzedCount || 0) + ' turns analysed'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    var row = el('div', 'row row-cards');
+    function mini(label, val, sub) {
+      var col = el('div', 'col-6 col-md-4');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', label));
+      b.appendChild(el('div', 'kpi__val num mt-1', val));
+      if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      c.appendChild(b); col.appendChild(c); return col;
+    }
+    row.appendChild(mini('Cruise HR',
+      sk.cruiseHr != null ? String(Math.round(sk.cruiseHr)) : '—', 'bpm between turns'));
+    var rec = sk.recovery || {};
+    row.appendChild(mini('Recovery rate',
+      rec.avgRateBpmMin != null ? rec.avgRateBpmMin.toFixed(1) : '—',
+      'bpm/min · ' + (rec.n || 0) + ' turns counted'));
+    var bg = sk.biggest;
+    row.appendChild(mini('Hardest turn type',
+      bg ? turnLabel(bg) : '—',
+      bg && bg.riseBpm != null ? '+' + bg.riseBpm + ' bpm rise' : ''));
+    body.appendChild(row);
+
+    /* 종류·택별 묶음 — 어느 쪽 회전이 더 힘든지. 엔진 라벨은 한글이라
+       (이 페이지는 영어) type·side 코드에서 직접 만든다. recoveryN 이
+       0 이면 회복을 잴 만한 회전이 없었다는 뜻이라 값을 비운다. */
+    var groups = sk.groups || [];
+    if (groups.length) {
+      var wrap = el('div', 'table-responsive mt-3');
+      var t = el('table', 'table table-vcenter card-table table-sm');
+      var th = el('thead'), htr = el('tr');
+      ['Turn', 'Count', 'Entry HR', 'Peak HR', 'Rise', 'Recovery'].forEach(function (x, i) {
+        htr.appendChild(el('th', i ? 'text-end' : null, x));
+      });
+      th.appendChild(htr); t.appendChild(th);
+      var tb = el('tbody');
+      groups.forEach(function (g) {
+        var tr = el('tr');
+        tr.appendChild(el('td', null, turnLabel(g)));
+        tr.appendChild(el('td', 'text-end num', String(g.n)));
+        tr.appendChild(el('td', 'text-end num',
+          g.entryHr != null ? g.entryHr + ' bpm' : '—'));
+        tr.appendChild(el('td', 'text-end num',
+          g.peakHr != null ? g.peakHr + ' bpm' : '—'));
+        tr.appendChild(el('td', 'text-end num',
+          g.riseBpm != null ? (g.riseBpm > 0 ? '+' : '') + g.riseBpm : '—'));
+        tr.appendChild(el('td', 'text-end num',
+          (g.recoveryN > 0 && g.recoveryRateBpmMin != null && g.recoveryRateBpmMin > 0)
+            ? g.recoveryRateBpmMin.toFixed(1) + ' bpm/min'
+            : '—'));
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    }
+    card.appendChild(body);
+    host.appendChild(card);
   }
 
   /* 추정 신뢰도 라벨 — 엔진은 한글을 돌려주는데 이 페이지는 영어다 */
@@ -514,6 +672,56 @@
     var host = $('perf-extra');
     if (!host) return;
     while (host.firstChild) host.removeChild(host.firstChild);
+
+    /* §450 Speed splits — mean-max 곡선이 모양을 보여주고, 이 표가 그
+       곡선의 앵커 값을 숫자로 준다. Waterspeed 의 'Best Speed Splits'
+       에 대응. alpha 는 500m 를 50m 게이트 안에서 돌아온 왕복 베스트로,
+       속도만이 아니라 '돌아올 수 있는' 속도라 성격이 다르다. */
+    var splitRows = [];
+    (a.peaks || []).forEach(function (p) {
+      splitRows.push({ label: p.windowSec + ' s', kind: 'time', ms: p.speedMs });
+    });
+    (a.distanceBests || []).forEach(function (d) {
+      splitRows.push({
+        label: d.distanceM === 1852 ? '1 NM' : d.distanceM + ' m',
+        kind: 'distance', ms: d.speedMs
+      });
+    });
+    if (a.alpha && a.alpha.speedMs > 0) {
+      splitRows.push({
+        label: 'Alpha ' + a.alpha.distanceM + ' m',
+        kind: 'alpha', ms: a.alpha.speedMs,
+        note: 'within ' + a.alpha.gateM + ' m gate'
+      });
+    }
+    if (splitRows.length) {
+      var sc = el('div', 'card');
+      var sh = el('div', 'card-header');
+      sh.appendChild(el('h3', 'card-title', 'Best speed splits'));
+      sh.appendChild(el('div', 'card-actions lab', 'best sustained average'));
+      sc.appendChild(sh);
+      var sw = el('div', 'table-responsive');
+      var st = el('table', 'table table-vcenter card-table table-sm');
+      var sth = el('thead'), sthr = el('tr');
+      ['Split', 'Type', 'Speed', 'km/h'].forEach(function (x, i) {
+        sthr.appendChild(el('th', i ? 'text-end' : null, x));
+      });
+      sth.appendChild(sthr); st.appendChild(sth);
+      var stb = el('tbody');
+      var KIND = { time: 'duration', distance: 'distance', alpha: 'out & back' };
+      splitRows.forEach(function (r) {
+        var tr = el('tr');
+        tr.appendChild(el('td', null, r.label));
+        tr.appendChild(el('td', 'text-end text-secondary',
+          KIND[r.kind] + (r.note ? ' · ' + r.note : '')));
+        tr.appendChild(el('td', 'text-end num', (r.ms * KT).toFixed(2) + ' kt'));
+        tr.appendChild(el('td', 'text-end num text-secondary',
+          (r.ms * 3.6).toFixed(1)));
+        stb.appendChild(tr);
+      });
+      st.appendChild(stb); sw.appendChild(st); sc.appendChild(sw);
+      host.appendChild(sc);
+    }
 
     /* Runs — 어느 구간이 진짜 주행이었는지. 세션 전체 평균이 숨기는 것. */
     var rw = a.runs || {}, runs = rw.runs || [];
@@ -914,7 +1122,15 @@
       + 'lying flat on the board.',
     'no-rest-window':
       'No moment was found where the board floated still, so there is nothing to zero against. '
-      + 'A RaceBox export in Bike Mode also removes the lateral axis heel needs.',
+      + 'Look for a fall where the board stops and floats before you climb back on.',
+    /* §451 — Bike Mode 는 정지 구간을 찾아도 소용이 없다. 가로 G 축을
+       LeanAngle 로 대체해 내보내므로 힐의 원천 자체가 파일에 없다.
+       그래서 다른 사유와 달리 "다음 촬영에서 바꿀 것" 을 지시한다. */
+    'bike-mode':
+      'This RaceBox file was exported in Bike Mode, which replaces the lateral G axis '
+      + 'with a motorcycle lean angle. That lean angle is turn banking, not board heel '
+      + '(measured correlation with yaw rate r=0.38), so heel cannot be recovered from '
+      + 'this file. Turn Bike Mode off in the RaceBox app and re-export to get heel.',
     'no-board-reference': 'No board reference found.'
   };
 
@@ -931,7 +1147,12 @@
     if (!S.length) {
       var box = el('div', 'alert alert-warning');
       box.appendChild(el('div', 'fw-bold', 'Board attitude is not available for this session'));
-      var why = (cal && cal.reason && ATT_REASON[cal.reason]) || ATT_REASON['no-board-reference'];
+      /* 사유는 보정기 reason 보다 융합이 덮어쓴 값을 우선한다 —
+         Bike Mode 는 보정기가 'no-rest-window' 로 보고하지만 실제
+         원인은 그게 아니다(§451). */
+      var reasonKey = (fusion && fusion.attitudeRejected)
+        || (cal && cal.reason) || 'no-board-reference';
+      var why = ATT_REASON[reasonKey] || ATT_REASON['no-board-reference'];
       box.appendChild(el('div', 'mt-1', why));
       box.appendChild(el('div', 'mt-2',
         'Speed, distance, turns and VMG are unaffected — only heel and pitch are missing.'));
@@ -1034,6 +1255,116 @@
       card2.appendChild(f2);
       host.appendChild(card2);
     }
+    renderStability(host, session);
+  }
+
+  /* §451 안정성 — "보드가 얼마나 덜 흔들렸나" 와 "그게 속도·VMG 로
+     이어졌나". 상·하위 25% 를 갈라 차이를 보여준다(상관계수보다 읽기
+     쉽고, 두 집단에서 지표가 실제로 갈리지 않으면 엔진이 이득을 0 으로
+     막는다 — §447 가짜 이득 방지). 힐·피치가 있어야 하므로 자세가 있는
+     세션에서만 의미 있는 값이 나온다. */
+  function renderStability(host, session) {
+    if (!window.RDStability || !session) return;
+    var st;
+    try { st = RDStability.analyze(session); } catch (e) { return; }
+    if (!st) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Board stability'));
+    head.appendChild(el('div', 'card-actions lab',
+      st.ok ? (st.segments + ' cruising windows') : 'not enough steady cruising'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    if (!st.ok) {
+      body.appendChild(el('div', 'text-secondary',
+        'Stability needs at least 12 windows of steady cruising above 12 kt with heel '
+        + 'and pitch present. This session had ' + (st.segments || 0) + '.'));
+      card.appendChild(body); host.appendChild(card); return;
+    }
+
+    var row = el('div', 'row row-cards');
+    function mini(label, val, sub) {
+      var col = el('div', 'col-6 col-md-3');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', label));
+      b.appendChild(el('div', 'kpi__val num mt-1', val));
+      if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      c.appendChild(b); col.appendChild(c); return col;
+    }
+    row.appendChild(mini('Pitch steadiness',
+      st.pitchSd != null ? st.pitchSd.toFixed(2) + '\u00b0' : '\u2014', 'lower is steadier'));
+    row.appendChild(mini('Heel steadiness',
+      st.heelSd != null ? st.heelSd.toFixed(2) + '\u00b0' : '\u2014', 'lower is steadier'));
+    row.appendChild(mini('Speed variation',
+      st.speedCv != null ? (st.speedCv * 100).toFixed(1) + '%' : '\u2014', 'within a window'));
+    row.appendChild(mini('Pitch rate',
+      st.pitchRate != null ? st.pitchRate.toFixed(2) + '\u00b0/s' : '\u2014', 'porpoising proxy'));
+    body.appendChild(row);
+
+    var gaps = [
+      { k: 'pitchVsSpeed', label: 'Steady pitch \u2192 speed', unit: '\u00b0', target: 'kt' },
+      { k: 'heelVsVmg', label: 'Steady heel \u2192 VMG', unit: '\u00b0', target: 'kt VMG' },
+      { k: 'heelVsSpeed', label: 'Steady heel \u2192 speed', unit: '\u00b0', target: 'kt' }
+    ].filter(function (g) { return st[g.k] && st[g.k].stableTarget != null; });
+
+    if (gaps.length) {
+      var wrap = el('div', 'table-responsive mt-3');
+      var t = el('table', 'table table-vcenter card-table table-sm');
+      var th = el('thead'), htr = el('tr');
+      ['Relationship', 'Steadiest 25%', 'Roughest 25%', 'Difference'].forEach(function (x, i) {
+        htr.appendChild(el('th', i ? 'text-end' : null, x));
+      });
+      th.appendChild(htr); t.appendChild(th);
+      var tb = el('tbody');
+      gaps.forEach(function (g) {
+        var q = st[g.k], tr = el('tr');
+        tr.appendChild(el('td', null, g.label));
+        tr.appendChild(el('td', 'text-end num',
+          q.stableMetric.toFixed(2) + g.unit + ' \u2192 ' + q.stableTarget.toFixed(1)));
+        tr.appendChild(el('td', 'text-end num',
+          q.roughMetric.toFixed(2) + g.unit + ' \u2192 ' + q.roughTarget.toFixed(1)));
+        var d = el('td', 'text-end num');
+        /* gain 0 = 두 집단에서 지표가 갈리지 않았다는 뜻. '0.0 kt' 로
+           쓰면 측정된 0 처럼 읽히므로 문구로 구분한다. */
+        d.textContent = (q.gain > 0)
+          ? '+' + q.gain.toFixed(1) + ' ' + g.target
+          : 'no separation';
+        tr.appendChild(d);
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    }
+    card.appendChild(body);
+    host.appendChild(card);
+
+    var tips = [];
+    try { tips = RDStability.coach(session, st, tackHeelFromSession(session)) || []; } catch (e) {}
+    tips.forEach(function (tip) {
+      var box = el('div',
+        tip.severity === 'high' ? 'alert alert-warning mt-3' : 'alert alert-info mt-3');
+      box.appendChild(el('div', 'fw-bold', tip.title));
+      box.appendChild(el('div', 'mt-1', tip.detail));
+      if (tip.why) box.appendChild(el('div', 'mt-1 text-secondary', tip.why));
+      host.appendChild(box);
+    });
+  }
+
+  /* 택별 중앙 힐 — 좌우 불균형 코칭 트리거 입력. 순항(12kt+)만 본다. */
+  function tackHeelFromSession(session) {
+    var pv = [], sv = [];
+    (session.samples || []).forEach(function (p) {
+      if (p.heel == null || p.speed == null || p.twa == null) return;
+      if (p.speed * KT < 12) return;
+      (p.twa < 0 ? pv : sv).push(p.heel);
+    });
+    function md(a) {
+      if (!a.length) return null;
+      var v = a.slice().sort(function (x, y) { return x - y; });
+      return v[v.length >> 1];
+    }
+    return { port: md(pv), starboard: md(sv) };
   }
 
   /* ---------- 코칭 (SPS 분해 · 윙 what-if) ---------- */

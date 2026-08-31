@@ -357,3 +357,15 @@
 @media (max-width:620px) {
   .replay__timetoggle button {padding:4px 8px; font-size:0.72rem;}
 }
+
+/* §450 심박 존 — 존별 시간 비중을 한 줄 누적 막대로. 표는 정확한 값을,
+   막대는 "어디에 몰려 있는가" 를 즉시 보여준다. */
+.zone-bar {
+  display: flex; width: 100%; height: 14px; border-radius: 4px;
+  overflow: hidden; background: rgba(255, 255, 255, .06);
+}
+.zone-bar__seg { height: 100%; }
+.zone-sw {
+  display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+  margin-right: 8px; vertical-align: baseline;
+}
