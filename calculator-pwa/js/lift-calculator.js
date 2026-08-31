@@ -1377,7 +1377,23 @@
       };
       points.push(pt);
       if (pt.capped) anyCapped = true;
-      if (pt.feasible && (!optimum || pt.V_vmg_kt > optimum.V_vmg_kt)) {
+      /* §480 (2026-08-31) — 동점이면 **큰 윙**을 고른다.
+         강풍에서는 V_b 가 모델 상한(UPWIND_VB_CAP_KT=35kt)에 걸려 여러
+         면적이 완전히 같은 VMG 를 낸다. 예: 20kt/선수/AR13.7 은 3.0·3.5·
+         4.0 ㎡ 가 모두 24.70kt, 22kt/상급 은 2.5~4.5 ㎡ 가 모두 22.50kt.
+         엄격한 > 는 그 평탄구간의 **첫** 점을 남기므로 늘 가장 작은 윙이
+         정점으로 보고됐다 — 22kt 에서 2.5㎡ 를 추천하는 셈이다.
+         평탄구간은 모델이 그 위를 분해하지 못한다는 뜻이지 작은 윙이
+         낫다는 뜻이 아니고, 같은 VMG 라면 큰 윙이 저속 여유·펌핑 부담·
+         돌풍 대응에서 낫다. 두 독립 근거가 이 규칙을 지지한다:
+           · Timo spec Case 5 (20kt/선수) 기대 3.5~5.0 → 4.0 으로 들어옴
+           · 옥대표 실사용 22kt = 4.5㎡ → 평탄구간 상단과 정확히 일치
+         허용오차 0.05kt 는 VMG 가 0.1kt 로 반올림돼 있어 사실상 '완전 동점'
+         만 잡는다. 평탄하지 않은 구간(약·중풍)은 전혀 영향받지 않는다. */
+      if (pt.feasible && (!optimum ||
+          pt.V_vmg_kt > optimum.V_vmg_kt + 1e-9 ||
+          (Math.abs(pt.V_vmg_kt - optimum.V_vmg_kt) <= 0.05 &&
+           pt.area_m2 > optimum.area_m2))) {
         optimum = pt;
       }
     }

@@ -17,18 +17,46 @@
  * fallback 으로 텍스트가 적어도 PDF stream 에 박혀 있음을 본다.
  *
  *   실행:  node selftest-pdf-render.js
- *   통과:  종료 코드 0 · 출력: 실 PDF 두 개 (/tmp/pdftest/render-ko.pdf
- *          /tmp/pdftest/render-en.pdf)
+ *   통과:  종료 코드 0 · 출력: 실 PDF 두 개 (OUT_DIR/render-ko.pdf,
+ *          OUT_DIR/render-en.pdf — OUT_DIR 은 ~/.cache/dmj-selftest/pdftest)
  * ============================================================ */
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var DIR_BOOT = __dirname;
 
-var jsPDF;
-try { jsPDF = require('/tmp/pdftest/node_modules/jspdf').jsPDF; }
-catch (e) {
-  console.error('jsPDF not installed at /tmp/pdftest. Selftest abort.');
-  process.exit(2);
+/* jsPDF 위치 — 예전에는 /tmp/pdftest 한 곳만 봤는데, /tmp 는 재부팅마다
+   비어서 이 검증이 조용히 안 돌게 됐다(전체 스위트에서 계속 실패로
+   보이던 원인). 이제 여러 곳을 훑고, 없으면 홈 캐시에 한 번 설치한다.
+   저장소에는 node_modules 를 넣지 않는다 — 이 repo 는 저장하면 곧
+   배포라, 의존성 트리를 커밋할 자리가 아니다. */
+var os = require('os');
+var CACHE = path.join(os.homedir(), '.cache', 'dmj-selftest', 'pdftest');
+var CANDIDATES = [
+  path.join(DIR_BOOT, 'node_modules', 'jspdf'),
+  path.join(CACHE, 'node_modules', 'jspdf'),
+  '/tmp/pdftest/node_modules/jspdf'
+];
+function loadJsPdf() {
+  for (var i = 0; i < CANDIDATES.length; i++) {
+    try { return require(CANDIDATES[i]).jsPDF; } catch (e) {}
+  }
+  return null;
+}
+var jsPDF = loadJsPdf();
+if (!jsPDF) {
+  console.log('jsPDF 없음 — ' + CACHE + ' 에 한 번 설치합니다…');
+  try {
+    fs.mkdirSync(CACHE, { recursive: true });
+    require('child_process').execSync(
+      'npm install --no-audit --no-fund --silent jspdf',
+      { cwd: CACHE, stdio: 'ignore' });
+  } catch (e) {
+    console.error('jsPDF 설치 실패 (오프라인?): ' + e.message);
+    process.exit(2);
+  }
+  jsPDF = loadJsPdf();
+  if (!jsPDF) { console.error('설치했는데도 로드 실패. abort.'); process.exit(2); }
 }
 
 var DIR = __dirname;
@@ -131,10 +159,15 @@ keys.forEach(function (k) {
 });
 
 console.log('\n[4] 파일 저장');
-fs.writeFileSync('/tmp/pdftest/render-ko.pdf', Buffer.from(koBuf));
-fs.writeFileSync('/tmp/pdftest/render-en.pdf', Buffer.from(enBuf));
-console.log('  /tmp/pdftest/render-ko.pdf  (' + koV.fileSize + ' bytes)');
-console.log('  /tmp/pdftest/render-en.pdf  (' + enV.fileSize + ' bytes)');
+/* 산출물도 캐시 디렉터리로 — /tmp 는 없어질 수 있고, 없으면 이 검증이
+   맨 마지막 줄에서 ENOENT 로 죽는다(예전 실패의 두 번째 원인). */
+fs.mkdirSync(CACHE, { recursive: true });
+var KO_OUT = path.join(CACHE, 'render-ko.pdf');
+var EN_OUT = path.join(CACHE, 'render-en.pdf');
+fs.writeFileSync(KO_OUT, Buffer.from(koBuf));
+fs.writeFileSync(EN_OUT, Buffer.from(enBuf));
+console.log('  ' + KO_OUT + '  (' + koV.fileSize + ' bytes)');
+console.log('  ' + EN_OUT + '  (' + enV.fileSize + ' bytes)');
 
 console.log('\n----------------------------------------');
 var pass = (

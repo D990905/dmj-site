@@ -12,12 +12,26 @@
  *   실행:  cd riding-dashboard && osascript -l JavaScript selftest-423-video-missing.js
  * ============================================================ */
 'use strict';
-ObjC.import('Foundation');
 
-function readFile(p) {
-  var s = $.NSString.stringWithContentsOfFileEncodingError(p, $.NSUTF8StringEncoding, null);
-  if (!s) throw new Error('read fail: ' + p);
-  return ObjC.unwrap(s);
+/* node 로도, JXA(osascript -l JavaScript)로도 돌아간다. 예전에는 JXA
+   전용이라 `node selftest-*.js` 로 전체를 훑으면 ObjC 미정의로 죽었고,
+   그게 "계속 실패하는 테스트" 로 보였다 — 실제로는 실행기가 틀렸던 것.
+   이제 환경을 보고 파일 읽기만 갈아끼운다. */
+var IS_NODE = (typeof process !== 'undefined' && process.versions && process.versions.node);
+var readFile, DIRNAME;
+if (IS_NODE) {
+  var _fs = require('fs'), _path = require('path');
+  DIRNAME = __dirname;
+  /* 상대경로는 __dirname 기준으로 푼다 — 어느 디렉터리에서 돌려도 같게 */
+  readFile = function (p) { return _fs.readFileSync(_path.resolve(DIRNAME, p), 'utf8'); };
+} else {
+  ObjC.import('Foundation');
+  DIRNAME = '.';
+  readFile = function (p) {
+    var s = $.NSString.stringWithContentsOfFileEncodingError(p, $.NSUTF8StringEncoding, null);
+    if (!s) throw new Error('read fail: ' + p);
+    return ObjC.unwrap(s);
+  };
 }
 
 var pass = 0, fail = 0, lines = [];
@@ -131,4 +145,9 @@ if (I && I.T) {
 lines.push('');
 lines.push('§423 video-missing selftest — ' + pass + ' PASS / ' + fail + ' FAIL  ' +
   (fail === 0 ? '[ALL PASS]' : '[HAS FAIL]'));
-lines.join('\n');
+var REPORT = lines.join('\n');
+if (IS_NODE) {
+  console.log(REPORT);
+  process.exit(fail ? 1 : 0);   /* 스위트가 종료 코드로 판정할 수 있게 */
+}
+REPORT;

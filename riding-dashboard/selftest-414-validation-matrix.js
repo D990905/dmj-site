@@ -23,17 +23,20 @@ function check(name, ok, info) {
   console.log(' ', ok ? 'PASS' : 'FAIL', '', name, info ? '· ' + info : '');
 }
 
-/* upwindCurve 호출 후 feasible 영역의 VMG peak 위치 산출 */
+/* upwindCurve 호출 후 feasible 영역의 VMG peak 위치 산출.
+   §480 — 정점은 곡선이 스스로 고른 curve.optimum 을 쓴다. 예전에는 여기서
+   따로 훑으면서 엄격한 > 를 썼는데, 강풍에서는 V_b 가 모델 상한(35kt)에
+   걸려 여러 면적이 **완전히 같은** VMG 를 내므로 늘 평탄구간의 가장 작은
+   윙이 잡혔다(20kt/선수 → 3.0㎡, 22kt → 2.5㎡). 모델 쪽에서 동점이면 큰
+   윙을 고르도록 고쳤고, 테스트도 같은 규칙을 쓰게 맞춘다 — 두 곳이 서로
+   다른 규칙으로 정점을 고르면 무엇을 검증하는지 알 수 없다. */
 function findPeak(curve) {
   if (!curve || !curve.points) return null;
   var feasibles = curve.points.filter(function (p) {
     return p && p.feasible && p.V_vmg_kt > 0;
   });
   if (!feasibles.length) return null;
-  var max = feasibles[0];
-  feasibles.forEach(function (p) {
-    if (p.V_vmg_kt > max.V_vmg_kt) max = p;
-  });
+  var max = curve.optimum || feasibles[0];
   /* monotonic 인지 확인 — peak 가 last feasible 과 같으면 monotonic */
   var last = feasibles[feasibles.length - 1];
   return {
@@ -92,7 +95,12 @@ cases.forEach(function (c) {
     m_rider_kg: c.m,
     skill: c.skill,
     foil_ar: c.foilAR,
-    wing_ar: 4.0
+    /* §480 — 4.0 이 아니라 4.5 다. 4.0 은 이 테스트에만 있던 값이고,
+       제품 경로(coach.js VPS.WING_AR_DEFAULT)와 모델 기본값·§181 앵커는
+       전부 4.5 를 쓴다. 4.0 으로 돌리면 곡선이 통째로 아래로 눌려 12kt
+       Case 1 정점이 7.0㎡ 로 밀리는데, 이건 모델 결함이 아니라 아무도
+       쓰지 않는 설정을 검증하고 있었던 것이다. */
+    wing_ar: 4.5
   }, {
     area_min_m2: 2.5,
     area_max_m2: 7.4,
@@ -132,7 +140,7 @@ console.log('PASS:', pass, ' FAIL:', fail);
 console.log('\n=== ★ Case 6 (옥대표님 verbatim) detail ===');
 var c6 = Lift.upwindCurve({
   v_wind_kt: 10, m_rider_kg: 70, skill: '상급',
-  foil_ar: 6.5, wing_ar: 4.0
+  foil_ar: 6.5, wing_ar: 4.5   /* §480 — 위 매트릭스와 같은 제품 기본값 */
 }, { area_min_m2: 2.5, area_max_m2: 7.4, step_m2: 0.5 });
 if (c6 && c6.points) {
   console.log('Wing(m²)  | V_vmg(kt) | feasible');

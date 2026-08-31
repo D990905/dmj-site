@@ -32,4 +32,7 @@ _ci_site/
 
 # 대용량 샘플 영상 — GitHub 100MB 제한. 로컬 재생/검증용으로만 둔다.
 riding-dashboard/sample/*.mp4
+# 예외 — selftest-replay 가 쓰는 116KB 픽스처(실제 카메라 moov, mdat 제거).
+# 이게 없으면 selftest-replay 가 ENOENT 로 죽는다.
+!riding-dashboard/sample/replay-sync-test.mp4
 riding-dashboard/sample/*.mov

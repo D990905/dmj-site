@@ -63,9 +63,20 @@ check('RDPdfExport._selftest API',
   /_selftest\s*:\s*selftest/.test(ROOT.pdfModule));
 
 /* Lazy load 패턴 */
-check('html2pdf CDN URL valid',
-  /cdnjs\.cloudflare\.com\/ajax\/libs\/html2pdf\.js\/0\.10\.1\/html2pdf\.bundle\.min\.js/
+/* §177 v4 (2026-05-27) 이후 html2pdf.js 번들은 **의도적으로 제거**됐다 —
+   0.10.1 내장 html2canvas 가 빈 canvas 를 반환해 PDF 가 백지로 나왔다.
+   standalone html2canvas 1.4.1 + jsPDF 2.5.1 을 직접 로드하는 게 현재
+   구조다. 이 검사가 옛 URL 을 찾고 있어서 실패했었다(코드가 아니라
+   테스트가 낡았던 것). html2pdf 로 되돌아가면 다시 백지가 되므로,
+   '없어야 한다' 까지 함께 못박는다. */
+check('html2canvas 1.4.1 CDN URL valid',
+  /cdnjs\.cloudflare\.com\/ajax\/libs\/html2canvas\/1\.4\.1\/html2canvas\.min\.js/
     .test(ROOT.pdfModule));
+check('jsPDF 2.5.1 CDN URL valid',
+  /cdnjs\.cloudflare\.com\/ajax\/libs\/jspdf\/2\.5\.1\/jspdf\.umd\.min\.js/
+    .test(ROOT.pdfModule));
+check('html2pdf 번들은 다시 들어오지 않았다 (§177 v4 백지 회귀 방지)',
+  !/html2pdf\.bundle/.test(ROOT.pdfModule));
 check('Pretendard CDN URL valid',
   /jsdelivr\.net\/gh\/orioncactus\/pretendard@v1\.3\.9/.test(ROOT.pdfModule));
 check('Lazy script injection',
@@ -166,10 +177,15 @@ console.log('\n[4] app.js 이벤트 결선');
 check('pdf-export-btn 결선', /pdf-export-btn/.test(ROOT.app));
 check('RDPdfExport.generate 호출',
   /RDPdfExport\.generate\s*\(/.test(ROOT.app));
+/* §178 이후 공유 감지는 app.js 가 아니라 pdf-export.js 안에서 일어난다 —
+   버튼은 generate({preview:true}) 만 부르고, 공유 가능 여부는 미리보기
+   모달이 스스로 판단해 자기 버튼을 켠다. 검사 대상을 ROOT.app 에서
+   ROOT.pdfModule 로 옮긴다(의도는 그대로: 감지되고, 전달된다). */
 check('canShareFiles 감지',
-  /canShareFiles\s*\(\s*\)/.test(ROOT.app));
+  /function\s+canShareFiles\s*\(/.test(ROOT.pdfModule) &&
+  /navigator\.canShare/.test(ROOT.pdfModule));
 check('share 옵션 전달',
-  /share\s*:\s*canShare/.test(ROOT.app));
+  /canShare\s*:\s*canShareFiles\s*\(\s*\)/.test(ROOT.pdfModule));
 
 /* ============================================================
  * [5] 보고서 메타데이터 / 페이지 헤더 일관성

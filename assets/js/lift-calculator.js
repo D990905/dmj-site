@@ -966,9 +966,9 @@
        8kt 9.5→9.5 · 10kt 7.5→7.5 · 12kt 5.25→6.25 · 14kt 3.75→5.25 ·
        16kt 3.0→4.5 · 18kt 2.25→4.0 · 20kt 2.0→3.0  (전 구간 단조·역U 유지)
        §181-C V_boat 18.1kt 불변 · runSelfTest 62/62 · matrix PASS. */
-  /* §464 — 지속 가능한 옆힘 / 라이더 체중. 실측 앵커: 옥대표 10~14kt
-     5.0㎡ 주행 시 0.56. 여유를 둬 0.60. 다른 체급 검증 전까지 잠정값. */
-  var SUSTAINABLE_SIDE_FORCE_RATIO = 0.60;
+  /* §481 — §464 의 SUSTAINABLE_SIDE_FORCE_RATIO(0.60) 는 제거됐다.
+     틀린 전제에서 나온 앵커였고, 옆힘 한계는 이미 upwindSpeed 안의
+     H_max = mTotal·g·tan(θ_heel) 이 담당한다. wingRecommendation 주석 참조. */
 
   var WING_AREA_REF_M2 = 7.5;      // §181-E (Danny 2026-05-22) — 5.5→7.5, heel 결합 피벗
   var WING_HEEL_COUPLE_EXP = -1.2; // §181-E (Danny 2026-05-22) — 0→−1.2, 풍속 민감도 완만화. DO_NOT_REVERT §181-E
@@ -1381,7 +1381,23 @@
       };
       points.push(pt);
       if (pt.capped) anyCapped = true;
-      if (pt.feasible && (!optimum || pt.V_vmg_kt > optimum.V_vmg_kt)) {
+      /* §480 (2026-08-31) — 동점이면 **큰 윙**을 고른다.
+         강풍에서는 V_b 가 모델 상한(UPWIND_VB_CAP_KT=35kt)에 걸려 여러
+         면적이 완전히 같은 VMG 를 낸다. 예: 20kt/선수/AR13.7 은 3.0·3.5·
+         4.0 ㎡ 가 모두 24.70kt, 22kt/상급 은 2.5~4.5 ㎡ 가 모두 22.50kt.
+         엄격한 > 는 그 평탄구간의 **첫** 점을 남기므로 늘 가장 작은 윙이
+         정점으로 보고됐다 — 22kt 에서 2.5㎡ 를 추천하는 셈이다.
+         평탄구간은 모델이 그 위를 분해하지 못한다는 뜻이지 작은 윙이
+         낫다는 뜻이 아니고, 같은 VMG 라면 큰 윙이 저속 여유·펌핑 부담·
+         돌풍 대응에서 낫다. 두 독립 근거가 이 규칙을 지지한다:
+           · Timo spec Case 5 (20kt/선수) 기대 3.5~5.0 → 4.0 으로 들어옴
+           · 옥대표 실사용 22kt = 4.5㎡ → 평탄구간 상단과 정확히 일치
+         허용오차 0.05kt 는 VMG 가 0.1kt 로 반올림돼 있어 사실상 '완전 동점'
+         만 잡는다. 평탄하지 않은 구간(약·중풍)은 전혀 영향받지 않는다. */
+      if (pt.feasible && (!optimum ||
+          pt.V_vmg_kt > optimum.V_vmg_kt + 1e-9 ||
+          (Math.abs(pt.V_vmg_kt - optimum.V_vmg_kt) <= 0.05 &&
+           pt.area_m2 > optimum.area_m2))) {
         optimum = pt;
       }
     }
@@ -1433,46 +1449,37 @@
     if (!curve.optimum) {
       return { feasible: false, error: 'no_feasible_wing', curve: curve };
     }
-    /* §464 (2026-08-31) — 지속 가능한 옆힘 한계.
+    /* §481 (2026-08-31) — §464 의 옆힘 필터를 **제거**한다.
        ────────────────────────────────────────────────────────────
-       모델의 VMG 곡선 정점만 쓰면 라이더가 물리적으로 버틸 수 없는 윙을
-       추천하게 된다. 실측 대조에서 드러난 문제 —
+       §464 는 "지속 가능한 옆힘 = 라이더 체중 × 0.60" 을 곡선 위에 한 번
+       더 씌웠다. 세 가지가 틀렸다.
 
-         12kt · 75kg · 상급 · AR6.5
-           곡선 정점 7.0㎡ → 필요한 옆힘 690N = 체중의 94%
-           옥대표 실사용 5.0㎡ → 410N = 체중의 56%
+       (1) 앵커가 틀린 전제에서 나왔다. 0.56 이라는 실측 비율은 "옥대표가
+           10~14kt 에서 5.0㎡ 를 쓴다" 는 가정에서 계산됐는데, 본인이 준
+           실제 표는 10kt→6.5 · 12→6.0 · 14→5.5 · 18→5.0 · 22→4.5 다.
+           5.0 은 18kt 의 윙이지 10~14kt 의 윙이 아니다.
+       (2) 라이더 체중만 썼다. §471 에서 옥대표가 바로잡았듯 —
+           "라이더 기울기와 포일 마스트 기울기가 일직선이어야 하중을
+           실을 수 있어" — 일직선 균형에서는 **라이더+장비 전체 무게**가
+           버틴다. 모델의 다른 곳은 이미 mTotal 을 쓴다.
+       (3) 무엇보다 **이미 안에 있다.** upwindSpeed 는 CL 을 정할 때
+           H_max = mTotal·g·tan(θ_heel) 로 잘라낸다. 실측 확인 결과 곡선
+           위 모든 점에서 side_force_N ≤ side_force_max_N 이 성립한다.
+           밖에서 또 자르는 건 이중 계산이고, 그것도 3배 작은 상수로
+           자르고 있었다.
 
-       옆힘은 라이더가 팔과 몸으로 계속 버텨야 하는 힘이다. 체중의 90%를
-       한 시간 넘게 버틸 수는 없다. 모델의 heel-cap(H_max = m·g·tanθ)은
-       순간 균형만 보고 지속 가능성을 보지 않는다 — 상급 39° 에서
-       tan 39° = 0.81 이라 체중의 81% 까지 허용한다.
+       실제 피해: 72kg·상급·AR6.5 기준 추천이 12kt→4.5㎡ · 14kt→3.25㎡ ·
+       18kt→2.0㎡ 로 나왔다. 옥대표 실사용은 6.0 · 5.5 · 5.0 이다.
+       18kt 에 2.0㎡ 는 탈 수 없는 윙이다.
 
-       앵커는 실측이다. 옥대표는 10~14kt 에서 5.0㎡ 로 79~96% 포일링을
-       유지한다. 그 조건의 소요 옆힘이 체중의 0.56 배다. 여기에 약간의
-       여유를 둔 0.60 을 지속 한계로 잡는다.
-
-       ⚠ 이 값은 한 라이더의 실측에서 나왔다. 다른 체급·장비에서 검증되지
-       않았으므로 opts.max_side_force_ratio 로 조정 가능하게 둔다.
-       ──────────────────────────────────────────────────────────── */
-    var forceRatio = (opts.max_side_force_ratio > 0)
-      ? Number(opts.max_side_force_ratio) : SUSTAINABLE_SIDE_FORCE_RATIO;
-    var riderWeightN = Number(p.m_rider_kg) * CONST.G;
-    var forceCapN = riderWeightN * forceRatio;
-
-    /* 곡선 정점 — 공력만 본 값(참고용으로 함께 돌려준다) */
+       따라서 추천 = 곡선 정점(공력 + 내부 heel-cap)이다. 진단 필드는
+       남기되 모델이 실제로 쓰는 값을 담는다. 지속 가능성(오래 버티는
+       힘)을 따로 모델링할 근거가 생기면 그때 다시 넣되, 상수 하나가
+       아니라 장비 기하(rig-limits.js)에서 유도해야 한다. */
     var aeroOptimum = curve.optimum.area_m2;
-
-    /* 지속 가능한 옆힘 안에서의 최적 — 이것이 실제 추천 */
-    var sustainable = null;
-    curve.points.forEach(function (q) {
-      if (!q.feasible || !(q.V_vmg_kt > 0)) return;
-      var d = upwindSpeed(Object.assign({}, p, { wing_area_m2: q.area_m2 }));
-      if (!d || !d.feasible) return;
-      if (!(d.side_force_N <= forceCapN)) return;
-      if (!sustainable || q.V_vmg_kt > sustainable.V_vmg_kt) sustainable = q;
-    });
-    var forceLimited = !!(sustainable && sustainable.area_m2 < aeroOptimum);
-    var performance = sustainable ? sustainable.area_m2 : aeroOptimum;
+    var sustainable = curve.optimum;
+    var forceLimited = false;   /* §481 — 밖에서 자르지 않는다 */
+    var performance = aeroOptimum;
     // 풍상 주행 가능한 최소 윙 (practical floor — 이 미만은 풍상 불가)
     var feas = curve.points.filter(function (q) { return q.feasible; });
     var minFeasible = feas.length
@@ -1484,6 +1491,10 @@
     practical = Math.round(practical * 100) / 100;
     var perfDetail = upwindSpeed(Object.assign({}, p, { wing_area_m2: performance }));
     var pracDetail = upwindSpeed(Object.assign({}, p, { wing_area_m2: practical }));
+    var capN = (perfDetail && perfDetail.side_force_max_N != null)
+      ? perfDetail.side_force_max_N : null;
+    var useN = (perfDetail && perfDetail.side_force_N != null)
+      ? Math.round(perfDetail.side_force_N) : null;
     return {
       feasible: true,
       performance: performance,
@@ -1491,12 +1502,12 @@
       gust: gust,
       gust_offset_m2: gustOffset,
       peak_raw_m2: performance,
-      /* §464 — 공력 정점과 옆힘 한계를 구분해 돌려준다. 화면이 "왜 더 큰
-         윙을 안 권하는지" 를 말할 수 있어야 한다. */
+      /* §481 — 진단은 모델이 **실제로** 쓰는 heel 한계를 보고한다.
+         (예전에는 여기에 밖에서 만든 0.60 상수가 들어갔다) */
       aero_optimum_m2: aeroOptimum,
       force_limited: forceLimited,
-      max_side_force_ratio: forceRatio,
-      side_force_cap_N: Math.round(forceCapN),
+      side_force_cap_N: capN,
+      side_force_N: useN,
       min_feasible_m2: Math.round(minFeasible * 100) / 100,
       performance_vmg_kt: (perfDetail && perfDetail.feasible) ? perfDetail.V_vmg_kt : null,
       practical_vmg_kt: (pracDetail && pracDetail.feasible) ? pracDetail.V_vmg_kt : null,
