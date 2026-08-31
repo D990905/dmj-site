@@ -83,5 +83,44 @@ var zeroTr = St.computeFitnessTrend(hist.map(function (h) {
 ok(zeroTr.current.CTL === 0,
    '부하가 전부 null 이면 CTL = 0 — 지금까지의 상태를 재현', zeroTr.current.CTL);
 
+console.log('\n[6] §457 육상 운동 원장');
+/* localStorage 스텁 — Node 에는 없다 */
+global.localStorage = {
+  _d: {}, getItem: function (k) { return this._d[k] || null; },
+  setItem: function (k, v) { this._d[k] = v; },
+  removeItem: function (k) { delete this._d[k]; },
+  key: function (i) { return Object.keys(this._d)[i]; },
+  get length() { return Object.keys(this._d).length; }
+};
+var DAY = 86400000, now = Date.now();
+ok(St.saveWorkout({ sportKey: 'run_easy', durationMin: 50, AU: 60,
+                    method: 'met', dateEpoch: now - DAY }).ok,
+   '육상 운동 저장');
+ok(!St.saveWorkout({ sportKey: 'run_easy' }).ok, '시간 없는 기록은 거부');
+ok(St.listWorkouts().length === 1, '목록 1건', St.listWorkouts().length);
+
+var led = St.loadLedger();
+ok(led.length === 1 && led[0].kind === 'land',
+   '원장에 육상 운동이 들어간다', JSON.stringify(led[0] && led[0].kind));
+ok(led[0].trimp === 60, '육상 AU 가 부하로 실린다', led[0] && led[0].trimp);
+
+/* 만성 부하가 실제로 쌓였을 때만 비율이 뜻이 있다 */
+var a1 = St.computeACWR(led);
+ok(a1.ratio != null, '비율 산출 자체는 된다', a1.ratio);
+ok(a1.ratio > 2,
+   '기록이 며칠뿐이면 비율이 크게 튄다 — 그래서 화면은 21일 미만이면 감춘다',
+   a1.ratio && a1.ratio.toFixed(2));
+
+/* 35일에 걸쳐 고르게 쌓으면 1 근처로 수렴 */
+for (var d = 35; d >= 2; d--) {
+  St.saveWorkout({ sportKey: 'run_easy', durationMin: 45, AU: 50,
+                   method: 'met', dateEpoch: now - d * DAY });
+}
+var a2 = St.computeACWR(St.loadLedger());
+ok(a2.ratio > 0.7 && a2.ratio < 1.4,
+   '고르게 쌓이면 비율이 1 근처', a2.ratio && a2.ratio.toFixed(2));
+
+ok(St.deleteWorkout(St.listWorkouts()[0].id).ok, '삭제');
+
 console.log('\n=== 결과: ' + P + ' PASS / ' + F + ' FAIL ===');
 process.exit(F ? 1 : 0);

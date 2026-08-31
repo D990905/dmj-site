@@ -44,6 +44,10 @@
   function K_TITLES()      { return nsPrefix() + 'titles_v1'; }
   function K_VIDEO()       { return nsPrefix() + 'videosync_v1'; }
   function K_RIDER()       { return nsPrefix() + 'rider_v1'; }
+  /* §457 육상 운동 기록 — 세일링 아닌 활동(조깅·웨이트·요가…).
+     세션(K_SESSIONS)과 분리해 둔다: 트랙도 분석도 없고, 부하만
+     같은 원장에 합쳐 CTL/ATL/TSB 를 만든다. */
+  function K_WORKOUTS()    { return nsPrefix() + 'workouts_v1'; }
   function videoDbName()   { return nsPrefix() + 'video_blobs_v1'; }
 
   /* §412 — legacy(전역) → uid namespace 1회 마이그레이션 플래그 (브라우저 전역).
@@ -620,6 +624,100 @@
   /* 체중·스킬은 거의 안 바뀌고 윙·포일도 자주 안 바뀌므로, 한 번
      입력하면 다음 세션에 자동으로 채워지도록 브라우저에 저장한다.
      ("같은 입력 반복" 회피 — 코치가 매 세션 재입력하지 않게.) */
+  /* ---------- §457 육상 운동 ---------- */
+  var MAX_WORKOUTS = 400;
+
+  function readWorkouts() {
+    try {
+      var raw = global.localStorage ? global.localStorage.getItem(K_WORKOUTS()) : null;
+      if (!raw) return [];
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+
+  function writeWorkouts(arr) {
+    try {
+      global.localStorage.setItem(K_WORKOUTS(), JSON.stringify(arr || []));
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: (e && e.message) || 'save failed' };
+    }
+  }
+
+  /* w = { dateEpoch, sportKey, durationMin, rpe?, note?, AU, method }
+     AU 는 caller 가 analysis.computeWorkload 로 산출해 넘긴다 — 저장소는
+     계산하지 않는다(엔진과 저장을 섞지 않는다). */
+  function saveWorkout(w) {
+    if (!w || !w.sportKey || !(w.durationMin > 0)) {
+      return { ok: false, error: 'invalid workout' };
+    }
+    var arr = readWorkouts();
+    arr.push({
+      id: 'wk_' + Date.now() + '_' + Math.floor(Math.random() * 1e6),
+      savedAt: Date.now(),
+      dateEpoch: w.dateEpoch || Date.now(),
+      sportKey: w.sportKey,
+      durationMin: Number(w.durationMin),
+      rpe: (w.rpe != null && w.rpe > 0) ? Number(w.rpe) : null,
+      note: w.note || '',
+      AU: (w.AU != null && isFinite(w.AU)) ? Number(w.AU) : null,
+      method: w.method || null
+    });
+    arr.sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
+    if (arr.length > MAX_WORKOUTS) arr = arr.slice(arr.length - MAX_WORKOUTS);
+    var res = writeWorkouts(arr);
+    return res.ok ? { ok: true, count: arr.length } : res;
+  }
+
+  function listWorkouts() { return readWorkouts(); }
+
+  function deleteWorkout(id) {
+    var arr = readWorkouts().filter(function (w) { return w.id !== id; });
+    return writeWorkouts(arr);
+  }
+
+  /* 세션 + 육상 운동을 하나의 부하 원장으로 합친다.
+     computeFitnessTrend 는 { dateEpoch, trimp } 만 보므로 그 모양으로
+     맞춰 준다. 라이딩은 trimp, 육상은 AU — 둘 다 같은 Banister scale
+     로 정렬돼 있다(analysis.computeWorkload 주석 참조). */
+  function loadLedger() {
+    var out = [];
+    readAll().forEach(function (r) {
+      if (r.trimp != null && isFinite(r.trimp)) {
+        out.push({ dateEpoch: r.dateEpoch, trimp: r.trimp,
+                   kind: 'ride', name: r.name, method: r.loadMethod || null });
+      }
+    });
+    readWorkouts().forEach(function (w) {
+      if (w.AU != null && isFinite(w.AU)) {
+        out.push({ dateEpoch: w.dateEpoch, trimp: w.AU,
+                   kind: 'land', name: w.sportKey, method: w.method, id: w.id });
+      }
+    });
+    out.sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
+    return out;
+  }
+
+  /* 급성:만성 부하 비율. 7일 평균 ÷ 28일 평균.
+     ⚠ '0.8~1.3 안전구간' 은 학계 논란 중이라 규칙이 아니라 신호로만
+     쓴다 — 임계값 판정은 여기서 하지 않고 값만 돌려준다. */
+  function computeACWR(ledger, endEpoch) {
+    var end = endEpoch || Date.now();
+    var DAY = 86400000;
+    function sumWithin(days) {
+      var from = end - days * DAY, s2 = 0;
+      (ledger || []).forEach(function (x) {
+        if (x.dateEpoch > from && x.dateEpoch <= end) s2 += x.trimp || 0;
+      });
+      return s2;
+    }
+    var acute = sumWithin(7) / 7;
+    var chronic = sumWithin(28) / 28;
+    if (!(chronic > 0)) return { acute: acute, chronic: chronic, ratio: null };
+    return { acute: acute, chronic: chronic, ratio: acute / chronic };
+  }
+
   function saveRider(rider) {
     try {
       global.localStorage.setItem(K_RIDER(), JSON.stringify(rider || {}));
@@ -1300,6 +1398,11 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     loadVideoBlobs: loadVideoBlobs,
     removeVideoBlob: removeVideoBlob,
     clearVideoBlobs: clearVideoBlobs,
+    saveWorkout: saveWorkout,
+    listWorkouts: listWorkouts,
+    deleteWorkout: deleteWorkout,
+    loadLedger: loadLedger,
+    computeACWR: computeACWR,
     saveRider: saveRider,
     loadRider: loadRider,
     computeFitnessTrend: computeFitnessTrend,

@@ -681,6 +681,491 @@
     renderWindSources(host, a);
   }
 
+  /* ===================== §457 훈련부하 =====================
+     라이딩과 육상 운동을 하나의 원장에 합쳐 체력(CTL)·피로(ATL)·
+     컨디션(TSB) 추세를 내고, 오늘 무엇을 할지 제안한다.
+
+     ⚠ 급성:만성 비율(ACWR)의 "0.8~1.3 안전구간" 은 학계 논란 중이라
+     여기서는 규칙이 아니라 **모니터링 신호**로만 쓴다. 화면에도 그렇게
+     적는다 — 숫자 하나로 훈련을 금지하지 않는다. */
+
+  /* MET 라이브러리의 description 은 한글이다(엔진은 한국어 페이지가
+     주 사용처). 이 페이지는 영어이므로 sportKey 에서 라벨을 만든다 —
+     키가 이미 영어라 사전을 따로 둘 필요가 없다. */
+  var SPORT_WORD = {
+    hiit: 'HIIT', crossfit: 'CrossFit', sup: 'SUP',
+    run: 'Run', cycle: 'Cycle', row: 'Row', swim: 'Swim', hike: 'Hike',
+    walk: 'Walk', elliptical: 'Elliptical', strength: 'Strength',
+    yoga: 'Yoga', pilates: 'Pilates', mobility: 'Mobility',
+    stretching: 'Stretching'
+  };
+  function sportLabel(key) {
+    if (!key) return '\u2014';
+    var parts = String(key).split('_');
+    var head = SPORT_WORD[parts[0]] ||
+      (parts[0].charAt(0).toUpperCase() + parts[0].slice(1));
+    if (parts.length === 1) return head;
+    var tail = parts.slice(1).join(' ').replace(/-/g, '\u2013');
+    return head + ' \u00b7 ' + tail;
+  }
+
+  function riderProfile() {
+    var rp = {};
+    try {
+      rp = (window.RDStorage && RDStorage.loadRider) ? (RDStorage.loadRider() || {}) : {};
+    } catch (e) { rp = {}; }
+    var w = parseFloat(($('in-weight') || {}).value);
+    if (isFinite(w)) rp.weightKg = w;
+    return rp;
+  }
+
+  /* 급성:만성 비율은 만성(28일) 쪽이 실제로 28일에 걸쳐 쌓였을 때만
+     뜻이 있다. 기록이 5일뿐이면 분모가 거의 0 이라 비율이 4.0 처럼
+     튀고, 그걸 그대로 넘기면 "부상 위험" 경고가 오작동한다(실측).
+     충분히 쌓이기 전에는 아예 null 로 두어 판정에서 뺀다. */
+  var ACWR_MIN_DAYS = 21;
+  function acwrIfMeaningful(ledger) {
+    if (!ledger || !ledger.length) return null;
+    var spanDays = (Date.now() - ledger[0].dateEpoch) / 86400000;
+    if (spanDays < ACWR_MIN_DAYS) {
+      return { ratio: null, tooShort: true, spanDays: spanDays };
+    }
+    try { return RDStorage.computeACWR(ledger); } catch (e) { return null; }
+  }
+
+  function renderTraining() {
+    var host = $('training-body');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    if (!window.RDStorage || !RDStorage.loadLedger) {
+      host.appendChild(el('div', 'text-secondary', 'Storage module unavailable.'));
+      return;
+    }
+    var ledger = RDStorage.loadLedger();
+    var rp = riderProfile();
+
+    renderLoadInputsNotice(host, rp, ledger);
+    renderTrainingState(host, ledger);
+    renderWorkoutForm(host, rp);
+    renderTodaySuggestion(host, ledger, rp);
+    renderLedgerTable(host, ledger);
+  }
+
+  /* 부하가 왜 비어 있는지 — 라이딩 세션은 안정시 심박·성별이 있어야
+     심박 기반 부하가 나온다. 그게 없으면 원장에 라이딩이 안 들어온다. */
+  function renderLoadInputsNotice(host, rp, ledger) {
+    var miss = [];
+    if (!(rp.restHr > 0)) miss.push('resting heart rate');
+    if (!rp.sex) miss.push('sex');
+    if (!(rp.maxHr > 0)) miss.push('measured max heart rate');
+    var rides = ledger.filter(function (x) { return x.kind === 'ride'; }).length;
+    if (!miss.length && rides) return;
+    var box = el('div', 'alert alert-info');
+    if (miss.length) {
+      box.appendChild(el('div', 'fw-bold', 'Rides need a few numbers before they carry a load'));
+      box.appendChild(el('div', 'mt-1',
+        'Missing: ' + miss.join(', ') + '. Enter them once in the old dashboard\u2019s '
+        + 'heart-rate card and every saved ride from then on gets a training load. '
+        + 'Without them a ride is stored with no load at all, so the trend below '
+        + 'stays flat.'));
+    } else {
+      box.appendChild(el('div', 'fw-bold', 'No rides carry a load yet'));
+      box.appendChild(el('div', 'mt-1',
+        'Save a session after entering resting heart rate and sex, and it will appear here.'));
+    }
+    host.appendChild(box);
+  }
+
+  /* 체력·피로·컨디션 + 급성:만성 */
+  function renderTrainingState(host, ledger) {
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Fitness, fatigue and form'));
+    head.appendChild(el('div', 'card-actions lab',
+      ledger.length + ' logged item' + (ledger.length === 1 ? '' : 's')));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    if (!ledger.length) {
+      body.appendChild(el('div', 'text-secondary',
+        'Nothing logged yet. Save a ride, or add a land workout below.'));
+      card.appendChild(body); host.appendChild(card); return;
+    }
+
+    var trend = null;
+    try {
+      trend = RDStorage.computeFitnessTrend(ledger, { endDate: Date.now() });
+    } catch (e) {}
+    var cur = trend && trend.current;
+    var acwr = acwrIfMeaningful(ledger);
+
+    var row = el('div', 'row row-cards');
+    function tile(label, val, sub) {
+      var col = el('div', 'col-6 col-md-3');
+      var c = el('div', 'card'), b = el('div', 'card-body');
+      b.appendChild(el('div', 'lab', label));
+      b.appendChild(el('div', 'kpi__val num mt-1', val));
+      if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
+      c.appendChild(b); col.appendChild(c); return col;
+    }
+    row.appendChild(tile('Fitness (CTL)',
+      cur ? cur.CTL.toFixed(0) : '\u2014', '42-day average load'));
+    row.appendChild(tile('Fatigue (ATL)',
+      cur ? cur.ATL.toFixed(0) : '\u2014', '7-day average load'));
+    row.appendChild(tile('Form (TSB)',
+      cur ? (cur.TSB > 0 ? '+' : '') + cur.TSB.toFixed(0) : '\u2014',
+      'fitness minus fatigue'));
+    row.appendChild(tile('Acute : chronic',
+      (acwr && acwr.ratio != null) ? acwr.ratio.toFixed(2) : '\u2014',
+      (acwr && acwr.tooShort)
+        ? 'needs ' + ACWR_MIN_DAYS + '+ days of history'
+        : 'a signal, not a rule'));
+    body.appendChild(row);
+
+    /* 한 달이 안 되면 CTL 이 아직 오르는 중이라 값을 단정하면 안 된다. */
+    var span = ledger.length
+      ? (Date.now() - ledger[0].dateEpoch) / 86400000 : 0;
+    if (span < 28) {
+      body.appendChild(el('div', 'alert alert-warning mt-3',
+        'Only ' + Math.max(1, Math.round(span)) + ' days of history. Fitness is a '
+        + '42-day average, so it is still climbing from zero and will read low '
+        + 'until about four weeks have accumulated. Treat these numbers as a '
+        + 'starting baseline, not a verdict.'));
+    }
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* 육상 운동 기록 — 부하 계산은 엔진(computeWorkload)에 맡긴다. */
+  function renderWorkoutForm(host, rp) {
+    if (!window.RDSportMET) return;
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Log a land workout'));
+    head.appendChild(el('div', 'card-actions lab', 'anything that is not sailing'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+    var row = el('div', 'row g-2 align-items-end');
+
+    function field(label, node, cls) {
+      var col = el('div', cls || 'col-6 col-md-3');
+      col.appendChild(el('label', 'form-label lab', label));
+      col.appendChild(node);
+      return col;
+    }
+    var dateIn = el('input', 'form-control');
+    dateIn.type = 'date';
+    dateIn.value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+      .toISOString().slice(0, 10);
+
+    var sportSel = el('select', 'form-select');
+    var LIB = RDSportMET.LIBRARY || {};
+    var byCat = {};
+    Object.keys(LIB).forEach(function (k) {
+      var c = LIB[k].category;
+      if (c === 'sailing') return;        /* 세일링은 세션 업로드로 들어온다 */
+      (byCat[c] = byCat[c] || []).push(k);
+    });
+    Object.keys(byCat).forEach(function (c) {
+      var g = document.createElement('optgroup');
+      g.label = c;
+      byCat[c].forEach(function (k) {
+        var o = document.createElement('option');
+        o.value = k;
+        o.textContent = sportLabel(k) + '  (MET ' + LIB[k].met + ')';
+        g.appendChild(o);
+      });
+      sportSel.appendChild(g);
+    });
+
+    var durIn = el('input', 'form-control');
+    durIn.type = 'number'; durIn.min = '5'; durIn.max = '600'; durIn.value = '45';
+
+    var rpeIn = el('input', 'form-control');
+    rpeIn.type = 'number'; rpeIn.min = '1'; rpeIn.max = '10'; rpeIn.placeholder = 'optional';
+
+    row.appendChild(field('Date', dateIn));
+    row.appendChild(field('Activity', sportSel, 'col-12 col-md-4'));
+    row.appendChild(field('Minutes', durIn, 'col-6 col-md-2'));
+    row.appendChild(field('Effort 1\u201310', rpeIn, 'col-6 col-md-2'));
+
+    var btnCol = el('div', 'col-12 mt-2');
+    var btn = el('button', 'btn btn-primary', 'Add workout');
+    btn.type = 'button';
+    var msg = el('span', 'ms-3 text-secondary');
+    btnCol.appendChild(btn); btnCol.appendChild(msg);
+    row.appendChild(btnCol);
+    body.appendChild(row);
+
+    body.appendChild(el('div', 'text-secondary mt-3',
+      'Effort is optional. With it the load is scored from how hard it felt, which '
+      + 'is the only way strength work counts properly \u2014 heart rate barely moves '
+      + 'under a barbell. Without it the load comes from the activity\u2019s standard '
+      + 'metabolic cost and your body weight.'));
+
+    btn.addEventListener('click', function () {
+      var mins = parseFloat(durIn.value);
+      if (!(mins > 0)) { msg.textContent = 'Enter the duration.'; return; }
+      var rpe = parseFloat(rpeIn.value);
+      var pseudo = { sportKey: sportSel.value, durationMin: mins };
+      if (isFinite(rpe) && rpe >= 1 && rpe <= 10) pseudo.rpe = rpe;
+      /* 체감강도를 적었으면 그것을 우선한다. computeWorkload 는 MET
+         단계를 먼저 시도하는데, 웨이트처럼 심박·MET 이 실제 부하를
+         못 잡는 운동에서는 체감강도가 유일하게 정직한 입력이다. */
+      var w = null;
+      try {
+        w = pseudo.rpe
+          ? An.computeWorkload(pseudo, rp, { forceTier: 'srpe' })
+          : An.computeWorkload(pseudo, rp);
+      } catch (e) { w = null; }
+      if (!w || w.AU == null) {
+        msg.textContent = 'Could not score that workout.';
+        return;
+      }
+      var d = dateIn.value ? new Date(dateIn.value + 'T12:00:00') : new Date();
+      var res = RDStorage.saveWorkout({
+        dateEpoch: d.getTime(), sportKey: pseudo.sportKey,
+        durationMin: mins, rpe: pseudo.rpe || null,
+        AU: w.AU, method: w.method
+      });
+      if (!res.ok) { msg.textContent = res.error || 'Save failed.'; return; }
+      renderTraining();
+    });
+
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* 오늘의 제안 — 회복 상태 판정 + 부족분을 채울 육상 운동 */
+  function renderTodaySuggestion(host, ledger, rp) {
+    if (!window.RDCoach || !RDCoach.decideRecoveryAction) return;
+    var trend = null;
+    try { trend = RDStorage.computeFitnessTrend(ledger, { endDate: Date.now() }); } catch (e) {}
+    var acwr = acwrIfMeaningful(ledger);
+    var cur = trend && trend.current;
+    if (!cur) return;
+
+    var decision = null;
+    try {
+      decision = RDCoach.decideRecoveryAction({
+        tsb: cur.TSB,
+        acwr: (acwr && acwr.ratio != null) ? acwr.ratio : null
+      });
+    } catch (e) {}
+    if (!decision) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'What to do today'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    /* 엔진의 label·recommendation·note 는 한글이다. 이 페이지는 영어라
+       action 코드에서 영문을 만든다 — 값을 끼워 만든 문장이라 사전
+       번역이 되지 않는다(§452 와 같은 이유). */
+    var ACT = {
+      full_ride: { tone: 'alert-success', head: 'Full session is fine',
+        body: 'Ride at full intensity. Good conditions are worth pushing into '
+            + 'z3\u2013z4; go after turn quality and a distance best.' },
+      moderate: { tone: 'alert-info', head: 'Ride, but keep it moderate',
+        body: 'Stay mostly in z2\u2013z3 and keep the session shorter than usual. '
+            + 'Technique work over top-end speed.' },
+      active_recovery: { tone: 'alert-warning', head: 'Active recovery',
+        body: 'Either skip the water or keep it to a light z1 cruise of about 30 '
+            + 'minutes. Mobility or yoga for half an hour is the better use of '
+            + 'today. Reassess tomorrow.' },
+      rest: { tone: 'alert-danger', head: 'Rest',
+        body: 'No training load today. Sleep, food and easy movement only.' }
+    };
+    var act = ACT[decision.action] || ACT.moderate;
+    var box = el('div', 'alert ' + act.tone);
+    box.appendChild(el('div', 'fw-bold', act.head));
+    box.appendChild(el('div', 'mt-1', act.body));
+    body.appendChild(box);
+
+    /* 판정 근거 — 어떤 지표가 어떤 색이었는지 */
+    var facs = decision.contributing_factors || [];
+    if (facs.length) {
+      var wrap = el('div', 'table-responsive mt-2');
+      var t = el('table', 'table table-vcenter card-table table-sm');
+      var th = el('thead'), htr = el('tr');
+      ['Signal', 'Value', 'Reading'].forEach(function (x, i) {
+        htr.appendChild(el('th', i === 1 ? 'text-end' : null, x));
+      });
+      th.appendChild(htr); t.appendChild(th);
+      var tb = el('tbody');
+      /* 판정 문구도 영문으로 — 코드가 아니라 값 구간으로 다시 만든다. */
+      function reading(f) {
+        var v = Number(f.value);
+        if (f.factor === 'TSB') {
+          if (v < -30) return 'deeply fatigued \u2014 recovery needed';
+          if (v < -15) return 'fatigue building \u2014 ease off';
+          if (v < 0) return 'training load is about right';
+          if (v < 25) return 'well recovered';
+          return 'peaked \u2014 very fresh';
+        }
+        if (f.factor === 'ACWR') {
+          if (v > 1.5) return 'load climbing fast \u2014 worth watching';
+          if (v < 0.6) return 'load has dropped off sharply';
+          if (v > 1.3 || v < 0.8) return 'outside the commonly cited band';
+          return 'steady';
+        }
+        return f.flag || '';
+      }
+      facs.forEach(function (f) {
+        var trr = el('tr');
+        trr.appendChild(el('td', null, f.factor));
+        trr.appendChild(el('td', 'text-end num',
+          f.value == null ? '\u2014' : Number(f.value).toFixed(2)));
+        trr.appendChild(el('td', 'text-secondary', reading(f)));
+        tb.appendChild(trr);
+      });
+      t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+    }
+
+    /* 못 타는 날의 대체 — 부족한 부하만큼 육상으로 */
+    if (RDStorage.suggestLandWorkout) {
+      var weekLoad = 0, DAY = 86400000, now = Date.now();
+      ledger.forEach(function (x) {
+        if (x.dateEpoch > now - 7 * DAY) weekLoad += x.trimp || 0;
+      });
+      /* 목표 주간 부하 = 만성 부하(일평균)×7. 아직 쌓이는 중이면 현재
+         주간 부하를 그대로 목표로 둔다(무리한 증량 제안 방지). */
+      var target = (acwr && acwr.chronic > 0) ? acwr.chronic * 7 : weekLoad;
+      var gapAU = Math.max(0, target - weekLoad);
+      var opts = null;
+      try {
+        opts = RDStorage.suggestLandWorkout(
+          { gap_AU: gapAU > 0 ? gapAU : 100 }, rp,
+          { timeAvailable_min: 60 },
+          RDStorage.listWorkouts().map(function (w) {
+            return { sportKey: w.sportKey, dateEpoch: w.dateEpoch };
+          }), { topN: 4 });
+      } catch (e) {}
+      if (opts && opts.options && opts.options.length) {
+        body.appendChild(el('h4', 'mt-4 mb-2', 'If you cannot get on the water'));
+        body.appendChild(el('div', 'text-secondary mb-2',
+          gapAU > 0
+            ? ('You are about ' + Math.round(gapAU) + ' load units below your own '
+               + 'recent weekly average. These would close that gap:')
+            : 'You are already at your recent weekly average. These keep it there:'));
+        var wrap2 = el('div', 'table-responsive');
+        var t2 = el('table', 'table table-vcenter card-table table-sm');
+        var th2 = el('thead'), h2 = el('tr');
+        ['Activity', 'Minutes', 'Load', 'Why'].forEach(function (x, i) {
+          h2.appendChild(el('th', (i === 1 || i === 2) ? 'text-end' : null, x));
+        });
+        th2.appendChild(h2); t2.appendChild(th2);
+        var tb2 = el('tbody');
+        opts.options.forEach(function (o) {
+          var trr = el('tr');
+          trr.appendChild(el('td', null, sportLabel(o.sportKey)));
+          trr.appendChild(el('td', 'text-end num',
+            o.durationMin != null ? Math.round(o.durationMin) : '\u2014'));
+          trr.appendChild(el('td', 'text-end num',
+            o.AU_estimate != null ? Math.round(o.AU_estimate) : '\u2014'));
+          /* notes·step_by_step 은 한글이다. 영문 페이지이므로 대신
+             구조화된 필드(강도·장비·전이효과)로 설명을 만든다. */
+          var why = [];
+          /* 강도 코드(LIT/HIT/threshold)를 사람 말로. 유산소 종목이고
+             최대심박을 알면 목표 심박까지 적는다 — "최대심박 70% 로
+             50분" 처럼 바로 실행 가능한 형태가 되어야 한다. */
+          var ZONE = {
+            LIT: { label: 'easy aerobic', lo: 0.60, hi: 0.70 },
+            threshold: { label: 'tempo', lo: 0.70, hi: 0.82 },
+            HIT: { label: 'hard intervals', lo: 0.85, hi: 0.95 },
+            recovery: { label: 'very light', lo: 0.50, hi: 0.60 }
+          };
+          var z = ZONE[o.intensity];
+          if (z) {
+            var lib2 = (RDSportMET.LIBRARY || {})[o.sportKey] || {};
+            var cardio = (lib2.category === 'cardio' || lib2.category === 'hiit');
+            if (cardio && rp.maxHr > 0) {
+              why.push(z.label + ' \u00b7 ' + Math.round(rp.maxHr * z.lo) + '\u2013'
+                + Math.round(rp.maxHr * z.hi) + ' bpm ('
+                + Math.round(z.lo * 100) + '\u2013' + Math.round(z.hi * 100)
+                + '% of max)');
+            } else {
+              why.push(z.label);
+            }
+          }
+          if (o.carryover != null) {
+            why.push('carries over to foiling ' + Math.round(o.carryover * 100) + '%');
+          }
+          if (o.equipment && o.equipment.length) {
+            var needsKit = o.equipment.filter(function (e2) {
+              return e2 !== 'minimal' && e2 !== 'floor_space';
+            });
+            why.push(needsKit.length
+              ? ('needs ' + needsKit.join(', ').replace(/_/g, ' '))
+              : 'no kit needed');
+          }
+          trr.appendChild(el('td', 'text-secondary', why.join(' \u00b7 ')));
+          tb2.appendChild(trr);
+        });
+        t2.appendChild(tb2); wrap2.appendChild(t2); body.appendChild(wrap2);
+      }
+    }
+
+    var f = el('div', 'card-footer text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'This is training guidance from your own logged load, not medical '
+      + 'advice. The acute:chronic ratio is shown because it tracks how fast your '
+      + 'load is climbing \u2014 its widely quoted "safe zone" is disputed in the '
+      + 'literature, so it is a signal here, never a rule. Never train through pain, '
+      + 'illness or injury on the strength of a number.';
+    card.appendChild(body);
+    card.appendChild(f);
+    host.appendChild(card);
+  }
+
+  /* 원장 — 무엇이 얼마의 부하로 들어갔는지 */
+  function renderLedgerTable(host, ledger) {
+    if (!ledger.length) return;
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Load ledger'));
+    head.appendChild(el('div', 'card-actions lab', 'newest first'));
+    card.appendChild(head);
+    var wrap = el('div', 'table-responsive');
+    wrap.style.maxHeight = '420px'; wrap.style.overflowY = 'auto';
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Date', 'What', 'Type', 'Load', 'Scored from', ''].forEach(function (x, i) {
+      htr.appendChild(el('th', i === 3 ? 'text-end' : null, x));
+    });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+    var METHOD = { banister: 'heart rate', met: 'activity + body weight',
+                   srpe: 'how hard it felt' };
+    ledger.slice().reverse().forEach(function (x) {
+      var trr = el('tr');
+      var d = new Date(x.dateEpoch);
+      trr.appendChild(el('td', 'num', d.toISOString().slice(0, 10)));
+      trr.appendChild(el('td', null,
+        x.kind === 'land' ? sportLabel(x.name) : (x.name || '\u2014')));
+      var badge = el('span', 'badge', x.kind === 'ride' ? 'Ride' : 'Land');
+      badge.style.background = x.kind === 'ride' ? '#4dabf7' : '#82c91e';
+      badge.style.color = '#0b1220';
+      var td = el('td'); td.appendChild(badge); trr.appendChild(td);
+      trr.appendChild(el('td', 'text-end num', Math.round(x.trimp)));
+      trr.appendChild(el('td', 'text-secondary', METHOD[x.method] || '\u2014'));
+      var act = el('td');
+      if (x.kind === 'land' && x.id) {
+        var del = el('button', 'btn btn-sm btn-ghost-danger', 'Remove');
+        del.type = 'button';
+        del.addEventListener('click', function () {
+          RDStorage.deleteWorkout(x.id); renderTraining();
+        });
+        act.appendChild(del);
+      }
+      trr.appendChild(act);
+      tb.appendChild(trr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
+    host.appendChild(card);
+  }
+
   /* §456 Gain/Loss — "얼마나 빨랐나" 가 아니라 "바람 쪽으로 얼마나
      나아갔나". 풍상 레그에서 옆으로 아무리 멀리 갔어도 바람 축 진행이
      같으면 이득은 0 이다. 회전 손실은 그 진행을 몇 미터 까먹었는지로
@@ -2488,6 +2973,7 @@
     renderTurnExtras(analysis);
     renderPerfExtra(analysis);
     renderSessions();
+    renderTraining();
     populateReplayGhost();
     renderPhysiology(analysis);
     renderEnvironment(analysis, est);
@@ -2684,6 +3170,9 @@
       try { document.documentElement.lang = 'en'; } catch (e) {}
     }
     initTabs();
+    /* 훈련부하는 현재 세션과 무관하게 원장을 본다 — 파일을 올리지 않아도
+       탭을 열면 보여야 한다. */
+    try { renderTraining(); } catch (e) {}
     var rp = $('btn-replay');
     if (rp) rp.addEventListener('click', function () {
       if (!CUR.session || !window.RDReplay) return;
