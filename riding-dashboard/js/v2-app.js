@@ -223,6 +223,18 @@
       readoutHost: $('timeline-readout'),
       onExclude: function (a, b) { addExclusion(a, b); }
     });
+    /* §486 — 축이 벽시계가 아니라 '물 위에 있던 시간' 이라는 걸 밝힌다.
+       접힌 시간이 있을 때만 적는다 — 없는데 적으면 군더더기다. */
+    var act = document.querySelector('#chart-timeline')
+      && document.querySelector('#chart-timeline').closest('.card');
+    act = act && act.querySelector('.card-actions');
+    if (act && stackInst && stackInst.series) {
+      var rm = stackInst.series.removedSec || 0;
+      act.textContent = rm > 30
+        ? ('drag to select \u00b7 gaps closed \u2014 ' + RDChartStack.fmtClock(rm)
+           + ' of stops and removed time folded out')
+        : 'drag to select a range \u00b7 one shared time axis';
+    }
     renderEditBar();
   }
 
@@ -3353,11 +3365,20 @@
     var hp = hist(pv), hs = hist(sv);
 
     /* 두 히스토그램을 같은 축에 위아래로 — 포트는 위, 스타보드는 아래 */
-    var W = 640, H = 150, MID = H / 2, PAD = 26;
+    var W = 640, H = 150, MID = H / 2;   /* W 는 viewBox 단위 — 화면 폭은 CSS 100% */
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + (H + PAD));
-    svg.setAttribute('width', '100%');
-    svg.style.maxWidth = W + 'px';
+    /* §486 (옥대표 "우측 하단이 비어보이는게 거슬린다") — 이 SVG 는
+       maxWidth 640px 로 잠겨 있어서, 카드가 1800px 여도 왼쪽 640px 만
+       쓰고 오른쪽 절반이 통째로 비었다. 잠금을 풀고 카드 폭을 채운다.
+       preserveAspectRatio="none" + 고정 높이 → 가로만 늘어나고 막대
+       높이(=세로 스케일)는 그대로다. 히스토그램이라 가로로 늘어나도
+       뜻이 안 변한다.
+       축 라벨만은 늘어나면 안 되므로 SVG 밖 HTML 로 뺐다(아래). */
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.width = '100%';
+    svg.style.height = H + 'px';
+    svg.style.display = 'block';
     function bars(h, up, color) {
       var bw = W / NB;
       h.forEach(function (f, i) {
@@ -3380,20 +3401,15 @@
     axis.setAttribute('y1', MID); axis.setAttribute('y2', MID);
     axis.setAttribute('stroke', THEME.grid);
     svg.appendChild(axis);
-    [0, 0.5, 1].forEach(function (f) {
-      var tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      tx.setAttribute('x', (f * W).toFixed(0));
-      tx.setAttribute('y', H + 16);
-      tx.setAttribute('fill', THEME.dim);
-      tx.setAttribute('font-size', '11');
-      tx.setAttribute('font-family', '"IBM Plex Mono", monospace');
-      tx.setAttribute('text-anchor', f === 0 ? 'start' : (f === 1 ? 'end' : 'middle'));
-      var isDeg = (M === 'twa' || M === 'heel' || M === 'pitch');
-      tx.textContent = (lo + f * (hi - lo)).toFixed(isDeg ? 0 : 1)
-        + (isDeg ? '\u00b0' : ' kt');
-      svg.appendChild(tx);
-    });
     body.appendChild(svg);
+    /* 축 라벨 — SVG 가로 확대에 딸려 늘어나지 않도록 HTML 로 */
+    var isDeg = (M === 'twa' || M === 'heel' || M === 'pitch');
+    var axisRow = el('div', 'd-flex justify-content-between lab mt-1');
+    [0, 0.5, 1].forEach(function (f) {
+      axisRow.appendChild(el('span', null,
+        (lo + f * (hi - lo)).toFixed(isDeg ? 0 : 1) + (isDeg ? '\u00b0' : ' kt')));
+    });
+    body.appendChild(axisRow);
 
     var leg = el('div', 'd-flex gap-4 mt-2');
     function chip(color, label, arr) {

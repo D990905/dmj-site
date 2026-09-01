@@ -93,9 +93,33 @@ if (fs.existsSync(GPX)) {
   ok('실세션: 전구간 평균속도가 요약과 같은 범위(±2kt)',
      Math.abs(avgKt - a.summary.avgSpeedMovingMs * 1.94384) < 2.5,
      avgKt.toFixed(1) + ' vs ' + (a.summary.avgSpeedMovingMs * 1.94384).toFixed(1));
-  var rm2 = CS.rangeManeuvers(a.maneuvers, 0, rs.durationSec);
-  ok('실세션: 전구간 기동 수 = 분석 기동 수',
+  /* §486 — 축이 압축돼 있으므로 기동 시각도 같은 좌표로 옮겨서 세야 한다.
+     series 를 안 넘기면 접힌 만큼 어긋나 일부가 범위 밖으로 빠진다. */
+  var rm2 = CS.rangeManeuvers(a.maneuvers, 0, rs.durationSec, rs);
+  ok('실세션: 전구간 기동 수 = 분석 기동 수 (압축 좌표 변환 포함)',
      rm2.total === a.maneuvers.length, rm2.total + ' vs ' + a.maneuvers.length);
+  var rmNo = CS.rangeManeuvers(a.maneuvers, 0, rs.durationSec);
+  ok('series 를 안 넘기면 어긋난다 (변환이 실제로 필요하다는 증거)',
+     rmNo.total < a.maneuvers.length, rmNo.total + ' vs ' + a.maneuvers.length);
+
+  /* ---------- §486 시간축 압축 ---------- */
+  var un = CS.buildSeries(sess, { compress: false });
+  ok('압축하면 축이 짧아진다', rs.durationSec < un.durationSec,
+     CS.fmtClock(rs.durationSec) + ' < ' + CS.fmtClock(un.durationSec));
+  ok('접은 시간 = 벽시계 − 압축축 (일치)',
+     Math.abs(rs.removedSec - (un.durationSec - rs.durationSec)) < 1,
+     CS.fmtClock(rs.removedSec));
+  ok('압축을 꺼도 예전처럼 동작한다', un.removedSec === 0 && un.compressed === false);
+  /* 실제↔화면 좌표 왕복 — 구간 안의 시각은 되돌아와야 한다 */
+  var mid = rs.segments[Math.floor(rs.segments.length / 2)];
+  var probe = (mid.realFrom + mid.realTo) / 2;
+  ok('실제→화면→실제 왕복이 일치 (구간 내부)',
+     Math.abs(CS.compToReal(rs, CS.realToComp(rs, probe)) - probe) < 1,
+     probe.toFixed(0) + ' → ' + CS.realToComp(rs, probe).toFixed(0));
+  ok('화면 좌표는 단조 증가 (뒤엉키지 않는다)',
+     rs.x.every(function (v, i) { return i === 0 || v >= rs.x[i - 1] - 1e-6; }));
+  ok('이음매마다 null 이 있어 선이 붙어 보이지 않는다',
+     rs.y[0].filter(function (v) { return v === null; }).length >= rs.segments.length - 1);
 } else { console.log('  SKIP  실데이터 없음'); }
 
 console.log('\n§473  ' + pass + '/' + (pass + fail) + ' pass');

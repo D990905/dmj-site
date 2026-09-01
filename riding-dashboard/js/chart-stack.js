@@ -31,7 +31,14 @@
   ];
 
   /* 기록 공백·제외 구간에서 선을 끊는다. 이걸 안 하면 지워버린 10분이
-     완만한 사선으로 남아 그 시간에 타고 있었던 것처럼 보인다(§459). */
+     완만한 사선으로 남아 그 시간에 타고 있었던 것처럼 보인다(§459).
+     §486 (옥대표) — 거기서 한 걸음 더: 끊은 자리를 **비워 두지 않고
+     양쪽을 붙인다.** 구간을 지웠는데 그 자리가 빈 채로 남으면 화면의
+     상당 부분이 아무 정보도 없는 여백이 되고, "지운 만큼 시간이 흘렀다"
+     는 잘못된 인상도 준다. x축은 벽시계가 아니라 **물 위에 있던 시간**이
+     된다(축 라벨도 그렇게 읽어야 한다).
+     이음매는 눈에 보이게 남긴다 — null 한 점으로 선을 끊어서, 붙였다는
+     사실 자체는 숨기지 않는다. */
   function buildSeries(session, opts) {
     opts = opts || {};
     var S = (session && session.samples) || [];
@@ -39,6 +46,7 @@
     var maxPts = opts.maxPoints || 1800;
     var step = Math.max(1, Math.floor(S.length / maxPts));
     var t0 = S[0].t;
+    var compress = opts.compress !== false;
     var gapSec = (session.cfg && session.cfg.gapThresholdSec) || 8;
     var legEnd = {};
     (session.legs || []).forEach(function (lg) { legEnd[lg.end] = true; });
@@ -52,8 +60,12 @@
     });
     if (!panels.length) return null;
 
+    /* segs[k] = { realFrom, realTo, compFrom } — 압축 좌표와 실제 경과초를
+       서로 되돌리기 위한 지도. 구간 제외는 실제 시각으로 해야 하므로
+       (원본 세션에 적용된다) 이 지도가 없으면 드래그가 엉뚱한 데를 지운다. */
     var xs = [], ys = panels.map(function () { return []; });
-    var prevT = null, prevIdx = null;
+    var segs = [];
+    var prevT = null, prevIdx = null, shift = 0, segStart = null;
     for (var i = 0; i < S.length; i += step) {
       var tt = S[i].t - t0;
       var broke = false;
@@ -61,15 +73,62 @@
         if ((tt - prevT) > Math.max(gapSec, step * 2)) broke = true;
         else for (var j = prevIdx; j < i; j++) if (legEnd[j]) { broke = true; break; }
       }
-      if (broke) { xs.push(prevT + 0.001); ys.forEach(function (a) { a.push(null); }); }
-      xs.push(tt);
+      if (broke) {
+        /* 이음매 — 선을 끊는 null 을 앞 구간 끝에 두고, 압축 모드면 사이
+           시간을 접는다. x 는 반드시 단조 증가해야 하므로(uPlot 요구)
+           접는 양에서 EPS 만큼 덜 접어 다음 점이 null 바로 뒤에 오게 한다. */
+        var EPS = 0.001;
+        xs.push(prevT - shift);
+        ys.forEach(function (a) { a.push(null); });
+        segs.push({ realFrom: segStart, realTo: prevT, compFrom: segStart - shift });
+        if (compress) shift += (tt - prevT) - EPS;
+        segStart = tt;
+      }
+      if (segStart == null) segStart = tt;
+      xs.push(tt - shift);
       panels.forEach(function (p, k) {
         var v = p.get(S[i]);
         ys[k].push(v != null && isFinite(v) ? v : null);
       });
       prevT = tt; prevIdx = i;
     }
-    return { panels: panels, x: xs, y: ys, t0: t0, step: step, durationSec: xs[xs.length - 1] };
+    if (segStart != null) {
+      segs.push({ realFrom: segStart, realTo: prevT, compFrom: segStart - shift });
+    }
+
+    return {
+      panels: panels, x: xs, y: ys, t0: t0, step: step,
+      compressed: compress, segments: segs,
+      removedSec: compress ? shift : 0,
+      wallDurationSec: prevT,
+      durationSec: xs[xs.length - 1]
+    };
+  }
+
+  /* 실제 경과초 → 화면 x. 접힌 구간 안이면 그 구간의 시작으로 붙인다. */
+  function realToComp(series, tSec) {
+    if (!series || !series.segments || !series.segments.length) return tSec;
+    var segs = series.segments;
+    for (var i = 0; i < segs.length; i++) {
+      if (tSec <= segs[i].realTo) {
+        return segs[i].compFrom + Math.max(0, tSec - segs[i].realFrom);
+      }
+    }
+    var last = segs[segs.length - 1];
+    return last.compFrom + (last.realTo - last.realFrom);
+  }
+  /* 화면 x → 실제 경과초. 드래그한 구간을 원본에서 지우려면 이게 필요하다. */
+  function compToReal(series, x) {
+    if (!series || !series.segments || !series.segments.length) return x;
+    var segs = series.segments;
+    for (var i = 0; i < segs.length; i++) {
+      var span = segs[i].realTo - segs[i].realFrom;
+      if (x <= segs[i].compFrom + span) {
+        return segs[i].realFrom + Math.max(0, x - segs[i].compFrom);
+      }
+    }
+    var last = segs[segs.length - 1];
+    return last.realTo;
   }
 
   /* 드래그 구간의 즉시 평균. null 은 빼고 세되, **몇 %가 유효했는지**를
@@ -103,11 +162,15 @@
 
   /* 구간 안의 기동. 시각화 자체보다 이 수가 중요하다 —
      "이 구간 평균 12kt" 는 그 안에 자이브가 8번 있었는지에 따라 뜻이 다르다. */
-  function rangeManeuvers(maneuvers, fromSec, toSec) {
+  /* fromSec/toSec 는 **화면(압축) 좌표**다. 기동은 실제 시각을 갖고 있으므로
+     같은 좌표계로 옮겨서 센다 — 안 그러면 접힌 만큼 어긋난다. */
+  function rangeManeuvers(maneuvers, fromSec, toSec, series) {
     var lo = Math.min(fromSec, toSec), hi = Math.max(fromSec, toSec);
     var t = 0, g = 0;
     (maneuvers || []).forEach(function (m) {
-      if (m.tSec == null || m.tSec < lo || m.tSec > hi) return;
+      if (m.tSec == null) return;
+      var x = series ? realToComp(series, m.tSec) : m.tSec;
+      if (x < lo || x > hi) return;
       if (m.type === 'gybe') g++; else t++;
     });
     return { tacks: t, gybes: g, total: t + g };
@@ -148,7 +211,8 @@
       var top = u.bbox.top, h = u.bbox.height;
       mans.forEach(function (m) {
         if (m.tSec == null) return;
-        var x = u.valToPos(m.tSec, 'x', true);
+        /* §486 — 기동 시각도 압축 좌표로 옮겨야 선과 어긋나지 않는다 */
+        var x = u.valToPos(realToComp(series, m.tSec), 'x', true);
         if (x < u.bbox.left || x > u.bbox.left + u.bbox.width) return;
         ctx.strokeStyle = m.type === 'gybe' ? 'rgba(247,103,7,0.45)' : 'rgba(77,171,247,0.45)';
         ctx.beginPath();
@@ -231,7 +295,9 @@
 
     function showSelection(a, b) {
       var st = rangeStats(series, a, b);
-      st.maneuvers = rangeManeuvers(mans, a, b);
+      st.realFromSec = compToReal(series, st.fromSec);
+      st.realToSec = compToReal(series, st.toSec);
+      st.maneuvers = rangeManeuvers(mans, a, b, series);
       selection = st;
       /* 모든 판에 같은 구간을 칠한다 — 한 판만 칠하면 어디를 보고 있는지
          잃어버린다. */
@@ -293,7 +359,11 @@
       ex.type = 'button';
       ex.className = 'btn btn-sm btn-outline-danger';
       ex.textContent = 'Exclude this range';
-      ex.addEventListener('click', function () { opts.onExclude(st.fromSec, st.toSec); });
+      /* 제외는 **원본 세션**에 적용되므로 실제 경과초로 되돌려 넘긴다 */
+      ex.addEventListener('click', function () {
+        opts.onExclude(st.realFromSec != null ? st.realFromSec : st.fromSec,
+                       st.realToSec != null ? st.realToSec : st.toSec);
+      });
       bar.appendChild(ex);
     }
     var cl = document.createElement('button');
@@ -307,6 +377,7 @@
   }
 
   var API = { render: render, buildSeries: buildSeries, rangeStats: rangeStats,
+              realToComp: realToComp, compToReal: compToReal,
               rangeManeuvers: rangeManeuvers, PANELS: PANELS, fmtClock: fmtClock };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else global.RDChartStack = API;
