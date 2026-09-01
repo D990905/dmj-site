@@ -3329,69 +3329,202 @@
       t.appendChild(tb2); wrap.appendChild(t); body.appendChild(wrap);
     }
 
-    /* 속도 곡선 — apex 를 0 으로 맞춰 겹친다 */
+    /* 속도 곡선 — apex 를 0 으로 맞춰 겹친다.
+       §497: 뒤에 비교 밴드를 깔기 때문에 높이를 키웠다(220 → 300). */
     var plotHost = el('div', 'chart-host mt-3');
-    plotHost.style.height = '220px';
+    plotHost.style.height = '300px';
     body.appendChild(plotHost);
+    var capHost = el('div', 'lab mt-1');
+    body.appendChild(capHost);
     card.appendChild(body);
     host.appendChild(card);
-    drawTurnCurves(plotHost, picked, sel);
+    var info = drawTurnCurves(plotHost, picked, sel, a);
+    /* 밴드가 무엇인지 말해 주지 않으면 회색 띠는 장식이 된다 */
+    if (info && info.banded) {
+      capHost.textContent =
+        'Shaded band = the middle half (25\u201375%) of your ' + info.poolN + ' '
+        + info.poolLabel + ' this session, dashed line = the median. '
+        + (info.collapsed
+            ? 'Too many turns selected to draw individually \u2014 showing their median instead.'
+            : 'A selected line above the band is a better-than-usual turn.');
+    } else if (info) {
+      capHost.textContent = 'Not enough comparable turns for a band '
+        + '(needs at least 3), so only the selected turns are drawn.';
+    }
   }
 
-  /* apex 정렬 속도 곡선. 회전 전후 여유를 두고 잘라 "들어가서 나오기까지"
-     한 장면으로 본다. */
-  function drawTurnCurves(hostEl, picked, sel) {
+  /* §497 apex 정렬 속도 곡선 — 개별 선 대신 **밴드 + 고른 선** (옥대표)
+     "그래프에 세일요드처럼 표준편차 부분을 희미하게 표현하는것도 좀
+      고려해봐. 아니면 더 나은 방식이 있으면 그렇게 해주고."
+      "그래프의 높이가 잘 보이게 설정을 바꿔야할것 같고."
+
+     전에는 고른 회전 수만큼 선을 그렸다. 다섯 개만 넘어도 뭉개져서
+     "이 회전이 좋았나" 를 못 읽는다. 두 가지를 바꿨다.
+
+     ① 배경에 **비교 모집단의 25~75% 밴드 + 중앙값**을 깐다. 그래야
+        고른 선이 "내 평소보다 위인지 아래인지" 로 읽힌다 — 절대 속도가
+        아니라 **자기 대비**가 회전 품질의 진짜 질문이다.
+     ② 표준편차(±SD)가 아니라 **사분위**를 쓴다. 회전 속도 곡선은
+        apex 근처에서 한쪽으로 쏠린 분포다(잘 돈 회전은 덜 떨어지고
+        말아먹은 회전은 크게 떨어진다). 평균±SD 는 그 쏠림에서 밴드를
+        실제 데이터가 없는 곳까지 늘린다. 사분위는 항상 실측 안에 있다.
+     ③ y 축을 데이터에 맞춰 자른다. 0 부터 그리면 회전의 골이 눌려
+        안 보인다 — 옥대표가 말한 "높이" 문제의 실체가 이것이다.
+
+     모집단은 지금 걸린 그룹 필터(§488)를 따른다. 필터가 'all' 인데
+     고른 회전이 전부 같은 종류면 그 종류로 좁힌다 — 택 곡선을 자이브
+     밴드에 대고 읽는 건 의미가 없다. */
+
+  var TURN_PAD_SEC = 12, TURN_STEP = 0.5;
+
+  /* 한 회전을 apex=0 격자 위에 올린다 */
+  function turnCurveOn(S, m, xs) {
+    var apexT = S[m.apexIdx] ? S[m.apexIdx].t : null;
+    if (apexT == null) return null;
+    var pts = [];
+    for (var i = 0; i < S.length; i++) {
+      var dt = S[i].t - apexT;
+      if (dt < -TURN_PAD_SEC) continue;
+      if (dt > TURN_PAD_SEC) break;
+      if (S[i].speed == null) continue;
+      pts.push([dt, S[i].speed * KT]);
+    }
+    if (pts.length < 3) return null;
+    return xs.map(function (xv) {
+      var best = null, bd = Infinity;
+      for (var j = 0; j < pts.length; j++) {
+        var d = Math.abs(pts[j][0] - xv);
+        if (d < bd) { bd = d; best = pts[j][1]; }
+      }
+      return bd <= TURN_STEP ? best : null;
+    });
+  }
+
+  function quantile(sorted, p) {
+    if (!sorted.length) return null;
+    var idx = (sorted.length - 1) * p;
+    var lo = Math.floor(idx), hi = Math.ceil(idx);
+    if (lo === hi) return sorted[lo];
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+  }
+
+  /* 격자 위 곡선 여럿 → x 마다 p25/p50/p75.
+     한 x 에 3개 미만이면 밴드를 그리지 않는다 — 두 회전으로 그린
+     "사분위" 는 사분위가 아니라 그냥 두 점이다. */
+  function turnBand(curves, xs) {
+    var lo = [], mid = [], hi = [], n = [];
+    xs.forEach(function (_, k) {
+      var v = [];
+      curves.forEach(function (c) { if (c[k] != null) v.push(c[k]); });
+      v.sort(function (x, y) { return x - y; });
+      n.push(v.length);
+      if (v.length < 3) { lo.push(null); mid.push(null); hi.push(null); return; }
+      lo.push(quantile(v, 0.25));
+      mid.push(quantile(v, 0.50));
+      hi.push(quantile(v, 0.75));
+    });
+    return { lo: lo, mid: mid, hi: hi, n: n };
+  }
+
+  function drawTurnCurves(hostEl, picked, sel, a) {
     if (!window.uPlot || !CUR.session) return;
     var S = CUR.session.samples || [];
     if (!S.length) return;
-    var PAD_SEC = 12;
-    var series = [], tMin = 0, tMax = 0;
-    picked.forEach(function (m) {
-      var apexT = S[m.apexIdx] ? S[m.apexIdx].t : null;
-      if (apexT == null) return;
-      var pts = [];
-      for (var i = 0; i < S.length; i++) {
-        var dt = S[i].t - apexT;
-        if (dt < -PAD_SEC) continue;
-        if (dt > PAD_SEC) break;
-        if (S[i].speed == null) continue;
-        pts.push([dt, S[i].speed * KT]);
-      }
-      if (pts.length < 3) return;
-      tMin = Math.min(tMin, pts[0][0]);
-      tMax = Math.max(tMax, pts[pts.length - 1][0]);
-      series.push({ m: m, pts: pts });
-    });
-    if (!series.length) { hostEl.textContent = 'No speed samples around these turns.'; return; }
 
-    /* 공통 x 격자 위로 각 곡선을 옮긴다 — uPlot 은 단일 x 배열을 쓴다. */
-    var STEP = 0.5, xs = [];
-    for (var x = Math.floor(tMin); x <= Math.ceil(tMax); x += STEP) xs.push(x);
-    var data = [xs];
-    var opts = [];
-    series.forEach(function (sr, k) {
-      var ys = xs.map(function (xv) {
-        var best = null, bd = Infinity;
-        for (var j = 0; j < sr.pts.length; j++) {
-          var d = Math.abs(sr.pts[j][0] - xv);
-          if (d < bd) { bd = d; best = sr.pts[j][1]; }
-        }
-        return bd <= STEP ? best : null;
-      });
-      data.push(ys);
-      opts.push({
-        label: '#' + (sel[k] + 1) + ' ' + (sr.m.type === 'tack' ? 'tack' : 'gybe')
-             + (sr.m.side === 'P' ? ' P' : sr.m.side === 'S' ? ' S' : ''),
-        stroke: sr.m.side === 'P' ? '#e03131' : '#2f9e44',
-        width: 1.6,
-        value: function (u, v) { return v == null ? '\u2014' : v.toFixed(1) + ' kt'; }
-      });
+    var xs = [];
+    for (var x = -TURN_PAD_SEC; x <= TURN_PAD_SEC; x += TURN_STEP) xs.push(x);
+
+    /* ---- 고른 회전 ---- */
+    var lines = [];
+    picked.forEach(function (m, k) {
+      var ys = turnCurveOn(S, m, xs);
+      if (ys) lines.push({ m: m, ys: ys, no: sel[k] + 1 });
     });
+    if (!lines.length) { hostEl.textContent = 'No speed samples around these turns.'; return; }
+
+    /* ---- 비교 모집단 ---- */
+    var mans = (a && a.maneuvers) || [];
+    var pType = TURNFILT.type, pSide = TURNFILT.side;
+    if (pType === 'all') {
+      var types = {};
+      picked.forEach(function (m) { types[m.type] = 1; });
+      var tk = Object.keys(types);
+      if (tk.length === 1) pType = tk[0];
+    }
+    var pool = mans.filter(function (m) {
+      if (pType !== 'all' && m.type !== pType) return false;
+      if (pSide !== 'all' && m.side !== pSide) return false;
+      return true;
+    });
+    var poolCurves = [];
+    pool.forEach(function (m) {
+      var ys = turnCurveOn(S, m, xs);
+      if (ys) poolCurves.push(ys);
+    });
+    var band = poolCurves.length >= 3 ? turnBand(poolCurves, xs) : null;
+
+    /* ---- y 범위: 실제로 그리는 값에만 맞춘다 ---- */
+    var vMin = Infinity, vMax = -Infinity;
+    function span(arr) {
+      arr.forEach(function (v) {
+        if (v == null) return;
+        if (v < vMin) vMin = v;
+        if (v > vMax) vMax = v;
+      });
+    }
+    lines.forEach(function (l) { span(l.ys); });
+    if (band) { span(band.lo); span(band.hi); }
+    if (!isFinite(vMin) || !isFinite(vMax) || vMax <= vMin) { vMin = 0; vMax = 20; }
+    var padY = Math.max(0.6, (vMax - vMin) * 0.10);
+    var yLo = Math.max(0, vMin - padY), yHi = vMax + padY;
+
+    /* ---- 계열 조립 ---- */
+    var data = [xs], opts = [], bands = [];
+    var bandFill = (currentThemeName() === 'light')
+      ? 'rgba(100,116,139,0.20)' : 'rgba(148,163,184,0.18)';
+
+    if (band) {
+      data.push(band.hi); data.push(band.lo); data.push(band.mid);
+      opts.push({ label: 'Typical 75%', stroke: 'transparent', width: 0,
+                  points: { show: false },
+                  value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } });
+      opts.push({ label: 'Typical 25%', stroke: 'transparent', width: 0,
+                  points: { show: false },
+                  value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } });
+      opts.push({ label: 'Typical (median of ' + poolCurves.length + ')',
+                  stroke: THEME.dim, width: 2, dash: [5, 4],
+                  points: { show: false },
+                  value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } });
+      bands.push({ series: [1, 2], fill: bandFill });
+    }
+
+    /* 선이 너무 많으면 개별 선 대신 **고른 것들의 중앙값** 하나로.
+       여덟 개가 한계다 — 그 위로는 색을 구분해도 눈이 못 따라간다. */
+    var MANY = 8;
+    if (lines.length > MANY) {
+      var selBand = turnBand(lines.map(function (l) { return l.ys; }), xs);
+      data.push(selBand.mid);
+      opts.push({ label: 'Selected (median of ' + lines.length + ')',
+                  stroke: THEME.accent, width: 2.6, points: { show: false },
+                  value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } });
+    } else {
+      lines.forEach(function (l) {
+        data.push(l.ys);
+        opts.push({
+          label: '#' + l.no + ' ' + (l.m.type === 'tack' ? 'tack' : 'gybe')
+               + (l.m.side === 'P' ? ' P' : l.m.side === 'S' ? ' S' : ''),
+          stroke: l.m.side === 'P' ? '#e03131' : '#2f9e44',
+          width: 2.2, points: { show: false },
+          value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; }
+        });
+      });
+    }
 
     track(new uPlot({
-      width: hostEl.clientWidth || 860, height: 200, padding: [12, 14, 4, 6],
+      width: hostEl.clientWidth || 860, height: 280, padding: [12, 14, 4, 6],
       cursor: { drag: { x: true, y: false } },
-      scales: { x: { time: false } },
+      scales: { x: { time: false }, y: { range: [yLo, yHi] } },
+      bands: bands,
       axes: [
         { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
@@ -3408,9 +3541,17 @@
       ],
       series: [{ label: 'From apex',
                  value: function (u, v) {
-                   return v == null ? '\u2014' : (v > 0 ? '+' : '') + v.toFixed(1) + ' s';
+                   return v == null ? '—' : (v > 0 ? '+' : '') + v.toFixed(1) + ' s';
                  } }].concat(opts)
     }, data, hostEl), hostEl);
+
+    return {
+      poolN: poolCurves.length,
+      banded: !!band,
+      poolLabel: (pType === 'all' ? 'turns' : pType === 'tack' ? 'tacks' : 'gybes')
+        + (pSide === 'P' ? ' on port' : pSide === 'S' ? ' on starboard' : ''),
+      collapsed: lines.length > MANY
+    };
   }
 
   /* §461 회전 연습 추이 — 세션을 4등분해 회전 품질이 어떻게 변했나.

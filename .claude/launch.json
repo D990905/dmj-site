@@ -1,0 +1,85 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-dmj.py"
+      ],
+      "port": 8779
+    },
+    {
+      "name": "replay-package",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-replay-pkg.py"
+      ],
+      "port": 8790
+    },
+    {
+      "name": "dmjsite-verify",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-dmjsite-verify.py"
+      ],
+      "port": 8791
+    },
+    {
+      "name": "rd-431",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-rd431.py"
+      ],
+      "port": 8793
+    },
+    {
+      "name": "rd-432",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-rd432.py"
+      ],
+      "port": 8794
+    },
+    {
+      "name": "rd-433",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-433.py"
+      ],
+      "port": 8795
+    },
+    {
+      "name": "rd-450",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-rd450.py"
+      ],
+      "port": 8796
+    },
+    {
+      "name": "rd-450-base",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-rd450base.py"
+      ],
+      "port": 8797
+    },
+    {
+      "name": "rd-479",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-rd479.py"
+      ],
+      "port": 8798
+    },
+    {
+      "name": "rd-497",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "/tmp/serve-rd497.py"
+      ],
+      "port": 8799
+    }
+  ]
+}
