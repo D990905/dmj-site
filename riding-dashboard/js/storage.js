@@ -233,6 +233,34 @@
   }
 
   /* 분석 결과에서 컴팩트 레코드 생성 */
+  /* §490 — 히스토그램에서 시간가중 상위 X% 평균 속도.
+     히스토그램은 **분석 대상 구간**(기록 공백·제외 구간을 뺀 레그)에서
+     만들어지므로, 여기서 나오는 값은 자동으로 "널 구간 제외" 다.
+     상위 50/20% 는 정지·표류 구간을 정의상 더 걸러낸다 —
+     세션끼리 비교할 때 쉬는 시간 길이에 휘둘리지 않는 지표다. */
+  function topPercentSpeedMs(analysis, pct) {
+    var h = (analysis && analysis.histogram) || [];
+    if (!h.length || !(pct > 0)) return null;
+    var total = 0;
+    h.forEach(function (b) { total += (b.seconds || 0); });
+    if (!(total > 0)) return null;
+    var want = total * (pct / 100);
+    /* 빠른 쪽부터 채운다 */
+    var bins = h.slice().sort(function (a, b) {
+      return ((b.fromKt + b.toKt) / 2) - ((a.fromKt + a.toKt) / 2);
+    });
+    var acc = 0, sum = 0;
+    for (var i = 0; i < bins.length && acc < want; i++) {
+      var sec = bins[i].seconds || 0;
+      if (sec <= 0) continue;
+      var use = Math.min(sec, want - acc);
+      var mid = (bins[i].fromKt + bins[i].toKt) / 2;
+      sum += mid * use; acc += use;
+    }
+    if (!(acc > 0)) return null;
+    return (sum / acc) / 1.94384;   /* kt → m/s (레코드는 m/s 규약) */
+  }
+
   function buildRecord(meta, analysis) {
     var s = analysis.summary || {};
     var ms = analysis.maneuverStats || {};
@@ -261,6 +289,11 @@
       distanceM: s.totalDistanceM || 0,
       maxSpeedMs: s.maxSpeedMs || 0,
       avgSpeedMovingMs: s.avgSpeedMovingMs || 0,
+      /* §490 시즌 흐름용 — 상위 50/20% 평균 속도. 히스토그램(=분석 구간)에서
+         뽑으므로 기록 공백·제외 구간이 이미 빠져 있고, 상위 X% 라서
+         정지·표류가 정의상 더 걸러진다. */
+      sogTop50Ms: topPercentSpeedMs(analysis, 50),
+      sogTop20Ms: topPercentSpeedMs(analysis, 20),
       activeRatio: s.activeRatio || 0,
       /* §435 — 포일링(활주) 거리·시간 세션 트렌드 스파크라인용. */
       activeDistanceM: s.activeDistanceM != null ? s.activeDistanceM : null,

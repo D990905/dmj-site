@@ -2566,19 +2566,119 @@
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
     host.appendChild(card);
 
-    /* 시즌 흐름 — 저장 세션이 2개 이상일 때만 의미가 있다 */
-    var pts = sorted.filter(function (r) { return r.dateEpoch && r.maxSpeedMs != null; });
+    /* §490 시즌 흐름 (옥대표) — 지표·집계를 골라 보고, 같은 세션이 여러 번
+       저장돼 있으면 하나로 친다.
+       ────────────────────────────────────────────────────────────
+       빈 그래프였던 이유: 같은 파일을 세 번 저장해 dateEpoch 가 셋 다
+       같았다. uPlot 은 x 가 증가해야 그리므로 아무것도 안 나온다.
+       → 세션 시그니처(없으면 날짜+이름)로 묶어 **가장 최근 저장본만** 쓰고,
+         그래도 x 가 겹치면 1초씩 밀어 겹침을 푼다.
+
+       "널 구간 제거" (옥대표 질문) — 이미 그렇게 되어 있고, 지표 선택으로
+       더 분명해진다:
+         · 평균(주행)  = movingTime 기준 — 멈춰 있던 시간이 빠진다
+         · 상위 50/20% = 히스토그램(분석 구간)에서 뽑아 정지·표류가 정의상 빠진다
+         · 거리·시간   = 분석 구간 합계 (기록 공백·제외 구간 제외, §459)
+       즉 "시작~종료 전체"가 아니라 **실제로 탄 시간**만 센다. */
+    var byKey = {};
+    sorted.forEach(function (r) {
+      if (!r.dateEpoch) return;
+      var k = r.sig || (r.dateEpoch + '|' + (r.name || ''));
+      var prev = byKey[k];
+      if (!prev || (r.savedAt || 0) > (prev.savedAt || 0)) byKey[k] = r;
+    });
+    var pts = Object.keys(byKey).map(function (k) { return byKey[k]; })
+      .sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
     if (pts.length < 2 || !window.uPlot) return;
+
+    var TREND_METRICS = [
+      { key: 'max',   label: 'Top speed',      unit: 'kt',  dp: 1,
+        get: function (r) { return r.maxSpeedMs != null ? r.maxSpeedMs * KT : null; } },
+      { key: 'top20', label: 'Best 20% speed', unit: 'kt',  dp: 1,
+        get: function (r) { return r.sogTop20Ms != null ? r.sogTop20Ms * KT : null; } },
+      { key: 'top50', label: 'Best 50% speed', unit: 'kt',  dp: 1,
+        get: function (r) { return r.sogTop50Ms != null ? r.sogTop50Ms * KT : null; } },
+      { key: 'avg',   label: 'Average speed (moving)', unit: 'kt', dp: 1,
+        get: function (r) { return r.avgSpeedMovingMs ? r.avgSpeedMovingMs * KT : null; } },
+      { key: 'dist',  label: 'Distance',       unit: 'km',  dp: 2,
+        get: function (r) { return r.distanceM != null ? r.distanceM / 1000 : null; } },
+      { key: 'foil',  label: 'Foiling time',   unit: 'min', dp: 0,
+        get: function (r) { return r.activeTimeSec != null ? r.activeTimeSec / 60 : null; } },
+      { key: 'tacks', label: 'Tacks',          unit: '',    dp: 0,
+        get: function (r) { return r.tackCount != null ? r.tackCount : null; } },
+      { key: 'gybes', label: 'Gybes',          unit: '',    dp: 0,
+        get: function (r) { return r.gybeCount != null ? r.gybeCount : null; } },
+      { key: 'turns', label: 'Turns total',    unit: '',    dp: 0,
+        get: function (r) { return r.maneuverTotal != null ? r.maneuverTotal : null; } },
+      { key: 'eff',   label: 'Turn efficiency', unit: '',   dp: 0,
+        get: function (r) { return r.avgEfficiency != null ? r.avgEfficiency : null; } },
+      { key: 'sps',   label: 'Performance score', unit: '', dp: 0,
+        get: function (r) { return r.vpsOverall != null ? r.vpsOverall : null; } }
+    ];
+    function metricDef(k) {
+      for (var i = 0; i < TREND_METRICS.length; i++) {
+        if (TREND_METRICS[i].key === k) return TREND_METRICS[i];
+      }
+      return TREND_METRICS[0];
+    }
+    var md = metricDef(TREND.metric);
+
     var c2 = el('div', 'card mt-3');
     var h2 = el('div', 'card-header');
     h2.appendChild(el('h3', 'card-title', 'Season trend'));
-    h2.appendChild(el('div', 'card-actions lab', 'top speed per session'));
+    var act2 = el('div', 'card-actions d-flex align-items-center gap-2');
+    var msel = el('select', 'form-select form-select-sm');
+    msel.style.width = 'auto';
+    TREND_METRICS.forEach(function (m) {
+      var have = pts.some(function (r) { return m.get(r) != null; });
+      var o = document.createElement('option');
+      o.value = m.key;
+      o.textContent = m.label + (have ? '' : ' — not stored yet');
+      o.disabled = !have;
+      if (m.key === md.key) o.selected = true;
+      msel.appendChild(o);
+    });
+    msel.addEventListener('change', function () {
+      TREND.metric = msel.value; renderSessions();
+    });
+    act2.appendChild(msel);
+    act2.appendChild(el('span', 'lab', pts.length + ' sessions'));
+    h2.appendChild(act2);
     c2.appendChild(h2);
     var b2 = el('div', 'card-body');
     var plot = el('div', 'chart-host'); plot.id = 'chart-season';
-    b2.appendChild(plot); c2.appendChild(b2); host.appendChild(c2);
-    var xs = pts.map(function (r) { return r.dateEpoch / 1000; });
-    var ys = pts.map(function (r) { return r.maxSpeedMs * KT; });
+    b2.appendChild(plot);
+
+    var usable = pts.filter(function (r) { return md.get(r) != null; });
+    if (usable.length < 2) {
+      b2.appendChild(el('div', 'text-secondary',
+        'Only ' + usable.length + ' session has this metric stored. Older sessions were '
+        + 'saved before it existed — save a session again and it fills in.'));
+      c2.appendChild(b2); host.appendChild(c2);
+      return;
+    }
+    /* x 가 겹치면 uPlot 이 아무것도 안 그린다 — 같은 날 다른 세션이면 밀어 준다 */
+    var xs = [], lastX = -Infinity;
+    usable.forEach(function (r) {
+      var x = r.dateEpoch / 1000;
+      if (x <= lastX) x = lastX + 1;
+      xs.push(x); lastX = x;
+    });
+    var ys = usable.map(function (r) { return md.get(r); });
+
+    var foot = el('div', 'text-secondary mt-2');
+    foot.style.fontSize = '.8125rem';
+    foot.textContent = (md.key === 'top20' || md.key === 'top50')
+      ? 'Time-weighted mean of your fastest ' + (md.key === 'top20' ? '20' : '50')
+        + '% of riding time. Stops, drifting and recording gaps are out by construction '
+        + '— a long rest cannot drag this number down.'
+      : (md.key === 'avg'
+          ? 'Averaged over moving time only, so stops do not count against you.'
+          : 'Computed over analysed time — recording gaps and any stretches you '
+            + 'removed are already excluded.');
+    b2.appendChild(foot);
+    c2.appendChild(b2); host.appendChild(c2);
+
     track(new uPlot({
       width: plot.clientWidth || 800, height: 260, padding: [12, 14, 4, 6],
       cursor: { drag: { x: true, y: false } },
@@ -2586,13 +2686,16 @@
         { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace' },
         { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
-          font: '11px "IBM Plex Mono", monospace', size: 42 }
+          font: '11px "IBM Plex Mono", monospace', size: 46 }
       ],
       series: [
         {},
-        { label: 'Top speed', stroke: THEME.accent, width: 2,
+        { label: md.label, stroke: THEME.accent, width: 2,
           fill: 'rgba(77,171,247,0.14)', points: { show: true, size: 7 },
-          value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } }
+          value: function (u, v) {
+            return v == null ? '—'
+              : v.toFixed(md.dp) + (md.unit ? ' ' + md.unit : '');
+          } }
       ]
     }, [xs, ys], plot), plot);
   }
@@ -2824,6 +2927,8 @@
      을 0 초로 맞춰 겹친다 — 시각이 다른 회전을 같은 자로 보려면 정점을
      맞춰야 한다. */
   var TURNSEL = [];
+  /* §490 — 시즌 흐름에서 고른 지표 */
+  var TREND = { metric: 'max' };
   /* §488 — 회전 목록 그룹 필터 (종류 × 택 방향) */
   var TURNFILT = { type: 'all', side: 'all' };
 
