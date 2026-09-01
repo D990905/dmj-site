@@ -717,7 +717,7 @@
      뭐가 달라지는지 안 보였다(§428). 밴티지는 지도에 화살표를 깔아
      눈으로 대조하게 하는데, 우리는 거기에 **계산**을 더한다 —
      포트/스타보드 풍상 각도가 같아지는 풍향을 찾아 제안한다. */
-  var windMap = null;
+  var windMap = null, windMapRO = null;
   function renderWindConfirm(host, a, est) {
     if (!window.L || !window.RDWindConfirm || !CUR.session) return;
     var S = (CUR.session.samples || []).filter(function (p) {
@@ -769,6 +769,7 @@
     host.appendChild(card);
 
     /* ---- 지도 ---- */
+    if (windMapRO) { try { windMapRO.disconnect(); } catch (e) {} windMapRO = null; }
     if (windMap) { try { windMap.remove(); } catch (e) {} windMap = null; }
     var map = L.map(mapHost, { zoomControl: false, attributionControl: false });
     windMap = map;
@@ -786,8 +787,22 @@
       try { map.fitBounds(bounds, { padding: [30, 30] }); } catch (e) {}
     }
     fit();
-    setTimeout(function () { try { map.invalidateSize(); fit(); } catch (e) {} }, 60);
-
+    /* ⚠ 이 카드는 환경 탭 안에 있고, 탭은 처음에 **숨어 있다.**
+       숨은 상태에서 Leaflet 을 만들면 컨테이너 크기가 0 이라 fitBounds 가
+       세계지도로 끝난다. 예전에 쓰던 setTimeout(60ms) 한 방은 그때도
+       여전히 숨어 있어서 소용이 없다(§486 에서 겪은 것과 같은 함정인데,
+       그때는 탭이 곧 열리는 경우였다).
+       → **ResizeObserver 로 실제 크기가 생기는 순간**을 잡는다.
+       탭 전환·창 크기 변경·테마 전환 어느 경로든 같은 곳으로 들어온다. */
+    var lastW = 0, lastH = 0;
+    function refit() {
+      var w2 = mapHost.clientWidth, h2 = mapHost.clientHeight;
+      if (!w2 || !h2) return;                 /* 아직 숨어 있다 */
+      if (w2 === lastW && h2 === lastH) return;
+      lastW = w2; lastH = h2;
+      try { map.invalidateSize(false); fit(); } catch (e) {}
+      buildArrows();                          /* 화살표도 새 경계로 다시 */
+    }
     /* 바람 화살표 격자 — 지도 위에 5×5. 풍향이 바뀌면 회전만 시킨다. */
     var arrows = [];
     function buildArrows() {
@@ -818,8 +833,17 @@
         if (d) d.style.transform = 'rotate(' + (toward + 180) + 'deg)';
       });
     }
-    setTimeout(buildArrows, 120);
     map.on('moveend zoomend', function () { setTimeout(buildArrows, 30); });
+
+    /* ⚠ 옵저버는 arrows·buildArrows 가 **정의된 뒤에** 붙인다.
+       ResizeObserver 콜백이 observe() 직후에 한 번 도는데, 위쪽에 두면
+       그때 arrows 가 아직 undefined 라 터진다. */
+    if (window.ResizeObserver) {
+      windMapRO = new ResizeObserver(function () { refit(); });
+      windMapRO.observe(mapHost);
+    }
+    setTimeout(refit, 60);
+    setTimeout(refit, 400);
 
     /* ---- 실시간 판정 ---- */
     function updateLive(wd) {
