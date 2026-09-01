@@ -64,7 +64,9 @@
 | F1 | **스트럿 장착 디스플레이** — 조사 완료, [strut-display.md](strut-display.md) 참조. 요약: 필름형 완제품은 사실상 없음, Vakaros Atlas 2 가 기성 기준(Qi 무선충전=포트 없음이 방수의 핵심) |
 | F2 | **3D 프린터 + 소재 매칭** — 조사 완료, [3d-print-gear.md](3d-print-gear.md). 요약: **P2S 799,000원**·ASA+O링(EPDM)·**탄소섬유 금지(GPS 차단)**·**RaceBox 공식 STEP CAD 무료 배포**·하네스 라인은 Dyneema 로프라 **자작 금지, 사서 쓸 것** |
 | F3 | **engineered knit / 가변밀도 TPU 격자** — 하네스 분산층. 추가 지시가 코웍 예산 소진 뒤 도착해 미조사. 별건으로 재조사 필요 |
-| F4 | **본인 RaceBox 가 Mini 인지 Mini S 인지 확인** — Mini 는 내부 저장이 없어 폰 상시 연결이 필요하다. 케이스 설계 전에 확정할 것 |
+| F4 | ✅ **기종 확정 = RaceBox Micro** (옥대표 정정, 코웍의 Mini S 추정은 오류). 25×40×12mm·15g·**배터리 없음(외부 3.5~16V)**·**공식 "not waterproof"** → 케이스가 배터리를 품고 방수를 100% 져야 한다 |
+| F5 | **Micro 용 기성 3D 모델 2건 구매·검증** — [USB-C 무선충전 방수](https://cults3d.com/en/3d-model/various/racebox-micro-enclosure-usb-c-wireless-charging)(500mAh 내장, ~₩3,200) · [ultra PACKET](https://cults3d.com/en/3d-model/gadget/racebox-micro-ultra-packet)(3mm O링). 합쳐 1만원 미만 — **백지에서 그리기 전에 남의 설계부터 뜯어볼 것** |
+| F6 | **Micro 소비전류 확인** — 500mAh 로 몇 시간인지가 세션 길이를 정한다. 공식 미공개. 2핀 헤더 피치·1S LiPo 직결 가능 여부도 같이 |
 
 ---
 
