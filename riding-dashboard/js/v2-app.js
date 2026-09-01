@@ -2378,14 +2378,17 @@
     try { sp = An.computeStatsPanel(a); } catch (e) { sp = null; }
     if (!sp || !sp.rows || !sp.rows.length) return;
 
+    /* §485 (옥대표) — 단위를 아래 줄이 아니라 이름 괄호 안에.
+       두 줄이면 행 높이가 늘고 눈이 두 번 움직인다. 한 줄에 붙이면
+       "무엇을 어떤 단위로" 가 한 번에 읽힌다. */
     var METRIC_LABEL = {
-      sog:  ['Speed (SOG)', 'kt'],
-      vmg:  ['VMG', 'kt'],
-      twa:  ['Course wind angle', '°'],
-      awa:  ['Apparent wind angle', '°'],
-      heel: ['Heel', '°'],
-      pitch:['Pitch', '°'],
-      hr:   ['Heart rate', 'bpm']
+      sog:  'Speed / SOG (kt)',
+      vmg:  'VMG (kt)',
+      twa:  'Course wind angle (°)',
+      awa:  'Apparent wind angle (°)',
+      heel: 'Heel (°)',
+      pitch:'Pitch (°)',
+      hr:   'Heart rate (bpm)'
     };
     function fmtVal(row, v) {
       if (v == null || !isFinite(v)) return '—';
@@ -2429,15 +2432,14 @@
     var tb2 = el('tbody');
     order.forEach(function (metric) {
       var modes = byMetric[metric];
-      var label = METRIC_LABEL[metric] || [metric, ''];
+      var label = METRIC_LABEL[metric] || metric;
       var modeKeys = Object.keys(modes);
       modeKeys.forEach(function (mode, mi) {
         var tr = el('tr');
         if (mi === 0) {
           var tdM = el('td');
           tdM.rowSpan = modeKeys.length;
-          tdM.appendChild(el('div', null, label[0]));
-          tdM.appendChild(el('div', 'lab', label[1]));
+          tdM.appendChild(el('div', null, label));
           tr.appendChild(tdM);
         }
         tr.appendChild(el('td', null,
