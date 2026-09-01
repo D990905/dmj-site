@@ -8,9 +8,13 @@ function grab(name) {
   return src.slice(i, j + 4);
 }
 var KT = 1.94384;
-var F = new Function('KT',
-  grab('tbFmt') + grab('tbPick') + grab('tbDiff') + grab('tbCauseNote') +
-  '\nreturn { tbFmt: tbFmt, tbPick: tbPick, tbDiff: tbDiff, tbCauseNote: tbCauseNote };')(KT);
+/* tbFmt 는 기본 모집단을 TACKBIAS.tier 에서 읽는다(§503) — 떼어낸
+   함수만 실행하므로 그 상태를 여기서 만들어 준다. */
+var F = new Function('KT', 'TACKBIAS',
+  grab('tbFmt') + grab('tbPick') + grab('tbDiff') + grab('tbUpDownSanity').replace(/var box[\s\S]*?return box;/, 'return { ratio: ratio };') + grab('tbCauseNote') +
+  '\nreturn { tbFmt: tbFmt, tbPick: tbPick, tbDiff: tbDiff, tbCauseNote: tbCauseNote,'
+  + ' tbUpDownSanity: tbUpDownSanity, setTier: function (t) { TACKBIAS.tier = t; } };')(
+  KT, { metric: 'sog', mode: 'upwind', tier: 'avg' });
 
 var pass = 0, fail = 0;
 function ok(n, c, x) { if (c) { pass++; console.log('  ok   ' + n); }
@@ -85,7 +89,47 @@ var tiny = mk({ sog: [15.0, 15.05], vmg: [10.0, 9.98], twa: [50, 50.1] });
 var n5 = F.tbCauseNote(tiny, 'upwind');
 ok('미미하면 "없음" 으로', n5 && /no meaningful bias/.test(n5), n5);
 
-console.log('\n[9] 풍향 오차 산술 — 차이 D° 는 풍향 D/2° 로 설명된다');
+console.log('\n[9] ★ §503 모집단 스위치 — 평균 vs 상위');
+/* tier 를 바꾸면 같은 rows 에서 다른 값이 나와야 한다.
+   옥대표 질문("이게 오류일까")을 가르는 도구가 이것이다. */
+var tiered = [
+  { metric: 'vmg', mode: 'upwind', side: 'P', unit: 'speed',
+    avg: 5.7 / KT, tier50: 7.0 / KT, tier20: 8.2 / KT },
+  { metric: 'vmg', mode: 'upwind', side: 'S', unit: 'speed',
+    avg: 4.9 / KT, tier50: 6.2 / KT, tier20: 7.4 / KT }
+];
+F.setTier('avg');
+ok('기본은 평균', Math.abs(F.tbFmt(tiered[0]).v - 5.7) < 0.01);
+F.setTier('tier50');
+ok('Best 50% 로 바뀐다', Math.abs(F.tbFmt(tiered[0]).v - 7.0) < 0.01);
+F.setTier('tier20');
+ok('Best 20% 로 바뀐다', Math.abs(F.tbFmt(tiered[0]).v - 8.2) < 0.01);
+F.setTier('tier20');
+ok('명시 인자가 상태를 이긴다', Math.abs(F.tbFmt(tiered[0], 'avg').v - 5.7) < 0.01);
+F.setTier('avg');
+ok('tier 값이 없으면 null (조용히 빠진다)',
+   F.tbFmt({ avg: null, tier50: 3, unit: 'speed' }) === null);
+
+console.log('\n[10] ★ §503 위생 검사 — 풍하 VMG 가 풍상보다 큰가');
+/* 옥대표 세션: 풍하 5.9 ≈ 풍상 5.7 → 비율 1.03. 경고가 떠야 한다. */
+function vmgRows(upP, upS, dnP, dnS) {
+  return [
+    { metric: 'vmg', mode: 'upwind',   side: 'P', unit: 'speed', avg: upP / KT },
+    { metric: 'vmg', mode: 'upwind',   side: 'S', unit: 'speed', avg: upS / KT },
+    { metric: 'vmg', mode: 'downwind', side: 'P', unit: 'speed', avg: dnP / KT },
+    { metric: 'vmg', mode: 'downwind', side: 'S', unit: 'speed', avg: dnS / KT }
+  ];
+}
+var flagged = F.tbUpDownSanity(vmgRows(5.7, 4.9, 5.9, 5.6));
+ok('옥대표 세션은 경고 대상', flagged != null,
+   flagged ? '(비율 ' + flagged.ratio.toFixed(2) + ')' : '');
+ok('그 비율이 1.3 미만', flagged && flagged.ratio < 1.3);
+/* 제 테스트 세션: 풍상 8.9/8.4, 풍하 15.4/15.9 → 비율 1.8. 정상. */
+ok('정상 세션은 경고 없음', F.tbUpDownSanity(vmgRows(8.9, 8.4, 15.4, 15.9)) === null);
+ok('풍하가 없으면 조용히 빠진다',
+   F.tbUpDownSanity([{ metric: 'vmg', mode: 'upwind', side: 'P', unit: 'speed', avg: 5 }]) === null);
+
+console.log('\n[11] 풍향 오차 산술 — 차이 D° 는 풍향 D/2° 로 설명된다');
 /* 풍향을 δ 만큼 틀리면 한쪽 +δ, 반대쪽 −δ → 측정 차이 = 진짜 + 2δ.
    즉 관측된 4.0° 는 δ=2.0° 면 통째로 설명된다. 카드가 이 숫자를 쓴다. */
 var gap = 51.8 - 47.8;

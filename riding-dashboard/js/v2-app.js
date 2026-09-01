@@ -3173,7 +3173,7 @@
    * 색은 파랑(중립)이다 — 어느 택이 빠른 건 좋고 나쁨이 아니다.
    * ============================================================ */
 
-  var TACKBIAS = { metric: 'sog', mode: 'upwind' };
+  var TACKBIAS = { metric: 'sog', mode: 'upwind', tier: 'avg' };
 
   /* 이 카드만 다시 그린다 — 탭 전체를 다시 그리면 스크롤이 맨 위로 튄다 */
   function renderTackBiasRefresh(a) {
@@ -3193,11 +3193,14 @@
   ];
 
   /* rows 값은 기본 단위(속도 m/s)이고 unit 은 내부 키다 — §501 과 같은 규칙 */
-  function tbFmt(r) {
-    if (!r || r.avg == null || !isFinite(r.avg)) return null;
-    if (r.unit === 'speed') return { v: r.avg * KT, txt: (r.avg * KT).toFixed(1), unit: 'kt' };
-    if (r.unit === 'bpm') return { v: r.avg, txt: String(Math.round(r.avg)), unit: 'bpm' };
-    return { v: r.avg, txt: r.avg.toFixed(1), unit: '°' };
+  function tbFmt(r, tier) {
+    if (!r) return null;
+    var key = tier || TACKBIAS.tier || 'avg';
+    var v = (key === 'avg') ? r.avg : r[key];
+    if (v == null || !isFinite(v)) return null;
+    if (r.unit === 'speed') return { v: v * KT, txt: (v * KT).toFixed(1), unit: 'kt' };
+    if (r.unit === 'bpm') return { v: v, txt: String(Math.round(v)), unit: 'bpm' };
+    return { v: v, txt: v.toFixed(1), unit: '°' };
   }
   function tbPick(rows, metric, mode, side) {
     for (var i = 0; i < rows.length; i++) {
@@ -3257,6 +3260,22 @@
     });
     body.appendChild(mWrap);
 
+    /* §503 (옥대표 "이게 오류일까 사실일까") — 모집단 스위치.
+       기본이 **평균**이라 포일링 못 한 시간이 다 들어간다. 풍하에서
+       흘러다닌 시간이 많으면 풍하 VMG 가 풍상만큼 낮게 깔려서
+       "풍향이 틀렸나" 로 보인다. 좁혀 보면 갈린다 —
+         TOP 20% 로 풍하가 확 오르면 → 평균 문제(정상)
+         좁혀도 풍상≈풍하면    → 풍향 오차 의심
+       엔진이 tier50·tier20 을 이미 준다(방향 판정까지 반영돼 있다). */
+    var tWrap = el('div', 'btn-group btn-group-sm mb-3 ms-2');
+    [['avg', 'All'], ['tier50', 'Best 50%'], ['tier20', 'Best 20%']].forEach(function (t) {
+      var b = el('button', 'btn' + (TACKBIAS.tier === t[0] ? ' active' : ''), t[1]);
+      b.type = 'button';
+      b.addEventListener('click', function () { TACKBIAS.tier = t[0]; renderTackBiasRefresh(a); });
+      tWrap.appendChild(b);
+    });
+    body.appendChild(tWrap);
+
     var pR = tbPick(rows, TACKBIAS.metric, TACKBIAS.mode, 'P');
     var sR = tbPick(rows, TACKBIAS.metric, TACKBIAS.mode, 'S');
     var pf = tbFmt(pR), sf = tbFmt(sR);
@@ -3313,6 +3332,13 @@
     var note = tbCauseNote(rows, TACKBIAS.mode);
     if (note) body.appendChild(el('div', 'alert alert-info mt-3', note));
 
+    /* ②-a 위생 검사 — 풍하 VMG 가 풍상보다 크지 않으면 뭔가 잘못됐다.
+       정상 세션은 풍하 VMG 가 풍상의 1.5~2.5배다. 비슷하거나 낮으면
+       (ㄱ) 풍하에서 활주를 못 했거나 (ㄴ) 풍향이 크게 틀려 양쪽이 다
+       사실은 리치이거나 — 둘 중 하나다. 스위치로 갈린다. */
+    var sane = tbUpDownSanity(rows);
+    if (sane) body.appendChild(sane);
+
     /* ② 풍향 오차 경고 — CWA 계열일 때만, 그리고 정량적으로 */
     if (TACKBIAS.metric === 'twa' || TACKBIAS.metric === 'awa') {
       var cwaP = tbFmt(tbPick(rows, 'twa', TACKBIAS.mode, 'P'));
@@ -3336,6 +3362,35 @@
 
     card.appendChild(body);
     host.appendChild(card);
+  }
+
+  /* 풍상/풍하 VMG 크기 비교 — 이 카드의 값이 믿을 만한지 먼저 본다.
+     옥대표 세션에서 풍하 5.9 ≈ 풍상 5.7 이 나와 "오류인가" 질문이 나왔다.
+     계산은 맞았고(속도 −4% + CWA 2.7° → VMG −14.7% 는 CWA 65~70° 에서
+     성립한다), 이상한 건 **풍하가 풍상보다 안 크다는 것** 이었다. */
+  function tbUpDownSanity(rows) {
+    function both(mode) {
+      var p = tbFmt(tbPick(rows, 'vmg', mode, 'P'));
+      var s = tbFmt(tbPick(rows, 'vmg', mode, 'S'));
+      if (!p || !s) return null;
+      return (p.v + s.v) / 2;
+    }
+    var up = both('upwind'), dn = both('downwind');
+    if (up == null || dn == null || up <= 0) return null;
+    var ratio = dn / up;
+    if (ratio >= 1.3) return null;          /* 정상 */
+    var box = el('div', 'alert alert-warning mt-2');
+    box.appendChild(el('div', 'fw-bold',
+      'Downwind VMG is not clearly above upwind — read these numbers with care'));
+    box.appendChild(el('div', 'mt-1',
+      'Downwind VMG averages ' + dn.toFixed(1) + ' kt against ' + up.toFixed(1)
+      + ' kt upwind (' + ratio.toFixed(2) + '\u00d7). On a session that was really '
+      + 'sailed both ways this ratio is usually 1.5 to 2.5. Two things do this: '
+      + 'time spent off the foil downwind, which drags the average down, or a wind '
+      + 'direction that is well off, which turns both legs into reaches. '
+      + 'Switch to Best 20% \u2014 if downwind jumps, it was the slow time; '
+      + 'if it stays level with upwind, check the wind direction.'));
+    return box;
   }
 
   /* 지표를 가로질러 원인을 가른다.
