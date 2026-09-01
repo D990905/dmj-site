@@ -226,6 +226,15 @@
       if (lossM != null) lbl += ' · lost ' + lossM.toFixed(0) + ' m';
       else lbl += ' · loss not measurable' + (L && L.reason ? ' (' + L.reason + ')' : '');
       mk.bindTooltip(lbl, { direction: 'top' });
+      /* §496 (옥대표) — "트랙상의 메뉴버 점들도 클릭하면 데이터 요약
+         화면으로 이동되게" — 점을 누르면 그 회전을 상세로 연다.
+         핸들러는 호출부가 넣는다(탭 전환·선택은 앱의 일이다). */
+      if (typeof opts.onPick === 'function') {
+        mk.on('click', function () { opts.onPick(k, m); });
+        if (mk.getElement) {
+          try { mk.getElement().style.cursor = 'pointer'; } catch (e) {}
+        }
+      }
       drawn++;
     });
 

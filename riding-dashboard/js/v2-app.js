@@ -2949,9 +2949,20 @@
   }
 
   /* ---------- 회전 좌우 분포 · 개별 목록 ---------- */
+  /* §496 A2 (옥대표) — 회전을 고를 때마다 목록이 1번으로 되돌아갔다.
+     renderTurnExtras 가 카드를 통째로 다시 만들면서 스크롤이 0 이 된다.
+     95개 중 90번째를 보다가 하나 고르면 처음으로 튕기니 비교가 불가능했다.
+     다시 그리기 전에 스크롤 위치를 재고, 그린 뒤에 되돌린다. */
   function renderTurnExtras(a) {
     var host = $('turn-extra');
+    var listWrap = document.getElementById('turn-list');
+    var keepTop = null;
+    if (listWrap) {
+      var sc = listWrap.querySelector('.table-responsive');
+      if (sc) keepTop = sc.scrollTop;
+    }
     while (host.firstChild) host.removeChild(host.firstChild);
+    TURN_KEEP_SCROLL = keepTop;
     var mans = a.maneuvers || [];
     if (!mans.length) return;
 
@@ -3071,6 +3082,19 @@
       tb.appendChild(tr);
     });
     t.appendChild(tb); wrap.appendChild(t); card2.appendChild(wrap);
+    /* §496 — 다시 그린 뒤 스크롤을 되돌린다. DOM 에 붙은 다음이라야
+       scrollTop 이 먹으므로 다음 프레임에 넣는다. */
+    if (TURN_KEEP_SCROLL != null) {
+      var keep = TURN_KEEP_SCROLL;
+      /* 레이아웃이 끝나야 scrollTop 이 먹는다 — rAF 한 번으로는 아직
+         높이가 0 이라 0 으로 잘린다. 붙은 뒤 한 박자 늦춘다. */
+      setTimeout(function () {
+        wrap.scrollTop = keep;
+        if (wrap.scrollTop === 0 && keep > 0) {
+          setTimeout(function () { wrap.scrollTop = keep; }, 60);
+        }
+      }, 0);
+    }
     var fn = el('div', 'card-footer text-secondary');
     fn.style.fontSize = '.8125rem';
     fn.textContent = 'Click a row to open it below; click again to deselect. '
@@ -3096,6 +3120,94 @@
   var TREND = { metric: 'max' };
   /* §488 — 회전 목록 그룹 필터 (종류 × 택 방향) */
   var TURNFILT = { type: 'all', side: 'all' };
+  /* §496 — 회전 목록을 다시 그릴 때 유지할 스크롤 위치 */
+  var TURN_KEEP_SCROLL = null;
+
+  /* §496 — 회전 위치 미니 지도. Leaflet 인스턴스를 들고 있다가 다시
+     그릴 때 지운다(안 지우면 컨테이너가 재사용돼 "already initialized"). */
+  var turnMiniMap = null;
+  function renderTurnMiniMap(host, a, selIdx) {
+    if (!window.L || !CUR.session) { host.style.display = 'none'; return; }
+    var S = CUR.session.samples || [];
+    var mans = a.maneuvers || [];
+    if (!S.length || !mans.length) { host.style.display = 'none'; return; }
+    if (turnMiniMap) { try { turnMiniMap.remove(); } catch (e) {} turnMiniMap = null; }
+
+    var pts = S.filter(function (p) { return p && isFinite(p.lat) && isFinite(p.lng); });
+    if (pts.length < 2) { host.style.display = 'none'; return; }
+    var map = L.map(host, { zoomControl: false, attributionControl: false });
+    turnMiniMap = map;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+    /* 트랙은 배경 — 주인공은 회전 점이다 */
+    var step = Math.max(1, Math.floor(pts.length / 1500));
+    var line = [];
+    for (var i = 0; i < pts.length; i += step) line.push([pts[i].lat, pts[i].lng]);
+    L.polyline(line, { color: THEME.dim, weight: 1.5, opacity: 0.45 }).addTo(map);
+
+    var selSet = {};
+    selIdx.forEach(function (i) { selSet[i] = true; });
+    var selLatLng = [];
+    mans.forEach(function (m, k) {
+      var idx = m.apexIdx != null ? m.apexIdx : m.startIdx;
+      var p = S[idx];
+      if (!p || !isFinite(p.lat) || !isFinite(p.lng)) return;
+      var on = !!selSet[k];
+      var col = m.type === 'gybe' ? THEME.gybe : THEME.accent;
+      var mk = L.circleMarker([p.lat, p.lng], {
+        radius: on ? 8 : 3.5,
+        color: on ? col : THEME.dim,
+        weight: on ? 2.5 : 1,
+        opacity: on ? 1 : 0.6,
+        fillColor: col,
+        fillOpacity: on ? 0.9 : 0.25
+      }).addTo(map);
+      mk.bindTooltip((m.type === 'gybe' ? 'Gybe' : 'Tack') + ' #' + (k + 1)
+        + ' · ' + fmtClock(m.tSec), { direction: 'top' });
+      /* 지도 → 목록: 점을 누르면 그 회전을 고른다(토글) */
+      mk.on('click', function () {
+        var pos = TURNSEL.indexOf(k);
+        if (pos < 0) TURNSEL.push(k); else TURNSEL.splice(pos, 1);
+        renderTurnExtras(a);
+        scrollTurnRowIntoView(k);
+      });
+      if (on) selLatLng.push([p.lat, p.lng]);
+    });
+
+    /* 고른 회전이 보이도록 맞춘다 — 하나면 그 주변, 여럿이면 전부 */
+    function fit() {
+      try {
+        if (selLatLng.length === 1) map.setView(selLatLng[0], 16);
+        else if (selLatLng.length > 1) map.fitBounds(selLatLng, { padding: [30, 30] });
+        else {
+          var la = pts.map(function (p) { return p.lat; });
+          var ln = pts.map(function (p) { return p.lng; });
+          map.fitBounds([[Math.min.apply(null, la), Math.min.apply(null, ln)],
+                         [Math.max.apply(null, la), Math.max.apply(null, ln)]],
+                        { padding: [20, 20] });
+        }
+      } catch (e) {}
+    }
+    fit();
+    /* 숨은 탭에서 만들어지면 크기가 0 — 다시 재고 다시 맞춘다(§486·§491) */
+    setTimeout(function () { try { map.invalidateSize(); fit(); } catch (e) {} }, 60);
+  }
+
+  /* 목록에서 그 회전 행을 보이게 스크롤 */
+  function scrollTurnRowIntoView(turnIdx) {
+    setTimeout(function () {
+      var host = document.getElementById('turn-list');
+      if (!host) return;
+      var rows = host.querySelectorAll('tbody tr');
+      for (var i = 0; i < rows.length; i++) {
+        var first = rows[i].querySelector('td');
+        if (first && first.textContent.trim() === String(turnIdx + 1)) {
+          rows[i].scrollIntoView({ block: 'nearest' });
+          return;
+        }
+      }
+    }, 30);
+  }
 
   function renderTurnDetail(host, a) {
     var mans = a.maneuvers || [];
@@ -3116,6 +3228,17 @@
     head.appendChild(act);
     card.appendChild(head);
     var body = el('div', 'card-body');
+
+    /* §496 A1 (옥대표) — 고른 회전이 **어디서** 일어났는지.
+       "해당하는 메뉴버가 어디서 일어난건지 확인이 가능해."
+       Track 탭 지도는 다른 탭이라 회전을 고르는 순간 안 보인다. 그래서
+       상세 카드 안에 작은 지도를 둔다 — 트랙 전체를 흐리게 깔고, 고른
+       회전만 강조, 나머지 회전은 작은 점으로. 점을 누르면 그 회전으로
+       선택이 옮겨간다(목록과 지도가 같은 것을 가리키게). */
+    var miniHost = el('div');
+    miniHost.style.cssText = 'height:220px;border-radius:4px;overflow:hidden;margin-bottom:12px';
+    body.appendChild(miniHost);
+    renderTurnMiniMap(miniHost, a, sel);
 
     if (picked.length === 1) {
       var m = picked[0];
@@ -4615,7 +4738,20 @@
         catch (e) { losses = []; }
       }
       mapInst = RDMapTactical.renderLoss(host, session, analysis,
-        { height: 460, losses: losses });
+        { height: 460, losses: losses,
+          /* §496 — 지도 점 → 회전 상세. 탭을 넘어가야 하므로 Turns 탭을
+             열고, 그 회전만 고른 뒤 목록에서 보이게 스크롤한다. */
+          onPick: function (idx) {
+            TURNSEL.length = 0; TURNSEL.push(idx);
+            var tab = document.querySelector('a[href="#tab-turns"]');
+            if (tab) tab.click();
+            try { renderTurnExtras(analysis); } catch (e) {}
+            scrollTurnRowIntoView(idx);
+            var det = document.getElementById('turn-extra');
+            if (det) setTimeout(function () {
+              det.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            }, 60);
+          } });
       if (!mapInst) return;
       if (note) note.textContent = 'circle area = distance lost in the turn';
       lg.appendChild(legendItem(mapSwatch('#4dabf7', 10, 10, true), 'tack'));
@@ -4627,7 +4763,7 @@
           + ' m in total (biggest ' + Math.round(mapInst.maxLossM) + ' m). '
           + 'Hollow circles are turns where there was no steady run either side to '
           + 'measure against \u2014 they are drawn, not hidden, so the map does not '
-          + 'read as if you never turned there.';
+          + 'read as if you never turned there. Click a circle to open that turn.';
       }
       return;
     }
