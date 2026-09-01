@@ -2426,6 +2426,14 @@
     if (!host) return;
     while (host.firstChild) host.removeChild(host.firstChild);
 
+    /* §502 Tack bias — 통계표의 요약이므로 그 위에 둔다. 자기 호스트를
+       따로 갖는 이유는 지표 버튼을 눌렀을 때 **이 카드만** 다시 그리기
+       위해서다(성능 탭 전체를 다시 그리면 스크롤이 튄다). */
+    var tbHost = el('div');
+    tbHost.id = 'tackbias-host';
+    host.appendChild(tbHost);
+    try { renderTackBias(tbHost, a); } catch (e) {}
+
     renderTackDistribution(host, a);
 
     /* §450 Speed splits — mean-max 곡선이 모양을 보여주고, 이 표가 그
@@ -3142,6 +3150,254 @@
      하나면 지표 전부, 여럿이면 나란히 비교. 속도 곡선은 회전 정점(apex)
      을 0 초로 맞춰 겹친다 — 시각이 다른 회전을 같은 자로 보려면 정점을
      맞춰야 한다. */
+  /* ============================================================
+   * §502 Tack Bias — 포트/스타보드 비대칭을 **한 숫자로** (V10)
+   *
+   * §420·§421 이 통째로 이 얘기였는데 우리는 이름 없는 표 두 칸으로만
+   * 줬다. 밴티지는 이름을 붙이고 Diff 한 숫자로 요약한다 — 그래야
+   * 시즌 추이로 추적할 수 있는 지표가 된다.
+   *
+   * 밴티지보다 두 가지를 더한다:
+   *
+   * ① **원인을 자동으로 가른다.** 밴티지는 지표를 사람이 갈아끼우며
+   *    스스로 알아내야 한다. 옥대표 세션에서 SOG 는 −0.9%(사실상 없음)
+   *    인데 VMG 는 −11.2%, CWA 는 +12.0% 였다 → 속도가 아니라 **각도**
+   *    문제이고 스타보드에서 5.5° 더 벌린다. 이 추론을 카드가 한다.
+   *
+   * ② **풍향 오차 경고.** 이게 §421 의 교훈이고 밴티지엔 없다.
+   *    풍향을 δ 만큼 잘못 넣으면 한쪽 CWA 는 +δ, 반대쪽은 −δ 가 되어
+   *    **측정 차이 = 진짜 차이 + 2δ** 가 된다. 즉 CWA 차이 D° 는
+   *    풍향이 D/2° 만 틀려도 통째로 설명된다. 이 숫자를 같이 보여
+   *    주지 않으면 있지도 않은 비대칭을 연습하게 된다.
+   *
+   * 색은 파랑(중립)이다 — 어느 택이 빠른 건 좋고 나쁨이 아니다.
+   * ============================================================ */
+
+  var TACKBIAS = { metric: 'sog', mode: 'upwind' };
+
+  /* 이 카드만 다시 그린다 — 탭 전체를 다시 그리면 스크롤이 맨 위로 튄다 */
+  function renderTackBiasRefresh(a) {
+    var h = $('tackbias-host');
+    if (!h) return;
+    while (h.firstChild) h.removeChild(h.firstChild);
+    try { renderTackBias(h, a); } catch (e) {}
+  }
+
+  var TB_METRICS = [
+    { id: 'sog',  label: 'Speed' },
+    { id: 'vmg',  label: 'VMG' },
+    { id: 'twa',  label: 'CWA' },
+    { id: 'awa',  label: 'AWA' },
+    { id: 'heel', label: 'Heel' },
+    { id: 'hr',   label: 'HR' }
+  ];
+
+  /* rows 값은 기본 단위(속도 m/s)이고 unit 은 내부 키다 — §501 과 같은 규칙 */
+  function tbFmt(r) {
+    if (!r || r.avg == null || !isFinite(r.avg)) return null;
+    if (r.unit === 'speed') return { v: r.avg * KT, txt: (r.avg * KT).toFixed(1), unit: 'kt' };
+    if (r.unit === 'bpm') return { v: r.avg, txt: String(Math.round(r.avg)), unit: 'bpm' };
+    return { v: r.avg, txt: r.avg.toFixed(1), unit: '°' };
+  }
+  function tbPick(rows, metric, mode, side) {
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (r.metric === metric && r.mode === mode && r.side === side) return r;
+    }
+    return null;
+  }
+  /* Diff = (Stbd − Port) / |Port| . 부호는 '스타보드가 어느 쪽인지' 만
+     말한다. 좋고 나쁨이 아니므로 색을 입히지 않는다. */
+  function tbDiff(p, s) {
+    if (p == null || s == null || !isFinite(p) || Math.abs(p) < 1e-9) return null;
+    return (s - p) / Math.abs(p) * 100;
+  }
+
+  function renderTackBias(host, a) {
+    if (!An.computeStatsPanel) return;
+    var sp = null;
+    try { sp = An.computeStatsPanel(a); } catch (e) { sp = null; }
+    if (!sp || !sp.rows || !sp.rows.length) return;
+    var rows = sp.rows;
+
+    /* 값이 있는 지표만 스위처에 올린다 — 빈 버튼은 누르게 만들고 실망시킨다 */
+    var avail = TB_METRICS.filter(function (m) {
+      return ['upwind', 'downwind'].some(function (md) {
+        return tbFmt(tbPick(rows, m.id, md, 'P')) && tbFmt(tbPick(rows, m.id, md, 'S'));
+      });
+    });
+    if (!avail.length) return;
+    if (!avail.some(function (m) { return m.id === TACKBIAS.metric; })) {
+      TACKBIAS.metric = avail[0].id;
+    }
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Tack bias — port against starboard'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    /* 풍상/풍하 */
+    var modeWrap = el('div', 'btn-group btn-group-sm mb-2');
+    [['upwind', 'Upwind'], ['downwind', 'Downwind']].forEach(function (m) {
+      var b = el('button', 'btn' + (TACKBIAS.mode === m[0] ? ' active' : ''), m[1]);
+      b.type = 'button';
+      b.addEventListener('click', function () { TACKBIAS.mode = m[0]; renderTackBiasRefresh(a); });
+      modeWrap.appendChild(b);
+    });
+    body.appendChild(modeWrap);
+
+    /* 지표 */
+    var mWrap = el('div', 'btn-group btn-group-sm mb-3 ms-2');
+    avail.forEach(function (m) {
+      var b = el('button', 'btn' + (TACKBIAS.metric === m.id ? ' active' : ''), m.label);
+      b.type = 'button';
+      b.addEventListener('click', function () { TACKBIAS.metric = m.id; renderTackBiasRefresh(a); });
+      mWrap.appendChild(b);
+    });
+    body.appendChild(mWrap);
+
+    var pR = tbPick(rows, TACKBIAS.metric, TACKBIAS.mode, 'P');
+    var sR = tbPick(rows, TACKBIAS.metric, TACKBIAS.mode, 'S');
+    var pf = tbFmt(pR), sf = tbFmt(sR);
+    if (!pf || !sf) {
+      body.appendChild(el('div', 'alert alert-warning',
+        'No ' + (TACKBIAS.mode === 'upwind' ? 'upwind' : 'downwind')
+        + ' data for this metric.'));
+      card.appendChild(body); host.appendChild(card); return;
+    }
+    var d = tbDiff(pf.v, sf.v);
+
+    /* 한 줄 요약 — Port | Diff | Stbd */
+    var row = el('div', 'd-flex align-items-center justify-content-between');
+    function side(label, val, unit) {
+      var c = el('div', 'text-center');
+      c.appendChild(el('div', 'lab', label));
+      c.appendChild(el('div', 'kpi__val num mt-1', val));
+      c.appendChild(el('div', 'lab', unit));
+      return c;
+    }
+    row.appendChild(side('Port', pf.txt, pf.unit));
+    var mid = el('div', 'text-center px-3');
+    mid.appendChild(el('div', 'lab', 'Diff'));
+    var dv = el('div', 'kpi__val num mt-1',
+      d == null ? '—' : (d > 0 ? '+' : '') + d.toFixed(1) + '%');
+    /* 중립 색 — 어느 택이 빠른 게 좋고 나쁨이 아니다 */
+    dv.style.color = THEME.accent;
+    mid.appendChild(dv);
+    mid.appendChild(el('div', 'lab', 'starboard vs port'));
+    row.appendChild(mid);
+    row.appendChild(side('Starboard', sf.txt, sf.unit));
+    body.appendChild(row);
+
+    /* 좌우 막대 — 중앙에서 벌어진 쪽이 큰 쪽 */
+    if (d != null) {
+      var barWrap = el('div', 'mt-3');
+      barWrap.style.cssText = 'position:relative;height:10px;border-radius:5px;'
+        + 'background:' + THEME.grid;
+      var half = Math.max(-100, Math.min(100, d)) / 100;   /* −1..1 */
+      var seg = el('div');
+      var w = Math.min(50, Math.abs(half) * 50 * 4);       /* ±25% 를 꽉 차게 */
+      seg.style.cssText = 'position:absolute;top:0;bottom:0;background:' + THEME.accent
+        + ';border-radius:5px;'
+        + (half >= 0 ? 'left:50%;' : 'right:50%;') + 'width:' + w + '%';
+      barWrap.appendChild(seg);
+      var mark = el('div');
+      mark.style.cssText = 'position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;'
+        + 'background:' + THEME.axisText;
+      barWrap.appendChild(mark);
+      body.appendChild(barWrap);
+    }
+
+    /* ① 원인 자동 분리 — 속도인가 각도인가 */
+    var note = tbCauseNote(rows, TACKBIAS.mode);
+    if (note) body.appendChild(el('div', 'alert alert-info mt-3', note));
+
+    /* ② 풍향 오차 경고 — CWA 계열일 때만, 그리고 정량적으로 */
+    if (TACKBIAS.metric === 'twa' || TACKBIAS.metric === 'awa') {
+      var cwaP = tbFmt(tbPick(rows, 'twa', TACKBIAS.mode, 'P'));
+      var cwaS = tbFmt(tbPick(rows, 'twa', TACKBIAS.mode, 'S'));
+      if (cwaP && cwaS) {
+        var degGap = Math.abs(cwaS.v - cwaP.v);
+        var w2 = el('div', 'alert alert-warning mt-2');
+        w2.appendChild(el('div', 'fw-bold', 'Read this one against your wind direction'));
+        w2.appendChild(el('div', 'mt-1',
+          'Getting the wind direction wrong by δ pushes one tack’s angle up by δ and '
+          + 'the other down by δ, so the gap you see is the real gap plus 2δ. '
+          + 'This ' + degGap.toFixed(1) + '° gap would be fully explained by a wind '
+          + 'direction that is off by just ' + (degGap / 2).toFixed(1) + '°'
+          + (CUR.est && CUR.est.confidence
+              ? ' — the track estimate is ' + confLabel(CUR.est.confidence) + ' confidence'
+              : '')
+          + '. Confirm the wind before training this away.'));
+        body.appendChild(w2);
+      }
+    }
+
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* 지표를 가로질러 원인을 가른다.
+
+     ⚠ 처음엔 크기 비율만 봤다(|VMG%| 가 |속도%| 의 2배 이상이면 각도).
+     옥대표 세션에서 속도 +2.8% · VMG −5.4% 였는데 2.8 < 5.4/2 = 2.7 이
+     거짓이라 **경계에서 놓쳤다.** 그런데 이 경우는 사실 가장 확실한
+     각도 신호다 — **부호가 반대**이기 때문이다. 한 택이 더 빠른데
+     실효 전진은 반대 택이 낫다면, 빠른 쪽이 각도를 버리고 있다는 뜻이고
+     달리 설명할 길이 없다. 그래서 부호 판정을 크기 판정보다 먼저 둔다. */
+  function tbCauseNote(rows, mode) {
+    function gap(metric) {
+      var p = tbFmt(tbPick(rows, metric, mode, 'P'));
+      var s = tbFmt(tbPick(rows, metric, mode, 'S'));
+      if (!p || !s) return null;
+      return { pct: tbDiff(p.v, s.v), deg: s.v - p.v };
+    }
+    var sog = gap('sog'), vmg = gap('vmg'), cwa = gap('twa');
+    if (!sog || !vmg || sog.pct == null || vmg.pct == null) return null;
+    var aS = Math.abs(sog.pct), aV = Math.abs(vmg.pct);
+
+    /* 둘 다 미미하면 '비대칭이 없다' 도 결론이다 */
+    if (aS < 2 && aV < 3) {
+      return 'Both tacks are within a couple of percent on speed and VMG — no '
+           + 'meaningful bias to work on ' + (mode === 'upwind' ? 'upwind' : 'downwind') + '.';
+    }
+
+    function wider() {
+      if (!cwa || cwa.deg == null) return '';
+      return ' You sail ' + Math.abs(cwa.deg).toFixed(1) + '\u00b0 wider on '
+           + (cwa.deg > 0 ? 'starboard' : 'port')
+           + (mode === 'upwind' ? ', and that is where the VMG goes.'
+                                : ', which costs downwind VMG the same way.');
+    }
+
+    /* ★ 부호가 반대 — 가장 확실한 각도 신호 */
+    if (aS >= 1 && aV >= 2 && (sog.pct > 0) !== (vmg.pct > 0)) {
+      return 'You are ' + aS.toFixed(1) + '% faster on '
+        + (sog.pct > 0 ? 'starboard' : 'port')
+        + ' but your VMG is ' + aV.toFixed(1) + '% better on '
+        + (vmg.pct > 0 ? 'starboard' : 'port')
+        + ' — the two point opposite ways, which only happens when the faster tack '
+        + 'is giving up angle.' + wider();
+    }
+
+    /* 같은 방향인데 VMG 가 훨씬 크게 벌어짐 → 여전히 각도 쪽 */
+    if (aV >= 3 && aS < aV * 0.6) {
+      return 'Speed is close on both tacks (' + (sog.pct > 0 ? '+' : '')
+        + sog.pct.toFixed(1) + '%) but VMG differs by ' + aV.toFixed(1)
+        + '% — that gap is coming from angle, not boat speed.' + wider();
+    }
+
+    /* 같은 방향이고 크기도 비슷 → 속도 차이 */
+    if (aS >= 2) {
+      return 'You are ' + aS.toFixed(1) + '% faster on '
+        + (sog.pct > 0 ? 'starboard' : 'port')
+        + ' and the VMG follows it (' + aV.toFixed(1)
+        + '%) — this reads as a speed difference rather than an angle one.';
+    }
+    return null;
+  }
+
   var TURNSEL = [];
   /* §490 — 시즌 흐름에서 고른 지표 */
   var TREND = { metric: 'max' };
