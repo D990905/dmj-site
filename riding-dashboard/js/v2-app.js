@@ -2606,6 +2606,57 @@
     host.appendChild(c2);
   }
 
+  /* §495 — 저장된 세션 열기. 저장 당시의 풍향·풍속·장비 입력까지 되살려야
+     그때 본 화면과 같은 숫자가 나온다. 트랙만 다시 분석하고 입력을 지금
+     화면 값으로 두면, 같은 세션인데 점수가 달라 보인다. */
+  function openSavedSession(rec) {
+    if (!rec || !window.RDStorage) return;
+    var gpx = null;
+    try { gpx = RDStorage.loadTrack(rec.id); } catch (e) { gpx = null; }
+    if (!gpx) {
+      alertLine('This session is stored as a summary only — its track was cleared '
+        + 'to make space, so it cannot be reopened.');
+      return;
+    }
+    /* 융합 세션(여러 파일 합본)은 v2 에 복원 경로가 없다. 조용히 실패하는
+       대신 어디로 가야 하는지 알려 준다. */
+    if (typeof gpx === 'string' && gpx.slice(0, 8) === 'RDFUSED1') {
+      alertLine('This one was saved as a merged session (multiple files). '
+        + 'Open it from the old dashboard — this page cannot rebuild merged tracks yet.');
+      return;
+    }
+    /* 저장 당시 입력 복원 — 폼을 먼저 채우고 분석을 돌린다 */
+    try {
+      if (rec.windSpeedKt != null && $('in-windspeed')) {
+        $('in-windspeed').value = rec.windSpeedKt;
+      }
+    } catch (e) {}
+    try {
+      loadGpxText(gpx, rec.name || 'Saved session');
+      /* 저장된 풍향이 있으면 추정 대신 그 값으로 다시 분석한다 */
+      if (rec.windDir != null && CUR.fullSession) {
+        CUR.windDir = rec.windDir;
+        reapplyEdits();
+      }
+      var el2 = document.getElementById('chart-timeline');
+      if (el2) el2.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    } catch (e) {
+      alertLine('Could not reopen this session: ' + (e && e.message ? e.message : e));
+    }
+  }
+
+  /* 화면 상단에 한 줄 안내 — alert() 는 흐름을 끊는다 */
+  function alertLine(msg) {
+    var host = document.getElementById('nav-meta');
+    if (!host) return;
+    var prev = host.textContent;
+    host.textContent = msg;
+    host.style.color = THEME.warn;
+    setTimeout(function () {
+      host.textContent = prev; host.style.color = '';
+    }, 6000);
+  }
+
   /* ---------- 저장된 세션 · 시즌 흐름 ---------- */
   function listSessions() {
     try { return (Store && Store.listSessions) ? (Store.listSessions() || []) : []; }
@@ -2625,7 +2676,8 @@
     var card = el('div', 'card');
     var h = el('div', 'card-header');
     h.appendChild(el('h3', 'card-title', 'Saved sessions'));
-    h.appendChild(el('div', 'card-actions lab', list.length + ' stored'));
+    h.appendChild(el('div', 'card-actions lab',
+      list.length + ' stored · click a row to open'));
     card.appendChild(h);
     var wrap = el('div', 'table-responsive');
     var t = el('table', 'table table-vcenter card-table table-sm');
@@ -2640,9 +2692,29 @@
     });
     sorted.forEach(function (r) {
       var tr = el('tr');
+      /* §495 (옥대표) — 저장된 세션을 눌러 바로 연다.
+         원본 트랙이 남아 있는 세션만 가능하다(hasTrack). 저장 공간이
+         모자라면 오래된 트랙부터 비워지므로(storeTrackWithEviction),
+         요약만 남은 세션이 생긴다 — 그걸 눌렀을 때 아무 일도 안 일어나면
+         고장으로 보이므로 왜 못 여는지 말해 준다(§416 과 같은 게이팅). */
+      if (r.hasTrack) {
+        tr.style.cursor = 'pointer';
+        tr.title = 'Open this session';
+        tr.addEventListener('click', function () { openSavedSession(r); });
+      } else {
+        tr.title = 'Summary only — the track was cleared to save space, '
+                 + 'so this one cannot be reopened.';
+        tr.style.opacity = '0.72';
+      }
       var d = r.dateEpoch ? new Date(r.dateEpoch) : null;
-      tr.appendChild(el('td', 'num', d ? d.toISOString().slice(0, 10) : '—'));
-      tr.appendChild(el('td', null, r.name || 'Session'));
+      var tdD = el('td', 'num', d ? d.toISOString().slice(0, 10) : '—');
+      tr.appendChild(tdD);
+      var tdN = el('td', null, r.name || 'Session');
+      if (!r.hasTrack) {
+        var badge = el('span', 'lab ms-2', 'summary only');
+        tdN.appendChild(badge);
+      }
+      tr.appendChild(tdN);
       /* 저장 레코드는 SI 단위(m·m/s)로 들어간다 — 표시할 때 변환한다 */
       tr.appendChild(el('td', 'text-end num',
         r.distanceM != null ? (r.distanceM / 1000).toFixed(2) + ' km' : '—'));
