@@ -712,6 +712,182 @@
     catch (e) { return txt; }
   }
 
+  /* §505 풍향 확인 — 지도 + 화살표 + 슬라이더 + **최적 풍향 계산**.
+     지금까지는 숫자 입력칸 하나뿐이라 218 을 넣든 211 을 넣든 화면에서
+     뭐가 달라지는지 안 보였다(§428). 밴티지는 지도에 화살표를 깔아
+     눈으로 대조하게 하는데, 우리는 거기에 **계산**을 더한다 —
+     포트/스타보드 풍상 각도가 같아지는 풍향을 찾아 제안한다. */
+  var windMap = null;
+  function renderWindConfirm(host, a, est) {
+    if (!window.L || !window.RDWindConfirm || !CUR.session) return;
+    var S = (CUR.session.samples || []).filter(function (p) {
+      return p && isFinite(p.lat) && isFinite(p.lng);
+    });
+    if (S.length < 50) return;
+    var curDir = a.windDir;
+    if (curDir == null) return;
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Confirm the wind direction'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    body.appendChild(el('div', 'text-secondary mb-2',
+      'Arrows point the way the wind blows. Drag the slider until they line up '
+      + 'with how the session felt — upwind legs should sit either side of the arrows.'));
+
+    var mapHost = el('div');
+    mapHost.style.cssText = 'height:340px;border-radius:4px;overflow:hidden';
+    body.appendChild(mapHost);
+
+    /* 슬라이더 + 현재 값 */
+    var ctl = el('div', 'd-flex align-items-center gap-3 mt-3');
+    var slider = el('input', 'form-range');
+    slider.type = 'range'; slider.min = '0'; slider.max = '359'; slider.step = '1';
+    slider.value = String(Math.round(curDir));
+    slider.style.flex = '1';
+    var readout = el('div', 'kpi__val num');
+    readout.style.minWidth = '86px';
+    readout.textContent = Math.round(curDir) + '°';
+    ctl.appendChild(slider); ctl.appendChild(readout);
+    var applyBtn = el('button', 'btn btn-primary', 'Use this direction');
+    applyBtn.type = 'button';
+    ctl.appendChild(applyBtn);
+    body.appendChild(ctl);
+
+    /* 실시간 대칭 판정 */
+    var live = el('div', 'mt-2');
+    body.appendChild(live);
+
+    /* 최적 풍향 제안 */
+    var sw = null;
+    try { sw = RDWindConfirm.sweep(S, curDir, { range: 25, step: 1 }); } catch (e) {}
+    var vd = sw ? RDWindConfirm.verdict(sw, curDir) : null;
+
+    card.appendChild(body);
+    host.appendChild(card);
+
+    /* ---- 지도 ---- */
+    if (windMap) { try { windMap.remove(); } catch (e) {} windMap = null; }
+    var map = L.map(mapHost, { zoomControl: false, attributionControl: false });
+    windMap = map;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    var step = Math.max(1, Math.floor(S.length / 1200));
+    var line = [];
+    for (var i = 0; i < S.length; i += step) line.push([S[i].lat, S[i].lng]);
+    L.polyline(line, { color: THEME.accent, weight: 2, opacity: 0.9 }).addTo(map);
+
+    var la = S.map(function (p) { return p.lat; });
+    var ln = S.map(function (p) { return p.lng; });
+    var bounds = [[Math.min.apply(null, la), Math.min.apply(null, ln)],
+                  [Math.max.apply(null, la), Math.max.apply(null, ln)]];
+    function fit() {
+      try { map.fitBounds(bounds, { padding: [30, 30] }); } catch (e) {}
+    }
+    fit();
+    setTimeout(function () { try { map.invalidateSize(); fit(); } catch (e) {} }, 60);
+
+    /* 바람 화살표 격자 — 지도 위에 5×5. 풍향이 바뀌면 회전만 시킨다. */
+    var arrows = [];
+    function buildArrows() {
+      arrows.forEach(function (m) { try { map.removeLayer(m); } catch (e) {} });
+      arrows = [];
+      var b = map.getBounds();
+      var latSpan = b.getNorth() - b.getSouth(), lngSpan = b.getEast() - b.getWest();
+      for (var r = 0; r < 5; r++) {
+        for (var c = 0; c < 5; c++) {
+          var lat = b.getSouth() + latSpan * (r + 0.5) / 5;
+          var lng = b.getWest() + lngSpan * (c + 0.5) / 5;
+          var icon = L.divIcon({
+            className: '', iconSize: [26, 26], iconAnchor: [13, 13],
+            html: '<div class="wc-arrow" style="transform:rotate(0deg)">↓</div>'
+          });
+          arrows.push(L.marker([lat, lng], { icon: icon, interactive: false }).addTo(map));
+        }
+      }
+      spinArrows(parseFloat(slider.value));
+    }
+    /* 화살표는 '바람이 가는 방향' 을 가리킨다. 풍향(from)이 200° 면
+       바람은 20° 쪽으로 분다 → 아래 화살표(↓, 기본 남쪽)를 그만큼 돌린다. */
+    function spinArrows(wd) {
+      var toward = (wd + 180) % 360;
+      arrows.forEach(function (m) {
+        var e = m.getElement && m.getElement();
+        var d = e && e.querySelector('.wc-arrow');
+        if (d) d.style.transform = 'rotate(' + (toward + 180) + 'deg)';
+      });
+    }
+    setTimeout(buildArrows, 120);
+    map.on('moveend zoomend', function () { setTimeout(buildArrows, 30); });
+
+    /* ---- 실시간 판정 ---- */
+    function updateLive(wd) {
+      while (live.firstChild) live.removeChild(live.firstChild);
+      var r = null;
+      try { r = RDWindConfirm.asymmetryAt(S, wd); } catch (e) {}
+      if (!r) {
+        live.appendChild(el('div', 'text-secondary',
+          'Not enough upwind sailing on both tacks at this direction to judge.'));
+        return;
+      }
+      var box = el('div', 'alert ' + (r.absDiff <= 3 ? 'alert-success' : 'alert-info'));
+      box.appendChild(el('div', 'fw-bold',
+        'Upwind angle  —  port ' + r.port.toFixed(1) + '° · starboard '
+        + r.stbd.toFixed(1) + '°  ·  gap ' + r.absDiff.toFixed(1) + '°'));
+      box.appendChild(el('div', 'mt-1',
+        r.absDiff <= 3
+          ? 'The two tacks sit almost evenly either side of this direction.'
+          : 'Getting the direction wrong by δ lifts one tack by δ and drops the '
+            + 'other by δ, so a ' + r.absDiff.toFixed(1) + '° gap is what a '
+            + (r.absDiff / 2).toFixed(1) + '° error would produce.'));
+      live.appendChild(box);
+    }
+    updateLive(curDir);
+
+    /* ---- 최적 제안 ---- */
+    if (vd) {
+      var sug = el('div', 'alert ' + (vd.notable ? 'alert-warning' : 'alert-secondary') + ' mt-2');
+      sug.appendChild(el('div', 'fw-bold',
+        'Most symmetric direction: ' + Math.round(vd.bestDir) + '°'
+        + (Math.abs(vd.offsetDeg) < 0.5 ? ' — that is what you have'
+            : '  (' + (vd.offsetDeg > 0 ? '+' : '') + vd.offsetDeg.toFixed(0)
+              + '° from the ' + Math.round(curDir) + '° in use)')));
+      sug.appendChild(el('div', 'mt-1',
+        'This is the direction that makes your port and starboard upwind angles match. '
+        + '⚠ It assumes you sail both tacks equally well — if one tack is '
+        + 'genuinely weaker, this will quietly absorb that into the wind. '
+        + 'Treat it as a second opinion, not an answer.'));
+      if (vd.notable) {
+        var useBest = el('button', 'btn btn-sm mt-2',
+          'Try ' + Math.round(vd.bestDir) + '°');
+        useBest.type = 'button';
+        useBest.addEventListener('click', function () {
+          slider.value = String(Math.round(vd.bestDir));
+          readout.textContent = Math.round(vd.bestDir) + '°';
+          spinArrows(vd.bestDir);
+          updateLive(vd.bestDir);
+        });
+        sug.appendChild(useBest);
+      }
+      body.appendChild(sug);
+    }
+
+    /* ---- 슬라이더 ---- */
+    var liveTimer = null;
+    slider.addEventListener('input', function () {
+      var wd = parseFloat(slider.value);
+      readout.textContent = Math.round(wd) + '°';
+      spinArrows(wd);
+      /* 판정은 표본 전체를 훑으므로 살짝 미룬다 — 드래그가 끊기면 안 된다 */
+      if (liveTimer) clearTimeout(liveTimer);
+      liveTimer = setTimeout(function () { updateLive(wd); }, 90);
+    });
+    applyBtn.addEventListener('click', function () {
+      applyWind(((parseFloat(slider.value) % 360) + 360) % 360, null);
+    });
+  }
+
   /* ---------- 환경 (풍향 · VMG · 폴라) ---------- */
   function renderEnvironment(a, est) {
     var host = $('env-body');
@@ -758,6 +934,9 @@
     c4.appendChild(src); row.appendChild(c4);
 
     cb.appendChild(row); ctl.appendChild(cb); host.appendChild(ctl);
+
+    /* §505 — 숫자 입력 바로 아래에 지도. 여기서 눈과 계산이 만난다. */
+    try { renderWindConfirm(host, a, est); } catch (e) {}
 
     btn.addEventListener('click', function () {
       var v = parseFloat(inp.value);
