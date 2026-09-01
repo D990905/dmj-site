@@ -1,182 +1,310 @@
-# 3D 프린터 · DIY 장비 조사 (2026-09-01)
+# 3D 프린터 · DIY 장비 조사 (2026-09-01, 2차 보강)
 
-옥대표 지시로 코웍 에이전트가 조사. **원문 전체는 이 문서**이고, 못 채운
-항목은 맨 아래 재조사 목록에 남겼다.
+옥대표 지시로 코웍 에이전트 조사. 1차 답변의 **정정 3건**이 포함돼 있다.
 
 ---
 
-## 결론 3줄
+## ⚠️ 1차 답변 정정 3건
 
-1. **FDM 이다. 레진 아니다.** 레진은 밀폐는 좋지만 자외선에 황변·취성화되고
-   TPU 를 못 뽑는다. 케이스+스트랩+하네스 부품을 한 대로 하려면 FDM.
-2. **프린트만으로 방수는 안 된다.** O링 홈 설계 + 규격 O링이 필수.
-   현실적 목표 IP65~67(무보증).
-3. **"풋스트랩 재질로 하네스"는 하지 말 것.** 하중이 아니라 **카테고리가
-   다르다** — 윙 하네스 라인은 웨빙이 아니라 **Dyneema 로프 + PU 튜브**다.
+| 1차에서 한 말 | 실제 |
+|---|---|
+| "RaceBox Mini 치수 확인 못 함" | **72.05 × 80.88 × 25.60 mm** — 공식 STEP CAD 실측 |
+| "IP 등급 없음, splash resistant 만" | **공식 FAQ 에 IP54 명시.** 그리고 **공식 매뉴얼에 "염수가 기기 외피와 방수 절연을 손상시킬 수 있다"** ← 윙포일에 직격 |
+| "GNSS 케이스는 PLA·PETG·나일론 다 OK" | ❌ **나일론 안 된다.** Taoglas 앱노트: 흡습 하우징은 유전율을 바꿔 안테나를 디튜닝. **짙은 카본블랙 안료도 RF 흡수** → 밝은색·자연색 필라멘트 |
 
-## 🎯 가장 중요한 발견 — RaceBox 공식 CAD 무료 배포
+---
 
-RaceBox 가 `RaceBox Mini Defeaturized.step` 을 공식 배포하고, 페이지에
-"다운로드해서 커스텀 케이스·슬리브·클램프를 설계하라"고 직접 적어 놨다.
-치수 실측이 필요 없다.
+## 💡 프린팅 전에 이것부터 — 2~3만원
+
+**Pelican 1010 Micro Case** — 내부 **111 × 73 × 43 mm**, **IP67**(1m 30분), 투명 뚜껑 버전 있음.
+RaceBox Mini S(72 × 81 × 25.6 mm)가 **여유 있게 들어간다.**
+
+→ 이걸로 **위성 수신부터 시험하라.** 되면 3D 프린팅이 아예 불필요할 수도 있고,
+안 되면 그 실패 원인이 프린트 설계의 입력값이 된다. 실패해도 몇 만원이다.
+https://www.pelican.com/us/en/product/cases/1010
+
+## 🎯 공식 무료 CAD
+
+`RaceBox Mini Defeaturized.step` (4.2MB, mm, 무료)
+RaceBox 공식 문구: *"Feel free to download it and design any custom case/sleeve/clamp/etc around it."*
 → https://www.racebox.pro/products/racebox-mini/cad-download
 
-## 프린터
+**형상**: 위아래로 좁아지는 이중 절두 피라미드. **허리(바닥에서 8.1mm)가 최대 둘레**
+→ **클램셸 분할선을 여기 두면 양쪽 다 언더컷이 없다.**
 
-| 기종 | 챔버 | 국내 최저가 | 판정 |
+---
+
+## RaceBox — 옥대표 기기는 Mini S
+
+| | Mini | **Mini S** | Micro |
 |---|---|---|---|
-| **Bambu Lab P2S** | 밀폐(수동), 베드 110°C | **799,000원** | **🥇 1순위** |
-| Bambu Lab P1S | 밀폐(수동) | 629,000원 | 예산 빠듯하면. ASA 워핑 감수 |
-| Bambu Lab X2D | **능동 가열 65°C** | 1,099,000원 | ASA 를 크게·자주 뽑으면 |
-| Elegoo Centauri Carbon | 밀폐(비가열) | 확인 못 함 | — |
-| Prusa CORE One | 능동 55°C | 국내가·A/S 확인 못 함 | — |
+| 치수 | 72.05 × 80.88 × 25.60 mm | 동일 하우징 | 25 × 40 × 12 |
+| 방수 | **IP54** | 동일 | **"not waterproof" 공식 명시** |
+| 내장 저장 | **없음 (폰 BT 필수)** | **130분@25Hz / 325분@10Hz** | 130분@25Hz |
+| 배터리 | 1100mAh, 20h+ | 동일 | 없음 |
+| 가격 | $219 | $289 | $129 |
 
-- 국내 공식총판 **3D몬**(02-546-2617), 해외직구가 오히려 **더 비쌈**(P1S 직구 72만 vs 국내정품 62.9만)
-- **AMS 콤보 사지 말 것** — TPU 는 AMS(PTFE 튜브)로 못 돌린다. 좌굴·잼. 외부 스풀 직결 필수
-- 빌드볼륨은 선택 기준이 아니다(케이스 100×80×40, 버클 50mm 이하 → 256³ 과잉 충분)
-- ⚠ P1S 챔버 능동/수동 표기가 자료마다 충돌. bambulab.com 이 크롤링 차단이라 1차 확인 못 함 → **수동으로 간주**
-- X1C 는 2026-03-31 단종, 후속이 X2D
+25Hz CSV 를 폰 없이 뽑았으므로 **Mini S**.
 
-## 소재
+**공식 문서의 물 관련 문구 (원문)**
+- 마케팅: *"Splash Resistant — Safe to use on water jets, boats or in the rain"*
+- FAQ: *"The devices are IP54 rated."*
+- FAQ: USB 커버는 *"does not improve the water ingress protection"* (녹 방지용)
+- 🔴 매뉴얼: **"Saltwater may cause damage to the device's shell and water insulation."**
 
-**케이스 본체: ASA 1순위 / PETG 2순위. PLA 절대 금지.**
+IP54 = 5(방진) + 4(모든 방향 튀는 물). **분사수(IPX5)도 침수(IPX7)도 아니다.**
 
-| 소재 | 자외선 | 해수·흡습 | 내열 | 판정 |
-|---|---|---|---|---|
-| ASA | 최상 (ABS 대비 10배) | 흡수 안 함 | HDT 85~102°C | ✅ 1순위 |
-| PETG | 중간 | 우수 | 연화 ~70°C | ✅ 2순위 (마운트엔 충분) |
-| PA(나일론) | 약함 | **PA6 흡수 9~10%** | 좋음 | ❌ 해수 부적합 |
-| PLA | ❌ | **가수분해** | **Tg 55~65°C** | ❌ **금지** |
+**기성 방수 케이스: 0건.** 공식·서드파티 전부 차량 거치대뿐(Mini/Mini S 기준).
+Micro 용은 20건+ 중 방수 주장 3건 존재.
+🚨 검색 오염: "The RaceBox Mini by OpenFabPDX"는 **핫휠 장난감차 캐리어**다. 무관.
 
-PLA 배제 근거: 직사광 아래 어두운 표면 실측 77°C 에서 1시간 내 변형 사례.
-보드 데크 위 검은 케이스가 그 범위다.
-실사용 근거: 카이트보드 트래커 마운트(TrackFin)가 **PETG 프린트**로 시판 중.
+⚠️ **선행사례가 없는 길이다** — gps-speedsurfing.com 기기 카테고리에 RaceBox 가 없고
+(Garmin/Coros/Locosys 가 표준), 윙포일 실사용 보고를 못 찾았다.
 
-**유연 부품: TPU 95A 부터.** 85A 는 다이렉트 드라이브 필수에 세팅이 까다롭고,
-패딩은 어차피 EVA 폼이 담당한다.
-⚠ **TPU 는 자외선에 취약** — 상시 햇볕 노출 부품은 TPU 말고 ASA.
+---
 
-**국내 가격(다나와 최저가)**: ASA 24,200 / TPU 95A 29,500~33,000 /
-PETG 17,900 / 필라멘트 건조기 58,910 (TPU·ASA 흡습성이라 건조기 사실상 필수)
+## 🔴 GNSS — 케이스 설계의 진짜 제약
 
-## 방수 실링 — O링이 답
+```
+✅ 재질:  ASA 또는 PETG, 자연색·밝은색
+❌ 금지:  카본파이버 충전(패러데이 케이지) / 금속·메탈릭 도료 /
+          나일론(흡습→디튜닝) / 짙은 카본블랙 안료(RF 흡수)
+📏 두께:  2~4mm — GPS L1 파장 190mm 대비 1~2%라 전기적으로 투명.
+          두께는 RF 가 아니라 구조 강도로 정하면 된다
+📐 공극:  기기 상면 ↔ 케이스 천장 최소 5mm 에어갭 (Taoglas 최소 4mm)
+🚫 금속:  케이스 상반부에 인서트·나사·자석·Qi 코일 배치 금지
+🧭 배치:  RaceBox 로고면이 하늘을 향하게 (공식 매뉴얼)
+```
+출처: [Taoglas APN-13-8-002.B](https://www.taoglas.com/assets/application-notes/Internal-GPS-Active-Patch-AntennaAPN-13-8-002.B.pdf)
+
+## 실링
 
 | 방식 | 현실 등급 |
 |---|---|
-| 프린트만 (벽 3~5겹, 압출 105~110%) | IPX4 |
-| + 아세톤 스무딩 / 에폭시 코팅 | 개선되나 단독 불충분 |
-| **+ 규격 O링 페이스 씰 + 볼트 다수** | **IP65 안정, IP67 목표 가능** |
+| 프린트만 (4벽+, 저속) | IPX4 |
+| + 실리콘 실런트 백업 | IP65 |
+| **+ 규격 O링 + 균등 클램핑** | **IP67 목표 (무보증)** |
 
-설계 수치: 압축률 **15~25%**, 홈 충진율 **60~85%**(100% 절대 금지 —
-열팽창 여유). 소형 케이스 실전 예: 홈 2mm 폭 × 1.5mm 깊이 + CS 1.5mm O링.
-볼트는 촘촘·균등(씰 실패는 거의 항상 접합면에서 시작).
+압축률 **15~25%**, 홈 충진율 **60~85%**(100% 금지). 실전 예: 홈 2mm × 1.5mm + CS 1.5mm.
+**O링 재질 EPDM**(해수+UV 최적). NBR 은 오존/UV 취약 → 비추.
 
-**O링 재질: EPDM.** 해수·자외선 모두 우수, 보트 가스켓 표준.
-NBR 은 오존/UV 취약이라 비추. FKM(바이톤)은 대안이나 비쌈.
+## 충전 — Qi 는 함정 2개
 
-## GNSS 제약 (확인된 사실)
+| 방식 | 판정 |
+|---|---|
+| **뚜껑 개폐, 육상에서 충전** | ⭐⭐⭐⭐⭐ **업계 표준** |
+| Qi 내장 | ⭐⭐⭐ 함정 2개 |
 
-- **탄소섬유 함유 필라멘트 절대 금지** (PLA-CF/PETG-CF/PA-CF) — 전도성이라
-  패러데이 케이지로 작동해 위성 신호 차단
-- 금속 도장·금속 플레이크 페인트도 금지
-- 비전도성 플라스틱(ASA·PETG·PC·나일론)은 RF 투과 OK → **ASA/PETG 그대로**
+- 🪤 **USB-C CC 저항**: Qi 리시버는 *소스*, RaceBox 는 *싱크*. USB-C 소스는
+  **CC1/CC2 에 56kΩ 풀업**을 걸어야 5V/500mA 를 광고한다. 없으면 **충전이 시작 안 된다.**
+- 🪤 **코일+페라이트 = 넓은 금속 평면** → 안테나 5mm 금지 규칙에 직접 걸린다.
+  코일은 반드시 **케이스 바닥**(안테나 반대편).
 
-## 충전 — 포트를 만들지 말 것
+결로 대응: 습한 곳에서 열지 말 것. **실리카겔은 선택이 아니라 필수.**
 
-배터리 20시간+ 이므로 **충전할 때만 케이스를 여는 게 가장 현실적**이다.
-Qi 무선충전 내장은 가능하나 제약이 있다 — 공극 4mm 초과 또는 정렬 ±3mm
-벗어나면 효율 급락 → 코일 위 벽두께 1.5~2mm 로 얇게 설계해야 함.
-방수 자석 커넥터의 해수 내구성은 확인 못 함.
+---
 
-## RaceBox 기종 — Mini vs Mini S
+## 프린터 — 🥇 Bambu Lab P2S 799,000원
 
-| | Mini | Mini S |
+| 기종 | 챔버 | 국내가 |
 |---|---|---|
-| 내부 저장 | **없음 — 폰 BT 상시 연결 필수** | **있음** (25Hz 130분 / 10Hz 325분) |
-| 배터리 | 1100mAh, 20시간+ | 동일 |
-| 방수 | **"Splash Resistant"** — IP 등급 없음 | 동일 |
-| 충전 | USB-C + 방수/방진 커버 동봉 | 동일 |
-| 마운트 | 1/4"-20 UNC, 실리콘 패드, 벨크로 | 동일 |
-| 무게 | 106 g | 동일 |
-| 치수(mm) | **공식 미기재** (CAD 로 해결) | 미기재 |
+| **P2S** ⭐ | 밀폐, 베드 110°C | **799,000** |
+| P1S | 밀폐(수동) | 629,000 |
+| X2D | **능동 65°C** | 1,099,000 |
 
-⚠ **본인 기기가 어느 쪽인지 확인할 것.** 25Hz CSV 를 폰 없이 뽑았다면 Mini S.
-⚠ 검색 요약에 나오는 "integrated magnets" 는 공식 페이지에 없음(상위 모델과 혼동)
+- **AMS 콤보 사지 말 것** — TPU 는 AMS(PTFE 튜브)로 못 돌린다
+- 해외직구 P1S 720,000 > 국내정품 629,000 → 직구 이유 없음
+- 국내 총판 3D몬(02-546-2617)
 
-**기성 방수 케이스는 시중에 없다** — 직접 만드는 게 맞다.
-(MakerWorld/Thingiverse 의 RaceBox 커버들은 전부 방수 아님)
+**소재**: ASA 1순위(24,200~26,000/kg) · PETG 2순위(17,900~22,000) ·
+TPU 95A(29,500~33,000) · 건조기 58,910 (TPU·ASA 흡습성이라 사실상 필수)
+**PLA 금지**(Tg 55~65°C, 직사광 실측 77°C 에서 1시간 변형)
 
-## 하네스 — 사서 쓸 것
+**층간이 약축**: Z 인장 **50~75% 감소**, XY 대비 4~5배 약함.
+⚠️ 카본 필라멘트는 XY 는 올라가지만 **Z 이방성이 더 나빠진다**(80~90% 초과).
+→ **하중은 층 평면 방향으로 흐르게** 설계·배치.
 
-윙 하네스 라인 상용품 구조: **Gottifredi Maffioli Dyneema 코어 + Festo PU
-튜브 + 50mm 벨크로 웨빙 + Inox 오벌 링**. 표준 길이 70~90cm. €30~99.
-흥미롭게도 여기에도 3D 프린트 부품이 들어가는데, **로프가 하중을 받고
-프린트 부품은 형상 유지** 역할이다 — 우리도 그 선을 지켜야 한다.
+**안전**: ASA/ABS 는 스티렌 VOC + 초미세입자 방출(0.29~113.10 μg/min).
+**밀폐 챔버 + HEPA + 활성탄 2단 + 환기.** 거주공간 무필터 금지.
 
-**자작 금지 사유 3가지**
-1. 카테고리가 다르다 (웨빙 ≠ Dyneema 로프)
-2. 웨빙보다 **봉제가 먼저 터진다** — 무거운 웨빙 3~4겹 바텍은 가정용
-   재봉틀로 불가능. 공업용 클래스 필요
-3. 쿠팡·알리 웨빙은 **인장강도 미표기**가 대부분 — 계산 자체가 불가능
+---
 
-**⚠ 상용 하네스·스프레더바 제조사는 파단강도를 공개하지 않는다**(제품
-페이지 직접 확인). "상용품 대비 얼마나 약한가"를 정량 비교할 근거가 없다.
+## 🟢 풋스트랩 DIY — **하십시오** (1차보다 훨씬 긍정적)
 
-### 하중 계산 — 두 갈래가 같은 자릿수로 수렴
+**핵심**: 상용 풋스트랩의 하중 경로는 **웨빙 → 볼트/와셔 클램프 → 보드 인서트**다.
+**바느질은 하중을 안 받는다.** 형태 유지·패딩 봉합용이다.
 
-| 출처 | 지속 | 설계(돌풍) | ×5 안전율 |
+- Armstrong: EVA + 네오프렌, **316L 스크류 + 티타늄 헥스와셔**, 와셔가 폼을 눌러 웨빙을 클램프. 홀 ø4.2mm
+- Duotone: **M7×28 스크류 4개** + 금속 탑와셔 2 + **플라스틱 탑와셔·안티트위스트 인서트**
+- NSI: 중간층 3.2mm 헤비듀티 웨빙 + 바닥 8mm 저밀도 EVA (상용은 트리플 덴시티)
+
+⚠️ **패딩 생략 금지** — 얇은 스트랩으로 발뼈가 재배열된 실사용자 보고 있음.
+
+### 웨빙 — 폴리에스터가 정답 (정량)
+
+| | 폴리에스터 | 나일론 |
+|---|---|---|
+| UV 1,000h 후 유지 | **90%** | 60~70% |
+| 수분 흡수 | **<0.4%** | 3~5% |
+| **젖었을 때 강도 손실** | **0%** | **15%** |
+
+**MIL-W-17337 폴리에스터 파단하중**: 25mm **907 kgf** / 38mm 1,361 / 50mm 1,814
+
+풋스트랩 목표 250 kgf → **25mm 로 안전율 3.6배**. 충분하다.
+
+**봉제 계산** (Practical Sailor 실측 역산, 손바느질 효율 η≈0.65):
+V-92 락스티치 1스티치 유효 18.9 lbf → 풋스트랩 250 kgf 에 **29 스티치**
+→ 25mm 박스-X 1개(≈30스티치)로 커버, 2~3개면 안전율 2~3배 ✅
+
+---
+
+## 🔴 하네스 — 본체는 사고, 라인만 만든다
+
+### 실측 데이터 (wetestkites 독립 시험)
+
+| 항목 | 값 |
+|---|---|
+| 카이트 하네스 실사용 하중 | **300~400 kg** |
+| 훅 최소 권장 강도 | **500 kg 이상** |
+| Ride Engine 훅 영구변형 시작 | 226 kg |
+| Ion 스프레더바 파손 | 약 575 kg |
+| **실패 보고 73건 — 거의 전부 훅 용접부** | **정적 시험에서 재현 안 됨 → 파괴는 동적·피로** |
+
+### 계산
+
+```
+설계 최대 P = 400 kgf,  안전율 5:1 → 필요 파단 2,000 kgf ≈ 19.6 kN
+교차검증: EN 566 등반슬링 22 kN, EN 1891 정적로프 22 kN — 일치
+```
+
+우리 물리 모델(83kg 일직선, 22kt·4.5㎡)의 지속 옆힘 **1.21 kN(124 kgf)** 과
+같은 자릿수이며, 카이트 실측(300~400kgf)이 더 크다 — 보수적으로 400 을 쓴다.
+
+| 웨빙 | 파단 | 안전율 | 하네스 |
 |---|---|---|---|
-| **우리 물리 모델** (83kg 일직선 균형, 22kt·4.5㎡) | **1.21 kN** | 2.8 kN | **14 kN** |
-| 코웍 독립 추정 (78kg, 분담률 가정) | 0.5~0.8 kN | 1.5~2.3 kN | 7.5~11.5 kN |
+| 국내 가방부자재 "웨빙끈" | **미표기·아크릴 혼용** | 산출 불가 | 🔴 절대 불가 |
+| MIL 폴리에스터 25mm | 907 kgf | 2.3 | 🔴 불가 |
+| MIL 폴리에스터 50mm | 1,814 | 4.5 | 🟠 EN 566 미달 |
 
-우리 모델 값이 더 크고 근거가 낫다(실측 보정된 옆힘 계산). **1차 하중경로
-목표 14 kN 을 쓴다.** 25mm 폴리에스터 웨빙이 8~12 kN 대라 **단일 경로로는
-빠듯** → 폭 확대 또는 경로 분할.
-독립 추정이 같은 자릿수로 떨어진 건 위생 검사로 의미가 있다.
+**하지만 웨빙은 약한 고리가 아니다.** 실패의 대부분이 **금속 훅**이고,
+정적으로 600kg 견딘 훅이 실사용에서 부러진다. 집에서 피로 시험은 불가능하다.
 
-## 안전 — 놓치기 쉬움
+🔴 **결정적: 카이트/윙 하네스 본체에 적용되는 ISO/EN 규격이 존재하지 않는다.**
+ISO 21853 은 퀵릴리스 전용, ISO 12401 은 윈드서핑 하네스를 명시적으로 제외.
+→ 자작하면 **비교할 기준선조차 없다.**
 
-ASA/ABS 는 가열 시 **스티렌·아크릴로니트릴 VOC + 초미세입자** 방출
-(스티렌 실측 0.29~113.10 μg/min). **밀폐 챔버 + HEPA + 활성탄 2단 + 환기**
-필요. 활성탄은 포화되면 재방출하므로 주기 교체. **거주공간 무필터 ASA 금지.**
+### 🟢 하네스 **라인**은 예외 — 커뮤니티 표준 관행
 
-## 총 견적 (2026-09, 원)
+윙 하네스 라인은 웨빙이 아니라 **다이니마 로프 + PU 튜브**다.
+(ION = 다이니마 코어 + PU 외피 / Wingman = Gottifredi Maffioli + Festo PU + Inox 오벌링 /
+Severne = 로프 + 2mm 고밀도 PU 압출 튜브, 투명해서 마모 육안 확인)
+
+**다이니마 SK78 파단**: 3mm 997 kg / **4mm 1,465** / 5mm 2,348
+
+```
+양끝 스플라이스 루프 → 2가닥 분담, 스플라이스 효율 0.9
+4mm SK78: 1,465 × 2 × 0.9 = 2,637 kgf  ✅ (목표 2,000)
+3mm:        997 × 2 × 0.9 = 1,795 kgf  🟠
+→ 4mm 이상
+```
+
+길이 70~90cm. ⚠️ **윙과 보드가 같은 루프에 걸려 전체를 한 번에 버릴 수 있도록
+연속 다이니마 클로즈드 루프를 포함할 것.**
+
+### 최종 판정
+
+| | |
+|---|---|
+| **풋스트랩 DIY** | 🟢 **하십시오** |
+| **하네스 라인 DIY (4mm 다이니마 + 튜브)** | 🟢 **해도 됩니다** |
+| 하네스 웨빙 벨트 자작 | 🔴 금지 — 20kN 필요, 233스티치, 검증 불가 |
+| **스프레더바·훅 자작** | 🔴 **절대 금지** |
+
+**직설적으로**: 훅이 하중 상태에서 파손되면 **텐션 걸린 채 갑자기 풀린다.**
+뾰족하게 부러진 스테인리스가 몸 앞에 있고 그대로 물에 떨어진다.
+규격도 없고 시험 장비도 없고 피로 이력도 모르는 자작품으로 감수할 리스크가 아니다.
+→ 하네스 본체는 구매 (카이트존 Prolimit Drift X-Light 150,000원)
+
+---
+
+## 3D 프린트 do / don't
+
+| 부품 | 판정 |
+|---|---|
+| 안티트위스트 와셔·플레이트 | 🟢 (Duotone 정품도 플라스틱 인서트) |
+| 풋스트랩 웨지·라이저·스페이서 | 🟢 (압축 하중만) |
+| 스트랩 형태유지 스티프너, 봉제 지그, 훅 커버 | 🟢 |
+| 하네스 라인 스토퍼·어저스터 | 🟠 프로토타입만 |
+| **하네스 훅 / 스프레더바** | 🔴 **절대 금지** |
+| 하중 받는 버클·D링 | 🔴 사출 POM 구매 |
+| 스크류/볼트 | 🔴 316 스테인리스 |
+
+ℹ️ Wingman 이 "high-end 3D printed" 부품을 쓴다고 하지만 **공정(SLS/MJF vs FDM)과
+부위는 확인 못 함.** 산업용 SLS 나일론은 가정용 FDM 과 물성이 전혀 다르니 근거로 쓰지 말 것.
+
+---
+
+## 국내 구매처 (확인된 것만)
+
+| 품목 | 판매처 | 가격 | 강도표기 |
+|---|---|---|---|
+| 웨빙 25/38/50mm | [천나라](https://1000nara.com/category/%EA%B0%80%EB%B0%A9%EB%81%88%EC%9B%A8%EB%B9%99/593/) | 2,100~5,100원 | ❌ |
+| 웨빙 100마 롤 | [부자재1번가](https://sub1st.co.kr/category/%EA%B0%80%EB%B0%A9%EB%81%88/134/) | 45,990원 | ❌ (38mm는 **아크릴 100%** 주의) |
+| **슬링벨트 25mm** | [나비엠알오](https://www.navimro.com/p/K26750170/) | 11,539원 | ✅ **0.7톤, 안전율 7:1, KS** |
+| EVA 폼 | [YJ24](https://shop.yj24.com/category/eva%ED%8F%BC/47/) | 5T 3,000~4,000원 | 밀도 미표기 |
+| 네오프렌 롤 | [링쿠라이프](https://linkulife.co.kr/product/%EB%84%A4%EC%98%A4%ED%94%84%EB%9E%9C...%EB%A1%A4%ED%98%95%EC%8B%9D-2mm-3mm-4mm/890/) | 3mm 15,000원 | — |
+| 본딩사 0.8mm 300M | [로스킨](https://rawskin.co.kr/product/%EB%A1%9C%EC%8A%A4%ED%82%A8-%EB%B3%B8%EB%94%A9%EC%82%AC08mm300m/7989/) | 6,050원 | V규격 미표기 |
+| **316 육각볼트 M6** | [볼트백화점](https://gobolt.co.kr/goods/view?no=63) | 8,602원~ | ✅ |
+| 플라스틱 버클 | [플라스틱랜드](https://eplasticland.com/category/%EB%B2%84%ED%81%B4/50/) | ~1,000원 | POM 표기 없음 |
+
+**하드웨어 재질**: 보드 스크류·와셔 = **316(A4)** (304 는 표면 멀쩡한데 내부 부식 진행) ·
+버클/D링 = **UV 안정화 POM** > 나일론 (POM 흡수 ~0.2%) ·
+⚠️ **벨크로는 해수·모래·UV 로 열화**, 힐스트랩 박리 사례 → 사이즈 조절은
+벨크로 말고 **스크류 홀 다중 위치**(Armstrong/Duotone 방식)
+
+⚠️ **국내 가방부자재용 웨빙에 인장강도를 표기하는 판매처를 한 곳도 못 찾았다.**
+숫자가 붙는 건 산업용 슬링벨트뿐.
+⚠️ **쿠팡·G마켓은 봇 차단(403)으로 한 건도 검증 못 함** — 앱에서 직접 확인 필요.
+
+---
+
+## 총 견적
 
 | 항목 | 금액 |
 |---|---|
-| Bambu Lab P2S 정품 단품 | 799,000 |
-| ASA 1kg | 24,200 |
+| Bambu Lab P2S (단품) | 799,000 |
+| ASA 1kg (국산) | 26,000 |
 | TPU 95A 1kg | 33,000 |
-| PETG 1kg | 17,900 |
+| PETG 1kg | 22,000 |
 | 필라멘트 건조기 | 58,910 |
 | EPDM O링 세트 | ~15,000 (추정) |
-| **소계** | **약 948,000** |
-| 웨빙·EVA·실·316SUS | 확인 못 함 (추정 5~15만) |
-| 하네스 라인 **완제품** | 5~15만 |
-| **총합** | **약 110만~130만원** |
+| **Pelican 1010 (사전 검증, 강력 권장)** | ~30,000 (추정) |
+| **소계** | **약 984,000** |
+| 풋스트랩 BOM | 4~6만 |
+| 다이니마 4mm SK78 + PU튜브 | 3~5만 (국내처 확인 못 함) |
+| **하네스 본체 — 완제품 구매** | 150,000 |
+| **총합** | **약 118만 ~ 130만원** |
 
-## 재조사 필요 (웹검색 예산 소진으로 못 채움)
+## 끝까지 확인 못 한 것
 
-1. 쿠팡 직링크·정확한 쿠팡가 (쿠팡 403 차단)
-2. bambulab.com 1차 사양 (403) — P1S 챔버 표기 충돌
-3. **웨빙 인장강도 규격표**(MIL-SPEC/EN 566), 국내 MBS 표기 웨빙 판매처
-4. 316 vs 304 해수 부식 1차 출처, 국내 마린 하드웨어
-5. 마린 스레드(V-69/V-92, Tenara) 국내 판매처
-6. 하네스 돌풍 동하중 배수(×2~3) 실측 출처 — 현재는 추정
-7. 공업용 재봉틀 요구 등급
-8. GNSS 안테나 위 플라스틱 두께 가이드
-9. 방수 자석 커넥터 해수 내구성
-10. Elegoo Centauri Carbon 현재 국내가, Prusa CORE One 국내 A/S
-11. 국내 EPDM 규격 O링 소매처
-12. **engineered knit / 가변밀도 TPU 격자** — 추가 지시가 예산 소진 뒤 도착해
-    반영 못 됨. 별건으로 재조사 필요
+1. 쿠팡·G마켓 전 품목 (403) — 앱에서 직접 확인
+2. 인장강도 표기 가방부자재 웨빙 국내 판매처 — 존재 확인 못 함
+3. V-69/V-92 본디드 실 국내 판매처
+4. POM/델린 명시 버클 국내 소매처
+5. 하네스 라인 완제품 국내 판매처 (해외: DAKINE €14.95~, ION €44.99~)
+6. 네오프렌 저지 라이닝 단면/양면 표기
+7. **윙포일 하네스 라인 실제 하중 실측** — 전 브랜드 파단하중 미공개
+8. EVA 폼 밀도(kg/m³) — 국내 미표기
+9. **RaceBox 윙포일/카이트 실사용 보고** — 커뮤니티 사이트 전부 403/404. **가장 근거가 얇은 부분**
+10. 단섬유 CF 필라멘트의 1.5GHz 실측 감쇠 (연속섬유 124dB 데이터만)
+11. Elegoo Centauri Carbon 현재 국내가, Prusa CORE One 국내가·A/S
+12. **engineered knit / 가변밀도 TPU 격자** — 추가 지시가 예산 소진 뒤 도착해 미조사
 
 ## 주요 출처
-- RaceBox: [Mini](https://www.racebox.pro/products/racebox-mini) · [Mini S](https://www.racebox.pro/products/racebox-mini-s) · [기술사양](https://www.racebox.pro/products/racebox-mini/tech-specs) · [CAD](https://www.racebox.pro/products/racebox-mini/cad-download)
-- 소재: [MatterHackers 옥외용](https://www.matterhackers.com/articles/the-best-3d-printing-filament-for-outdoor-use) · [Sovol ASA vs PETG](https://www.sovol3d.com/blogs/news/best-filament-for-outdoor-3d-prints-asa-vs-petg-vs-abs) · [3D Printerly PLA 내열](https://3dprinterly.com/will-pla-petg-or-abs-melt-in-a-car-or-the-sun/)
-- 실링: [Global O-Ring 홈 설계](https://www.globaloring.com/o-ring-groove-design/) · [Fictiv 방수 설계 101](https://www.fictiv.com/articles/nothing-gets-in-waterproof-enclosure-design-101-and-ip68)
-- GNSS: [ARK Electronics GPS 배치](https://docs.arkelectron.com/knowledge-base/knowledge-base/gps-placement) · [탄소섬유와 GPS](https://www.supreemcarbon.com/article/does-carbon-fiber-block-gps-supreem-carbon-1.html)
-- 하네스: [ION Wing Harness Line](https://www.ion-products.com/en/us/products/wing-harness-line-48220-7070) · [Wingman Loop v2](https://www.wingman-products.com/product/wing-foil-harness-line-mono/)
-- FDM vs 레진: [Formlabs 수밀 3D프린팅](https://formlabs.com/blog/watertight-3d-printing/) · [FacFox TPU vs 플렉시블 레진](https://facfox.com/docs/kb/comparison-of-3d-printed-tpu-rubber-and-other-flexible-resins)
-- 국내: [3D몬 총판](https://www.3dmon.co.kr/) · [덕유항공](https://dyairkorea.com/) · 다나와 [P1S](https://prod.danawa.com/info/?pcode=75723509) · [P2S](https://prod.danawa.com/info/?pcode=99839798)
-- 안전: [NIH 3D프린터 배출](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8915804/)
+- RaceBox: [Mini](https://www.racebox.pro/products/racebox-mini) · [Mini S](https://www.racebox.pro/products/racebox-mini-s) · [CAD](https://www.racebox.pro/products/racebox-mini/cad-download)
+- GNSS: [Taoglas APN-13-8-002.B](https://www.taoglas.com/assets/application-notes/Internal-GPS-Active-Patch-AntennaAPN-13-8-002.B.pdf) · [ARK Electronics](https://docs.arkelectron.com/knowledge-base/knowledge-base/gps-placement)
+- 실링: [Global O-Ring](https://www.globaloring.com/o-ring-groove-design/) · [Fictiv](https://www.fictiv.com/articles/nothing-gets-in-waterproof-enclosure-design-101-and-ip68)
+- 하네스: [ION](https://www.ion-products.com/en/us/products/wing-harness-line-48220-7070) · [Wingman Loop v2](https://www.wingman-products.com/product/wing-foil-harness-line-mono/)
+- 풋스트랩 DIY: [Kiteforum $20 footstraps](https://kiteforum.com/viewtopic.php?t=2353889) · [Progression Project](https://forum.progressionproject.com/t/making-foot-strap-and-harness/7191)
+- 케이스: [Pelican 1010](https://www.pelican.com/us/en/product/cases/1010)
+- 국내: [3D몬](https://www.3dmon.co.kr/) · 다나와 [P2S](https://prod.danawa.com/info/?pcode=99839798)
