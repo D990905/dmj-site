@@ -1496,6 +1496,30 @@
         optimum = pt;
       }
     }
+    /* §489 (옥대표 "7.4까지 나오게 해줘") — 격자가 상한에 정확히 안 떨어지면
+       끝점이 빠진다. 2.5 에서 0.5 씩이면 7.0 까지만 나오고 7.4 는 사라져,
+       정점이 7.0~7.4 사이에 있으면 곡선이 단조 증가로만 보인다.
+       상한을 마지막 점으로 반드시 포함한다. */
+    if (points.length && Math.abs(points[points.length - 1].area_m2 - aMax) > 1e-6) {
+      var uEnd = upwindSpeed(Object.assign({}, p, { wing_area_m2: aMax }));
+      var ptEnd = {
+        area_m2:   Math.round(aMax * 100) / 100,
+        V_boat_kt: (uEnd && uEnd.feasible) ? uEnd.V_boat_kt : 0,
+        V_vmg_kt:  (uEnd && uEnd.feasible) ? uEnd.V_vmg_kt  : 0,
+        feasible:  !!(uEnd && uEnd.feasible),
+        depowered: !!(uEnd && uEnd.depowered),
+        capped:    !!(uEnd && uEnd.capped)
+      };
+      points.push(ptEnd);
+      if (ptEnd.capped) anyCapped = true;
+      if (ptEnd.feasible && (!optimum ||
+          ptEnd.V_vmg_kt > optimum.V_vmg_kt + 1e-9 ||
+          (Math.abs(ptEnd.V_vmg_kt - optimum.V_vmg_kt) <= 0.05 &&
+           ptEnd.area_m2 > optimum.area_m2))) {
+        optimum = ptEnd;
+      }
+    }
+
     return {
       points: points,
       optimum: optimum,

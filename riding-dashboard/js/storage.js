@@ -44,6 +44,9 @@
   function K_TITLES()      { return nsPrefix() + 'titles_v1'; }
   function K_VIDEO()       { return nsPrefix() + 'videosync_v1'; }
   function K_RIDER()       { return nsPrefix() + 'rider_v1'; }
+  /* §487 세션 문답 답변 — 트랙만 봐서는 갈리지 않는 것들(왜 느렸는지)의
+     라이더 확인. 세션 시그니처 → { questionId: optionKey }. */
+  function K_QA()          { return nsPrefix() + 'sessionqa_v1'; }
   /* §457 육상 운동 기록 — 세일링 아닌 활동(조깅·웨이트·요가…).
      세션(K_SESSIONS)과 분리해 둔다: 트랙도 분석도 없고, 부하만
      같은 원장에 합쳐 CTL/ATL/TSB 를 만든다. */
@@ -799,6 +802,45 @@
     return { acute: acute, chronic: chronic, ratio: acute / chronic };
   }
 
+  /* §487 — 세션별 문답 답변. 답 하나가 성능 통계에서 구간을 빼기도 하므로
+     세션 시그니처로 묶어 두고, 같은 파일을 다시 열면 그대로 살아난다. */
+  function loadAllAnswers() {
+    try {
+      var raw = global.localStorage ? global.localStorage.getItem(K_QA()) : null;
+      var o = raw ? JSON.parse(raw) : null;
+      return (o && typeof o === 'object') ? o : {};
+    } catch (e) { return {}; }
+  }
+  function loadSessionAnswers(sig) {
+    if (!sig) return {};
+    var all = loadAllAnswers();
+    return (all[sig] && typeof all[sig] === 'object') ? all[sig] : {};
+  }
+  /* rec = { key, effect, fromSec, toSec } — 구간까지 함께 담는다.
+     제외를 적용하려고 매번 다시 탐지하면 이미 제외된 세션에서 탐지하게
+     되어 질문이 사라지는 순환에 빠진다. 답은 '그 구간에 대한 사실'이다. */
+  function saveSessionAnswer(sig, questionId, rec) {
+    if (!sig || !questionId) return { ok: false };
+    try {
+      var all = loadAllAnswers();
+      if (!all[sig]) all[sig] = {};
+      if (rec == null) delete all[sig][questionId];
+      else all[sig][questionId] = rec;
+      if (!Object.keys(all[sig]).length) delete all[sig];
+      global.localStorage.setItem(K_QA(), JSON.stringify(all));
+      return { ok: true };
+    } catch (e) { return { ok: false }; }
+  }
+  function clearSessionAnswers(sig) {
+    if (!sig) return { ok: false };
+    try {
+      var all = loadAllAnswers();
+      delete all[sig];
+      global.localStorage.setItem(K_QA(), JSON.stringify(all));
+      return { ok: true };
+    } catch (e) { return { ok: false }; }
+  }
+
   function saveRider(rider) {
     try {
       global.localStorage.setItem(K_RIDER(), JSON.stringify(rider || {}));
@@ -1489,6 +1531,9 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     computeACWR: computeACWR,
     saveRider: saveRider,
     loadRider: loadRider,
+    loadSessionAnswers: loadSessionAnswers,
+    saveSessionAnswer: saveSessionAnswer,
+    clearSessionAnswers: clearSessionAnswers,
     computeFitnessTrend: computeFitnessTrend,
     interpretTSB: interpretTSB,
     suggestLandWorkout: suggestLandWorkout,

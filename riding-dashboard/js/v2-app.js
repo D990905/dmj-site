@@ -255,12 +255,36 @@
   }
   function resetEdits() { CUR.edit = null; reapplyEdits(); }
 
+  /* §487 — 문답 답변이 만든 제외구간을 수동 제외와 합친다. "옆에서
+     봐주느라 천천히 다녔다" 는 답 하나가 그 구간을 성능 통계에서
+     빼야 의미가 있다 — 답만 받고 숫자를 그대로 두면 물어본 보람이 없다. */
+  function qaExclusions() {
+    if (!window.RDStorage || !CUR.fullSession) return [];
+    var sig = null;
+    try { sig = sessionSig(CUR.fullSession); } catch (e) { return []; }
+    if (!sig) return [];
+    var answers = {};
+    try { answers = RDStorage.loadSessionAnswers(sig) || {}; } catch (e) { return []; }
+    var t0 = CUR.fullSession.samples[0].t;
+    var out = [];
+    Object.keys(answers).forEach(function (qid) {
+      var a = answers[qid];
+      if (!a || a.effect !== 'exclude') return;
+      if (!(a.toSec > a.fromSec)) return;
+      out.push({ from: t0 + a.fromSec, to: t0 + a.toSec, reason: qid });
+    });
+    return out;
+  }
+
   function reapplyEdits() {
     if (!CUR.fullSession) return;
     var base = CUR.fullSession, sess = base;
-    var hasEdit = CUR.edit && CUR.edit.excludeRanges && CUR.edit.excludeRanges.length;
+    var manual = (CUR.edit && CUR.edit.excludeRanges) || [];
+    var fromQa = qaExclusions();
+    var allRanges = manual.concat(fromQa);
+    var hasEdit = allRanges.length > 0;
     if (hasEdit) {
-      try { sess = An.applyEdits(base, CUR.edit); }
+      try { sess = An.applyEdits(base, { excludeRanges: allRanges }); }
       catch (e) { CUR.edit = null; sess = base; }
     }
     var est = CUR.est;
@@ -2700,7 +2724,38 @@
     var card2 = el('div', 'card');
     var h2 = el('div', 'card-header');
     h2.appendChild(el('h3', 'card-title', 'Every turn'));
-    h2.appendChild(el('div', 'card-actions lab', mans.length + ' detected'));
+    /* §488 (옥대표) — 그룹 필터. 95개를 한 줄로 늘어놓으면 "자이빙 스타보드만"
+       같은 질문에 답할 수가 없다. 종류(택/자이브)와 택 방향(포트/스타보드)을
+       따로 걸러 본다. 선택(TURNSEL)은 **원본 인덱스**로 잡아 두므로 필터를
+       바꿔도 고른 회전이 풀리지 않는다. */
+    var view = mans.map(function (m, i) { return { m: m, i: i }; })
+      .filter(function (d) {
+        if (TURNFILT.type !== 'all' && d.m.type !== TURNFILT.type) return false;
+        if (TURNFILT.side !== 'all' && d.m.side !== TURNFILT.side) return false;
+        return true;
+      });
+    var act2 = el('div', 'card-actions d-flex align-items-center gap-2');
+    function filtSel(list, cur, onPick) {
+      var sel = el('select', 'form-select form-select-sm');
+      sel.style.width = 'auto';
+      list.forEach(function (o) {
+        var op = document.createElement('option');
+        op.value = o[0]; op.textContent = o[1];
+        if (o[0] === cur) op.selected = true;
+        sel.appendChild(op);
+      });
+      sel.addEventListener('change', function () { onPick(sel.value); });
+      return sel;
+    }
+    act2.appendChild(filtSel([['all', 'All turns'], ['gybe', 'Gybes'], ['tack', 'Tacks']],
+      TURNFILT.type, function (v) { TURNFILT.type = v; renderTurnExtras(a); }));
+    act2.appendChild(filtSel([['all', 'Both tacks'], ['P', 'Port'], ['S', 'Starboard']],
+      TURNFILT.side, function (v) { TURNFILT.side = v; renderTurnExtras(a); }));
+    act2.appendChild(el('span', 'lab',
+      view.length === mans.length
+        ? (mans.length + ' detected')
+        : (view.length + ' of ' + mans.length)));
+    h2.appendChild(act2);
     card2.appendChild(h2);
     var wrap = el('div', 'table-responsive');
     wrap.style.maxHeight = '420px'; wrap.style.overflowY = 'auto';
@@ -2712,7 +2767,8 @@
       });
     th.appendChild(htr); t.appendChild(th);
     var tb = el('tbody');
-    mans.forEach(function (m, i) {
+    view.forEach(function (d) {
+      var m = d.m, i = d.i;
       var tr = el('tr');
       /* §454 — 행을 눌러 회전을 고른다(다중 선택 토글). 고른 회전은
          위쪽 상세 카드에 지표와 속도 곡선으로 펼쳐진다. */
@@ -2756,6 +2812,7 @@
     card2.appendChild(fn);
     lh.appendChild(card2);
 
+    renderSessionQA(host, a);
     renderTurnProgression(host, a);
     renderTurnGroups(host, a);
     renderTurnCoaching(host, a);
@@ -2767,6 +2824,8 @@
      을 0 초로 맞춰 겹친다 — 시각이 다른 회전을 같은 자로 보려면 정점을
      맞춰야 한다. */
   var TURNSEL = [];
+  /* §488 — 회전 목록 그룹 필터 (종류 × 택 방향) */
+  var TURNFILT = { type: 'all', side: 'all' };
 
   function renderTurnDetail(host, a) {
     var mans = a.maneuvers || [];
@@ -2969,6 +3028,136 @@
      같이 본다 — 활주 시간과 심박이 함께 떨어졌으면 바람이 죽은 것이고,
      심박이 유지된 채 품질만 떨어졌으면 피로다. 이 구분을 안 하면 바람이
      죽은 걸 기량 저하로 오독한다(8/31 실측: 4구간 심박 150→123). */
+  /* §487 — 문답 탐지가 쓰는 4분위 요약. 회전 추이 카드가 만들던 것과
+     같은 계산이라 여기 한 번만 두고 둘이 같이 쓴다. */
+  function turnQuarters(a) {
+    var mans = (a.maneuvers || []).filter(function (m) {
+      return m.type === 'tack' || m.type === 'gybe';
+    });
+    var S = (CUR.session && CUR.session.samples) || [];
+    if (mans.length < 12 || !S.length) return null;
+    var t0 = S[0].t, span = S[S.length - 1].t - t0;
+    if (!(span > 0)) return null;
+    var Q = 4, bk = [];
+    for (var q = 0; q < Q; q++) bk.push({ turns: [], hrSum: 0, hrN: 0 });
+    mans.forEach(function (m) {
+      var qi = Math.min(Q - 1, Math.floor(m.tSec / span * Q));
+      if (qi >= 0) bk[qi].turns.push(m);
+    });
+    for (var i = 1; i < S.length; i++) {
+      var dt = S[i].t - S[i - 1].t;
+      if (!(dt > 0) || dt > 5 || S[i].hr == null) continue;
+      var qj = Math.min(Q - 1, Math.floor((S[i].t - t0) / span * Q));
+      bk[qj].hrSum += S[i].hr; bk[qj].hrN++;
+    }
+    return bk.map(function (b, q) {
+      return { q: q, n: b.turns.length,
+               foil: b.turns.filter(function (m) { return m.foilKept; }).length,
+               hr: b.hrN ? b.hrSum / b.hrN : null };
+    });
+  }
+
+  /* §487 세션 문답 — 트랙만 봐서는 갈리지 않는 것을 라이더에게 묻는다.
+     "왜 느렸는지" 는 탄 사람만 안다. 답 하나가 서술을 바꾸고, 필요하면
+     그 구간을 성능 통계에서 뺀다(이유가 붙은 제외로). */
+  function renderSessionQA(host, a) {
+    if (!window.RDSessionQA || !CUR.session) return;
+    var quarters = null;
+    try { quarters = turnQuarters(a); } catch (e) { quarters = null; }
+    var qs;
+    try { qs = RDSessionQA.detect(CUR.session, a, { quarters: quarters }); }
+    catch (e) { qs = []; }
+    qs = qs || [];
+
+    var sig = null;
+    try { sig = sessionSig(CUR.fullSession || CUR.session); } catch (e) {}
+    var answers = {};
+    try { if (sig && window.RDStorage) answers = RDStorage.loadSessionAnswers(sig) || {}; }
+    catch (e) {}
+
+    /* 이미 답한 질문은 **탐지에서 사라져도 남긴다.** "옆에서 봐줬다" 고
+       답하면 그 구간이 통계에서 빠지고, 그러면 이상징후 자체가 사라져
+       질문이 없어진다 — 답을 되돌릴 방법도 같이 사라진다는 뜻이다.
+       저장된 답의 구간으로 질문을 되살려 항상 보이게 한다. */
+    var seen = {};
+    qs.forEach(function (q) { seen[q.id] = true; });
+    Object.keys(answers).forEach(function (qid) {
+      if (seen[qid]) return;
+      var def = RDSessionQA.QUESTIONS[qid];
+      if (!def) return;
+      var rec = answers[qid];
+      qs.push({
+        id: qid, title: def.title, options: def.options,
+        evidence: 'Answered — this stretch ('
+          + RDSessionQA.fmtClock(rec.fromSec) + '–' + RDSessionQA.fmtClock(rec.toSec)
+          + ') is being treated as you described.',
+        fromSec: rec.fromSec, toSec: rec.toSec
+      });
+    });
+    if (!qs.length) return;
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'A few things the track cannot tell'));
+    var pending = qs.filter(function (q) { return !answers[q.id]; }).length;
+    head.appendChild(el('div', 'card-actions lab',
+      pending ? (pending + ' unanswered') : 'all answered'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    qs.forEach(function (q) {
+      var sec = el('div', 'mb-3');
+      sec.appendChild(el('div', 'fw-bold', q.title));
+      sec.appendChild(el('div', 'text-secondary mt-1', q.evidence));
+      var row = el('div', 'd-flex flex-wrap gap-2 mt-2');
+      q.options.forEach(function (o) {
+        var picked = answers[q.id] && answers[q.id].key === o.key;
+        var b = el('button', 'btn btn-sm' + (picked ? ' active' : ''));
+        b.type = 'button';
+        b.textContent = o.label;
+        if (picked) {
+          b.style.borderColor = THEME.accent;
+          b.style.color = THEME.accent;
+        }
+        b.addEventListener('click', function () {
+          /* 답에는 **그때의 구간**을 함께 저장한다. 제외를 적용하려고
+             매번 다시 탐지하면, 이미 제외된 세션에서 탐지하게 되어
+             질문이 사라지고 답도 무효가 되는 순환에 빠진다. */
+          var cur = answers[q.id] && answers[q.id].key;
+          var next = (cur === o.key) ? null
+            : { key: o.key, effect: o.effect, fromSec: q.fromSec, toSec: q.toSec };
+          try { if (sig) RDStorage.saveSessionAnswer(sig, q.id, next); } catch (e) {}
+          reapplyEdits();          /* 답이 제외구간을 만들 수 있으므로 전체 재계산 */
+        });
+        row.appendChild(b);
+      });
+      sec.appendChild(row);
+      if (answers[q.id]) {
+        var ansKey = answers[q.id].key;
+        var opt = q.options.filter(function (o) { return o.key === ansKey; })[0];
+        if (opt && opt.effect === 'exclude') {
+          sec.appendChild(el('div', 'lab mt-2',
+            'That stretch is out of the performance numbers. Press again to undo.'));
+        } else if (opt && opt.effect === 'fatigue') {
+          sec.appendChild(el('div', 'lab mt-2',
+            'Kept in the numbers, flagged as a training-load signal.'));
+        } else if (opt) {
+          sec.appendChild(el('div', 'lab mt-2', 'Kept in the numbers.'));
+        }
+      }
+      body.appendChild(sec);
+    });
+
+    var f = el('div', 'text-secondary');
+    f.style.fontSize = '.8125rem';
+    f.textContent = 'Speed falling can mean the wind dropped, or that you were riding '
+      + 'slowly with someone, or winding down — they look identical on a track. '
+      + 'Rather than guess, the dashboard asks. Answers are remembered for this session.';
+    body.appendChild(f);
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
   function renderTurnProgression(host, a) {
     var mans = (a.maneuvers || []).filter(function (m) {
       return m.type === 'tack' || m.type === 'gybe';
@@ -3051,6 +3240,18 @@
     var withEff = rows.filter(function (r) { return r.eff != null; });
     var best = withEff.slice().sort(function (x, y) { return y.eff - x.eff; })[0];
     var msgs = [];
+    /* §487 — 마지막 구간을 답변으로 빼 버렸으면 아래 degraded 분기가 아예
+       안 걸린다(이상징후가 사라졌으니). 그래도 왜 뺐는지는 말해 줘야 한다. */
+    try {
+      if (window.RDSessionQA && window.RDStorage && CUR.fullSession) {
+        var sigN = sessionSig(CUR.fullSession);
+        var recN = sigN ? (RDStorage.loadSessionAnswers(sigN) || {}).lateDrop : null;
+        if (recN && recN.key) {
+          var told = RDSessionQA.narrate('lateDrop', recN.key);
+          if (told) msgs.push(told);
+        }
+      }
+    } catch (e) {}
     if (first.eff != null && best && best.q !== 0 && best.eff - first.eff >= 8) {
       msgs.push('Turn efficiency rose from ' + Math.round(first.eff)
         + ' in the first quarter to ' + Math.round(best.eff) + ' by quarter '
@@ -3091,10 +3292,24 @@
       var lead = 'By the last quarter ' + (what.length ? what.join(' and ') : 'turn quality fell')
         + '. ';
       if (planingDrop > 0.35 && hrDrop != null && hrDrop > 12) {
+        /* §487 (옥대표) — 여기서 예전에는 "바람이 죽은 것" 이라고 **단정**했다.
+           8/31 의 실제 답은 셋째였다: "여친이 타는거 옆에서 봐주느라 천천히
+           주위를 맴돌면서 다녔다." 속도와 심박이 같이 떨어지는 건 바람이
+           죽어도, 누굴 옆에서 봐줘도, 마무리로 슬슬 타도 똑같이 보인다.
+           트랙만으로는 못 가린다 → 라이더 답이 있으면 그 답을 말하고,
+           없으면 후보를 늘어놓되 고르지 않는다. */
+        var qaAns = null;
+        try {
+          if (window.RDSessionQA && window.RDStorage && CUR.session) {
+            var sigQ = sessionSig(CUR.session);
+            var recQ = sigQ ? (RDStorage.loadSessionAnswers(sigQ) || {}).lateDrop : null;
+            qaAns = recQ && recQ.key;
+          }
+        } catch (e) {}
+        /* 위에서 이미 답변 서술을 넣었으면 여기서는 증거만 적는다 */
         msgs.push(lead + 'Planing time also fell ' + Math.round(planingDrop * 100)
           + '% and average heart rate dropped ' + Math.round(hrDrop) + ' bpm. '
-          + 'Struggling harder for less would push heart rate up \u2014 both falling '
-          + 'together points at the wind dying rather than you fading.');
+          + (qaAns ? '' : RDSessionQA.undecided('lateDrop')));
       } else if (hrDrop != null && hrDrop < 5) {
         msgs.push(lead + 'Heart rate held up through it, which reads as fatigue '
           + 'rather than conditions \u2014 the useful part of a session can end '
@@ -4210,8 +4425,23 @@
     show(CUR.session, a, CUR.name, est);
   }
 
+  var qaApplying = false;
   function show(session, analysis, name, est, fullSession) {
     CUR.fullSession = fullSession || CUR.fullSession || session;
+    /* §487 — 저장된 문답 답변이 만든 제외구간을 **첫 표시에서도** 적용한다.
+       예전에는 답을 누른 그 순간에만 반영되고, 다음에 파일을 다시 열면
+       답은 남아 있는데 숫자는 제외 전으로 돌아갔다. 답이 통계를 바꾸는
+       기능이라면 새로 열 때도 같은 숫자가 나와야 한다.
+       qaApplying 으로 한 번만 — reapplyEdits 가 다시 show 를 부르므로. */
+    if (!qaApplying && session === CUR.fullSession) {
+      var qx = [];
+      try { qx = qaExclusions(); } catch (e) { qx = []; }
+      if (qx.length) {
+        qaApplying = true;
+        try { reapplyEdits(); } finally { qaApplying = false; }
+        return;
+      }
+    }
     CUR.session = session; CUR.name = name; CUR.est = est;
     CUR.windDir = analysis.windDir;
     CUR.analysis = analysis;
