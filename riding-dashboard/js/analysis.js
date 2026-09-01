@@ -1031,6 +1031,18 @@
           var vKt = sp * Geo.MS_TO_KNOTS;
           rec.awa = Math.atan2(windSpeedKt * Math.sin(twaRad),
                                windSpeedKt * Math.cos(twaRad) + vKt) * 180 / Math.PI;
+          /* §494 (옥대표) — 겉보기 풍속(AWS). 같은 벡터의 크기다:
+               AWS² = V² + TWS² + 2·V·TWS·cos(TWA)
+             윙이 실제로 받는 바람의 세기라 트림·사이즈 판단의 근거가 된다.
+             ⚠ 정확도는 AWA 와 다르다. 포일링 속도에서 AWA 는 배 속도가
+             지배해 풍속 오차에 둔감하지만(TWS 4kt 틀려도 3~4°),
+             AWS 는 그 오차를 거의 1:1 로 물려받는다(18kt 주행·CWA 50°
+             에서 TWS 12→16kt 이면 AWS 27.3→30.8kt, 13%).
+             풍속이 눈대중인 세션에서는 크기보다 **추세**로 읽어야 한다.
+             단위는 다른 속도 지표와 맞춰 m/s 로 담는다. */
+          var awsKt = Math.sqrt(vKt * vKt + windSpeedKt * windSpeedKt +
+                                2 * vKt * windSpeedKt * Math.cos(twaRad));
+          rec.aws = awsKt / Geo.MS_TO_KNOTS;
         }
         /* 힐(Heel)은 택에 따라 부호가 갈린다 — 한 택은 +, 반대 택은 −.
            택을 합쳐 평균하면 좌·우가 상쇄돼 무의미하지만, 포트/스타보드
@@ -1070,6 +1082,9 @@
          생기지 않아 통계 패널이 AWA 행을 만들지 않는다. */
       var awaArr = arr.filter(function (o) { return o.awa != null; });
       if (awaArr.length) g.awa = statsBy(awaArr, 'awa');
+      /* §494 AWS — awa 와 같은 조건(풍속 입력)에서만 생긴다 */
+      var awsArr = arr.filter(function (o) { return o.aws != null; });
+      if (awsArr.length) g.aws = statsBy(awsArr, 'aws');
       /* heel·pitch 는 표본에 실제 데이터가 있을 때만 통계를 산출한다
          (추후 .vkx 대비 — GPX 만 있을 땐 키 자체가 생기지 않는다).
          힐은 부호 있는 값으로 집계한다 — 이 group()은 포트(P)·스타보드(S)
@@ -1157,6 +1172,8 @@
     { metric: 'sog',   label: 'SOG (속도)',          unit: 'speed', split: true },
     { metric: 'twa',   label: 'CWA',                unit: 'deg',   split: true  },
     { metric: 'awa',   label: 'AWA (겉보기 풍각)',    unit: 'deg',   split: true  },
+    /* §494 — AWS(겉보기 풍속). 풍속 입력이 있어야만 산출된다. */
+    { metric: 'aws',   label: 'AWS (겉보기 풍속)',    unit: 'speed', split: true  },
     { metric: 'vmg',   label: 'VMG (풍상·풍하 유효속도)', unit: 'speed', split: true },
     { metric: 'heel',  label: '힐 (Heel)',           unit: 'deg',   split: true  },
     { metric: 'pitch', label: '피치 (Pitch·트림)',   unit: 'deg',   split: true  },
@@ -1200,6 +1217,9 @@
        뽑는다. 이렇게 하지 않으면 '상위'가 저속·펌핑 순간의 큰 각(옆에서
        부는 바람)을 대표로 뽑아 값이 이상해진다(스타보드 풍하 71° 문제). */
     if (metric === 'awa') return 'low';
+    /* §494 AWS 는 클수록 '많이 받은' 것 — 속도가 붙을수록 커진다.
+       AWA 와 반대로 높은 쪽을 상위로 뽑는다(빠르게 활주할 때의 겉보기 풍속). */
+    if (metric === 'aws') return 'high';
     return 'neutral';   // heel · pitch · hr
   }
 

@@ -2506,6 +2506,7 @@
       vmg:  'VMG (kt)',
       twa:  'Course wind angle (°)',
       awa:  'Apparent wind angle (°)',
+      aws:  'Apparent wind speed (kt)',
       heel: 'Heel (°)',
       pitch:'Pitch (°)',
       hr:   'Heart rate (bpm)'
@@ -2593,7 +2594,14 @@
       /* §492 — 택별 심박 차이를 체력 좌우차로 바로 읽지 않도록 경고.
          한쪽 택을 세션 후반에 몰아서 탔으면 그 택 심박이 낮게 나온다. */
       + 'Heart rate is split by tack too, but read a difference carefully — if you '
-      + 'sailed one tack mostly late in the session, that alone lowers it.';
+      + 'sailed one tack mostly late in the session, that alone lowers it.'
+      /* §494 — AWS 는 풍속 입력 오차를 거의 그대로 물려받는다. 숫자를
+         절대값으로 믿게 두면 안 된다. */
+      + (sp.rows.some(function (r) { return r.metric === 'aws'; })
+          ? '  Apparent wind speed is built from the wind speed you entered, so it '
+            + 'carries that error almost one-for-one — read it as a trend, not a '
+            + 'measurement. The angle is far less sensitive to it.'
+          : '');
     c2.appendChild(f2);
     host.appendChild(c2);
   }
