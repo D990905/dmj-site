@@ -1115,6 +1115,11 @@
     };
     return {
       windDir: wd,
+      /* §498 — 계산에 쓴 풍속을 결과에 같이 담는다. 그동안 wind 객체는
+         풍향만 들고 있어서, 풍속이 필요한 소비자는 폼을 다시 읽어야 했다.
+         AWA·AWS 가 이미 이 값으로 계산돼 들어 있으므로 같이 있는 게 맞다.
+         풍속 미입력이면 null (hasTws 가 false 인 경우). */
+      windSpeedKt: hasTws ? windSpeedKt : null,
       // 전체(택 합산) — 후방호환 키
       vmgUpwindAvgMs: g.upwind.all.vmg.avg,
       vmgUpwindTop50Ms: g.upwind.all.vmg.top50,

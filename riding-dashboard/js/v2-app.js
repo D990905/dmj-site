@@ -41,6 +41,21 @@
     var v = parseFloat(($('in-windspeed') || {}).value);
     return isFinite(v) ? v : null;
   }
+  /* §498 — analyzeSession 에 넘길 공통 옵션.
+     ⚠ 이걸 만든 이유: v2 는 그동안 analyzeSession 에 **풍속을 한 번도
+     넘기지 않았다.** 네 군데 호출부가 전부 windConfidence 만 넘겼다.
+     그 결과 §494 로 넣은 AWS 와 AWA 가 계산 자체가 안 돼서(analysis.js
+     의 hasTws 가 항상 false) 통계표에 한 줄도 뜬 적이 없다.
+     §482(포일을 바꿔도 예측이 안 변하던 것)와 같은 종류의 결함이다 —
+     기능은 다 만들어져 있었고 입력만 끊겨 있었다.
+     새 호출부를 만들 때도 이 헬퍼를 쓸 것. */
+  function analysisOpts(est, extra) {
+    var o = extra ? JSON.parse(JSON.stringify(extra)) : {};
+    if (est && est.confidence != null) o.windConfidence = est.confidence;
+    var ws = windSpeedFromForm();
+    if (ws != null) o.windSpeedKt = ws;
+    return o;
+  }
   /* §491 (옥대표 "노안이라서 잘 안보임") — 라이트 테마.
      ────────────────────────────────────────────────────────────
      차트 색은 CSS 가 아니라 JS 가 캔버스에 직접 칠하므로, 테마를 바꾸면
@@ -373,7 +388,7 @@
     }
     var est = CUR.est;
     var wd = CUR.windDir != null ? CUR.windDir : (est && est.windDir);
-    var a = An.analyzeSession(sess, wd, est ? { windConfidence: est.confidence } : {});
+    var a = An.analyzeSession(sess, wd, analysisOpts(est));
     show(sess, a, CUR.name, est, base);
   }
 
@@ -4251,10 +4266,225 @@
     'no-board-reference': 'No board reference found.'
   };
 
+  /* ============================================================
+   * §498 트림 요구량 — "속도가 변하면 붐을 얼마나 더 당겨야 하나" (B1)
+   *
+   * 원래 B1 은 "AWA 별 속도 곡선 = 본인 최적 AWA 밴드" 였다. **폐기했다.**
+   * AWA 는 속도로부터 계산되는 값이라(AWA = atan2(TWS·sinTWA,
+   * TWS·cosTWA + V)) CWA 를 고정하면 AWA↔속도가 동어반복이 된다.
+   * 옥대표 8/31 세션 실측으로 확인: CWA 45–55° 에서 r = −0.959,
+   * 55–65° 에서 −0.993. "AWA 22°에서 제일 빠르다" 는 발견이 아니라
+   * **정의**다 — 빠르니까 AWA 가 22°인 것이다.
+   * (전체 상관은 0.222 로 낮아 보이는데, 그건 CWA 가 섞여서 그렇다.
+   *  이 함정 때문에 순진하게 만들면 그럴듯한 가짜 차트가 나온다.)
+   *
+   * 순환이 아닌 질문으로 바꿨다:
+   *   AoA = AWA − 붐각.  윙의 목표 AoA 는 대체로 일정하다.
+   *   → **ΔAWA 가 그대로 Δ붐각 요구량이다.**
+   *
+   * 절대 붐각은 못 낸다 — 윙의 양력곡선 기울기와 영양력각을 모른다.
+   * 하지만 **변화량은 낼 수 있고, 코칭에 필요한 건 그쪽이다.**
+   * "지금보다 5kt 빨라지면 붐을 3° 더 당겨야 한다" 는 실행 가능한 문장이다.
+   *
+   * 닫힌 루프(실제로 얼마나 당겼는지 감지)는 붐 IMU 가 있어야 한다 —
+   * backlog B6. 이건 열린 루프다.
+   * ============================================================ */
+
+  function awaAt(twaDeg, vKt, twsKt) {
+    var r = twaDeg * Math.PI / 180;
+    return Math.atan2(twsKt * Math.sin(r), twsKt * Math.cos(r) + vKt) * 180 / Math.PI;
+  }
+
+  var TRIM_BANDS = [
+    { key: 'up',   label: 'Upwind',   lo: 35,  hi: 65,  rep: 50 },
+    { key: 'reach',label: 'Reaching', lo: 65,  hi: 110, rep: 90 },
+    { key: 'down', label: 'Downwind', lo: 110, hi: 165, rep: 135 }
+  ];
+
+  function pctOf(sorted, f) {
+    if (!sorted.length) return null;
+    var i = (sorted.length - 1) * f, lo = Math.floor(i), hi = Math.ceil(i);
+    return lo === hi ? sorted[lo] : sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+  }
+
+  function renderTrimDemand(host, session, analysis) {
+    var wind = analysis && analysis.wind;
+    var twsKt = wind && wind.windSpeedKt;
+    var wd = wind && wind.windDir;
+    if (twsKt == null || wd == null || !(twsKt > 0)) {
+      var warn = el('div', 'alert alert-warning');
+      warn.appendChild(el('div', 'fw-bold', 'Trim demand needs a wind speed'));
+      warn.appendChild(el('div', 'mt-1',
+        'Set the wind speed above and this panel will show how much boom angle '
+        + 'each speed change asks for.'));
+      host.appendChild(warn);
+      return;
+    }
+
+    /* 세션에서 실제로 쓴 코스와 속도 */
+    var S = (session.samples || []);
+    var byBand = {};
+    TRIM_BANDS.forEach(function (b) { byBand[b.key] = []; });
+    /* 시간은 **샘플 수가 아니라 실제 dt 합**이다. 1Hz 가정은 기기마다
+       깨지고(RaceBox 25Hz), 기록 공백이 있으면 더 크게 틀린다. */
+    var gapMax = (session.cfg && session.cfg.gapThresholdSec) || 8;
+    for (var k = 0; k < S.length; k++) {
+      var p = S[k];
+      if (p.speed == null || p.heading == null) continue;
+      var v = p.speed * KT;
+      if (v < 6) continue;   /* 활주 전 저속은 트림 얘기가 아니다 */
+      var dt = (k > 0) ? (p.t - S[k - 1].t) : 0;
+      if (!(dt > 0) || dt > gapMax) dt = 0;
+      var twa = Math.abs(((p.heading - wd + 540) % 360) - 180);
+      for (var i = 0; i < TRIM_BANDS.length; i++) {
+        var b = TRIM_BANDS[i];
+        if (twa >= b.lo && twa < b.hi) { byBand[b.key].push({ twa: twa, v: v, dt: dt }); break; }
+      }
+    }
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Trim demand — boom angle a speed change asks for'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    body.appendChild(el('div', 'text-secondary mb-3',
+      'Angle of attack is the apparent wind angle minus your boom angle. The wing wants '
+      + 'roughly the same angle of attack throughout, so when the apparent wind swings, '
+      + 'the boom has to follow it by the same amount. This panel shows how far it swings '
+      + 'across the speeds you actually rode at ' + twsKt.toFixed(0) + ' kt of wind.'));
+
+    var wrap = el('div', 'table-responsive');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Course', 'Time', 'Your speed range', 'Apparent wind swings', 'Boom must follow']
+      .forEach(function (x, i) { htr.appendChild(el('th', i > 1 ? 'text-end' : null, x)); });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+
+    var rows = 0, biggest = null;
+    TRIM_BANDS.forEach(function (b) {
+      var g = byBand[b.key];
+      if (g.length < 40) return;
+      rows++;
+      var vs = g.map(function (d) { return d.v; }).sort(function (x, y) { return x - y; });
+      var twaMed = g.map(function (d) { return d.twa; }).sort(function (x, y) { return x - y; });
+      var tRep = pctOf(twaMed, 0.5);
+      var v10 = pctOf(vs, 0.10), v90 = pctOf(vs, 0.90);
+      var a10 = awaAt(tRep, v10, twsKt), a90 = awaAt(tRep, v90, twsKt);
+      var swing = Math.abs(a10 - a90);
+      if (!biggest || swing > biggest.swing) biggest = { b: b, swing: swing };
+
+      var tr = el('tr');
+      tr.appendChild(el('td', null, b.label + ' · ' + Math.round(tRep) + '°'));
+      var secs = 0;
+      g.forEach(function (d) { secs += d.dt; });
+      tr.appendChild(el('td', null, fmtClock(secs)));
+      tr.appendChild(el('td', 'text-end num', v10.toFixed(1) + '–' + v90.toFixed(1) + ' kt'));
+      tr.appendChild(el('td', 'text-end num',
+        Math.round(a10) + '° → ' + Math.round(a90) + '°'));
+      var td = el('td', 'text-end num fw-bold', swing.toFixed(1) + '°');
+      tr.appendChild(td);
+      tb.appendChild(tr);
+    });
+
+    if (!rows) {
+      body.appendChild(el('div', 'alert alert-warning',
+        'Not enough riding in any one course band to read a trim demand from.'));
+      card.appendChild(body); host.appendChild(card); return;
+    }
+    t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+
+    /* 왜 풍하가 더 큰가 — 이게 이 패널의 요점이다 */
+    var up = byBand.up.length >= 40, down = byBand.down.length >= 40;
+    if (up && down) {
+      var uS = byBand.up.map(function (d) { return d.v; }).sort(function (a, c) { return a - c; });
+      var dS = byBand.down.map(function (d) { return d.v; }).sort(function (a, c) { return a - c; });
+      var uSw = Math.abs(awaAt(50, pctOf(uS, 0.10), twsKt) - awaAt(50, pctOf(uS, 0.90), twsKt));
+      var dSw = Math.abs(awaAt(135, pctOf(dS, 0.10), twsKt) - awaAt(135, pctOf(dS, 0.90), twsKt));
+      if (uSw > 0.5) {
+        body.appendChild(el('div', 'alert alert-info mt-3',
+          'Downwind asks for ' + (dSw / uSw).toFixed(1) + '× the trim movement upwind does '
+          + 'over the same speed spread — ' + dSw.toFixed(0) + '° against '
+          + uSw.toFixed(0) + '°. That is geometry, not technique: heading away from the wind '
+          + 'makes the apparent wind angle far more sensitive to boat speed. It is why a gybe exit '
+          + 'punishes a late sheet-in much harder than a tack exit does.'));
+      }
+    }
+
+    /* 곡선 — 실제로 탄 속도 구간을 강조 */
+    var plot = el('div', 'chart-host mt-3');
+    plot.style.height = '260px';
+    body.appendChild(plot);
+
+    var cap = el('div', 'lab mt-1');
+    cap.textContent = 'Apparent wind angle against boat speed at ' + twsKt.toFixed(0)
+      + ' kt true wind. Flatter is more forgiving — the boom can stay put while speed moves.';
+    body.appendChild(cap);
+
+    card.appendChild(body);
+    host.appendChild(card);
+    drawTrimCurves(plot, twsKt, byBand);
+
+    /* 정직하게 — 절대값은 못 낸다 */
+    var honest = el('div', 'text-secondary mt-2');
+    honest.style.fontSize = '12px';
+    honest.textContent = 'This is the change in boom angle, not the angle itself — that would '
+      + 'need your wing’s lift curve, which we do not have. And it is open loop: it says what '
+      + 'the boom should do, not what it did. Detecting that needs a sensor on the boom.';
+    body.appendChild(honest);
+  }
+
+  function drawTrimCurves(hostEl, twsKt, byBand) {
+    if (!window.uPlot) return;
+    var xs = [];
+    for (var v = 6; v <= 28; v += 0.5) xs.push(v);
+    var data = [xs], opts = [];
+    var colors = { up: '#4dabf7', reach: '#f59f00', down: '#e03131' };
+    TRIM_BANDS.forEach(function (b) {
+      var g = byBand[b.key];
+      if (g.length < 40) return;
+      var twaMed = g.map(function (d) { return d.twa; }).sort(function (x, y) { return x - y; });
+      var tRep = pctOf(twaMed, 0.5);
+      data.push(xs.map(function (vv) { return awaAt(tRep, vv, twsKt); }));
+      opts.push({
+        label: b.label + ' (' + Math.round(tRep) + '°)',
+        stroke: colors[b.key], width: 2.2, points: { show: false },
+        value: function (u, val) { return val == null ? '—' : val.toFixed(1) + '°'; }
+      });
+    });
+    if (!opts.length) { hostEl.style.display = 'none'; return; }
+
+    track(new uPlot({
+      width: hostEl.clientWidth || 860, height: 240, padding: [12, 14, 4, 6],
+      cursor: { drag: { x: true, y: false } },
+      scales: { x: { time: false } },
+      axes: [
+        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+          font: '11px "IBM Plex Mono", monospace',
+          values: function (u, ticks) {
+            return ticks.map(function (v) { return v.toFixed(0) + ' kt'; });
+          } },
+        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+          font: '11px "IBM Plex Mono", monospace', size: 46,
+          values: function (u, ticks) {
+            return ticks.map(function (v) { return v.toFixed(0) + '°'; });
+          } }
+      ],
+      series: [{ label: 'Boat speed',
+                 value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } }]
+               .concat(opts)
+    }, data, hostEl), hostEl);
+  }
+
   function renderAttitude(session, analysis, fusion) {
     var host = $('attitude-body');
     if (!host) return;
     while (host.firstChild) host.removeChild(host.firstChild);
+
+    /* §498 B1 — 트림 요구량은 IMU 가 없어도 나온다(GPS + 풍속이면 충분).
+       그래서 자세 게이트보다 **앞에** 그린다. */
+    try { renderTrimDemand(host, session, analysis); } catch (e) {}
 
     var cal = fusion && fusion.attitude;
     var S = (session.samples || []).filter(function (p) {
@@ -4958,7 +5188,7 @@
     if (mode === 'keep') {
       /* 풍향은 그대로 두고 라이더 입력만 반영해 다시 계산한다 */
       var keep = CUR.windDir != null ? CUR.windDir : null;
-      var a0 = An.analyzeSession(CUR.session, keep, {});
+      var a0 = An.analyzeSession(CUR.session, keep, analysisOpts(CUR.est));
       show(CUR.session, a0, CUR.name, CUR.est);
       return;
     }
@@ -4966,8 +5196,7 @@
       est = estimateWind(CUR.session);
       dir = est && est.windDir != null ? est.windDir : null;
     } else { est = null; }
-    var a = An.analyzeSession(CUR.session, dir,
-      est ? { windConfidence: est.confidence } : {});
+    var a = An.analyzeSession(CUR.session, dir, analysisOpts(est));
     CUR.est = est;
     show(CUR.session, a, CUR.name, est);
   }
@@ -5179,8 +5408,7 @@
         var session = An.normalizeSession(res.parsed);
         var est = estimateWind(session);
         var wd = est && est.windDir != null ? est.windDir : null;
-        var analysis = An.analyzeSession(session, wd,
-          est ? { windConfidence: est.confidence } : {});
+        var analysis = An.analyzeSession(session, wd, analysisOpts(est));
         var primary = res.fusion && res.fusion.primary;
         var name = (primary && primary.fileName)
           ? primary.fileName.replace(/\.[^.]+$/, '')
@@ -5212,7 +5440,7 @@
        트랙에서 자동 추정해 기본값으로 쓰고, 추정임을 화면에 밝힌다. */
     var est = estimateWind(session);
     var wd = est && est.windDir != null ? est.windDir : null;
-    var analysis = An.analyzeSession(session, wd, est ? { windConfidence: est.confidence } : {});
+    var analysis = An.analyzeSession(session, wd, analysisOpts(est));
     show(session, analysis, name, est);
   }
 
@@ -5299,6 +5527,22 @@
       if (!CUR.session) return;
       applyWind(CUR.est ? null : undefined, CUR.est ? 're-estimate' : 'keep');
     });
+    /* §498 — 풍속 입력에 핸들러가 **아예 없었다.** 값을 바꿔도 아무 일도
+       일어나지 않았고, 다른 버튼이 재분석을 부를 때까지 반영되지 않았다.
+       풍속은 AWA·AWS·트림 요구량의 유일한 입력이라 바뀌면 바로 다시
+       계산해야 한다. 풍향은 건드리지 않는다('keep'). */
+    var wsIn = $('in-windspeed');
+    if (wsIn) {
+      var wsLast = wsIn.value;
+      var wsApply = function () {
+        if (!CUR.session) return;
+        if (wsIn.value === wsLast) return;   /* 값이 안 바뀌었으면 재계산 안 함 */
+        wsLast = wsIn.value;
+        applyWind(null, 'keep');
+      };
+      wsIn.addEventListener('change', wsApply);
+      wsIn.addEventListener('blur', wsApply);
+    }
     $('v2-file').addEventListener('change', function (e) {
       CUR.isDemo = false;
       loadFiles(e.target.files);
