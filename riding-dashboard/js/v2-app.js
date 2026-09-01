@@ -3235,6 +3235,10 @@
     row.appendChild(distCard('Gybes by side', counts.gybeP, 'Starboard', counts.gybeS));
     host.appendChild(row);
 
+    /* §507 (V17) — 방향별 집계. 개별 목록보다 위에 둔다: '어느 쪽으로
+       도는 걸 못 하는가' 가 목록에서 눈으로 찾아지지 않기 때문이다. */
+    try { renderTurnDirection(host, a); } catch (e) {}
+
     /* 개별 회전 목록 — 요약만으로는 어느 회전이 나빴는지 못 찾는다 */
     var lh = $('turn-list');
     while (lh.firstChild) lh.removeChild(lh.firstChild);
@@ -3347,6 +3351,164 @@
     renderTurnGroups(host, a);
     renderTurnCoaching(host, a);
     renderTurnDetail(host, a);
+  }
+
+  /* ============================================================
+   * §507 회전 **방향**별 집계 (V17)
+   *
+   * 우리는 회전을 `m.side` 로만 묶어 왔다. 그건 **어느 택에 있었나**이지
+   * **어느 쪽으로 돌았나**가 아니다. 밴티지는 Port→Stbd 와 Stbd→Port 를
+   * 갈라 보고, 그 격차가 Tack bias 보다 훨씬 컸다(16% vs 4%).
+   *
+   * 우리 데이터에서도 그렇다. 강릉 샘플:
+   *   자이브 P→S  손실  0% · 회복  4.3초
+   *   자이브 S→P  손실 55% · 회복 21.6초   ← 같은 자이브인데 딴판
+   * 이건 '스타보드가 느리다' 가 아니라 **'왼쪽으로 도는 자이브를 못 한다'**
+   * 는 뜻이고, 연습할 대상이 완전히 다르다.
+   *
+   * 방향은 headingBefore/headingAfter 를 풍향에 대고 판정한다 —
+   * m.side 에 의존하지 않는다(그건 탈출 택이다).
+   *
+   * ⚠ 한 세션의 그룹당 표본은 보통 3~8개다. 개수를 반드시 같이 보여 주고,
+   *   너무 적으면 단정하지 않는다.
+   * ============================================================ */
+
+  var TURNDIR_MIN_N = 3;
+
+  function turnDirGroups(a, windDir) {
+    var mans = (a && a.maneuvers) || [];
+    if (windDir == null || !window.RDWindConfirm) return null;
+    var g = {};
+    mans.forEach(function (m) {
+      if (m.headingBefore == null || m.headingAfter == null) return;
+      var from = RDWindConfirm.tackOf(m.headingBefore, windDir);
+      var to = RDWindConfirm.tackOf(m.headingAfter, windDir);
+      if (from === to) return;              /* 택이 안 바뀌었으면 회전이 아니다 */
+      var key = m.type + ':' + from + to;
+      if (!g[key]) {
+        g[key] = { key: key, type: m.type, from: from, to: to, n: 0,
+                   loss: [], minSpd: [], rate: [], rec: [], eff: [] };
+      }
+      var b = g[key];
+      b.n++;
+      if (m.lossDisplayPct != null && isFinite(m.lossDisplayPct)) b.loss.push(m.lossDisplayPct);
+      if (m.minSpeedMs != null) b.minSpd.push(m.minSpeedMs * KT);
+      if (m.avgTurnRateDegSec != null) b.rate.push(m.avgTurnRateDegSec);
+      if (m.recoverySec != null) b.rec.push(m.recoverySec);
+      if (m.efficiency != null && isFinite(m.efficiency)) b.eff.push(m.efficiency);
+    });
+    function avg(x) {
+      if (!x.length) return null;
+      var s = 0; for (var i = 0; i < x.length; i++) s += x[i];
+      return s / x.length;
+    }
+    return Object.keys(g).map(function (k) {
+      var b = g[k];
+      b.avgLoss = avg(b.loss); b.avgMin = avg(b.minSpd);
+      b.avgRate = avg(b.rate); b.avgRec = avg(b.rec); b.avgEff = avg(b.eff);
+      return b;
+    }).sort(function (x, y) {
+      if (x.type !== y.type) return x.type === 'tack' ? -1 : 1;
+      return x.from < y.from ? -1 : 1;
+    });
+  }
+
+  /* 같은 종류(택끼리·자이브끼리)의 두 방향을 비교해 격차를 말한다.
+     '어느 택이 빠른가' 가 아니라 '어느 쪽으로 도는 걸 못 하는가' 다. */
+  function turnDirFinding(groups) {
+    var out = [];
+    ['tack', 'gybe'].forEach(function (t) {
+      var pair = groups.filter(function (g) { return g.type === t; });
+      if (pair.length !== 2) return;
+      var a1 = pair[0], b1 = pair[1];
+      if (a1.n < TURNDIR_MIN_N || b1.n < TURNDIR_MIN_N) return;
+      if (a1.avgLoss == null || b1.avgLoss == null) return;
+      var worse = a1.avgLoss > b1.avgLoss ? a1 : b1;
+      var better = worse === a1 ? b1 : a1;
+      var gap = worse.avgLoss - better.avgLoss;
+      if (gap < 8) return;                  /* 8%p 미만이면 굳이 말하지 않는다 */
+      var label = function (g) {
+        return (g.from === 'P' ? 'port' : 'starboard') + ' to '
+             + (g.to === 'P' ? 'port' : 'starboard');
+      };
+      var line = 'Your ' + (t === 'tack' ? 'tacks' : 'gybes') + ' turning '
+        + label(worse) + ' lose ' + Math.round(worse.avgLoss) + '% against '
+        + Math.round(better.avgLoss) + '% the other way'
+        + (worse.avgRec != null && better.avgRec != null
+            ? ', and take ' + worse.avgRec.toFixed(1) + ' s to recover against '
+              + better.avgRec.toFixed(1) + ' s'
+            : '')
+        + '. That is a turning-direction problem, not a tack-speed one — '
+        + 'the two are different things to practise.';
+      out.push({ text: line, n: Math.min(worse.n, better.n) });
+    });
+    return out;
+  }
+
+  function renderTurnDirection(host, a) {
+    var wd = a.windDir;
+    var groups = turnDirGroups(a, wd);
+    if (!groups || !groups.length) return;
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Which way you turn'));
+    head.appendChild(el('div', 'card-actions lab', 'entry tack → exit tack'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+    body.appendChild(el('div', 'text-secondary mb-2',
+      'Grouped by the direction of the turn, not by which tack you were on. '
+      + 'A rider can be fine turning one way and poor the other — that is a '
+      + 'different thing to fix than being slow on one tack.'));
+
+    var wrap = el('div', 'table-responsive');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Turn', 'Count', 'Avg loss', 'Lowest speed', 'Turn rate', 'Recovery']
+      .forEach(function (x, i) { htr.appendChild(el('th', i ? 'text-end' : null, x)); });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+    groups.forEach(function (g) {
+      var tr = el('tr');
+      var name = (g.type === 'tack' ? 'Tack' : 'Gybe') + '  '
+        + (g.from === 'P' ? 'port' : 'stbd') + ' → '
+        + (g.to === 'P' ? 'port' : 'stbd');
+      tr.appendChild(el('td', null, name));
+      var cn = el('td', 'text-end num', String(g.n));
+      if (g.n < TURNDIR_MIN_N) cn.style.color = THEME.warn;
+      tr.appendChild(cn);
+      tr.appendChild(el('td', 'text-end num',
+        g.avgLoss == null ? '—' : Math.round(g.avgLoss) + '%'));
+      tr.appendChild(el('td', 'text-end num',
+        g.avgMin == null ? '—' : g.avgMin.toFixed(1) + ' kt'));
+      tr.appendChild(el('td', 'text-end num',
+        g.avgRate == null ? '—' : g.avgRate.toFixed(1) + '°/s'));
+      tr.appendChild(el('td', 'text-end num',
+        g.avgRec == null ? '—' : g.avgRec.toFixed(1) + ' s'));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); body.appendChild(wrap);
+
+    var findings = turnDirFinding(groups);
+    findings.forEach(function (f) {
+      var box = el('div', 'alert alert-info mt-3');
+      box.appendChild(el('div', null, f.text));
+      if (f.n < 5) {
+        box.appendChild(el('div', 'mt-1',
+          '⚠ Only ' + f.n + ' turns in the smaller group — worth watching '
+          + 'across a few sessions before calling it a pattern.'));
+      }
+      body.appendChild(box);
+    });
+
+    if (groups.some(function (g) { return g.n < TURNDIR_MIN_N; })) {
+      body.appendChild(el('div', 'lab mt-2',
+        'Counts in amber have fewer than ' + TURNDIR_MIN_N
+        + ' turns — those rows are shown but not compared.'));
+    }
+
+    card.appendChild(body);
+    host.appendChild(card);
   }
 
   /* §454 선택한 회전 — 표에서 고른 회전들의 상세.
