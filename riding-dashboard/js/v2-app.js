@@ -2685,6 +2685,11 @@
       });
       th.appendChild(htr); t.appendChild(th);
       var tb = el('tbody');
+      /* §506 (옥대표 "5개만 화면에 노출하고 더보기 버튼으로") —
+         런이 20개씩 나오면 표가 화면을 잡아먹는다. 상위 5개만 두고
+         나머지는 접는다. 정렬이 빠른 순이라 위 5개가 볼 값어치가 크다. */
+      var RUN_SHOW = 5;
+      var rows = [];
       runs.forEach(function (r, i) {
         var tr = el('tr');
         tr.appendChild(el('td', 'num', String(i + 1)));
@@ -2696,9 +2701,28 @@
           r.heading == null ? '—' : Math.round(r.heading) + '°'));
         tr.appendChild(el('td', 'text-end num',
           r.avgHr == null ? '—' : Math.round(r.avgHr) + ' bpm'));
+        if (i >= RUN_SHOW) tr.style.display = 'none';
+        rows.push(tr);
         tb.appendChild(tr);
       });
       t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
+      if (runs.length > RUN_SHOW) {
+        var more = el('div', 'card-footer text-center');
+        var mb = el('button', 'btn btn-sm btn-ghost-secondary',
+          'Show all ' + runs.length + ' runs');
+        mb.type = 'button';
+        var open = false;
+        mb.addEventListener('click', function () {
+          open = !open;
+          rows.forEach(function (tr, i) {
+            if (i >= RUN_SHOW) tr.style.display = open ? '' : 'none';
+          });
+          mb.textContent = open ? 'Show top ' + RUN_SHOW + ' only'
+                                : 'Show all ' + runs.length + ' runs';
+        });
+        more.appendChild(mb);
+        card.appendChild(more);
+      }
     }
     host.appendChild(card);
 
@@ -5769,9 +5793,60 @@
     var st = mapInst.stats;
     if (st && st.n && cav) {
       var pct = function (v) { return Math.round(v / st.n * 100) + '%'; };
-      cav.textContent = 'Shifts: ' + pct(st.lift) + ' lifted, ' + pct(st.header) +
-        ' headed. Pressure: ' + pct(st.gust) + ' above / ' + pct(st.lull) + ' below your usual. ' +
-        'Inferred from the track \u2014 no wind instrument, so lost trim or a wave reads the same way.';
+      /* §506 (옥대표 "설명이 조금 더 디테일 하면 좋겠고")
+         전에는 백분율 한 줄과 경고 한 줄이 전부였다. 색이 무엇을 뜻하는지,
+         그 숫자로 뭘 해야 하는지, 어떻게 계산했는지가 없었다.
+         셋을 나눠 적는다 — 무엇을 보고 있나 / 어떻게 읽나 / 얼마나 믿나. */
+      while (cav.firstChild) cav.removeChild(cav.firstChild);
+      cav.className = 'lab mt-1';
+
+      var line1 = el('div');
+      line1.appendChild(el('span', 'text-secondary', 'This session: '));
+      line1.appendChild(el('span', 'fw-bold', pct(st.lift) + ' lifted'));
+      line1.appendChild(el('span', 'text-secondary', ' \u00b7 '));
+      line1.appendChild(el('span', 'fw-bold', pct(st.header) + ' headed'));
+      line1.appendChild(el('span', 'text-secondary',
+        ' \u00b7 pressure ' + pct(st.gust) + ' above and ' + pct(st.lull)
+        + ' below your usual.'));
+      cav.appendChild(line1);
+
+      if (mapMode !== 'tack') {
+        var d1 = el('div', 'mt-2');
+        d1.appendChild(el('span', 'fw-bold', 'What the colour means. '));
+        d1.appendChild(el('span', null,
+          'Green is a lift \u2014 the wind swung so you could point higher without '
+          + 'changing anything. Orange is a header \u2014 it swung the other way and '
+          + 'pushed you off course. Grey is the angle you held most of the time on '
+          + 'that tack.'));
+        cav.appendChild(d1);
+
+        var d2 = el('div', 'mt-2');
+        d2.appendChild(el('span', 'fw-bold', 'How to read it upwind. '));
+        d2.appendChild(el('span', null,
+          'A long orange stretch is the classic sign you stayed on a headed tack '
+          + 'too long \u2014 that is where tacking would have paid. Green stretches '
+          + 'are the ones worth staying on. Look for whether the colours cluster in '
+          + 'one part of the course: that means the shift was in the place, not the clock.'));
+        cav.appendChild(d2);
+
+        var d3 = el('div', 'mt-2');
+        d3.appendChild(el('span', 'fw-bold', 'Line width is pressure. '));
+        d3.appendChild(el('span', null,
+          'Thick means you were going faster than your own median on that tack, '
+          + 'thin means slower \u2014 read as gust and lull.'));
+        cav.appendChild(d3);
+      }
+
+      var d4 = el('div', 'mt-2 text-secondary');
+      d4.appendChild(el('span', 'fw-bold', '\u26a0 How this is worked out. '));
+      d4.appendChild(el('span', null,
+        'There is no wind instrument on the board, so this is inferred from the '
+        + 'track itself: your heading is compared with the angle you normally held '
+        + 'on that same tack, smoothed over about 20 seconds. That means anything '
+        + 'that changes your heading or speed reads the same way as wind \u2014 '
+        + 'a lost bit of trim, a wave, a moment of pumping, or easing off to look '
+        + 'around. Treat it as where to look, not as a measurement.'));
+      cav.appendChild(d4);
     }
   }
 
