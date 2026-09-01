@@ -29,8 +29,12 @@
      힘든 요소였다: 11px · 대문자 · 자간 넓음 · 흐린 회색. 대문자와 넓은
      자간은 작은 글씨에서 단어 모양을 무너뜨려 노안에 특히 불리하다.
      크기를 올리고 자간을 줄이고 대문자를 뗐다. */
+  /* §500 — 다크에서 흐린 글자가 5.78:1 로 본문(11.86:1)의 절반이었다.
+     색상·채도 고정, 명도만 64.9%→78% → #c1c5cd, 8.50:1 (WCAG AAA). */
   .lab { font-size: .8125rem; letter-spacing: .02em;
-         color: var(--tblr-secondary); font-family: "IBM Plex Mono", monospace; }
+         color: #c1c5cd; font-family: "IBM Plex Mono", monospace; }
+  [data-bs-theme="dark"] .text-secondary,
+  :root:not([data-bs-theme="light"]) .text-secondary { color: #c1c5cd !important; }
   .u-legend { font-size: .75rem; }
   .chart-host { min-height: 280px; }
   /* §473 세로 스택 — 판 사이 경계선 하나로 묶어 보이게, x축은 맨 아래만 */
@@ -296,6 +300,6 @@
 <script src="js/bin-table.js?v=bin-477"></script>
 <script src="js/correlation.js?v=corr-478"></script>
 <script src="js/formula.js?v=formula-479"></script>
-<script src="js/v2-app.js?v=v498"></script>
+<script src="js/v2-app.js?v=v500"></script>
 </body>
 </html>

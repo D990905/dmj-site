@@ -64,12 +64,24 @@
      전부 진하게 간다. 대비를 올리는 게 이 작업의 목적이다.
      의미색(포트 적 · 스타보드 녹)은 국제 관례라 유지하되, 흰 배경에서
      대비가 모자란 톤은 한 단계 어둡게 쓴다. */
+  /* §500 (옥대표 "흐린 배경에 글자가 너무 어두운것 같아 / 색은 바꾸지말고
+     밝게") — 다크에서 흐린 글자만 대비가 절반이었다: .lab·축라벨이
+     5.78:1 / 4.94:1 인데 본문은 11.86:1. 노안에 이게 그대로 걸린다.
+     **색상(hue)과 채도는 소수점까지 그대로 두고 명도만 올렸다** —
+     dim #8a97a8 = HSL(214°, 14.7%, 60%) → axisText HSL(214°, 14.7%, 78%)
+     = #bfc6cf, 대비 8.51:1 (WCAG AAA). 본문 11.86:1 보다는 낮게 남겨
+     '보조 정보' 라는 위계는 유지한다.
+
+     dim 과 axisText 를 **나눈 이유**: dim 은 글자만 쓰는 게 아니라
+     지도의 흐린 배경 트랙·안 고른 회전 점에도 쓰인다. 글자를 밝히자고
+     그 표식까지 밝히면 '고른 것 vs 안 고른 것' 대비가 무너진다.
+     → 글자·축라벨은 axisText, 표식은 dim 그대로. */
   var THEME_DARK = { accent: '#4dabf7', warn: '#f59f00', grid: '#2b3648',
-                     dim: '#8a97a8', bg: '#1a2234',
+                     dim: '#8a97a8', axisText: '#bfc6cf', bg: '#1a2234',
                      port: '#e03131', stbd: '#2f9e44', gybe: '#f76707',
                      ink: '#e6edf5' };
   var THEME_LIGHT = { accent: '#0d6efd', warn: '#b45309', grid: '#d3d9e2',
-                      dim: '#465063', bg: '#ffffff',
+                      dim: '#465063', axisText: '#465063', bg: '#ffffff',
                       port: '#c92a2a', stbd: '#1e7e34', gybe: '#c2410c',
                       ink: '#111827' };
   function currentThemeName() {
@@ -256,10 +268,10 @@
       scales: { x: { time: false, range: [h[0].fromKt - binW * 0.6,
                                           h[h.length - 1].toKt + binW * 0.6] } },
       axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
           values: function (u, t) { return t.map(function (v) { return v + ' kt'; }); } },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace', size: 44,
           values: function (u, t) { return t.map(function (v) { return v.toFixed(0) + 'm'; }); } }
       ],
@@ -514,10 +526,10 @@
       cursor: { drag: { x: true, y: false } },
       scales: { x: { time: false } },
       axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
           values: function (u, t) { return t.map(function (v) { return fmtClock(v); }); } },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace', size: 40 }
       ],
       series: [
@@ -2141,12 +2153,12 @@
         legend: { show: false },
         scales: { x: { time: false } },
         axes: [
-          { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+          { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
             font: '11px "IBM Plex Mono", monospace',
             values: function (u, t) {
               return t.map(function (v) { return v.toFixed(0) + res.x.unit; });
             } },
-          { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+          { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
             font: '11px "IBM Plex Mono", monospace', size: 46,
             values: function (u, t) { return t.map(function (v) { return v.toFixed(1); }); } }
         ],
@@ -2863,9 +2875,9 @@
       width: plot.clientWidth || 800, height: 260, padding: [12, 14, 4, 6],
       cursor: { drag: { x: true, y: false } },
       axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace' },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace', size: 46 }
       ],
       series: [
@@ -2946,10 +2958,10 @@
       cursor: { drag: { x: false, y: false } },
       scales: { x: { time: false } },
       axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
           values: function (u, t) { return t.map(function (v) { return v.toFixed(0) + ' kt'; }); } },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace', size: 44,
           values: function (u, t) { return t.map(function (v) { return v.toFixed(0); }); } }
       ],
@@ -3541,14 +3553,14 @@
       scales: { x: { time: false }, y: { range: [yLo, yHi] } },
       bands: bands,
       axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
           values: function (u, ticks) {
             return ticks.map(function (v) {
               return (v > 0 ? '+' : '') + v.toFixed(0) + ' s';
             });
           } },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace', size: 44,
           values: function (u, ticks) {
             return ticks.map(function (v) { return v.toFixed(0) + ' kt'; });
@@ -4460,12 +4472,12 @@
       cursor: { drag: { x: true, y: false } },
       scales: { x: { time: false } },
       axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
           values: function (u, ticks) {
             return ticks.map(function (v) { return v.toFixed(0) + ' kt'; });
           } },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace', size: 46,
           values: function (u, ticks) {
             return ticks.map(function (v) { return v.toFixed(0) + '°'; });
@@ -5009,10 +5021,10 @@
       cursor: { drag: { x: false, y: false } },
       scales: { x: { time: false } },
       axes: [
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
           values: function (u, t) { return t.map(function (v) { return v + ' m²'; }); } },
-        { stroke: THEME.dim, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
+        { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace', size: 42 }
       ],
       series: [

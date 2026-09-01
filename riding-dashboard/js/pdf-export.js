@@ -134,7 +134,33 @@
   /* ============================================================
    * 데이터 추출 — DOM 에서 직접 (state 캡슐화 회피)
    * ============================================================ */
-  function $(id) { return document.getElementById(id); }
+  /* §499 — 소스 어댑터.
+     이 모듈은 구 대시보드(index.html)의 DOM id 26개와 전역 `state` 에
+     묶여 있었다. v2 에는 그 id 가 **하나도 없어서** 그대로 붙이면 백지가
+     나온다. id 를 v2 에 이식하는 건 구조를 거스르는 일이라, 대신
+     **$() 한 곳만 소스를 먼저 보게** 했다. textOf·valueOf·
+     canvasToDataURL·collectStatStrip·querySelector 는 전부 $() 위에
+     서 있으므로 호출부를 한 줄도 안 고쳐도 된다.
+
+     source.el(id) 규약:
+       · 엘리먼트 반환  → 그걸 쓴다
+       · null 반환      → '없음' (해당 페이지가 우아하게 빠진다)
+       · undefined 반환 → 모르는 id → 진짜 document 에서 찾는다
+                          (rd-pdf-root 같은 이 모듈 자신의 id 가 여기 해당) */
+  var SRC = null;
+  function $(id) {
+    if (SRC && typeof SRC.el === 'function') {
+      var e = SRC.el(id);
+      if (e !== undefined) return e;
+    }
+    return document.getElementById(id);
+  }
+  /* 전역 state 도 소스가 대신 줄 수 있다 (v2 는 자기 CUR 을 넘긴다) */
+  function pdfState() {
+    if (SRC && SRC.state) return SRC.state;
+    return (typeof global !== 'undefined' && global.state) ||
+           (typeof window !== 'undefined' && window.state) || {};
+  }
   function textOf(id) {
     var el = $(id);
     return el ? String(el.textContent || '').trim() : '';
@@ -821,8 +847,7 @@
      기존 VPS 평면 grid + stat strip 는 보조 정보로 후순위. */
   function buildSummary(meta, page) {
     /* state.* 직접 read (window scope 또는 global). graceful fallback */
-    var state = (typeof global !== 'undefined' && global.state) ||
-                 (typeof window !== 'undefined' && window.state) || {};
+    var state = pdfState();
     var vps = state.vps || {};
     var analysis = state.analysis || {};
     var summary = analysis.summary || {};
@@ -1128,8 +1153,7 @@
     /* ───── Phase 2 — Recommendation 3-chip callout (★ P0) ─────
        옥대표님 spec §5. Coach narrative 위에 3 chip — 강점 · 개선 · 다음 세션.
        Phase 0 의 Top 3 highlights 결과 재사용 (data consistency). */
-    var state = (typeof global !== 'undefined' && global.state) ||
-                 (typeof window !== 'undefined' && window.state) || {};
+    var state = pdfState();
     var vps = state.vps || {};
     var analysis = state.analysis || {};
     var summary = analysis.summary || {};
@@ -1424,8 +1448,14 @@
 
   function generate(opts) {
     opts = opts || {};
+    /* §499 — opts.source 가 있으면 그 어댑터로 읽는다. 끝나면 반드시
+       되돌린다(실패 경로 포함) — 안 그러면 구 대시보드가 v2 소스를
+       계속 물고 있게 된다. */
+    SRC = opts.source || null;
+    var releaseSrc = function () { SRC = null; };
     var ds = $('dashboard-view');
     if (!ds || ds.hidden) {
+      releaseSrc();
       return Promise.reject(new Error(
         T('PDF 보고서는 세션이 로드되었을 때만 생성할 수 있습니다')));
     }
