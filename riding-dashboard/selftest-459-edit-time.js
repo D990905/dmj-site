@@ -78,5 +78,49 @@ ok(legSpans.every(function (v) { return v < 700; }),
    '어떤 레그도 공백을 삼키지 않았다',
    legSpans.map(function (v) { return Math.round(v); }).join(','));
 
+
+/* ---------- §493 편집본 위에서 다시 제외하기 ----------
+   편집본은 시각을 0 부터 다시 매긴다. 화면에서 고른 구간을 원본 좌표로
+   되돌리지 못하면, 앞을 이미 잘라낸 세션에서 두 번째 제외가 그 차이만큼
+   엉뚱한 데를 지운다(옥대표 실측: 드래그한 곳은 남고 다른 데가 사라짐).
+   표본에 붙인 origT 가 그 되돌리기의 유일한 근거다. */
+(function () {
+  var e1 = { excludeRanges: [{ from: 0, to: 300 }] };
+  var s1 = An.applyEdits(s, e1);
+  ok(s1.samples[0].origT != null && s1.samples[0].origT > 300,
+     '§493 편집본 표본이 원본 시각(origT)을 들고 있다', s1.samples[0].origT);
+  ok(Math.abs(s1.samples[0].t) < 1e-9,
+     '§493 편집본 t 는 0 부터 다시 매겨진다 (원점이 다르다는 사실 고정)');
+
+  function toOrig(sess, el) {
+    var S = sess.samples, target = S[0].t + el, lo = 0, hi = S.length - 1;
+    while (lo < hi) { var m = (lo + hi) >> 1; if (S[m].t < target) lo = m + 1; else hi = m; }
+    var p = S[lo];
+    return (p.origT != null ? p.origT : p.t) + (target - p.t);
+  }
+  var oFrom = toOrig(s1, 200), oTo = toOrig(s1, 400);
+  ok(oFrom > 450 && oFrom < 550 && oTo > 650 && oTo < 750,
+     '§493 편집본 200~400s 가 원본 500s 대로 옮겨진다',
+     oFrom.toFixed(0) + '~' + oTo.toFixed(0));
+
+  var s2 = An.applyEdits(s, { excludeRanges: e1.excludeRanges.concat([{ from: oFrom, to: oTo }]) });
+  var left = 0;
+  s2.samples.forEach(function (p) { if (p.origT >= oFrom && p.origT <= oTo) left++; });
+  ok(left === 0, '§493 2차 제외가 실제로 그 구간을 지운다', left);
+  ok(s2.samples.length < s1.samples.length,
+     '§493 2차 제외로 표본이 줄어든다 (아무 효과 없던 옛 버그 방지)',
+     s1.samples.length + ' → ' + s2.samples.length);
+
+  /* 옛 방식 재현 — 화면 좌표(200~400)를 원본 좌표로 착각해 그대로 넘긴다.
+     그러면 **사용자가 고른 구간은 그대로 남는다**. 그게 옥대표가 본 증상이다:
+     "드래그한 곳은 남고 다른 데가 사라진다". */
+  var sOld = An.applyEdits(s, { excludeRanges: e1.excludeRanges.concat([{ from: 200, to: 400 }]) });
+  var stillThere = 0;
+  sOld.samples.forEach(function (p) { if (p.origT >= oFrom && p.origT <= oTo) stillThere++; });
+  ok(stillThere > 0,
+     '§493 옛 방식은 고른 구간을 못 지운다 (회귀 대조)',
+     '고른 구간에 남은 표본=' + stillThere);
+})();
+
 console.log('\n=== 결과: ' + P + ' PASS / ' + F + ' FAIL ===');
 process.exit(F ? 1 : 0);

@@ -1,5 +1,13 @@
 <!doctype html>
 <html lang="en" data-bs-theme="dark">
+<!-- §491 — 테마는 CSS 가 그려지기 전에 정한다. 나중에 JS 로 바꾸면
+     어두운 화면이 한 번 번쩍인 뒤 밝아진다(FOUC). -->
+<script>
+  try {
+    var t = localStorage.getItem('rd_theme');
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-bs-theme', t);
+  } catch (e) {}
+</script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,19 +25,34 @@
   .kpi__val { font-size: 1.75rem; font-weight: 600; line-height: 1.1; }
   .kpi__unit { font-size: .875rem; color: var(--tblr-secondary); }
   .kpi__sub { font-size: .75rem; color: var(--tblr-secondary); }
-  .lab { font-size: .6875rem; letter-spacing: .12em; text-transform: uppercase;
+  /* §491 (옥대표 "노안이라서 잘 안보임") — 이 클래스가 화면에서 제일 읽기
+     힘든 요소였다: 11px · 대문자 · 자간 넓음 · 흐린 회색. 대문자와 넓은
+     자간은 작은 글씨에서 단어 모양을 무너뜨려 노안에 특히 불리하다.
+     크기를 올리고 자간을 줄이고 대문자를 뗐다. */
+  .lab { font-size: .8125rem; letter-spacing: .02em;
          color: var(--tblr-secondary); font-family: "IBM Plex Mono", monospace; }
   .u-legend { font-size: .75rem; }
   .chart-host { min-height: 280px; }
   /* §473 세로 스택 — 판 사이 경계선 하나로 묶어 보이게, x축은 맨 아래만 */
   #chart-timeline { min-height: 0; }
-  .rd-stack-panel + .rd-stack-panel { border-top: 1px solid rgba(139,152,165,0.16); }
-  /* uPlot 기본 선택 음영은 검정 7% 라 다크 배경에서 안 보인다 — 밝은 쪽으로 */
+  .rd-stack-panel + .rd-stack-panel { border-top: 1px solid var(--tblr-border-color); }
+  /* uPlot 기본 선택 음영은 검정 7% 라 다크 배경에서 안 보인다 — 밝은 쪽으로.
+     라이트 테마에서는 반대로 너무 옅어 파랑을 진하게 쓴다. */
   #chart-timeline .u-select {
     background: rgba(77,171,247,0.16);
     border-left: 1px solid rgba(77,171,247,0.55);
     border-right: 1px solid rgba(77,171,247,0.55);
   }
+  [data-bs-theme="light"] #chart-timeline .u-select {
+    background: rgba(13,110,253,0.14);
+    border-left: 1px solid rgba(13,110,253,0.6);
+    border-right: 1px solid rgba(13,110,253,0.6);
+  }
+  /* 라이트에서 본문 대비를 확실히 — 흐린 회색 글씨가 노안에 제일 안 보인다 */
+  [data-bs-theme="light"] body { color: #111827; }
+  [data-bs-theme="light"] .text-secondary { color: #3f4a5a !important; }
+  [data-bs-theme="light"] .lab { color: #465063; }
+  [data-bs-theme="light"] .card { border-color: #d3d9e2; }
 </style>
 </head>
 <body>
@@ -37,8 +60,10 @@
   <header class="navbar navbar-expand-md d-print-none">
     <div class="container-xl">
       <div class="navbar-brand fw-bold">Riding Dashboard</div>
-      <div class="navbar-nav flex-row order-md-last">
+      <div class="navbar-nav flex-row order-md-last align-items-center gap-3">
         <span class="nav-item d-none d-md-flex align-items-center lab" id="nav-meta">—</span>
+        <button type="button" class="btn btn-sm" id="theme-toggle"
+                title="Switch between light and dark">Light</button>
       </div>
     </div>
   </header>
@@ -251,7 +276,7 @@
 <script src="js/analysis-imu.js?v=auto-463"></script>
 <script src="js/analysis-hr.js?v=auto-463"></script>
 <script src="js/session-merger.js?v=auto-463"></script>
-<script src="js/analysis.js?v=auto-463"></script>
+<script src="js/analysis.js?v=v493"></script>
 <script src="js/storage.js?v=trend-490"></script>
 <script src="vendor/uPlot.iife.min.js?v=1.6.32"></script>
 <script src="js/chart-meanmax.js?v=sections-450"></script>
@@ -264,13 +289,13 @@
 <script src="js/anim.js?v=auto-463"></script>
 <script src="js/charts.js?v=auto-463"></script>
 <script src="js/replay.js?v=auto-463"></script>
-<script src="js/map-v2.js?v=map-441"></script>
+<script src="js/map-v2.js?v=map-491"></script>
 <script src="js/map-tactical.js?v=tact-472b"></script>
 <script src="js/chart-stack.js?v=stack-486"></script>
 <script src="js/session-qa.js?v=qa-487"></script>
 <script src="js/bin-table.js?v=bin-477"></script>
 <script src="js/correlation.js?v=corr-478"></script>
 <script src="js/formula.js?v=formula-479"></script>
-<script src="js/v2-app.js?v=v490"></script>
+<script src="js/v2-app.js?v=v493"></script>
 </body>
 </html>

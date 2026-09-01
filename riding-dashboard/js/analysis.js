@@ -1160,7 +1160,15 @@
     { metric: 'vmg',   label: 'VMG (풍상·풍하 유효속도)', unit: 'speed', split: true },
     { metric: 'heel',  label: '힐 (Heel)',           unit: 'deg',   split: true  },
     { metric: 'pitch', label: '피치 (Pitch·트림)',   unit: 'deg',   split: true  },
-    { metric: 'hr',    label: '심박수 (HR)',          unit: 'bpm',   split: false }
+    /* §492 (옥대표 "스타보드 심박수가 빠진이유가 뭘까") — split:false 였다.
+       "심박은 좌우 택과 무관하다" 는 전제였는데, 실제로는 버킷마다 값이
+       다르게 나온다(데모 세션 풍상 P 147 vs S 127). 무관하다고 단정할
+       근거가 없었고, 무엇보다 합산값을 **Port 칸에** 넣고 Starboard 를
+       비워 두는 바람에 "스타보드 심박은 측정이 안 됐다" 로 읽혔다.
+       버킷별 통계는 이미 계산되고 있었다 — 쪼개서 그대로 보여 준다.
+       ⚠ 택별 차이는 시간 교란일 수 있다(한쪽 택을 세션 후반에 몰아서
+       탔다면 그때 심박이 낮다). 카드 각주가 그 점을 밝힌다. */
+    { metric: 'hr',    label: '심박수 (HR)',          unit: 'bpm',   split: true }
   ];
   var STATS_MODES = [
     { id: 'upwind',   label: '풍상' },
@@ -2694,7 +2702,15 @@
       var segDist = (k > 0 && contiguous) ? (s.segDist || 0) : 0;
       cum += segDist;
       var es = {
-        t: s.t - t0, lat: s.lat, lng: s.lng, ele: s.ele,
+        t: s.t - t0,
+        /* §493 — 편집본은 시각을 0 부터 다시 매긴다. 그러면 화면에서
+           고른 구간을 **원본 어디인지** 되돌릴 방법이 없어진다.
+           앞을 이미 잘라낸 세션에서 다시 구간을 제외하면 그 차이만큼
+           엉뚱한 데가 지워졌다(옥대표 실측: 드래그한 곳은 그대로 남고
+           다른 구간이 사라짐). 원본 시각을 표본에 달아 둔다.
+           이미 편집본에서 온 표본이면 그 원본 시각을 그대로 물려준다. */
+        origT: (s.origT != null ? s.origT : s.t),
+        lat: s.lat, lng: s.lng, ele: s.ele,
         speed: s.speed, heading: s.heading, hr: (s.hr != null ? s.hr : null),
         cumDist: cum, segDist: segDist,
         speedDevice: s.speedDevice, speedRaw: s.speedRaw,

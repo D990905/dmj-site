@@ -41,8 +41,59 @@
     var v = parseFloat(($('in-windspeed') || {}).value);
     return isFinite(v) ? v : null;
   }
-  var THEME = { accent: '#4dabf7', warn: '#f59f00', grid: '#2b3648',
-                dim: '#8a97a8', bg: '#1a2234' };
+  /* §491 (옥대표 "노안이라서 잘 안보임") — 라이트 테마.
+     ────────────────────────────────────────────────────────────
+     차트 색은 CSS 가 아니라 JS 가 캔버스에 직접 칠하므로, 테마를 바꾸면
+     THEME 도 같이 바뀌어야 한다. 다크의 흐린 회색(dim #8a97a8)을 흰
+     배경에 그대로 쓰면 거의 안 보인다 — 라이트에서는 축·격자·라벨을
+     전부 진하게 간다. 대비를 올리는 게 이 작업의 목적이다.
+     의미색(포트 적 · 스타보드 녹)은 국제 관례라 유지하되, 흰 배경에서
+     대비가 모자란 톤은 한 단계 어둡게 쓴다. */
+  var THEME_DARK = { accent: '#4dabf7', warn: '#f59f00', grid: '#2b3648',
+                     dim: '#8a97a8', bg: '#1a2234',
+                     port: '#e03131', stbd: '#2f9e44', gybe: '#f76707',
+                     ink: '#e6edf5' };
+  var THEME_LIGHT = { accent: '#0d6efd', warn: '#b45309', grid: '#d3d9e2',
+                      dim: '#465063', bg: '#ffffff',
+                      port: '#c92a2a', stbd: '#1e7e34', gybe: '#c2410c',
+                      ink: '#111827' };
+  function currentThemeName() {
+    try {
+      var t = localStorage.getItem('rd_theme');
+      if (t === 'light' || t === 'dark') return t;
+    } catch (e) {}
+    return document.documentElement.getAttribute('data-bs-theme') === 'light'
+      ? 'light' : 'dark';
+  }
+  var THEME = currentThemeName() === 'light'
+    ? Object.assign({}, THEME_LIGHT) : Object.assign({}, THEME_DARK);
+
+  function applyTheme(name) {
+    document.documentElement.setAttribute('data-bs-theme', name);
+    try { localStorage.setItem('rd_theme', name); } catch (e) {}
+    var src = (name === 'light') ? THEME_LIGHT : THEME_DARK;
+    /* THEME 은 여러 곳이 참조를 들고 있으므로 **객체를 갈아끼우지 않고**
+       속성만 덮어쓴다 — 새 객체를 만들면 옛 참조가 옛 색을 계속 쓴다. */
+    Object.keys(src).forEach(function (k) { THEME[k] = src[k]; });
+    var btn = document.getElementById('theme-toggle');
+    if (btn) btn.textContent = (name === 'light') ? 'Dark' : 'Light';
+    /* 차트는 만들 때 색을 캔버스에 구워 넣는다 — 전부 다시 그린다 */
+    if (CUR && CUR.fullSession) { try { reapplyEdits(); } catch (e) {} }
+  }
+
+  (function bindTheme() {
+    function wire() {
+      var btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      btn.textContent = (currentThemeName() === 'light') ? 'Dark' : 'Light';
+      btn.addEventListener('click', function () {
+        applyTheme(currentThemeName() === 'light' ? 'dark' : 'light');
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', wire, { once: true });
+    } else { wire(); }
+  })();
 
   /* 숨겨진 탭 안에서 만들어진 차트는 clientWidth 가 0 이라 너비가 틀린다.
      인스턴스를 들고 있다가 탭이 보이는 순간·창 크기 변경 시 다시 맞춘다. */
@@ -241,11 +292,44 @@
   /* ---------- 트랙 편집 (구간 제외 · 되돌리기) ---------- */
   /* 편집은 항상 원본(fullSession)에 적용한다 — 편집본에 또 편집하면
      구간 좌표가 어긋난다. */
+  /* §493 (옥대표 "해당구간을 제거하니까 저렇게 나오는데 버그일까?") — 버그였다.
+     ────────────────────────────────────────────────────────────
+     시간 원점이 두 개 섞여 있었다. 타임라인은 **현재 보고 있는 세션**
+     (이미 제외가 적용된 편집본)에서 그려지므로 축의 0:00 은 편집본의
+     첫 표본이다. 그런데 여기서는 **원본**의 첫 표본을 기준으로 절대시각을
+     만들고 있었다. 이미 앞부분을 잘라낸 상태라면 그 차이만큼(옥대표
+     경우 앞에서 17:53 을 잘라 둔 상태) 엉뚱한 구간이 지워진다 —
+     드래그한 곳은 그대로 남고 다른 데가 사라진다.
+
+     원본이 아니라 **차트가 그려진 세션의 t0** 를 써야 한다. 제외 목록은
+     절대시각으로 보관되고 항상 원본에 적용되므로, 여기만 맞으면
+     여러 번 잘라도 계속 맞는다.
+     (§486 시간축 압축 이전에도 있던 결함인데, 압축으로 눈에 띄었다) */
+  /* 화면 경과초 → **원본 세션의 시각**. 편집본은 시각이 0 부터 다시
+     매겨져 있으므로(§493) 표본에 달아 둔 origT 로 되돌린다. */
+  function toOriginalTime(sess, elapsed) {
+    var S = (sess && sess.samples) || [];
+    if (!S.length) return elapsed;
+    var target = S[0].t + elapsed;
+    var lo = 0, hi = S.length - 1;
+    while (lo < hi) {
+      var mid = (lo + hi) >> 1;
+      if (S[mid].t < target) lo = mid + 1; else hi = mid;
+    }
+    var p = S[lo];
+    /* 표본이 없는 자리는 가장 가까운 표본의 원본 시각 + 남은 차이 */
+    var base = (p.origT != null) ? p.origT : p.t;
+    return base + (target - p.t);
+  }
+
   function addExclusion(fromElapsed, toElapsed) {
-    if (!CUR.fullSession) return;
-    var t0 = CUR.fullSession.samples[0].t;
+    var base = CUR.session || CUR.fullSession;
+    if (!base || !base.samples || !base.samples.length) return;
     CUR.edit = CUR.edit || { excludeRanges: [] };
-    CUR.edit.excludeRanges.push({ from: t0 + fromElapsed, to: t0 + toElapsed });
+    CUR.edit.excludeRanges.push({
+      from: toOriginalTime(base, fromElapsed),
+      to: toOriginalTime(base, toElapsed)
+    });
     reapplyEdits();
   }
   function removeExclusion(i) {
@@ -2481,16 +2565,13 @@
         tr.appendChild(el('td', null,
           mode === 'upwind' ? 'Upwind' : mode === 'downwind' ? 'Downwind' : 'All'));
         ['P', 'S'].forEach(function (side) {
+          /* §492 — 예전에는 택 구분이 없는 지표(HR)의 합산값을 **Port 칸에**
+             넣고 Starboard 를 비웠다. 그러면 "스타보드는 측정이 안 됐다"
+             로 읽힌다 — 실제로는 그 숫자가 양쪽 합산이었다.
+             이제 HR 도 버킷별로 쪼개므로 이 분기는 필요 없다. 그래도
+             택 구분이 없는 지표가 다시 생기면, 한쪽에 몰지 말고 양쪽에
+             같은 값을 넣는다(같은 값임이 보이는 게 낫다). */
           var row = modes[mode][side] || modes[mode]['-'];
-          /* hr 처럼 좌우 구분이 없는 지표는 한 값을 양쪽에 두지 않고
-             포트 칸에만 넣고 스타보드는 비운다 */
-          var isShared = !modes[mode][side] && modes[mode]['-'];
-          if (isShared && side === 'S') {
-            tr.appendChild(el('td', 'text-end text-secondary', '—'));
-            tr.appendChild(el('td', 'text-end text-secondary', '—'));
-            tr.appendChild(el('td', 'text-end text-secondary', '—'));
-            return;
-          }
           if (!row) {
             tr.appendChild(el('td', 'text-end text-secondary', '—'));
             tr.appendChild(el('td', 'text-end text-secondary', '—'));
@@ -2508,7 +2589,11 @@
     var f2 = el('div', 'card-footer text-secondary');
     f2.style.fontSize = '.8125rem';
     f2.textContent = 'Averages are time-weighted. "Best" tiers reject noise — for wind angles '
-      + 'that means the lowest angles upwind, the highest downwind.';
+      + 'that means the lowest angles upwind, the highest downwind. '
+      /* §492 — 택별 심박 차이를 체력 좌우차로 바로 읽지 않도록 경고.
+         한쪽 택을 세션 후반에 몰아서 탔으면 그 택 심박이 낮게 나온다. */
+      + 'Heart rate is split by tack too, but read a difference carefully — if you '
+      + 'sailed one tack mostly late in the session, that alone lowers it.';
     c2.appendChild(f2);
     host.appendChild(c2);
   }

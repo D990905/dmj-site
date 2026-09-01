@@ -83,7 +83,14 @@
 
     var bounds = global.L.latLngBounds(pts.map(function (p) { return [p.lat, p.lng]; }));
     map.fitBounds(bounds, { padding: [24, 24] });
-    setTimeout(function () { map.invalidateSize(); }, 60);
+    /* §491 — 숨은 탭에서 만들어진 지도는 크기가 0 이라, 그 크기로 맞춘
+       fitBounds 배율이 그대로 남아 엉뚱하게 확대돼 있다. invalidateSize
+       만으로는 배율이 안 고쳐진다 — **경계도 다시 맞춰야** 한다.
+       (map-tactical 에는 §486 에서 이미 넣었고, 여기만 빠져 있었다) */
+    setTimeout(function () {
+      try { map.invalidateSize(); map.fitBounds(bounds, { padding: [24, 24] }); }
+      catch (e) {}
+    }, 60);
 
     return { map: map, segments: drawn, markers: markers, tiers: TIERS };
   }

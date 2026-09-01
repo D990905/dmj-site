@@ -227,13 +227,23 @@ var aSj = An.analyzeSession(sj, sjW, {});
 check('송정 세션에 HR 분석이 있다', !!(aSj.hr && aSj.hr.hasHR));
 var panelSj = An.computeStatsPanel(aSj);
 var hrRows = panelSj.rows.filter(function (r) { return r.metric === 'hr'; });
-check('심박 행이 풍상·풍하 2행으로 산출된다', hrRows.length === 2,
+/* §492 — 심박도 좌우 택으로 쪼갠다(풍상 P/S · 풍하 P/S = 4행).
+   예전에는 합산 2행이었는데, 화면이 그 합산값을 **Port 칸에** 넣고
+   Starboard 를 비워 "스타보드는 측정이 안 됐다" 로 읽혔다(옥대표 지적).
+   버킷별 통계는 원래부터 계산되고 있었다. */
+check('심박 행이 풍상·풍하 × 포트/스타보드 4행으로 산출된다', hrRows.length === 4,
   '심박 행 수=' + hrRows.length);
 check('옛 단독 "전체 세션" 심박 행이 없다 (모든 심박 행에 풍상/풍하 mode)',
   hrRows.length > 0 && hrRows.every(function (r) {
     return r.mode === 'upwind' || r.mode === 'downwind'; }));
-check('심박은 좌우 택으로 쪼개지 않는다 (side 없음 — 풍상/풍하만)',
-  hrRows.every(function (r) { return r.side == null; }));
+check('심박 행마다 택(P/S)이 붙는다 — 한쪽 칸만 차는 일이 없다',
+  hrRows.every(function (r) { return r.side === 'P' || r.side === 'S'; }));
+check('풍상·풍하 각각 포트·스타보드가 다 있다',
+  ['upwind', 'downwind'].every(function (m) {
+    return ['P', 'S'].every(function (sd) {
+      return hrRows.some(function (r) { return r.mode === m && r.side === sd; });
+    });
+  }));
 var hrUp = hrRows.filter(function (r) { return r.mode === 'upwind'; })[0];
 var hrDn = hrRows.filter(function (r) { return r.mode === 'downwind'; })[0];
 check('풍상·풍하 심박 행이 둘 다 있다', !!hrUp && !!hrDn);
@@ -242,7 +252,7 @@ check('풍상·풍하 심박 행이 둘 다 있다', !!hrUp && !!hrDn);
 var tsHr = aSj.wind && aSj.wind.tackSplit;
 var hrMatchOk = true;
 hrRows.forEach(function (r) {
-  var src = tsHr && tsHr[r.mode] && tsHr[r.mode].all && tsHr[r.mode].all.hr;
+  var src = tsHr && tsHr[r.mode] && tsHr[r.mode][r.side] && tsHr[r.mode][r.side].hr;
   if (!src || r.avg !== src.avg || r.tier50 !== src.top50 ||
       r.tier20 !== src.top20) {
     hrMatchOk = false;
