@@ -5191,6 +5191,295 @@
 
   /* ---------- 전체 ---------- */
   var CUR = { session: null, name: null, est: null };
+  /* ============================================================
+   * §501 v2 → PDF 소스 어댑터 (C1)
+   *
+   * pdf-export.js 는 구 대시보드(index.html)의 DOM id **26개**와 전역
+   * `state` 를 읽도록 짜여 있다. v2 에는 그 id 가 **하나도 없어서**
+   * 그냥 붙이면 백지가 나온다. id 를 v2 에 이식하는 건 구조를 거스르는
+   * 일이라(§499), pdf-export 의 `$()` 만 소스를 먼저 보게 고쳤다.
+   * 여기서는 **구 id → v2 엘리먼트** 사전을 만든다.
+   *
+   * 규약(§499):
+   *   엘리먼트 → 그걸 쓴다 · null → 없음(해당 페이지가 우아하게 빠짐)
+   *   undefined → 모르는 id → 진짜 document 에서 찾는다
+   *
+   * v2 에 대응이 없는 값(포일 종횡비·최대심박 등)은 **합성 노드**로 준다.
+   * textOf/valueOf 는 textContent/value 만 보므로 떼어 놓은 노드로 충분하다.
+   * ============================================================ */
+
+  function pdfSynth(text, tag) {
+    var e = document.createElement(tag || 'div');
+    e.textContent = (text == null) ? '' : String(text);
+    return e;
+  }
+  function pdfSynthInput(val) {
+    var e = document.createElement('input');
+    e.value = (val == null) ? '' : String(val);
+    return e;
+  }
+  function pdfSynthSelect(label) {
+    var s = document.createElement('select');
+    var o = document.createElement('option');
+    o.textContent = label || '';
+    o.selected = true;
+    s.appendChild(o);
+    return s;
+  }
+  /* collectStatStrip 이 찾는 구조(.stat > .stat__label + .stat__value)로
+     직접 만든다 — v2 카드를 긁으면 클래스가 안 맞아 라벨이 다 빈다. */
+  function pdfSynthStrip(pairs) {
+    var wrap = document.createElement('div');
+    pairs.forEach(function (p) {
+      if (p[1] == null) return;
+      var s = document.createElement('div'); s.className = 'stat';
+      var l = document.createElement('div'); l.className = 'stat__label';
+      l.textContent = p[0];
+      var v = document.createElement('div'); v.className = 'stat__value';
+      v.textContent = p[1];
+      s.appendChild(l); s.appendChild(v); wrap.appendChild(s);
+    });
+    return wrap;
+  }
+  /* 차트 호스트 안의 <canvas> 를 꺼낸다. canvasToDataURL 은 tagName 이
+     CANVAS 여야 하므로 호스트 div 를 그대로 주면 안 된다. */
+  function pdfCanvasIn(hostId) {
+    var h = $(hostId);
+    if (!h) return null;
+    var c = h.querySelector('canvas');
+    return c || null;
+  }
+
+  /* 회전 집계 — 세션 전체 평균.
+     ⚠ PDF 회전 페이지의 그리드는 **6칸이 상한**이다
+     (pdf-export buildManeuverPage: Math.min(stats.length, 6)).
+     12줄을 주면 뒤 6줄이 조용히 잘려서 자이브 통계가 통째로 사라진다.
+     그래서 택·자이브를 **한 줄에 합쳐** 정확히 6줄로 만든다.
+     이렇게 하면 잘리지도 않고, 택 vs 자이브 대조가 한눈에 보인다 —
+     밴티지가 헤드라인으로 쓰는 값이 바로 이 대조다(V5). */
+  function pdfManeuverStrip(a) {
+    var mans = (a && a.maneuvers) || [];
+    var tacks = mans.filter(function (m) { return m.type === 'tack'; });
+    var gybes = mans.filter(function (m) { return m.type === 'gybe'; });
+    function avg(list, key) {
+      var v = [];
+      list.forEach(function (m) { if (m[key] != null && isFinite(m[key])) v.push(m[key]); });
+      if (!v.length) return null;
+      return v.reduce(function (x, y) { return x + y; }, 0) / v.length;
+    }
+    function side(list, sd) {
+      return list.filter(function (m) { return m.side === sd; }).length;
+    }
+    /* 택·자이브를 'T / G' 로 나란히. 한쪽이 없으면 그쪽만 '—' */
+    function pair(key, fmt) {
+      var t = avg(tacks, key), g = avg(gybes, key);
+      if (t == null && g == null) return null;
+      return (t == null ? '\u2014' : fmt(t)) + ' / ' + (g == null ? '\u2014' : fmt(g));
+    }
+    var kt = function (v) { return (v * KT).toFixed(1); };
+    var rows = [
+      ['Tacks (Port · Stbd)',
+       tacks.length ? tacks.length + '  (' + side(tacks, 'P') + ' · ' + side(tacks, 'S') + ')' : null],
+      ['Gybes (Port · Stbd)',
+       gybes.length ? gybes.length + '  (' + side(gybes, 'P') + ' · ' + side(gybes, 'S') + ')' : null],
+      ['Avg lowest speed  T / G',
+       pair('minSpeedMs', function (v) { return kt(v) + ' kt'; })],
+      ['Avg turn rate  T / G',
+       pair('avgTurnRateDegSec', function (v) { return v.toFixed(1) + '\u00b0/s'; })],
+      ['Avg loss  T / G',
+       pair('lossDisplayPct', function (v) { return Math.round(v) + '%'; })],
+      ['Avg recovery  T / G',
+       pair('recoverySec', function (v) { return v.toFixed(1) + ' s'; })]
+    ];
+    return pdfSynthStrip(rows);
+  }
+
+  /* 성능 통계 — 풍상/풍하 × 포트/스타보드 핵심만.
+     computeStatsPanel 의 rows 를 쓴다(라벨·단위·방향 판정이 이미 들어 있다). */
+  function pdfStatsStrip(a) {
+    var panel = null;
+    try { panel = An.computeStatsPanel(a); } catch (e) {}
+    var rows = (panel && panel.rows) || [];
+    var out = [];
+    function pick(metric, mode, sideId) {
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        if (r.metric === metric && r.mode === mode && r.side === sideId) return r;
+      }
+      return null;
+    }
+    /* ⚠ rows 의 값은 **기본 단위**(속도 m/s)이고 unit 은 'speed'|'deg'|'bpm'
+       같은 **내부 키**다. 표시 변환은 렌더러 몫이다(analysis.js 주석 명시).
+       그냥 붙이면 '7.0 speed' 처럼 나온다 — v2 통계표의 fmtVal 과 같은 규칙. */
+    function fmt(r) {
+      if (!r || r.avg == null || !isFinite(r.avg)) return null;
+      var v = r.avg;
+      if (r.unit === 'speed') return (v * KT).toFixed(1) + ' kt';
+      if (r.unit === 'bpm') return Math.round(v) + ' bpm';
+      return v.toFixed(0) + '\u00b0';
+    }
+    [['sog', 'Speed'], ['vmg', 'VMG'], ['twa', 'CWA']].forEach(function (m) {
+      ['upwind', 'downwind'].forEach(function (mode) {
+        var pRow = pick(m[0], mode, 'P'), sRow = pick(m[0], mode, 'S');
+        var pv = fmt(pRow), sv = fmt(sRow);
+        if (pv == null && sv == null) return;
+        out.push([
+          (mode === 'upwind' ? 'Upwind ' : 'Downwind ') + m[1] + '  P / S',
+          (pv || '\u2014') + ' / ' + (sv || '\u2014')
+        ]);
+      });
+    });
+    return pdfSynthStrip(out);
+  }
+
+  function v2PdfSource() {
+    var a = CUR.analysis || {};
+    var sum = a.summary || {};
+    var wind = a.wind || {};
+    var kt = function (ms) { return ms == null ? null : (ms * KT).toFixed(1) + ' kt'; };
+
+    var windTxt = (wind.windDir != null ? Math.round(wind.windDir) + '°' : '—')
+      + (wind.windSpeedKt != null ? ' · ' + wind.windSpeedKt + ' kt' : '');
+
+    var strip = pdfSynthStrip([
+      ['Distance', sum.distanceM != null ? (sum.distanceM / 1000).toFixed(1) + ' km' : null],
+      ['Top speed', kt(sum.maxSpeedMs)],
+      ['Avg speed (moving)', kt(sum.avgMovingSpeedMs)],
+      ['Duration', sum.durationSec != null ? fmtClock(sum.durationSec) : null],
+      ['Upwind VMG (top 50%)', kt(wind.vmgUpwindTop50Ms)],
+      ['Downwind VMG (top 50%)', kt(wind.vmgDownwindTop50Ms)],
+      ['Tacks', (a.maneuvers || []).filter(function (m) { return m.type === 'tack'; }).length],
+      ['Gybes', (a.maneuvers || []).filter(function (m) { return m.type === 'gybe'; }).length]
+    ]);
+
+    var hasHrData = (CUR.session && (CUR.session.samples || []).some(function (p) {
+      return p && p.hr != null;
+    }));
+
+    var MAP = {
+      /* 게이트 — 세션이 로드돼 있으면 통과 */
+      'dashboard-view': CUR.session ? ($('kpi-row') || pdfSynth('')) : null,
+
+      /* 표지·머리말 */
+      'session-title': $('hdr-title'),
+      'session-date': $('hdr-date'),
+      'session-sport-select': pdfSynthSelect('Wing Foil'),
+      'session-source': pdfSynth(CUR.name || ''),
+      'wind-readout': pdfSynth(windTxt),
+
+      /* 라이더 입력 */
+      'rider-weight-input': $('in-weight'),
+      'rider-skill-select': $('in-skill'),
+      'rider-wing-input': $('in-wing'),
+      'rider-foilar-input': pdfSynthInput(''),   /* v2 는 장비 모듈에서 고른다 */
+      'hr-maxhr-input': pdfSynthInput(''),
+
+      /* 요약·통계 */
+      'summary-strip': strip,
+      /* ⚠ perf-extra 를 그대로 주면 안 된다 — maneuver-stats 와 같은 문제.
+         v2 카드는 .stat 류 클래스가 없어서 collectStatStrip 이 폴백으로
+         빠지고, 중첩 div 를 다 훑어 'Speed VMG Wind angle' 이 두 번 찍히고
+         라벨 없는 값과 차트 캡션('Port (above) · 352 samples …')까지 섞였다.
+         → 분석 결과에서 직접 짓는다. */
+      'stats-panel-body': pdfStatsStrip(a),
+      /* ⚠ v2 카드를 그대로 주면 안 된다. collectStatStrip 은 .stat 류
+         클래스를 먼저 찾고, 못 찾으면 **모든 div/li/p 를 훑는 폴백**으로
+         빠진다. v2 카드는 중첩 div 라서 같은 문구가 서너 번 중복돼 들어온다
+         (실제로 'Tacks by side Port 4 Starboard 5' 가 3번 찍혔다).
+         → 회전 집계도 합성해서 준다. 겸사겸사 세션 평균(최저속도·회전율)을
+         담는데, 이건 밴티지가 헤드라인으로 쓰는 값이기도 하다(V5). */
+      'maneuver-stats': pdfManeuverStrip(a),
+
+      /* 지도·차트 */
+      'map': $('map-host'),
+      'speed-chart': pdfCanvasIn('chart-meanmax'),
+      'histogram-chart': pdfCanvasIn('chart-hist'),
+      'target-polar-canvas': pdfCanvasIn('chart-polar'),
+      'violin-canvas': null,        /* v2 에 없음 → 해당 블록이 빠진다 */
+
+      /* 심박 — v2 는 전용 차트가 없다. 카드만 있으면 페이지가 나온다 */
+      'hr-summary-card': hasHrData ? $('phys-body') : null,
+      'hr-zone-chart': null,
+      'hr-trend-chart': null,
+      'hr-eff-chart': null,
+
+      /* 코치·점수·이력 */
+      'coach-card': $('coach-body'),
+      'vps-card': $('coach-body'),
+      'runs-list': $('sessions-body')
+    };
+
+    return {
+      el: function (id) {
+        /* Object.prototype 오염 방지 — hasOwnProperty 로만 판정 */
+        if (!Object.prototype.hasOwnProperty.call(MAP, id)) return undefined;
+        return MAP[id];
+      },
+      state: {
+        vps: CUR.vps || {},
+        analysis: a,
+        wind: { confidence: CUR.est && CUR.est.confidence },
+        whatif: CUR.whatif || {},
+        history: (function () {
+          try { return Store.listSessions() || []; } catch (e) { return []; }
+        })(),
+        savedSessions: (function () {
+          try { return Store.listSessions() || []; } catch (e) { return []; }
+        })()
+      }
+    };
+  }
+
+  /* 탭을 한 번씩 눌러 모든 차트를 그려 둔다.
+     v2 는 탭 안의 차트를 그 탭이 보일 때 그리므로, 안 본 탭의 캔버스는
+     비어 있거나 크기가 0 이다. PDF 는 전 탭을 다 담으므로 미리 깨워야 한다.
+     지도는 숨은 상태에서 크기가 0 이라 invalidateSize 까지 필요하다(§486). */
+  function pdfWarmTabs() {
+    var tabs = Array.prototype.slice.call(
+      document.querySelectorAll('a[href^="#tab-"]'));
+    if (!tabs.length) return Promise.resolve();
+    var active = document.querySelector('a[href^="#tab-"].active');
+    var p = Promise.resolve();
+    tabs.forEach(function (t) {
+      p = p.then(function () {
+        try { t.click(); } catch (e) {}
+        return new Promise(function (r) { setTimeout(r, 260); });
+      });
+    });
+    return p.then(function () {
+      /* 지도가 있는 탭에서 한 번 더 크기를 잡아 준다 */
+      return new Promise(function (r) { setTimeout(r, 400); });
+    }).then(function () {
+      if (active) { try { active.click(); } catch (e) {} }
+      return new Promise(function (r) { setTimeout(r, 200); });
+    });
+  }
+
+  function exportV2Pdf() {
+    if (!window.RDPdfExport) {
+      alertLine('PDF module is not loaded.');
+      return;
+    }
+    if (!CUR.session) {
+      alertLine('Load a session first.');
+      return;
+    }
+    var btn = $('btn-pdf');
+    if (btn) { btn.disabled = true; btn.textContent = 'Preparing…'; }
+    /* 지도 탭을 켜 둔 채로 캡처해야 Leaflet 이 크기를 갖는다 */
+    pdfWarmTabs().then(function () {
+      var trackTab = document.querySelector('a[href="#tab-track"]');
+      if (trackTab) { try { trackTab.click(); } catch (e) {} }
+      return new Promise(function (r) { setTimeout(r, 500); });
+    }).then(function () {
+      return RDPdfExport.generate({ source: v2PdfSource() });
+    }).catch(function (e) {
+      alertLine('PDF failed: ' + ((e && e.message) || e));
+    }).then(function () {
+      if (btn) { btn.disabled = false; btn.textContent = 'PDF'; }
+    });
+  }
+
 
   /* 풍향을 바꾸면 분석 전체를 다시 돌린다 — 택/자이브·VMG·폴라가 전부
      풍향에 매달려 있어서 부분 갱신은 틀린 화면을 만든다. */
@@ -5496,6 +5785,8 @@
       }
     });
 
+    var pb = $('btn-pdf');
+    if (pb) pb.addEventListener('click', exportV2Pdf);
     var sb = $('btn-save');
     if (sb) sb.addEventListener('click', function () {
       if (!CUR.session || !Store || !Store.saveSession) return;
