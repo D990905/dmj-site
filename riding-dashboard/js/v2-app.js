@@ -4359,7 +4359,74 @@
      이 그림은 '퍼짐' 을 준다. 같은 평균이라도 고르게 낸 속도와 몰아친
      속도는 다른 문제다. 포트·스타보드를 위아래로 맞대어 좌우 비대칭을
      한눈에 본다(§421 이후 계속 문제였던 부분). */
-  var TDIST = { metric: 'sog', mode: 'upwind' };
+  var TDIST = { metric: 'sog', mode: 'upwind', shape: 'violin', tier: 'all' };
+
+  /* §504 (V1) — 포트/스타보드 박스플롯.
+     바이올린은 분포의 생김새를 보여 주고, 이건 **중앙값과 사분위를
+     정확히** 읽게 한다. 두 상자의 중앙선이 어긋난 정도가 곧 Tack bias 다.
+     가로축이 값이므로 상자는 **가로로 눕는다**(바이올린과 축이 같아
+     토글해도 눈이 다시 적응할 필요가 없다).
+
+     ⚠ 표본이 5개 미만이면 상자를 그리지 않는다 — 사분위가 없는데
+     사분위 그림을 그리면 없는 확신을 보여 준다(§497 과 같은 규칙).
+     밴티지는 n=1 로도 박스를 그린다. */
+  function drawTackBox(svg, W, H, pv, sv, lo, hi) {
+    var NS = 'http://www.w3.org/2000/svg';
+    function q(sorted, f) {
+      if (!sorted.length) return null;
+      var i = (sorted.length - 1) * f, a2 = Math.floor(i), b2 = Math.ceil(i);
+      return a2 === b2 ? sorted[a2] : sorted[a2] + (sorted[b2] - sorted[a2]) * (i - a2);
+    }
+    var span = (hi - lo) || 1;
+    function X(v) { return ((v - lo) / span) * W; }
+    function add(tag, attrs) {
+      var e = document.createElementNS(NS, tag);
+      Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+      svg.appendChild(e);
+      return e;
+    }
+    function box(arr, cy, color, label) {
+      if (arr.length < 5) {
+        add('text', { x: 6, y: cy + 4, fill: THEME.axisText, 'font-size': 12 })
+          .textContent = label + ' — too few samples (' + arr.length + ') for a box';
+        return;
+      }
+      var v = arr.slice().sort(function (x, y) { return x - y; });
+      var q1 = q(v, 0.25), med = q(v, 0.5), q3 = q(v, 0.75);
+      var iqr = q3 - q1;
+      /* 수염은 1.5×IQR 안의 실제 값까지 (표준 Tukey) */
+      var loW = q1 - 1.5 * iqr, hiW = q3 + 1.5 * iqr;
+      var wLo = v.find(function (x) { return x >= loW; });
+      var wHi = null;
+      for (var i = v.length - 1; i >= 0; i--) { if (v[i] <= hiW) { wHi = v[i]; break; } }
+      if (wLo == null) wLo = v[0];
+      if (wHi == null) wHi = v[v.length - 1];
+      var bh = 26;
+      /* 수염 */
+      add('line', { x1: X(wLo), x2: X(wHi), y1: cy, y2: cy,
+                    stroke: color, 'stroke-width': 1.5 });
+      [wLo, wHi].forEach(function (x) {
+        add('line', { x1: X(x), x2: X(x), y1: cy - 7, y2: cy + 7,
+                      stroke: color, 'stroke-width': 1.5 });
+      });
+      /* 상자 */
+      add('rect', { x: X(q1), width: Math.max(1, X(q3) - X(q1)),
+                    y: cy - bh / 2, height: bh,
+                    fill: color, 'fill-opacity': 0.28,
+                    stroke: color, 'stroke-width': 1.5, rx: 2 });
+      /* 중앙값 */
+      add('line', { x1: X(med), x2: X(med), y1: cy - bh / 2, y2: cy + bh / 2,
+                    stroke: color, 'stroke-width': 2.5 });
+      /* 이상치 */
+      v.forEach(function (x) {
+        if (x < wLo || x > wHi) {
+          add('circle', { cx: X(x), cy: cy, r: 2, fill: color, 'fill-opacity': 0.6 });
+        }
+      });
+    }
+    box(pv, H * 0.30, '#e03131', 'Port');
+    box(sv, H * 0.70, '#2f9e44', 'Starboard');
+  }
 
   function renderTackDistribution(host, a) {
     var ts = a.wind && a.wind.tackSplit;
@@ -4404,6 +4471,20 @@
       'mode', TDIST.mode, function (v) {
         TDIST.mode = v; renderPerfExtra(a);
       }));
+    /* §504 (V1) — 모양 토글. 바이올린은 분포의 **생김새**(꼬리·쌍봉)를
+       보여 주고, 박스플롯은 **중앙값과 사분위를 정확히** 읽게 해 준다.
+       택 비교는 후자가 낫다 — 두 상자의 중앙선이 얼마나 어긋났는지가
+       Tack bias 의 Diff 와 같은 것을 눈으로 보여 주기 때문이다. */
+    act.appendChild(pick([['violin', 'Violin'], ['box', 'Box plot']],
+      'shape', TDIST.shape, function (v) {
+        TDIST.shape = v; renderPerfExtra(a);
+      }));
+    /* §504 — 모집단. Tack bias 스위치(§503)와 같은 질문에 답한다:
+       느린 시간을 빼면 그림이 달라지는가. */
+    act.appendChild(pick([['all', 'All'], ['t50', 'Best 50%'], ['t20', 'Best 20%']],
+      'tier', TDIST.tier, function (v) {
+        TDIST.tier = v; renderPerfExtra(a);
+      }));
     head.appendChild(act);
     card.appendChild(head);
 
@@ -4431,6 +4512,22 @@
     }
     var pv = P.map(val).filter(function (v) { return v != null; });
     var sv = S.map(val).filter(function (v) { return v != null; });
+
+    /* §504 모집단 — '좋은 방향' 을 따라 자른다. 속도·VMG 는 큰 쪽이,
+       풍상 CWA 는 작은 쪽이 상위다. 지표마다 방향이 다르므로
+       무조건 큰 값을 남기면 풍상 각도에서 **정반대**를 뽑게 된다
+       (§420 에서 겪은 것과 같은 함정). */
+    if (TDIST.tier !== 'all') {
+      var keep = (TDIST.tier === 't20') ? 0.20 : 0.50;
+      var lowIsBetter = (M === 'twa' && TDIST.mode === 'upwind');
+      var cut = function (arr) {
+        if (arr.length < 5) return arr;      /* 너무 적으면 자르지 않는다 */
+        var v = arr.slice().sort(function (x, y) { return x - y; });
+        var n = Math.max(3, Math.round(v.length * keep));
+        return lowIsBetter ? v.slice(0, n) : v.slice(v.length - n);
+      };
+      pv = cut(pv); sv = cut(sv);
+    }
     var all = pv.concat(sv);
     if (!all.length) {
       body.appendChild(el('div', 'text-secondary', 'No samples for this metric.'));
@@ -4481,13 +4578,17 @@
         svg.appendChild(r);
       });
     }
-    bars(hp, true, '#e03131');     /* 포트 = 적색 (국제 관례) */
-    bars(hs, false, '#2f9e44');    /* 스타보드 = 녹색 */
-    var axis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    axis.setAttribute('x1', 0); axis.setAttribute('x2', W);
-    axis.setAttribute('y1', MID); axis.setAttribute('y2', MID);
-    axis.setAttribute('stroke', THEME.grid);
-    svg.appendChild(axis);
+    if (TDIST.shape === 'box') {
+      drawTackBox(svg, W, H, pv, sv, lo, hi);
+    } else {
+      bars(hp, true, '#e03131');     /* 포트 = 적색 (국제 관례) */
+      bars(hs, false, '#2f9e44');    /* 스타보드 = 녹색 */
+      var axis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      axis.setAttribute('x1', 0); axis.setAttribute('x2', W);
+      axis.setAttribute('y1', MID); axis.setAttribute('y2', MID);
+      axis.setAttribute('stroke', THEME.grid);
+      svg.appendChild(axis);
+    }
     body.appendChild(svg);
     /* 축 라벨 — SVG 가로 확대에 딸려 늘어나지 않도록 HTML 로 */
     var isDeg = (M === 'twa' || M === 'heel' || M === 'pitch');
@@ -4514,8 +4615,15 @@
         + (med != null ? ' \u00b7 median ' + med.toFixed(1) + unit : '')));
       return d;
     }
-    leg.appendChild(chip('#e03131', 'Port (above)', pv));
-    leg.appendChild(chip('#2f9e44', 'Starboard (below)', sv));
+    /* 위/아래는 바이올린 얘기다 — 박스 모드에선 맞지 않는다 */
+    var isBox = (TDIST.shape === 'box');
+    leg.appendChild(chip('#e03131', isBox ? 'Port (top)' : 'Port (above)', pv));
+    leg.appendChild(chip('#2f9e44', isBox ? 'Starboard (bottom)' : 'Starboard (below)', sv));
+    if (TDIST.tier !== 'all') {
+      leg.appendChild(el('span', 'text-secondary',
+        '\u00b7 ' + (TDIST.tier === 't20' ? 'best 20%' : 'best 50%') + ' only'
+        + ((M === 'twa' && TDIST.mode === 'upwind') ? ' (closest angles)' : '')));
+    }
     body.appendChild(leg);
     card.appendChild(body);
     host.appendChild(card);
