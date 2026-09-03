@@ -345,6 +345,46 @@
     naver:  { label: '네이버', builtin: false, scopes: '' }
   };
 
+  /* §528 — 백엔드 생사 확인.
+     Supabase 무료티어는 7일 무활동이면 프로젝트를 재운다(§425·§527). 그러면
+     호스트 DNS 가 통째로 사라져서(NXDOMAIN) 어떤 인증 호출도 **응답 없이
+     매달린다**. 로그인 UI 가 그걸 모르면 사용자는 버튼을 누르고 아무 일도
+     안 일어나는 화면을 본다.
+
+     그래서 짧은 타임아웃으로 먼저 찔러 보고, 죽어 있으면 **죽었다고 말한다.**
+     결과는 캐시한다 — 페이지마다 매번 찌를 이유가 없다. */
+  var _health = null;
+  function backendHealth(opts) {
+    opts = opts || {};
+    if (_health && !opts.force) return _health;
+    var ms = opts.timeoutMs || 6000;
+    _health = new Promise(function (resolve) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (done) return;
+        done = true;
+        resolve({ ok: false, reason: 'timeout' });
+      }, ms);
+      var url = SUPABASE_URL + '/auth/v1/health';
+      var opt = { method: 'GET', headers: { apikey: SUPABASE_KEY } };
+      var p;
+      try { p = fetch(url, opt); } catch (e) { p = Promise.reject(e); }
+      p.then(function (r) {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        resolve(r && r.ok ? { ok: true } : { ok: false, reason: 'http_' + (r && r.status) });
+      }).catch(function () {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        /* DNS 가 없어도 fetch 는 TypeError 로 떨어진다 — 잠든 프로젝트의
+           전형적인 모습이다. 네트워크 자체가 끊긴 경우와 구별할 수 없으므로
+           둘을 합쳐 'unreachable' 로 둔다. */
+        resolve({ ok: false, reason: 'unreachable' });
+      });
+    });
+    return _health;
+  }
+
   function providerInfo(name) { return PROVIDERS[name] || null; }
   function providerList() {
     return Object.keys(PROVIDERS).map(function (k) {
@@ -724,6 +764,7 @@
     signInWithProvider: signInWithProvider,  // §527 카카오·구글·애플·네이버 공통
     providerList: providerList,              // §527 화면이 버튼을 만들 때 쓴다
     providerInfo: providerInfo,
+    backendHealth: backendHealth,        // §528 잠든 프로젝트 감지
     logout: logout,
     currentUser: currentUser,
     isLoggedIn: isLoggedIn,

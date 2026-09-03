@@ -188,6 +188,15 @@
         <span style="color:var(--color-slate)">이미 회원이세요?</span>
         <a href="login.html">로그인</a>
       </div>
+      <!-- §528 — 소셜은 가입과 로그인이 같은 흐름이다. 여기서 누르면
+           계정이 없으면 만들어지고 있으면 그냥 들어간다. -->
+      <div class="auth-sso" id="auth-sso">
+        <button type="button" data-provider="kakao">카카오로 시작하기</button>
+        <button type="button" data-provider="google">Google 로 시작하기</button>
+        <button type="button" data-provider="apple">Apple 로 시작하기</button>
+        <button type="button" data-provider="naver">네이버로 시작하기</button>
+      </div>
+      <p class="auth-sso-note" id="auth-sso-note"></p>
     </form>
   </div>
 </main>
@@ -264,6 +273,27 @@ document.addEventListener('DOMContentLoaded', function () {
     window.location.replace(nextDest);
     return;
   }
+  /* §528 소셜 가입 — login.html 과 같은 경로. 안 켜진 제공자는
+     왜 안 되는지 말한다(조용히 아무 일도 안 하는 게 제일 나쁘다). */
+  var sso = document.getElementById('auth-sso');
+  var ssoNote = document.getElementById('auth-sso-note');
+  if (sso && window.DMJAuth && window.DMJAuth.signInWithProvider) {
+    sso.addEventListener('click', async function (ev) {
+      var b = ev.target.closest('[data-provider]');
+      if (!b) return;
+      var was = b.textContent;
+      b.disabled = true; b.textContent = '이동 중…';
+      if (ssoNote) ssoNote.textContent = '';
+      try {
+        await window.DMJAuth.signInWithProvider(b.getAttribute('data-provider'),
+          { redirectTo: location.origin + '/profile.html' });
+      } catch (err) {
+        b.disabled = false; b.textContent = was;
+        if (ssoNote) ssoNote.textContent = (err && err.message) || '가입에 실패했습니다.';
+      }
+    });
+  }
+
   var form = document.getElementById('signup-form');
   var err = document.getElementById('auth-error');
   if (!form) return;

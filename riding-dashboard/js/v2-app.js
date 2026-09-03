@@ -1750,6 +1750,97 @@
   }
 
     /* §526 T5 목표 강도 밴드 */
+  /* ═══════════════════════════════════════════════════════════════
+   * §528 계정 상태 (옥대표 "로그인 기능을 넣자. 그래야 데이터가 보존되지")
+   *
+   * 이 칩이 답해야 하는 질문은 하나다: **내 기록이 어디에 있나.**
+   *   · 로그인함    → 계정에 묶임. 다른 기기에서도 보인다
+   *   · 로그인 안 함 → 이 브라우저에만. 지우면 끝이다
+   *   · 백엔드 잠듦  → 로그인을 하고 싶어도 못 한다. 그걸 말해야 한다
+   *
+   * ⚠ 세 번째가 지금 실제 상황이다(§527 진단: 무료티어 auto-pause).
+   *   그래서 이 UI 의 성공 조건은 "로그인이 된다" 가 아니라
+   *   **"백엔드가 죽어도 대시보드가 멀쩡하고, 왜 못 하는지 보인다"** 이다.
+   * ═══════════════════════════════════════════════════════════════ */
+  var AUTH_UI = { health: null, checked: false };
+
+  function authLoginUrl() {
+    /* 로그인 후 여기로 돌아오게 한다 — 로그인하고 홈으로 튕기면
+       하던 분석을 다시 열어야 한다 */
+    var next = '/riding-dashboard/v2.html';
+    return '../login.html?next=' + encodeURIComponent(next);
+  }
+
+  function renderAuthChip() {
+    var host = $('auth-chip');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+
+    var A = window.DMJAuth;
+    if (!A) {
+      /* 인증 모듈 자체가 안 실렸다 — 로컬 전용으로 도는 것이고,
+         그것도 정상 동작이다(§412 이전의 v2 가 그랬다). */
+      host.appendChild(el('span', null, 'saved on this browser'));
+      host.title = 'The sign-in module did not load, so everything is stored '
+                 + 'locally in this browser only.';
+      return;
+    }
+
+    var user = null;
+    try { user = A.currentUser && A.currentUser(); } catch (e) {}
+
+    if (user) {
+      var who = user.name || user.email || 'signed in';
+      var wrap = el('span');
+      var dot = el('span');
+      dot.style.cssText = 'display:inline-block;width:7px;height:7px;border-radius:50%;'
+        + 'background:' + THEME.stbd + ';margin-right:6px;vertical-align:middle';
+      wrap.appendChild(dot);
+      wrap.appendChild(document.createTextNode(who));
+      host.appendChild(wrap);
+      var out = el('button', 'btn btn-sm btn-ghost-secondary ms-2 p-0 px-1', 'sign out');
+      out.type = 'button';
+      out.addEventListener('click', function () {
+        out.disabled = true; out.textContent = '\u2026';
+        A.logout().then(function () { location.reload(); })
+                  .catch(function () { out.disabled = false; out.textContent = 'sign out'; });
+      });
+      host.appendChild(out);
+      host.title = 'Your rides are tied to this account, so they follow you to '
+                 + 'another browser or phone.';
+      return;
+    }
+
+    /* 로그인 안 함 — 백엔드가 살아 있는지에 따라 말이 달라진다 */
+    var txt = el('span', null, 'this browser only');
+    host.appendChild(txt);
+
+    if (!AUTH_UI.checked && A.backendHealth) {
+      AUTH_UI.checked = true;
+      A.backendHealth().then(function (h) {
+        AUTH_UI.health = h;
+        renderAuthChip();
+      }).catch(function () {});
+    }
+
+    if (AUTH_UI.health && AUTH_UI.health.ok === false) {
+      var warn = el('span', 'ms-2');
+      warn.style.color = THEME.warn;
+      warn.textContent = 'sign-in unavailable';
+      warn.title = 'The account server is not responding, so signing in is not '
+        + 'possible right now. Your rides are still being saved in this browser '
+        + '\u2014 nothing is lost, it just cannot follow you to another device yet.';
+      host.appendChild(warn);
+      return;
+    }
+
+    var link = el('a', 'btn btn-sm btn-ghost-secondary ms-2 p-0 px-1', 'sign in');
+    link.href = authLoginUrl();
+    host.appendChild(link);
+    host.title = 'Rides are stored in this browser. Sign in and they follow you '
+               + 'to another browser or phone.';
+  }
+
   function renderTargetExertion(body, decision, rp) {
     if (!window.RDFitness || !decision) return;
     var band = RDFitness.targetBand(decision.action, rp && rp.maxHr, rp && rp.restHr);
@@ -8628,6 +8719,17 @@
         if (window.console) console.error('[v2] replay', e);
         setTimeout(function () { rp.textContent = '▶ Replay'; }, 2000);
       }
+    });
+
+    /* §528 — 계정 칩. DMJAuth 는 비동기로 세션을 복원하므로 이벤트로도 듣는다.
+       §412 가 말한 그 이벤트다: 로그인 상태가 바뀌면 namespace 가 바뀌므로
+       **화면 전체를 다시 그려야** 남의(혹은 이전의) 데이터가 안 남는다. */
+    try { renderAuthChip(); } catch (e) {}
+    window.addEventListener('dmj-auth-change', function () {
+      try { renderAuthChip(); } catch (e) {}
+      /* 세션 목록·훈련부하는 namespace 를 타므로 다시 그린다 */
+      try { renderSessions(); } catch (e) {}
+      try { renderTraining(); } catch (e) {}
     });
 
     var pb = $('btn-pdf');

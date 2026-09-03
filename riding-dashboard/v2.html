@@ -98,6 +98,8 @@
               <button type="button" class="btn" id="btn-export-csv">CSV</button>
               <button type="button" class="btn" id="btn-export-gpx">GPX</button>
               <a class="btn" href="index.html">Old dashboard</a>
+              <!-- §528 계정 — 데이터가 이 브라우저에만 있는지, 계정에 묶였는지 -->
+              <span id="auth-chip" class="lab ms-2"></span>
             </div>
           </div>
         </div>
@@ -293,7 +295,11 @@
 <script src="js/analysis-hr.js?v=auto-463"></script>
 <script src="js/session-merger.js?v=auto-463"></script>
 <script src="js/analysis.js?v=v516"></script>
-<script src="js/storage.js?v=v520"></script>
+<!-- §528 인증 — storage 가 DMJAuth 를 보고 namespace 를 정하므로 **먼저** 실어야 한다.
+     defer 를 쓰지 않는 이유: defer 는 실행이 문서 파싱 뒤로 밀려서
+     storage.js 가 먼저 돌아버린다(그러면 첫 read 가 bare namespace 로 나간다). -->
+<script src="../assets/js/supabase-auth.js?v=v528"></script>
+<script src="js/storage.js?v=v528"></script>
 <script src="vendor/uPlot.iife.min.js?v=1.6.32"></script>
 <script src="js/chart-meanmax.js?v=sections-450"></script>
 <script src="js/segments.js?v=v523"></script>
@@ -317,6 +323,6 @@
 <script src="js/formula.js?v=formula-479"></script>
 <script src="js/wind-confirm.js?v=wc-505"></script>
 <script src="js/pdf-export.js?v=pdf-501"></script>
-<script src="js/v2-app.js?v=v526"></script>
+<script src="js/v2-app.js?v=v528"></script>
 </body>
 </html>
