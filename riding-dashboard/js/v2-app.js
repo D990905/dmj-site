@@ -5910,6 +5910,53 @@
     }
     summary.textContent = msg;
     host.appendChild(summary);
+
+    /* §511 — 엔진은 optimumAtBoundary 와 comfortWingM2 를 이미 주는데
+       v2 가 둘 다 **무시하고 있었다**(구 대시보드 app.js 는 쓴다).
+       그래서 약풍에서 스윕 상한(7.4㎡)이 그대로 '추천' 으로 나갔다:
+       10kt 에서 7.4㎡ · +4.6kt 라고 단언했는데, 그건 답이 아니라
+       "모델이 더 큰 걸 원하는데 우리가 볼 수 있는 범위가 여기까지" 라는
+       뜻이다. §498(AWS 배선)·§482(포일 배선)와 같은 종류 — 값은 이미
+       있었고 읽는 쪽이 없었다. */
+    if (whatIf.optimumAtBoundary) {
+      var b = el('div', 'alert alert-warning');
+      b.appendChild(el('div', 'fw-bold', 'This is the edge of what the model can judge'));
+      var rng = whatIf.sweep
+        ? whatIf.sweep.min + '–' + whatIf.sweep.max + ' m²' : 'the sweep range';
+      b.appendChild(el('div', 'mt-1',
+        'The peak sits on the boundary of ' + rng + ', so the model wants a bigger '
+        + 'wing than it is allowed to consider. Read the number as “bigger would help”, '
+        + 'not as a size to buy — and the gain figure is least reliable here, because '
+        + 'the light-wind end of the speed model is the part still waiting on measured '
+        + 'wind (backlog D1).'));
+      host.appendChild(b);
+    }
+
+    /* 편안함 추천 — 정점은 풍상 VMG 만 본다. 실제 선택은 제어성·돌풍
+       여유·풍하까지 걸린 절충이라 한 사이즈 작은 쪽이 답인 날이 많다. */
+    if (whatIf.comfortWingM2 != null && whatIf.optimumWingM2 != null) {
+      var same = Math.round(whatIf.comfortWingM2 * 2) === Math.round(whatIf.optimumWingM2 * 2);
+      var c = el('div', 'alert alert-info');
+      if (same) {
+        c.textContent = whatIf.optimumWingM2 + ' m² is also the smallest wing that still '
+          + 'holds upwind here, so there is no easier-handling size below it.';
+      } else {
+        var isActual = Math.round(whatIf.comfortWingM2 * 2)
+                    === Math.round(whatIf.actualWingM2 * 2);
+        c.appendChild(el('div', 'fw-bold', 'Easier-handling size: '
+          + whatIf.comfortWingM2 + ' m²'));
+        c.appendChild(el('div', 'mt-1',
+          'One size below the peak'
+          + (whatIf.comfortVmgKt != null
+              ? ' — upwind VMG about ' + whatIf.comfortVmgKt.toFixed(1) + ' kt, a little '
+                + 'under the peak' : '')
+          + ', but lighter to pump and quicker through turns. The peak is chosen on '
+          + 'upwind VMG alone; real wing choice also trades control and gust headroom, '
+          + 'which is why riders usually sit below it.'
+          + (isActual ? ' That is the size you actually rode.' : '')));
+      }
+      host.appendChild(c);
+    }
     host.appendChild(el('div', 'text-secondary mb-2',
       'Anchored to your measured upwind VMG of ' + whatIf.measuredVmgKt.toFixed(1)
       + ' kt, so the curve is scaled to what you actually achieved — not raw theory.'));
