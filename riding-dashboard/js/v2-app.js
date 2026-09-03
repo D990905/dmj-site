@@ -5861,6 +5861,124 @@
     host.appendChild(card);
   }
 
+  /* ============================================================
+   * §512 풍하 파워 — 윙 크기의 진짜 구속조건 (옥대표 2026-09-02)
+   *
+   * 옥대표: "풍상에서 약간 챌린지 하는게 좋아. 풍상이 너무 편안하면
+   *          풍하는 거의 모자랄 경우가 많아."
+   *
+   * 계산으로 확인된다. 윙이 실제로 받는 건 진풍이 아니라 **겉보기 풍속**
+   * 이고, 힘은 그 **제곱**에 비례한다(q = ½ρV²).
+   *   · 풍상 — 보트 속도가 겉보기 바람에 **더해진다** → AWS 가 커진다
+   *   · 풍하 — 바람에서 **도망가므로** 속도가 겉보기 바람을 깎는다
+   *
+   * 강릉 세션 실측(TWS 14kt): 풍상 AWS 25.1kt vs 풍하 14.2kt.
+   * 비 0.56 → 힘은 **0.32배**. 풍하에서 윙이 3분의 1 힘밖에 못 낸다.
+   *
+   * 그리고 **바람이 셀수록 벌어진다** — 풍하 AWS 는 진풍이 12→20kt 로
+   * 올라도 14.6→14.7kt 로 거의 그대로다(빨라진 만큼 도로 깎이니까).
+   * 반면 풍상은 23.3→30.7kt 로 계속 큰다. 힘 비 0.39 → 0.23.
+   *
+   * ⚠ 이것이 기존 '편안함 추천'(정점 −0.5㎡)이 **거꾸로**인 이유다.
+   *   그 추천은 풍하를 더 허전하게 만든다. 풍상 정점은 **하한이지
+   *   상한이 아니다.**
+   *
+   * ⚠ 한계 — 풍하 AWS 절대값은 입력 풍속 오차를 거의 1:1 로 물려받는다
+   *   (§494 · backlog D4). **비율은 믿을 만하고 절대값은 추세로** 읽는다.
+   * ============================================================ */
+  function downwindPower(a) {
+    var ts = a && a.wind && a.wind.tackSplit;
+    if (!ts) return null;
+    function awsOf(mode) {
+      var arr = (ts[mode] && ts[mode].all && ts[mode].all.samples) || [];
+      var v = [], sog = [], twa = [];
+      for (var i = 0; i < arr.length; i++) {
+        var p = arr[i];
+        if (p.aws == null || !isFinite(p.aws)) continue;
+        v.push(p.aws * KT);
+        if (p.sog != null) sog.push(p.sog * KT);
+        if (p.twa != null) twa.push(p.twa);
+      }
+      if (v.length < 30) return null;          /* 근거가 얇으면 말하지 않는다 */
+      function mean(x) {
+        var s = 0; for (var k = 0; k < x.length; k++) s += x[k];
+        return s / x.length;
+      }
+      return { aws: mean(v), sog: sog.length ? mean(sog) : null,
+               twa: twa.length ? mean(twa) : null, n: v.length };
+    }
+    var up = awsOf('upwind'), dn = awsOf('downwind');
+    if (!up || !dn || !(up.aws > 0)) return null;
+    var ratio = dn.aws / up.aws;
+    return { up: up, dn: dn, awsRatio: ratio,
+             forceRatio: ratio * ratio,        /* 힘 ∝ AWS² */
+             areaForParity: 1 / (ratio * ratio) };
+  }
+
+  function renderDownwindPower(host, a) {
+    var d = downwindPower(a);
+    if (!d) return;
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Downwind is where the wing runs out'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    var row = el('div', 'd-flex align-items-center justify-content-between');
+    function cell(label, val, sub) {
+      var c = el('div', 'text-center');
+      c.appendChild(el('div', 'lab', label));
+      c.appendChild(el('div', 'kpi__val num mt-1', val));
+      if (sub) c.appendChild(el('div', 'lab', sub));
+      return c;
+    }
+    row.appendChild(cell('Apparent wind upwind', d.up.aws.toFixed(1),
+      'kt' + (d.up.twa != null ? '  ·  ' + Math.round(d.up.twa) + '°' : '')));
+    var mid = el('div', 'text-center px-3');
+    mid.appendChild(el('div', 'lab', 'Wing force downwind'));
+    var pv = el('div', 'kpi__val num mt-1', Math.round(d.forceRatio * 100) + '%');
+    pv.style.color = d.forceRatio < 0.35 ? THEME.warn : THEME.accent;
+    mid.appendChild(pv);
+    mid.appendChild(el('div', 'lab', 'of what it gets upwind'));
+    row.appendChild(mid);
+    row.appendChild(cell('Apparent wind downwind', d.dn.aws.toFixed(1),
+      'kt' + (d.dn.twa != null ? '  ·  ' + Math.round(d.dn.twa) + '°' : '')));
+    body.appendChild(row);
+
+    var why = el('div', 'alert alert-info mt-3');
+    why.appendChild(el('div', 'fw-bold', 'Why the two are so far apart'));
+    why.appendChild(el('div', 'mt-1',
+      'The wing feels apparent wind, not true wind, and force goes with its '
+      + 'square. Upwind your speed adds to the wind, so apparent wind climbs to '
+      + d.up.aws.toFixed(1) + ' kt. Downwind you are sailing away from it, so your '
+      + 'speed cancels it back down to ' + d.dn.aws.toFixed(1) + ' kt. '
+      + 'That is ' + (d.awsRatio * 100).toFixed(0) + '% of the wind speed but only '
+      + Math.round(d.forceRatio * 100) + '% of the force — you would need about '
+      + d.areaForParity.toFixed(1) + '× the wing area downwind to match the '
+      + 'pull you get upwind.'));
+    body.appendChild(why);
+
+    var flip = el('div', 'alert alert-warning mt-2');
+    flip.appendChild(el('div', 'fw-bold', 'So size for downwind, not for upwind comfort'));
+    flip.appendChild(el('div', 'mt-1',
+      'A wing that feels easy upwind will be short downwind — and the gap widens '
+      + 'as it blows harder, because downwind apparent wind barely rises with true '
+      + 'wind while upwind it keeps climbing. Read the upwind peak below as a '
+      + 'floor, not a ceiling: going a size under it buys upwind comfort and pays '
+      + 'for it downwind.'));
+    body.appendChild(flip);
+
+    var caveat = el('div', 'lab mt-2');
+    caveat.textContent = 'The ratio is solid, the absolute numbers less so — '
+      + 'apparent wind speed inherits your wind-speed input almost one for one, '
+      + 'so read ' + d.up.aws.toFixed(1) + ' and ' + d.dn.aws.toFixed(1)
+      + ' kt as a trend rather than a measurement.';
+    body.appendChild(caveat);
+
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
   function renderCoach(a, vps, whatIf) {
     var host = $('coach-body');
     while (host.firstChild) host.removeChild(host.firstChild);
@@ -5900,6 +6018,10 @@
       return;
     }
     var summary = el('div', whatIf.recommendChange ? 'alert alert-info' : 'alert alert-success');
+    /* §512 — 풍하 파워를 먼저 보여 준다. 아래 추천이 **풍상 전용**이라
+       그 맥락 없이 읽으면 거꾸로 간다(옥대표: 풍상이 편하면 풍하가 모자라다). */
+    try { renderDownwindPower(host, a); } catch (e) {}
+
     var msg = 'You rode ' + whatIf.actualWingM2 + ' m². ';
     if (whatIf.recommendChange && whatIf.recommendedWingM2 != null) {
       msg += 'For these conditions ' + whatIf.recommendedWingM2 + ' m² is predicted to be faster upwind — '
@@ -5932,28 +6054,33 @@
       host.appendChild(b);
     }
 
-    /* 편안함 추천 — 정점은 풍상 VMG 만 본다. 실제 선택은 제어성·돌풍
-       여유·풍하까지 걸린 절충이라 한 사이즈 작은 쪽이 답인 날이 많다. */
+    /* §512 — 예전에 여기 '편안함 추천'(정점 −0.5㎡)이 있었다. **뺐다.**
+       그 권고는 풍상만 보고 만든 것이라 풍하를 더 허전하게 만든다 —
+       위 카드가 보여 주듯 풍하에서 윙이 받는 힘은 풍상의 1/3 수준이고,
+       바람이 셀수록 더 벌어진다. 옥대표 경험칙("풍상이 너무 편안하면
+       풍하는 거의 모자란다")과 계산이 같은 말을 한다.
+       대신 **정점이 하한이라는 것**과 한 사이즈 작게 갔을 때 무엇을
+       내주는지를 적는다. */
     if (whatIf.comfortWingM2 != null && whatIf.optimumWingM2 != null) {
       var same = Math.round(whatIf.comfortWingM2 * 2) === Math.round(whatIf.optimumWingM2 * 2);
-      var c = el('div', 'alert alert-info');
+      var c = el('div', 'alert alert-secondary');
       if (same) {
         c.textContent = whatIf.optimumWingM2 + ' m² is also the smallest wing that still '
-          + 'holds upwind here, so there is no easier-handling size below it.';
+          + 'holds upwind here, so there is nothing below it to consider.';
       } else {
         var isActual = Math.round(whatIf.comfortWingM2 * 2)
                     === Math.round(whatIf.actualWingM2 * 2);
-        c.appendChild(el('div', 'fw-bold', 'Easier-handling size: '
-          + whatIf.comfortWingM2 + ' m²'));
+        c.appendChild(el('div', 'fw-bold',
+          'Going a size under the peak (' + whatIf.comfortWingM2 + ' m²) costs you downwind'));
         c.appendChild(el('div', 'mt-1',
-          'One size below the peak'
+          'It is easier to pump and quicker through turns'
           + (whatIf.comfortVmgKt != null
-              ? ' — upwind VMG about ' + whatIf.comfortVmgKt.toFixed(1) + ' kt, a little '
-                + 'under the peak' : '')
-          + ', but lighter to pump and quicker through turns. The peak is chosen on '
-          + 'upwind VMG alone; real wing choice also trades control and gust headroom, '
-          + 'which is why riders usually sit below it.'
-          + (isActual ? ' That is the size you actually rode.' : '')));
+              ? ', and upwind VMG only drops to about '
+                + whatIf.comfortVmgKt.toFixed(1) + ' kt' : '')
+          + ' — but the wing is already short downwind at the peak size, and this '
+          + 'makes that worse. Take it if the day is about turns, not if it is '
+          + 'about getting back downwind with power.'
+          + (isActual ? ' This is the size you actually rode.' : '')));
       }
       host.appendChild(c);
     }
