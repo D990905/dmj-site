@@ -449,7 +449,10 @@
       loadMethod: (meta.workload && meta.workload.method) || null,
       /* §463 — 세션 시그니처. 자동 기록된 부하와 저장된 세션이 같은
          라이딩인지 가리는 데 쓴다(중복 계상 방지). */
-      sig: meta.sig ? String(meta.sig) : null
+      sig: meta.sig ? String(meta.sig) : null,
+      /* §520 V2 — 그날 쓴 장비. **스냅샷**이지 참조가 아니다: 프로필
+         장비를 바꿔도 지난 세션의 라벨은 안 흔들려야 한다. */
+      gear: (meta.gear && typeof meta.gear === 'object') ? meta.gear : null
     };
   }
 
@@ -483,6 +486,29 @@
     }
     var w = writeAll(arr);
     return w.ok ? { ok: true, record: rec } : w;
+  }
+
+  /* §520 — 지난 세션에 장비를 나중에 채워 넣는다.
+     기존 세션은 전부 gear 가 null 이라, 이 길이 없으면 비교가 시작되는 데
+     몇 달이 걸린다. backfilled 로 표시해 둔다 — 저장 시점 스냅샷과
+     나중에 기억으로 적은 것은 신뢰도가 다르고, 그 차이를 지워선 안 된다. */
+  function setSessionGear(id, gear) {
+    if (!id) return { ok: false, error: 'no id' };
+    var arr = readAll(), found = false;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].id !== id) continue;
+      found = true;
+      if (gear == null) { arr[i].gear = null; break; }
+      var g = {};
+      Object.keys(gear).forEach(function (k) { g[k] = gear[k]; });
+      g.backfilled = true;
+      g.backfilledAt = Date.now();
+      arr[i].gear = g;
+      break;
+    }
+    if (!found) return { ok: false, error: 'not found' };
+    var w = writeAll(arr);
+    return w.ok ? { ok: true } : w;
   }
 
   function listSessions() {
@@ -1864,6 +1890,7 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     sessionsKey: K_SESSIONS,
     currentUid: _currentUid,
     saveSession: saveSession,
+    setSessionGear: setSessionGear,
     listSessions: listSessions,
     deleteSession: deleteSession,
     clearAll: clearAll,

@@ -3392,9 +3392,10 @@
     var wrap = el('div', 'table-responsive');
     var t = el('table', 'table table-vcenter card-table table-sm');
     var th = el('thead'), htr = el('tr');
-    ['Date', 'Name', 'Distance', 'Top', 'Avg', 'Turns', 'SPS'].forEach(function (x, i) {
-      htr.appendChild(el('th', i > 1 ? 'text-end' : null, x));
-    });
+    ['Date', 'Name', 'Gear', 'Distance', 'Top', 'Avg', 'Turns', 'SPS']
+      .forEach(function (x, i) {
+        htr.appendChild(el('th', i > 2 ? 'text-end' : null, x));
+      });
     th.appendChild(htr); t.appendChild(th);
     var tb = el('tbody');
     var sorted = list.slice().sort(function (a2, b2) {
@@ -3425,6 +3426,30 @@
         tdN.appendChild(badge);
       }
       tr.appendChild(tdN);
+      /* §520 V2 — 그날 쓴 장비. 비어 있으면 **지금 채울 수 있게** 한다.
+         기존 세션은 전부 비어 있어서, 이 길이 없으면 비교가 시작되는 데
+         몇 달이 걸린다. */
+      var tdG = el('td');
+      var gl = gearLabel(r.gear);
+      if (gl) {
+        var gs = el('span', null, gl);
+        if (r.gear && r.gear.backfilled) {
+          gs.title = 'Filled in later, not recorded at save time';
+          gs.style.opacity = '0.85';
+          gs.appendChild(el('span', 'lab ms-1', '\u00b7 added later'));
+        }
+        tdG.appendChild(gs);
+      } else {
+        var addG = el('button', 'btn btn-sm btn-ghost-secondary p-0 px-1', 'add gear');
+        addG.type = 'button';
+        addG.title = 'Record which wing, foil and board you used';
+        addG.addEventListener('click', function (ev) {
+          ev.stopPropagation();          /* 행 클릭(세션 열기)과 섞이지 않게 */
+          openGearBackfill(r);
+        });
+        tdG.appendChild(addG);
+      }
+      tr.appendChild(tdG);
       /* 저장 레코드는 SI 단위(m·m/s)로 들어간다 — 표시할 때 변환한다 */
       tr.appendChild(el('td', 'text-end num',
         r.distanceM != null ? (r.distanceM / 1000).toFixed(2) + ' km' : '—'));
@@ -3542,6 +3567,49 @@
       TREND.metric = msel.value; renderSessions();
     });
     act2.appendChild(msel);
+
+    /* §520 V2 — 장비별로 갈라 본다. **이게 V2 를 하는 이유다**: 세션에
+       장비를 붙이는 목적은 목록에 한 줄 더 쓰는 게 아니라 "6.0 이랑 5.0
+       중 뭐가 나았나" 를 물을 수 있게 하는 것이다.
+       ⚠ 장비가 적힌 세션이 2개 미만이면 메뉴를 안 띄운다 — 고를 게
+       하나뿐인 필터는 고장으로 보인다. */
+    var gearKeyOf = function (r) {
+      var g = r.gear;
+      if (!g) return null;
+      if (g.handWingName) return g.handWingName;
+      if (g.wingM2 != null) return g.wingM2 + ' m\u00b2';
+      return null;
+    };
+    var gearKeys = {};
+    pts.forEach(function (r) { var k = gearKeyOf(r); if (k) gearKeys[k] = (gearKeys[k] || 0) + 1; });
+    var gearList = Object.keys(gearKeys).sort();
+    if (gearList.length >= 2) {
+      var gsel = el('select', 'form-select form-select-sm');
+      gsel.style.width = 'auto';
+      var oAll = document.createElement('option');
+      oAll.value = ''; oAll.textContent = 'Any gear';
+      gsel.appendChild(oAll);
+      gearList.forEach(function (k) {
+        var o = document.createElement('option');
+        o.value = k; o.textContent = k + ' (' + gearKeys[k] + ')';
+        /* 점이 1개면 선이 안 그려진다 — §510 과 같은 규칙 */
+        o.disabled = gearKeys[k] < 2;
+        if (k === TREND.gear) o.selected = true;
+        gsel.appendChild(o);
+      });
+      gsel.addEventListener('change', function () {
+        TREND.gear = gsel.value || null; renderSessions();
+      });
+      act2.appendChild(gsel);
+    } else if (TREND.gear) {
+      TREND.gear = null;               /* 고를 게 없어졌으면 필터를 푼다 */
+    }
+    if (TREND.gear) {
+      pts = pts.filter(function (r) { return gearKeyOf(r) === TREND.gear; });
+    }
+    var unlabelled = 0;
+    pts.forEach(function (r) { if (!gearKeyOf(r)) unlabelled++; });
+
     act2.appendChild(el('span', 'lab', pts.length + ' sessions'));
     h2.appendChild(act2);
     c2.appendChild(h2);
@@ -3596,6 +3664,21 @@
           : 'Computed over analysed time — recording gaps and any stretches you '
             + 'removed are already excluded.');
     b2.appendChild(foot);
+    /* §520 — 장비가 안 적힌 세션이 있으면 그렇다고 말한다. 이걸 안 적으면
+       '장비별로 보기' 메뉴가 왜 안 뜨는지(또는 왜 세션이 적은지) 알 수
+       없다. 비교는 라벨이 붙은 만큼만 가능하다. */
+    if (unlabelled) {
+      var un = el('div', 'text-secondary mt-1');
+      un.style.fontSize = '.8125rem';
+      /* 수·동사는 **라벨 없는 개수**를 따라간다. 분모(pts.length)를 따라가면
+         "1 of these 6 sessions have" 처럼 어긋난다(실측). */
+      un.textContent = unlabelled + ' of these ' + pts.length + ' sessions '
+        + (unlabelled > 1 ? 'have' : 'has') + ' no gear recorded, so '
+        + (unlabelled > 1 ? 'they cannot' : 'it cannot') + ' be compared by '
+        + 'wing or foil. Add it from the list above \u2014 the row shows an '
+        + '"add gear" button.';
+      b2.appendChild(un);
+    }
     c2.appendChild(b2); host.appendChild(c2);
 
     track(new uPlot({
@@ -4380,7 +4463,8 @@
 
   var TURNSEL = [];
   /* §490 — 시즌 흐름에서 고른 지표 */
-  var TREND = { metric: 'max' };
+  /* §520 — gear 는 시즌 흐름의 장비 필터(null = 전체) */
+  var TREND = { metric: 'max', gear: null };
   /* §488 — 회전 목록 그룹 필터 (종류 × 택 방향) */
   var TURNFILT = { type: 'all', side: 'all' };
   /* §496 — 회전 목록을 다시 그릴 때 유지할 스크롤 위치 */
@@ -6471,6 +6555,142 @@
     };
   }
 
+  /* §520 V2 (옥대표 1순위) — 세션별 장비.
+     RDGear 는 **라이더 프로필에 한 벌**이라 세션에 안 붙었다. 그래서
+     "6.0 이랑 5.0 중 뭐가 나았나" 를 물을 수가 없다 — 데이터는 다 있는데
+     라벨이 없다. §482 가 포일을 예측에 배선해 놨는데 과거 세션에는
+     그때 무슨 포일이었는지 기록이 없는 것도 같은 이유다.
+
+     저장 시점의 선택을 **스냅샷**으로 떠서 레코드에 박는다. 나중에
+     프로필 장비를 바꿔도 지난 세션의 라벨은 안 흔들려야 한다 —
+     참조(id만 저장)로 두면 프로필을 바꾸는 순간 과거가 소급해 바뀐다. */
+  /* §520 — 지난 세션의 장비를 지금 채운다. 인라인 폼 한 줄:
+     핸드윙 · 앞포일 · 보드. 이 셋이 비교에서 실제로 쓰이는 축이다.
+     나머지(마스트·하네스·수면)는 스냅샷에만 담고 여기선 묻지 않는다 —
+     기억으로 적는 자리라 물을수록 정확도가 떨어진다. */
+  function openGearBackfill(rec) {
+    if (!window.RDGear || !window.RDStorage || !RDStorage.setSessionGear) return;
+    var host = $('sessions-body') || document.body;
+    var old = document.getElementById('gear-backfill');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+
+    var box = el('div', 'card mt-2'); box.id = 'gear-backfill';
+    var b = el('div', 'card-body');
+    b.appendChild(el('div', 'fw-bold',
+      'What did you use on ' + (rec.name || 'this session') + '?'));
+    b.appendChild(el('div', 'text-secondary mt-1',
+      'Recorded as filled in later, so it is never confused with a session '
+      + 'that had its gear captured at save time.'));
+
+    var row = el('div', 'd-flex flex-wrap gap-3 mt-2 align-items-end');
+    var picks = {};
+    function pick(label, key, bank) {
+      var w = el('div');
+      w.appendChild(el('div', 'lab', label));
+      var sel = el('select', 'form-select form-select-sm');
+      sel.style.width = 'auto';
+      var none = document.createElement('option');
+      none.value = ''; none.textContent = "don't know";
+      sel.appendChild(none);
+      bank.forEach(function (o) {
+        var op = document.createElement('option');
+        op.value = o.id; op.textContent = o.label || o.name || o.id;
+        sel.appendChild(op);
+      });
+      w.appendChild(sel);
+      picks[key] = sel;
+      row.appendChild(w);
+    }
+    pick('Hand wing', 'handWing', RDGear.HAND_WINGS);
+    pick('Front foil', 'frontWing', RDGear.FRONT_WINGS);
+    pick('Board', 'board', RDGear.BOARDS);
+
+    var save = el('button', 'btn btn-sm btn-primary', 'Save gear');
+    save.type = 'button';
+    var msg = el('div', 'lab mt-2');
+    save.addEventListener('click', function () {
+      var g = {};
+      function put(key, bank, nameKey) {
+        var id = picks[key].value;
+        if (!id) return;
+        g[key] = id;
+        var o = RDGear.byId(bank, id);
+        if (o) {
+          g[nameKey] = o.label || o.name || o.id;
+          if (o.areaM2 != null) g.wingM2 = o.areaM2;
+          if (o.areaCm2 != null && key === 'frontWing') g.foilAreaCm2 = o.areaCm2;
+          if (o.ar != null && key === 'frontWing') g.foilAR = o.ar;
+        }
+      }
+      put('handWing', RDGear.HAND_WINGS, 'handWingName');
+      put('frontWing', RDGear.FRONT_WINGS, 'frontWingName');
+      put('board', RDGear.BOARDS, 'boardName');
+      if (!Object.keys(g).length) {
+        msg.textContent = 'Nothing picked \u2014 choose at least one.';
+        return;
+      }
+      var r = RDStorage.setSessionGear(rec.id, g);
+      if (!r.ok) { msg.textContent = 'Could not save: ' + (r.error || 'unknown'); return; }
+      if (box.parentNode) box.parentNode.removeChild(box);
+      renderSessions();
+    });
+    row.appendChild(save);
+
+    var cancel = el('button', 'btn btn-sm', 'Cancel');
+    cancel.type = 'button';
+    cancel.addEventListener('click', function () {
+      if (box.parentNode) box.parentNode.removeChild(box);
+    });
+    row.appendChild(cancel);
+
+    b.appendChild(row); b.appendChild(msg);
+    box.appendChild(b);
+    host.appendChild(box);
+    box.scrollIntoView({ block: 'nearest' });
+  }
+
+  function gearSnapshot() {
+    if (!window.RDGear) return null;
+    var sel;
+    try { sel = gearSelection(); } catch (e) { return null; }
+    if (!sel) return null;
+    function nameOf(bank, id) {
+      var o = RDGear.byId(bank, id);
+      return o ? (o.label || o.name || o.id) : null;
+    }
+    var handW = RDGear.byId(RDGear.HAND_WINGS, sel.handWing);
+    var frontW = RDGear.byId(RDGear.FRONT_WINGS, sel.frontWing);
+    var g = {
+      handWing: sel.handWing, handWingName: nameOf(RDGear.HAND_WINGS, sel.handWing),
+      frontWing: sel.frontWing, frontWingName: nameOf(RDGear.FRONT_WINGS, sel.frontWing),
+      rearWing: sel.rearWing, mast: sel.mast, board: sel.board,
+      boardName: nameOf(RDGear.BOARDS, sel.board),
+      harness: sel.harness, surface: sel.surface
+    };
+    /* 폼의 윙 면적은 장비 목록과 어긋날 수 있다(직접 입력). 둘 다 남긴다 */
+    var wf = parseFloat(($('in-wing') || {}).value);
+    if (isFinite(wf)) g.wingM2Form = wf;
+    if (handW && handW.areaM2 != null) g.wingM2 = handW.areaM2;
+    else if (isFinite(wf)) g.wingM2 = wf;
+    if (frontW) {
+      if (frontW.areaCm2 != null) g.foilAreaCm2 = frontW.areaCm2;
+      if (frontW.ar != null) g.foilAR = frontW.ar;
+    }
+    return g;
+  }
+
+  /* 화면에 한 줄로 — 없는 항목은 조용히 뺀다 */
+  function gearLabel(g) {
+    if (!g) return null;
+    var parts = [];
+    if (g.wingM2 != null) parts.push(g.wingM2 + ' m\u00b2'
+      + (g.handWingName ? ' ' + g.handWingName : ''));
+    else if (g.handWingName) parts.push(g.handWingName);
+    if (g.frontWingName) parts.push(g.frontWingName);
+    if (g.boardName) parts.push(g.boardName);
+    return parts.length ? parts.join(' \u00b7 ') : null;
+  }
+
   function saveGear(patch) {
     var rp = {};
     try { rp = (window.RDStorage && RDStorage.loadRider) ? (RDStorage.loadRider() || {}) : {}; }
@@ -7712,6 +7932,7 @@
             tack: CUR.vps.overall && CUR.vps.overall.tackScore,
             gybe: CUR.vps.overall && CUR.vps.overall.gybeScore
           } : null,
+          gear: gearSnapshot(),            // §520 V2 — 그날 쓴 장비 스냅샷
           workload: v2SessionWorkload(),   // §458 훈련부하 AU + 산출 방식
           sig: sessionSig(CUR.session),    // §463 자동 기록분과 중복 방지
           /* §509 — 트랙을 압축 형식으로 담기 위해 샘플을 같이 넘긴다.
