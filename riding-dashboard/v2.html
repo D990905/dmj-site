@@ -94,6 +94,9 @@
               <button type="button" class="btn" id="btn-replay">▶ Replay</button>
               <button type="button" class="btn" id="btn-save">Save session</button>
               <button type="button" class="btn" id="btn-pdf">PDF</button>
+              <!-- §525 W13 — 서버 없이 되는 내보내기 -->
+              <button type="button" class="btn" id="btn-export-csv">CSV</button>
+              <button type="button" class="btn" id="btn-export-gpx">GPX</button>
               <a class="btn" href="index.html">Old dashboard</a>
             </div>
           </div>
@@ -209,6 +212,10 @@
                     <button type="button" class="btn btn-sm" data-mode="tack">Tack</button>
                     <button type="button" class="btn btn-sm" data-mode="loss">Turn loss</button>
                   </div>
+                  <div class="btn-group btn-group-sm" role="group" id="map-tiles">
+                    <button type="button" class="btn btn-sm" data-tiles="map">Map</button>
+                    <button type="button" class="btn btn-sm" data-tiles="satellite">Satellite</button>
+                  </div>
                   <span class="lab" id="map-mode-note"></span>
                 </div>
                 <div id="map-host" style="height:460px;border-radius:4px;overflow:hidden"></div>
@@ -289,8 +296,9 @@
 <script src="js/storage.js?v=v520"></script>
 <script src="vendor/uPlot.iife.min.js?v=1.6.32"></script>
 <script src="js/chart-meanmax.js?v=sections-450"></script>
-<script src="js/segments.js?v=v522"></script>
-<script src="js/chart-polar.js?v=v521"></script>
+<script src="js/segments.js?v=v523"></script>
+<script src="js/export.js?v=v525"></script>
+<script src="js/chart-polar.js?v=v523"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="../assets/js/lift-calculator.js?v=auto-463"></script>
 <script src="js/coach.js?v=auto-463"></script>
@@ -299,8 +307,8 @@
 <script src="js/anim.js?v=auto-463"></script>
 <script src="js/charts.js?v=auto-463"></script>
 <script src="js/replay.js?v=auto-463"></script>
-<script src="js/map-v2.js?v=map-491"></script>
-<script src="js/map-tactical.js?v=tact-496"></script>
+<script src="js/map-v2.js?v=v525"></script>
+<script src="js/map-tactical.js?v=v525"></script>
 <script src="js/chart-stack.js?v=stack-486"></script>
 <script src="js/session-qa.js?v=qa-487"></script>
 <script src="js/bin-table.js?v=bin-477"></script>
@@ -308,6 +316,6 @@
 <script src="js/formula.js?v=formula-479"></script>
 <script src="js/wind-confirm.js?v=wc-505"></script>
 <script src="js/pdf-export.js?v=pdf-501"></script>
-<script src="js/v2-app.js?v=v522"></script>
+<script src="js/v2-app.js?v=v525"></script>
 </body>
 </html>

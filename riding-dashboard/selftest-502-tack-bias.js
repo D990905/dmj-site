@@ -10,8 +10,15 @@ function grab(name) {
 var KT = 1.94384;
 /* tbFmt 는 기본 모집단을 TACKBIAS.tier 에서 읽는다(§503) — 떼어낸
    함수만 실행하므로 그 상태를 여기서 만들어 준다. */
+/* §524 — tbDiff 가 단위별 바닥값(TB_PCT_FLOOR)을 참조하므로 같이 떼어낸다 */
+function grabVar(decl) {
+  var i = src.indexOf(decl);
+  if (i < 0) throw new Error('못 찾음: ' + decl);
+  return src.slice(i, src.indexOf('\n  };', i) + 5);
+}
 var F = new Function('KT', 'TACKBIAS',
-  grab('tbFmt') + grab('tbPick') + grab('tbDiff') + grab('tbUpDownSanity').replace(/var box[\s\S]*?return box;/, 'return { ratio: ratio };') + grab('tbCauseNote') +
+  grabVar('  var TB_PCT_FLOOR = {') + '\n'
+  + grab('tbFmt') + grab('tbPick') + grab('tbDiff') + grab('tbUpDownSanity').replace(/var box[\s\S]*?return box;/, 'return { ratio: ratio };') + grab('tbCauseNote') +
   '\nreturn { tbFmt: tbFmt, tbPick: tbPick, tbDiff: tbDiff, tbCauseNote: tbCauseNote,'
   + ' tbUpDownSanity: tbUpDownSanity, setTier: function (t) { TACKBIAS.tier = t; } };')(
   KT, { metric: 'sog', mode: 'upwind', tier: 'avg' });
@@ -37,12 +44,15 @@ function mk(spec) {
 }
 
 console.log('\n[1] tbDiff');
-ok('+10%', Math.abs(F.tbDiff(10, 11) - 10) < 1e-9);
-ok('−10%', Math.abs(F.tbDiff(10, 9) + 10) < 1e-9);
-ok('0 나눗셈은 null', F.tbDiff(0, 5) === null);
-ok('null 입력은 null', F.tbDiff(null, 5) === null);
+ok('+10%', Math.abs(F.tbDiff(10, 11, 'kt') - 10) < 1e-9);
+ok('−10%', Math.abs(F.tbDiff(10, 9, 'kt') + 10) < 1e-9);
+ok('0 나눗셈은 null', F.tbDiff(0, 5, 'kt') === null);
+ok('null 입력은 null', F.tbDiff(null, 5, 'kt') === null);
 /* 음수 기준값에서도 부호가 뒤집히지 않아야 한다 (|Port| 로 나눈다) */
-ok('음수 기준에서 부호 보존', F.tbDiff(-10, -9) > 0);
+ok('음수 기준에서 부호 보존', F.tbDiff(-10, -9, 'kt') > 0);
+/* §524 — 분모가 작으면 백분율을 만들지 않는다 (Waterspeed 의 +421.4%) */
+ok('0.3kt 기준은 null', F.tbDiff(0.3, 2.0, 'kt') === null);
+ok('단위를 안 넘기면 기본 바닥 0.5', F.tbDiff(0.4, 1.0) === null);
 
 console.log('\n[2] tbFmt — 단위 변환 (엔진은 m/s, 화면은 kt)');
 var f = F.tbFmt({ avg: 10 / KT, unit: 'speed' });

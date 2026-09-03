@@ -23,6 +23,34 @@
   'use strict';
   var KT = 1.94384;
 
+  /* §525 W14 — 지도 배경 선택 (Waterspeed: Standard/Hybrid/Satellite).
+     위성이 필요한 이유가 있다: 해안선·부표·양식장·이안류 자리가 보여야
+     "저기서 왜 느렸나" 를 읽는다. 도로 지도는 물 위가 전부 파란색이라
+     아무 단서가 없다.
+     Esri World Imagery 는 키 없이 쓸 수 있다(출처 표기 필요). */
+  var TILES = {
+    map: { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+           opts: { maxZoom: 19, attribution: '\u00a9 OpenStreetMap' } },
+    satellite: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/'
+         + 'World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      opts: { maxZoom: 19, attribution: 'Imagery \u00a9 Esri, Maxar, Earthstar Geographics' } }
+  };
+  function tileKey() {
+    try {
+      var v = global.localStorage && global.localStorage.getItem('rd_map_tiles');
+      return (v === 'satellite') ? 'satellite' : 'map';
+    } catch (e) { return 'map'; }
+  }
+  function setTileKey(k) {
+    try { global.localStorage.setItem('rd_map_tiles', k === 'satellite' ? 'satellite' : 'map'); }
+    catch (e) {}
+  }
+  function addTiles(map) {
+    var t = TILES[tileKey()] || TILES.map;
+    return global.L.tileLayer(t.url, t.opts).addTo(map);
+  }
+
   function geo() {
     return global.RDGeo || (typeof require === 'function' ? require('./geo.js') : null);
   }
@@ -190,9 +218,7 @@
     while (host.firstChild) host.removeChild(host.firstChild);
     host.style.height = (opts.height || 460) + 'px';
     var map = global.L.map(host, { zoomControl: true });
-    global.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap'
-    }).addTo(map);
+    addTiles(map);
 
     /* 트랙은 배경으로 죽인다 — 주인공은 원이다. */
     var step = Math.max(1, Math.floor(pts.length / 3000));
@@ -274,9 +300,7 @@
     while (host.firstChild) host.removeChild(host.firstChild);
     host.style.height = (opts.height || 460) + 'px';
     var map = global.L.map(host, { zoomControl: true });
-    global.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap'
-    }).addTo(map);
+    addTiles(map);
 
     /* 색·굵기가 바뀔 때만 선을 끊는다 — 점마다 그리면 레이어가 수천 개다. */
     var step = Math.max(1, Math.floor(pts.length / 3000));
@@ -323,7 +347,8 @@
               shiftColor: shiftColor, tackColor: tackColor,
               widthFor: widthFor, tackBaselines: tackBaselines, classify: classify,
               classifySeries: classifySeries, summarize: summarize,
-              signedTwa: signedTwa, bucketOf: bucketOf };
+              signedTwa: signedTwa, bucketOf: bucketOf,
+              tileKey: tileKey, setTileKey: setTileKey };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else global.RDMapTactical = API;
 })(typeof window !== 'undefined' ? window : globalThis);

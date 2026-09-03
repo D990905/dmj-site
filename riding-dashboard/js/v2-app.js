@@ -3005,6 +3005,8 @@
     /* §502 Tack bias — 통계표의 요약이므로 그 위에 둔다. 자기 호스트를
        따로 갖는 이유는 지표 버튼을 눌렀을 때 **이 카드만** 다시 그리기
        위해서다(성능 탭 전체를 다시 그리면 스크롤이 튄다). */
+    try { renderFoilStructure(host, a); } catch (e) {}
+
     var tbHost = el('div');
     tbHost.id = 'tackbias-host';
     host.appendChild(tbHost);
@@ -4219,9 +4221,101 @@
   }
   /* Diff = (Stbd − Port) / |Port| . 부호는 '스타보드가 어느 쪽인지' 만
      말한다. 좋고 나쁨이 아니므로 색을 입히지 않는다. */
-  function tbDiff(p, s) {
-    if (p == null || s == null || !isFinite(p) || Math.abs(p) < 1e-9) return null;
+  /* §524 %폭발 감사 — Waterspeed 에서 `Exit VMG +421.4%` 를 보고
+     우리 코드를 뒤졌더니 **같은 결함이 여기 있었다.**
+     가드가 1e-9 라서 0 으로 나누기만 막고, 뜻 없는 백분율은 그대로 낸다:
+     Port VMG 0.3kt vs Starboard 2.0kt → **+567%**. 이건 정보가 아니다.
+
+     기준은 "분모가 0 이 아니냐" 가 아니라 **"이 분모로 나눈 비율이
+     읽을 만하냐"** 여야 한다. 단위별 바닥값을 두고, 그 아래면 백분율을
+     내지 않는다 — 화면은 대신 절대 차이를 보여 준다. */
+  var TB_PCT_FLOOR = {
+    kt: 1.0,        /* 1kt 미만을 기준으로 한 % 는 뜻이 없다 */
+    bpm: 40,        /* 심박이 40 아래면 측정 오류다 */
+    deg: 5,         /* 각도 5° 미만 기준의 % 는 노이즈 */
+    '': 0.5
+  };
+  function tbDiff(p, s, unit) {
+    if (p == null || s == null || !isFinite(p) || !isFinite(s)) return null;
+    var floor = TB_PCT_FLOOR[unit || ''];
+    if (floor == null) floor = TB_PCT_FLOOR[''];
+    if (Math.abs(p) < floor) return null;
     return (s - p) / Math.abs(p) * 100;
+  }
+
+  /* §524 W6 포일링 구조 (Waterspeed 벤치마킹).
+     우리는 포일링 **시간과 비율**만 있었다. 그런데 같은 30분이라도
+     "3분씩 열 번" 과 "안 떨어지고 30분" 은 전혀 다른 라이딩이고,
+     후자가 실력이다. 몇 번 끊겼는지 · 가장 길게 버틴 게 얼마인지가
+     그 차이를 드러낸다.
+
+     우리가 더 하는 것: 그들은 숫자만 준다. 우리는 **끊긴 횟수가
+     무엇을 뜻하는지** 같이 적는다 — 회전이 많은 세션은 원래 자주
+     끊기므로, 회전 수로 나눈 값이 실제로 읽을 값이다. */
+  function renderFoilStructure(host, a) {
+    if (!window.RDSegments || !CUR.session) return;
+    var S = CUR.session.samples || [];
+    if (!S.length) return;
+    var secs, sum;
+    try {
+      secs = RDSegments.foilSections(S, foilThresholdMs(), 2);
+      sum = RDSegments.foilSummary(S, secs);
+    } catch (e) { return; }
+    if (!sum || !sum.count) return;
+
+    var card = el('div', 'card mb-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'How the foiling was strung together'));
+    head.appendChild(el('div', 'card-actions lab',
+      'above ' + (foilThresholdMs() * KT).toFixed(0) + ' kt'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    var row = el('div', 'row g-2');
+    function box(label, val, sub) {
+      var c = el('div', 'col-6 col-md-3');
+      var w = el('div', 'p-2 rounded');
+      w.style.background = currentThemeName() === 'light'
+        ? 'rgba(0,0,0,.03)' : 'rgba(255,255,255,.04)';
+      w.appendChild(el('div', 'lab', label));
+      w.appendChild(el('div', 'num fw-bold mt-1', val));
+      if (sub) w.appendChild(el('div', 'lab', sub));
+      c.appendChild(w); return c;
+    }
+    row.appendChild(box('Stretches', String(sum.count),
+      'separate times up on foil'));
+    row.appendChild(box('Longest', fmtClock(sum.longestSec),
+      (sum.longestM / 1000).toFixed(2) + ' km'));
+    row.appendChild(box('Average stretch', fmtClock(sum.totalSec / sum.count),
+      (sum.totalM / sum.count / 1000).toFixed(2) + ' km each'));
+    var turns = (a.maneuvers || []).length;
+    row.appendChild(box('Per turn',
+      turns ? (sum.count / turns).toFixed(2) : '\u2014',
+      turns ? 'breaks per turn (' + turns + ' turns)' : 'no turns detected'));
+    body.appendChild(row);
+
+    /* 숫자만 두면 "13번 끊겼다" 가 나쁜 건지 알 수 없다.
+       회전할 때 떨어지는 건 정상이고, **회전보다 많이 끊기는 것**이 신호다. */
+    var note = el('div', 'text-secondary mt-2');
+    note.style.fontSize = '.8125rem';
+    if (turns) {
+      var ratio = sum.count / turns;
+      note.textContent = ratio <= 1.15
+        ? 'You came off the foil about once per turn \u2014 that is what a clean '
+          + 'session looks like, since a turn is where it normally happens. The '
+          + 'number to grow is the longest stretch, not this one.'
+        : 'You came off the foil ' + ratio.toFixed(1) + ' times per turn, so '
+          + 'roughly ' + Math.round(sum.count - turns) + ' of these breaks were '
+          + 'not at a turn \u2014 touchdowns in a straight line. That is a '
+          + 'different fault from a bad gybe: it is height control or a foil '
+          + 'that is loaded up, not turn technique.';
+    } else {
+      note.textContent = 'Longest unbroken stretch is the number worth growing \u2014 '
+        + 'total foiling time can rise just from a longer session.';
+    }
+    body.appendChild(note);
+    card.appendChild(body);
+    host.appendChild(card);
   }
 
   function renderTackBias(host, a) {
@@ -4293,7 +4387,7 @@
         + ' data for this metric.'));
       card.appendChild(body); host.appendChild(card); return;
     }
-    var d = tbDiff(pf.v, sf.v);
+    var d = tbDiff(pf.v, sf.v, pf.unit);
 
     /* 한 줄 요약 — Port | Diff | Stbd */
     var row = el('div', 'd-flex align-items-center justify-content-between');
@@ -4312,12 +4406,20 @@
     row.appendChild(side('P', 'Port', pf.txt, pf.unit));
     var mid = el('div', 'text-center px-3');
     mid.appendChild(el('div', 'lab', 'Diff'));
+    /* %가 뜻이 없으면(§524: 분모가 바닥값 미만) **절대 차이**를 보여 준다.
+       "—" 만 띄우면 차이가 없다는 뜻으로 읽히는데, 실제로는 차이가 크고
+       비율로 말할 수 없을 뿐이다. */
+    var absDelta = (pf.v != null && sf.v != null) ? (sf.v - pf.v) : null;
     var dv = el('div', 'kpi__val num mt-1',
-      d == null ? '—' : (d > 0 ? '+' : '') + d.toFixed(1) + '%');
+      d != null ? ((d > 0 ? '+' : '') + d.toFixed(1) + '%')
+        : (absDelta != null
+            ? ((absDelta > 0 ? '+' : '') + absDelta.toFixed(1) + ' ' + (pf.unit || ''))
+            : '\u2014'));
     /* 중립 색 — 어느 택이 빠른 게 좋고 나쁨이 아니다 */
     dv.style.color = THEME.accent;
     mid.appendChild(dv);
-    mid.appendChild(el('div', 'lab', 'starboard vs port'));
+    mid.appendChild(el('div', 'lab', d != null ? 'starboard vs port'
+      : 'starboard vs port \u00b7 too small a base for %'));
     row.appendChild(mid);
     row.appendChild(side('S', 'Starboard', sf.txt, sf.unit));
     body.appendChild(row);
@@ -4419,7 +4521,7 @@
       var p = tbFmt(tbPick(rows, metric, mode, 'P'));
       var s = tbFmt(tbPick(rows, metric, mode, 'S'));
       if (!p || !s) return null;
-      return { pct: tbDiff(p.v, s.v), deg: s.v - p.v };
+      return { pct: tbDiff(p.v, s.v, p.unit), deg: s.v - p.v };
     }
     var sog = gap('sog'), vmg = gap('vmg'), cwa = gap('twa');
     if (!sog || !vmg || sog.pct == null || vmg.pct == null) return null;
@@ -8418,6 +8520,51 @@
 
     var pb = $('btn-pdf');
     if (pb) pb.addEventListener('click', exportV2Pdf);
+
+    /* §525 W13 — 서버 없이 되는 내보내기. Strava·Health 는 OAuth 라
+       서버가 있어야 하고, 공유 링크는 Supabase(§415) 가 붙어야 한다. */
+    function wireExport(id, ext, mime, make) {
+      var b = $(id);
+      if (!b) return;
+      b.addEventListener('click', function () {
+        if (!CUR.session || !window.RDExport) return;
+        var txt;
+        try { txt = make(); } catch (e) { txt = null; }
+        if (!txt) { b.textContent = 'failed'; return; }
+        var okDl = RDExport.download(txt,
+          RDExport.safeName(CUR.name || 'session', ext), mime);
+        var was = b.textContent;
+        b.textContent = okDl ? 'saved' : 'blocked';
+        setTimeout(function () { b.textContent = was; }, 1600);
+      });
+    }
+    wireExport('btn-export-csv', 'csv', 'text/csv;charset=utf-8', function () {
+      return RDExport.toCsv(CUR.session, CUR.analysis || {});
+    });
+    wireExport('btn-export-gpx', 'gpx', 'application/gpx+xml;charset=utf-8', function () {
+      return RDExport.toGpx(CUR.session, CUR.name || 'Session');
+    });
+
+    /* §525 W14 — 지도 배경. 위성이 있어야 해안선·부표·양식장이 보이고,
+       그래야 "저기서 왜 느렸나" 를 읽는다. 선택은 기억한다. */
+    var tileWrap = $('map-tiles');
+    if (tileWrap && window.RDMapTactical && RDMapTactical.setTileKey) {
+      var cur = RDMapTactical.tileKey ? RDMapTactical.tileKey() : 'map';
+      Array.prototype.forEach.call(tileWrap.querySelectorAll('button'), function (b) {
+        if (b.getAttribute('data-tiles') === cur) b.classList.add('active');
+        b.addEventListener('click', function () {
+          RDMapTactical.setTileKey(b.getAttribute('data-tiles'));
+          Array.prototype.forEach.call(tileWrap.querySelectorAll('button'),
+            function (o) { o.classList.remove('active'); });
+          b.classList.add('active');
+          if (mapCtx) {
+            renderTrack(mapCtx.session, mapCtx.analysis);
+            segHl = null;
+            try { renderSegmentStepper(mapCtx.analysis); } catch (e) {}
+          }
+        });
+      });
+    }
     var sb = $('btn-save');
     if (sb) sb.addEventListener('click', function () {
       if (!CUR.session || !Store || !Store.saveSession) return;

@@ -37,9 +37,22 @@
     host.style.height = (opts.height || 460) + 'px';
 
     var map = global.L.map(host, { zoomControl: true, attributionControl: true });
-    global.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap'
-    }).addTo(map);
+    /* §525 W14 — 배경 선택은 map-tactical 이 들고 있다. 여기서 타일을
+       또 박으면 speed 모드만 위성이 안 먹는다(실측: 버튼은 켜지는데
+       타일이 그대로였다). 한 곳에서만 정한다. */
+    if (global.RDMapTactical && global.RDMapTactical.tileKey
+        && global.RDMapTactical.tileKey() === 'satellite') {
+      global.L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/'
+        + 'World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 19,
+          attribution: 'Imagery \u00a9 Esri, Maxar, Earthstar Geographics' }
+      ).addTo(map);
+    } else {
+      global.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '\u00a9 OpenStreetMap'
+      }).addTo(map);
+    }
 
     /* 속도 구간별로 폴리라인을 쪼개 색을 입힌다.
        한 줄로 그리면 색을 못 넣고, 점마다 그리면 수천 개 레이어가 된다. */
