@@ -4523,6 +4523,307 @@
       capHost.textContent = 'Not enough comparable turns for a band '
         + '(needs at least 3), so only the selected turns are drawn.';
     }
+
+    /* §515 V11 — 같은 회전을 **위에서** 본다 */
+    renderTurnTracks(body, picked, sel, a);
+  }
+
+  /* §515 — 궤적 그림 + 반전 토글 + 읽는 법.
+     그림만 놓으면 예쁜 선 뭉치다. 무엇을 보라고 말해야 도구가 된다. */
+  function renderTurnTracks(body, picked, sel, a) {
+    var head = el('div', 'd-flex align-items-center justify-content-between mt-4');
+    head.appendChild(el('div', 'fw-bold', 'Seen from above'));
+    var ctrls = el('div', 'd-flex align-items-center gap-2');
+
+    var mirrorBtn = el('button', 'btn btn-sm '
+      + (TRACKPLOT.mirror ? 'btn-primary' : 'btn-outline-secondary'),
+      TRACKPLOT.mirror ? 'Port flipped' : 'Flip port turns');
+    mirrorBtn.type = 'button';
+    mirrorBtn.addEventListener('click', function () {
+      TRACKPLOT.mirror = !TRACKPLOT.mirror;
+      renderTurnExtras(a);
+    });
+    ctrls.appendChild(mirrorBtn);
+
+    var padSel = el('select', 'form-select form-select-sm');
+    padSel.style.width = 'auto';
+    [6, 10, 16, 24].forEach(function (v) {
+      var o = document.createElement('option');
+      o.value = String(v); o.textContent = '\u00b1' + v + ' s';
+      if (v === TRACKPLOT.pad) o.selected = true;
+      padSel.appendChild(o);
+    });
+    padSel.addEventListener('change', function () {
+      TRACKPLOT.pad = parseInt(padSel.value, 10) || 10;
+      renderTurnExtras(a);
+    });
+    ctrls.appendChild(padSel);
+    head.appendChild(ctrls);
+    body.appendChild(head);
+
+    var host = el('div', 'mt-2');
+    body.appendChild(host);
+    var cap = el('div', 'lab mt-1');
+    body.appendChild(cap);
+
+    var r = null;
+    try { r = drawTurnTracks(host, picked, sel, a); } catch (e) {
+      host.textContent = 'Could not draw the tracks.';
+      return;
+    }
+    if (!r) {
+      if (!host.firstChild) {
+        host.textContent = 'No position samples around these turns.';
+      }
+      return;
+    }
+
+    /* 무엇이 그려졌는지 → 무엇을 읽으라는 것인지 순서로 */
+    var parts = [];
+    parts.push('Every turn starts at the same point \u2014 the centre \u2014 '
+      + 'travelling straight up, so the entries lie on top of each other and '
+      + 'you are looking at what happened after that. The dot on each line is '
+      + 'the apex, its slowest moment. Distances are metres, both axes to the '
+      + 'same scale.');
+    if (r.poolN) {
+      parts.push('The faint lines are your other ' + r.poolN
+        + ' comparable turns this session.');
+    }
+    if (r.widest && r.widest.shape) {
+      parts.push('Widest of the selected: #' + r.widest.no + ' at '
+        + r.widest.shape.widthM.toFixed(1) + ' m off the entry line, '
+        + r.widest.shape.travelM.toFixed(0) + ' m travelled.');
+    }
+    parts.push(TRACKPLOT.mirror
+      ? 'Port turns are mirrored left-to-right so both sides overlay \u2014 '
+        + 'good for comparing shape, but it hides which way you turn worse. '
+        + 'Turn it off to see that again.'
+      : 'Port and starboard turn opposite ways, so they mirror each other. '
+        + 'Flip port turns to lay the two on top of each other and compare '
+        + 'the shape directly.');
+    parts.push('A wide, rounded path that keeps speed beats a tight one that '
+      + 'stalls \u2014 read this next to the speed curve above, not instead of it.');
+    cap.textContent = parts.join(' ');
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+   * §515 V11 — 회전 궤적 겹치기 (옥대표 백로그 ⭐⭐ "전혀 없는 것")
+   *
+   * §497 이 '속도 대 시간' 이라면 이건 **공간 궤적**이다. 같은 손실률
+   * 두 회전이 전혀 다른 모양일 수 있다 — 하나는 넓게 돌아 속도를
+   * 지켰고 하나는 급하게 꺾어 미끄러졌는데, 시간축 곡선에서는 둘 다
+   * "12% 손실" 로 같아 보인다. 그 차이는 위에서 내려다봐야 보인다.
+   *
+   * 정렬 규칙 세 가지 — 이게 없으면 그냥 항적 뭉치다:
+   *   ① 원점 = **회전 시작점**(startIdx), 그리고 진입 침로
+   *      (headingBefore)를 **위쪽(+y)** 으로 돌린다. 그래야 진입 궤적이
+   *      전부 x=0 세로선 위에 겹쳐서 "여기서부터 무슨 일이 벌어졌나"
+   *      가 한 그림이 된다.
+   *      ⚠ 처음엔 원점을 apex(최저속)로 잡았다가 고쳤다 — headingBefore
+   *      는 회전 **시작 직전** 4초로 재는 값이라 그 진입선은 apex 를
+   *      지나지 않는다. 시작점~apex 사이에 이미 옆으로 밀린 거리만큼
+   *      회전마다 다르게 어긋나서, 실측에서 진입부 산포(SD 77px)가
+   *      이탈부(45px)보다 **더 컸다** — 정렬이 안 되고 있었다는 뜻이다.
+   *   ② apex 는 각 궤적 위에 점으로 찍는다. 어디서 제일 느려졌는지가
+   *      모양과 같이 보여야 "넓게 돌아 속도를 지켰다" 를 읽는다.
+   *   ③ 미터 등축(等軸). 위경도를 그대로 그리면 위도에 따라 가로가
+   *      눌려서 회전 반경이 왜곡된다 — 부산(35°N)에서 경도 1° 는
+   *      위도 1° 의 0.82 배다.
+   *
+   * 좌우 반전을 **기본으로 켜지 않는다.** P 회전과 S 회전은 서로
+   * 반대로 돈다 — 겹치려면 한쪽을 뒤집어야 하지만, 뒤집는 순간
+   * "왼쪽으로 도는 걸 못 한다"(§507 에서 실제로 찾은 것)가 그림에서
+   * 사라진다. 그래서 토글로 두고, 켤 때 무슨 일이 일어나는지 적는다.
+   * ═══════════════════════════════════════════════════════════════ */
+
+  var TRACKPLOT = { mirror: false, pad: 10 };
+  var MPD = 111320;                    /* 위도 1° 의 미터 */
+
+  /* 한 회전의 궤적을 시작점 원점·진입침로 위쪽인 미터 좌표로.
+     시간창은 시작 pad 초 전부터 끝 pad 초 후까지 — 회전 길이는
+     회전마다 다르므로 apex 기준 고정폭으로 자르면 긴 택의 이탈부가
+     통째로 잘린다. */
+  function turnPathOn(S, m, padSec) {
+    if (!m || m.startIdx == null) return null;
+    var o = S[m.startIdx];
+    if (!o || o.lat == null || o.lng == null) return null;
+    var hb = m.headingBefore;
+    if (hb == null) return null;
+    var t0 = o.t;
+    var tEnd = (m.endIdx != null && S[m.endIdx]) ? S[m.endIdx].t : t0;
+    var cosLat = Math.cos(o.lat * Math.PI / 180);
+    /* 진입침로를 +y 로 보내는 회전각. 화면 좌표는 북=+y, 동=+x 이므로
+       침로 θ 에 대해 R=[[cosθ,−sinθ],[sinθ,cosθ]] 를 걸면
+       (sinθ,cosθ) → (0,1) 이다. */
+    var th = hb * Math.PI / 180;
+    var cs = Math.cos(th), sn = Math.sin(th);
+    var pts = [];
+    for (var i = 0; i < S.length; i++) {
+      var dt = S[i].t - t0;
+      if (dt < -padSec) continue;
+      if (S[i].t > tEnd + padSec) break;
+      if (S[i].lat == null || S[i].lng == null) continue;
+      var ex = (S[i].lng - o.lng) * MPD * cosLat;   /* 동쪽 m */
+      var ny = (S[i].lat - o.lat) * MPD;            /* 북쪽 m */
+      pts.push({
+        x: ex * cs - ny * sn,
+        y: ex * sn + ny * cs,
+        t: dt,
+        v: S[i].speed == null ? null : S[i].speed * KT,
+        apex: (i === m.apexIdx)
+      });
+    }
+    return pts.length >= 4 ? pts : null;
+  }
+
+  /* 궤적의 폭·깊이 — 모양을 숫자 하나로 만들지는 않되, 읽기를 돕는다.
+     width  = 진입선(x=0)에서 좌우로 가장 멀리 간 거리
+     travel = 회전 구간에서 실제로 지나간 경로 길이 */
+  function pathShape(pts) {
+    var wMax = 0, travel = 0;
+    for (var i = 0; i < pts.length; i++) {
+      var ax = Math.abs(pts[i].x);
+      if (ax > wMax) wMax = ax;
+      if (i) {
+        var dx = pts[i].x - pts[i - 1].x, dy = pts[i].y - pts[i - 1].y;
+        travel += Math.sqrt(dx * dx + dy * dy);
+      }
+    }
+    return { widthM: wMax, travelM: travel };
+  }
+
+  function svgEl(name, attrs) {
+    var e = document.createElementNS('http://www.w3.org/2000/svg', name);
+    if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+
+  function drawTurnTracks(hostEl, picked, sel, a) {
+    while (hostEl.firstChild) hostEl.removeChild(hostEl.firstChild);
+    if (!CUR.session) return null;
+    var S = CUR.session.samples || [];
+    if (!S.length) return null;
+    var pad = TRACKPLOT.pad;
+
+    function prep(m) {
+      var p = turnPathOn(S, m, pad);
+      if (!p) return null;
+      /* 반전은 **x 부호만** 뒤집는다 — 진행 방향(y)은 건드리지 않는다 */
+      if (TRACKPLOT.mirror && m.side === 'P') {
+        p = p.map(function (q) { return { x: -q.x, y: q.y, t: q.t, v: q.v }; });
+      }
+      return p;
+    }
+
+    var lines = [];
+    picked.forEach(function (m, k) {
+      var p = prep(m);
+      if (p) lines.push({ m: m, pts: p, no: sel[k] + 1, shape: pathShape(p) });
+    });
+    if (!lines.length) {
+      hostEl.textContent = 'These turns have no position samples to draw.';
+      return null;
+    }
+
+    /* 배경 모집단 — §497 과 같은 필터를 따른다 */
+    var mans = (a && a.maneuvers) || [];
+    var pType = TURNFILT.type, pSide = TURNFILT.side;
+    if (pType === 'all') {
+      var types = {};
+      picked.forEach(function (m) { types[m.type] = 1; });
+      var tk = Object.keys(types);
+      if (tk.length === 1) pType = tk[0];
+    }
+    var pickedIds = {};
+    picked.forEach(function (m) { pickedIds[m.startIdx + ':' + m.endIdx] = 1; });
+    var pool = [];
+    mans.forEach(function (m) {
+      if (pType !== 'all' && m.type !== pType) return;
+      if (pSide !== 'all' && m.side !== pSide) return;
+      if (pickedIds[m.startIdx + ':' + m.endIdx]) return;
+      var p = prep(m);
+      if (p) pool.push({ m: m, pts: p });
+    });
+
+    /* ---- 스케일: 등축. 가로세로 중 큰 쪽에 맞춘다 ---- */
+    var xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+    function ext(pts) {
+      pts.forEach(function (q) {
+        if (q.x < xMin) xMin = q.x; if (q.x > xMax) xMax = q.x;
+        if (q.y < yMin) yMin = q.y; if (q.y > yMax) yMax = q.y;
+      });
+    }
+    lines.forEach(function (l) { ext(l.pts); });
+    pool.forEach(function (l) { ext(l.pts); });
+    if (!isFinite(xMin)) return null;
+    var W = Math.max(hostEl.clientWidth || 860, 320), H = 340, M = 26;
+    var spanX = Math.max(xMax - xMin, 1), spanY = Math.max(yMax - yMin, 1);
+    var k = Math.min((W - 2 * M) / spanX, (H - 2 * M) / spanY);
+    var cx = (xMin + xMax) / 2, cy = (yMin + yMax) / 2;
+    function px(q) { return W / 2 + (q.x - cx) * k; }
+    function py(q) { return H / 2 - (q.y - cy) * k; }   /* 북쪽이 위 */
+    function d(pts) {
+      return pts.map(function (q, i) {
+        return (i ? 'L' : 'M') + px(q).toFixed(1) + ' ' + py(q).toFixed(1);
+      }).join(' ');
+    }
+
+    var svg = svgEl('svg', { width: '100%', height: String(H),
+      viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'xMidYMid meet' });
+    svg.style.display = 'block';
+
+    /* 진입선 — x=0 세로선. "얼마나 벌어졌나" 의 기준이다 */
+    var x0 = px({ x: 0, y: 0 });
+    svg.appendChild(svgEl('line', { x1: x0, y1: 8, x2: x0, y2: H - 8,
+      stroke: THEME.axisText, 'stroke-width': 1, 'stroke-dasharray': '3 5',
+      opacity: 0.45 }));
+
+    pool.forEach(function (l) {
+      svg.appendChild(svgEl('path', { d: d(l.pts), fill: 'none',
+        stroke: THEME.dim, 'stroke-width': 1.2, opacity: 0.32,
+        'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+    });
+
+    var COL_P = THEME.port, COL_S = THEME.stbd;
+    lines.forEach(function (l) {
+      var col = l.m.side === 'P' ? COL_P : l.m.side === 'S' ? COL_S : THEME.accent;
+      svg.appendChild(svgEl('path', { d: d(l.pts), fill: 'none', stroke: col,
+        'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+      /* apex — 제일 느렸던 지점. 모양 위 어디쯤인지가 요점이다 */
+      var apx = null;
+      for (var ai = 0; ai < l.pts.length; ai++) { if (l.pts[ai].apex) { apx = l.pts[ai]; break; } }
+      if (apx) {
+        svg.appendChild(svgEl('circle', { cx: px(apx), cy: py(apx),
+          r: 3.6, fill: col, stroke: THEME.bg || 'none', 'stroke-width': 1.2 }));
+      }
+      /* 진입 끝(가장 이른 점)에 번호 */
+      var head = l.pts[0];
+      var tx = svgEl('text', { x: px(head) + 5, y: py(head) - 4,
+        fill: col, 'font-size': '11' });
+      tx.textContent = '#' + l.no;
+      svg.appendChild(tx);
+    });
+
+    /* 축척 막대 — 미터가 안 적히면 "넓게 돈다" 를 셀 수가 없다 */
+    var barM = [5, 10, 20, 25, 50, 100].filter(function (v) {
+      return v * k >= 40 && v * k <= (W - 2 * M) * 0.5;
+    })[0] || Math.max(5, Math.round((W - 2 * M) / k / 4));
+    var bx = M, by = H - 14, bw = barM * k;
+    svg.appendChild(svgEl('line', { x1: bx, y1: by, x2: bx + bw, y2: by,
+      stroke: THEME.axisText, 'stroke-width': 2 }));
+    var bt = svgEl('text', { x: bx + bw + 6, y: by + 4,
+      fill: THEME.axisText, 'font-size': '11' });
+    bt.textContent = barM + ' m';
+    svg.appendChild(bt);
+
+    hostEl.appendChild(svg);
+    return {
+      poolN: pool.length,
+      lines: lines,
+      widest: lines.slice().sort(function (p, q) {
+        return q.shape.widthM - p.shape.widthM;
+      })[0]
+    };
   }
 
   /* §497 apex 정렬 속도 곡선 — 개별 선 대신 **밴드 + 고른 선** (옥대표)
