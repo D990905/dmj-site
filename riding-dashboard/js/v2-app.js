@@ -1173,6 +1173,7 @@
     /* §514 — 오늘의 제안 **앞에** 둔다. 제안이 이 입력을 쓰기 때문이다. */
     try { renderWellness(host); } catch (e) {}
     renderTodaySuggestion(host, ledger, rp);
+    try { renderHrRecovery(host); } catch (e) {}
     renderLedgerTable(host, ledger);
   }
 
@@ -1748,6 +1749,112 @@
     return box;
   }
 
+    /* §526 T5 목표 강도 밴드 */
+  function renderTargetExertion(body, decision, rp) {
+    if (!window.RDFitness || !decision) return;
+    var band = RDFitness.targetBand(decision.action, rp && rp.maxHr, rp && rp.restHr);
+    var wrap = el('div', 'mt-2');
+    if (!band.ok) {
+      if (band.reason === 'need_max_hr') {
+        wrap.appendChild(el('div', 'lab',
+          'Enter a measured max heart rate above and this becomes a target '
+          + 'heart-rate band, not just a word.'));
+        body.appendChild(wrap);
+      }
+      /* rest_day 면 밴드를 안 준다 — 목표 심박을 주면 그건 타라는 말이다 */
+      return;
+    }
+    var row = el('div', 'd-flex flex-wrap align-items-baseline gap-3');
+    var v = el('div', 'kpi__val num', band.loBpm + '\u2013' + band.hiBpm);
+    v.style.color = THEME.accent;
+    row.appendChild(v);
+    row.appendChild(el('div', 'lab', 'bpm \u00b7 ' + band.label + ' \u00b7 '
+      + Math.round(band.loPct * 100) + '\u2013' + Math.round(band.hiPct * 100)
+      + '% ' + (band.method === 'karvonen' ? 'of heart-rate reserve'
+                                           : 'of max heart rate')));
+    wrap.appendChild(row);
+    if (band.method !== 'karvonen') {
+      wrap.appendChild(el('div', 'lab',
+        'Add your resting heart rate above for a sharper band \u2014 with it the '
+        + 'percentages are taken off your reserve, which matters when your '
+        + 'resting rate is low.'));
+    }
+    /* 오늘 이미 탔으면 지켰는지 보여 준다 — 처방과 실행을 잇는다 */
+    if (CUR.session && CUR.session.samples) {
+      var comp = RDFitness.bandCompliance(CUR.session.samples, band);
+      if (comp && comp.totalSec > 60) {
+        var line = el('div', 'lab mt-1');
+        line.textContent = 'The session loaded above spent '
+          + Math.round(comp.inPct) + '% of its heart-rate time in this band ('
+          + Math.round(comp.belowSec / 60) + ' min under, '
+          + Math.round(comp.aboveSec / 60) + ' min over).';
+        wrap.appendChild(line);
+      }
+    }
+    body.appendChild(wrap);
+  }
+
+  /* §526 T4 심박 회복 — 힘든 뒤 심박이 얼마나 빨리 떨어지나.
+     ⚠ 진단이 아니다. 같은 사람의 **추세**로만 뜻이 있다. */
+  function renderHrRecovery(host) {
+    if (!window.RDFitness || !CUR.session) return;
+    var S = CUR.session.samples || [];
+    var h = RDFitness.hrRecovery(S, { peakMinBpm: 130, windowSec: 60 });
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Heart-rate recovery'));
+    head.appendChild(el('div', 'card-actions lab', 'drop 60 s after a hard patch'));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+
+    if (!h.ok) {
+      var why;
+      if (h.reason === 'no_hr') {
+        why = 'This session has no heart-rate data.';
+      } else if (h.reason === 'never_hard_enough') {
+        why = 'Your heart rate never reached 130 bpm this session (peak '
+          + Math.round(h.maxHrSeen) + '), so there is no hard patch to recover from.';
+      } else if (h.reason === 'no_clean_recovery') {
+        why = 'The recording stops within a minute of the last hard patch, so '
+          + 'there is nothing to measure the drop against. Leaving the watch '
+          + 'running for a minute after you come in is all it takes.';
+      } else {
+        why = 'Not enough data.';
+      }
+      body.appendChild(el('div', 'text-secondary', why));
+      card.appendChild(body); host.appendChild(card);
+      return;
+    }
+
+    var bandInfo = RDFitness.hrrBand(h.bestDropBpm);
+    var row = el('div', 'd-flex flex-wrap align-items-baseline gap-3');
+    var v = el('div', 'kpi__val num', '\u2212' + Math.round(h.bestDropBpm));
+    v.style.color = THEME.accent;
+    row.appendChild(v);
+    row.appendChild(el('div', 'lab', 'bpm in 60 s \u00b7 ' + bandInfo.label
+      + ' \u00b7 ' + Math.round(h.bestPeakBpm) + ' \u2192 '
+      + Math.round(h.bestEndBpm) + ' bpm'));
+    body.appendChild(row);
+    if (h.count > 1) {
+      body.appendChild(el('div', 'lab mt-1',
+        'Best of ' + h.count + ' recoveries this session \u00b7 average \u2212'
+        + Math.round(h.avgDropBpm) + ' bpm.'));
+    }
+    var note = el('div', 'text-secondary mt-2');
+    note.style.fontSize = '.8125rem';
+    note.textContent = 'How fast your heart rate falls after effort tracks aerobic '
+      + 'fitness and how well you are recovering. Read it as your own trend, not '
+      + 'against anyone else: conditions on the water are never the same twice, so '
+      + 'a single session says little and a run of sessions says a lot. This is '
+      + 'not a medical measure \u2014 a clinical test is done on a treadmill under '
+      + 'controlled load, and this is not that.';
+    body.appendChild(note);
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+
   /* 오늘의 제안 — 회복 상태 판정 + 부족분을 채울 육상 운동 */
   function renderTodaySuggestion(host, ledger, rp) {
     if (!window.RDCoach || !RDCoach.decideRecoveryAction) return;
@@ -1813,7 +1920,12 @@
     box.appendChild(el('div', 'mt-1', act.body));
     body.appendChild(box);
 
-    /* §514 — 몇 개의 신호로 판정했는지, 그리고 **빠진 것은 왜 빠졌는지**.
+    /* §526 T5 — 판정을 **심박 밴드**로 옮긴다. "적당히 타세요" 는 실행할
+       수 없고 "128~149 bpm" 은 실행할 수 있다. Athlytic 벤치마킹의
+       Target Exertion 에 대응하는 자리다. */
+    try { renderTargetExertion(body, decision, rp); } catch (e) {}
+
+  /* §514 — 몇 개의 신호로 판정했는지, 그리고 **빠진 것은 왜 빠졌는지**.
        이걸 안 적으면 두 신호로 내린 판정과 네 신호로 내린 판정이 화면에서
        똑같아 보인다. 판정 규칙이 '빨강 2개 이상이면 휴식' 이라 세는 개수가
        곧 신뢰도다. */
