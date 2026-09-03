@@ -278,6 +278,34 @@ document.addEventListener('DOMContentLoaded', function () {
     window.location.replace(nextDest);
     return;
   }
+
+
+  var form = document.getElementById('login-form');
+  var err = document.getElementById('auth-error');
+  if (!form) return;
+  /* §527 — 소셜 로그인 버튼 배선 */
+  var sso = document.getElementById('auth-sso');
+  var ssoNote = document.getElementById('auth-sso-note');
+  if (sso && window.DMJAuth && window.DMJAuth.signInWithProvider) {
+    sso.addEventListener('click', async function (ev) {
+      var b = ev.target.closest('[data-provider]');
+      if (!b) return;
+      var name = b.getAttribute('data-provider');
+      var was = b.textContent;
+      b.disabled = true; b.textContent = '이동 중…';
+      if (ssoNote) ssoNote.textContent = '';
+      try {
+        await window.DMJAuth.signInWithProvider(name, { redirectTo: nextUrl() });
+        /* 성공하면 브라우저가 제공자 페이지로 떠나므로 여기 아래는 안 온다 */
+      } catch (err) {
+        b.disabled = false; b.textContent = was;
+        if (ssoNote) {
+          ssoNote.textContent = (err && err.message) ? err.message : '로그인에 실패했습니다.';
+        }
+      }
+    });
+  }
+
   /* §529 — 켜진 제공자만 눌리게. 눌러 봐야 아는 것보다 낫다.
      그리고 OAuth 는 **돌아올 때** 에러가 URL 로 온다(?error=...&error_description=...)
      — 그걸 안 읽으면 로그인 실패가 조용히 사라진다. */
@@ -307,32 +335,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }).catch(function () {});
   })();
-
-  var form = document.getElementById('login-form');
-  var err = document.getElementById('auth-error');
-  if (!form) return;
-  /* §527 — 소셜 로그인 버튼 배선 */
-  var sso = document.getElementById('auth-sso');
-  var ssoNote = document.getElementById('auth-sso-note');
-  if (sso && window.DMJAuth && window.DMJAuth.signInWithProvider) {
-    sso.addEventListener('click', async function (ev) {
-      var b = ev.target.closest('[data-provider]');
-      if (!b) return;
-      var name = b.getAttribute('data-provider');
-      var was = b.textContent;
-      b.disabled = true; b.textContent = '이동 중…';
-      if (ssoNote) ssoNote.textContent = '';
-      try {
-        await window.DMJAuth.signInWithProvider(name, { redirectTo: nextUrl() });
-        /* 성공하면 브라우저가 제공자 페이지로 떠나므로 여기 아래는 안 온다 */
-      } catch (err) {
-        b.disabled = false; b.textContent = was;
-        if (ssoNote) {
-          ssoNote.textContent = (err && err.message) ? err.message : '로그인에 실패했습니다.';
-        }
-      }
-    });
-  }
 
   function nextUrl() {
     try {

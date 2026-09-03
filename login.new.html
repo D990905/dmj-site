@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko" data-dmj-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로그인 — 단무지공방</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/dmj-ui.css?v=530">
+<style>
+  /* 인증 화면은 한 장짜리라 폭을 좁힌다 — 넓으면 폼이 허공에 뜬다 */
+  .auth { max-width: 420px; margin: 0 auto; }
+  .auth-sso { display: grid; gap: var(--sp-2); margin-top: var(--sp-4); }
+  .auth-sso button { width: 100%; }
+  .auth-sep { display: flex; align-items: center; gap: var(--sp-3); margin: var(--sp-4) 0; color: var(--t-dim); font-size: 13px; }
+  .auth-sep::before, .auth-sep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .badge-soon { font-family: var(--font-mono); font-size: 11px; color: var(--t-dim); margin-left: 6px; }
+  .auth-error { background: color-mix(in srgb, var(--bad) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bad) 40%, transparent);
+    color: var(--t-main); padding: var(--sp-3); border-radius: var(--radius); margin-bottom: var(--sp-3); font-size: 14px; }
+  .auth-links { display: flex; justify-content: space-between; margin-top: var(--sp-3); font-size: 14px; }
+  .auth-sso-note { color: var(--warn); font-size: 13px; margin-top: var(--sp-3); }
+</style>
+</head>
+<body class="dmj">
+
+<!--#nav:begin-->
+<!-- §530 공통 헤더 — 모든 페이지가 이걸 쓴다. 페이지마다 다른 헤더가
+     "짜깁기" 느낌의 가장 큰 원인이었다. -->
+<header class="nav">
+  <div class="wrap nav__in">
+    <a class="nav__brand" href="index.html">단무지공방 <span class="lab">DMJ</span></a>
+    <button class="btn btn--ghost nav__toggle" type="button" aria-expanded="false"
+            aria-controls="nav-links" aria-label="메뉴 열기">☰</button>
+    <nav class="nav__links" id="nav-links">
+      <a class="nav__link" href="find-my-gear.html">장비 찾기</a>
+      <a class="nav__link" href="skill-assessment.html">레벨 검사</a>
+      <a class="nav__link" href="consult.html">컨설팅</a>
+      <a class="nav__link" href="riding-dashboard/v2.html">라이딩 분석</a>
+      <a class="nav__link" href="coach.html">대니 코치</a>
+      <a class="nav__link" href="about.html">소개</a>
+      <a class="btn btn--primary" href="login.html" id="nav-auth-cta">로그인</a>
+    </nav>
+  </div>
+</header>
+<!--#nav:end-->
+
+<section class="section">
+  <div class="wrap">
+    <div class="auth">
+      <div class="section__head center">
+        <h1>다시 오셨네요</h1>
+        <p class="t-lead">로그인하면 라이딩 기록이 계정에 묶여 다른 기기에서도 보입니다.</p>
+      </div>
+
+      <div class="card">
+        <div class="card__body">
+          <div id="auth-error" class="auth-error" role="alert" hidden></div>
+          <form id="login-form" autocomplete="on" novalidate>
+            <div class="field">
+              <label class="field__label" for="lg-email">이메일</label>
+              <input class="input" id="lg-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            </div>
+            <div class="field">
+              <label class="field__label" for="lg-pw">비밀번호</label>
+              <input class="input" id="lg-pw" type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button class="btn btn--primary btn--block" type="submit">로그인</button>
+            <div class="auth-links">
+              <a href="signup.html">회원가입</a>
+              <a href="password-reset.html">비밀번호 찾기</a>
+            </div>
+
+            <div class="auth-sep">또는</div>
+            <div class="auth-sso" id="auth-sso">
+              <button class="btn" type="button" data-provider="kakao">카카오로 계속</button>
+              <button class="btn" type="button" data-provider="google">Google 로 계속</button>
+              <button class="btn" type="button" data-provider="apple">Apple 로 계속</button>
+              <button class="btn" type="button" data-provider="naver">네이버로 계속</button>
+            </div>
+            <p class="auth-sso-note" id="auth-sso-note"></p>
+          </form>
+        </div>
+      </div>
+
+      <p class="lab center mt-4">
+        로그인하지 않아도 라이딩 분석은 쓸 수 있습니다 — 다만 이 브라우저에만 남습니다.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!--#foot:begin-->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <div class="nav__brand">단무지공방</div>
+        <p class="t-dim mt-2" style="max-width:38ch">
+          단순하고 무식하게, 그러나 지혜롭게. 윙포일 장비를 파는 곳이 아니라
+          라이딩을 컨설팅하는 곳입니다.
+        </p>
+      </div>
+      <div>
+        <div class="lab mb-3">시작하기</div>
+        <a href="find-my-gear.html">장비 찾기</a>
+        <a href="skill-assessment.html">레벨 검사</a>
+        <a href="consult.html">컨설팅 신청</a>
+        <a href="coach.html">대니 코치에게 묻기</a>
+      </div>
+      <div>
+        <div class="lab mb-3">분석</div>
+        <a href="riding-dashboard/v2.html">라이딩 대시보드</a>
+        <a href="calculator.html">셋업 계산기</a>
+        <a href="glossary.html">용어집</a>
+        <a href="about.html">소개</a>
+      </div>
+    </div>
+    <div class="foot__legal">
+      © 단무지공방 · <a href="policies.html">이용약관 · 개인정보처리방침</a>
+    </div>
+  </div>
+</footer>
+<script>
+/* §530 — 모바일 메뉴 + 로그인 상태. 두 줄이면 되는 걸 페이지마다
+   다르게 써 놔서 동작이 제각각이었다. 여기 하나로 통일한다. */
+(function () {
+  var t = document.querySelector('.nav__toggle');
+  var l = document.getElementById('nav-links');
+  if (t && l) t.addEventListener('click', function () {
+    var open = l.classList.toggle('is-open');
+    t.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  /* 현재 페이지 표시 */
+  var here = location.pathname.split('/').pop() || 'index.html';
+  Array.prototype.forEach.call(document.querySelectorAll('.nav__link'), function (a) {
+    if (a.getAttribute('href') === here) a.setAttribute('aria-current', 'page');
+  });
+  /* 로그인 상태 — DMJAuth 가 있으면 CTA 를 바꾼다 */
+  function syncAuth() {
+    var cta = document.getElementById('nav-auth-cta');
+    if (!cta || !window.DMJAuth || !window.DMJAuth.isLoggedIn) return;
+    if (window.DMJAuth.isLoggedIn()) {
+      var u = window.DMJAuth.currentUser() || {};
+      cta.textContent = (u.name || u.email || '내 정보');
+      cta.href = 'profile.html';
+    }
+  }
+  syncAuth();
+  window.addEventListener('dmj-auth-change', syncAuth);
+})();
+</script>
+<!--#foot:end-->
+<script src="assets/js/supabase-auth.js?v=v530"></script>
+<script>
+// §169 Day 1B — login submit handler (localStorage sprint shim)
+// §171-B 보완 — ?redirect=cart.html 등 쿼리 파라미터 지원 (whitelist: cart.html/quote.html/profile.html).
+document.addEventListener('DOMContentLoaded', function () {
+  // Safe redirect: 같은 도메인 내 경로만 허용 (open redirect 방지).
+  function getSafeRedirect() {
+    try {
+      var u = new URL(window.location.href);
+      var r = u.searchParams.get('redirect');
+      if (!r) return null;
+      // Reject absolute URLs and protocol-relative ones.
+      if (/^(https?:|\/\/)/i.test(r)) return null;
+      // Whitelist common destinations.
+      var allow = ['cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
+      if (allow.indexOf(r) >= 0) return r;
+      return null;
+    } catch (e) { return null; }
+  }
+  var nextDest = getSafeRedirect() || 'profile.html';
+
+  // 이미 로그인 상태면 redirect/profile 로
+  if (window.DMJAuth && window.DMJAuth.isLoggedIn()) {
+    window.location.replace(nextDest);
+    return;
+  }
+
+
+  var form = document.getElementById('login-form');
+  var err = document.getElementById('auth-error');
+  if (!form) return;
+  /* §527 — 소셜 로그인 버튼 배선 */
+  var sso = document.getElementById('auth-sso');
+  var ssoNote = document.getElementById('auth-sso-note');
+  if (sso && window.DMJAuth && window.DMJAuth.signInWithProvider) {
+    sso.addEventListener('click', async function (ev) {
+      var b = ev.target.closest('[data-provider]');
+      if (!b) return;
+      var name = b.getAttribute('data-provider');
+      var was = b.textContent;
+      b.disabled = true; b.textContent = '이동 중…';
+      if (ssoNote) ssoNote.textContent = '';
+      try {
+        await window.DMJAuth.signInWithProvider(name, { redirectTo: nextUrl() });
+        /* 성공하면 브라우저가 제공자 페이지로 떠나므로 여기 아래는 안 온다 */
+      } catch (err) {
+        b.disabled = false; b.textContent = was;
+        if (ssoNote) {
+          ssoNote.textContent = (err && err.message) ? err.message : '로그인에 실패했습니다.';
+        }
+      }
+    });
+  }
+
+  /* §529 — 켜진 제공자만 눌리게. 눌러 봐야 아는 것보다 낫다.
+     그리고 OAuth 는 **돌아올 때** 에러가 URL 로 온다(?error=...&error_description=...)
+     — 그걸 안 읽으면 로그인 실패가 조용히 사라진다. */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      var hash = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+      var err = q.get('error_description') || q.get('error')
+             || hash.get('error_description') || hash.get('error');
+      if (err && ssoNote) ssoNote.textContent = decodeURIComponent(err);
+    } catch (e) {}
+    if (!sso || !window.DMJAuth || !window.DMJAuth.enabledProviders) return;
+    window.DMJAuth.enabledProviders().then(function (ext) {
+      if (!ext) return;                 /* 모르면 그대로 둔다 */
+      Array.prototype.forEach.call(sso.querySelectorAll('[data-provider]'), function (b) {
+        var name = b.getAttribute('data-provider');
+        if (ext[name]) return;
+        b.disabled = true;
+        b.style.opacity = '.5';
+        b.title = name === 'naver'
+          ? '네이버는 Supabase 기본 제공자가 아닙니다 (커스텀 OIDC 필요)'
+          : '아직 켜지지 않았습니다 (Supabase 대시보드에서 활성화 필요)';
+        var tag = document.createElement('span');
+        tag.className = 'badge-soon';
+        tag.textContent = '준비 중';
+        b.appendChild(tag);
+      });
+    }).catch(function () {});
+  })();
+
+  function nextUrl() {
+    try {
+      var q = new URLSearchParams(location.search).get('next');
+      if (q && /^\/[^/]/.test(q)) return location.origin + q;
+    } catch (e) {}
+    return location.origin + '/profile.html';
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    err.hidden = true; err.textContent = '';
+    var data = new FormData(form);
+    var email = String(data.get('email') || '');
+    var password = String(data.get('password') || '');
+    try {
+      await window.DMJAuth.login(email, password);
+      window.location.assign(nextDest);
+    } catch (ex) {
+      err.textContent = ex.message || '로그인에 실패했습니다.';
+      err.hidden = false;
+    }
+  });
+});
+</script>
+</body>
+</html>
