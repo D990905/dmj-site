@@ -195,6 +195,17 @@
 
   /* SPS 카드 — 산출 불가 사유를 숨기지 않는다. "—" 만 띄우면
      무엇을 더 넣어야 하는지 알 수 없다. */
+  /* §519 (옥대표 "구간을 지웠는데 적용이 안 되는 것 같다") — 실제로는
+     적용된다. 실측(데모 세션, 정지 16구간 1:11:03 제외):
+       점 2950→2291 · 거리 18.44→16.99km · 평균 11.6→12.5kt ·
+       포일링 비중 33%→61% · 주행시간 51:36→44:03  ← 전부 움직인다
+       Performance score 50→51                      ← 이것만 안 움직인다
+     버그가 아니라 **구조**다. 두 항목 다 느린 시간에 둔감하게 설계돼 있다:
+       · 회전 점수 = 각 회전의 품질 → 정지 구간을 빼도 같은 회전들이다
+       · 속도 점수 = 풍상 VMG **상위 20%** 기준 → 느린 시간을 빼도
+         상위 20% 는 거의 그대로다 (백로그 §409 가 이 얘기다)
+     문제는 침묵이다. 71분을 지웠는데 큰 숫자가 그대로면 고장으로 읽는다.
+     그래서 편집이 걸려 있을 때는 이 점수가 왜 안 움직이는지 적는다. */
   function spsCard(vps) {
     var col = el('div', 'col-6 col-md-4 col-xl-2');
     var card = el('div', 'card'), b = el('div', 'card-body');
@@ -413,10 +424,25 @@
     hint.style.fontSize = '.8125rem';
     hint.textContent = ranges.length
       ? ranges.length + ' segment' + (ranges.length > 1 ? 's' : '') + ' excluded — '
-        + 'distance, speed and turn analysis are recomputed without them.'
+        + 'everything below is recomputed without them: distance, average speed, '
+        + 'foiling share, turns, the map and the timeline.'
       : 'Drag across any panel to select a range \u2014 the averages for that '
         + 'stretch appear under the chart, with the option to exclude it.';
     host.appendChild(hint);
+    /* §519 — 그런데 **Performance score 는 거의 안 움직인다.** 그걸 말하지
+       않으면, 정지 구간을 한참 지운 뒤 큰 숫자가 그대로인 걸 보고
+       "적용이 안 됐다" 로 읽는다(옥대표가 실제로 그렇게 읽었다).
+       버그가 아니라 구조다 — 두 항목 다 느린 시간에 둔감하게 설계됐다.
+       실측: 정지 16구간 1:11:03 을 빼도 50 → 51. */
+    if (ranges.length) {
+      var caveat = el('div', 'text-secondary mt-1');
+      caveat.style.cssText = 'font-size:.8125rem;opacity:.9';
+      caveat.textContent = 'The performance score barely moves, and that is '
+        + 'expected \u2014 its turn half scores each turn (the same turns either '
+        + 'way) and its speed half is anchored on your best 20% upwind VMG, '
+        + 'which the slow time was never part of.';
+      host.appendChild(caveat);
+    }
     if (!ranges.length) return;
     var t0 = CUR.fullSession ? CUR.fullSession.samples[0].t : 0;
     var list = el('div', 'd-flex flex-wrap gap-2 mt-2 align-items-center');
@@ -3763,6 +3789,41 @@
       TURNFILT.type, function (v) { TURNFILT.type = v; renderTurnExtras(a); }));
     act2.appendChild(filtSel([['all', 'Both tacks'], ['P', 'Port'], ['S', 'Starboard']],
       TURNFILT.side, function (v) { TURNFILT.side = v; renderTurnExtras(a); }));
+    /* §518 (옥대표 "모두 한번에 선택하는 기능") — 지금 **걸린 필터에
+       보이는 것 전부**를 고른다. 전체가 아니라 보이는 것이라야 뜻이
+       있다: 'Gybes · Port 27개' 를 골라 밴드와 궤적을 한 번에 보는 게
+       목적이지, 안 보이는 38개까지 섞는 건 목적이 아니다.
+       이미 다 골라져 있으면 같은 버튼이 해제로 바뀐다 — 버튼 두 개를
+       두면 둘 중 어느 게 지금 상태인지 매번 읽어야 한다. */
+    var viewIdx = view.map(function (d) { return d.i; });
+    var allPicked = viewIdx.length > 0 && viewIdx.every(function (i) {
+      return TURNSEL.indexOf(i) >= 0;
+    });
+    if (viewIdx.length) {
+      var selAll = el('button', 'btn btn-sm '
+        + (allPicked ? 'btn-primary' : 'btn-outline-secondary'),
+        allPicked ? 'Clear ' + viewIdx.length : 'Select all ' + viewIdx.length);
+      selAll.type = 'button';
+      selAll.title = allPicked
+        ? 'Deselect these ' + viewIdx.length + ' turns'
+        : 'Select every turn the current filter shows';
+      selAll.addEventListener('click', function () {
+        if (allPicked) {
+          /* 보이는 것만 뺀다 — 필터 밖에서 고른 것은 건드리지 않는다.
+             ⚠ 재할당하지 않고 제자리에서 지운다. TURNSEL 은 다른 곳에서
+             .length=0 · .push 로 **같은 배열을 계속 쓰는** 전제다. */
+          var keep = TURNSEL.filter(function (i) { return viewIdx.indexOf(i) < 0; });
+          TURNSEL.length = 0;
+          keep.forEach(function (i) { TURNSEL.push(i); });
+        } else {
+          viewIdx.forEach(function (i) {
+            if (TURNSEL.indexOf(i) < 0) TURNSEL.push(i);
+          });
+        }
+        renderTurnExtras(a);
+      });
+      act2.appendChild(selAll);
+    }
     act2.appendChild(el('span', 'lab',
       view.length === mans.length
         ? (mans.length + ' detected')
