@@ -1039,15 +1039,20 @@
     var footP = el('div', 'card-footer text-secondary');
     footP.style.fontSize = '.8125rem';
     footP.textContent = 'Red = port tack, green = starboard — the international convention. '
-      + 'Up is upwind. A dent on one side means that tack is losing speed.';
+      + 'Up is upwind. The solid line is your best 5% at that angle, the shaded '
+      + 'band down to your usual speed \u2014 a wide band means an inconsistent '
+      + 'angle. Angles with fewer than 5 samples are left blank rather than drawn '
+      + 'at zero. A dent on one side means that tack is losing speed.';
     cardP.appendChild(footP);
     colP.appendChild(cardP); grid.appendChild(colP);
     host.appendChild(grid);
 
     if (window.RDPolar) {
       RDPolar.render(polarHost, a.polar,
-        { grid: THEME.grid, dim: THEME.dim, port: '#e03131', starboard: '#2f9e44',
-          size: Math.min(400, polarHost.clientWidth || 380) });
+        { grid: THEME.grid, dim: THEME.dim, port: THEME.port, starboard: THEME.stbd,
+          size: Math.min(400, polarHost.clientWidth || 380),
+          band: true, minN: 5 });
+      renderOptimalAngles(cardP, a);
     }
 
     renderPolarGrid(host, a);
@@ -4840,6 +4845,98 @@
     w.appendChild(sideDot(side));
     w.appendChild(document.createTextNode(label));
     return w;
+  }
+
+  /* §521 최적 각도 — Waterspeed 의 OPTIMAL TARGET ANGLES 를 우리 규칙으로.
+     ⚠ **지표가 방향에 따라 다르다**(그들도 그렇게 한다, IMG_1518 vs 1531):
+       · 풍상 = VMG 최대각. 각도를 팔아 높이를 사는 게임이라 VMG 가 목적함수다.
+       · 풍하 = 그 각의 **속도**가 기준. 포일에서는 깊이보다 속도를 지키는
+         게 먼저고, 깊게 갈수록 VMG 가 커 보이는 착시가 생긴다.
+     한 지표로 통일하면 둘 중 하나는 **틀린 것을 최적화**하게 된다.
+
+     그리고 못 낼 때는 숫자 대신 **왜 못 내는지**를 적는다 — 그들이
+     "풍하 최적각 173°" 를 낸 자리가 정확히 이 검산이 없는 자리다. */
+  function renderOptimalAngles(card, a) {
+    if (!window.RDPolar || !RDPolar.optimalAngle || !a || !a.polar) return;
+    var bins = a.polar.combined || a.polar.starboard;
+    if (!bins || !bins.length) return;
+    var up = RDPolar.optimalAngle(bins, 'upwind', 5);
+    var dn = RDPolar.optimalAngle(bins, 'downwind', 5);
+    if (!up.ok && !dn.ok && up.reason === 'no_data' && dn.reason === 'no_data') return;
+
+    var body = el('div', 'card-body border-top pt-3');
+    var head = el('div', 'd-flex align-items-baseline justify-content-between');
+    head.appendChild(el('div', 'fw-bold', 'Best angles you actually sailed'));
+    head.appendChild(el('div', 'lab', 'from this session, not a boat polar'));
+    body.appendChild(head);
+
+    var row = el('div', 'row g-3 mt-1');
+    function why(r) {
+      if (r.reason === 'need_more_samples') {
+        return 'No angle has ' + (r.need || 5) + ' or more samples here yet.';
+      }
+      if (r.reason === 'only_implausible_deep') {
+        return 'Every downwind angle with enough samples is deeper than 165\u00b0, '
+          + 'which a foil cannot actually be fastest at \u2014 the wind direction '
+          + 'is probably off. Check it on the Environment tab.';
+      }
+      if (r.reason === 'only_implausible_high') {
+        return 'Every upwind angle with enough samples is closer than 30\u00b0 to '
+          + 'the wind, which nothing points \u2014 the wind direction is probably '
+          + 'off. Check it on the Environment tab.';
+      }
+      return 'Not enough sailing at these angles.';
+    }
+    function cell(title, r, mode) {
+      var c = el('div', 'col-6');
+      var box = el('div', 'p-2 rounded');
+      box.style.background = currentThemeName() === 'light'
+        ? 'rgba(13,110,253,.05)' : 'rgba(77,171,247,.07)';
+      box.appendChild(el('div', 'lab', title));
+      if (!r.ok) {
+        box.appendChild(el('div', 'mt-1 text-secondary', why(r)));
+        c.appendChild(box); return c;
+      }
+      var v = el('div', 'kpi__val num mt-1', Math.round(r.twaDeg) + '\u00b0');
+      v.style.color = mode === 'upwind' ? THEME.stbd : THEME.warn;
+      box.appendChild(v);
+      /* 방향에 따라 무엇이 기준인지 **화면이 말한다** */
+      box.appendChild(el('div', 'lab mt-1', mode === 'upwind'
+        ? 'best VMG ' + r.vmgKt.toFixed(1) + ' kt  (at ' + r.speedKt.toFixed(1) + ' kt)'
+        : 'fastest ' + r.speedKt.toFixed(1) + ' kt  (VMG ' + r.vmgKt.toFixed(1) + ' kt)'));
+      box.appendChild(el('div', 'lab', r.count + ' samples'));
+      if (r.atEdge) {
+        var w = el('div', 'lab mt-1');
+        w.style.color = THEME.warn;
+        w.textContent = 'This is the edge of what you sailed \u2014 the real best '
+          + 'may be beyond it.';
+        box.appendChild(w);
+      }
+      /* 뺀 게 있으면 말한다 — 그 표본이 많다는 건 대개 풍향이 틀렸다는 신호다 */
+      if (r.excluded) {
+        var x = el('div', 'lab mt-1');
+        x.style.color = THEME.warn;
+        x.textContent = r.excluded.samples + ' samples at '
+          + Math.round(r.excluded.extremeTwa) + '\u00b0 were left out as '
+          + (mode === 'upwind' ? 'impossibly high' : 'impossibly deep')
+          + ' \u2014 if that is a lot, the wind direction is off.';
+        box.appendChild(x);
+      }
+      c.appendChild(box); return c;
+    }
+    row.appendChild(cell('Upwind', up, 'upwind'));
+    row.appendChild(cell('Downwind', dn, 'downwind'));
+    body.appendChild(row);
+
+    var note = el('div', 'text-secondary mt-2');
+    note.style.fontSize = '.8125rem';
+    note.textContent = 'Upwind is judged on VMG \u2014 upwind you trade angle for '
+      + 'height, so progress to windward is the goal. Downwind is judged on speed: '
+      + 'on a foil, going deeper looks better on VMG right up until you drop off '
+      + 'the foil, so speed is the honest measure. Both need the wind direction '
+      + 'to be right \u2014 check it on the Environment tab first.';
+    body.appendChild(note);
+    card.appendChild(body);
   }
 
   var TRACKPLOT = { mirror: false, pad: 10 };
