@@ -4860,8 +4860,11 @@
     if (!window.RDPolar || !RDPolar.optimalAngle || !a || !a.polar) return;
     var bins = a.polar.combined || a.polar.starboard;
     if (!bins || !bins.length) return;
-    var up = RDPolar.optimalAngle(bins, 'upwind', 5);
-    var dn = RDPolar.optimalAngle(bins, 'downwind', 5);
+    /* ⚠ minN 을 넘기지 않는다. 넘기면 그리기 기준(5)이 최적 각도에도
+       적용돼 13표본짜리 빈이 '최적' 으로 뽑힌다(실측). 최적은 하나의
+       숫자로 단언하는 것이라 더 두꺼운 근거(OPT_MIN_N=15)를 써야 한다. */
+    var up = RDPolar.optimalAngle(bins, 'upwind');
+    var dn = RDPolar.optimalAngle(bins, 'downwind');
     if (!up.ok && !dn.ok && up.reason === 'no_data' && dn.reason === 'no_data') return;
 
     var body = el('div', 'card-body border-top pt-3');
@@ -4875,11 +4878,6 @@
       if (r.reason === 'need_more_samples') {
         return 'No angle has ' + (r.need || 5) + ' or more samples here yet.';
       }
-      if (r.reason === 'only_implausible_deep') {
-        return 'Every downwind angle with enough samples is deeper than 165\u00b0, '
-          + 'which a foil cannot actually be fastest at \u2014 the wind direction '
-          + 'is probably off. Check it on the Environment tab.';
-      }
       if (r.reason === 'only_implausible_high') {
         return 'Every upwind angle with enough samples is closer than 30\u00b0 to '
           + 'the wind, which nothing points \u2014 the wind direction is probably '
@@ -4887,7 +4885,7 @@
       }
       return 'Not enough sailing at these angles.';
     }
-    function cell(title, r, mode) {
+    function cell(title, r, mode, a) {
       var c = el('div', 'col-6');
       var box = el('div', 'p-2 rounded');
       box.style.background = currentThemeName() === 'light'
@@ -4912,20 +4910,63 @@
           + 'may be beyond it.';
         box.appendChild(w);
       }
-      /* 뺀 게 있으면 말한다 — 그 표본이 많다는 건 대개 풍향이 틀렸다는 신호다 */
-      if (r.excluded) {
-        var x = el('div', 'lab mt-1');
-        x.style.color = THEME.warn;
-        x.textContent = r.excluded.samples + ' samples at '
-          + Math.round(r.excluded.extremeTwa) + '\u00b0 were left out as '
-          + (mode === 'upwind' ? 'impossibly high' : 'impossibly deep')
-          + ' \u2014 if that is a lot, the wind direction is off.';
-        box.appendChild(x);
+      /* 깊은 각 — 숨기지 않고 **두 해석을 같이** 준다.
+         옥대표: "파도가 커서 풍하 런으로 달린 구간들도 꽤 있었을거야."
+         맞다. 스웰을 타면 데드다운윈드 근처가 실제로 제일 빠르다. */
+      if (r.deep) {
+        var dp = el('div', 'lab mt-1');
+        dp.textContent = 'That is very deep. With swell running it is real \u2014 '
+          + 'the wave is pushing, not the wing. With flat water it usually means '
+          + 'the wind direction is off. ' + r.count + ' samples here, so '
+          + (r.count >= 60 ? 'this is not a stray reading.'
+                           : 'it is worth a second look.');
+        box.appendChild(dp);
+      }
+      /* ★ 극단 각도는 숨기지도 단정하지도 않는다 — **얼마나 붙잡았는지**를
+         잰다. 각도 값은 가능·불가능을 못 가른다(파도가 판을 바꾼다).
+         못 버티는 각도는 지나간 게 사실이어도 타깃이 아니다. */
+      if (r.extreme) {
+        var hold = null;
+        try {
+          hold = RDSegments.longestStretchAtTwa(
+            (CUR.session && CUR.session.samples) || [], a.windDir,
+            r.twaDeg, (a.polar && a.polar.binDeg) || 7.5, 1.5);
+        } catch (e) {}
+        var dp = el('div', 'lab mt-1');
+        if (hold && hold.stretches) {
+          var held = hold.longestSec;
+          /* 최장 길이만 보면 안 된다. 8초를 세 번 = 총 11초는 90분 세션에서
+             0.2% 다 — 그걸 '라인' 이라고 부르면 안 된다(실측에서 그렇게
+             불렀다). **버틴 길이와 전체 비중을 같이** 본다. */
+          var rideSec = (a && a.summary && a.summary.activeTimeSec)
+            || (a && a.summary && a.summary.movingTimeSec) || 0;
+          var share = rideSec > 0 ? (hold.totalSec / rideSec) * 100 : null;
+          var momentary = (held < 5) || (share != null && share < 2);
+          if (momentary) dp.style.color = THEME.warn;
+          dp.textContent = (r.extreme === 'high' ? 'That is very high. '
+                                                 : 'That is very deep. ')
+            + 'Longest hold ' + held.toFixed(1) + ' s, '
+            + hold.stretches + ' bursts, ' + Math.round(hold.totalSec) + ' s total'
+            + (share != null ? ' (' + share.toFixed(1) + '% of your riding)' : '')
+            + '. '
+            + (momentary
+                ? 'That reads as momentary \u2014 riding up or down a wave face, '
+                  + 'not an angle you can hold. Something that happened, not a '
+                  + 'target to aim for.'
+                : 'Held long enough and often enough to be a real line \u2014 with '
+                  + 'swell running, that is genuine.');
+        } else {
+          dp.textContent = (r.extreme === 'high' ? 'That is very high'
+                                                 : 'That is very deep')
+            + ' for a foil. With swell it can be real; on flat water it usually '
+            + 'means the wind direction is off.';
+        }
+        box.appendChild(dp);
       }
       c.appendChild(box); return c;
     }
-    row.appendChild(cell('Upwind', up, 'upwind'));
-    row.appendChild(cell('Downwind', dn, 'downwind'));
+    row.appendChild(cell('Upwind', up, 'upwind', a));
+    row.appendChild(cell('Downwind', dn, 'downwind', a));
     body.appendChild(row);
 
     var note = el('div', 'text-secondary mt-2');
@@ -5186,7 +5227,7 @@
     if (!window.RDPolar || !RDPolar.optimalAngle) return;
     var bins = a.polar.combined;
     if (!bins || !bins.length) return;
-    var best = RDPolar.optimalAngle(bins, st.direction, 5);
+    var best = RDPolar.optimalAngle(bins, st.direction);
     if (!best.ok) return;
 
     /* 표본이 얇으면 **비교 자체를 하지 않는다.** 4표본짜리 레그에

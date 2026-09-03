@@ -105,6 +105,40 @@ ok('가장 긴 시간 89초', near(sum.longestSec, 89, 0.5), String(sum.longestS
 ok('가장 긴 거리 1068 m', near(sum.longestM, 89 * 12, 1), String(sum.longestM));
 ok('구간 없으면 0', Sg.foilSummary(S, []).count === 0);
 
+console.log('\n[8b] ★ 그 각도를 얼마나 붙잡았나 (옥대표: "순간적인거였겠지?")');
+/* 각도 값은 가능·불가능을 못 가른다 — 파도가 판을 바꾼다.
+   가르는 것은 지속 시간이다. */
+var Sw = mkS();
+/* 풍향 0 기준: 침로 40 → TWA 40. 중간에 3초만 침로 5(TWA 5)로 튄다 */
+for (var w = 50; w < 53; w++) Sw[w].heading = 5;
+var burst = Sg.longestStretchAtTwa(Sw, 0, 3.75, 7.5, 1.5);
+ok('순간 구간이 잡힌다', burst.stretches === 1, JSON.stringify(burst));
+ok('길이가 2초쯤', near(burst.longestSec, 2, 0.5), String(burst.longestSec));
+
+/* 여러 번 스쳤으면 횟수와 합계가 나온다 */
+var Sm = mkS();
+[10, 11, 30, 31, 60, 61].forEach(function (i) { Sm[i].heading = 5; });
+var many = Sg.longestStretchAtTwa(Sm, 0, 3.75, 7.5, 1.5);
+ok('여러 번이면 여러 구간', many.stretches === 3, String(many.stretches));
+ok('가장 긴 것은 여전히 짧다', many.longestSec <= 2);
+ok('합계는 그보다 크다', many.totalSec > many.longestSec);
+
+/* 오래 붙잡은 각도는 길게 나온다 — 이건 진짜 라인이다 */
+var Sl = mkS();
+for (var q = 0; q < 60; q++) Sl[q].heading = 5;
+var held = Sg.longestStretchAtTwa(Sl, 0, 3.75, 7.5, 1.5);
+ok('오래 붙잡으면 길게 나온다', held.longestSec >= 55, String(held.longestSec));
+
+/* 1초 튀어나갔다 돌아온 것은 한 구간으로 센다 */
+var Sg2 = mkS();
+for (var z = 0; z < 20; z++) Sg2[z].heading = 5;
+Sg2[10].heading = 40;                      /* 1초 이탈 */
+ok('1초 이탈은 이어 붙인다',
+   Sg.longestStretchAtTwa(Sg2, 0, 3.75, 7.5, 1.5).stretches === 1);
+
+ok('없는 각도는 0', Sg.longestStretchAtTwa(Sw, 0, 176.25, 7.5, 1.5).stretches === 0);
+ok('풍향 없으면 null', Sg.longestStretchAtTwa(Sw, null, 3.75, 7.5, 1.5) === null);
+
 console.log('\n[9] build — 다섯 종류가 같은 모양으로 나온다');
 var a = { maneuvers: [
   { type: 'tack', side: 'P', startIdx: 100, endIdx: 110, apexIdx: 105 },

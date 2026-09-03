@@ -34,8 +34,22 @@
      포일이 풍상 4° 로 갈 수는 없다 — 남을 비판한 결함을 반대쪽에
      그대로 두고 있었던 것이다. 윙포일 실제 풍상 TWA 는 40~55° 이고,
      30° 아래는 어떤 장비로도 못 간다(대개 택 중 표본이 섞인 것). */
-  var UPWIND_SANITY_DEG = 30;     /* 이보다 높이 붙을 수 없다 */
-  var DOWNWIND_SANITY_DEG = 165;  /* 이보다 깊으면 포일에서 최적일 수 없다 */
+  /* ⚠⚠ **각도로 거절하지 않는다.** 두 번 틀렸다(옥대표 정정 2026-09-03):
+       1차: 풍하 165° 이상을 '물리적으로 불가' 로 거절 →
+            "파도가 커서 풍하 런으로 달린 구간들도 꽤 있었을거야."
+            맞다. 스웰을 타면 데드다운윈드 근처가 실제로 제일 빠르다.
+       2차: 그래서 풍상만 30° 로 남겼는데 →
+            "풍상도 말도 안되는 각도로 올라갈때도 있엇어."
+            이것도 맞다. 파도 면을 타고 올라가면 순간적으로 아주 높이 붙는다.
+
+     교훈: **각도 값은 가능·불가능을 못 가른다.** 파도가 판을 바꾼다.
+     가르는 것은 **버틴 시간**이다 — 2초 스치고 지나간 각도는 실제로
+     지나갔더라도 '타깃 각도' 가 아니다. 붙잡을 수 없기 때문이다.
+     그래서 여기서는 각도를 안 자르고, 화면이 **얼마나 버텼는지**를
+     같이 보여 주게 한다(RDSegments.longestStretchAtTwa). */
+  var EXTREME_HIGH_DEG = 35;      /* 이보다 높으면 '버텼나' 를 같이 묻는다 */
+  var EXTREME_DEEP_DEG = 150;     /* 이보다 깊으면 마찬가지 */
+  var OPT_MIN_N = 15;             /* 최적 각도는 이만큼은 있어야 고른다 */
 
   function ringsFor(maxKt) {
     var step = maxKt > 24 ? 10 : (maxKt > 12 ? 5 : 2);
@@ -88,16 +102,21 @@
 
   function optimalAngle(bins, mode, minN) {
     if (!bins || !bins.length) return { ok: false, reason: 'no_data' };
-    var need = (minN == null) ? MIN_N : minN;
+    /* 그리는 기준(MIN_N=5)보다 **두껍게** 요구한다. 최적 각도는 하나의
+       숫자로 단언하는 것이라, 다섯 점으로 고른 '최적' 은 최적이 아니다.
+       Waterspeed 의 173° 도 결국 얇은 빈 하나였다 — 막아야 할 것은
+       깊은 각도가 아니라 얇은 근거다. */
+    var need = (minN == null) ? OPT_MIN_N : minN;
 
     /* 물리적으로 말이 안 되는 각은 **후보에서 뺀다**(거절이 아니다).
        처음엔 argmax 가 거기 걸리면 통째로 거절했는데, 그러면 멀쩡한
        답이 있는데도 아무 숫자를 못 준다. 빼고 나머지 중 최선을 주되
        **뺐다는 사실을 같이 넘긴다** — 그 표본이 많다는 건 대개
        풍향 입력이 틀렸다는 신호라서 그것 자체가 정보다. */
+    /* 각도로 거르지 않는다 — 풍상/풍하 범위만 나눈다 */
     function plausible(twa) {
-      if (mode === 'upwind') return twa > UPWIND_SANITY_DEG && twa <= 90;
-      if (mode === 'downwind') return twa >= 90 && twa < DOWNWIND_SANITY_DEG;
+      if (mode === 'upwind') return twa <= 90;
+      if (mode === 'downwind') return twa >= 90;
       return true;
     }
     function inMode(twa) {
@@ -134,9 +153,7 @@
       : null;
     if (!considered) {
       return { ok: false,
-               reason: exBins ? (mode === 'upwind' ? 'only_implausible_high'
-                                                   : 'only_implausible_deep')
-                              : 'need_more_samples',
+               reason: 'need_more_samples',
                need: need, excluded: excluded,
                twaDeg: exTwa };
     }
@@ -152,6 +169,12 @@
     });
     best.atEdge = (best.twaDeg === lo || best.twaDeg === hi);
     best.excluded = excluded;
+    /* 깊은 각이 이겼으면 숨기지 않고 **두 해석을 같이** 내놓는다:
+       파도를 탔으면 진짜, 풍향이 틀렸으면 허상. 표본 수가 그 둘을 가른다. */
+    /* 극단이면 값을 숨기지 않고 **표시만** 한다. 화면이 '얼마나 버텼나'
+       를 붙여서 두 해석(파도 / 풍향 오차)을 같이 내놓는다. */
+    if (mode === 'downwind' && best.twaDeg >= EXTREME_DEEP_DEG) best.extreme = 'deep';
+    if (mode === 'upwind' && best.twaDeg <= EXTREME_HIGH_DEG) best.extreme = 'high';
     best.ok = true;
     return best;
   }
@@ -379,8 +402,9 @@
   var API = { render: render, optimalAngle: optimalAngle,
     _test: { toPoints: toPoints, ringsFor: ringsFor, maxKtOf: maxKtOf,
              segments: segments, optimalAngle: optimalAngle, hexA: hexA,
-             MIN_N: MIN_N, UPWIND_SANITY_DEG: UPWIND_SANITY_DEG,
-             DOWNWIND_SANITY_DEG: DOWNWIND_SANITY_DEG } };
+             MIN_N: MIN_N, OPT_MIN_N: OPT_MIN_N,
+             EXTREME_HIGH_DEG: EXTREME_HIGH_DEG,
+             EXTREME_DEEP_DEG: EXTREME_DEEP_DEG } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else global.RDPolar = API;
 })(typeof window !== 'undefined' ? window : globalThis);

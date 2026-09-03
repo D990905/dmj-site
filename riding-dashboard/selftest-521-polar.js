@@ -43,50 +43,60 @@ var up = bins([
 ]);
 var o = T.optimalAngle(up, 'upwind', 5);
 ok('산출된다', o.ok === true, JSON.stringify(o));
-ok('VMG 가 최대인 각을 고른다 (30~90° 안에서)',
+ok('VMG 가 최대인 각을 고른다 (0~90° 안에서)',
    Math.abs(o.vmgKt - Math.max.apply(null, up
-     .filter(function (x) { return x.twaCenter > 30 && x.twaCenter <= 90; })
+     .filter(function (x) { return x.twaCenter <= 90; })
      .map(function (x) {
        return x.avgMs * 1.94384 * Math.abs(Math.cos(x.twaCenter * Math.PI / 180));
      }))) < 1e-6);
 ok('풍상 범위(<=90°) 안', o.twaDeg <= 90);
 
-console.log('\n[4] ★ 검산 — Waterspeed 의 "풍하 최적각 173°" 를 막는다');
-/* 깊은 각에 노이즈로 큰 값이 하나 들어간 경우. 그 빈을 **후보에서 빼고**
-   나머지 중 최선을 준다 — 거절해 버리면 멀쩡한 답까지 잃는다. */
-var dn = bins([
-  [123.75, 20, 16, 19], [131.25, 20, 15.5, 18], [138.75, 20, 15, 18],
-  [146.25, 20, 14, 17], [153.75, 20, 13, 16], [161.25, 20, 12, 15],
-  [168.75, 30, 25, 30]      /* ← 노이즈. 원래라면 여기가 argmax */
+console.log('\n[4] ★ 각도로 거절하지 않는다 — 파도가 판을 바꾼다');
+/* 옥대표 정정 두 번:
+     "파도가 커서 풍하 런으로 달린 구간들도 꽤 있었을거야."
+     "풍상도 말도 안되는 각도로 올라갈때도 있엇어."
+   둘 다 맞다. 각도 값은 가능·불가능을 못 가른다. 노이즈를 거르는 건
+   **표본 두께**가 하고, 타깃인지 아닌지는 **버틴 시간**이 가른다
+   (그건 RDSegments.longestStretchAtTwa 와 selftest-522 가 맡는다). */
+var swell = bins([
+  [123.75, 40, 16, 19], [138.75, 40, 17, 20],
+  [168.75, 80, 22, 26]      /* 스웰 런 — 두껍고 실제로 빠르다 */
 ]);
-var od = T.optimalAngle(dn, 'downwind', 5);
-ok('그래도 답을 준다', od.ok === true, JSON.stringify(od));
-ok('데드다운윈드 근처를 고르지 않는다', od.twaDeg < 165, String(od.twaDeg));
-ok('**풍하는 속도 기준**이라 제일 빠른 각을 고른다', od.twaDeg === 123.75,
-   String(od.twaDeg));
-ok('뺀 사실을 넘긴다', !!od.excluded && od.excluded.bins === 1);
-ok('뺀 표본 수도', od.excluded.samples === 30);
-ok('제일 극단이던 각도 남긴다', od.excluded.extremeTwa === 168.75);
-var odClean = T.optimalAngle(dn.slice(0, 6), 'downwind', 5);
-ok('노이즈가 없으면 excluded 없음', odClean.ok === true && !odClean.excluded);
+var sw = T.optimalAngle(swell, 'downwind');
+ok('깊고 두꺼우면 **그 값을 준다**', sw.ok === true && sw.twaDeg === 168.75,
+   JSON.stringify(sw));
+ok('극단이라고 표시는 한다', sw.extreme === 'deep');
+ok('표본 수를 같이 넘긴다', sw.count === 80);
 
-console.log('\n[4b] ★ 반대쪽도 막는다 — 풍상 4° 는 어떤 포일도 못 간다');
-/* 라이브에서 실제로 나왔던 값(4°, 13표본). 풍하만 막고 풍상은 안 막았던 결함. */
-var upNoise = bins([
-  [3.75, 13, 14, 16],       /* VMG 13.97 — 원래라면 argmax */
-  [41.25, 20, 16, 18], [48.75, 20, 16.2, 18]
+var high = bins([
+  [3.75, 60, 14, 16],       /* 파도 면을 타고 올라간 것 — 두껍다 */
+  [41.25, 40, 16, 18]
 ]);
-var ou = T.optimalAngle(upNoise, 'upwind', 5);
-ok('그래도 답을 준다', ou.ok === true, JSON.stringify(ou));
-ok('30° 이하를 고르지 않는다', ou.twaDeg > 30, String(ou.twaDeg));
-ok('**풍상은 VMG 기준**', ou.twaDeg === 41.25, String(ou.twaDeg));
-ok('뺀 사실을 넘긴다', !!ou.excluded && ou.excluded.samples === 13);
-ok('경계 상수 30°', T.UPWIND_SANITY_DEG === 30);
+var hi = T.optimalAngle(high, 'upwind');
+ok('풍상도 거절하지 않는다', hi.ok === true && hi.twaDeg === 3.75, JSON.stringify(hi));
+ok('극단 표시는 high', hi.extreme === 'high');
+ok('제외 목록은 이제 없다', !hi.excluded);
 
-/* 말이 되는 각이 하나도 없으면 그때는 숫자를 안 낸다 */
-var allBad = T.optimalAngle(bins([[3.75, 20, 12, 14], [11.25, 20, 11, 13]]), 'upwind', 5);
-ok('전부 말이 안 되면 산출 거부', allBad.ok === false);
-ok('그 이유를 구분해 말한다', allBad.reason === 'only_implausible_high', allBad.reason);
+/* 얇으면 애초에 후보가 아니다 — Waterspeed 의 173° 가 이 경우였다 */
+var thinDeep = bins([
+  [123.75, 40, 16, 19], [138.75, 40, 15, 18],
+  [168.75, 6, 25, 30]       /* 6표본짜리 노이즈 */
+]);
+var td = T.optimalAngle(thinDeep, 'downwind');
+ok('얇은 극단 빈은 안 고른다', td.ok === true && td.twaDeg === 123.75,
+   String(td.twaDeg));
+ok('그때는 극단 표시도 없다', !td.extreme);
+
+/* ★ 라이브에서 실제로 잡힌 것: minN 을 5 로 넘기면 13표본짜리 4° 가
+   '최적' 으로 뽑혔다. 기본값(15)을 써야 한다. */
+var thin13 = bins([[3.75, 13, 14, 16], [56.25, 66, 11.9, 14]]);
+ok('minN 기본값이면 13표본 빈은 안 뽑힌다',
+   T.optimalAngle(thin13, 'upwind').twaDeg === 56.25);
+ok('minN 을 5 로 낮추면 뽑힌다 (그래서 넘기면 안 된다)',
+   T.optimalAngle(thin13, 'upwind', 5).twaDeg === 3.75);
+ok('최적 기본 표본 기준 15', T.OPT_MIN_N === 15);
+ok('극단 경계 — 풍상 35°', T.EXTREME_HIGH_DEG === 35);
+ok('극단 경계 — 풍하 150°', T.EXTREME_DEEP_DEG === 150);
 
 console.log('\n[5] 표본 부족·경계 처리');
 ok('전부 얇으면 산출 안 함',
@@ -133,7 +143,8 @@ ok('이상한 값은 회색으로 떨어진다', /rgba\(128,128,128/.test(T.hexA
 
 console.log('\n[8] 상수가 문서와 일치');
 ok('MIN_N = 5', T.MIN_N === 5);
-ok('풍하 검산 경계 165°', T.DOWNWIND_SANITY_DEG === 165);
+ok('각도 거절 상수가 없다', T.UPWIND_SANITY_DEG === undefined
+   && T.DOWNWIND_SANITY_DEG === undefined);
 
 console.log('\n' + pass + '/' + (pass + fail) + ' 통과');
 process.exit(fail ? 1 : 0);

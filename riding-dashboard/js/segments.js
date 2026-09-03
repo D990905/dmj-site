@@ -184,7 +184,51 @@
              totalSec: totalSec, totalM: totalM };
   }
 
+  /* ---- 그 풍각을 **얼마나 붙잡고 있었나** ----
+     옥대표 정정 두 번으로 얻은 기준(2026-09-03):
+       "파도가 커서 풍하 런으로 달린 구간들도 꽤 있었을거야."
+       "풍상도 말도 안되는 각도로 올라갈때도 있엇어."
+       "근데 그게 순간적인거였겠지?"
+     그렇다. 각도 값은 가능·불가능을 못 가른다 — 파도가 판을 바꾼다.
+     가르는 것은 **지속 시간**이다. 2초 스치고 지나간 각도는 실제로
+     지나갔더라도 타깃이 아니다. 붙잡을 수 없기 때문이다.
+
+     반환: { longestSec, totalSec, stretches, medianSec }
+     끊김 허용(gapSec)을 두는 이유 — 1초 튀어나갔다 돌아온 것을 두
+     구간으로 세면 실제보다 짧게 나온다. */
+  function longestStretchAtTwa(S, windDir, centerDeg, binDeg, gapSec) {
+    if (!S || !S.length || windDir == null || centerDeg == null) return null;
+    var half = (binDeg || 7.5) / 2;
+    var allow = (gapSec == null) ? 1.5 : gapSec;
+    var lo = centerDeg - half, hi = centerDeg + half;
+    var runs = [], cur = null, lastIn = null;
+    for (var i = 0; i < S.length; i++) {
+      if (S[i].heading == null || S[i].speed == null) continue;
+      var twa = Math.abs(angDiff(windDir, S[i].heading));
+      var inBin = (twa >= lo && twa < hi);
+      if (inBin) {
+        if (!cur) cur = { a: S[i].t, b: S[i].t };
+        else cur.b = S[i].t;
+        lastIn = S[i].t;
+      } else if (cur && (S[i].t - lastIn) > allow) {
+        runs.push(cur.b - cur.a); cur = null;
+      }
+    }
+    if (cur) runs.push(cur.b - cur.a);
+    runs = runs.filter(function (r) { return r > 0; });
+    if (!runs.length) return { longestSec: 0, totalSec: 0, stretches: 0, medianSec: 0 };
+    var total = runs.reduce(function (x, y) { return x + y; }, 0);
+    var sorted = runs.slice().sort(function (x, y) { return x - y; });
+    return {
+      longestSec: sorted[sorted.length - 1],
+      totalSec: total,
+      stretches: runs.length,
+      medianSec: sorted[Math.floor(sorted.length / 2)]
+    };
+  }
+
   var API = { build: build, segStats: segStats, angleChange: angleChange,
+              longestStretchAtTwa: longestStretchAtTwa,
               foilSections: foilSections, foilSummary: foilSummary,
               legsFrom: legsFrom, KT: KT,
               _test: { angDiff: angDiff } };
