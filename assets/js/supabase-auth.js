@@ -392,11 +392,56 @@
     });
   }
 
+  /* §529 — **어떤 제공자가 실제로 켜져 있는지 서버에 물어본다.**
+     처음엔 signInWithOAuth 의 반환 에러로 잡으려 했는데, 그건 틀렸다:
+     Supabase 클라이언트는 제공자를 검증하지 않고 그냥 authorize URL 로
+     넘긴다. 그래서 안 켜진 제공자도 "redirect 시작됨" 으로 성공처럼
+     돌아오고(실측), 사용자는 400 에러 페이지로 튕긴다.
+     /auth/v1/settings 의 external 맵이 정답지다. */
+  var _providers = null;
+  function enabledProviders(force) {
+    if (_providers && !force) return _providers;
+    _providers = new Promise(function (resolve) {
+      var done = false;
+      var timer = setTimeout(function () {
+        if (!done) { done = true; resolve(null); }   /* 모르면 막지 않는다 */
+      }, 6000);
+      fetch(SUPABASE_URL + '/auth/v1/settings', { headers: { apikey: SUPABASE_KEY } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (done) return;
+          done = true; clearTimeout(timer);
+          resolve(d && d.external ? d.external : null);
+        })
+        .catch(function () {
+          if (done) return;
+          done = true; clearTimeout(timer);
+          resolve(null);
+        });
+    });
+    return _providers;
+  }
+
   function signInWithProvider(name, opts) {
     opts = opts || {};
     var info = PROVIDERS[name];
     if (!info) return Promise.reject(new Error('지원하지 않는 로그인 방식입니다: ' + name));
-    return ensureClient().then(function () {
+    return enabledProviders().then(function (ext) {
+      /* ext 가 null = 서버에 못 물어봤다. 그때는 막지 않는다 —
+         모른다고 길을 닫으면 멀쩡한 제공자까지 못 쓴다. */
+      if (ext && !ext[name]) {
+        var e = new Error(
+          info.builtin
+            ? info.label + ' 로그인이 아직 켜져 있지 않습니다. Supabase 대시보드 '
+              + 'Authentication → Providers 에서 ' + name + ' 을 활성화해 주세요.'
+            : info.label + ' 는 Supabase 기본 제공자가 아닙니다. 커스텀 OIDC 나 '
+              + 'Edge Function 이 필요합니다.');
+        e.code = 'provider_not_enabled';
+        e.provider = name;
+        throw e;
+      }
+      return ensureClient();
+    }).then(function () {
       var o = {
         redirectTo: opts.redirectTo || (window.location.origin + window.location.pathname)
       };
@@ -765,6 +810,7 @@
     providerList: providerList,              // §527 화면이 버튼을 만들 때 쓴다
     providerInfo: providerInfo,
     backendHealth: backendHealth,        // §528 잠든 프로젝트 감지
+    enabledProviders: enabledProviders,  // §529 서버가 알려주는 활성 제공자
     logout: logout,
     currentUser: currentUser,
     isLoggedIn: isLoggedIn,

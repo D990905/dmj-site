@@ -294,6 +294,36 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  /* §529 — 켜진 제공자만 눌리게. 눌러 봐야 아는 것보다 낫다.
+     그리고 OAuth 는 **돌아올 때** 에러가 URL 로 온다(?error=...&error_description=...)
+     — 그걸 안 읽으면 로그인 실패가 조용히 사라진다. */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      var hash = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+      var err = q.get('error_description') || q.get('error')
+             || hash.get('error_description') || hash.get('error');
+      if (err && ssoNote) ssoNote.textContent = decodeURIComponent(err);
+    } catch (e) {}
+    if (!sso || !window.DMJAuth || !window.DMJAuth.enabledProviders) return;
+    window.DMJAuth.enabledProviders().then(function (ext) {
+      if (!ext) return;                 /* 모르면 그대로 둔다 */
+      Array.prototype.forEach.call(sso.querySelectorAll('[data-provider]'), function (b) {
+        var name = b.getAttribute('data-provider');
+        if (ext[name]) return;
+        b.disabled = true;
+        b.style.opacity = '.5';
+        b.title = name === 'naver'
+          ? '네이버는 Supabase 기본 제공자가 아닙니다 (커스텀 OIDC 필요)'
+          : '아직 켜지지 않았습니다 (Supabase 대시보드에서 활성화 필요)';
+        var tag = document.createElement('span');
+        tag.className = 'badge-soon';
+        tag.textContent = '준비 중';
+        b.appendChild(tag);
+      });
+    }).catch(function () {});
+  })();
+
   var form = document.getElementById('signup-form');
   var err = document.getElementById('auth-error');
   if (!form) return;
