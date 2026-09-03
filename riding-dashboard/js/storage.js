@@ -905,6 +905,210 @@
   /* 급성:만성 부하 비율. 7일 평균 ÷ 28일 평균.
      ⚠ '0.8~1.3 안전구간' 은 학계 논란 중이라 규칙이 아니라 신호로만
      쓴다 — 임계값 판정은 여기서 하지 않고 값만 돌려준다. */
+  /* ============================================================
+   * §513 웰니스 원장 — 회복 판정의 빈 슬롯 채우기
+   *
+   * `coach.decideRecoveryAction` 은 **4인자**(TSB · ACWR · HRV 편차 ·
+   * Hooper) + 휴식일을 받도록 짜여 있는데, 소스에 `computeHRVTrend — 향후`
+   * `computeWellnessTrend — 향후` 라고 적힌 채 **함수 자체가 없었고**,
+   * v2 는 tsb·acwr **둘만** 넘기고 있었다. 판정 로직은 4인자를 세도록
+   * 돼 있으니 절반만 도는 셈이다.
+   *
+   * 여기서 그 둘을 만든다. 웨어러블 연동이 없어도 **손으로 넣으면 돈다** —
+   * Hooper 는 원래 설문이고, 안정시심박은 시계가 아침에 보여 준다.
+   *
+   * 저장 단위는 **하루 한 건**. 같은 날 다시 넣으면 덮어쓴다.
+   *   { date:'YYYY-MM-DD', hrvMs, rhrBpm, sleepH,
+   *     hooper:{ fatigue, stress, soreness, sleepQuality } }  각 1~5
+   * ============================================================ */
+  function K_WELLNESS()    { return nsPrefix() + 'wellness_v1'; }
+
+  function ymd(epoch) {
+    var d = new Date(epoch);
+    return d.getFullYear() + '-'
+      + String(d.getMonth() + 1).padStart(2, '0') + '-'
+      + String(d.getDate()).padStart(2, '0');
+  }
+  function readWellness() {
+    try {
+      var raw = global.localStorage.getItem(K_WELLNESS());
+      var a = raw ? JSON.parse(raw) : [];
+      return Array.isArray(a) ? a : [];
+    } catch (e) { return []; }
+  }
+  function writeWellness(arr) {
+    try {
+      global.localStorage.setItem(K_WELLNESS(), JSON.stringify(arr));
+      return { ok: true };
+    } catch (e) { return { ok: false, error: String(e && e.name) }; }
+  }
+  /* 하루 한 건 — 같은 날짜는 덮어쓴다(부분 갱신: 준 필드만 바꾼다) */
+  function saveWellness(rec) {
+    if (!rec || !rec.date) return { ok: false, error: 'no date' };
+    var arr = readWellness();
+    var i = -1;
+    for (var k = 0; k < arr.length; k++) { if (arr[k].date === rec.date) { i = k; break; } }
+    var merged = (i >= 0) ? Object.assign({}, arr[i]) : { date: rec.date };
+    ['hrvMs', 'rhrBpm', 'sleepH'].forEach(function (f) {
+      if (rec[f] != null && isFinite(rec[f])) merged[f] = Number(rec[f]);
+    });
+    if (rec.hooper) {
+      merged.hooper = Object.assign({}, merged.hooper || {});
+      ['fatigue', 'stress', 'soreness', 'sleepQuality'].forEach(function (f) {
+        var v = rec.hooper[f];
+        if (v != null && isFinite(v)) merged.hooper[f] = Math.max(1, Math.min(5, Math.round(v)));
+      });
+    }
+    /* 쓸 값이 하나도 없으면 날짜만 있는 빈 행이 남는다. 그 행은 어떤
+       추세에도 안 잡히면서 목록에만 나와, 기록한 줄 알았던 날이
+       비어 있는 상태로 조용히 지나간다. 그래서 거절한다. */
+    var usable = (merged.hrvMs != null) || (merged.rhrBpm != null)
+      || (merged.sleepH != null)
+      || (merged.hooper && Object.keys(merged.hooper).length > 0);
+    if (!usable) return { ok: false, error: 'nothing to save' };
+    merged.savedAt = Date.now();
+    if (i >= 0) arr[i] = merged; else arr.push(merged);
+    arr.sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    if (arr.length > 400) arr = arr.slice(arr.length - 400);
+    var w = writeWellness(arr);
+    return w.ok ? { ok: true, record: merged } : w;
+  }
+  function loadWellness() { return readWellness(); }
+  function deleteWellness(date) {
+    return writeWellness(readWellness().filter(function (r) { return r.date !== date; }));
+  }
+
+  /* --- HRV 편차 (Plews 2013) ---------------------------------
+     ln(rMSSD) 의 7일 이동평균을 개인 기준선(그 앞 기간의 평균·표준편차)과
+     비교해 **표준화 편차(SD)** 로 낸다. 절대값이 아니라 자기 기준선 대비를
+     보는 게 요점이다 — HRV 절대값은 사람마다 몇 배씩 다르다.
+     ln 을 쓰는 이유: rMSSD 분포가 오른쪽으로 길게 치우쳐 있어 그대로
+     평균·SD 를 내면 높은 값 몇 개가 기준선을 끌어올린다.
+     ⚠ 기준선이 얇으면(관측 14일 미만) **산출하지 않는다** — §457 에서
+       ACWR 이 5일치로 4.00 을 찍어 오경고를 냈던 것과 같은 실수를 막는다. */
+  function computeHRVTrend(endEpoch) {
+    var end = endEpoch || Date.now();
+    var endYmd = ymd(end);
+    var rows = readWellness().filter(function (r) {
+      return r.hrvMs != null && isFinite(r.hrvMs) && r.hrvMs > 0 && r.date <= endYmd;
+    });
+    if (rows.length < 14) {
+      return { ok: false, reason: 'need_more_days', have: rows.length, need: 14 };
+    }
+    var ln = rows.map(function (r) { return { date: r.date, v: Math.log(r.hrvMs) }; });
+    var recent = ln.slice(-7);
+    if (recent.length < 4) return { ok: false, reason: 'need_more_days', have: recent.length, need: 4 };
+    function mean(a) { var s = 0; a.forEach(function (x) { s += x; }); return s / a.length; }
+    var recentMean = mean(recent.map(function (x) { return x.v; }));
+    /* 기준선 — 최근 7일을 뺀 나머지(최대 60일) */
+    var baseArr = ln.slice(Math.max(0, ln.length - 67), ln.length - 7)
+                    .map(function (x) { return x.v; });
+    if (baseArr.length < 7) {
+      return { ok: false, reason: 'need_more_days', have: baseArr.length, need: 7 };
+    }
+    var bMean = mean(baseArr);
+    var varSum = 0;
+    baseArr.forEach(function (x) { varSum += (x - bMean) * (x - bMean); });
+    var sd = Math.sqrt(varSum / baseArr.length);
+    if (!(sd > 0)) return { ok: false, reason: 'flat_baseline' };
+    var dev = (recentMean - bMean) / sd;
+    return {
+      ok: true,
+      deviationSD: Math.round(dev * 100) / 100,
+      recent7Ms: Math.round(Math.exp(recentMean) * 10) / 10,
+      baselineMs: Math.round(Math.exp(bMean) * 10) / 10,
+      baselineDays: baseArr.length,
+      totalDays: rows.length
+    };
+  }
+
+  /* --- Hooper 지수 -------------------------------------------
+     피로·스트레스·근육통·수면질 각 1~5 (1=최악, 5=최고).
+     원 논문은 1~7 역척도지만 화면 입력을 쉽게 하려고 1~5 정척도로 받고,
+     coach 가 기대하는 5~50 스케일로 환산한다(4항목×5점=20 → ×2.5 = 50).
+     ⚠ **높을수록 좋다** — coach.decideRecoveryAction 이 `< 20` 을 빨강으로
+       보므로 방향이 맞다. */
+  function computeWellnessTrend(endEpoch) {
+    var end = endEpoch || Date.now();
+    var endYmd = ymd(end);
+    var rows = readWellness().filter(function (r) {
+      if (r.date > endYmd || !r.hooper) return false;
+      return ['fatigue', 'stress', 'soreness', 'sleepQuality'].every(function (f) {
+        return r.hooper[f] != null && isFinite(r.hooper[f]);
+      });
+    });
+    if (!rows.length) return { ok: false, reason: 'no_entries' };
+    var last = rows[rows.length - 1];
+    var h = last.hooper;
+    var raw = h.fatigue + h.stress + h.soreness + h.sleepQuality;   /* 4~20 */
+    var composite = Math.round(raw * 2.5 * 10) / 10;                /* 10~50 */
+    /* 최근 7일 평균도 같이 — 하루치는 컨디션이 튄다 */
+    var recent = rows.slice(-7);
+    var avgRaw = 0;
+    recent.forEach(function (r) {
+      avgRaw += r.hooper.fatigue + r.hooper.stress + r.hooper.soreness + r.hooper.sleepQuality;
+    });
+    avgRaw /= recent.length;
+    return {
+      ok: true,
+      composite: composite,
+      today: { fatigue: h.fatigue, stress: h.stress,
+               soreness: h.soreness, sleepQuality: h.sleepQuality },
+      date: last.date,
+      recent7Composite: Math.round(avgRaw * 2.5 * 10) / 10,
+      days: rows.length,
+      /* 오늘 것이 아니면 화면이 그렇게 말해야 한다 */
+      isToday: last.date === ymd(end)
+    };
+  }
+
+  /* --- 마지막 휴식일로부터 며칠 -------------------------------
+     원장에 부하 기록이 **없는 날**이 휴식일이다. 오늘부터 거슬러 올라가며
+     처음 만나는 빈 날까지의 일수를 센다. 오늘이 비어 있으면 0. */
+  function daysSinceRest(ledger, endEpoch) {
+    var end = endEpoch || Date.now();
+    var byDay = {};
+    (ledger || []).forEach(function (e) {
+      if (e && e.dateEpoch) byDay[ymd(e.dateEpoch)] = true;
+    });
+    var DAY = 86400000;
+    for (var i = 0; i < 60; i++) {
+      if (!byDay[ymd(end - i * DAY)]) return i;
+    }
+    return 60;   /* 60일 내내 쉰 날이 없다 — 사실상 상한 */
+  }
+
+  /* --- 안정시심박 추세 ----------------------------------------
+     HRV 가 없어도 회복 신호가 된다. 최근 7일 평균이 기준선보다
+     **올라가면** 피로 신호다(HRV 와 방향이 반대). */
+  function computeRHRTrend(endEpoch) {
+    var end = endEpoch || Date.now();
+    var endYmd = ymd(end);
+    var rows = readWellness().filter(function (r) {
+      return r.rhrBpm != null && isFinite(r.rhrBpm) && r.rhrBpm > 0 && r.date <= endYmd;
+    });
+    if (rows.length < 14) {
+      return { ok: false, reason: 'need_more_days', have: rows.length, need: 14 };
+    }
+    var v = rows.map(function (r) { return r.rhrBpm; });
+    function mean(a) { var s = 0; a.forEach(function (x) { s += x; }); return s / a.length; }
+    var recent = mean(v.slice(-7));
+    var base = v.slice(Math.max(0, v.length - 67), v.length - 7);
+    if (base.length < 7) return { ok: false, reason: 'need_more_days', have: base.length, need: 7 };
+    var bMean = mean(base);
+    var varSum = 0;
+    base.forEach(function (x) { varSum += (x - bMean) * (x - bMean); });
+    var sd = Math.sqrt(varSum / base.length);
+    return {
+      ok: true,
+      recent7Bpm: Math.round(recent * 10) / 10,
+      baselineBpm: Math.round(bMean * 10) / 10,
+      deltaBpm: Math.round((recent - bMean) * 10) / 10,
+      deviationSD: sd > 0 ? Math.round((recent - bMean) / sd * 100) / 100 : null,
+      baselineDays: base.length
+    };
+  }
+
   function computeACWR(ledger, endEpoch) {
     var end = endEpoch || Date.now();
     var DAY = 86400000;
@@ -1617,6 +1821,15 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
   }
 
   var Storage = {
+    /* §513 웰니스 — 회복 판정의 빈 슬롯 */
+    saveWellness: saveWellness,
+    loadWellness: loadWellness,
+    deleteWellness: deleteWellness,
+    computeHRVTrend: computeHRVTrend,
+    computeWellnessTrend: computeWellnessTrend,
+    computeRHRTrend: computeRHRTrend,
+    daysSinceRest: daysSinceRest,
+    wellnessKey: K_WELLNESS,
     /* §509 트랙 압축 — 저장은 encodeTrack, 복원은 decodeTrack */
     encodeTrack: encodeTrack,
     decodeTrack: decodeTrack,

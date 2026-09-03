@@ -1139,6 +1139,8 @@
     renderLoadInputsNotice(host, rp, ledger);
     renderTrainingState(host, ledger);
     renderWorkoutForm(host, rp);
+    /* §514 — 오늘의 제안 **앞에** 둔다. 제안이 이 입력을 쓰기 때문이다. */
+    try { renderWellness(host); } catch (e) {}
     renderTodaySuggestion(host, ledger, rp);
     renderLedgerTable(host, ledger);
   }
@@ -1414,6 +1416,307 @@
     host.appendChild(card);
   }
 
+  /* ============================================================
+   * §514 웰니스 입력 + 웨어러블 가져오기
+   *
+   * 옥대표: "애플워치나 가민 삼성갤럭시 오라링의 데이터를 자동으로
+   *          댕겨올 수 있게 ... 안되면 일단 수동부터"
+   *
+   * 자동 연동의 현실:
+   *   · **Apple Watch** — HealthKit 은 **iOS 앱에서만** 읽는다. 웹에서
+   *     접근하는 공개 API 가 없다. 우리 대시보드는 정적 웹이라 불가.
+   *   · **Garmin** — Connect API 는 OAuth + 개발자 승인 + **서버**가
+   *     필요하다(토큰 교환을 브라우저에서 하면 비밀키가 노출된다).
+   *   · **Samsung Health** — 안드로이드 앱 또는 파트너 API. 웹 불가.
+   *   · **Oura** — REST API v2 가 공개돼 있어 넷 중 유일하게 가능성이
+   *     있으나 CORS 와 토큰 보관 문제가 남는다.
+   *   → **넷 다 서버가 있어야 한다.** 지금은 없다.
+   *
+   * 그래서 지금 되는 두 길을 만든다:
+   *   ① **수동 입력** — Hooper 4항목·안정시심박·HRV·수면. 시계가 아침에
+   *      보여 주는 숫자를 옮겨 적으면 그날부터 판정이 좋아진다.
+   *   ② **파일 가져오기** — 네 기기 **전부 CSV 를 내보낸다.** 열 이름을
+   *      자동으로 알아보고 한 번에 수십~수백 일을 채운다. 인증이 필요
+   *      없고 오늘 바로 된다.
+   * API 연동은 서버가 생기면 ②의 파서를 그대로 재사용한다.
+   * ============================================================ */
+
+  var WELL_FIELDS = [
+    { k: 'fatigue',      label: 'Fatigue',       lo: 'wrecked',  hi: 'fresh' },
+    { k: 'stress',       label: 'Stress',        lo: 'very high', hi: 'none' },
+    { k: 'soreness',     label: 'Muscle soreness', lo: 'severe', hi: 'none' },
+    { k: 'sleepQuality', label: 'Sleep quality', lo: 'awful',    hi: 'great' }
+  ];
+
+  function todayYmd() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+         + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function renderWellness(host) {
+    if (!RDStorage || !RDStorage.saveWellness) return;
+    var today = todayYmd();
+    var existing = (RDStorage.loadWellness() || []).filter(function (r) {
+      return r.date === today;
+    })[0] || {};
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'How you feel today'));
+    head.appendChild(el('div', 'card-actions lab', today));
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+    body.appendChild(el('div', 'text-secondary mb-2',
+      'Four questions, five seconds. This is the Hooper index — the standard '
+      + 'subjective wellness measure in sports science, and the single cheapest '
+      + 'thing you can add to a recovery decision. Without it the call below is '
+      + 'made on training load alone.'));
+
+    var vals = Object.assign({}, existing.hooper || {});
+    var grid = el('div', 'row g-3');
+    WELL_FIELDS.forEach(function (f) {
+      var col = el('div', 'col-12 col-md-6');
+      col.appendChild(el('div', 'lab', f.label));
+      var wrap = el('div', 'btn-group btn-group-sm mt-1 w-100');
+      for (var n = 1; n <= 5; n++) {
+        (function (n) {
+          var b = el('button', 'btn' + (vals[f.k] === n ? ' active' : ''), String(n));
+          b.type = 'button';
+          b.addEventListener('click', function () {
+            vals[f.k] = n;
+            RDStorage.saveWellness({ date: today, hooper: vals });
+            renderTraining();
+          });
+          wrap.appendChild(b);
+        })(n);
+      }
+      col.appendChild(wrap);
+      var scale = el('div', 'lab mt-1');
+      scale.textContent = '1 = ' + f.lo + '   ·   5 = ' + f.hi;
+      col.appendChild(scale);
+      grid.appendChild(col);
+    });
+    body.appendChild(grid);
+
+    /* 시계가 주는 숫자 — 있으면 넣고 없으면 비워 둔다 */
+    var num = el('div', 'row g-3 mt-1');
+    [['rhrBpm', 'Resting heart rate', 'bpm', 30, 100],
+     ['hrvMs', 'HRV (rMSSD or SDNN)', 'ms', 5, 300],
+     ['sleepH', 'Sleep', 'h', 0, 14]].forEach(function (f) {
+      var col = el('div', 'col-12 col-md-4');
+      col.appendChild(el('div', 'lab', f[1] + ' (' + f[2] + ')'));
+      var inp = el('input', 'form-control num mt-1');
+      inp.type = 'number'; inp.min = String(f[3]); inp.max = String(f[4]);
+      inp.step = (f[0] === 'sleepH') ? '0.1' : '1';
+      if (existing[f[0]] != null) inp.value = String(existing[f[0]]);
+      inp.addEventListener('change', function () {
+        var v = parseFloat(inp.value);
+        var rec = { date: today };
+        rec[f[0]] = isFinite(v) ? v : null;
+        if (isFinite(v)) { RDStorage.saveWellness(rec); renderTraining(); }
+      });
+      col.appendChild(inp);
+      num.appendChild(col);
+    });
+    body.appendChild(num);
+
+    /* 추세 요약 */
+    var tr = el('div', 'mt-3');
+    var hrv = RDStorage.computeHRVTrend ? RDStorage.computeHRVTrend() : null;
+    var rhr = RDStorage.computeRHRTrend ? RDStorage.computeRHRTrend() : null;
+    var line = [];
+    if (hrv && hrv.ok) {
+      line.push('HRV ' + hrv.recent7Ms + ' ms over the last 7 days against a '
+        + hrv.baselineDays + '-day baseline of ' + hrv.baselineMs + ' ms ('
+        + (hrv.deviationSD > 0 ? '+' : '') + hrv.deviationSD + ' SD)');
+    } else if (hrv && hrv.have != null) {
+      line.push('HRV trend needs ' + hrv.need + ' days, has ' + hrv.have);
+    }
+    if (rhr && rhr.ok) {
+      line.push('resting HR ' + rhr.recent7Bpm + ' bpm vs baseline '
+        + rhr.baselineBpm + ' (' + (rhr.deltaBpm > 0 ? '+' : '') + rhr.deltaBpm + ')');
+    }
+    if (line.length) {
+      tr.className = 'lab mt-3';
+      tr.textContent = line.join('  ·  ') + '.';
+      body.appendChild(tr);
+    }
+
+    /* 가져오기 */
+    body.appendChild(renderWellnessImport());
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* ---- CSV 가져오기 — 네 기기 전부 CSV 를 내보낸다 ---- */
+  var WELL_COLS = {
+    /* Apple Health 는 startDate, Garmin 은 Date, Oura 는 date 를 쓴다 */
+    date: [/^date$/i, /^day$/i, /^summary.?date$/i, /^start.?(date|time)/i,
+           /^creation.?date$/i, /^timestamp$/i, /날짜/],
+    hrvMs: [/hrv/i, /rmssd/i, /sdnn/i, /heart.?rate.?variability/i],
+    rhrBpm: [/resting.?heart/i, /^rhr$/i, /lowest.?resting/i, /resting.?hr/i, /안정시/],
+    sleepH: [/total.?sleep.?duration/i, /^sleep.?hours?$/i, /^sleep$/i, /asleep.?time/i, /수면/]
+  };
+
+  function wellMatchCols(header) {
+    var map = {};
+    Object.keys(WELL_COLS).forEach(function (field) {
+      for (var i = 0; i < header.length; i++) {
+        var h = String(header[i]).trim();
+        if (!h) continue;
+        for (var p = 0; p < WELL_COLS[field].length; p++) {
+          if (WELL_COLS[field][p].test(h)) {
+            if (map[field] == null) map[field] = i;
+            break;
+          }
+        }
+        if (map[field] != null) break;
+      }
+    });
+    return map;
+  }
+
+  /* 'YYYY-MM-DD' 로 정규화 — ISO·미국식·엑셀식 모두 받는다 */
+  function wellNormDate(s) {
+    if (s == null) return null;
+    var t = String(s).trim().replace(/^"|"$/g, '');
+    if (!t) return null;
+    var m = t.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+    if (m) {
+      return m[1] + '-' + String(+m[2]).padStart(2, '0') + '-' + String(+m[3]).padStart(2, '0');
+    }
+    var d = new Date(t);
+    if (!isNaN(d.getTime())) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+           + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    return null;
+  }
+
+  /* 수면은 기기마다 단위가 다르다 — 초·분·시간을 값 크기로 가른다 */
+  function wellNormSleep(v) {
+    var n = parseFloat(v);
+    if (!isFinite(n) || n <= 0) return null;
+    if (n > 1000) return Math.round(n / 3600 * 10) / 10;   /* 초 */
+    if (n > 24) return Math.round(n / 60 * 10) / 10;       /* 분 */
+    return Math.round(n * 10) / 10;                        /* 시간 */
+  }
+
+  function parseWellnessCsv(text) {
+    var lines = String(text).split(/\r?\n/).filter(function (l) { return l.trim(); });
+    if (lines.length < 2) return { ok: false, error: 'not enough rows' };
+    function split(l) {
+      var out = [], cur = '', q = false;
+      for (var i = 0; i < l.length; i++) {
+        var c = l[i];
+        if (c === '"') { q = !q; continue; }
+        if (c === ',' && !q) { out.push(cur); cur = ''; continue; }
+        cur += c;
+      }
+      out.push(cur);
+      return out;
+    }
+    var header = split(lines[0]);
+    var map = wellMatchCols(header);
+    if (map.date == null) {
+      return { ok: false, error: 'no date column',
+               header: header.slice(0, 12) };
+    }
+    var found = Object.keys(map).filter(function (k) { return k !== 'date'; });
+    if (!found.length) {
+      return { ok: false, error: 'no wellness column recognised',
+               header: header.slice(0, 12) };
+    }
+    var rows = [], skipped = 0;
+    for (var i = 1; i < lines.length; i++) {
+      var c = split(lines[i]);
+      var date = wellNormDate(c[map.date]);
+      if (!date) { skipped++; continue; }
+      var rec = { date: date };
+      var any = false;
+      if (map.hrvMs != null) {
+        var hv = parseFloat(c[map.hrvMs]);
+        if (isFinite(hv) && hv > 0 && hv < 400) { rec.hrvMs = hv; any = true; }
+      }
+      if (map.rhrBpm != null) {
+        var rv = parseFloat(c[map.rhrBpm]);
+        if (isFinite(rv) && rv > 25 && rv < 120) { rec.rhrBpm = rv; any = true; }
+      }
+      if (map.sleepH != null) {
+        var sv = wellNormSleep(c[map.sleepH]);
+        if (sv != null && sv <= 20) { rec.sleepH = sv; any = true; }
+      }
+      if (any) rows.push(rec); else skipped++;
+    }
+    return { ok: rows.length > 0, rows: rows, skipped: skipped,
+             matched: found, header: header.slice(0, 12),
+             error: rows.length ? null : 'no usable rows' };
+  }
+
+  /* 가져오기 결과는 renderTraining() 재렌더를 살아남아야 한다.
+     성공 메시지를 out 에 붙인 직후 재렌더가 training-body 를 통째로
+     비워서, 15일치가 실제로 저장됐는데도 화면엔 아무 말도 안 떴다(실측).
+     그래서 메시지를 밖에 들고 있다가 다시 그릴 때 붙인다. */
+  var wellFlash = null;
+
+  function renderWellnessImport() {
+    var box = el('div', 'mt-3');
+    var head = el('div', 'fw-bold', 'Import from your watch or ring');
+    box.appendChild(head);
+    box.appendChild(el('div', 'text-secondary mt-1',
+      'Apple Health, Garmin Connect, Samsung Health and Oura all export CSV. '
+      + 'Drop one here and the columns are matched automatically — no account, '
+      + 'no keys, works today. (A direct API connection needs a server we do not '
+      + 'have yet; when it exists this same parser is reused.)'));
+    var inp = el('input', 'form-control mt-2');
+    inp.type = 'file'; inp.accept = '.csv,text/csv';
+    var out = el('div', 'mt-2');
+    if (wellFlash) {
+      var flash = el('div', 'alert alert-' + (wellFlash.kind === 'ok' ? 'success' : 'warning'));
+      flash.appendChild(el('div', 'fw-bold', wellFlash.title));
+      flash.appendChild(el('div', 'mt-1', wellFlash.body));
+      out.appendChild(flash);
+      wellFlash = null;
+    }
+    inp.addEventListener('change', function () {
+      var f = inp.files && inp.files[0];
+      if (!f) return;
+      while (out.firstChild) out.removeChild(out.firstChild);
+      var fr = new FileReader();
+      fr.onload = function () {
+        var res = parseWellnessCsv(String(fr.result || ''));
+        if (!res.ok) {
+          var bad = el('div', 'alert alert-warning');
+          bad.appendChild(el('div', 'fw-bold', 'Could not read that file'));
+          bad.appendChild(el('div', 'mt-1',
+            (res.error || 'unknown') + '. Columns seen: '
+            + (res.header || []).join(', ')
+            + '. It needs a date column plus at least one of HRV, resting heart '
+            + 'rate or sleep.'));
+          out.appendChild(bad);
+          return;
+        }
+        var n = 0;
+        res.rows.forEach(function (r) {
+          if (RDStorage.saveWellness(r).ok) n++;
+        });
+        wellFlash = {
+          kind: 'ok',
+          title: 'Imported ' + n + ' days',
+          body: 'Matched: ' + res.matched.join(', ')
+            + (res.skipped ? '  \u00b7  skipped ' + res.skipped + ' rows with no usable value' : '')
+            + '. Days you had already filled in were merged, not overwritten.'
+        };
+        renderTraining();
+      };
+      fr.readAsText(f);
+    });
+    box.appendChild(inp);
+    box.appendChild(out);
+    return box;
+  }
+
   /* 오늘의 제안 — 회복 상태 판정 + 부족분을 채울 육상 운동 */
   function renderTodaySuggestion(host, ledger, rp) {
     if (!window.RDCoach || !RDCoach.decideRecoveryAction) return;
@@ -1425,10 +1728,28 @@
 
     var decision = null;
     try {
+      /* §514 — 여태 tsb·acwr **둘만** 넘기고 있었다. 판정 로직은 4인자를
+         세도록 돼 있어서(red≥2→rest) 절반만 도는 셈이었다.
+         이제 나머지 셋을 채운다 — 없으면 null 이고 그 인자는 무시된다. */
+      var hrvT = RDStorage.computeHRVTrend ? RDStorage.computeHRVTrend() : null;
+      var wellT = RDStorage.computeWellnessTrend ? RDStorage.computeWellnessTrend() : null;
+      var restD = RDStorage.daysSinceRest ? RDStorage.daysSinceRest(ledger) : null;
       decision = RDCoach.decideRecoveryAction({
         tsb: cur.TSB,
-        acwr: (acwr && acwr.ratio != null) ? acwr.ratio : null
+        acwr: (acwr && acwr.ratio != null) ? acwr.ratio : null,
+        hrvDeviationSD: (hrvT && hrvT.ok) ? hrvT.deviationSD : null,
+        hooperComposite: (wellT && wellT.ok) ? wellT.composite : null,
+        daysSinceRest: restD
       });
+      CUR.recoveryInputs = {
+        tsb: cur.TSB,
+        acwr: (acwr && acwr.ratio != null) ? acwr.ratio : null,
+        hrv: (hrvT && hrvT.ok) ? hrvT.deviationSD : null,
+        hooper: (wellT && wellT.ok) ? wellT.composite : null,
+        rest: restD,
+        hrvWhy: (hrvT && !hrvT.ok) ? hrvT.reason : null,
+        hooperWhy: (wellT && !wellT.ok) ? wellT.reason : null
+      };
     } catch (e) {}
     if (!decision) return;
 
@@ -1460,6 +1781,27 @@
     box.appendChild(el('div', 'fw-bold', act.head));
     box.appendChild(el('div', 'mt-1', act.body));
     body.appendChild(box);
+
+    /* §514 — 몇 개의 신호로 판정했는지, 그리고 **빠진 것은 왜 빠졌는지**.
+       이걸 안 적으면 두 신호로 내린 판정과 네 신호로 내린 판정이 화면에서
+       똑같아 보인다. 판정 규칙이 '빨강 2개 이상이면 휴식' 이라 세는 개수가
+       곧 신뢰도다. */
+    var ri = CUR.recoveryInputs || {};
+    var have = ['tsb', 'acwr', 'hrv', 'hooper', 'rest'].filter(function (k) {
+      return ri[k] != null;
+    }).length;
+    var miss = [];
+    if (ri.hrv == null) {
+      miss.push('HRV' + (ri.hrvWhy === 'need_more_days'
+        ? ' (needs 14 days of entries)' : ' (not entered)'));
+    }
+    if (ri.hooper == null) miss.push('today’s four wellness answers');
+    var cov = el('div', 'lab mt-2');
+    cov.textContent = 'Decided on ' + have + ' of 5 signals'
+      + (miss.length ? ' — missing ' + miss.join(' and ')
+          + '. Fill those in above and this call gets sharper.'
+        : ' — the full set.');
+    body.appendChild(cov);
 
     /* 판정 근거 — 어떤 지표가 어떤 색이었는지 */
     var facs = decision.contributing_factors || [];
