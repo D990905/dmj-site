@@ -4939,6 +4939,366 @@
     card.appendChild(body);
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+   * §522 W3 구간 스테퍼 (옥대표 "렉을 선택해서 분석하는거 좋아")
+   *
+   * Waterspeed 는 **하나의 스테퍼**로 Legs·Runs·Tacks·Jibes·Foiling 을
+   * 다 훑는다. 우리는 같은 것들을 §497·§456·detectRuns 로 따로 만들어
+   * 놨는데 조작이 제각각이라 "이 구간" 이라는 개념이 화면에 없었다.
+   *
+   * 우리가 더 하는 것 셋:
+   *   ① 손실을 **미터**로도 준다(W5) — "12%" 보다 "15m" 가 손에 잡힌다
+   *   ② 타깃 대비를 **방향에 따라 다른 지표**로(W4) — 풍상 VMG, 풍하 속도
+   *   ③ 분모가 0 근처면 **백분율을 안 쓴다**(그들은 +421.4% 를 낸다)
+   * ═══════════════════════════════════════════════════════════════ */
+  var SEGSTEP = { kind: 'leg', idx: 0 };
+  var segHl = null;                 /* 지도 강조 레이어 */
+
+  var SEG_KINDS = [
+    ['leg', 'Legs'], ['run', 'Runs'], ['tack', 'Tacks'],
+    ['gybe', 'Gybes'], ['foiling', 'Foiling']
+  ];
+
+  function foilThresholdMs() {
+    var cfg = (CUR.session && CUR.session.cfg) || {};
+    var kt = cfg.activeSpeedKt || cfg.foilingSpeedKt || 11;
+    return kt / KT;
+  }
+
+  function buildSegs(kind, a) {
+    if (!window.RDSegments || !CUR.session) return [];
+    try {
+      return RDSegments.build(kind, {
+        analysis: a, samples: CUR.session.samples || [],
+        foilThresholdMs: foilThresholdMs(), dipSec: 2
+      });
+    } catch (e) { return []; }
+  }
+
+  /* 지도에 그 구간만 굵게. 지도는 RDMapTactical 이 만들었고 Leaflet
+     인스턴스를 들고 있으므로 그 위에 폴리라인을 얹는다. */
+  function highlightSegment(seg) {
+    /* ⚠ 이 파일의 IIFE 는 인자가 없다 — `global` 이 스코프에 없어서
+       예전엔 여기서 조용히 터졌다(호출부 try/catch 가 삼켰다).
+       카드는 그려지는데 지도 강조만 안 되는 증상이었다. */
+    var L = window.L;
+    if (!mapInst || !mapInst.map || !L) return;
+    if (segHl) {
+      segHl.forEach(function (ly) { try { mapInst.map.removeLayer(ly); } catch (e) {} });
+      segHl = null;
+    }
+    if (!seg || !CUR.session) return;
+    var S = CUR.session.samples || [];
+    var pts = [];
+    for (var i = seg.startIdx; i <= seg.endIdx && i < S.length; i++) {
+      if (S[i].lat != null && S[i].lng != null) pts.push([S[i].lat, S[i].lng]);
+    }
+    if (pts.length < 2) return;
+    var halo = L.polyline(pts, { color: '#0b1220', weight: 9, opacity: 0.55 })
+      .addTo(mapInst.map);
+    var line = L.polyline(pts, { color: '#c026d3', weight: 4, opacity: 0.95 })
+      .addTo(mapInst.map);
+    segHl = [halo, line];
+  }
+
+  /* 분모가 0 근처일 때 백분율을 쓰지 않는다.
+     Waterspeed 는 진입 VMG 가 0.6kt 일 때 "+421.4%" 를 낸다 — 뜻이 없다. */
+  function pctChange(from, to, minBase) {
+    var base = Math.abs(from), floor = (minBase == null) ? 0.5 : minBase;
+    if (!(base > floor)) return null;
+    return ((to - from) / base) * 100;
+  }
+
+  function renderSegmentStepper(a) {
+    var host = $('segment-stepper');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    if (!window.RDSegments || !CUR.session) return;
+
+    var segs = buildSegs(SEGSTEP.kind, a);
+    if (!segs.length) {
+      /* 종류를 바꿀 수는 있어야 한다 — 하나가 비었다고 UI 를 감추면
+         다른 종류가 있는지도 알 수 없다 */
+      var empty = el('div', 'card');
+      var eb = el('div', 'card-body d-flex flex-wrap align-items-center gap-2');
+      eb.appendChild(kindSelect(a));
+      eb.appendChild(el('span', 'text-secondary',
+        'None detected in this session.'));
+      empty.appendChild(eb); host.appendChild(empty);
+      highlightSegment(null);
+      return;
+    }
+    if (SEGSTEP.idx >= segs.length) SEGSTEP.idx = 0;
+    if (SEGSTEP.idx < 0) SEGSTEP.idx = segs.length - 1;
+    var seg = segs[SEGSTEP.idx];
+    var S = CUR.session.samples || [];
+    var wd = a.windDir;
+    var st = RDSegments.segStats(S, seg, wd);
+
+    var card = el('div', 'card');
+    var head = el('div', 'card-header d-flex flex-wrap align-items-center gap-2');
+    head.appendChild(el('h3', 'card-title mb-0', 'Segment'));
+    head.appendChild(kindSelect(a));
+
+    var nav = el('div', 'd-flex align-items-center gap-2 ms-auto');
+    function navBtn(txt, delta) {
+      var b = el('button', 'btn btn-sm', txt);
+      b.type = 'button';
+      b.addEventListener('click', function () {
+        SEGSTEP.idx += delta; renderSegmentStepper(a);
+      });
+      return b;
+    }
+    nav.appendChild(navBtn('\u2039', -1));
+    nav.appendChild(el('span', 'num', (SEGSTEP.idx + 1) + ' / ' + segs.length));
+    nav.appendChild(navBtn('\u203a', 1));
+    head.appendChild(nav);
+    card.appendChild(head);
+
+    var body = el('div', 'card-body');
+    if (!st) {
+      body.appendChild(el('div', 'text-secondary', 'No samples in this segment.'));
+      card.appendChild(body); host.appendChild(card);
+      return;
+    }
+
+    /* 머리줄 — 무엇을 보고 있는지 */
+    var title = el('div', 'd-flex flex-wrap align-items-baseline gap-2');
+    var name = el('div', 'fw-bold',
+      kindLabel(SEGSTEP.kind) + ' #' + seg.no);
+    title.appendChild(name);
+    if (seg.side) title.appendChild(sideTag(seg.side,
+      seg.side === 'P' ? 'Port' : 'Starboard'));
+    if (st.direction) {
+      var d = el('span', 'badge', st.direction === 'upwind' ? 'upwind' : 'downwind');
+      d.style.background = st.direction === 'upwind' ? THEME.stbd : THEME.warn;
+      d.style.color = '#0b1220';
+      title.appendChild(d);
+    }
+    title.appendChild(el('span', 'lab', fmtClock(st.durationSec)
+      + (st.distanceM != null ? '  \u00b7  ' + (st.distanceM / 1000).toFixed(2) + ' km' : '')));
+    body.appendChild(title);
+
+    /* 통계 격자 */
+    var grid = el('div', 'row g-2 mt-2');
+    function box(label, val, sub) {
+      var c = el('div', 'col-6 col-md-3');
+      var w = el('div', 'p-2 rounded');
+      w.style.background = currentThemeName() === 'light'
+        ? 'rgba(0,0,0,.03)' : 'rgba(255,255,255,.04)';
+      w.appendChild(el('div', 'lab', label));
+      w.appendChild(el('div', 'num fw-bold mt-1', val));
+      if (sub) w.appendChild(el('div', 'lab', sub));
+      c.appendChild(w); return c;
+    }
+    function kt(v) { return v == null ? '\u2014' : (v * KT).toFixed(1) + ' kt'; }
+    grid.appendChild(box('Avg speed', kt(st.avgSpeedMs), 'max ' + kt(st.maxSpeedMs)));
+    /* VMG 는 **크기**로 보여준다. 내부 부호는 +풍상/−풍하 규약이지만
+       화면에서 "풍하 VMG −6.2kt" 는 느리다는 뜻처럼 읽힌다 — 어느 쪽으로
+       가는지는 위의 upwind/downwind 배지가 이미 말한다. */
+    grid.appendChild(box('Avg VMG',
+      st.avgVmgMs == null ? '\u2014' : kt(Math.abs(st.avgVmgMs)),
+      st.maxVmgMs == null ? 'needs wind direction'
+                          : 'max ' + kt(Math.abs(st.maxVmgMs))));
+    grid.appendChild(box('Avg wind angle',
+      st.avgTwaDeg == null ? '\u2014' : Math.round(st.avgTwaDeg) + '\u00b0',
+      st.avgHr != null ? Math.round(st.avgHr) + ' bpm' : ''));
+    grid.appendChild(box('Distance',
+      st.distanceM == null ? '\u2014' : (st.distanceM / 1000).toFixed(2) + ' km',
+      st.samples + ' samples'));
+    body.appendChild(grid);
+
+    renderSegTurnDetail(body, seg, S, wd);
+    renderSegTarget(body, seg, st, a);
+    renderSegAngleChange(body, seg, S, wd);
+
+    card.appendChild(body);
+    host.appendChild(card);
+    highlightSegment(seg);
+  }
+
+  /* 회전 구간이면 진입/이탈을 **속도와 VMG 둘 다**, 손실은 **미터로도**.
+     W5·W7. 그들은 백분율만 주고 분모가 0 근처면 +421.4% 를 낸다. */
+  function renderSegTurnDetail(body, seg, S, wd) {
+    if (seg.kind !== 'tack' && seg.kind !== 'gybe') return;
+    var m = seg.man;
+    if (!m) return;
+    var wrap = el('div', 'row g-2 mt-2');
+    function cell(label, val, sub, tone) {
+      var c = el('div', 'col-6 col-md-3');
+      var w = el('div', 'p-2 rounded');
+      w.style.background = currentThemeName() === 'light'
+        ? 'rgba(0,0,0,.03)' : 'rgba(255,255,255,.04)';
+      w.appendChild(el('div', 'lab', label));
+      var v = el('div', 'num fw-bold mt-1', val);
+      if (tone) v.style.color = tone;
+      w.appendChild(v);
+      if (sub) w.appendChild(el('div', 'lab', sub));
+      c.appendChild(w); return c;
+    }
+    function kt(v) { return v == null ? '\u2014' : (v * KT).toFixed(1) + ' kt'; }
+    function pctTxt(p) {
+      return p == null ? 'too slow to compare' : (p > 0 ? '+' : '') + p.toFixed(1) + '%';
+    }
+    var sp = pctChange(m.entrySpeedMs, m.exitSpeedMs, 0.5);
+    wrap.appendChild(cell('Entry \u2192 exit speed',
+      kt(m.entrySpeedMs) + ' \u2192 ' + kt(m.exitSpeedMs), pctTxt(sp),
+      (sp != null && sp < 0) ? THEME.port : null));
+
+    /* 진입/이탈 VMG — 속도만 보면 "빠르게 나왔지만 각도를 버렸다" 를 놓친다 */
+    if (wd != null) {
+      var eV = vmgAtIdx(S, m.startIdx, wd), xV = vmgAtIdx(S, m.endIdx, wd);
+      var vp = pctChange(eV, xV, 0.5);
+      wrap.appendChild(cell('Entry \u2192 exit VMG',
+        kt(eV) + ' \u2192 ' + kt(xV), pctTxt(vp),
+        (vp != null && vp < 0) ? THEME.port : null));
+    }
+
+    /* W5 — 손실을 미터로. 회전이 없었다면 갔을 거리에서 실제 간 거리를 뺀다.
+       기준 속도는 진입·이탈 중 큰 쪽(§456 과 같은 규약). */
+    var ref = Math.max(m.entrySpeedMs || 0, m.exitSpeedMs || 0);
+    var dur = (S[m.endIdx] && S[m.startIdx]) ? (S[m.endIdx].t - S[m.startIdx].t) : null;
+    var actual = (S[m.endIdx] && S[m.startIdx] && S[m.endIdx].cumDist != null)
+      ? (S[m.endIdx].cumDist - S[m.startIdx].cumDist) : null;
+    if (ref > 0 && dur != null && actual != null) {
+      var lostM = Math.max(0, ref * dur - actual);
+      wrap.appendChild(cell('Lost in the turn', Math.round(lostM) + ' m',
+        'vs holding ' + kt(ref), lostM > 0 ? THEME.warn : null));
+    }
+    wrap.appendChild(cell('Recovery',
+      m.recoverySec == null ? '\u2014' : m.recoverySec.toFixed(1) + ' s',
+      'back to 95% of entry'));
+    body.appendChild(wrap);
+  }
+
+  function vmgAtIdx(S, i, wd) {
+    if (!S[i] || S[i].heading == null || S[i].speed == null || wd == null) return null;
+    var d = ((S[i].heading - wd + 540) % 360) - 180;
+    return S[i].speed * Math.cos(Math.abs(d) * Math.PI / 180);
+  }
+
+  /* W4 타깃 대비 — **방향에 따라 지표가 다르다**.
+     풍상은 VMG(각도를 팔아 높이를 산다), 풍하는 속도(포일은 깊게 갈수록
+     VMG 가 커 보이다가 떨어진다). 한 지표로 통일하면 둘 중 하나는
+     틀린 것을 최적화하게 된다. */
+  function renderSegTarget(body, seg, st, a) {
+    if (!st || !st.direction || !a.polar) return;
+    if (!window.RDPolar || !RDPolar.optimalAngle) return;
+    var bins = a.polar.combined;
+    if (!bins || !bins.length) return;
+    var best = RDPolar.optimalAngle(bins, st.direction, 5);
+    if (!best.ok) return;
+
+    /* 표본이 얇으면 **비교 자체를 하지 않는다.** 4표본짜리 레그에
+       "52% of target" 을 띄우면 발견처럼 읽히는데 그건 그냥 회전 사이
+       빈틈이다. 얇다고 칩만 달아 두는 것으로는 부족하다(실측에서
+       그렇게 보였다). */
+    var MIN_CMP = 20;
+    if (st.samples < MIN_CMP) {
+      var thin = el('div', 'lab mt-2');
+      thin.textContent = 'Too short to compare against your best \u2014 '
+        + st.samples + ' samples, needs ' + MIN_CMP + '.';
+      body.appendChild(thin);
+      return;
+    }
+    var upwind = st.direction === 'upwind';
+    var mine = upwind ? Math.abs(st.avgVmgMs || 0) * KT : (st.avgSpeedMs || 0) * KT;
+    var target = upwind ? best.vmgKt : best.speedKt;
+    if (!(target > 0)) return;
+    var pct = (mine / target) * 100;
+
+    var box = el('div', 'mt-3 p-2 rounded');
+    box.style.border = '1px solid ' + (pct >= 95 ? THEME.stbd : THEME.warn);
+    var h = el('div', 'd-flex align-items-center justify-content-between');
+    h.appendChild(el('div', 'lab', 'Against your best this session'));
+    var chip = el('span', 'badge', st.samples >= 60 ? 'solid' : 'short segment');
+    chip.style.background = st.samples >= 60 ? THEME.stbd : THEME.dim;
+    chip.style.color = '#0b1220';
+    h.appendChild(chip);
+    box.appendChild(h);
+    var r = el('div', 'd-flex flex-wrap gap-4 mt-1');
+    function kv(k, v, tone) {
+      var c = el('div');
+      c.appendChild(el('div', 'lab', k));
+      var vv = el('div', 'num fw-bold', v);
+      if (tone) vv.style.color = tone;
+      c.appendChild(vv);
+      return c;
+    }
+    r.appendChild(kv(upwind ? 'Target VMG' : 'Target speed', target.toFixed(1) + ' kt'));
+    r.appendChild(kv('% of target', Math.round(pct) + '%',
+      pct >= 95 ? THEME.stbd : THEME.warn));
+    r.appendChild(kv('Delta', (mine - target >= 0 ? '+' : '')
+      + (mine - target).toFixed(1) + ' kt'));
+    box.appendChild(r);
+    /* 각도 차이를 같이 말한다. 이게 없으면 "78° 로 간 레그를 34° 타깃에
+       대고 26%" 가 그냥 가혹한 숫자로만 읽힌다 — 실제로 알아야 할 것은
+       **각도를 얼마나 놓쳤나** 이고, 그건 다음 레그에서 고칠 수 있다. */
+    if (st.avgTwaDeg != null) {
+      var gap = st.avgTwaDeg - best.twaDeg;
+      if (Math.abs(gap) >= 8) {
+        var g = el('div', 'lab mt-1');
+        g.style.color = THEME.warn;
+        g.textContent = 'You sailed this at ' + Math.round(st.avgTwaDeg)
+          + '\u00b0 while your best ' + (upwind ? 'VMG' : 'speed') + ' angle was '
+          + Math.round(best.twaDeg) + '\u00b0 \u2014 '
+          + (upwind
+              ? (gap > 0 ? 'that is ' + Math.round(gap) + '\u00b0 lower than you can point'
+                         : 'that is ' + Math.round(-gap) + '\u00b0 higher, so you were pinching')
+              : (gap > 0 ? 'that is ' + Math.round(gap) + '\u00b0 deeper than your fastest'
+                         : 'that is ' + Math.round(-gap) + '\u00b0 higher than your fastest'))
+          + '. Much of the gap below is the angle, not the boat speed.';
+        box.appendChild(g);
+      }
+    }
+    box.appendChild(el('div', 'lab mt-1', upwind
+      ? 'Upwind is scored on VMG \u2014 progress to windward is the goal.'
+      : 'Downwind is scored on speed \u2014 on a foil, deeper flatters VMG right '
+        + 'up until you drop off.'));
+    body.appendChild(box);
+  }
+
+  /* W11 — 구간 안에서 풍각이 밀렸나(헤더/리프트) */
+  function renderSegAngleChange(body, seg, S, wd) {
+    if (!window.RDSegments || !RDSegments.angleChange) return;
+    var ac = RDSegments.angleChange(S, seg, wd);
+    if (!ac) return;
+    var d = ac.deltaDeg;
+    if (Math.abs(d) < 4) return;      /* 4° 미만은 노이즈와 구별이 안 된다 */
+    var line = el('div', 'lab mt-2');
+    line.textContent = 'Wind angle moved ' + (d > 0 ? '+' : '') + d.toFixed(1)
+      + '\u00b0 across this segment ('
+      + Math.round(ac.firstTwa) + '\u00b0 \u2192 ' + Math.round(ac.lastTwa)
+      + '\u00b0) \u2014 ' + (d > 0 ? 'you were freed' : 'you were headed')
+      + '. Could be a real shift or the wind direction drifting.';
+    body.appendChild(line);
+  }
+
+  function kindLabel(k) {
+    for (var i = 0; i < SEG_KINDS.length; i++) {
+      if (SEG_KINDS[i][0] === k) return SEG_KINDS[i][1].replace(/s$/, '');
+    }
+    return k;
+  }
+
+  function kindSelect(a) {
+    var sel = el('select', 'form-select form-select-sm');
+    sel.style.width = 'auto';
+    SEG_KINDS.forEach(function (p) {
+      var n = buildSegs(p[0], a).length;
+      var o = document.createElement('option');
+      o.value = p[0];
+      o.textContent = p[1] + (n ? ' (' + n + ')' : ' \u2014 none');
+      o.disabled = !n;
+      if (p[0] === SEGSTEP.kind) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener('change', function () {
+      SEGSTEP.kind = sel.value; SEGSTEP.idx = 0; renderSegmentStepper(a);
+    });
+    return sel;
+  }
+
   var TRACKPLOT = { mirror: false, pad: 10 };
   var MPD = 111320;                    /* 위도 1° 의 미터 */
 
@@ -7407,7 +7767,12 @@
       var b = ev.target.closest('button[data-mode]');
       if (!b || b.disabled) return;
       mapMode = b.getAttribute('data-mode');
-      if (mapCtx) renderTrack(mapCtx.session, mapCtx.analysis);
+      if (mapCtx) {
+        renderTrack(mapCtx.session, mapCtx.analysis);
+        /* 지도를 새로 만들면 강조 레이어가 날아간다 — 다시 얹는다 */
+        segHl = null;
+        try { renderSegmentStepper(mapCtx.analysis); } catch (e) {}
+      }
     });
   }
   bindMapMode();
@@ -7783,6 +8148,8 @@
     renderPhysiology(analysis);
     renderEnvironment(analysis, est);
     renderTrack(session, analysis);
+    /* §522 — 지도가 만들어진 **다음**이라야 강조 레이어를 얹을 수 있다 */
+    try { renderSegmentStepper(analysis); } catch (e) {}
     renderAttitude(session, analysis, CUR.fusion);
     var whatIf = null;
     if (window.RDCoach && RDCoach.computeWhatIf) {
