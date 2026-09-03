@@ -3145,8 +3145,10 @@
     var r1 = el('tr');
     var thM = el('th', null, 'Metric'); thM.rowSpan = 2; r1.appendChild(thM);
     var thD = el('th', null, 'Direction'); thD.rowSpan = 2; r1.appendChild(thD);
-    var thP = el('th', 'text-center', 'Port'); thP.colSpan = 3; r1.appendChild(thP);
-    var thS = el('th', 'text-center', 'Starboard'); thS.colSpan = 3; r1.appendChild(thS);
+    var thP = el('th', 'text-center'); thP.colSpan = 3;
+    thP.appendChild(sideTag('P', 'Port')); r1.appendChild(thP);
+    var thS = el('th', 'text-center'); thS.colSpan = 3;
+    thS.appendChild(sideTag('S', 'Starboard')); r1.appendChild(thS);
     th2.appendChild(r1);
     var r2 = el('tr');
     ['Avg', 'Best 50%', 'Best 20%', 'Avg', 'Best 50%', 'Best 20%'].forEach(function (x) {
@@ -3523,6 +3525,7 @@
 
     var usable = pts.filter(function (r) { return md.get(r) != null; });
     if (usable.length < 2) {
+      if (plot.parentNode) plot.parentNode.removeChild(plot);
       b2.appendChild(el('div', 'text-secondary',
         'Only ' + usable.length + ' session has this metric stored. Older sessions were '
         + 'saved before it existed — save a session again and it fills in.'));
@@ -3530,13 +3533,31 @@
       return;
     }
     /* x 가 겹치면 uPlot 이 아무것도 안 그린다 — 같은 날 다른 세션이면 밀어 준다 */
-    var xs = [], lastX = -Infinity;
+    var xs = [], lastX = -Infinity, badX = 0;
     usable.forEach(function (r) {
-      var x = r.dateEpoch / 1000;
+      var x = Number(r.dateEpoch) / 1000;
+      if (!isFinite(x)) { badX++; return; }
       if (x <= lastX) x = lastX + 1;
       xs.push(x); lastX = x;
     });
-    var ys = usable.map(function (r) { return md.get(r); });
+    var ys = usable.filter(function (r) { return isFinite(Number(r.dateEpoch)); })
+                   .map(function (r) { return md.get(r); });
+
+    /* x 가 숫자가 아니면 uPlot 은 **아무 말 없이** 축만 그리고 선을 안 그린다.
+       y 축은 데이터에서 정상으로 잡히기 때문에 "그래프가 안 나온다" 로만
+       보이고 원인이 화면에 없다 — 실제로 그렇게 한참 헤맸다(dateEpoch 이
+       ISO 문자열로 저장된 세션들). 그러니 침묵하지 않는다. */
+    if (xs.length < 2) {
+      if (plot.parentNode) plot.parentNode.removeChild(plot);  /* 빈 상자를 남기지 않는다 */
+      b2.appendChild(el('div', 'text-secondary',
+        badX
+          ? 'These sessions were saved with a broken date, so they cannot be '
+            + 'placed on a timeline. Re-saving each one fixes it \u2014 open it '
+            + 'from the list above and press Save session.'
+          : 'Not enough sessions with a usable date to draw a trend.'));
+      c2.appendChild(b2); host.appendChild(c2);
+      return;
+    }
 
     var foot = el('div', 'text-secondary mt-2');
     foot.style.fontSize = '.8125rem';
@@ -3695,8 +3716,9 @@
       var ls = el('div'); ls.style.cssText = 'background:#2f9e44;width:' + (sVal / tot * 100) + '%';
       bar.appendChild(lp); bar.appendChild(ls); b.appendChild(bar);
       var lg = el('div', 'd-flex justify-content-between mt-2');
-      lg.appendChild(el('span', 'num', 'Port ' + p));
-      lg.appendChild(el('span', 'num', sName + ' ' + sVal));
+      var lgP = el('span', 'num'); lgP.appendChild(sideTag('P', 'Port ' + p));
+      var lgS = el('span', 'num'); lgS.appendChild(sideTag('S', sName + ' ' + sVal));
+      lg.appendChild(lgP); lg.appendChild(lgS);
       b.appendChild(lg);
       card.appendChild(b); col.appendChild(card); return col;
     }
@@ -3775,7 +3797,10 @@
       badge.style.background = m.type === 'tack' ? '#4dabf7' : m.type === 'gybe' ? '#f76707' : '#868e96';
       badge.style.color = '#0b1220';
       var tdT = el('td'); tdT.appendChild(badge); tr.appendChild(tdT);
-      tr.appendChild(el('td', null, m.side === 'P' ? 'Port' : m.side === 'S' ? 'Stbd' : '—'));
+      var tdSide = el('td');
+      tdSide.appendChild(sideTag(m.side,
+        m.side === 'P' ? 'Port' : m.side === 'S' ? 'Stbd' : '\u2014'));
+      tr.appendChild(tdSide);
       tr.appendChild(el('td', 'text-end num', fmtClock(m.tSec)));
       var loss = m.lossDisplayPct != null ? m.lossDisplayPct : m.lossPct;
       tr.appendChild(el('td', 'text-end num', loss == null ? '—' : Math.round(loss) + '%'));
@@ -4123,14 +4148,19 @@
 
     /* 한 줄 요약 — Port | Diff | Stbd */
     var row = el('div', 'd-flex align-items-center justify-content-between');
-    function side(label, val, unit) {
+    function side(sd, label, val, unit) {
       var c = el('div', 'text-center');
-      c.appendChild(el('div', 'lab', label));
-      c.appendChild(el('div', 'kpi__val num mt-1', val));
+      var lb = el('div', 'lab');
+      lb.style.cssText = 'display:flex;align-items:center;justify-content:center';
+      lb.appendChild(sideTag(sd, label));
+      c.appendChild(lb);
+      var v = el('div', 'kpi__val num mt-1', val);
+      v.style.color = sideColor(sd) || '';
+      c.appendChild(v);
       c.appendChild(el('div', 'lab', unit));
       return c;
     }
-    row.appendChild(side('Port', pf.txt, pf.unit));
+    row.appendChild(side('P', 'Port', pf.txt, pf.unit));
     var mid = el('div', 'text-center px-3');
     mid.appendChild(el('div', 'lab', 'Diff'));
     var dv = el('div', 'kpi__val num mt-1',
@@ -4140,7 +4170,7 @@
     mid.appendChild(dv);
     mid.appendChild(el('div', 'lab', 'starboard vs port'));
     row.appendChild(mid);
-    row.appendChild(side('Starboard', sf.txt, sf.unit));
+    row.appendChild(side('S', 'Starboard', sf.txt, sf.unit));
     body.appendChild(row);
 
     /* 좌우 막대 — 중앙에서 벌어진 쪽이 큰 쪽 */
@@ -4482,8 +4512,10 @@
         var tr = el('tr');
         tr.appendChild(el('td', 'num', String(sel[k] + 1)));
         tr.appendChild(el('td', null, m.type === 'tack' ? 'Tack' : 'Gybe'));
-        tr.appendChild(el('td', null,
+        var tdS2 = el('td');
+        tdS2.appendChild(sideTag(m.side,
           m.side === 'P' ? 'Port' : m.side === 'S' ? 'Stbd' : '\u2014'));
+        tr.appendChild(tdS2);
         [m.entrySpeedMs, m.minSpeedMs, m.exitSpeedMs].forEach(function (v) {
           tr.appendChild(el('td', 'text-end num',
             v == null ? '\u2014' : (v * KT).toFixed(1)));
@@ -4635,6 +4667,35 @@
    * "왼쪽으로 도는 걸 못 한다"(§507 에서 실제로 찾은 것)가 그림에서
    * 사라진다. 그래서 토글로 두고, 켤 때 무슨 일이 일어나는지 적는다.
    * ═══════════════════════════════════════════════════════════════ */
+
+  /* §517 (옥대표) — P/S 색을 표에도. 좌현 적색·우현 녹색은 국제 항해
+     관례라 이미 바이올린·회전 궤적이 쓰고 있었는데, **표는 글자뿐**이라
+     같은 개념인 줄 눈으로 잇기가 어려웠다.
+
+     ⚠ 다만 적/녹은 색각이상에서 제일 구분이 안 되는 조합이다. 그래서
+     **색만으로 뜻을 싣지 않는다** — 점은 글자 옆에 붙는 보조 신호이고,
+     Port/Starboard 라는 글자가 언제나 남는다. 색을 빼도 표는 그대로
+     읽힌다(§474 에서 세운 규칙과 같다). */
+  function sideColor(side) {
+    return side === 'P' ? THEME.port : side === 'S' ? THEME.stbd : null;
+  }
+  /* 색 점 하나. 글자는 호출부가 따로 넣는다 */
+  function sideDot(side) {
+    var c = sideColor(side);
+    var d = el('span');
+    d.style.cssText = 'display:inline-block;width:8px;height:8px;border-radius:50%;'
+      + 'margin-right:6px;vertical-align:middle;flex:0 0 auto;'
+      + (c ? 'background:' + c + ';' : 'background:transparent;border:1px solid currentColor;');
+    return d;
+  }
+  /* 점 + 글자를 한 덩어리로 */
+  function sideTag(side, label) {
+    var w = el('span');
+    w.style.cssText = 'display:inline-flex;align-items:center;white-space:nowrap';
+    w.appendChild(sideDot(side));
+    w.appendChild(document.createTextNode(label));
+    return w;
+  }
 
   var TRACKPLOT = { mirror: false, pad: 10 };
   var MPD = 111320;                    /* 위도 1° 의 미터 */
@@ -5366,7 +5427,8 @@
       [['all', 'both'], ['P', 'port'], ['S', 'starboard']].forEach(function (sd) {
         var v = grp[sd[0]];
         if (!v || !v.count) return;
-        rows.push({ label: t[1] + ' \u00b7 ' + sd[1], isAll: sd[0] === 'all', v: v });
+        rows.push({ label: t[1] + ' \u00b7 ' + sd[1], side: sd[0],
+                    isAll: sd[0] === 'all', v: v });
       });
     });
     if (!rows.length) return;
@@ -5389,7 +5451,11 @@
     rows.forEach(function (r) {
       var tr = el('tr');
       if (r.isAll) tr.className = 'table-active';
-      tr.appendChild(el('td', null, r.label));
+      var tdG = el('td');
+      /* '양쪽' 행은 색이 없다 — 점이 있으면 한쪽을 가리키는 뜻이 된다 */
+      if (r.isAll) tdG.textContent = r.label;
+      else tdG.appendChild(sideTag(r.side, r.label));
+      tr.appendChild(tdG);
       tr.appendChild(el('td', 'text-end num', String(r.v.count)));
       function pct(x) { return x == null ? '\u2014' : Math.round(x) + '%'; }
       tr.appendChild(el('td', 'text-end num', pct(r.v.effAvg)));

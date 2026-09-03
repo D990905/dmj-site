@@ -102,8 +102,14 @@
       if (ts == null || ts <= 0) { skippedNoTime++; continue; }
       /* epoch 초 → Date. 밀리초로 내보내는 변형 대비 자릿수로 구분. */
       var ms = (ts > 1e11) ? ts : ts * 1000;
-      var time = new Date(ms);
-      if (isNaN(time.getTime())) { skippedNoTime++; continue; }
+      if (!isFinite(ms)) { skippedNoTime++; continue; }
+      /* ⚠ time 은 **epoch 밀리초 숫자**다. 예전엔 여기서 Date 객체를
+         만들었는데, GPX·RaceBox·병합기는 전부 숫자를 낸다. 이 파서만
+         달랐다. Date 객체는 뺄셈·정렬이 다 되니 분석은 멀쩡히 돌아가고,
+         **JSON.stringify 될 때만** ISO 문자열로 바뀐다 — 그래서
+         session.startEpoch → dateEpoch 로 실려 저장된 뒤에야 터졌다.
+         (시즌 흐름 그래프가 x 축 통째로 NaN 이라 조용히 빈 그래프였다.) */
+      var time = ms;
 
       var lat = num(f[cLat]);
       var lng = num(f[cLng]);
@@ -144,7 +150,8 @@
         points.length + '개).');
     }
 
-    var startDate = points[0].time.toISOString().slice(0, 10);
+    /* time 이 숫자가 됐으므로 여기서 Date 를 만든다 (예전엔 Date 객체였다) */
+    var startDate = new Date(points[0].time).toISOString().slice(0, 10);
     var trackName = 'Waterspeed 세션 ' + startDate;
 
     return {

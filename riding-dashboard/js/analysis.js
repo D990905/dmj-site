@@ -267,7 +267,12 @@
     });
     if (!session.legs.length) throw new Error('분석할 트랙 구간이 없습니다.');
 
-    session.startEpoch = t0;
+    /* 파서가 Date 를 주든 숫자를 주든 여기서 **숫자로 고정**한다.
+       startEpoch 은 저장 레코드의 dateEpoch 이 되고, 거기서 산술이
+       돌아간다(그래프 x 축). Date 객체는 산술은 되지만 직렬화하면
+       문자열이 되어 그때부터 NaN 이다 — 파서마다 다시 틀리지 않도록
+       통과 지점 한 곳에서 막는다. */
+    session.startEpoch = (t0 == null) ? null : Number(t0);
     // 샘플 간격(median dt) — 참고용
     var dts = [];
     session.legs.forEach(function (leg) {

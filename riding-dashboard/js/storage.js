@@ -134,8 +134,24 @@
       var raw = global.localStorage ? global.localStorage.getItem(K_SESSIONS()) : null;
       if (!raw) return [];
       var arr = JSON.parse(raw);
-      return Array.isArray(arr) ? arr : [];
+      if (!Array.isArray(arr)) return [];
+      return arr.map(repairDateEpoch);
     } catch (e) { return []; }
+  }
+  /* 이미 저장된 레코드 복구 — dateEpoch 이 ISO 문자열로 들어간 것이 있다.
+     Waterspeed CSV 파서가 time 을 Date 객체로 냈고, 그게 startEpoch →
+     dateEpoch 으로 실려 JSON 직렬화 때 문자열이 됐다. Date 로 읽는 곳
+     (표의 날짜 칸·정렬 키)은 문자열로도 멀쩡해서 겉으론 티가 안 났고,
+     **산술을 하는 시즌 흐름 그래프만** 조용히 죽어 있었다.
+     파서는 고쳤지만 이미 저장된 것은 읽을 때 되돌린다. */
+  function repairDateEpoch(r) {
+    if (!r || typeof r.dateEpoch === 'number') return r;
+    if (r.dateEpoch == null) return r;
+    var n = (typeof r.dateEpoch === 'string')
+      ? Date.parse(r.dateEpoch)
+      : Number(r.dateEpoch);
+    if (isFinite(n)) r.dateEpoch = n;
+    return r;
   }
   function writeAll(arr) {
     try {
@@ -336,6 +352,12 @@
     return (sum / acc) / 1.94384;   /* kt → m/s (레코드는 m/s 규약) */
   }
 
+  function numEpoch(v) {
+    if (v == null) return null;
+    var n = (typeof v === 'string') ? Date.parse(v) : Number(v);
+    return isFinite(n) ? n : null;
+  }
+
   function buildRecord(meta, analysis) {
     var s = analysis.summary || {};
     var ms = analysis.maneuverStats || {};
@@ -355,7 +377,9 @@
          ' · 편집본' 접미사를 붙여 저장했으나, 제목을 사용자가 직접
          편집하게 되면서 편집 상태는 별도 플래그로 분리한다(헤더 배지용). */
       edited: !!meta.edited,
-      dateEpoch: meta.dateEpoch || Date.now(),
+      /* 숫자로 고정 — Date 객체가 들어오면 직렬화될 때 문자열이 되고,
+         그 뒤로는 산술이 전부 NaN 이다(시즌 흐름 그래프가 그렇게 죽었다) */
+      dateEpoch: numEpoch(meta.dateEpoch) || Date.now(),
       sport: meta.sport || 'wingfoil',
       windDir: meta.windDir != null ? meta.windDir : null,
       windSpeedKt: meta.windSpeedKt != null ? meta.windSpeedKt : null,
