@@ -320,6 +320,66 @@
     });
   }
 
+  /* §527 (옥대표 "카카오톡 구글 네이버 애플 로그인 또는 커스텀 로그인")
+     — 소셜 로그인 일반화.
+
+     ⚠ **코드가 있다고 되는 게 아니다.** OAuth 는 세 곳이 다 맞아야 켜진다:
+       ① 각 제공자 개발자 콘솔에 앱 등록 → client id/secret
+       ② Supabase 대시보드 Authentication > Providers 에서 그 값 입력·활성화
+       ③ 제공자 콘솔의 redirect URI 에 Supabase 콜백 주소 등록
+     ①·③ 은 옥대표 계정이라야 하고 ② 도 대시보드 접근이 필요하다.
+     그래서 여기서는 **켜지지 않은 제공자를 눌렀을 때 조용히 실패하지 않고
+     무엇이 빠졌는지 말하게** 한다 — 그게 코드가 할 수 있는 몫이다.
+
+     제공자별 사정:
+       kakao  — Supabase 기본 제공자. §180 에서 이미 붙였다.
+       google — Supabase 기본 제공자.
+       apple  — Supabase 기본 제공자. 단 Apple Developer 유료 멤버십 필요.
+       naver  — **Supabase 기본 제공자가 아니다.** 커스텀 OIDC 로 넣거나
+                Edge Function 이 필요하다. 코드 경로는 열어 두되 화면에서
+                '설정 필요' 로 구분해 표시한다 — 되는 척하면 안 된다. */
+  var PROVIDERS = {
+    kakao:  { label: '카카오', builtin: true,  scopes: 'profile_nickname profile_image' },
+    google: { label: 'Google', builtin: true,  scopes: 'email profile' },
+    apple:  { label: 'Apple',  builtin: true,  scopes: 'email name' },
+    naver:  { label: '네이버', builtin: false, scopes: '' }
+  };
+
+  function providerInfo(name) { return PROVIDERS[name] || null; }
+  function providerList() {
+    return Object.keys(PROVIDERS).map(function (k) {
+      return { id: k, label: PROVIDERS[k].label, builtin: PROVIDERS[k].builtin };
+    });
+  }
+
+  function signInWithProvider(name, opts) {
+    opts = opts || {};
+    var info = PROVIDERS[name];
+    if (!info) return Promise.reject(new Error('지원하지 않는 로그인 방식입니다: ' + name));
+    return ensureClient().then(function () {
+      var o = {
+        redirectTo: opts.redirectTo || (window.location.origin + window.location.pathname)
+      };
+      if (info.scopes) o.scopes = info.scopes;
+      return sb.auth.signInWithOAuth({ provider: name, options: o });
+    }).then(function (res) {
+      if (res.error) {
+        var m = String(res.error.message || '');
+        /* 제공자가 대시보드에서 안 켜져 있으면 Supabase 가 이 문구를 준다.
+           그대로 노출하면 사용자는 무슨 말인지 모른다. */
+        if (/provider is not enabled|Unsupported provider/i.test(m)) {
+          var e = new Error(info.label + ' 로그인이 아직 켜져 있지 않습니다. '
+            + 'Supabase 대시보드에서 ' + name + ' 제공자를 활성화해야 합니다.');
+          e.code = 'provider_not_enabled';
+          e.provider = name;
+          throw e;
+        }
+        throw new Error(_translateAuthError(m));
+      }
+      return res.data;   // 브라우저가 제공자 페이지로 이동 중
+    });
+  }
+
   function logout() {
     return ensureClient().then(function () {
       return sb.auth.signOut();
@@ -661,6 +721,9 @@
     signup: signup,
     login: login,
     signInWithKakao: signInWithKakao,    // §180 신규
+    signInWithProvider: signInWithProvider,  // §527 카카오·구글·애플·네이버 공통
+    providerList: providerList,              // §527 화면이 버튼을 만들 때 쓴다
+    providerInfo: providerInfo,
     logout: logout,
     currentUser: currentUser,
     isLoggedIn: isLoggedIn,

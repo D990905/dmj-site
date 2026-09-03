@@ -78,6 +78,66 @@
      무조건 읽어 다음 사용자에게 누수되던 경로를 끊는다. sessions 요약본은
      rd_legacybak_sessions_v1 로 백업(롤백용). track 은 namespace 복사본이 보존본.
      비로그인/DMJAuth 부재(node)/이미 마이그레이션 = no-op. */
+  /* §527 — 비로그인 상태의 사일로 합치기.
+     v2 대시보드는 DMJAuth 를 안 실어서 데이터가 **bare `rd_*`** 에 쌓였고,
+     구 대시보드는 DMJAuth 를 실어서 비로그인분이 **`rd_anon_*`** 에 쌓였다.
+     v2 에 로그인을 붙이는 순간 v2 도 `rd_anon_` 을 보게 되는데, 그러면
+     bare 에 있던 세션이 **화면에서 사라진다**(지워지는 건 아니지만 같은 일로
+     보인다). 그래서 붙이기 전에 bare → anon 을 먼저 합친다.
+
+     규칙은 로그인 마이그레이션과 같다: 복사 → 검증 → 원본 제거,
+     **대상에 이미 있으면 덮지 않는다**(둘 다 쓰던 사람의 것을 지우면 안 된다). */
+  function _moveNamespace(fromPrefix, toPrefix, flagKey) {
+    var ls; try { ls = global.localStorage; } catch (e) { ls = null; }
+    if (!ls || fromPrefix === toPrefix) return { migrated: false, reason: 'noop' };
+    try {
+      if (flagKey && ls.getItem(flagKey)) return { migrated: false, reason: 'already' };
+      var SUFFIX = ['sessions_v1', 'edits_v1', 'titles_v1', 'videosync_v1',
+                    'rider_v1', 'sessionqa_v1', 'workouts_v1', 'wellness_v1'];
+      var src = [];
+      SUFFIX.forEach(function (suf) {
+        if (ls.getItem(fromPrefix + suf) != null) src.push(fromPrefix + suf);
+      });
+      for (var i = 0; i < ls.length; i++) {
+        var lk = ls.key(i);
+        if (lk && lk.indexOf(fromPrefix + 'track_v1_') === 0) src.push(lk);
+      }
+      if (!src.length) {
+        if (flagKey) { try { ls.setItem(flagKey, 'none'); } catch (e) {} }
+        return { migrated: false, reason: 'no-source' };
+      }
+      var moved = [], failed = [];
+      for (var j = 0; j < src.length; j++) {
+        var from = src[j];
+        var to = toPrefix + from.slice(fromPrefix.length);
+        var val = ls.getItem(from);
+        if (val == null) continue;
+        if (ls.getItem(to) == null) {
+          try { ls.setItem(to, val); } catch (e) { failed.push(from); continue; }
+          if (ls.getItem(to) !== val) { failed.push(from); continue; }
+        }
+        try { ls.removeItem(from); } catch (e) {}
+        moved.push(from);
+      }
+      if (!failed.length && flagKey) {
+        try { ls.setItem(flagKey, String(Date.now())); } catch (e) {}
+      }
+      return { migrated: moved.length > 0, moved: moved, failed: failed };
+    } catch (e) {
+      return { migrated: false, reason: 'error', error: String(e) };
+    }
+  }
+
+  var ANON_MERGE_FLAG = 'rd_ns_merge_anon_v1';
+  var _anonMergeTried = false;
+  function mergeBareIntoAnon() {
+    if (_anonMergeTried) return { migrated: false, reason: 'checked' };
+    if (!_authLayerPresent()) return { migrated: false, reason: 'no-auth-layer' };
+    if (_currentUid()) return { migrated: false, reason: 'logged-in' };
+    _anonMergeTried = true;
+    return _moveNamespace('rd_', 'rd_anon_', ANON_MERGE_FLAG);
+  }
+
   function migrateLegacyIfNeeded() {
     var ls; try { ls = global.localStorage; } catch (e) { ls = null; }
     if (!ls) return { migrated: false, reason: 'no-localStorage' };
@@ -98,10 +158,18 @@
         if (lk && lk.indexOf('rd_track_v1_') === 0) legacy.push(lk);
       }
       if (!legacy.length) {
+        /* bare 는 없어도 anon 에 있을 수 있다 — 그것만 합치고 끝낸다 */
+        var only = _moveNamespace('rd_anon_', 'rd_' + uid + '_',
+                                  'rd_ns_merge_anon_to_' + uid);
         _migrationTriedFor[uid] = true;
-        return { migrated: false, reason: 'no-legacy-data' };
+        return { migrated: !!only.migrated, uid: uid,
+                 moved: only.moved || [], failed: only.failed || [],
+                 reason: only.migrated ? 'anon-merged' : 'no-legacy-data' };
       }
       var prefix = 'rd_' + uid + '_';
+      /* §527 — bare 뿐 아니라 `rd_anon_` 도 끌어온다. 비로그인으로 쓰다
+         로그인한 사람의 데이터가 anon 에 있기 때문이다. bare 를 먼저
+         옮기고(아래 루프), anon 은 그 뒤에 별도로 합친다. */
       var moved = [], failed = [];
       for (var j = 0; j < legacy.length; j++) {
         var bare = legacy[j];
@@ -118,6 +186,11 @@
         try { ls.removeItem(bare); } catch (e) {}   /* verified copy 이후 bare 제거 */
         moved.push(bare);
       }
+      /* anon 사일로도 이 사용자 namespace 로 합친다 */
+      var anonRes = _moveNamespace('rd_anon_', prefix, 'rd_ns_merge_anon_to_' + uid);
+      if (anonRes.moved) moved = moved.concat(anonRes.moved);
+      if (anonRes.failed && anonRes.failed.length) failed = failed.concat(anonRes.failed);
+
       if (!failed.length) {                  /* 부분 실패 시 flag 미설정 → 다음 진입 재시도 */
         try { ls.setItem(MIGRATION_FLAG, uid + '@' + (global.Date && Date.now ? Date.now() : 0)); } catch (e) {}
         _migrationTriedFor[uid] = true;
@@ -130,6 +203,7 @@
 
   function readAll() {
     migrateLegacyIfNeeded();   /* §412 — 첫 read 시 자동 마이그레이션 (in-memory guard 로 저비용) */
+    mergeBareIntoAnon();       /* §527 — 비로그인이면 bare 사일로를 anon 으로 */
     try {
       var raw = global.localStorage ? global.localStorage.getItem(K_SESSIONS()) : null;
       if (!raw) return [];
@@ -1886,6 +1960,7 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     isCompactTrack: isCompactTrack,
     /* §412 — per-user namespace 격리 + legacy 마이그레이션 */
     migrateLegacyIfNeeded: migrateLegacyIfNeeded,
+    mergeBareIntoAnon: mergeBareIntoAnon,   // §527
     nsPrefix: nsPrefix,
     sessionsKey: K_SESSIONS,
     currentUid: _currentUid,

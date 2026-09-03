@@ -182,10 +182,15 @@
         <a href="signup.html">회원가입</a>
         <a href="password-reset.html">비밀번호 찾기</a>
       </div>
-      <div class="auth-sso">
-        <button type="button" disabled>Google <span class="badge-soon">추후 지원</span></button>
-        <button type="button" disabled>Apple <span class="badge-soon">추후 지원</span></button>
+      <!-- §527 소셜 로그인. 제공자가 아직 안 켜졌으면 눌렀을 때
+           '왜 안 되는지' 를 말한다 — 비활성 버튼은 언제 되는지 알 수 없다. -->
+      <div class="auth-sso" id="auth-sso">
+        <button type="button" data-provider="kakao">카카오로 계속</button>
+        <button type="button" data-provider="google">Google 로 계속</button>
+        <button type="button" data-provider="apple">Apple 로 계속</button>
+        <button type="button" data-provider="naver">네이버로 계속</button>
       </div>
+      <p class="auth-sso-note" id="auth-sso-note"></p>
     </form>
   </div>
 </main>
@@ -276,6 +281,37 @@ document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('login-form');
   var err = document.getElementById('auth-error');
   if (!form) return;
+  /* §527 — 소셜 로그인 버튼 배선 */
+  var sso = document.getElementById('auth-sso');
+  var ssoNote = document.getElementById('auth-sso-note');
+  if (sso && window.DMJAuth && window.DMJAuth.signInWithProvider) {
+    sso.addEventListener('click', async function (ev) {
+      var b = ev.target.closest('[data-provider]');
+      if (!b) return;
+      var name = b.getAttribute('data-provider');
+      var was = b.textContent;
+      b.disabled = true; b.textContent = '이동 중…';
+      if (ssoNote) ssoNote.textContent = '';
+      try {
+        await window.DMJAuth.signInWithProvider(name, { redirectTo: nextUrl() });
+        /* 성공하면 브라우저가 제공자 페이지로 떠나므로 여기 아래는 안 온다 */
+      } catch (err) {
+        b.disabled = false; b.textContent = was;
+        if (ssoNote) {
+          ssoNote.textContent = (err && err.message) ? err.message : '로그인에 실패했습니다.';
+        }
+      }
+    });
+  }
+
+  function nextUrl() {
+    try {
+      var q = new URLSearchParams(location.search).get('next');
+      if (q && /^\/[^/]/.test(q)) return location.origin + q;
+    } catch (e) {}
+    return location.origin + '/profile.html';
+  }
+
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     err.hidden = true; err.textContent = '';
