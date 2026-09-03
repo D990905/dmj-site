@@ -1,258 +1,159 @@
-<!-- DO_NOT_REVERT §156 + §169 — login UI shell. §169 Day 1B: localStorage-based sprint shim 활성화 (auth-shim.js). Phase 12 Supabase 백엔드 연동 시 교체. -->
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-dmj-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0A2540">
-<meta name="robots" content="noindex,nofollow">
-<title>로그인 | 단무지</title>
-<meta name="description" content="단무지 회원 계정으로 로그인하세요.">
-
-<!-- §172 — Stale Service Worker auto-cleanup (DO_NOT_REVERT) -->
-<script>
-(function(){
-  if (!('serviceWorker' in navigator)) return;
-  navigator.serviceWorker.getRegistrations().then(function(regs){
-    var hadStale = false;
-    regs.forEach(function(r){
-      var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
-      // Any SW not from our domain's allowed list is treated as stale.
-      // We don't ship our own SW right now → unregister all.
-      hadStale = true;
-      r.unregister();
-    });
-    if (hadStale && 'caches' in window) {
-      caches.keys().then(function(names){
-        names.forEach(function(n){ caches.delete(n); });
-        // Reload once to fetch fresh resources (avoid infinite loop with sessionStorage flag)
-        try {
-          if (!sessionStorage.getItem('__sw_cleanup_reloaded__')) {
-            sessionStorage.setItem('__sw_cleanup_reloaded__', '1');
-            location.reload();
-          }
-        } catch(e){}
-      });
-    }
-  }).catch(function(){});
-})();
-</script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A2540'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%23fff' font-family='Inter,sans-serif' font-weight='800' font-size='14'%3ED%3C/text%3E%3C/svg%3E">
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로그인 — 단무지공방</title>
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/dmj-ui.css?v=530">
+<style>
+  /* 인증 화면은 한 장짜리라 폭을 좁힌다 — 넓으면 폼이 허공에 뜬다 */
+  .auth { max-width: 420px; margin: 0 auto; }
+  .auth-sso { display: grid; gap: var(--sp-2); margin-top: var(--sp-4); }
+  .auth-sso button { width: 100%; }
+  .auth-sep { display: flex; align-items: center; gap: var(--sp-3); margin: var(--sp-4) 0; color: var(--t-dim); font-size: 13px; }
+  .auth-sep::before, .auth-sep::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .badge-soon { font-family: var(--font-mono); font-size: 11px; color: var(--t-dim); margin-left: 6px; }
+  .auth-error { background: color-mix(in srgb, var(--bad) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bad) 40%, transparent);
+    color: var(--t-main); padding: var(--sp-3); border-radius: var(--radius); margin-bottom: var(--sp-3); font-size: 14px; }
+  .auth-links { display: flex; justify-content: space-between; margin-top: var(--sp-3); font-size: 14px; }
+  .auth-sso-note { color: var(--warn); font-size: 13px; margin-top: var(--sp-3); }
+</style>
 </head>
-<body>
+<body class="dmj">
 
-<div class="trust-bar"><div class="container"><div class="trust-bar__inner">
-<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
-<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
-<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
-</div></div></div>
-
-<header class="site-header" id="site-header">
-  <div class="container">
-    <nav class="nav" aria-label="주 메뉴">
-      <a href="index.html" class="nav__logo" aria-label="단무지 홈">
-        <span class="nav__logo-mark">D</span>
-        <span>단무지</span>
-      </a>
-
-      <div class="nav__primary" role="menubar">
-        <div class="nav__has-sub" role="none">
-          <a href="index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
-          <div class="nav__sub" role="menu">
-            <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
-            <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
-            <a href="takoon.html" class="nav__sub-link" role="menuitem"><b>Takoon</b><span>부담없는 시작</span></a>
-            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>Forward WIP</b><span>탑라이더들의 안전장비</span></a>
-          </div>
-        </div>
-
-        <div class="nav__has-sub" role="none">
-          <a href="index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
-          <div class="nav__sub" role="menu">
-            <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
-            <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
-            <a href="style/wave.html" class="nav__sub-link" role="menuitem"><b>Wave</b><span>파도·서핑</span></a>
-            <a href="style/hybrid.html" class="nav__sub-link" role="menuitem"><b>Hybrid</b><span>다목적</span></a>
-          </div>
-        </div>
-
-        <!-- 4. 장비 (§145-G v6 — Danny 2026-05-13: parts categories. 브랜드 dropdown 별도 유지. DO_NOT_REVERT) -->
-        <div class="nav__has-sub" role="none">
-          <a href="find-my-gear.html" class="nav__link">장비</a>
-          <div class="nav__sub" role="menu">
-            <a href="genre/wing.html" class="nav__sub-link" role="menuitem"><b>윙</b><span>핸들·붐·FDS 윙</span></a>
-            <a href="genre/foil.html" class="nav__sub-link" role="menuitem"><b>포일</b><span>FW·Mast·Stab·세트</span></a>
-            <a href="genre/board.html" class="nav__sub-link" role="menuitem"><b>보드</b><span>입문 보드·중상급 셰이프</span></a>
-            <a href="wip.html" class="nav__sub-link" role="menuitem"><b>안전장비</b><span>헬멧·임팩트 베스트·하니스</span></a>
-          </div>
-        </div>
-
-        <div class="nav__has-sub" role="none">
-          <a href="index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
-          <div class="nav__sub nav__sub--wide" role="menu">
-            <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
-            <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
-            <a href="level/advanced.html" class="nav__sub-link" role="menuitem"><b>상급</b><span>전문 분야 진입</span></a>
-            <a href="level/pro.html" class="nav__sub-link" role="menuitem"><b>선수</b><span>Race·대회</span></a>
-            <a href="women/index.html" hidden class="nav__sub-link" role="menuitem"><b>여성 라이더</b><span>Women fit·progression</span></a>
-            <a href="junior/index.html" hidden class="nav__sub-link" role="menuitem"><b>유소년·어린이</b><span>안전·작은 사이즈</span></a>
-            <a href="family/index.html" hidden class="nav__sub-link" role="menuitem"><b>가족 라이딩</b><span>3-4 set 번들</span></a>
-          </div>
-        </div>
-
-        <a href="find-my-gear.html" class="nav__link nav__link--cta" role="menuitem" style="background:var(--color-sun);color:var(--color-navy);padding:8px 16px;border-radius:999px;font-weight:600">스마트 컨설팅 ↗</a>
-                <!-- DO_NOT_REVERT §171-B — cart icon. badge auto-updates via cart.js. (§206 sweep 2026-06-06) -->
-        <a href="cart.html" class="nav__link nav__cart" role="menuitem" aria-label="장바구니">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          <span class="nav__cart-badge" data-cart-badge aria-live="polite" aria-atomic="true" hidden>0</span>
-        </a>
-<a href="login.html" class="nav__link nav__link--login" role="menuitem" style="font-size:13px;color:rgba(255,255,255,.85)">로그인</a>
-      </div>
-
-      <div class="nav__actions">
-        <button type="button" class="nav__icon-btn" aria-label="검색 (Phase 2 예정)" disabled title="Phase 2 예정">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
-        </button>
-        <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="nav__icon-btn" aria-label="카톡 상담">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </a>
-        <button type="button" class="nav__hamburger" data-menu-open aria-label="메뉴 열기" aria-controls="mobile-menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-        </button>
-      </div>
+<!--#nav:begin-->
+<!-- §530 공통 헤더 — 모든 페이지가 이걸 쓴다. 페이지마다 다른 헤더가
+     "짜깁기" 느낌의 가장 큰 원인이었다. -->
+<header class="nav">
+  <div class="wrap nav__in">
+    <a class="nav__brand" href="index.html">단무지공방 <span class="lab">DMJ</span></a>
+    <button class="btn btn--ghost nav__toggle" type="button" aria-expanded="false"
+            aria-controls="nav-links" aria-label="메뉴 열기">☰</button>
+    <nav class="nav__links" id="nav-links">
+      <a class="nav__link" href="find-my-gear.html">장비 찾기</a>
+      <a class="nav__link" href="skill-assessment.html">레벨 검사</a>
+      <a class="nav__link" href="consult.html">컨설팅</a>
+      <a class="nav__link" href="riding-dashboard/v2.html">라이딩 분석</a>
+      <a class="nav__link" href="coach.html">대니 코치</a>
+      <a class="nav__link" href="about.html">소개</a>
+      <a class="btn btn--primary" href="login.html" id="nav-auth-cta">로그인</a>
     </nav>
   </div>
 </header>
+<!--#nav:end-->
 
-<div class="mobile-menu" id="mobile-menu" aria-hidden="true">
-  <button type="button" class="mobile-menu__close" data-menu-close aria-label="메뉴 닫기">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-  </button>
-  <ul class="mobile-menu__list">
-    <li><a href="find-my-gear.html" style="color:var(--color-sun);font-weight:700">스마트 컨설팅 ↗ <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
-    <li><a href="login.html">로그인 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></li>
-    <li class="mobile-menu__heading">브랜드</li>
-    <li><a href="levitaz.html">Levitaz</a></li>
-    <li><a href="ppc.html">PPC</a></li>
-    <li><a href="takoon.html">Takoon</a></li>
-    <li><a href="wip.html">Forward WIP</a></li>
-    <li class="mobile-menu__heading">라이딩 스타일</li>
-    <li><a href="style/flat-speed.html">Flat·Speed</a></li>
-    <li><a href="style/choppy-freeride.html">Choppy·Freeride</a></li>
-    <li><a href="style/wave.html">Wave</a></li>
-    <li><a href="style/hybrid.html">Hybrid</a></li>
-    <li class="mobile-menu__heading">장비</li>
-    <li><a href="levitaz.html">Levitaz</a></li>
-    <li><a href="ppc.html">PPC</a></li>
-    <li><a href="takoon.html">Takoon</a></li>
-    <li><a href="wip.html">Forward WIP</a></li>
-    <li class="mobile-menu__heading">실력 수준</li>
-    <li><a href="level/beginner.html">입문</a></li><li><a href="level/novice.html">초급</a></li>
-    <li><a href="level/intermediate.html">중급</a></li>
-    <li><a href="level/advanced.html">상급</a></li>
-    <li><a href="level/pro.html">선수</a></li>
-    <li hidden><a href="women/index.html" style="color:var(--color-sun);font-weight:600">여성 라이더</a></li>
-    <li hidden><a href="junior/index.html" style="color:var(--color-sun);font-weight:600">유소년·어린이</a></li>
-    <li hidden><a href="family/index.html" style="color:var(--color-sun);font-weight:600">가족 라이딩</a></li>
-  </ul>
-  <div class="mobile-menu__about">
-    <h4>단무지 소개</h4>
-    <p style="font-size:14px;line-height:1.6;color:rgba(255,255,255,.7);margin:0">윙·포일·SUP 네 가지 브랜드 정식 수입 큐레이션. 한국 라이더 spot 환경에 맞게 컨설팅합니다.</p>
+<section class="section">
+  <div class="wrap">
+    <div class="auth">
+      <div class="section__head center">
+        <h1>다시 오셨네요</h1>
+        <p class="t-lead">로그인하면 라이딩 기록이 계정에 묶여 다른 기기에서도 보입니다.</p>
+      </div>
+
+      <div class="card">
+        <div class="card__body">
+          <div id="auth-error" class="auth-error" role="alert" hidden></div>
+          <form id="login-form" autocomplete="on" novalidate>
+            <div class="field">
+              <label class="field__label" for="lg-email">이메일</label>
+              <input class="input" id="lg-email" type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            </div>
+            <div class="field">
+              <label class="field__label" for="lg-pw">비밀번호</label>
+              <input class="input" id="lg-pw" type="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+            </div>
+            <button class="btn btn--primary btn--block" type="submit">로그인</button>
+            <div class="auth-links">
+              <a href="signup.html">회원가입</a>
+              <a href="password-reset.html">비밀번호 찾기</a>
+            </div>
+
+            <div class="auth-sep">또는</div>
+            <div class="auth-sso" id="auth-sso">
+              <button class="btn" type="button" data-provider="kakao">카카오로 계속</button>
+              <button class="btn" type="button" data-provider="google">Google 로 계속</button>
+              <button class="btn" type="button" data-provider="apple">Apple 로 계속</button>
+              <button class="btn" type="button" data-provider="naver">네이버로 계속</button>
+            </div>
+            <p class="auth-sso-note" id="auth-sso-note"></p>
+          </form>
+        </div>
+      </div>
+
+      <p class="lab center mt-4">
+        로그인하지 않아도 라이딩 분석은 쓸 수 있습니다 — 다만 이 브라우저에만 남습니다.
+      </p>
+    </div>
   </div>
-</div>
+</section>
 
-<!-- ========== Login Shell ========== -->
-<main class="auth-shell">
-  <div class="auth-card">
-    <h1>로그인</h1>
-    <p class="sub">단무지 회원 계정으로 로그인하세요</p>
-    <div id="auth-error" class="auth-error" role="alert" hidden></div>
-    <form id="login-form" autocomplete="on" novalidate>
-      <input type="email" name="email" required placeholder="이메일" autocomplete="email">
-      <input type="password" name="password" required placeholder="비밀번호" autocomplete="current-password">
-      <button type="submit">로그인</button>
-      <div class="auth-links">
-        <a href="signup.html">회원가입</a>
-        <a href="password-reset.html">비밀번호 찾기</a>
+<!--#foot:begin-->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <div class="nav__brand">단무지공방</div>
+        <p class="t-dim mt-2" style="max-width:38ch">
+          단순하고 무식하게, 그러나 지혜롭게. 윙포일 장비를 파는 곳이 아니라
+          라이딩을 컨설팅하는 곳입니다.
+        </p>
       </div>
-      <!-- §527 소셜 로그인. 제공자가 아직 안 켜졌으면 눌렀을 때
-           '왜 안 되는지' 를 말한다 — 비활성 버튼은 언제 되는지 알 수 없다. -->
-      <div class="auth-sso" id="auth-sso">
-        <button type="button" data-provider="kakao">카카오로 계속</button>
-        <button type="button" data-provider="google">Google 로 계속</button>
-        <button type="button" data-provider="apple">Apple 로 계속</button>
-        <button type="button" data-provider="naver">네이버로 계속</button>
+      <div>
+        <div class="lab mb-3">시작하기</div>
+        <a href="find-my-gear.html">장비 찾기</a>
+        <a href="skill-assessment.html">레벨 검사</a>
+        <a href="consult.html">컨설팅 신청</a>
+        <a href="coach.html">대니 코치에게 묻기</a>
       </div>
-      <p class="auth-sso-note" id="auth-sso-note"></p>
-    </form>
-  </div>
-</main>
-
-<!-- ========== Footer ========== -->
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-col">
-        <h4>도움말</h4>
-        <ul>
-          <li><a href="membership.html">회원 등급 안내</a></li>
-          <li><a href="glossary.html">윙포일 용어 사전</a></li>
-          <li><a href="calculator.html">Lift Calculator</a></li>
-          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
-          <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>컨설팅</h4>
-        <ul>
-          <li><a href="level/beginner.html">입문 가이드</a></li><li><a href="level/novice.html">초급 가이드</a></li>
-          <li><a href="level/intermediate.html">중급 가이드</a></li>
-          <li><a href="level/advanced.html">상급 가이드</a></li>
-          <li><a href="level/pro.html">선수 가이드</a></li>
-          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Brand</h4>
-        <ul>
-          <li><a href="levitaz.html">Levitaz</a></li>
-          <li><a href="ppc.html">PPC</a></li>
-          <li><a href="takoon.html">Takoon</a></li>
-          <li><a href="wip.html">Forward WIP</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>정책·안내</h4>
-        <ul>
-          <li><a href="products/wip/size-chart.html">WIP 사이즈 차트</a></li>
-          <li><a href="policy/shipping.html">배송 정책</a></li>
-          <li><a href="policy/refund.html">환불 정책</a></li>
-          <li><a href="policy/privacy.html">개인정보처리방침</a></li>
-          <li><a href="policy/terms.html">이용약관</a></li>
-        </ul>
+      <div>
+        <div class="lab mb-3">분석</div>
+        <a href="riding-dashboard/v2.html">라이딩 대시보드</a>
+        <a href="calculator.html">셋업 계산기</a>
+        <a href="glossary.html">용어집</a>
+        <a href="about.html">소개</a>
       </div>
     </div>
-    <div class="footer-business"><strong>단무지공방</strong> · 사업자등록번호 144-55-01008 · 통신판매업신고 진행 중 · 대표 이정희 · 개인정보 보호책임자 옥덕필 · danmujigroup@gmail.com · 주소 서울특별시 중구 마른내로 72, 715호 (인현동2가, 인현상가/신성아파트) · Levitaz · PPC · Takoon · WIP 한국 정식 수입원</div>
-    <div class="footer-bottom">
-      <span>© <span data-year>2026</span> DMJ·공방. All rights reserved.</span>
-      <div class="footer-bottom__legal">
-        <a href="policy/privacy.html">개인정보처리방침</a>
-        <a href="policy/terms.html">이용약관</a>
-        <a href="policy/refund.html">환불정책</a>
-        <a href="policy/shipping.html">배송정책</a>
-      </div>
+    <div class="foot__legal">
+      © 단무지공방 · <a href="policies.html">이용약관 · 개인정보처리방침</a>
     </div>
   </div>
 </footer>
-
-<script src="assets/js/supabase-auth.js?v=supabase-187-20260604" defer></script>
+<script>
+/* §530 — 모바일 메뉴 + 로그인 상태. 두 줄이면 되는 걸 페이지마다
+   다르게 써 놔서 동작이 제각각이었다. 여기 하나로 통일한다. */
+(function () {
+  var t = document.querySelector('.nav__toggle');
+  var l = document.getElementById('nav-links');
+  if (t && l) t.addEventListener('click', function () {
+    var open = l.classList.toggle('is-open');
+    t.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  /* 현재 페이지 표시 */
+  var here = location.pathname.split('/').pop() || 'index.html';
+  Array.prototype.forEach.call(document.querySelectorAll('.nav__link'), function (a) {
+    if (a.getAttribute('href') === here) a.setAttribute('aria-current', 'page');
+  });
+  /* 로그인 상태 — DMJAuth 가 있으면 CTA 를 바꾼다 */
+  function syncAuth() {
+    var cta = document.getElementById('nav-auth-cta');
+    if (!cta || !window.DMJAuth || !window.DMJAuth.isLoggedIn) return;
+    if (window.DMJAuth.isLoggedIn()) {
+      var u = window.DMJAuth.currentUser() || {};
+      cta.textContent = (u.name || u.email || '내 정보');
+      cta.href = 'profile.html';
+    }
+  }
+  syncAuth();
+  window.addEventListener('dmj-auth-change', syncAuth);
+})();
+</script>
+<!--#foot:end-->
+<script src="assets/js/supabase-auth.js?v=v530"></script>
 <script>
 // §169 Day 1B — login submit handler (localStorage sprint shim)
 // §171-B 보완 — ?redirect=cart.html 등 쿼리 파라미터 지원 (whitelist: cart.html/quote.html/profile.html).
@@ -360,10 +261,5 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
-<script src="assets/js/main.js" defer></script>
-  <script src="assets/js/nav-auth.js" defer></script>
-  <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
-  <link rel="stylesheet" href="assets/css/agent-deny.css">
-  <script src="assets/js/agent-deny.js" defer></script>
 </body>
 </html>

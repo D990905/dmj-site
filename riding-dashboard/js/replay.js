@@ -207,6 +207,92 @@
      · Heel·Pitch·HR— 센서 데이터가 있을 때만 슬롯을 만든다(없으면
                       사용자가 취할 조치가 없으므로 슬롯 자체를 생략).
      반환: [{ def, state:'data'|'needwind' }] (METRICS 순서). */
+  /* ═══════════════════════════════════════════════════════════
+   * §533 race-aware 타임라인 (Sailnjord 벤치마킹)
+   *
+   * 세일요드 플레이어의 핵심은 "시간축이 아니라 **세션 구조**를 보여주는
+   * 타임라인" 이다. 어디가 풍상 레그였고 어디서 돌았는지가 띠에 보이면
+   * 원하는 순간을 스크럽으로 헤매지 않고 바로 찾는다.
+   *
+   * 우리는 §522 segments.js 가 레그·회전을 이미 계산해 두었으므로
+   * 그걸 그대로 그린다 — 새 분석이 필요 없다.
+   *
+   * 색 규약은 대시보드와 같다: 풍상 초록 · 풍하 주황 · 택 파랑 · 자이브 주황.
+   * 다른 색을 새로 고르면 두 화면이 서로 다른 언어를 쓰게 된다.
+   * ═══════════════════════════════════════════════════════════ */
+  var TL = { up: '#2f9e44', down: '#f59f00', idle: 'rgba(255,255,255,.10)',
+             tack: '#4dabf7', gybe: '#f76707' };
+
+  function timelineSegments() {
+    if (!R || !R.samples || !R.samples.length) return null;
+    var S = R.samples, wd = R.windDir;
+    var out = { legs: [], turns: [] };
+    /* 회전 — 분석에 있으면 그대로 */
+    var mans = (R.analysis && R.analysis.maneuvers) || [];
+    mans.forEach(function (m) {
+      if (m.startIdx == null || !S[m.startIdx]) return;
+      out.turns.push({ t: S[m.startIdx].t, type: m.type });
+    });
+    /* 레그 — RDSegments 가 있으면 쓰고, 없으면 풍각으로 직접 나눈다.
+       리플레이는 대시보드 없이도 열릴 수 있어서 의존을 강제하지 않는다. */
+    if (global.RDSegments && global.RDSegments.build && wd != null) {
+      try {
+        var legs = global.RDSegments.build('leg', {
+          analysis: R.analysis || {}, samples: S, minLegSamples: 10
+        });
+        legs.forEach(function (g) {
+          var st = global.RDSegments.segStats(S, g, wd);
+          if (!st || !st.direction) return;
+          out.legs.push({ a: S[g.startIdx].t, b: S[g.endIdx].t, dir: st.direction });
+        });
+      } catch (e) {}
+    }
+    return out;
+  }
+
+  function drawTimeline() {
+    var cv = el('replay-timeline');
+    if (!cv || !R) return;
+    var w = cv.clientWidth || cv.parentNode && cv.parentNode.clientWidth || 0;
+    var h = cv.clientHeight || 22;
+    if (!w) return;
+    var dpr = global.devicePixelRatio || 1;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    var t0 = R.t0, dur = R.dur || 1;
+    function x(t) { return ((t - t0) / dur) * w; }
+
+    /* 바탕 — 기록은 있으나 분류가 없는 구간 */
+    ctx.fillStyle = TL.idle;
+    ctx.fillRect(0, h / 2 - 4, w, 8);
+
+    var segs = R._timeline || (R._timeline = timelineSegments());
+    if (!segs) return;
+
+    segs.legs.forEach(function (g) {
+      var xa = x(g.a), xb = x(g.b);
+      if (xb - xa < 0.5) return;
+      ctx.fillStyle = (g.dir === 'upwind') ? TL.up : TL.down;
+      ctx.globalAlpha = .75;
+      ctx.fillRect(xa, h / 2 - 4, xb - xa, 8);
+      ctx.globalAlpha = 1;
+    });
+
+    /* 회전 눈금 — 띠 위아래로 짧게. 점을 찍으면 촘촘할 때 뭉갠다 */
+    segs.turns.forEach(function (m) {
+      var xa = x(m.t);
+      ctx.strokeStyle = (m.type === 'tack') ? TL.tack : TL.gybe;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(xa, h / 2 - 9); ctx.lineTo(xa, h / 2 - 5);
+      ctx.moveTo(xa, h / 2 + 5); ctx.lineTo(xa, h / 2 + 9);
+      ctx.stroke();
+    });
+  }
+
   function buildMetricSlots(hasData, windDir) {
     var slots = [];
     METRICS.forEach(function (def) {
@@ -787,8 +873,17 @@
             'aria-pressed="true">경과</button>' +
           '<button type="button" data-rmode="clock" aria-pressed="false">실제</button>' +
         '</div>' +
-        '<input type="range" id="replay-scrub" class="replay__scrub" ' +
-          'min="0" max="1000" value="0" step="1" aria-label="Time scrubber">' +
+        /* §533 race-aware 타임라인 (Sailnjord 벤치마킹) — 스크러버 뒤에
+           깔리는 띠. 풍상/풍하를 색으로 나누고 회전 자리에 눈금을 찍는다.
+           세일요드가 이걸 'race-aware timeline' 이라 부르는데, 요점은
+           **시간축이 아니라 세션 구조를 보여준다**는 것이다: 어디가 업윈드
+           레그였고 어디서 돌았는지가 보이면 원하는 순간을 바로 찾는다. */
+        '<div class="replay__scrubwrap">' +
+          '<canvas id="replay-timeline" class="replay__timeline" ' +
+            'aria-hidden="true"></canvas>' +
+          '<input type="range" id="replay-scrub" class="replay__scrub" ' +
+            'min="0" max="1000" value="0" step="1" aria-label="Time scrubber">' +
+        '</div>' +
         '<div class="replay__speed" id="replay-speed" role="group" ' +
           'aria-label="Playback speed"></div>' +
       '</div>' +
@@ -3199,6 +3294,24 @@
       this.setAttribute('aria-pressed', R.mapLinked ? 'true' : 'false');
       updateMapWindow();
     });
+
+    /* §533 — 타임라인은 스크러버가 자리를 잡은 **다음**에 그린다.
+       canvas 폭이 0 인 상태에서 그리면 아무것도 안 나온다(§486·§491 과
+       같은 함정: 숨은/미배치 요소의 clientWidth 는 0 이다). */
+    (function () {
+      var cv = el('replay-timeline');
+      if (!cv) return;
+      var redraw = function () { try { drawTimeline(); } catch (e) {} };
+      redraw();
+      setTimeout(redraw, 60);
+      if (global.ResizeObserver) {
+        var ro = new ResizeObserver(redraw);
+        ro.observe(cv.parentNode || cv);
+        R._tlObserver = ro;
+      } else {
+        global.addEventListener('resize', redraw);
+      }
+    })();
 
     // 스크러버
     var scrub = R.scrub;
