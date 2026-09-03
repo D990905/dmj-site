@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko" data-dmj-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대니 코치 — 단무지공방</title>
+<meta name="description" content="타는 곳·바람·체중·목표를 넣으면 실제 계산으로 셋업을 골라 드립니다. 지어낸 답이 아니라 물리 모델과 옥대표 실측에서 나온 값입니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/dmj-ui.css?v=530">
+</head>
+<body class="dmj">
+
+<!--#nav:begin-->
+<!-- §530 공통 헤더 — 모든 페이지가 이걸 쓴다. 페이지마다 다른 헤더가
+     "짜깁기" 느낌의 가장 큰 원인이었다. -->
+<header class="nav">
+  <div class="wrap nav__in">
+    <a class="nav__brand" href="index.html">단무지공방 <span class="lab">DMJ</span></a>
+    <button class="btn btn--ghost nav__toggle" type="button" aria-expanded="false"
+            aria-controls="nav-links" aria-label="메뉴 열기">☰</button>
+    <nav class="nav__links" id="nav-links">
+      <a class="nav__link" href="find-my-gear.html">장비 찾기</a>
+      <a class="nav__link" href="skill-assessment.html">레벨 검사</a>
+      <a class="nav__link" href="consult.html">컨설팅</a>
+      <a class="nav__link" href="riding-dashboard/v2.html">라이딩 분석</a>
+      <a class="nav__link" href="coach.html">대니 코치</a>
+      <a class="nav__link" href="about.html">소개</a>
+      <a class="btn btn--primary" href="login.html" id="nav-auth-cta">로그인</a>
+    </nav>
+  </div>
+</header>
+<!--#nav:end-->
+
+<section class="section section--tight">
+  <div class="wrap">
+    <div class="section__head">
+      <div class="lab">DANNY COACH</div>
+      <h1 class="mt-2">오늘 뭘 타면 되나요</h1>
+      <p class="t-lead">
+        네 가지만 넣으면 답이 나옵니다. 챗봇이 지어내는 말이 아니라
+        <strong>양력·항력 모델</strong>과 <strong>옥대표 실측</strong>으로 맞춰 놓은
+        계산입니다 — 그래서 못 내는 답은 못 낸다고 말합니다.
+      </p>
+    </div>
+
+    <div class="grid grid--2">
+      <!-- 입력 -->
+      <div class="card">
+        <div class="card__head"><h2 class="card__title">내 조건</h2></div>
+        <div class="card__body">
+          <div class="grid grid--2">
+            <div class="field">
+              <label class="field__label" for="c-wind">바람 (kt)</label>
+              <input class="input num" id="c-wind" type="number" value="14" min="4" max="40" step="1">
+            </div>
+            <div class="field">
+              <label class="field__label" for="c-weight">체중 (kg)</label>
+              <input class="input num" id="c-weight" type="number" value="75" min="35" max="130" step="1">
+            </div>
+          </div>
+          <div class="grid grid--2">
+            <div class="field">
+              <label class="field__label" for="c-skill">레벨</label>
+              <select class="input" id="c-skill">
+                <option>입문</option><option>초급</option>
+                <option selected>중급</option><option>상급</option><option>선수</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field__label" for="c-pref">성향</label>
+              <select class="input" id="c-pref">
+                <option value="low">여유 있게 (작은 윙)</option>
+                <option value="mid" selected>표준</option>
+                <option value="high">파워 있게 (큰 윙)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="c-foil">앞 포일</label>
+            <select class="input" id="c-foil">
+              <option value="13.7|479">Levitaz R6 V1 — AR 13.7 · 479㎠</option>
+              <option value="12.9|430" selected>Levitaz R6 V2 — AR 12.9 · 430㎠</option>
+              <option value="14.3|530">Levitaz R6 V3 — AR 14.3 · 530㎠</option>
+              <option value="6.5|1200">일반 프리라이드 포일 — AR 6.5 · 1200㎠</option>
+            </select>
+          </div>
+          <button class="btn btn--primary btn--block" id="c-run" type="button">계산하기</button>
+        </div>
+      </div>
+
+      <!-- 결과 -->
+      <div class="card">
+        <div class="card__head">
+          <h2 class="card__title">추천</h2>
+          <span class="lab" id="c-basis"></span>
+        </div>
+        <div class="card__body" id="c-out">
+          <p class="t-dim mb-0">조건을 넣고 계산하기를 누르세요.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 한계 고지 — 이게 없으면 계산기를 점쟁이로 오해한다 -->
+    <div class="card mt-5">
+      <div class="card__body">
+        <h3>이 계산이 못 하는 것</h3>
+        <p class="mb-0">
+          바람은 <strong>눈대중이면 ±4~5kt</strong>씩 틀립니다. 그 오차가 그대로 추천에
+          실립니다. 파도·조류·수온, 그날 몸 상태는 아예 안 들어갑니다.
+          그래서 이 값은 <strong>출발점</strong>이지 정답이 아닙니다 —
+          실제로 타 보시고 <a href="riding-dashboard/v2.html">라이딩 분석</a>으로
+          맞았는지 확인하는 게 이 도구의 진짜 쓰임새입니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card__body row row--between">
+        <div>
+          <h3 class="mb-0">계산으로 안 풀리는 질문이라면</h3>
+          <p class="t-dim mb-0 mt-2">타는 곳·목표·예산이 얽힌 문제는 사람이 답하는 게 빠릅니다.</p>
+        </div>
+        <a class="btn btn--primary" href="consult.html">상담 신청</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--#foot:begin-->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <div class="nav__brand">단무지공방</div>
+        <p class="t-dim mt-2" style="max-width:38ch">
+          단순하고 무식하게, 그러나 지혜롭게. 윙포일 장비를 파는 곳이 아니라
+          라이딩을 컨설팅하는 곳입니다.
+        </p>
+      </div>
+      <div>
+        <div class="lab mb-3">시작하기</div>
+        <a href="find-my-gear.html">장비 찾기</a>
+        <a href="skill-assessment.html">레벨 검사</a>
+        <a href="consult.html">컨설팅 신청</a>
+        <a href="coach.html">대니 코치에게 묻기</a>
+      </div>
+      <div>
+        <div class="lab mb-3">분석</div>
+        <a href="riding-dashboard/v2.html">라이딩 대시보드</a>
+        <a href="calculator.html">셋업 계산기</a>
+        <a href="glossary.html">용어집</a>
+        <a href="about.html">소개</a>
+      </div>
+    </div>
+    <div class="foot__legal">
+      © 단무지공방 · <a href="policies.html">이용약관 · 개인정보처리방침</a>
+    </div>
+  </div>
+</footer>
+<script>
+/* §530 — 모바일 메뉴 + 로그인 상태. 두 줄이면 되는 걸 페이지마다
+   다르게 써 놔서 동작이 제각각이었다. 여기 하나로 통일한다. */
+(function () {
+  var t = document.querySelector('.nav__toggle');
+  var l = document.getElementById('nav-links');
+  if (t && l) t.addEventListener('click', function () {
+    var open = l.classList.toggle('is-open');
+    t.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  /* 현재 페이지 표시 */
+  var here = location.pathname.split('/').pop() || 'index.html';
+  Array.prototype.forEach.call(document.querySelectorAll('.nav__link'), function (a) {
+    if (a.getAttribute('href') === here) a.setAttribute('aria-current', 'page');
+  });
+  /* 로그인 상태 — DMJAuth 가 있으면 CTA 를 바꾼다 */
+  function syncAuth() {
+    var cta = document.getElementById('nav-auth-cta');
+    if (!cta || !window.DMJAuth || !window.DMJAuth.isLoggedIn) return;
+    if (window.DMJAuth.isLoggedIn()) {
+      var u = window.DMJAuth.currentUser() || {};
+      cta.textContent = (u.name || u.email || '내 정보');
+      cta.href = 'profile.html';
+    }
+  }
+  syncAuth();
+  window.addEventListener('dmj-auth-change', syncAuth);
+})();
+</script>
+<!--#foot:end-->
+<script src="assets/js/supabase-auth.js?v=v530"></script>
+<script src="assets/js/lift-calculator.js?v=v530"></script>
+<script>
+/* §531 대니 코치 — **실제 엔진을 돌린다.**
+   챗봇 흉내를 내지 않는 이유: 지어낸 답은 그럴듯할수록 위험하다.
+   여기서 나오는 숫자는 전부 DMJLift(양력·항력 모델 + 옥대표 실측 보정)에서
+   나오고, 모델이 답을 못 내면 **못 낸다고 말한다**. */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var out = $('c-out'), basis = $('c-basis');
+
+  function el(tag, cls, txt) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (txt != null) e.textContent = txt;
+    return e;
+  }
+  function stat(k, v, u, sub) {
+    var w = el('div', 'stat');
+    w.appendChild(el('div', 'stat__k', k));
+    var val = el('div', 'stat__v', v);
+    if (u) { var s = el('span', 'stat__u', u); val.appendChild(s); }
+    w.appendChild(val);
+    if (sub) w.appendChild(el('div', 'stat__sub', sub));
+    return w;
+  }
+
+  function run() {
+    while (out.firstChild) out.removeChild(out.firstChild);
+    basis.textContent = '';
+
+    if (!window.DMJLift || !DMJLift.wingSizeOptimal) {
+      out.appendChild(el('p', 'mb-0', '계산 엔진을 불러오지 못했습니다. 새로고침해 주세요.'));
+      return;
+    }
+    var foil = ($('c-foil').value || '12.9|430').split('|');
+    var p = {
+      v_wind_kt: parseFloat($('c-wind').value),
+      m_rider_kg: parseFloat($('c-weight').value),
+      skill: $('c-skill').value,
+      foil_ar: parseFloat(foil[0]),
+      foil_area_cm2: parseFloat(foil[1]),
+      preference: $('c-pref').value
+    };
+    var r;
+    try { r = DMJLift.wingSizeOptimal(p); } catch (e) { r = { error: String(e) }; }
+
+    if (!r || r.error) {
+      out.appendChild(el('p', '', '이 조건에서는 계산이 나오지 않습니다 ('
+        + (r && r.error ? r.error : 'unknown') + ').'));
+      out.appendChild(el('p', 't-dim mb-0',
+        '보통 바람이나 체중이 모델이 검증된 범위를 벗어났을 때 이렇게 됩니다. '
+        + '상담으로 물어보시는 편이 빠릅니다.'));
+      return;
+    }
+
+    /* ⚠ 반환 필드는 **실제 구조**를 확인하고 쓴다. 처음엔 이름을 추측해
+       r.wing_m2 / r.upwindSpeed 를 읽었다가 화면에 NaN 이 떴다(실측).
+       실제: optimal / min / max / v_upwind_kt / overpowered / size_cap_hit */
+    var grid = el('div', 'grid grid--2');
+    grid.appendChild(stat('핸드윙', Number(r.optimal).toFixed(1), ' \u33a1',
+      r.min + '\u2013' + r.max + '\u33a1 범위 · ' + p.skill + ' · '
+      + p.v_wind_kt + 'kt · ' + p.m_rider_kg + 'kg'));
+
+    var up = (r.v_upwind_kt != null && r.v_upwind_kt.at_optimal != null)
+      ? r.v_upwind_kt.at_optimal : r.v_upwind_kt;
+    var upOk = (typeof up === 'number' && isFinite(up) && up > 0.5);
+    grid.appendChild(stat('예상 풍상 속도',
+      upOk ? up.toFixed(1) : '\u2014', upOk ? ' kt' : '',
+      upOk ? '45\u00b0 기준 · VMG 로 환산하면 이보다 낮습니다'
+           : '이 바람에서는 풍상 주행이 성립하지 않습니다'));
+    out.appendChild(grid);
+
+    /* 이 조건에서 파워가 어떤지 — 숫자만 주면 "그래서 어쩌라고" 가 된다 */
+    var verdict = el('div', 'mt-4');
+    /* ⚠ 풍상 속도가 0 인데 '적정 구간' 이라고 하면 화면이 스스로 모순된다
+       (실측: 7kt 에서 그렇게 나왔다). 성립 여부를 **먼저** 판정한다. */
+    if (!upOk) {
+      verdict.appendChild(el('div', 'badge badge--warn', '풍상 주행 불가'));
+      verdict.appendChild(el('p', 'mt-2',
+        '이 바람에서는 어떤 윙을 써도 풍상으로 올라가기 어렵습니다. '
+        + '풍하로 내려갔다가 걸어 올라오는 날이거나, 더 큰 면적의 포일이 필요합니다.'));
+    } else if (r.overpowered) {
+      verdict.appendChild(el('div', 'badge badge--warn', '오버파워 구간'));
+      verdict.appendChild(el('p', 'mt-2',
+        '이 바람에서는 권장 크기로도 힘이 남습니다. 한 단계 작은 '
+        + r.min + '\u33a1 쪽이 편할 수 있습니다.'));
+    } else if (r.underpowered) {
+      verdict.appendChild(el('div', 'badge badge--warn', '파워 부족'));
+      verdict.appendChild(el('p', 'mt-2',
+        '이 바람에서는 띄우기가 빡빡합니다. ' + r.max
+        + '\u33a1 로 올리거나 면적이 큰 포일이 낫습니다.'));
+    } else {
+      verdict.appendChild(el('div', 'badge badge--ok', '적정 구간'));
+      verdict.appendChild(el('p', 'mt-2',
+        '이 조건은 모델이 자신 있게 답하는 범위 안입니다.'));
+    }
+    out.appendChild(verdict);
+
+    /* §511 — 모델의 '정점' 은 옥대표 실제 선택보다 크게 나온다.
+       그래서 컨트롤 여유 기준(controlComfortFloor)을 같이 보여 준다.
+       둘 사이가 실제로 고르게 되는 범위다. */
+    if (DMJLift.controlComfortFloor) {
+      var floor = DMJLift.controlComfortFloor(p.m_rider_kg + 12, p.v_wind_kt, 'moderate');
+      if (isFinite(floor) && floor > 0 && Math.abs(floor - r.optimal) > 0.2) {
+        var cf = el('div', 'mt-3');
+        cf.appendChild(el('div', 'lab', '컨트롤 여유 기준'));
+        cf.appendChild(el('p', 'mt-2 mb-0',
+          Number(floor).toFixed(1) + '\u33a1 \u2014 성능 정점(' + Number(r.optimal).toFixed(1)
+          + '\u33a1)보다 ' + (floor < r.optimal ? '작습니다' : '큽니다')
+          + '. 실제로 고르는 크기는 대개 이 둘 사이에 있습니다. '
+          + '풍상이 편하면 풍하에서 모자라기 쉬우니, 풍상에서 살짝 힘든 쪽이 하루 종일 낫습니다.'));
+        out.appendChild(cf);
+      }
+    }
+
+    /* 경계에 걸렸으면 추천인 척하지 않는다(§511 과 같은 규칙) */
+    if (r.size_cap_hit) {
+      var cap = el('div', 'lab mt-3');
+      cap.style.color = 'var(--warn)';
+      cap.textContent = '계산 범위의 상한(' + r.size_cap_m2
+        + '\u33a1)에 걸렸습니다. 실제 최적은 더 클 수 있어 이 값을 정답으로 '
+        + '단정하지 않습니다 \u2014 이런 날은 상담이 낫습니다.';
+      out.appendChild(cap);
+    }
+    if (r.clearance_capped) {
+      out.appendChild(el('div', 'lab mt-2',
+        '윙 스팬이 물에 닿는 한계로 크기가 제한됐습니다(하네스 높이·마스트 길이 영향).'));
+    }
+
+    basis.textContent = '양력 모델 + 실측 보정';
+  }
+
+  $('c-run').addEventListener('click', run);
+  ['c-wind','c-weight','c-skill','c-pref','c-foil'].forEach(function (id) {
+    var e = $(id);
+    if (e) e.addEventListener('change', run);
+  });
+  run();
+})();
+</script>
+</body>
+</html>

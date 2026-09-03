@@ -1,0 +1,300 @@
+/* ============================================================
+ * dmj-ui.css — §530 단무지공방 통합 디자인 시스템
+ *
+ * 옥대표 (2026-09-04):
+ *   "사이트는 좀 거슬리는게 많은게 이것저것 짜집기한 느낌이라서 일관성이 없어.
+ *    반면에 대시보드 스타일은 뭔가 획일적이고 통일감이 있잖아."
+ *
+ * 맞다. 페이지마다 자기만의 여백·색·글자를 들고 있어서 같은 사이트로 안 보인다.
+ * 대시보드(v2)가 통일돼 보이는 이유는 **표면 단계가 딱 셋이고, 수치는 전부
+ * 같은 폭 글꼴이고, 간격이 한 눈금 위에 있기** 때문이다. 그 규칙을 사이트로
+ * 옮긴다.
+ *
+ * 값의 출처: v2 대시보드 실측(getComputedStyle) —
+ *   페이지 #111827 · 카드 #1f2937 · 테두리 rgba(72,110,149,.14) · radius 8px
+ *   본문 시스템 산세 14px · 수치 IBM Plex Mono
+ * 그대로 쓴다. 눈대중으로 비슷하게 맞추면 두 화면을 오갈 때 어긋나 보인다.
+ *
+ * 규칙 셋 (이걸 어기면 다시 짜깁기가 된다):
+ *   ① 색은 토큰만 쓴다. 하드코딩 hex 금지.
+ *   ② 숫자·시간·좌표·단위는 .num (고정폭). 문장은 산세.
+ *   ③ 간격은 --sp-* 눈금만. 임의의 px 마진 금지.
+ * ============================================================ */
+
+:root {
+  /* ── 표면 (dark, 기본) — 단계는 셋뿐이다. 넷째를 만들지 말 것 */
+  --s-page:   #111827;   /* 페이지 바닥 */
+  --s-card:   #1f2937;   /* 카드·패널 */
+  --s-sunk:   #171f2e;   /* 카드 안 함몰(입력·타일) */
+  --s-hover:  #273244;
+
+  /* ── 글자 */
+  --t-main:   #e5e7eb;
+  --t-mid:    #c1c5cd;   /* v2 .lab 과 동일 */
+  --t-dim:    #8a97a8;
+  --t-on-accent: #0b1220;
+
+  /* ── 선 */
+  --line:      rgba(72,110,149,.14);   /* v2 카드 테두리 실측값 */
+  --line-firm: rgba(72,110,149,.30);
+
+  /* ── 브랜드 (기존 사이트 토큰과 동일 계열 유지 — 로고·인쇄물과 어긋나면 안 된다) */
+  --navy:  #0A2540;
+  --sea:   #4dabf7;      /* 대시보드 accent */
+  --sea-deep: #1F8FFF;
+  --sun:   #f59f00;
+
+  /* ── 상태 */
+  --ok:    #2f9e44;
+  --warn:  #f59f00;
+  --bad:   #e03131;
+
+  /* ── 좌우 (국제 항해 관례 — 대시보드와 같은 값) */
+  --port:  #e03131;
+  --stbd:  #2f9e44;
+
+  /* ── 글꼴 */
+  --font-sans: -apple-system, system-ui, "Segoe UI", Roboto, "Pretendard Variable",
+               Pretendard, "Apple SD Gothic Neo", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ── 간격 눈금 — 4px 기반. 이 밖의 값을 쓰지 말 것 */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; --sp-9: 96px;
+
+  --radius: 8px;         /* v2 실측 */
+  --radius-lg: 12px;
+  --shadow: 0 1px 2px rgba(0,0,0,.28), 0 8px 24px -8px rgba(0,0,0,.42);
+  --ease: cubic-bezier(.22,.84,.36,1);
+
+  --maxw: 1180px;        /* 본문 최대폭 */
+  color-scheme: dark;
+}
+
+/* 라이트 — 대시보드의 Light 토글과 짝을 이룬다.
+   같은 구조에 표면만 뒤집는다. 색을 새로 고르지 않는다. */
+:root[data-dmj-theme="light"] {
+  --s-page: #f5f7fa;
+  --s-card: #ffffff;
+  --s-sunk: #f5f7fa;
+  --s-hover:#e5eaf0;
+  --t-main: #0A2540;
+  --t-mid:  #465063;
+  --t-dim:  #6E7C8A;
+  --line:      #e5eaf0;
+  --line-firm: #c7cfd8;
+  --sea:    #1F8FFF;
+  --t-on-accent: #ffffff;
+  --shadow: 0 1px 2px rgba(10,37,64,.05), 0 8px 20px -6px rgba(10,37,64,.08);
+  color-scheme: light;
+}
+
+/* ============================================================
+ * 바탕
+ * ============================================================ */
+.dmj * { box-sizing: border-box; }
+.dmj {
+  margin: 0;
+  background: var(--s-page);
+  color: var(--t-main);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.dmj img { max-width: 100%; height: auto; display: block; }
+.dmj a { color: var(--sea); text-decoration: none; }
+.dmj a:hover { text-decoration: underline; }
+
+/* 수치는 전부 고정폭 — 표에서 자리가 흔들리지 않는다 */
+.dmj .num, .dmj .stat__v, .dmj .kpi__val { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* 작은 라벨 — v2 .lab 과 같은 규격 */
+.dmj .lab {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: .26px;
+  color: var(--t-mid);
+}
+
+/* ── 타이포 스케일 (5단계. 더 늘리지 말 것) */
+.dmj h1, .dmj .t-h1 { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.15; font-weight: 700; letter-spacing: -.02em; margin: 0 0 var(--sp-4); }
+.dmj h2, .dmj .t-h2 { font-size: clamp(22px, 2.6vw, 30px); line-height: 1.25; font-weight: 700; letter-spacing: -.01em; margin: 0 0 var(--sp-3); }
+.dmj h3, .dmj .t-h3 { font-size: 18px; line-height: 1.35; font-weight: 600; margin: 0 0 var(--sp-2); }
+.dmj p  { margin: 0 0 var(--sp-3); color: var(--t-mid); }
+.dmj .t-lead { font-size: 17px; color: var(--t-mid); }
+.dmj .t-dim  { color: var(--t-dim); }
+
+/* ============================================================
+ * 레이아웃
+ * ============================================================ */
+.dmj .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--sp-4); }
+.dmj .section { padding: var(--sp-8) 0; }
+.dmj .section--tight { padding: var(--sp-6) 0; }
+.dmj .section__head { margin-bottom: var(--sp-5); }
+.dmj .grid { display: grid; gap: var(--sp-4); }
+.dmj .grid--2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.dmj .grid--3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.dmj .grid--4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+@media (max-width: 900px) {
+  .dmj .grid--3, .dmj .grid--4 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 560px) {
+  .dmj .grid--2, .dmj .grid--3, .dmj .grid--4 { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+ * 카드 — 대시보드와 **완전히 같은** 규격
+ * ============================================================ */
+.dmj .card {
+  background: var(--s-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.dmj .card__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+.dmj .card__title { font-size: 15px; font-weight: 600; margin: 0; }
+.dmj .card__body { padding: var(--sp-4); }
+.dmj .card--link { transition: border-color .16s var(--ease), transform .16s var(--ease); }
+.dmj .card--link:hover { border-color: var(--line-firm); transform: translateY(-2px); }
+
+/* 통계 타일 */
+.dmj .stat { background: var(--s-sunk); border-radius: var(--radius); padding: var(--sp-3); }
+.dmj .stat__k { font-family: var(--font-mono); font-size: 12px; letter-spacing: .26px; color: var(--t-dim); }
+.dmj .stat__v { font-size: 26px; font-weight: 600; line-height: 1.15; margin-top: var(--sp-1); }
+.dmj .stat__u { font-size: 13px; color: var(--t-dim); margin-left: 2px; }
+.dmj .stat__sub { font-size: 12px; color: var(--t-dim); margin-top: var(--sp-1); }
+
+/* ============================================================
+ * 버튼 — 세 종류뿐. 넷째를 만들지 말 것
+ * ============================================================ */
+.dmj .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  padding: 10px 18px; border-radius: var(--radius);
+  border: 1px solid var(--line-firm); background: transparent; color: var(--t-main);
+  font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background .16s var(--ease), border-color .16s var(--ease), transform .12s var(--ease);
+  text-decoration: none;
+}
+.dmj .btn:hover { background: var(--s-hover); text-decoration: none; }
+.dmj .btn:active { transform: translateY(1px); }
+.dmj .btn--primary { background: var(--sea); border-color: var(--sea); color: var(--t-on-accent); font-weight: 600; }
+.dmj .btn--primary:hover { filter: brightness(1.08); background: var(--sea); }
+.dmj .btn--ghost { border-color: transparent; color: var(--t-mid); }
+.dmj .btn--ghost:hover { color: var(--t-main); }
+.dmj .btn--lg { padding: 14px 26px; font-size: 15px; }
+.dmj .btn--block { width: 100%; }
+.dmj .btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* 배지 */
+.dmj .badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .2px;
+  padding: 3px 8px; border-radius: 999px;
+  background: var(--s-sunk); color: var(--t-mid); border: 1px solid var(--line);
+}
+.dmj .badge--ok   { color: var(--ok);   border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+.dmj .badge--warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, transparent); }
+.dmj .badge--accent { color: var(--sea); border-color: color-mix(in srgb, var(--sea) 40%, transparent); }
+
+/* ============================================================
+ * 폼
+ * ============================================================ */
+.dmj .field { margin-bottom: var(--sp-3); }
+.dmj .field__label { display: block; font-family: var(--font-mono); font-size: 12px; letter-spacing: .26px; color: var(--t-dim); margin-bottom: 6px; }
+.dmj .input, .dmj select.input, .dmj textarea.input {
+  width: 100%; padding: 11px 12px;
+  background: var(--s-sunk); color: var(--t-main);
+  border: 1px solid var(--line-firm); border-radius: var(--radius);
+  font: inherit; font-size: 15px;
+}
+.dmj .input:focus { outline: 2px solid color-mix(in srgb, var(--sea) 55%, transparent); outline-offset: 1px; border-color: var(--sea); }
+.dmj .input::placeholder { color: var(--t-dim); }
+
+/* ============================================================
+ * 표 — 수치는 오른쪽, 고정폭
+ * ============================================================ */
+.dmj .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.dmj .table th {
+  text-align: left; font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  letter-spacing: .26px; color: var(--t-dim); text-transform: uppercase;
+  padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--line);
+}
+.dmj .table td { padding: var(--sp-3); border-bottom: 1px solid var(--line); }
+.dmj .table tr:last-child td { border-bottom: 0; }
+.dmj .table .n { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+ * 헤더 / 푸터 — **이게 통일감의 8할이다**
+ * ============================================================ */
+.dmj .nav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--s-page) 88%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.dmj .nav__in { display: flex; align-items: center; gap: var(--sp-4); height: 58px; }
+.dmj .nav__brand { font-weight: 700; font-size: 16px; color: var(--t-main); letter-spacing: -.01em; white-space: nowrap; }
+.dmj .nav__brand:hover { text-decoration: none; }
+.dmj .nav__links { display: flex; align-items: center; gap: var(--sp-1); margin-left: auto; }
+.dmj .nav__link {
+  padding: 7px 11px; border-radius: 6px; font-size: 14px; color: var(--t-mid);
+  white-space: nowrap;
+}
+.dmj .nav__link:hover { background: var(--s-hover); color: var(--t-main); text-decoration: none; }
+.dmj .nav__link[aria-current="page"] { color: var(--t-main); background: var(--s-card); }
+.dmj .nav__toggle { display: none; margin-left: auto; }
+@media (max-width: 860px) {
+  .dmj .nav__links {
+    display: none; position: absolute; top: 58px; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--s-card); border-bottom: 1px solid var(--line); padding: var(--sp-2);
+  }
+  .dmj .nav__links.is-open { display: flex; }
+  .dmj .nav__link { padding: 12px; }
+  .dmj .nav__toggle { display: inline-flex; }
+}
+
+.dmj .foot { border-top: 1px solid var(--line); padding: var(--sp-7) 0 var(--sp-6); margin-top: var(--sp-8); }
+.dmj .foot__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--sp-5); }
+@media (max-width: 720px) { .dmj .foot__grid { grid-template-columns: 1fr; } }
+.dmj .foot a { color: var(--t-mid); display: block; padding: 3px 0; font-size: 14px; }
+.dmj .foot a:hover { color: var(--t-main); }
+.dmj .foot__legal { margin-top: var(--sp-5); padding-top: var(--sp-4); border-top: 1px solid var(--line); font-size: 12px; color: var(--t-dim); }
+
+/* ============================================================
+ * 히어로 — 사진 위 글자. 대비를 보장하는 층을 항상 깐다
+ * ============================================================ */
+.dmj .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+.dmj .hero__media { position: absolute; inset: 0; }
+.dmj .hero__media img { width: 100%; height: 100%; object-fit: cover; }
+.dmj .hero__scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--s-page) 55%, transparent) 0%,
+    color-mix(in srgb, var(--s-page) 72%, transparent) 55%,
+    var(--s-page) 100%);
+}
+.dmj .hero__in { position: relative; padding: var(--sp-9) 0 var(--sp-8); }
+.dmj .hero__kicker { font-family: var(--font-mono); font-size: 13px; letter-spacing: .26px; color: var(--sea); margin-bottom: var(--sp-3); }
+.dmj .hero__lead { font-size: 18px; color: var(--t-mid); max-width: 62ch; }
+.dmj .hero__cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-5); }
+
+/* 유틸 (최소한만) */
+.dmj .mt-0{margin-top:0}.dmj .mt-2{margin-top:var(--sp-2)}.dmj .mt-3{margin-top:var(--sp-3)}
+.dmj .mt-4{margin-top:var(--sp-4)}.dmj .mt-5{margin-top:var(--sp-5)}
+.dmj .mb-0{margin-bottom:0}.dmj .mb-3{margin-bottom:var(--sp-3)}.dmj .mb-4{margin-bottom:var(--sp-4)}
+.dmj .row{display:flex;gap:var(--sp-3);align-items:center;flex-wrap:wrap}
+.dmj .row--between{justify-content:space-between}
+.dmj .center{text-align:center}
+.dmj .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* 접근성 — 키보드 포커스가 보여야 한다 */
+.dmj :focus-visible { outline: 2px solid var(--sea); outline-offset: 2px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .dmj * { transition: none !important; animation: none !important; }
+}

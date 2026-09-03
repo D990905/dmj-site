@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko" data-dmj-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>단무지공방 — 윙포일 라이딩 컨설팅</title>
+<meta name="description" content="장비를 파는 곳이 아니라 라이딩을 컨설팅합니다. 레벨·체중·스타일로 셋업을 고르고, GPS 트랙으로 실제 주행을 분석합니다.">
+<meta property="og:title" content="단무지공방 — 윙포일 라이딩 컨설팅">
+<meta property="og:description" content="레벨·체중·스타일로 셋업을 고르고, GPS 트랙으로 실제 주행을 분석합니다.">
+<meta property="og:image" content="https://dmjgroup.kr/assets/images/hero/danny-hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/dmj-ui.css?v=530">
+</head>
+<body class="dmj">
+
+<!--#nav:begin-->
+<!-- §530 공통 헤더 — 모든 페이지가 이걸 쓴다. 페이지마다 다른 헤더가
+     "짜깁기" 느낌의 가장 큰 원인이었다. -->
+<header class="nav">
+  <div class="wrap nav__in">
+    <a class="nav__brand" href="index.html">단무지공방 <span class="lab">DMJ</span></a>
+    <button class="btn btn--ghost nav__toggle" type="button" aria-expanded="false"
+            aria-controls="nav-links" aria-label="메뉴 열기">☰</button>
+    <nav class="nav__links" id="nav-links">
+      <a class="nav__link" href="find-my-gear.html">장비 찾기</a>
+      <a class="nav__link" href="skill-assessment.html">레벨 검사</a>
+      <a class="nav__link" href="consult.html">컨설팅</a>
+      <a class="nav__link" href="riding-dashboard/v2.html">라이딩 분석</a>
+      <a class="nav__link" href="coach.html">대니 코치</a>
+      <a class="nav__link" href="about.html">소개</a>
+      <a class="btn btn--primary" href="login.html" id="nav-auth-cta">로그인</a>
+    </nav>
+  </div>
+</header>
+<!--#nav:end-->
+
+<!-- ══ 히어로 ══ -->
+<section class="hero">
+  <div class="hero__media">
+    <img src="assets/images/hero/danny-hero.jpg" alt="" loading="eager" fetchpriority="high">
+  </div>
+  <div class="hero__scrim"></div>
+  <div class="wrap hero__in">
+    <div class="hero__kicker">단순하고 무식하게, 그러나 지혜롭게</div>
+    <h1>장비를 파는 곳이 아니라<br>라이딩을 컨설팅합니다</h1>
+    <p class="hero__lead">
+      같은 바람에서 같은 윙을 써도 사람마다 답이 다릅니다. 레벨·체중·스타일
+      세 축으로 셋업을 고르고, 실제 GPS 트랙으로 그 선택이 맞았는지까지 봅니다.
+    </p>
+    <div class="hero__cta">
+      <a class="btn btn--primary btn--lg" href="find-my-gear.html">1분 셋업 찾기</a>
+      <a class="btn btn--lg" href="riding-dashboard/v2.html">내 라이딩 분석하기</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 세 갈래 진입 ══ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>무엇부터 하시겠어요</h2>
+      <p class="t-lead">셋 중 어느 쪽으로 들어와도 같은 결론으로 이어집니다.</p>
+    </div>
+    <div class="grid grid--3">
+      <a class="card card--link" href="find-my-gear.html">
+        <div class="card__body">
+          <div class="lab">STEP 1</div>
+          <h3 class="mt-2">내 셋업 찾기</h3>
+          <p>레벨 · 체중 · 스타일 세 가지만 고르면 64개 시나리오에서 맞는 조합을 꺼냅니다.</p>
+          <div class="badge badge--accent">1분</div>
+        </div>
+      </a>
+      <a class="card card--link" href="skill-assessment.html">
+        <div class="card__body">
+          <div class="lab">STEP 2</div>
+          <h3 class="mt-2">레벨 검사</h3>
+          <p>스스로 매기는 레벨은 대개 어긋납니다. 실제로 되는 동작으로 판정합니다.</p>
+          <div class="badge badge--accent">5분</div>
+        </div>
+      </a>
+      <a class="card card--link" href="riding-dashboard/v2.html">
+        <div class="card__body">
+          <div class="lab">STEP 3</div>
+          <h3 class="mt-2">라이딩 분석</h3>
+          <p>GPX 하나만 올리면 택·자이브·풍상각·포일링 시간을 전부 계산합니다.</p>
+          <div class="badge badge--accent">무료</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 대시보드 (최대 차별점) ══ -->
+<section class="section" style="background:var(--s-card);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <div class="section__head">
+      <div class="lab">RIDING DASHBOARD</div>
+      <h2 class="mt-2">눈대중 대신 숫자로</h2>
+      <p class="t-lead">
+        "오늘 좀 잘 됐다" 를 확인할 방법이 없었습니다. 트랙을 올리면
+        어느 택이 느렸는지, 회전에서 몇 미터를 잃었는지, 어느 각도가 제일 빨랐는지가 나옵니다.
+      </p>
+    </div>
+    <div class="grid grid--4">
+      <div class="stat"><div class="stat__k">TACK BIAS</div><div class="stat__v">−23.6<span class="stat__u">%</span></div><div class="stat__sub">좌우 차이와 그 원인까지</div></div>
+      <div class="stat"><div class="stat__k">POLAR</div><div class="stat__v">56<span class="stat__u">°</span></div><div class="stat__sub">실제로 제일 잘 나간 각도</div></div>
+      <div class="stat"><div class="stat__k">TURN LOSS</div><div class="stat__v">15<span class="stat__u">m</span></div><div class="stat__sub">회전 하나에 잃은 거리</div></div>
+      <div class="stat"><div class="stat__k">FOILING</div><div class="stat__v">12:21</div><div class="stat__sub">안 떨어지고 버틴 최장</div></div>
+    </div>
+    <div class="grid grid--3 mt-4">
+      <div class="card"><div class="card__body">
+        <h3>구간별로 뜯어보기</h3>
+        <p>레그 · 런 · 택 · 자이브 · 포일링 구간을 하나씩 넘겨 보며 지도에서 그 자리를 확인합니다.</p>
+      </div></div>
+      <div class="card"><div class="card__body">
+        <h3>영상과 트랙을 맞춰서</h3>
+        <p>촬영 영상을 올리면 시각을 자동으로 맞춰 그 순간의 속도·각도를 같이 봅니다.</p>
+      </div></div>
+      <div class="card"><div class="card__body">
+        <h3>몸 상태까지</h3>
+        <p>심박 회복·훈련 부하·수면을 함께 봐서 오늘 얼마나 타도 되는지 알려줍니다.</p>
+      </div></div>
+    </div>
+    <div class="row mt-5">
+      <a class="btn btn--primary" href="riding-dashboard/v2.html">대시보드 열기</a>
+      <span class="lab">GPX · Waterspeed CSV · RaceBox CSV 지원</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 레벨별 ══ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>입문부터 선수까지</h2>
+      <p class="t-lead">레벨이 바뀌면 정답도 바뀝니다. 같은 장비를 계속 권하지 않습니다.</p>
+    </div>
+    <div class="grid grid--4">
+      <div class="card"><div class="card__body">
+        <div class="lab">LEVEL 1</div><h3 class="mt-2">처음 시작</h3>
+        <p>일어서기와 활주. 큰 포일과 안정적인 보드가 먼저입니다.</p></div></div>
+      <div class="card"><div class="card__body">
+        <div class="lab">LEVEL 2</div><h3 class="mt-2">자이빙이 되는</h3>
+        <p>포일을 유지한 채 도는 단계. 여기서 장비를 줄이기 시작합니다.</p></div></div>
+      <div class="card"><div class="card__body">
+        <div class="lab">LEVEL 3</div><h3 class="mt-2">택킹도 되는</h3>
+        <p>풍상 각도가 성적을 가릅니다. 포일 종횡비가 중요해지는 지점.</p></div></div>
+      <div class="card"><div class="card__body">
+        <div class="lab">LEVEL 4</div><h3 class="mt-2">대회 출전</h3>
+        <p>레이스 셋업. 0.5㎡ 차이가 순위를 바꾸는 영역입니다.</p></div></div>
+    </div>
+    <div class="row mt-5"><a class="btn" href="skill-assessment.html">내 레벨 검사하기</a></div>
+  </div>
+</section>
+
+<!-- ══ 브랜드 ══ -->
+<section class="section" style="background:var(--s-card);border-block:1px solid var(--line)">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>한 브랜드만 파는 곳과 다릅니다</h2>
+      <p class="t-lead">한 브랜드만 취급하면 그 브랜드 안에서만 답을 찾게 됩니다. 우리는 섞습니다.</p>
+    </div>
+    <div class="grid grid--4">
+      <a class="card card--link" href="levitaz.html"><div class="card__body">
+        <h3>Levitaz</h3><p class="mb-0">오스트리아 카본 포일. 레이스와 프리라이드 양쪽.</p></div></a>
+      <a class="card card--link" href="ppc.html"><div class="card__body">
+        <h3>PPC</h3><p class="mb-0">Sonic 핸드윙. 가벼운 바람에서 강한 라인업.</p></div></a>
+      <a class="card card--link" href="takoon.html"><div class="card__body">
+        <h3>Takoon</h3><p class="mb-0">프랑스. 프리라이드와 웨이브 성향.</p></div></a>
+      <a class="card card--link" href="wip.html"><div class="card__body">
+        <h3>Forward WIP</h3><p class="mb-0">임팩트 베스트·헬멧 등 안전 장비.</p></div></a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 상담 CTA ══ -->
+<section class="section">
+  <div class="wrap">
+    <div class="card">
+      <div class="card__body" style="padding:var(--sp-7)">
+        <div class="grid grid--2" style="align-items:center">
+          <div>
+            <h2>고민되면 물어보는 게 제일 빠릅니다</h2>
+            <p class="t-lead mb-0">
+              장비 목록을 아무리 봐도 내 조건에 맞는지는 안 나옵니다.
+              타는 곳·바람·체중·목표를 알려주시면 그에 맞춰 답해 드립니다.
+            </p>
+          </div>
+          <div class="row" style="justify-content:flex-end">
+            <a class="btn btn--primary btn--lg" href="consult.html">상담 신청</a>
+            <a class="btn btn--lg" href="coach.html">대니 코치에게 묻기</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--#foot:begin-->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <div class="nav__brand">단무지공방</div>
+        <p class="t-dim mt-2" style="max-width:38ch">
+          단순하고 무식하게, 그러나 지혜롭게. 윙포일 장비를 파는 곳이 아니라
+          라이딩을 컨설팅하는 곳입니다.
+        </p>
+      </div>
+      <div>
+        <div class="lab mb-3">시작하기</div>
+        <a href="find-my-gear.html">장비 찾기</a>
+        <a href="skill-assessment.html">레벨 검사</a>
+        <a href="consult.html">컨설팅 신청</a>
+        <a href="coach.html">대니 코치에게 묻기</a>
+      </div>
+      <div>
+        <div class="lab mb-3">분석</div>
+        <a href="riding-dashboard/v2.html">라이딩 대시보드</a>
+        <a href="calculator.html">셋업 계산기</a>
+        <a href="glossary.html">용어집</a>
+        <a href="about.html">소개</a>
+      </div>
+    </div>
+    <div class="foot__legal">
+      © 단무지공방 · <a href="policies.html">이용약관 · 개인정보처리방침</a>
+    </div>
+  </div>
+</footer>
+<script>
+/* §530 — 모바일 메뉴 + 로그인 상태. 두 줄이면 되는 걸 페이지마다
+   다르게 써 놔서 동작이 제각각이었다. 여기 하나로 통일한다. */
+(function () {
+  var t = document.querySelector('.nav__toggle');
+  var l = document.getElementById('nav-links');
+  if (t && l) t.addEventListener('click', function () {
+    var open = l.classList.toggle('is-open');
+    t.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  /* 현재 페이지 표시 */
+  var here = location.pathname.split('/').pop() || 'index.html';
+  Array.prototype.forEach.call(document.querySelectorAll('.nav__link'), function (a) {
+    if (a.getAttribute('href') === here) a.setAttribute('aria-current', 'page');
+  });
+  /* 로그인 상태 — DMJAuth 가 있으면 CTA 를 바꾼다 */
+  function syncAuth() {
+    var cta = document.getElementById('nav-auth-cta');
+    if (!cta || !window.DMJAuth || !window.DMJAuth.isLoggedIn) return;
+    if (window.DMJAuth.isLoggedIn()) {
+      var u = window.DMJAuth.currentUser() || {};
+      cta.textContent = (u.name || u.email || '내 정보');
+      cta.href = 'profile.html';
+    }
+  }
+  syncAuth();
+  window.addEventListener('dmj-auth-change', syncAuth);
+})();
+</script>
+<!--#foot:end-->
+<script src="assets/js/supabase-auth.js?v=v530"></script>
+</body>
+</html>

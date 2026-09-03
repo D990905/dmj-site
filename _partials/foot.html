@@ -1,0 +1,59 @@
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__grid">
+      <div>
+        <div class="nav__brand">단무지공방</div>
+        <p class="t-dim mt-2" style="max-width:38ch">
+          단순하고 무식하게, 그러나 지혜롭게. 윙포일 장비를 파는 곳이 아니라
+          라이딩을 컨설팅하는 곳입니다.
+        </p>
+      </div>
+      <div>
+        <div class="lab mb-3">시작하기</div>
+        <a href="find-my-gear.html">장비 찾기</a>
+        <a href="skill-assessment.html">레벨 검사</a>
+        <a href="consult.html">컨설팅 신청</a>
+        <a href="coach.html">대니 코치에게 묻기</a>
+      </div>
+      <div>
+        <div class="lab mb-3">분석</div>
+        <a href="riding-dashboard/v2.html">라이딩 대시보드</a>
+        <a href="calculator.html">셋업 계산기</a>
+        <a href="glossary.html">용어집</a>
+        <a href="about.html">소개</a>
+      </div>
+    </div>
+    <div class="foot__legal">
+      © 단무지공방 · <a href="policies.html">이용약관 · 개인정보처리방침</a>
+    </div>
+  </div>
+</footer>
+<script>
+/* §530 — 모바일 메뉴 + 로그인 상태. 두 줄이면 되는 걸 페이지마다
+   다르게 써 놔서 동작이 제각각이었다. 여기 하나로 통일한다. */
+(function () {
+  var t = document.querySelector('.nav__toggle');
+  var l = document.getElementById('nav-links');
+  if (t && l) t.addEventListener('click', function () {
+    var open = l.classList.toggle('is-open');
+    t.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  /* 현재 페이지 표시 */
+  var here = location.pathname.split('/').pop() || 'index.html';
+  Array.prototype.forEach.call(document.querySelectorAll('.nav__link'), function (a) {
+    if (a.getAttribute('href') === here) a.setAttribute('aria-current', 'page');
+  });
+  /* 로그인 상태 — DMJAuth 가 있으면 CTA 를 바꾼다 */
+  function syncAuth() {
+    var cta = document.getElementById('nav-auth-cta');
+    if (!cta || !window.DMJAuth || !window.DMJAuth.isLoggedIn) return;
+    if (window.DMJAuth.isLoggedIn()) {
+      var u = window.DMJAuth.currentUser() || {};
+      cta.textContent = (u.name || u.email || '내 정보');
+      cta.href = 'profile.html';
+    }
+  }
+  syncAuth();
+  window.addEventListener('dmj-auth-change', syncAuth);
+})();
+</script>
