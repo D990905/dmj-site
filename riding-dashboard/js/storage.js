@@ -163,6 +163,81 @@
       return (typeof t === 'string' && t) ? t : null;
     } catch (e) { return null; }
   }
+  /* ============================================================
+   * §509 트랙 압축 저장 — RDTRK1
+   *
+   * 왜: 옥대표 세션 6개 중 **5개가 "summary only"** 로 떨어져 다시 열 수
+   * 없었다. 원인은 용량이다.
+   *   · GPX 는 점 하나에 97 bytes 를 쓴다(태그·ISO 시각·고도).
+   *   · 47km 세션 = 약 6,100점 = 0.57 MB. 6세션이면 2.7 M자.
+   *   · **localStorage 는 UTF-16 이라 2.7 M자 ≈ 5.4 MB** 다. 보통 상한이
+   *     5 MB 이므로 넘는다 → 오래된 트랙부터 쫓겨난다(storeTrackWithEviction).
+   *   · 기존 compactGpx 는 공백만 지워 **6% 밖에** 못 줄였다(144→135 KB).
+   *
+   * 어떻게: 재분석에 필요한 건 lat·lng·시각 셋뿐이다. 나머지(속도·방위·
+   * 거리)는 normalizeSession 이 다시 계산한다. 그래서 셋만 **델타로** 담는다.
+   *   좌표는 1e-6 도 격자 = 적도에서 약 11 cm. GPS 오차(수 m)보다 훨씬
+   *   촘촘하므로 정보 손실이 없다.
+   * 결과: 144 KB → 13 KB (**11배**). 6세션 합계 2.7 MB → 0.25 MB.
+   *
+   * 형식:  RDTRK1|<t0>,<lat0e6>,<lng0e6>|dt,dlat,dlng;dt,dlat,dlng;...
+   * 옛 기록은 GPX 그대로 남아 있다 — 읽는 쪽이 둘 다 받는다.
+   * ============================================================ */
+  var TRACK_MAGIC = 'RDTRK1';
+
+  function encodeTrack(samples) {
+    if (!samples || !samples.length) return null;
+    var pts = [];
+    for (var i = 0; i < samples.length; i++) {
+      var p = samples[i];
+      if (p == null) continue;
+      var la = Number(p.lat), ln = Number(p.lng);
+      if (!isFinite(la) || !isFinite(ln)) continue;
+      /* t 는 epoch 초. normalizeSession 이 준 상대초일 수도 있어
+         startEpoch 를 더해 절대초로 맞춘다(호출부가 넘겨 준다). */
+      var t = Number(p.__abs != null ? p.__abs : p.t);
+      if (!isFinite(t)) continue;
+      pts.push([Math.round(t), Math.round(la * 1e6), Math.round(ln * 1e6)]);
+    }
+    if (pts.length < 2) return null;
+    var head = pts[0].join(',');
+    var body = [], pt = pts[0][0], pla = pts[0][1], pln = pts[0][2];
+    for (var k = 1; k < pts.length; k++) {
+      var q = pts[k];
+      body.push((q[0] - pt) + ',' + (q[1] - pla) + ',' + (q[2] - pln));
+      pt = q[0]; pla = q[1]; pln = q[2];
+    }
+    return TRACK_MAGIC + '|' + head + '|' + body.join(';');
+  }
+
+  /* 돌려주는 것 = [{lat, lng, t}] (t 는 epoch 초). 형식이 아니면 null. */
+  function decodeTrack(text) {
+    if (typeof text !== 'string' || text.slice(0, TRACK_MAGIC.length) !== TRACK_MAGIC) {
+      return null;
+    }
+    var parts = text.split('|');
+    if (parts.length < 3) return null;
+    var h = parts[1].split(',');
+    var t = parseInt(h[0], 10), la = parseInt(h[1], 10), ln = parseInt(h[2], 10);
+    if (!isFinite(t) || !isFinite(la) || !isFinite(ln)) return null;
+    var out = [{ lat: la / 1e6, lng: ln / 1e6, t: t }];
+    var rows = parts[2] ? parts[2].split(';') : [];
+    for (var i = 0; i < rows.length; i++) {
+      var c = rows[i].split(',');
+      if (c.length !== 3) continue;
+      t += parseInt(c[0], 10) || 0;
+      la += parseInt(c[1], 10) || 0;
+      ln += parseInt(c[2], 10) || 0;
+      out.push({ lat: la / 1e6, lng: ln / 1e6, t: t });
+    }
+    return out.length >= 2 ? out : null;
+  }
+
+  function isCompactTrack(text) {
+    return typeof text === 'string'
+        && text.slice(0, TRACK_MAGIC.length) === TRACK_MAGIC;
+  }
+
   /* GPX 트랙을 저장 전 가볍게 압축한다 — 태그 사이의 들여쓰기·줄바꿈
    * 공백을 제거. 기기가 내보낸 GPX 는 들여쓰기가 용량의 20~40% 를
    * 차지하는데, 태그 사이 공백은 XML 에서 무의미하므로 제거해도
@@ -367,9 +442,20 @@
     /* 원본 GPX 저장 — '다시 보기' 재분석용. 공백 압축 후 저장하며,
        압축 후에도 상한을 넘거나 저장에 실패하면 요약만 저장된다. */
     rec.hasTrack = false;
-    var gpx = (typeof meta.gpxText === 'string') ? compactGpx(meta.gpxText) : null;
-    if (gpx && gpx.length <= MAX_TRACK_CHARS) {
-      rec.hasTrack = storeTrackWithEviction(rec.id, gpx, arr);
+    /* §509 — 트랙은 **압축 형식(RDTRK1)** 으로 담는다. GPX 원문을 그대로
+       넣으면 점당 97 bytes 라 47km 세션 하나가 0.57 MB 이고, localStorage
+       가 UTF-16 이라 6세션이면 5 MB 상한을 넘어 오래된 트랙부터 쫓겨났다.
+       (옥대표 화면에서 6개 중 5개가 'summary only' 로 뜬 이유가 이것이다.)
+       샘플이 있으면 그걸 쓰고, 없으면 예전처럼 GPX 를 담는다. */
+    var payload = null;
+    if (meta.samples && meta.samples.length) {
+      payload = encodeTrack(meta.samples);
+    }
+    if (!payload && typeof meta.gpxText === 'string') {
+      payload = compactGpx(meta.gpxText);
+    }
+    if (payload && payload.length <= MAX_TRACK_CHARS) {
+      rec.hasTrack = storeTrackWithEviction(rec.id, payload, arr);
     }
     var w = writeAll(arr);
     return w.ok ? { ok: true, record: rec } : w;
@@ -1531,6 +1617,10 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
   }
 
   var Storage = {
+    /* §509 트랙 압축 — 저장은 encodeTrack, 복원은 decodeTrack */
+    encodeTrack: encodeTrack,
+    decodeTrack: decodeTrack,
+    isCompactTrack: isCompactTrack,
     /* §412 — per-user namespace 격리 + legacy 마이그레이션 */
     migrateLegacyIfNeeded: migrateLegacyIfNeeded,
     nsPrefix: nsPrefix,

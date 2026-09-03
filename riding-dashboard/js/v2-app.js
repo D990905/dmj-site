@@ -2875,6 +2875,47 @@
     if (!rec || !window.RDStorage) return;
     var gpx = null;
     try { gpx = RDStorage.loadTrack(rec.id); } catch (e) { gpx = null; }
+
+    /* §509 — 압축 형식(RDTRK1)이면 GPX 파싱을 건너뛰고 바로 세션을 만든다.
+       normalizeSession 이 속도·방위·거리를 다시 계산하므로 lat/lng/시각
+       셋이면 충분하다. */
+    if (RDStorage.isCompactTrack && RDStorage.isCompactTrack(gpx)) {
+      var pts = RDStorage.decodeTrack(gpx);
+      if (!pts) { alertLine('This session\u2019s track could not be read.'); return; }
+      try {
+        if (rec.windSpeedKt != null && $('in-windspeed')) {
+          $('in-windspeed').value = rec.windSpeedKt;
+        }
+      } catch (e) {}
+      /* ⚠ normalizeSession 은 `samples` 가 아니라 **parsed 모양**을 받는다:
+         { tracks:[{segments:[[{lat,lng,time,speed}]]}], hasTime, speedSource }.
+         처음에 {samples:pts} 를 넘겼다가 parsed.tracks.forEach 에서
+         터졌다(화면은 조용히 안 열렸다). 파서가 주는 모양 그대로 만든다. */
+      /* ⚠ time 은 **epoch 밀리초 숫자**다(gpx-parser.js:86). ISO 문자열을
+         넣으면 normalizeSession 이 (p.time - t0) 산술에서 NaN 을 만들어
+         t 가 전부 null 이 되고 속도가 0 으로 떨어진다 — 화면엔 날짜가
+         '+058346' 으로 뜬다. 저장된 초를 ms 로 올려 준다. */
+      var seg = pts.map(function (q) {
+        return { lat: q.lat, lng: q.lng, ele: null,
+                 time: q.t * 1000, speed: null, hr: null };
+      });
+      var sess = An.normalizeSession({
+        tracks: [{ name: rec.name || 'Session', segments: [seg] }],
+        hasTime: true, speedSource: 'derived',
+        trackName: rec.name || 'Session'
+      });
+      var est2 = estimateWind(sess);
+      var wd2 = (rec.windDir != null) ? rec.windDir
+                : (est2 && est2.windDir != null ? est2.windDir : null);
+      CUR.gpxText = null;          /* 원문은 더 이상 갖고 있지 않다 */
+      CUR.est = est2;
+      CUR.windDir = wd2;
+      var an2 = An.analyzeSession(sess, wd2, analysisOpts(est2));
+      show(sess, an2, rec.name || 'Session', est2);
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+      return;
+    }
+
     if (!gpx) {
       alertLine('This session is stored as a summary only — its track was cleared '
         + 'to make space, so it cannot be reopened.');
@@ -2938,8 +2979,45 @@
     var card = el('div', 'card');
     var h = el('div', 'card-header');
     h.appendChild(el('h3', 'card-title', 'Saved sessions'));
-    h.appendChild(el('div', 'card-actions lab',
-      list.length + ' stored · click a row to open'));
+    /* §510 (옥대표 "세션을 선택할 수 있게 만들어서 저장된 세션으로 즉시
+       돌아갈 수 있게") — 표에서 행을 누르는 길은 §495 에 있었지만,
+       표가 길어지면 찾아 내려가야 한다. 머리말에 바로 고르는 목록을 둔다.
+       ⚠ 다시 열 수 있는 건 트랙이 남아 있는 것뿐이라(§509 이전 기록은
+       상당수 요약만 남았다) **열리는 것만** 목록에 올린다. */
+    var act = el('div', 'card-actions d-flex align-items-center gap-2');
+    var openable = list.filter(function (r) { return r.hasTrack; })
+      .sort(function (a2, b2) { return (b2.dateEpoch || 0) - (a2.dateEpoch || 0); });
+    if (openable.length) {
+      var jump = el('select', 'form-select form-select-sm');
+      jump.style.width = 'auto';
+      var ph = document.createElement('option');
+      ph.value = ''; ph.textContent = 'Jump to a session…'; ph.selected = true;
+      jump.appendChild(ph);
+      openable.forEach(function (r) {
+        var o = document.createElement('option');
+        o.value = r.id;
+        var d = r.dateEpoch ? new Date(r.dateEpoch) : null;
+        o.textContent = (d ? d.toISOString().slice(0, 10) + '  ' : '')
+          + (r.name || 'Session')
+          + (r.distanceM ? '  ·  ' + (r.distanceM / 1000).toFixed(1) + ' km' : '');
+        jump.appendChild(o);
+      });
+      jump.addEventListener('change', function () {
+        var id = jump.value;
+        if (!id) return;
+        var rec = null;
+        for (var i = 0; i < list.length; i++) { if (list[i].id === id) { rec = list[i]; break; } }
+        jump.value = '';                 /* 다음 선택을 위해 되돌린다 */
+        if (rec) openSavedSession(rec);
+      });
+      act.appendChild(jump);
+    }
+    act.appendChild(el('span', 'lab',
+      list.length + ' stored'
+      + (openable.length < list.length
+          ? ' · ' + openable.length + ' can be reopened'
+          : ' · click a row to open')));
+    h.appendChild(act);
     card.appendChild(h);
     var wrap = el('div', 'table-responsive');
     var t = el('table', 'table table-vcenter card-table table-sm');
@@ -3042,11 +3120,33 @@
       { key: 'sps',   label: 'Performance score', unit: '', dp: 0,
         get: function (r) { return r.vpsOverall != null ? r.vpsOverall : null; } }
     ];
+    /* §510 (옥대표 "세션 숫자는 6인데 그래프가 안나와") —
+       고른 지표에 값이 하나도 없으면 빈 그래프가 그려진다. 사용자는
+       고장난 걸로 읽는다. 오래된 기록에는 없는 필드가 있기 때문이다
+       (그 기록을 저장할 때 아직 그 필드가 없었다).
+       → **값이 2개 이상 있는 지표만** 메뉴에 올리고, 고른 지표가
+       비어 있으면 그렇다고 말한다. */
+    function metricCount(def) {
+      var n = 0;
+      for (var i = 0; i < pts.length; i++) {
+        var v = def.get(pts[i]);
+        if (v != null && isFinite(v)) n++;
+      }
+      return n;
+    }
+    var METRIC_STATE = TREND_METRICS.map(function (d) {
+      return { def: d, n: metricCount(d) };
+    });
+    var AVAIL = METRIC_STATE.filter(function (m) { return m.n >= 2; });
     function metricDef(k) {
       for (var i = 0; i < TREND_METRICS.length; i++) {
         if (TREND_METRICS[i].key === k) return TREND_METRICS[i];
       }
       return TREND_METRICS[0];
+    }
+    /* 고른 지표가 비어 있으면 값이 있는 첫 지표로 옮긴다 */
+    if (AVAIL.length && !AVAIL.some(function (m) { return m.def.key === TREND.metric; })) {
+      TREND.metric = AVAIL[0].def.key;
     }
     var md = metricDef(TREND.metric);
 
@@ -3056,11 +3156,14 @@
     var act2 = el('div', 'card-actions d-flex align-items-center gap-2');
     var msel = el('select', 'form-select form-select-sm');
     msel.style.width = 'auto';
-    TREND_METRICS.forEach(function (m) {
-      var have = pts.some(function (r) { return m.get(r) != null; });
+    METRIC_STATE.forEach(function (st) {
+      var m = st.def;
+      /* 점이 1개면 선이 안 그려진다 — '있다' 로 치면 안 된다(§510) */
+      var have = st.n >= 2;
       var o = document.createElement('option');
       o.value = m.key;
-      o.textContent = m.label + (have ? '' : ' — not stored yet');
+      o.textContent = m.label
+        + (have ? '' : (st.n === 1 ? ' — only 1 session has it' : ' — not stored yet'));
       o.disabled = !have;
       if (m.key === md.key) o.selected = true;
       msel.appendChild(o);
@@ -6667,6 +6770,22 @@
           } : null,
           workload: v2SessionWorkload(),   // §458 훈련부하 AU + 산출 방식
           sig: sessionSig(CUR.session),    // §463 자동 기록분과 중복 방지
+          /* §509 — 트랙을 압축 형식으로 담기 위해 샘플을 같이 넘긴다.
+             normalizeSession 의 t 는 세션 시작 기준 상대초라, 저장할 때
+             절대 epoch 로 되돌려 준다(__abs). 안 그러면 다시 열 때
+             날짜가 1970 년이 된다. */
+          samples: (function () {
+            var S0 = (CUR.fullSession || CUR.session);
+            /* ⚠ 단위가 섞이기 쉬운 자리다. startEpoch 는 **밀리초**이고
+               (gpx-parser 가 Date.parse 로 만든다) 샘플의 t 는 **초**다.
+               그냥 더하면 절대시각만 1000배가 되어 다시 열 때 날짜가
+               '+058346' 년으로 뜬다 — 간격은 맞아서 속도는 정상으로
+               보이므로 눈에 잘 안 띈다. 초로 맞춰 더한다. */
+            var baseSec = ((S0 && S0.startEpoch) || 0) / 1000;
+            return ((S0 && S0.samples) || []).map(function (p) {
+              return { lat: p.lat, lng: p.lng, __abs: baseSec + p.t };
+            });
+          })(),
           gpxText: CUR.gpxText
         }, CUR.analysis);
         if (res && res.ok) {
