@@ -1188,7 +1188,11 @@
     renderWorkoutForm(host, rp);
     /* §514 — 오늘의 제안 **앞에** 둔다. 제안이 이 입력을 쓰기 때문이다. */
     try { renderWellness(host); } catch (e) {}
-    renderTodaySuggestion(host, ledger, rp);
+    /* §538 — 제안은 웰니스 값에 딸려 있으므로 전용 호스트에 담아
+       그 안만 다시 그릴 수 있게 한다(탭 전체 재렌더 = 스크롤 튐). */
+    var sugHost = el('div'); sugHost.id = 'today-suggestion';
+    host.appendChild(sugHost);
+    renderTodaySuggestion(sugHost, ledger, rp);
     try { renderHrRecovery(host); } catch (e) {}
     renderLedgerTable(host, ledger);
   }
@@ -1502,6 +1506,162 @@
          + '-' + String(d.getDate()).padStart(2, '0');
   }
 
+  /* §538 — 값을 저장했다는 표시.
+     옥대표 "이걸 입력하고 저장하는 버튼이 없고" — 버튼을 만드는 대신
+     **자동 저장이라는 걸 보이게** 한다. 버튼을 두면 누르지 않고 떠난
+     입력이 사라지는데, 그게 더 나쁘다. */
+  var _wellSaveTimer = null;
+  function wellSaved() {
+    var host = $('wellness-saved');
+    if (!host) return;
+    host.textContent = '저장됨 \u00b7 saved';
+    host.style.opacity = '1';
+    if (_wellSaveTimer) clearTimeout(_wellSaveTimer);
+    _wellSaveTimer = setTimeout(function () { host.style.opacity = '0'; }, 1800);
+  }
+
+  /* 웰니스 값에 딸린 것들만 다시 그린다 — 탭 전체가 아니라. */
+  function refreshWellnessDependents() {
+    try { renderWellnessTrend(); } catch (e) {}
+    try { renderWellnessChart(); } catch (e) {}
+    /* 오늘의 제안은 이 값들로 판정하므로 같이 갱신한다 */
+    try {
+      var sh = $('today-suggestion');
+      if (sh && window.RDStorage) {
+        while (sh.firstChild) sh.removeChild(sh.firstChild);
+        renderTodaySuggestion(sh, RDStorage.loadLedger(), riderProfile());
+      }
+    } catch (e) {}
+  }
+
+  function renderWellnessTrend() {
+    var tr = $('wellness-trend');
+    if (!tr) return;
+    while (tr.firstChild) tr.removeChild(tr.firstChild);
+    var hrv = RDStorage.computeHRVTrend ? RDStorage.computeHRVTrend() : null;
+    var rhr = RDStorage.computeRHRTrend ? RDStorage.computeRHRTrend() : null;
+    var line = [];
+    if (hrv && hrv.ok) {
+      line.push('HRV ' + hrv.recent7Ms + ' ms over the last 7 days against a '
+        + hrv.baselineDays + '-day baseline of ' + hrv.baselineMs + ' ms ('
+        + (hrv.deviationSD > 0 ? '+' : '') + hrv.deviationSD + ' SD)');
+    } else if (hrv && hrv.have != null) {
+      line.push('HRV trend needs ' + hrv.need + ' days, has ' + hrv.have);
+    }
+    if (rhr && rhr.ok) {
+      line.push('resting HR ' + rhr.recent7Bpm + ' bpm vs baseline '
+        + rhr.baselineBpm + ' (' + (rhr.deltaBpm > 0 ? '+' : '') + rhr.deltaBpm + ')');
+    }
+    if (line.length) {
+      tr.className = 'lab mt-3';
+      tr.textContent = line.join('  \u00b7  ') + '.';
+    }
+  }
+
+  /* §538 (옥대표 "입력후 데이터들은 어디서 시각화 되고 있는건지?")
+     — 정당한 질문이었다. 넣기만 하고 **글 한 줄**로만 돌려주고 있었다.
+     기록이 쌓이는 게 보여야 계속 넣을 이유가 생긴다.
+     HRV·안정시심박·Hooper 를 한 판에 겹치지 않고 세 줄로 나눠 그린다
+     (§473 과 같은 규칙 — 단위가 다른 걸 한 축에 겹치면 교차점이 뜻을
+     갖는 것처럼 보인다). */
+  function renderWellnessChart() {
+    var host = $('wellness-chart');
+    if (!host || !window.RDStorage || !RDStorage.loadWellness) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    var rows = (RDStorage.loadWellness() || []).slice().sort(function (a, b) {
+      return a.date < b.date ? -1 : 1;
+    });
+    if (rows.length < 2) {
+      var hint = el('div', 'lab mt-3');
+      hint.textContent = rows.length
+        ? 'One day recorded. From two days on, the trend is drawn here.'
+        : 'Nothing recorded yet \u2014 answer the four questions above and it '
+          + 'starts building a trend here.';
+      host.appendChild(hint);
+      return;
+    }
+
+    var SERIES = [
+      { k: 'hrvMs',  label: 'HRV',            unit: 'ms',  color: THEME.accent,
+        get: function (r) { return r.hrvMs; } },
+      { k: 'rhrBpm', label: 'Resting HR',     unit: 'bpm', color: THEME.port,
+        get: function (r) { return r.rhrBpm; } },
+      { k: 'hooper', label: 'How you felt',   unit: '/20', color: THEME.stbd,
+        get: function (r) {
+          if (!r.hooper) return null;
+          var ks = ['fatigue', 'stress', 'soreness', 'sleepQuality'], n = 0, sum = 0;
+          ks.forEach(function (x) { if (r.hooper[x] != null) { sum += r.hooper[x]; n++; } });
+          return n === 4 ? sum : null;      /* 넷 다 있을 때만 — 부분합은 비교가 안 된다 */
+        } }
+    ];
+
+    var wrap = el('div', 'mt-3');
+    var drew = 0;
+    SERIES.forEach(function (sd) {
+      var pts = [];
+      rows.forEach(function (r) {
+        var v = sd.get(r);
+        if (v != null && isFinite(v)) pts.push({ date: r.date, v: v });
+      });
+      if (pts.length < 2) return;
+      drew++;
+      var row = el('div', 'mt-2');
+      var head = el('div', 'd-flex align-items-baseline justify-content-between');
+      head.appendChild(el('div', 'lab', sd.label));
+      var last = pts[pts.length - 1];
+      head.appendChild(el('div', 'lab',
+        last.v + ' ' + sd.unit + '  \u00b7  ' + pts.length + ' days'));
+      row.appendChild(head);
+      row.appendChild(sparkline(pts, sd.color));
+      wrap.appendChild(row);
+    });
+    if (!drew) {
+      var none = el('div', 'lab mt-3');
+      none.textContent = 'Not enough of any one measure yet \u2014 two days of the '
+        + 'same field are needed before a line means anything.';
+      host.appendChild(none);
+      return;
+    }
+    host.appendChild(wrap);
+    var note = el('div', 'lab mt-2');
+    note.textContent = 'Each line is its own scale \u2014 they are different units, '
+      + 'so putting them on one axis would invent a relationship that is not there.';
+    host.appendChild(note);
+  }
+
+  /* 작은 추세선. uPlot 을 쓰기엔 과하고, 여기서 필요한 건 방향뿐이다. */
+  function sparkline(pts, color) {
+    var W = 100, H = 26;                       /* viewBox 단위 — 폭은 CSS 로 늘린다 */
+    var vs = pts.map(function (p) { return p.v; });
+    var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
+    if (hi - lo < 1e-9) { hi = lo + 1; }
+    var d = pts.map(function (p, i) {
+      var x = (i / (pts.length - 1)) * W;
+      var y = H - ((p.v - lo) / (hi - lo)) * (H - 4) - 2;
+      return (i ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2);
+    }).join(' ');
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.cssText = 'width:100%;height:34px;display:block';
+    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '1.6');
+    path.setAttribute('vector-effect', 'non-scaling-stroke');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(path);
+    /* 마지막 점 — 지금이 어디인지 */
+    var cx = W, cy = H - ((pts[pts.length - 1].v - lo) / (hi - lo)) * (H - 4) - 2;
+    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', String(cx - 1)); dot.setAttribute('cy', String(cy));
+    dot.setAttribute('r', '1.6'); dot.setAttribute('fill', color);
+    dot.setAttribute('vector-effect', 'non-scaling-stroke');
+    svg.appendChild(dot);
+    return svg;
+  }
+
   function renderWellness(host) {
     if (!RDStorage || !RDStorage.saveWellness) return;
     var today = todayYmd();
@@ -1512,9 +1672,20 @@
     var card = el('div', 'card mt-3');
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title', 'How you feel today'));
-    head.appendChild(el('div', 'card-actions lab', today));
+    var hact = el('div', 'card-actions d-flex align-items-center gap-3');
+    /* §538 — 자동 저장이라는 걸 보이게. 저장 버튼을 두면 누르지 않고
+       떠난 입력이 사라지는데 그게 더 나쁘다. */
+    var savedTag = el('span', 'lab');
+    savedTag.id = 'wellness-saved';
+    savedTag.style.cssText = 'color:' + THEME.stbd + ';opacity:0;transition:opacity .25s';
+    hact.appendChild(savedTag);
+    hact.appendChild(el('span', 'lab', today));
+    head.appendChild(hact);
     card.appendChild(head);
     var body = el('div', 'card-body');
+    body.appendChild(el('div', 'lab mb-2',
+      '\uc785\ub825\ud558\ub294 \uc989\uc2dc \uc800\uc7a5\ub429\ub2c8\ub2e4 \u2014 '
+      + 'saved as you type, no button needed.'));
     body.appendChild(el('div', 'text-secondary mb-2',
       'Four questions, five seconds. This is the Hooper index — the standard '
       + 'subjective wellness measure in sports science, and the single cheapest '
@@ -1532,9 +1703,18 @@
           var b = el('button', 'btn' + (vals[f.k] === n ? ' active' : ''), String(n));
           b.type = 'button';
           b.addEventListener('click', function () {
+            /* §538 (옥대표 "점수 클릭 할대마다 제일 위로 화면이 이동하네")
+               — renderTraining() 이 탭 전체를 다시 그려서 DOM 이 통째로
+               바뀌고 스크롤이 맨 위로 튀었다. 바뀌는 건 이 버튼 하나와
+               그에 딸린 요약·판정뿐이므로 **그것만** 다시 그린다. */
             vals[f.k] = n;
             RDStorage.saveWellness({ date: today, hooper: vals });
-            renderTraining();
+            Array.prototype.forEach.call(wrap.children, function (o, i) {
+              if (i + 1 === n) o.classList.add('active');
+              else o.classList.remove('active');
+            });
+            wellSaved();
+            refreshWellnessDependents();
           });
           wrap.appendChild(b);
         })(n);
@@ -1562,34 +1742,24 @@
         var v = parseFloat(inp.value);
         var rec = { date: today };
         rec[f[0]] = isFinite(v) ? v : null;
-        if (isFinite(v)) { RDStorage.saveWellness(rec); renderTraining(); }
+        if (isFinite(v)) {
+          RDStorage.saveWellness(rec);
+          wellSaved();
+          refreshWellnessDependents();
+        }
       });
       col.appendChild(inp);
       num.appendChild(col);
     });
     body.appendChild(num);
 
-    /* 추세 요약 */
-    var tr = el('div', 'mt-3');
-    var hrv = RDStorage.computeHRVTrend ? RDStorage.computeHRVTrend() : null;
-    var rhr = RDStorage.computeRHRTrend ? RDStorage.computeRHRTrend() : null;
-    var line = [];
-    if (hrv && hrv.ok) {
-      line.push('HRV ' + hrv.recent7Ms + ' ms over the last 7 days against a '
-        + hrv.baselineDays + '-day baseline of ' + hrv.baselineMs + ' ms ('
-        + (hrv.deviationSD > 0 ? '+' : '') + hrv.deviationSD + ' SD)');
-    } else if (hrv && hrv.have != null) {
-      line.push('HRV trend needs ' + hrv.need + ' days, has ' + hrv.have);
-    }
-    if (rhr && rhr.ok) {
-      line.push('resting HR ' + rhr.recent7Bpm + ' bpm vs baseline '
-        + rhr.baselineBpm + ' (' + (rhr.deltaBpm > 0 ? '+' : '') + rhr.deltaBpm + ')');
-    }
-    if (line.length) {
-      tr.className = 'lab mt-3';
-      tr.textContent = line.join('  ·  ') + '.';
-      body.appendChild(tr);
-    }
+    /* §538 — 추세 요약과 그래프는 전용 호스트에 담는다.
+       그래야 값을 바꿀 때 **이 안만** 다시 그리고 스크롤이 안 튄다. */
+    var trHost = el('div'); trHost.id = 'wellness-trend';
+    body.appendChild(trHost);
+    var chartHost = el('div'); chartHost.id = 'wellness-chart';
+    body.appendChild(chartHost);
+    refreshWellnessDependents();
 
     /* 가져오기 */
     body.appendChild(renderWellnessImport());
