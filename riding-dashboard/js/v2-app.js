@@ -8667,7 +8667,12 @@
     CUR.windDir = analysis.windDir;
     CUR.analysis = analysis;
     plots.length = 0;
-    $('hdr-title').textContent = name || 'Session';
+    /* §539 (옥대표 "세션 제목 수정가능하게 해줘") — 파일명이 그대로
+       제목이 되어 'Waterspeed 2026-09-03T05.21.45.000Z' 처럼 읽히지 않는다.
+       storage 에 saveSessionTitle/loadSessionTitle 이 **이미 있었는데**
+       v2 가 안 쓰고 있었다 — §482·§494·§511·§514 와 같은 계열이다.
+       제목은 세션 시그니처에 묶으므로 같은 파일을 다시 열어도 유지된다. */
+    setEditableTitle(name || 'Session');
     var d = session.startEpoch ? new Date(session.startEpoch) : null;
     $('hdr-date').textContent = d ? d.toISOString().slice(0, 10).replace(/-/g, '.') : '';
     $('nav-meta').textContent = (session.samples || []).length.toLocaleString() + ' points'
@@ -8721,6 +8726,82 @@
   /* 세션 시그니처 — 영상 blob·싱크 오프셋을 이 키로 저장한다.
      예전 페이지(app.js sessionSignature)와 동일한 식이어야 같은 영상이
      두 페이지에서 함께 보인다. */
+  /* §539 편집 가능한 세션 제목 */
+  function setEditableTitle(fallback) {
+    var h = $('hdr-title');
+    if (!h) return;
+    while (h.firstChild) h.removeChild(h.firstChild);
+
+    var sig = '';
+    try { sig = sessionSig(CUR.session); } catch (e) {}
+    var custom = null;
+    try {
+      if (sig && window.RDStorage && RDStorage.loadSessionTitle) {
+        custom = RDStorage.loadSessionTitle(sig);
+      }
+    } catch (e) {}
+    var shown = custom || fallback;
+
+    var span = el('span');
+    span.textContent = shown;
+    span.style.cssText = 'outline:none;border-bottom:1px dashed transparent;'
+      + 'cursor:text;padding-bottom:1px';
+    span.setAttribute('contenteditable', 'plaintext-only');
+    span.setAttribute('role', 'textbox');
+    span.setAttribute('aria-label', 'Session title — click to rename');
+    span.title = '클릭해서 제목을 바꿉니다 · click to rename';
+
+    function commit() {
+      var v = (span.textContent || '').replace(/\s+/g, ' ').trim();
+      span.style.borderBottomColor = 'transparent';
+      if (!sig || !window.RDStorage || !RDStorage.saveSessionTitle) return;
+      /* 비우면 **자동 제목으로 되돌린다** — 빈 제목을 저장하면 목록에서
+         어느 세션인지 알 수 없게 된다 */
+      if (!v || v === fallback) {
+        RDStorage.saveSessionTitle(sig, '');
+        span.textContent = fallback;
+        CUR.name = fallback;
+      } else {
+        RDStorage.saveSessionTitle(sig, v);
+        span.textContent = v;
+        CUR.name = v;
+      }
+      flashTitleSaved();
+      /* 저장 목록에도 같은 제목이 보이게 */
+      try { renderSessions(); } catch (e) {}
+    }
+    span.addEventListener('focus', function () {
+      span.style.borderBottomColor = THEME.accent;
+    });
+    span.addEventListener('blur', commit);
+    span.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter') { ev.preventDefault(); span.blur(); }
+      if (ev.key === 'Escape') { span.textContent = shown; span.blur(); }
+    });
+    h.appendChild(span);
+
+    var pen = el('span', 'lab ms-2');
+    pen.textContent = '\u270e';
+    pen.style.cssText = 'opacity:.45;cursor:text';
+    pen.addEventListener('click', function () { span.focus(); });
+    h.appendChild(pen);
+
+    var saved = el('span', 'lab ms-2');
+    saved.id = 'title-saved';
+    saved.style.cssText = 'color:' + THEME.stbd + ';opacity:0;transition:opacity .25s';
+    h.appendChild(saved);
+
+    CUR.name = shown;
+  }
+
+  function flashTitleSaved() {
+    var t = $('title-saved');
+    if (!t) return;
+    t.textContent = '저장됨';
+    t.style.opacity = '1';
+    setTimeout(function () { t.style.opacity = '0'; }, 1500);
+  }
+
   function sessionSig(sess) {
     if (!sess) return '';
     var sum = CUR.analysis && CUR.analysis.summary;
