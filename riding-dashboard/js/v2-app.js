@@ -8912,13 +8912,47 @@
     box.appendChild(b); host.appendChild(box);
   }
 
+  /* §540 (옥대표 "저장된걸 찾아서 넣어줘") — 잃어버린 세션 중 하나가
+     Vakaros .vkx 였는데 **v2 가 그 확장자를 안 받고 있었다.**
+     파서(js/vkx-parser.js)도, 구 대시보드의 처리 경로도 이미 있었다 —
+     v2 에만 배선이 없었다. §482·§494·§511·§514·§539 와 같은 계열, 일곱 번째.
+
+     .vkx 는 바이너리라 텍스트 융합 경로를 못 탄다. 따로 읽는다. */
+  function loadVkxFile(file) {
+    if (!window.RDVkx || !RDVkx.parseVKX) {
+      $('hdr-title').textContent = 'VKX parser not loaded';
+      return;
+    }
+    var fr = new FileReader();
+    fr.onerror = function () { $('hdr-title').textContent = 'Could not read the file'; };
+    fr.onload = function () {
+      try {
+        var parsed = RDVkx.parseVKX(fr.result);
+        var session = An.normalizeSession(parsed);
+        var est = estimateWind(session);
+        var wd = est && est.windDir != null ? est.windDir : null;
+        var analysis = An.analyzeSession(session, wd, analysisOpts(est));
+        CUR.edit = null; CUR.fullSession = null; CUR.gpxText = null; CUR.fusion = null;
+        renderFusionBanner(null);
+        show(session, analysis, file.name.replace(/\.vkx$/i, ''), est);
+      } catch (e) {
+        $('hdr-title').textContent = 'Could not read that VKX';
+        $('hdr-date').textContent = (e && e.message) ? e.message : '';
+      }
+    };
+    fr.readAsArrayBuffer(file);
+  }
+
   function loadFiles(fileList) {
     var files = [].slice.call(fileList || []);
     if (!files.length) return;
+    /* .vkx 는 하나씩 — 바이너리라 융합 경로에 섞을 수 없다 */
+    var vkx = files.filter(function (f) { return /\.vkx$/i.test(f.name); });
+    if (vkx.length) { loadVkxFile(vkx[0]); return; }
     var textLike = files.filter(function (f) { return /\.(gpx|csv|tcx)$/i.test(f.name); });
     if (!textLike.length) {
       $('hdr-title').textContent = 'Unsupported file type';
-      $('hdr-date').textContent = 'Upload .gpx, .csv or .tcx';
+      $('hdr-date').textContent = 'Upload .gpx, .vkx, .csv or .tcx';
       return;
     }
     readAllAsText(textLike, function (loaded, err) {
