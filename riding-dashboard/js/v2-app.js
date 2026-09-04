@@ -998,10 +998,17 @@
     var w = a.wind;
     if (!w) { host.appendChild(el('div', 'text-secondary', 'Wind not resolved.')); return; }
 
-    /* VMG 표 + 폴라를 나란히 */
+    /* §535 (옥대표 "좌측을 이렇게 비워둘 필요가 있을가?") — 그럴 필요 없었다.
+       예전 배치: 왼쪽 col-7 에 VMG 표(두 줄, ~150px) · 오른쪽 col-5 에
+       폴라 + 최적각 + 긴 설명(~1000px). 높이가 6배 넘게 차이 나서 왼쪽이
+       통째로 비었다.
+
+       바꾼 배치: **폴라를 넓은 왼쪽으로**(차트가 이 카드의 주인공이고
+       넓을수록 각도를 읽기 쉽다), 오른쪽에 VMG 표와 최적각을 **쌓는다**.
+       그러면 두 칼럼 높이가 얼추 맞고 빈 공간이 사라진다. */
     var grid = el('div', 'row row-cards');
 
-    var colT = el('div', 'col-lg-7');
+    var colT = el('div', 'col-lg-5');
     var cardT = el('div', 'card');
     var hT = el('div', 'card-header'); hT.appendChild(el('h3', 'card-title', 'VMG'));
     hT.appendChild(el('div', 'card-actions lab', 'velocity made good'));
@@ -1026,9 +1033,9 @@
     vmgRow('Upwind', w.vmgUpwindAvgMs, w.vmgUpwindTop50Ms, w.vmgUpwindTop20Ms, w.upwindTimeSec);
     vmgRow('Downwind', w.vmgDownwindAvgMs, w.vmgDownwindTop50Ms, w.vmgDownwindTop20Ms, w.downwindTimeSec);
     tbl.appendChild(tbody); bodyT.appendChild(tbl); cardT.appendChild(bodyT);
-    colT.appendChild(cardT); grid.appendChild(colT);
+    colT.appendChild(cardT);   /* grid 추가는 폴라 뒤에 — 순서를 바꾼다 */
 
-    var colP = el('div', 'col-lg-5');
+    var colP = el('div', 'col-lg-7');
     var cardP = el('div', 'card');
     var hP = el('div', 'card-header'); hP.appendChild(el('h3', 'card-title', 'Polar'));
     hP.appendChild(el('div', 'card-actions lab', 'top 5% speed per angle'));
@@ -1044,15 +1051,24 @@
       + 'angle. Angles with fewer than 5 samples are left blank rather than drawn '
       + 'at zero. A dent on one side means that tack is losing speed.';
     cardP.appendChild(footP);
-    colP.appendChild(cardP); grid.appendChild(colP);
+    colP.appendChild(cardP);
+    /* 폴라를 먼저(왼쪽), VMG·최적각을 나중에(오른쪽) */
+    grid.appendChild(colP);
+    grid.appendChild(colT);
     host.appendChild(grid);
 
     if (window.RDPolar) {
+      /* 칼럼이 넓어졌으니 차트도 키운다 — 각도 눈금이 촘촘해서
+         작으면 읽으려고 만든 눈금이 도리어 뭉갠다 */
       RDPolar.render(polarHost, a.polar,
         { grid: THEME.grid, dim: THEME.dim, port: THEME.port, starboard: THEME.stbd,
-          size: Math.min(400, polarHost.clientWidth || 380),
+          size: Math.min(520, polarHost.clientWidth || 460),
           band: true, minN: 5 });
-      renderOptimalAngles(cardP, a);
+      /* 최적각은 **오른쪽 칼럼**에 별도 카드로 — 폴라 카드에 붙이면
+         왼쪽이 더 길어져 원래 문제가 반대로 재현된다 */
+      var cardO = el('div', 'card mt-3');
+      renderOptimalAngles(cardO, a);
+      if (cardO.firstChild) colT.appendChild(cardO);
     }
 
     renderPolarGrid(host, a);
