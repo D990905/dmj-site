@@ -4893,7 +4893,12 @@
        회전만 강조, 나머지 회전은 작은 점으로. 점을 누르면 그 회전으로
        선택이 옮겨간다(목록과 지도가 같은 것을 가리키게). */
     var miniHost = el('div');
-    miniHost.style.cssText = 'height:220px;border-radius:4px;overflow:hidden;margin-bottom:12px';
+    /* 옥대표 (2026-09-04) "지도를 2배로 키우고" — 220 → 440px.
+       회전이 **어디서** 났는지가 이 카드의 요점인데 220px 에서는 트랙이
+       뭉쳐 보여 위치를 못 읽었다. 화면이 좁으면 그만큼 줄인다. */
+    miniHost.style.cssText =
+      'height:min(440px, 52vh);min-height:260px;border-radius:4px;'
+      + 'overflow:hidden;margin-bottom:12px';
     body.appendChild(miniHost);
     renderTurnMiniMap(miniHost, a, sel);
 
@@ -4904,7 +4909,11 @@
         var col = el('div', 'col-6 col-md-3');
         var c = el('div', 'card'), b = el('div', 'card-body');
         b.appendChild(el('div', 'lab', label));
-        b.appendChild(el('div', 'kpi__val num mt-1', val));
+        /* 옥대표 "지도아래 숫자 사이즈를 조금 줄이는게" — 지도를 키운 만큼
+           숫자가 화면을 잡아먹는다. 상단 KPI(1.75rem)와 구분되게 한 단계
+           낮춘 전용 클래스를 쓴다(전역 kpi__val 을 건드리면 헤더 KPI 까지
+           같이 작아진다). */
+        b.appendChild(el('div', 'turn__val num mt-1', val));
         if (sub) b.appendChild(el('div', 'kpi__sub mt-1', sub));
         c.appendChild(b); col.appendChild(c); return col;
       }

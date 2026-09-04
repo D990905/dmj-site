@@ -23,6 +23,9 @@
   :root { --tblr-font-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   .num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
   .kpi__val { font-size: 1.75rem; font-weight: 600; line-height: 1.1; }
+  /* §534 회전 상세 전용 — 지도를 키운 만큼 숫자는 한 단계 낮춘다 */
+  .turn__val { font-size: 1.3rem; font-weight: 600; line-height: 1.15;
+    font-family: "IBM Plex Mono", ui-monospace, monospace; }
   .kpi__unit { font-size: .875rem; color: var(--tblr-secondary); }
   .kpi__sub { font-size: .75rem; color: var(--tblr-secondary); }
   /* §491 (옥대표 "노안이라서 잘 안보임") — 이 클래스가 화면에서 제일 읽기
@@ -323,6 +326,6 @@
 <script src="js/formula.js?v=formula-479"></script>
 <script src="js/wind-confirm.js?v=wc-505"></script>
 <script src="js/pdf-export.js?v=pdf-501"></script>
-<script src="js/v2-app.js?v=v528"></script>
+<script src="js/v2-app.js?v=v534"></script>
 </body>
 </html>
