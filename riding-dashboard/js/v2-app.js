@@ -3615,6 +3615,21 @@
           : ' · click a row to open')));
     h.appendChild(act);
     card.appendChild(h);
+    /* §537 — 요약만 남은 게 있으면 목록 위에 한 줄로 설명한다.
+       행 툴팁은 마우스를 올려야 보여서, 왜 안 열리는지 모른 채 지나간다
+       (옥대표가 실제로 "왜 지난세션 데이터들을 볼 수 없다고 하지?" 라고 물었다). */
+    if (openable.length < list.length) {
+      var noteWrap = el('div', 'card-body py-2');
+      var note = el('div', 'text-secondary');
+      note.style.fontSize = '.8125rem';
+      note.textContent = (list.length - openable.length) + ' of these were saved '
+        + 'before tracks were compressed, and their tracks were dropped when '
+        + 'storage filled up \u2014 so they open as summaries only. Upload the '
+        + 'same file again and it reconnects to the existing row instead of '
+        + 'adding a duplicate. Tracks are 11\u00d7 smaller now, so they fit.';
+      noteWrap.appendChild(note);
+      card.appendChild(noteWrap);
+    }
     var wrap = el('div', 'table-responsive');
     var t = el('table', 'table table-vcenter card-table table-sm');
     var th = el('thead'), htr = el('tr');

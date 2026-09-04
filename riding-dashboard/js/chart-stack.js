@@ -311,9 +311,39 @@
       if (opts.onSelect) opts.onSelect(st);
     }
 
+    /* §536 (옥대표 "버그일까?") — **버그가 맞았다.**
+       render 는 생성 시 host.clientWidth 를 한 번 읽고 끝이었다. 창을 넓히면
+       카드는 늘어나는데 캔버스는 그대로라 **오른쪽이 빈 채로 남는다**
+       (실측: 컨테이너 1244px / 캔버스 1024px → 220px 공백).
+       uPlot 은 setSize 로 다시 잴 수 있으므로 컨테이너를 관찰해 따라가게 한다.
+       ⚠ setSize 를 매 픽셀마다 부르면 스크롤이 버벅인다 → rAF 로 묶는다. */
+    var ro = null, roPending = false;
+    function resizeTo(w) {
+      if (!(w > 0)) return;
+      plots.forEach(function (u) {
+        try { u.setSize({ width: w, height: u.height }); } catch (e) {}
+      });
+    }
+    if (global.ResizeObserver) {
+      ro = new ResizeObserver(function () {
+        if (roPending) return;
+        roPending = true;
+        (global.requestAnimationFrame || setTimeout)(function () {
+          roPending = false;
+          var w = host.clientWidth;
+          if (w > 0 && plots.length && Math.abs(plots[0].width - w) > 1) resizeTo(w);
+        });
+      });
+      ro.observe(host);
+    }
+
     return {
       plots: plots, series: series,
-      destroy: function () { plots.forEach(function (u) { try { u.destroy(); } catch (e) {} }); },
+      destroy: function () {
+        if (ro) { try { ro.disconnect(); } catch (e) {} ro = null; }
+        plots.forEach(function (u) { try { u.destroy(); } catch (e) {} });
+      },
+      resize: function () { resizeTo(host.clientWidth); },
       clearSelection: clearSelection,
       getSelection: function () { return selection; }
     };

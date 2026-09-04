@@ -533,7 +533,31 @@
   function saveSession(meta, analysis) {
     var rec = buildRecord(meta, analysis);
     var arr = readAll();
-    arr.push(rec);
+
+    /* §537 (옥대표 "왜 지난세션 데이터들을 볼 수 없다고 하지?")
+       — 트랙이 용량 부족으로 밀려난 세션들이다(storeTrackWithEviction).
+       §509 압축 전에는 GPX 원문이 점당 97바이트라 47km 세션 하나가
+       0.57MB 였고, 몇 개만 쌓여도 5MB 한도를 넘어 오래된 트랙부터
+       비워졌다. 지금은 11배 작아져서 **같은 파일을 다시 올리면 들어간다.**
+
+       그런데 그대로 두면 다시 올릴 때 **같은 세션이 한 줄 더 생긴다**
+       (요약만 남은 옛 줄 + 새 줄). 그래서 같은 시그니처가 이미 있으면
+       새로 만들지 않고 **그 줄을 되살린다** — 목록이 안 불어나고,
+       예전 줄에 붙여 둔 장비·제목이 그대로 유지된다. */
+    var replacedIdx = -1;
+    if (rec.sig) {
+      for (var si = 0; si < arr.length; si++) {
+        if (arr[si].sig && arr[si].sig === rec.sig) { replacedIdx = si; break; }
+      }
+    }
+    if (replacedIdx >= 0) {
+      var prev = arr[replacedIdx];
+      rec.id = prev.id;                     /* 트랙 키·문답 답변이 id 에 묶인다 */
+      if (prev.gear && !rec.gear) rec.gear = prev.gear;   /* 붙여 둔 장비 보존 */
+      arr[replacedIdx] = rec;
+    } else {
+      arr.push(rec);
+    }
     arr.sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
     if (arr.length > MAX_SESSIONS) {
       /* 상한 초과로 밀려나는 오래된 세션 — 트랙도 함께 정리 */
