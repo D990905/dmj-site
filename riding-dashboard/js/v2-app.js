@@ -265,6 +265,42 @@
 
   /* ---------- 속도 히스토그램 ---------- */
   /* 실제 bin 형태 = { fromKt, toKt, seconds } */
+  /* §541 (옥대표 "편차는 우측 그래프에 적당하지 않니?") — 맞다.
+     분포도가 편차를 얹을 자리다. 왼쪽 mean-max 곡선에 SD 를 얹으면
+     '지속시간별 최고속' 이라는 뜻이 달라진다.
+
+     ⚠ 다만 이 분포는 **쌍봉**이다: 정지·표류가 0kt 근처에 무더기로 쌓이고
+     주행이 14~20kt 에 쌓인다. 전체 평균±SD 를 그으면 **아무도 지나가지
+     않은 골짜기**에 밴드가 앉는다 — 통계는 맞는데 뜻이 없다.
+     그래서 **주행 구간(포일링 임계 이상)에서만** 재고, 그렇다고 적는다. */
+  function histSpread(h, thresholdKt) {
+    if (!h || !h.length) return null;
+    var sw = 0, sx = 0, all = 0;
+    h.forEach(function (b) {
+      var t = b.seconds || 0;
+      all += t;
+      var c = (b.fromKt + b.toKt) / 2;
+      if (c < thresholdKt) return;
+      sw += t; sx += c * t;
+    });
+    if (!(sw > 0)) return null;
+    var mean = sx / sw, v = 0;
+    h.forEach(function (b) {
+      var t = b.seconds || 0;
+      var c = (b.fromKt + b.toKt) / 2;
+      if (c < thresholdKt) return;
+      v += t * (c - mean) * (c - mean);
+    });
+    return {
+      meanKt: mean,
+      sdKt: Math.sqrt(v / sw),
+      ridingSec: sw,
+      totalSec: all,
+      excludedShare: all > 0 ? (all - sw) / all : 0,
+      thresholdKt: thresholdKt
+    };
+  }
+
   function renderHistogram(a) {
     var host = $('chart-hist');
     var h = a.histogram || [];
@@ -272,6 +308,8 @@
     var xs = h.map(function (b) { return (b.fromKt + b.toKt) / 2; });
     var ys = h.map(function (b) { return (b.seconds || 0) / 60; });
     var binW = h.length > 1 ? (h[0].toKt - h[0].fromKt) : 2;
+    var thrKt = foilThresholdMs() * KT;
+    var sp = histSpread(h, thrKt);
     while (host.firstChild) host.removeChild(host.firstChild);
     track(new uPlot({
       width: host.clientWidth || 420, height: 268, padding: [12, 12, 4, 6],
@@ -291,8 +329,52 @@
         { label: 'Time', stroke: THEME.accent, fill: 'rgba(77,171,247,0.32)', width: 1,
           paths: uPlot.paths.bars({ size: [0.86, Infinity] }),
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' min'; } }
-      ]
+      ],
+      /* 밴드는 막대 **뒤에** 그린다 — 위에 그리면 정작 분포를 가린다.
+         uPlot 은 세로 밴드가 없어서 draw 훅에서 직접 칠한다. */
+      hooks: {
+        drawClear: [function (u) {
+          if (!sp) return;
+          var ctx = u.ctx;
+          var lo = u.valToPos(sp.meanKt - sp.sdKt, 'x', true);
+          var hi = u.valToPos(sp.meanKt + sp.sdKt, 'x', true);
+          var mx = u.valToPos(sp.meanKt, 'x', true);
+          var top = u.bbox.top, hgt = u.bbox.height;
+          ctx.save();
+          ctx.fillStyle = 'rgba(148,163,184,0.16)';
+          ctx.fillRect(lo, top, hi - lo, hgt);
+          ctx.strokeStyle = THEME.dim;
+          ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+          ctx.beginPath(); ctx.moveTo(mx, top); ctx.lineTo(mx, top + hgt); ctx.stroke();
+          ctx.restore();
+        }]
+      }
     }, [xs, ys], host));
+
+    /* 숫자로도 준다 — 밴드를 눈대중으로 읽게 두면 안 된다.
+       ⚠ 전용 호스트에 담는다. host.parentNode 에 그냥 붙이면 재렌더마다
+       캡션이 쌓인다(풍속을 바꿀 때마다 한 줄씩 늘어난다). */
+    var capHost = $('hist-caption');
+    if (!capHost) {
+      capHost = el('div');
+      capHost.id = 'hist-caption';
+      host.parentNode.appendChild(capHost);
+    }
+    while (capHost.firstChild) capHost.removeChild(capHost.firstChild);
+    if (sp) {
+      var cap = el('div', 'lab mt-2');
+      cap.textContent = 'While riding: ' + sp.meanKt.toFixed(1) + ' kt average, '
+        + '\u00b1' + sp.sdKt.toFixed(1) + ' kt spread (1 SD, shaded).';
+      capHost.appendChild(cap);
+
+      var why = el('div', 'lab mt-1');
+      why.style.opacity = '.8';
+      why.textContent = 'Measured above ' + thrKt.toFixed(0) + ' kt only. '
+        + 'Including the ' + Math.round(sp.excludedShare * 100) + '% of time spent '
+        + 'stopped or drifting would split this into two humps, and the average '
+        + 'between them is a speed you never actually rode.';
+      capHost.appendChild(why);
+    }
   }
 
   /* ---------- 세션 시계열 ---------- */
