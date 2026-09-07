@@ -3637,6 +3637,39 @@
   /* §495 — 저장된 세션 열기. 저장 당시의 풍향·풍속·장비 입력까지 되살려야
      그때 본 화면과 같은 숫자가 나온다. 트랙만 다시 분석하고 입력을 지금
      화면 값으로 두면, 같은 세션인데 점수가 달라 보인다. */
+  /* §547 — 저장된 라이더 입력을 폼에 되돌린다. 없으면 건드리지 않는다
+     (오늘 값이 남는데, 그 사실은 restoreRiderInputs 의 반환값으로 알린다). */
+  function restoreRiderInputs(rec) {
+    var got = { wind: false, weight: false, wing: false, skill: false };
+    if (!rec) return got;
+    if (rec.windSpeedKt != null && $('in-windspeed')) {
+      $('in-windspeed').value = rec.windSpeedKt; got.wind = true;
+    }
+    var rd = rec.rider;
+    if (rd) {
+      if (rd.weightKg != null && $('in-weight')) { $('in-weight').value = rd.weightKg; got.weight = true; }
+      if (rd.wingM2 != null && $('in-wing')) { $('in-wing').value = rd.wingM2; got.wing = true; }
+      if (rd.skill && $('in-skill')) { $('in-skill').value = rd.skill; got.skill = true; }
+    }
+    /* 윙은 장비 스냅샷이 더 정확하다 — 저장 당시 실제로 고른 윙이다 */
+    if (!got.wing && rec.gear && rec.gear.wingM2 > 0 && $('in-wing')) {
+      $('in-wing').value = rec.gear.wingM2; got.wing = true;
+    }
+    /* §548 — 장비도 그 세션 것으로. 없으면 null 이라 프로필이 그대로 쓰인다. */
+    CUR.sessionGear = null;
+    if (rec.gear) {
+      var G = {}, keys = ['frontWing','rearWing','mast','handWing','board','surface','harness'];
+      var any = false;
+      keys.forEach(function (k) {
+        if (rec.gear[k] != null && rec.gear[k] !== '') { G[k] = rec.gear[k]; any = true; }
+      });
+      if (any) CUR.sessionGear = G;
+    }
+    got.gear = !!CUR.sessionGear;
+    CUR.restoredInputs = got;
+    return got;
+  }
+
   function openSavedSession(rec) {
     if (!rec || !window.RDStorage) return;
     var gpx = null;
@@ -3648,11 +3681,7 @@
     if (RDStorage.isCompactTrack && RDStorage.isCompactTrack(gpx)) {
       var pts = RDStorage.decodeTrack(gpx);
       if (!pts) { alertLine('This session\u2019s track could not be read.'); return; }
-      try {
-        if (rec.windSpeedKt != null && $('in-windspeed')) {
-          $('in-windspeed').value = rec.windSpeedKt;
-        }
-      } catch (e) {}
+      try { restoreRiderInputs(rec); } catch (e) {}
       /* ⚠ normalizeSession 은 `samples` 가 아니라 **parsed 모양**을 받는다:
          { tracks:[{segments:[[{lat,lng,time,speed}]]}], hasTime, speedSource }.
          처음에 {samples:pts} 를 넘겼다가 parsed.tracks.forEach 에서
@@ -3695,12 +3724,9 @@
       return;
     }
     /* 저장 당시 입력 복원 — 폼을 먼저 채우고 분석을 돌린다 */
+    try { restoreRiderInputs(rec); } catch (e) {}
     try {
-      if (rec.windSpeedKt != null && $('in-windspeed')) {
-        $('in-windspeed').value = rec.windSpeedKt;
-      }
-    } catch (e) {}
-    try {
+      CUR.restoringSaved = true;
       loadGpxText(gpx, rec.name || 'Saved session');
       /* 저장된 풍향이 있으면 추정 대신 그 값으로 다시 분석한다 */
       if (rec.windDir != null && CUR.fullSession) {
@@ -3709,7 +3735,9 @@
       }
       var el2 = document.getElementById('chart-timeline');
       if (el2) el2.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      CUR.restoringSaved = false;
     } catch (e) {
+      CUR.restoringSaved = false;
       alertLine('Could not reopen this session: ' + (e && e.message ? e.message : e));
     }
   }
@@ -7619,11 +7647,30 @@
      포일 면적이 이륙 속도를, 포일 스팬과 마스트가 벤틸레이션 한계를,
      핸드윙 스팬이 팁 접촉 한계를, 수면 상태가 그 두 여유를 정한다.
      선택은 라이더 프로필에 저장돼 다음 세션에 그대로 쓰인다. */
+  /* §548 — 얕은 병합. over 의 값이 비어 있지 않은 것만 base 를 덮는다. */
+  function merge(base, over) {
+    var out = {}, k;
+    for (k in base) if (Object.prototype.hasOwnProperty.call(base, k)) out[k] = base[k];
+    for (k in over) {
+      if (!Object.prototype.hasOwnProperty.call(over, k)) continue;
+      if (over[k] != null && over[k] !== '') out[k] = over[k];
+    }
+    return out;
+  }
+
   function gearSelection() {
     var rp = {};
     try { rp = (window.RDStorage && RDStorage.loadRider) ? (RDStorage.loadRider() || {}) : {}; }
     catch (e) {}
-    var g = rp.gear || {};
+    /* §548 (옥대표 "고래불 세션화면인데 오늘 탔던걸로 나와 4.0. 이것도 버그")
+       — 장비는 **라이더 프로필에 한 벌**이라 어떤 세션을 열든 오늘 장비가
+       따라왔다. 코치 패널이 5/25 고래불에 대고 "You rode 6 m²" 라고 말한
+       것이 그것이다. 세션을 열었으면 그 세션에 저장된 장비가 먼저다.
+       ⚠ 프로필 위에 덮어쓴다 — 옛 세션에 일부 항목만 기록돼 있으면
+          나머지는 프로필 값으로 채우되, 그 사실은 화면에 밝힌다. */
+    var g = (CUR.sessionGear && typeof CUR.sessionGear === 'object')
+      ? merge(rp.gear || {}, CUR.sessionGear)
+      : (rp.gear || {});
     var D = RDGear.DEFAULT;
     return {
       frontWing: g.frontWing || D.frontWing,
@@ -7780,15 +7827,88 @@
     try { RDStorage.saveRider(rp); } catch (e) {}
   }
 
+  /* §548 — 지금 화면의 장비·라이더 입력·풍속을 **열려 있는 그 세션**에 붙인다.
+     레코드는 id 로 찾는다: 시그니처가 같은 저장 레코드가 곧 이 세션이다.
+     아직 저장된 적이 없으면 붙일 곳이 없으므로 그렇게 말한다 — 조용히
+     아무 일도 안 일어나면 눌러도 되는 버튼인지 알 수 없다. */
+  function saveInputsToSession(btn) {
+    function flash(msg, okState) {
+      if (!btn) return;
+      var was = btn.textContent, cls = btn.className;
+      btn.textContent = msg;
+      btn.className = 'btn btn-sm ' + (okState ? 'btn-success' : 'btn-warning');
+      setTimeout(function () { btn.textContent = was; btn.className = cls; }, 2200);
+    }
+    if (!CUR.session || !Store) { flash('No session', false); return; }
+    var sig = null;
+    try { sig = sessionSig(CUR.session); } catch (e) { sig = null; }
+    var rec = null;
+    if (sig) {
+      listSessions().forEach(function (r) { if (r.sig === sig) rec = r; });
+    }
+    if (!rec) {
+      alertLine('This session is not saved yet \u2014 press "Save session" in the '
+        + 'header first, then these inputs stay with it.');
+      flash('Not saved yet', false);
+      return;
+    }
+    var r0 = riderFromForm();
+    var okGear = true, okIn = true;
+    try {
+      var snap = gearSnapshot();
+      if (snap && Store.setSessionGear) {
+        var g = Store.setSessionGear(rec.id, snap);
+        okGear = !!(g && g.ok !== false);
+      }
+    } catch (e) { okGear = false; }
+    try {
+      var res = Store.setSessionInputs(rec.id, {
+        rider: { weightKg: r0.weightKg, wingM2: r0.wingM2, skill: r0.skill },
+        windSpeedKt: windSpeedFromForm(),
+        windDir: CUR.windDir
+      });
+      okIn = !!(res && res.ok !== false);
+    } catch (e) { okIn = false; }
+    if (!okGear || !okIn) {
+      if (window.console) console.error('[v2 §548] save to session failed',
+        { gear: okGear, inputs: okIn });
+      flash('Save failed', false);
+      return;
+    }
+    CUR.gearDirty = false;
+    /* 이제 이 값들이 이 세션의 것이다 — 안내문도 그렇게 바뀌어야 한다 */
+    CUR.restoredInputs = { wind: true, weight: true, wing: true, skill: true };
+    try { renderSessions(); } catch (e) {}
+    try {
+      var note = $('rider-note');
+      if (note) {
+        note.textContent = 'Used by the performance score \u2014 saved with this session.';
+        note.className = 'lab';
+      }
+    } catch (e) {}
+    flash('Saved', true);
+  }
+
   function renderGearPicker(host) {
     if (!window.RDGear || !window.RDRigLimits) return;
     var sel = gearSelection();
 
     var card = el('div', 'card mb-3');
     var head = el('div', 'card-header');
-    head.appendChild(el('h3', 'card-title', 'Your gear today'));
-    head.appendChild(el('div', 'card-actions lab',
+    head.appendChild(el('h3', 'card-title',
+      CUR.sessionGear ? 'Gear for this session' : 'Your gear today'));
+    var acts = el('div', 'card-actions d-flex align-items-center gap-2');
+    acts.appendChild(el('span', 'lab',
       'foil area sets take-off, spans set how far you can heel'));
+    /* §548 (옥대표 "여기도 입력하고 나면 그 세션에 해당 정보를 저장하는
+       저장 버튼이 필요해") — 없으면 세션을 옮겨 다닐 때마다 그 세션과
+       상관없는 장비가 뜬다. 헤더의 'Save session' 은 멀고 뜻이 다르다. */
+    var gsave = el('button', 'btn btn-sm btn-primary', 'Save to this session');
+    gsave.type = 'button';
+    gsave.id = 'btn-gear-save';
+    gsave.addEventListener('click', function () { saveInputsToSession(gsave); });
+    acts.appendChild(gsave);
+    head.appendChild(acts);
     card.appendChild(head);
     var body = el('div', 'card-body');
     var row = el('div', 'row g-2');
@@ -7804,7 +7924,14 @@
         s.appendChild(op);
       });
       s.addEventListener('change', function () {
-        var p = {}; p[key] = s.value; saveGear(p);
+        /* §548 — 저장된 세션을 보고 있으면 프로필을 건드리지 않는다.
+           옛 세션의 장비를 고치려다 오늘의 기본 장비가 바뀌면 안 된다. */
+        if (CUR.sessionGear) {
+          CUR.sessionGear[key] = s.value;
+          CUR.gearDirty = true;
+        } else {
+          var p = {}; p[key] = s.value; saveGear(p);
+        }
         renderCoach(CUR.analysis, CUR.vps, CUR.whatIf);
       });
       col.appendChild(s);
@@ -8759,9 +8886,41 @@
     autoRecordRideLoad();
     renderKpis(analysis, vps);
     var note = $('rider-note');
-    if (note) note.textContent = (vps && vps.ok === false && vps.missing)
-      ? 'Score needs: ' + vps.missing.join(', ')
-      : 'Used by the performance score';
+    if (note) {
+      if (vps && vps.ok === false && vps.missing) {
+        note.textContent = 'Score needs: ' + vps.missing.join(', ');
+      } else {
+        /* §547 — 어떤 입력이 **그 세션의 것**이고 어떤 게 오늘 폼에 남아 있던
+           값인지 밝힌다. 이걸 안 적으면 옛 세션을 열 때 오늘의 풍속·윙으로
+           조용히 채점된다(5/25 고래불이 25kt 로 채점되고 있었다).
+           ⚠ 오늘 값은 CUR.restoredInputs 가 false 인 항목이다. */
+        var ri = CUR.restoredInputs;
+        var missing = [];
+        if (ri) {
+          if (!ri.wind) missing.push('wind speed');
+          if (!ri.wing) missing.push('wing');
+          if (!ri.weight) missing.push('weight');
+          if (!ri.skill) missing.push('skill');
+        }
+        if (ri && missing.length) {
+          note.textContent = 'Used by the performance score \u2014 but '
+            + missing.join(', ') + ' '
+            + (missing.length > 1 ? 'were' : 'was')
+            + ' not saved with this session, so the value'
+            + (missing.length > 1 ? 's' : '') + ' above '
+            + (missing.length > 1 ? 'are' : 'is')
+            + " carried over from the last session you looked at. "
+            + 'Correct ' + (missing.length > 1 ? 'them' : 'it')
+            + ' and press Recalculate, then Save session to keep it.';
+          note.className = 'lab text-warning';
+        } else {
+          note.textContent = ri
+            ? 'Used by the performance score \u2014 restored from this session.'
+            : 'Used by the performance score';
+          note.className = 'lab';
+        }
+      }
+    }
     if (window.RDMeanMax) {
       var mm = RDMeanMax.render($('chart-meanmax'), analysis, THEME);
       if (mm && mm.plot) track(mm.plot, $('chart-meanmax'));
@@ -9111,6 +9270,9 @@
 
   function loadGpxText(text, name) {
     CUR.gpxText = text;
+    /* §547 — 새로 올린 파일에는 저장된 입력이 없다. 이전 세션에서 복원한
+       표시가 남아 있으면 '이 세션에서 복원했다'는 거짓말이 된다. */
+    if (!CUR.restoringSaved) { CUR.restoredInputs = null; CUR.sessionGear = null; }
     CUR.edit = null; CUR.fullSession = null; CUR.fusion = null;
     renderFusionBanner(null);
     var parsed = Gpx.parseGPX(text);
@@ -9303,6 +9465,15 @@
           sport: 'wingfoil',
           windDir: CUR.windDir,
           windSpeedKt: windSpeedFromForm(),
+          /* §547 (옥대표 "어떤 세션을 선택해도 신체정보랑 기본 정보입력은
+             늘 같거나 최종 사용했던게 반복적으로 나타남") — 몸무게·윙·스킬은
+             **어디에도 저장되지 않고 있었다.** 폼의 마지막 값이 모든 과거
+             세션에 그대로 쓰였고, 점수는 그 값으로 계산된다. 5/25 고래불
+             (파일명이 12kt)이 25kt 로 채점되고 있었다. */
+          rider: (function () {
+            var r0 = riderFromForm();
+            return { weightKg: r0.weightKg, wingM2: r0.wingM2, skill: r0.skill };
+          })(),
           vps: CUR.vps && CUR.vps.ok !== false ? {
             overall: CUR.vps.overall && CUR.vps.overall.score,
             upwind: CUR.vps.upwind && CUR.vps.upwind.score,

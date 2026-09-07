@@ -633,6 +633,25 @@
     return w.ok ? { ok: true, record: rec } : w;
   }
 
+  /* §548 (옥대표 "여기도 입력하고 나면 그 세션에 해당 정보를 저장하는 저장
+     버튼이 필요해") — 라이더 입력·풍속만 한 레코드에 덧쓴다. 세션 전체를
+     다시 저장하면 트랙을 다시 인코딩해야 하고, 무엇보다 **열려 있는 세션이
+     저장된 그 세션인지** 확실할 때만 해야 한다. 여기서는 id 로 못박는다. */
+  function setSessionInputs(id, patch) {
+    if (!id || !patch) return { ok: false, error: 'no id' };
+    var arr = readAll(), found = false;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].id !== id) continue;
+      found = true;
+      if (patch.rider) arr[i].rider = patch.rider;
+      if (patch.windSpeedKt != null) arr[i].windSpeedKt = patch.windSpeedKt;
+      if (patch.windDir != null) arr[i].windDir = patch.windDir;
+      break;
+    }
+    if (!found) return { ok: false, error: 'not found' };
+    return writeAll(arr);
+  }
+
   /* §520 — 지난 세션에 장비를 나중에 채워 넣는다.
      기존 세션은 전부 gear 가 null 이라, 이 길이 없으면 비교가 시작되는 데
      몇 달이 걸린다. backfilled 로 표시해 둔다 — 저장 시점 스냅샷과
@@ -2068,6 +2087,7 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     currentUid: _currentUid,
     saveSession: saveSession,
     setSessionGear: setSessionGear,
+    setSessionInputs: setSessionInputs,
     listSessions: listSessions,
     deleteSession: deleteSession,
     clearAll: clearAll,
