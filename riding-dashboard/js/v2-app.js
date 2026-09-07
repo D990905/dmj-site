@@ -3697,6 +3697,8 @@
 
   function openSavedSession(rec) {
     if (!rec || !window.RDStorage) return;
+    /* §553 — 이 세션의 정체성. 다시 저장할 때 이 줄을 잇는다. */
+    CUR.openedRecId = rec.id;
     var gpx = null;
     try { gpx = RDStorage.loadTrack(rec.id); } catch (e) { gpx = null; }
 
@@ -9286,6 +9288,7 @@
        이 세션 것이 아니라고 표시된다. */
     CUR.restoredInputs = null;
     CUR.sessionGear = null;
+    CUR.openedRecId = null;      /* §553 — 새로 올린 파일은 새 세션이다 */
     try { restoreRiderInputs(null); } catch (e) {}
     /* .vkx 는 하나씩 — 바이너리라 융합 경로에 섞을 수 없다 */
     var vkx = files.filter(function (f) { return /\.vkx$/i.test(f.name); });
@@ -9552,6 +9555,9 @@
           gear: gearSnapshot(),            // §520 V2 — 그날 쓴 장비 스냅샷
           workload: v2SessionWorkload(),   // §458 훈련부하 AU + 산출 방식
           sig: sessionSig(CUR.session),    // §463 자동 기록분과 중복 방지
+          /* §553 — 저장된 세션을 다시 연 것이면 그 줄을 잇는다. 압축 트랙은
+             손실이라 다시 열면 sig 가 미세하게 달라져 사본이 생겼다. */
+          replaceId: CUR.openedRecId || null,
           /* §509 — 트랙을 압축 형식으로 담기 위해 샘플을 같이 넘긴다.
              normalizeSession 의 t 는 세션 시작 기준 상대초라, 저장할 때
              절대 epoch 로 되돌려 준다(__abs). 안 그러면 다시 열 때

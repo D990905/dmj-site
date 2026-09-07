@@ -554,8 +554,22 @@
        (요약만 남은 옛 줄 + 새 줄). 그래서 같은 시그니처가 이미 있으면
        새로 만들지 않고 **그 줄을 되살린다** — 목록이 안 불어나고,
        예전 줄에 붙여 둔 장비·제목이 그대로 유지된다. */
+    /* §553 — 저장된 세션을 다시 열어 저장하면 **행이 하나씩 늘어났다.**
+       §509 압축 트랙은 손실 인코딩이라(좌표를 델타·반올림으로 담는다) 다시
+       열면 거리가 미세하게 달라진다(슬라럼 18.44 → 18.45km). 시그니처가
+       거리에서 나오므로 sig 가 바뀌고, §537 의 upsert 가 안 걸린다.
+       옥대표 목록의 Waterspeed 3줄·'4.0 under powered' 2줄이 이것으로 보인다
+       — 서로 다른 세션이 아니라 같은 세션을 다시 열어 저장한 사본이다.
+
+       고칠 자리는 시그니처가 아니라 **정체성**이다: 저장된 세션 X 를 열어서
+       저장하면 그건 X 다. v2 가 열어 둔 레코드 id 를 넘기면 그 줄을 잇는다. */
     var replacedIdx = -1;
-    if (rec.sig) {
+    if (meta.replaceId) {
+      for (var ri2 = 0; ri2 < arr.length; ri2++) {
+        if (arr[ri2].id === meta.replaceId) { replacedIdx = ri2; break; }
+      }
+    }
+    if (replacedIdx < 0 && rec.sig) {
       for (var si = 0; si < arr.length; si++) {
         if (arr[si].sig && arr[si].sig === rec.sig) { replacedIdx = si; break; }
       }
