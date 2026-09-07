@@ -457,6 +457,16 @@
       sport: meta.sport || 'wingfoil',
       windDir: meta.windDir != null ? meta.windDir : null,
       windSpeedKt: meta.windSpeedKt != null ? meta.windSpeedKt : null,
+      /* §551 — §547 이 v2 에서 rider 를 넘기게 해 놓고 **여기서 복사하지
+         않아** 한 번도 저장되지 않았다. buildRecord 는 meta 를 통째로
+         퍼뜨리지 않고 필드를 하나씩 옮기므로, 새 필드는 여기에도 적어야
+         한다. §547 의 selftest 가 '넘겼는지'만 보고 '도착했는지'를 안 봐서
+         놓쳤다 — 저장은 saveSession→listSessions 왕복으로 검증할 것. */
+      rider: (meta.rider && typeof meta.rider === 'object') ? {
+        weightKg: meta.rider.weightKg != null ? Number(meta.rider.weightKg) : null,
+        wingM2: meta.rider.wingM2 != null ? Number(meta.rider.wingM2) : null,
+        skill: meta.rider.skill || null
+      } : null,
       durationSec: s.totalDurationSec || 0,
       movingTimeSec: s.movingTimeSec || 0,
       distanceM: s.totalDistanceM || 0,

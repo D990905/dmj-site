@@ -66,5 +66,34 @@ ok('★ 복원이 loadGpxText 보다 앞선다', iRestore>=0 && iLoad>iRestore,
 ok('VPS 는 폼에서 읽는다 (복원 값이 그대로 반영)',
    /computeVPS\(analysis, riderFromForm\(\), analysis\.windDir, windSpeedFromForm\(\)\)/.test(code));
 
+/* ★ 소스 문자열 검사만으로는 '넘겼는지'까지밖에 못 본다. §551 은 v2 가
+   rider 를 넘기는데 buildRecord 가 복사하지 않아 한 번도 저장되지 않은
+   경우였다. 저장은 반드시 saveSession→listSessions 왕복으로 검증한다. */
+console.log('\n[7] ★★ rider 가 실제로 레코드에 남는가 (왕복 검증)');
+var vm=require('vm');
+var store={};
+var g={ localStorage:{ getItem:function(k){return store[k]===undefined?null:store[k];},
+  setItem:function(k,v){store[k]=String(v);}, removeItem:function(k){delete store[k];},
+  get length(){return Object.keys(store).length;}, key:function(i){return Object.keys(store)[i];} },
+  console:console, Date:Date, Math:Math, JSON:JSON, isFinite:isFinite, Number:Number,
+  String:String, Array:Array, Object:Object, parseInt:parseInt, parseFloat:parseFloat, Promise:Promise };
+g.window=g; g.self=g; vm.createContext(g);
+vm.runInContext(fs.readFileSync(path.join(__dirname,'js/storage.js'),'utf8'), g);
+var S=g.RDStorage;
+S.saveSession({ name:'고래불', dateEpoch:Date.parse('2026-05-25'), sig:'K',
+                windSpeedKt:12, rider:{weightKg:69, wingM2:6, skill:'상급'} },
+              {summary:{},maneuverStats:{}});
+var rec=S.listSessions()[0];
+ok('★★ rider 가 저장된다 (넘기기만 하고 안 담기던 버그)', !!rec.rider,
+   JSON.stringify(rec.rider));
+ok('몸무게', rec.rider && rec.rider.weightKg===69);
+ok('윙', rec.rider && rec.rider.wingM2===6);
+ok('스킬', rec.rider && rec.rider.skill==='상급');
+ok('풍속도 함께', rec.windSpeedKt===12);
+S.saveSession({name:'무명', dateEpoch:1, sig:'N'},{summary:{},maneuverStats:{}});
+var bare=S.listSessions().filter(function(r){return r.sig==='N';})[0];
+ok('rider 가 없으면 null (undefined 로 새지 않는다)', bare.rider===null,
+   String(bare.rider));
+
 console.log('\n' + (fail ? 'FAIL ' : 'PASS ') + pass + '/' + (pass+fail));
 process.exit(fail ? 1 : 0);
