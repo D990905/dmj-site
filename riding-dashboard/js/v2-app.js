@@ -3697,8 +3697,16 @@
 
   function openSavedSession(rec) {
     if (!rec || !window.RDStorage) return;
-    /* §553 — 이 세션의 정체성. 다시 저장할 때 이 줄을 잇는다. */
-    CUR.openedRecId = rec.id;
+    /* §554 — 정체성(CUR.openedRecId)은 **세션이 실제로 열린 뒤에만** 잡는다.
+       §553 은 이걸 함수 첫 줄에 뒀는데, 이 함수에는 일찍 빠져나가는 길이
+       셋이나 있다: 요약만 남은 줄 · 압축 해제 실패 · 융합 세션.
+       그 길로 빠지면 화면에는 **이전 세션이 그대로 남는데** 정체성만 새
+       줄을 가리키게 되고, 그 상태에서 Save 를 누르면 §553 의 replaceId 가
+       **엉뚱한 줄에 남의 트랙을 덮어쓴다.**
+       실측(옥대표 브라우저): 5/25 고래불 줄이 '이름 고래불 · 날짜 오늘 ·
+       29.09km(=4.0 under powered 트랙)' 로 바뀌고 진짜 고래불이 사라졌다.
+       열기에 실패하면 아무것도 안 바뀌는 게 맞다 — 이전 세션의 정체성이
+       그대로 남아야 그 세션을 저장할 수 있다. */
     var gpx = null;
     try { gpx = RDStorage.loadTrack(rec.id); } catch (e) { gpx = null; }
 
@@ -3746,6 +3754,7 @@
       CUR.est = est2;
       CUR.windDir = wd2;
       var an2 = An.analyzeSession(sess, wd2, analysisOpts(est2));
+      CUR.openedRecId = rec.id;        /* §554 — 여기까지 왔으면 진짜 열렸다 */
       show(sess, an2, rec.name || 'Session', est2);
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
       return;
@@ -3767,6 +3776,7 @@
     try { restoreRiderInputs(rec); } catch (e) {}
     try {
       CUR.restoringSaved = true;
+      CUR.openedRecId = rec.id;        /* §554 — 트랙이 있는 걸 확인한 뒤 */
       loadGpxText(gpx, rec.name || 'Saved session');
       /* 저장된 풍향이 있으면 추정 대신 그 값으로 다시 분석한다 */
       if (rec.windDir != null && CUR.fullSession) {
@@ -7817,6 +7827,26 @@
     box.scrollIntoView({ block: 'nearest' });
   }
 
+  /* §554b (옥대표 "최근 9월달꺼 외에는 장비선택이 비어있어야 할거 같은데
+     뭔가 또 오버라이드 된거같네") — 맞다. Save session 은 늘 지금 고른 장비를
+     스냅샷으로 박았다. 그래서 옛 세션을 열어 저장하면 **오늘 장비가 그날
+     기록으로 둔갑한다.** 5/19·6/9·6/11 에 5.0/4.0 이 붙은 게 그것이다.
+     모르는 건 모르는 채로 두는 게 맞다 — §520 이 'add gear' 로 나중에
+     채우는 길을 이미 만들어 뒀다. */
+  function gearForSave() {
+    /* 새로 올린 파일이면 지금 고른 장비가 곧 그날 장비다 */
+    if (!CUR.openedRecId) return gearSnapshot();
+    /* 저장된 세션을 다시 연 경우 */
+    if (CUR.sessionGear) return gearSnapshot();   /* 그 줄에 기록돼 있던 것 */
+    if (CUR.gearDirty) {                          /* 사용자가 직접 골랐다 */
+      var g = gearSnapshot();
+      /* 저장 시점 스냅샷과 기억으로 적은 것은 신뢰도가 다르다(§520) */
+      if (g) g.backfilled = true;
+      return g;
+    }
+    return null;                                  /* 모르면 비워 둔다 */
+  }
+
   function gearSnapshot() {
     if (!window.RDGear) return null;
     var sel;
@@ -9552,7 +9582,7 @@
             tack: CUR.vps.overall && CUR.vps.overall.tackScore,
             gybe: CUR.vps.overall && CUR.vps.overall.gybeScore
           } : null,
-          gear: gearSnapshot(),            // §520 V2 — 그날 쓴 장비 스냅샷
+          gear: gearForSave(),             // §520·§554b — 아는 것만 기록한다
           workload: v2SessionWorkload(),   // §458 훈련부하 AU + 산출 방식
           sig: sessionSig(CUR.session),    // §463 자동 기록분과 중복 방지
           /* §553 — 저장된 세션을 다시 연 것이면 그 줄을 잇는다. 압축 트랙은

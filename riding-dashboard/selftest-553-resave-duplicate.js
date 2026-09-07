@@ -76,6 +76,19 @@ console.log('\n[6] v2 배선');
 var src=fs.readFileSync(path.join(__dirname,'js/v2-app.js'),'utf8');
 var code=src.replace(/\/\*[\s\S]*?\*\//g,'');
 ok('★ 세션을 열면 레코드 id 를 기억한다', /CUR\.openedRecId = rec\.id/.test(code));
+/* §554 — 열기에 실패하는 길이 셋(요약만·압축해제 실패·융합)이라, 함수
+   첫 줄에서 정체성을 잡으면 화면은 이전 세션인데 정체성만 새 줄이 되어
+   Save 가 엉뚱한 줄에 남의 트랙을 덮어쓴다. 실제로 그렇게 됐다. */
+var iOpen=code.indexOf('function openSavedSession(rec)');
+var head=code.slice(iOpen, iOpen+400);
+ok('★★ 함수 머리에서는 정체성을 잡지 않는다 (열기 실패 시 덮어쓰기 방지)',
+   head.indexOf('CUR.openedRecId = rec.id') < 0, head.slice(0,160));
+var nSet=(code.match(/CUR\.openedRecId = rec\.id/g)||[]).length;
+ok('★ 성공 지점 두 곳에서만 잡는다 (압축·GPX)', nSet===2, String(nSet)+'곳');
+ok('★ 압축 분기는 show() 직전에 잡는다',
+   /CUR\.openedRecId = rec\.id;[\s\S]{0,80}?show\(sess, an2/.test(code));
+ok('★ GPX 분기는 loadGpxText 직전에 잡는다',
+   /CUR\.openedRecId = rec\.id;[\s\S]{0,80}?loadGpxText\(gpx/.test(code));
 ok('★ 저장할 때 넘긴다', /replaceId: CUR\.openedRecId \|\| null/.test(code));
 ok('★ 새 파일을 올리면 잊는다 (새 세션은 새 줄)',
    /CUR\.openedRecId = null;/.test(code));
