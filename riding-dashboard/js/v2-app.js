@@ -3639,9 +3639,33 @@
      화면 값으로 두면, 같은 세션인데 점수가 달라 보인다. */
   /* §547 — 저장된 라이더 입력을 폼에 되돌린다. 없으면 건드리지 않는다
      (오늘 값이 남는데, 그 사실은 restoreRiderInputs 의 반환값으로 알린다). */
+  /* §549 (§548 검증 중 발각) — 라이더 프로필에는 69kg·상급이 저장돼 있는데
+     v2 폼은 index.html 의 기본값 75·중급을 쓰고 **프로필을 한 번도 읽지
+     않았다**. 같은 화면에서 코치 패널은 프로필을 읽어 "69 kg you" 라고
+     적고 성능 점수는 75kg 로 계산하고 있었다 — 두 숫자가 서로 다른 사람의
+     것이었다. §482·§494·§511·§514·§539·§540·§543·§544·§546 과 같은 계열,
+     열 번째다.
+     우선순위: 그 세션에 저장된 값 > 라이더 프로필 > HTML 기본값. */
+  function seedFromProfile(got) {
+    var rp = null;
+    try { rp = (window.RDStorage && RDStorage.loadRider) ? RDStorage.loadRider() : null; }
+    catch (e) { rp = null; }
+    if (!rp) return got;
+    if (!got.weight && rp.weightKg > 0 && $('in-weight')) {
+      $('in-weight').value = rp.weightKg; got.weightFrom = 'profile';
+    }
+    if (!got.skill && rp.skill && $('in-skill')) {
+      $('in-skill').value = rp.skill; got.skillFrom = 'profile';
+    }
+    if (!got.wing && rp.wingM2 > 0 && $('in-wing')) {
+      $('in-wing').value = rp.wingM2; got.wingFrom = 'profile';
+    }
+    return got;
+  }
+
   function restoreRiderInputs(rec) {
     var got = { wind: false, weight: false, wing: false, skill: false };
-    if (!rec) return got;
+    if (!rec) { CUR.restoredInputs = seedFromProfile(got); return CUR.restoredInputs; }
     if (rec.windSpeedKt != null && $('in-windspeed')) {
       $('in-windspeed').value = rec.windSpeedKt; got.wind = true;
     }
@@ -3666,6 +3690,7 @@
       if (any) CUR.sessionGear = G;
     }
     got.gear = !!CUR.sessionGear;
+    seedFromProfile(got);
     CUR.restoredInputs = got;
     return got;
   }
@@ -8897,10 +8922,13 @@
         var ri = CUR.restoredInputs;
         var missing = [];
         if (ri) {
+          /* §549 — 프로필에서 온 값은 '이전 세션에서 넘어온 값'이 아니다.
+             몸무게·스킬은 라이더 단위라 프로필이면 맞는 값이고, 윙과 풍속은
+             세션마다 달라지므로 프로필로 채웠으면 그것도 추정이다. */
           if (!ri.wind) missing.push('wind speed');
           if (!ri.wing) missing.push('wing');
-          if (!ri.weight) missing.push('weight');
-          if (!ri.skill) missing.push('skill');
+          if (!ri.weight && ri.weightFrom !== 'profile') missing.push('weight');
+          if (!ri.skill && ri.skillFrom !== 'profile') missing.push('skill');
         }
         if (ri && missing.length) {
           note.textContent = 'Used by the performance score \u2014 but '
@@ -9349,6 +9377,9 @@
       try { document.documentElement.lang = 'en'; } catch (e) {}
     }
     initTabs();
+    /* §549 — 저장 세션을 열기 전에 프로필을 먼저 폼에 싣는다. 데모나 새로
+       올린 파일도 옥대표 몸무게로 채점돼야 한다. */
+    try { restoreRiderInputs(null); } catch (e) {}
     /* 훈련부하는 현재 세션과 무관하게 원장을 본다 — 파일을 올리지 않아도
        탭을 열면 보여야 한다. */
     try { renderTraining(); } catch (e) {}
