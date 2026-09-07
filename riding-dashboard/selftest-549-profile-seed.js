@@ -42,7 +42,14 @@ ok('★ 윙은 프로필이어도 경고한다 (세션마다 다르다)',
 ok('★ 풍속도 항상 경고 (프로필에 없다)',
    /if \(!ri\.wind\) missing\.push\('wind speed'\)/.test(code));
 
-console.log('\n[5] 프로필이 없거나 값이 비면 조용히 넘어간다 (기본값 유지)');
+console.log('\n[5] ★ 출처를 뭉뚱그리지 않는다');
+ok('★ 프로필에서 온 항목을 따로 모은다', /fromProfile\.push\('weight'\)/.test(code)
+   && /fromProfile\.push\('skill'\)/.test(code));
+ok('★ 프로필 출처를 문구에 밝힌다', /from your rider profile/.test(code));
+ok('전부 세션 값일 때만 "restored from this session"',
+   /\} else \{\s*note\.textContent = ri\s*\? 'Used by the performance score \\u2014 restored from this session\.'/.test(code));
+
+console.log('\n[6] 프로필이 없거나 값이 비면 조용히 넘어간다 (기본값 유지)');
 ok('프로필 없음 방어', /if \(!rp\) return got/.test(code));
 ok('0·음수 몸무게는 안 쓴다 (> 0 검사)', /rp\.weightKg > 0/.test(code));
 

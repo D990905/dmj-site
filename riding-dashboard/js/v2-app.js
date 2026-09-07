@@ -8942,9 +8942,23 @@
             + ' and press Recalculate, then Save session to keep it.';
           note.className = 'lab text-warning';
         } else {
-          note.textContent = ri
-            ? 'Used by the performance score \u2014 restored from this session.'
-            : 'Used by the performance score';
+          /* §549b — "이 세션에서 복원했다"고 뭉뚱그리면 안 된다. 몸무게·스킬은
+             라이더 프로필에서 온 값이지 그 세션에 기록된 값이 아니다.
+             출처를 정확히 쓰는 게 §547·§549 의 요지다. */
+          var fromProfile = [];
+          if (ri) {
+            if (ri.weightFrom === 'profile') fromProfile.push('weight');
+            if (ri.skillFrom === 'profile') fromProfile.push('skill');
+          }
+          if (ri && fromProfile.length) {
+            note.textContent = 'Used by the performance score \u2014 wind speed and '
+              + 'wing come from this session, ' + fromProfile.join(' and ')
+              + ' from your rider profile.';
+          } else {
+            note.textContent = ri
+              ? 'Used by the performance score \u2014 restored from this session.'
+              : 'Used by the performance score';
+          }
           note.className = 'lab';
         }
       }
