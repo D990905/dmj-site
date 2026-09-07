@@ -51,6 +51,13 @@ ok('저장 세션 복원 중에는 안 지운다 (플래그)', /CUR\.restoringSa
 var resets=(code.match(/CUR\.restoringSaved = false/g)||[]).length;
 ok('★ 성공·실패 양쪽에서 플래그를 내린다', resets>=2, String(resets)+'회');
 
+console.log('\n[5b] ★ 초기화는 loadFiles 에도 있어야 한다');
+console.log('    (파일 하나도 융합 경로를 타서 loadGpxText 를 안 거친다)');
+ok('★ loadFiles 가 표시를 지운다',
+   /function loadFiles\(fileList\) \{[\s\S]{0,900}?CUR\.restoredInputs = null;\s*\n\s*CUR\.sessionGear = null;/.test(code));
+ok('★ 지운 뒤 프로필은 다시 싣는다 (몸무게·스킬은 유효)',
+   /CUR\.sessionGear = null;\s*\n\s*try \{ restoreRiderInputs\(null\); \} catch \(e\) \{\}/.test(code));
+
 console.log('\n[6] 점수는 복원된 폼 값으로 계산된다 (복원이 분석보다 먼저)');
 var iRestore=code.indexOf('restoreRiderInputs(rec); } catch (e) {}');
 var iLoad=code.indexOf('loadGpxText(gpx,');

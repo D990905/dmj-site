@@ -9264,6 +9264,16 @@
   function loadFiles(fileList) {
     var files = [].slice.call(fileList || []);
     if (!files.length) return;
+    /* §550 — 초기화는 **여기**여야 한다. §547 은 loadGpxText 에만 넣었는데,
+       파일이 하나여도 융합 경로를 타므로(포맷 감지가 거기 있다) 그 함수를
+       안 거치는 업로드가 있다. 그래서 새로 올린 파일인데도 직전 세션의
+       풍속·윙이 남은 채 "이 세션에서 왔다"고 적혔다 — 옥대표 6/11 트랙
+       업로드에서 실측(25kt·4.0 이 그대로 따라왔다).
+       프로필은 다시 싣는다: 몸무게·스킬은 라이더 값이라 맞고, 윙·풍속은
+       이 세션 것이 아니라고 표시된다. */
+    CUR.restoredInputs = null;
+    CUR.sessionGear = null;
+    try { restoreRiderInputs(null); } catch (e) {}
     /* .vkx 는 하나씩 — 바이너리라 융합 경로에 섞을 수 없다 */
     var vkx = files.filter(function (f) { return /\.vkx$/i.test(f.name); });
     if (vkx.length) { loadVkxFile(vkx[0]); return; }
