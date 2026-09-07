@@ -550,10 +550,57 @@
         if (arr[si].sig && arr[si].sig === rec.sig) { replacedIdx = si; break; }
       }
     }
+    /* §545 (옥대표 "6월 9일까지의 데이터를 볼 수가 없어") — §537 의 재연결은
+       **한 번도 작동한 적이 없다.** 되살려야 할 옛 줄들은 전부 sig 가 도입되기
+       전에 저장돼 `sig` 가 없고, 위 반복문은 sig 로만 맞춘다. 그래서 파일을
+       다시 올리면 '요약만 남은 옛 줄 + 새 줄' 두 개가 됐다 — 화면에 띄운
+       "다시 올리면 기존 행에 붙는다" 안내가 정작 그 행들에 대해 거짓이었다.
+       (2026-09-07 슬라럼 재업로드에서 실측: 15.48km 요약행이 그대로 남고
+        18.44km 새 행이 생겼다.)
+
+       그래서 sig 가 안 맞으면 **옛 줄 규칙**으로 한 번 더 찾는다:
+         · sig 가 없고 (= sig 도입 전 기록)
+         · hasTrack 이 false 이며 (= 요약만 남아 어차피 열 수 없다)
+         · 같은 날짜인 줄
+       중에서 이름이 같은 것을 우선하고, 그중 가장 최근에 저장된 것을 잇는다.
+
+       hasTrack:false 조건이 안전장치다 — 열 수 있는 줄은 절대 덮지 않으므로,
+       잘못 이어져도 잃는 데이터가 없다. 거리로는 못 맞춘다: 옛 줄의 거리는
+       제외 구간이 빠진 **분석 거리**라 원본과 20%까지 벌어진다(슬라럼 15.48
+       vs 18.44). 같은 날 옛 요약이 여럿이면(고래불 3줄) 첫 업로드가 하나를
+       잇고, 나머지는 그대로 남아 사용자가 지울 수 있다(§543).
+       ⚠ 들어오는 기록에 sig 가 **있을 때만** 이 길을 탄다. sig 없는 저장까지
+       합치면 근거 없이 두 세션을 묶게 된다(§537 테스트가 잡았다). */
+    if (replacedIdx < 0 && rec.sig && rec.dateEpoch) {
+      var dayOf = function (ep) {
+        var d = new Date(ep);
+        return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+      };
+      var myDay = dayOf(rec.dateEpoch), cands = [];
+      for (var li = 0; li < arr.length; li++) {
+        var o = arr[li];
+        if (o.sig) continue;                       /* 옛 줄만 */
+        if (o.hasTrack) continue;                  /* 열리는 줄은 건드리지 않는다 */
+        if (!o.dateEpoch || dayOf(o.dateEpoch) !== myDay) continue;
+        cands.push(li);
+      }
+      if (cands.length) {
+        var named = cands.filter(function (i2) { return arr[i2].name === rec.name; });
+        var pool = named.length ? named : cands;
+        var pick = pool[0];
+        for (var pi = 1; pi < pool.length; pi++) {
+          if ((arr[pool[pi]].savedAt || 0) > (arr[pick].savedAt || 0)) pick = pool[pi];
+        }
+        replacedIdx = pick;
+      }
+    }
     if (replacedIdx >= 0) {
       var prev = arr[replacedIdx];
       rec.id = prev.id;                     /* 트랙 키·문답 답변이 id 에 묶인다 */
       if (prev.gear && !rec.gear) rec.gear = prev.gear;   /* 붙여 둔 장비 보존 */
+      /* §545 — 옛 줄을 이어받을 때 그 줄의 이름을 지키지 않으면, 되살린
+         세션이 갑자기 파일명으로 바뀐다. 사용자가 알아보던 이름이 우선이다. */
+      if (!prev.sig && prev.name && prev.name !== rec.name) rec.name = prev.name;
       arr[replacedIdx] = rec;
     } else {
       arr.push(rec);
