@@ -56,7 +56,7 @@ console.log('    (파일 하나도 융합 경로를 타서 loadGpxText 를 안 �
 ok('★ loadFiles 가 표시를 지운다',
    /function loadFiles\(fileList\) \{[\s\S]{0,900}?CUR\.restoredInputs = null;\s*\n\s*CUR\.sessionGear = null;/.test(code));
 ok('★ 지운 뒤 프로필은 다시 싣는다 (몸무게·스킬은 유효)',
-   /CUR\.sessionGear = null;\s*\n\s*try \{ restoreRiderInputs\(null\); \} catch \(e\) \{\}/.test(code));
+   /CUR\.sessionGear = null;[\s\S]{0,160}?try \{ restoreRiderInputs\(null\); \} catch \(e\) \{\}/.test(code));
 
 console.log('\n[6] 점수는 복원된 폼 값으로 계산된다 (복원이 분석보다 먼저)');
 var iRestore=code.indexOf('restoreRiderInputs(rec); } catch (e) {}');
