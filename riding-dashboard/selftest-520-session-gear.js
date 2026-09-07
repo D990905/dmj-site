@@ -75,7 +75,10 @@ ok('디스크에도 있다', kept.gear && kept.gear.handWingName === 'PPC Sonic 
 
 console.log('\n[7] 화면 코드에 규칙이 박혀 있다');
 var src = fs.readFileSync(path.join(__dirname, 'js/v2-app.js'), 'utf8');
-ok('저장할 때 스냅샷을 넘긴다', /gear: gearSnapshot\(\)/.test(src));
+/* §554b — gearSnapshot 을 그대로 넘기지 않고 gearForSave 를 거친다.
+   모르는 장비를 기록으로 남기지 않기 위해서다(옛 세션엔 null). */
+ok('저장할 때 장비를 넘긴다', /gear: gearForSave\(\)/.test(src));
+ok('★ 다만 무조건 스냅샷은 아니다 (§554b)', !/gear: gearSnapshot\(\),/.test(src));
 ok('스냅샷 함수가 이름까지 뜬다', /handWingName: nameOf\(RDGear\.HAND_WINGS/.test(src));
 ok('목록에 Gear 열이 있다', /'Date', 'Name', 'Gear', 'Distance'/.test(src));
 ok('비면 채워넣기 버튼', /openGearBackfill\(r\)/.test(src));

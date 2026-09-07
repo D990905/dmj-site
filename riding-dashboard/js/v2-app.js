@@ -7834,8 +7834,18 @@
      모르는 건 모르는 채로 두는 게 맞다 — §520 이 'add gear' 로 나중에
      채우는 길을 이미 만들어 뒀다. */
   function gearForSave() {
-    /* 새로 올린 파일이면 지금 고른 장비가 곧 그날 장비다 */
-    if (!CUR.openedRecId) return gearSnapshot();
+    /* §554c — "새로 올린 파일"만으로는 부족하다. 옛 트랙 파일을 다시 올리는
+       경우가 있고(복구), 그때 오늘 장비를 붙이면 같은 문제가 그대로 재현된다.
+       판단 기준은 **세션 날짜**다: 오늘 탄 세션이면 지금 고른 장비가 곧 그날
+       장비이고, 지난 날짜면 오늘의 선택은 그날의 증거가 아니다. */
+    var st = CUR.session && CUR.session.startEpoch;
+    var isToday = false;
+    if (st) {
+      var a = new Date(st), b = new Date();
+      isToday = a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()
+                && a.getDate() === b.getDate();
+    }
+    if (!CUR.openedRecId && isToday) return gearSnapshot();
     /* 저장된 세션을 다시 연 경우 */
     if (CUR.sessionGear) return gearSnapshot();   /* 그 줄에 기록돼 있던 것 */
     if (CUR.gearDirty) {                          /* 사용자가 직접 골랐다 */

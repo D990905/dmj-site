@@ -45,8 +45,10 @@ ok('★ gearForSave 를 쓴다 (gearSnapshot 직접 아님)',
    /gear: gearForSave\(\)/.test(code) && !/gear: gearSnapshot\(\),/.test(code));
 var iG=code.indexOf('function gearForSave()');
 var gb=code.slice(iG, code.indexOf('\n  function ', iG+10));
-ok('★ 새로 올린 파일이면 지금 장비를 기록한다 (그날 탄 장비다)',
-   /if \(!CUR\.openedRecId\) return gearSnapshot\(\)/.test(gb));
+ok('★ 오늘 탄 세션을 새로 올린 경우에만 지금 장비를 기록한다',
+   /if \(!CUR\.openedRecId && isToday\) return gearSnapshot\(\)/.test(gb));
+ok('★★ 판단 기준은 세션 날짜다 (옛 파일을 복구로 다시 올려도 안 붙는다)',
+   /isToday = a\.getFullYear\(\) === b\.getFullYear\(\)/.test(gb));
 ok('★ 그 줄에 기록돼 있었으면 그것을 쓴다',
    /if \(CUR\.sessionGear\) return gearSnapshot\(\)/.test(gb));
 ok('★ 사용자가 직접 골랐으면 기록하되 backfilled 로 표시',
