@@ -9025,8 +9025,20 @@
         renderFusionBanner(null);
         show(session, analysis, file.name.replace(/\.vkx$/i, ''), est);
       } catch (e) {
-        $('hdr-title').textContent = 'Could not read that VKX';
-        $('hdr-date').textContent = (e && e.message) ? e.message : '';
+        /* §546 — 스택을 안 남기면 어디서 터졌는지 알 길이 없다. 실제로
+           옥대표 브라우저에서 .vkx 가 **정상 분석된 뒤에** 이 catch 가
+           떠서(59.96km·14,987점은 들어와 있었다) 파일이 실패한 것처럼
+           보였다. 삼켜진 예외는 증상을 지운다. */
+        if (window.console) console.error('[v2 §546] VKX pipeline threw', e);
+        /* 세션이 이미 올라와 있으면 파일 읽기 자체는 성공한 것이다 —
+           '못 읽었다'고 말하면 거짓말이 된다. */
+        if (CUR.session && CUR.analysis) {
+          alertLine('The file loaded, but one panel failed to draw: '
+            + ((e && e.message) ? e.message : 'unknown error'));
+        } else {
+          $('hdr-title').textContent = 'Could not read that VKX';
+          $('hdr-date').textContent = (e && e.message) ? e.message : '';
+        }
       }
     };
     fr.readAsArrayBuffer(file);
