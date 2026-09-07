@@ -612,10 +612,41 @@
   function listSessions() {
     return readAll().sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
   }
+  /* §543 (옥대표 "세션을 삭제하는 기능추가해줘") — 레코드와 트랙만 지우면
+     안 된다. sig 로 걸린 곁가지가 남으면 훈련부하 원장은 **없어진 세션을
+     계속 세고**(체력 추세가 틀어진다), 제목·편집·영상 blob 은 아무도
+     지울 수 없는 채로 자리를 차지한다.
+     ⚠ 같은 sig 를 쓰는 레코드가 아직 남아 있으면 곁가지는 건드리지 않는다 —
+     중복 저장본 하나를 지웠다고 나머지의 제목과 영상이 날아가면 안 된다. */
   function deleteSession(id) {
+    var all = readAll(), target = null;
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].id === id) { target = all[i]; break; }
+    }
     removeTrack(id);
-    var arr = readAll().filter(function (r) { return r.id !== id; });
-    return writeAll(arr);
+    var arr = all.filter(function (r) { return r.id !== id; });
+    var res = writeAll(arr);
+    var sig = target && target.sig;
+    if (sig) {
+      var stillUsed = false;
+      for (var j = 0; j < arr.length; j++) {
+        if (arr[j].sig === sig) { stillUsed = true; break; }
+      }
+      if (!stillUsed) {
+        try { deleteRideLoad(sig); } catch (e) {}
+        try { saveSessionTitle(sig, ''); } catch (e) {}
+        try { saveEditState(sig, null); } catch (e) {}
+        try { saveVideoSync(sig, null); } catch (e) {}
+        try { clearSessionAnswers(sig); } catch (e) {}
+        /* 영상 blob 은 IndexedDB — 비동기라 결과를 기다리지 않는다.
+           삭제 자체를 여기서 막을 이유는 없다. */
+        try {
+          var pr = clearVideoBlobs(sig);
+          if (pr && pr['catch']) pr['catch'](function () {});
+        } catch (e) {}
+      }
+    }
+    return res;
   }
   function clearAll() {
     /* 저장된 GPX 트랙 키도 전부 제거 */

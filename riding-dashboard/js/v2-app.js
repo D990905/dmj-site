@@ -265,42 +265,6 @@
 
   /* ---------- 속도 히스토그램 ---------- */
   /* 실제 bin 형태 = { fromKt, toKt, seconds } */
-  /* §541 (옥대표 "편차는 우측 그래프에 적당하지 않니?") — 맞다.
-     분포도가 편차를 얹을 자리다. 왼쪽 mean-max 곡선에 SD 를 얹으면
-     '지속시간별 최고속' 이라는 뜻이 달라진다.
-
-     ⚠ 다만 이 분포는 **쌍봉**이다: 정지·표류가 0kt 근처에 무더기로 쌓이고
-     주행이 14~20kt 에 쌓인다. 전체 평균±SD 를 그으면 **아무도 지나가지
-     않은 골짜기**에 밴드가 앉는다 — 통계는 맞는데 뜻이 없다.
-     그래서 **주행 구간(포일링 임계 이상)에서만** 재고, 그렇다고 적는다. */
-  function histSpread(h, thresholdKt) {
-    if (!h || !h.length) return null;
-    var sw = 0, sx = 0, all = 0;
-    h.forEach(function (b) {
-      var t = b.seconds || 0;
-      all += t;
-      var c = (b.fromKt + b.toKt) / 2;
-      if (c < thresholdKt) return;
-      sw += t; sx += c * t;
-    });
-    if (!(sw > 0)) return null;
-    var mean = sx / sw, v = 0;
-    h.forEach(function (b) {
-      var t = b.seconds || 0;
-      var c = (b.fromKt + b.toKt) / 2;
-      if (c < thresholdKt) return;
-      v += t * (c - mean) * (c - mean);
-    });
-    return {
-      meanKt: mean,
-      sdKt: Math.sqrt(v / sw),
-      ridingSec: sw,
-      totalSec: all,
-      excludedShare: all > 0 ? (all - sw) / all : 0,
-      thresholdKt: thresholdKt
-    };
-  }
-
   function renderHistogram(a) {
     var host = $('chart-hist');
     var h = a.histogram || [];
@@ -308,8 +272,6 @@
     var xs = h.map(function (b) { return (b.fromKt + b.toKt) / 2; });
     var ys = h.map(function (b) { return (b.seconds || 0) / 60; });
     var binW = h.length > 1 ? (h[0].toKt - h[0].fromKt) : 2;
-    var thrKt = foilThresholdMs() * KT;
-    var sp = histSpread(h, thrKt);
     while (host.firstChild) host.removeChild(host.firstChild);
     track(new uPlot({
       width: host.clientWidth || 420, height: 268, padding: [12, 12, 4, 6],
@@ -329,52 +291,8 @@
         { label: 'Time', stroke: THEME.accent, fill: 'rgba(77,171,247,0.32)', width: 1,
           paths: uPlot.paths.bars({ size: [0.86, Infinity] }),
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' min'; } }
-      ],
-      /* 밴드는 막대 **뒤에** 그린다 — 위에 그리면 정작 분포를 가린다.
-         uPlot 은 세로 밴드가 없어서 draw 훅에서 직접 칠한다. */
-      hooks: {
-        drawClear: [function (u) {
-          if (!sp) return;
-          var ctx = u.ctx;
-          var lo = u.valToPos(sp.meanKt - sp.sdKt, 'x', true);
-          var hi = u.valToPos(sp.meanKt + sp.sdKt, 'x', true);
-          var mx = u.valToPos(sp.meanKt, 'x', true);
-          var top = u.bbox.top, hgt = u.bbox.height;
-          ctx.save();
-          ctx.fillStyle = 'rgba(148,163,184,0.16)';
-          ctx.fillRect(lo, top, hi - lo, hgt);
-          ctx.strokeStyle = THEME.dim;
-          ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
-          ctx.beginPath(); ctx.moveTo(mx, top); ctx.lineTo(mx, top + hgt); ctx.stroke();
-          ctx.restore();
-        }]
-      }
+      ]
     }, [xs, ys], host));
-
-    /* 숫자로도 준다 — 밴드를 눈대중으로 읽게 두면 안 된다.
-       ⚠ 전용 호스트에 담는다. host.parentNode 에 그냥 붙이면 재렌더마다
-       캡션이 쌓인다(풍속을 바꿀 때마다 한 줄씩 늘어난다). */
-    var capHost = $('hist-caption');
-    if (!capHost) {
-      capHost = el('div');
-      capHost.id = 'hist-caption';
-      host.parentNode.appendChild(capHost);
-    }
-    while (capHost.firstChild) capHost.removeChild(capHost.firstChild);
-    if (sp) {
-      var cap = el('div', 'lab mt-2');
-      cap.textContent = 'While riding: ' + sp.meanKt.toFixed(1) + ' kt average, '
-        + '\u00b1' + sp.sdKt.toFixed(1) + ' kt spread (1 SD, shaded).';
-      capHost.appendChild(cap);
-
-      var why = el('div', 'lab mt-1');
-      why.style.opacity = '.8';
-      why.textContent = 'Measured above ' + thrKt.toFixed(0) + ' kt only. '
-        + 'Including the ' + Math.round(sp.excludedShare * 100) + '% of time spent '
-        + 'stopped or drifting would split this into two humps, and the average '
-        + 'between them is a speed you never actually rode.';
-      capHost.appendChild(why);
-    }
   }
 
   /* ---------- 세션 시계열 ---------- */
@@ -3813,6 +3731,43 @@
     try { return (Store && Store.listSessions) ? (Store.listSessions() || []) : []; }
     catch (e) { return []; }
   }
+  /* §543 — 삭제. RDStorage.deleteSession 은 **이미 있었는데**(옛 대시보드는
+     쓰고 있었다) v2 가 부르지 않고 있었다 — §482·§494·§511·§514·§539·§540 과
+     같은 계열의 여덟 번째다.
+     지운 세션이 지금 화면에 열려 있는 것이면 그대로 두되, 저장 목록에서
+     사라졌다는 걸 알려 준다(조용히 두면 '저장돼 있다'고 착각한다). */
+  function deleteSavedSession(rec) {
+    if (!rec || !Store || !Store.deleteSession) return;
+    var d = rec.dateEpoch ? new Date(rec.dateEpoch).toISOString().slice(0, 10) : '';
+    var what = (rec.name || 'Session')
+      + (d ? '  (' + d : '(')
+      + (rec.distanceM != null ? ', ' + (rec.distanceM / 1000).toFixed(1) + ' km' : '')
+      + ')';
+    var msg = 'Delete ' + what + '?\n\n'
+      + 'This removes the saved summary, its track, and its entry in the '
+      + 'training-load ledger. It cannot be undone.';
+    if (!window.confirm(msg)) return;
+    var openNow = CUR.session && sessionSig(CUR.session) === rec.sig;
+    try { Store.deleteSession(rec.id); } catch (e) {
+      if (window.console) console.error('[v2 §543] delete failed', e);
+      alertLine('That session could not be deleted.');
+      return;
+    }
+    /* §415 — cloud 에도 반영한다. 로컬에서만 지우면 다른 기기에서
+       다시 내려와 되살아난다. */
+    try {
+      if (window.RDCloud && typeof RDCloud.deleteSession === 'function') {
+        RDCloud.deleteSession(rec.id);
+      }
+    } catch (e) {}
+    renderSessions();
+    try { renderTraining(); } catch (e) {}
+    if (openNow) {
+      alertLine('Deleted from your saved sessions. It is still open here \u2014 '
+        + 'use "Save session" if you want it back.');
+    }
+  }
+
   function renderSessions() {
     var host = $('sessions-body');
     if (!host) return;
@@ -3885,7 +3840,7 @@
     var wrap = el('div', 'table-responsive');
     var t = el('table', 'table table-vcenter card-table table-sm');
     var th = el('thead'), htr = el('tr');
-    ['Date', 'Name', 'Gear', 'Distance', 'Top', 'Avg', 'Turns', 'SPS']
+    ['Date', 'Name', 'Gear', 'Distance', 'Top', 'Avg', 'Turns', 'SPS', '']
       .forEach(function (x, i) {
         htr.appendChild(el('th', i > 2 ? 'text-end' : null, x));
       });
@@ -3954,6 +3909,21 @@
         r.maneuverTotal != null ? String(r.maneuverTotal) : '—'));
       tr.appendChild(el('td', 'text-end num',
         r.vpsOverall != null ? String(Math.round(r.vpsOverall)) : '—'));
+      /* §543 (옥대표 "세션을 삭제하는 기능추가해줘") — 삭제는 되돌릴 수
+         없으니 무엇을 지우는지 이름·날짜·거리로 확인시킨다. 행 클릭(열기)과
+         섞이면 지우려다 열게 되므로 stopPropagation 이 필수다. */
+      var tdX = el('td', 'text-end');
+      var del = el('button', 'btn btn-sm btn-ghost-danger p-0 px-2', '\u00d7');
+      del.type = 'button';
+      del.title = 'Delete this session';
+      del.setAttribute('aria-label', 'Delete ' + (r.name || 'session'));
+      del.style.lineHeight = '1';
+      del.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        deleteSavedSession(r);
+      });
+      tdX.appendChild(del);
+      tr.appendChild(tdX);
       tb.appendChild(tr);
     });
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
@@ -8893,6 +8863,34 @@
   }
 
   /* §436 비교 세션(고스트) — 저장된 세션 중 고른 것을 함께 재생 */
+  /* §544 — 저장된 트랙을 세션으로 되돌린다. 두 가지 형식이 있다:
+       · §509 압축(RDTRK1)  — 지금 저장되는 것 전부
+       · 옛 GPX 원문        — §509 이전 기록
+     openSavedSession 은 둘 다 처리했는데 **buildGhost 는 GPX 만** 처리하고
+     있었다(옥대표 "이 비교창은 ... 가동이 안되는것 같아"). 압축본을
+     parseGPX 에 넘기면 던지고, try/catch 가 그걸 삼켜 null 을 돌려줬다 —
+     그래서 비교 상대를 골라도 리플레이에 **아무 말 없이** 안 나왔다.
+     §509 이후 저장분이 곧 '다시 열 수 있는 세션' 전부이므로, 사실상
+     이 기능은 처음부터 한 번도 안 돌았다. */
+  function sessionFromStoredTrack(gpx) {
+    if (!gpx) return null;
+    if (Store && Store.isCompactTrack && Store.isCompactTrack(gpx)) {
+      var pts = Store.decodeTrack(gpx);
+      if (!pts || !pts.length) return null;
+      /* ⚠ time 은 epoch **밀리초** 숫자다(§509 는 초로 저장한다). */
+      var seg = pts.map(function (q) {
+        return { lat: q.lat, lng: q.lng, ele: null,
+                 time: q.t * 1000, speed: null, hr: null };
+      });
+      return An.normalizeSession({
+        tracks: [{ name: 'Comparison', segments: [seg] }],
+        hasTime: true, speedSource: 'derived', trackName: 'Comparison'
+      });
+    }
+    if (typeof gpx === 'string' && gpx.slice(0, 8) === 'RDFUSED1') return null;
+    return An.normalizeSession(Gpx.parseGPX(gpx));
+  }
+
   function buildGhost() {
     var sel = $('replay-ghost');
     if (!sel || sel.hidden || !sel.value || !Store || !Store.loadTrack) return null;
@@ -8900,12 +8898,15 @@
     try { gpx = Store.loadTrack(sel.value); } catch (e) { gpx = null; }
     if (!gpx) return null;
     try {
-      var gs = An.normalizeSession(Gpx.parseGPX(gpx));
+      var gs = sessionFromStoredTrack(gpx);
       if (!gs || !gs.samples || !gs.samples.length || !gs.hasTime) return null;
       var opt = sel.options[sel.selectedIndex];
       return { session: gs, label: (opt && opt.textContent) || 'Comparison',
                color: '#B86BFF', mode: 'start' };
-    } catch (e) { return null; }
+    } catch (e) {
+      if (window.console) console.warn('[v2 §544] ghost failed to build', e);
+      return null;
+    }
   }
 
   function populateReplayGhost() {
@@ -8916,6 +8917,12 @@
     var none = document.createElement('option');
     none.value = ''; none.textContent = 'No comparison';
     sel.appendChild(none);
+    /* §544 — 이름표가 없어서 무엇에 쓰는 물건인지 알 수 없었다
+       (옥대표 "어떤방식으로 비교하기 위해서 만들었는지 기억이 안나는데").
+       고스트는 **리플레이에서만** 나타난다 — 대시보드 숫자는 안 바뀐다. */
+    sel.title = 'Pick a past session to race against in Replay \u2014 it appears '
+      + 'as a second (purple) board starting at the same moment. '
+      + 'This does not change any of the numbers on the dashboard.';
     var n = 0;
     listSessions().forEach(function (r) {
       if (!r || !r.hasTrack) return;
@@ -9088,6 +9095,61 @@
     show(session, analysis, name, est);
   }
 
+  /* §543 (옥대표 "왜 늘 슬라럼 세션으로만 진입되니" · "타 세션에서 트랙을
+     수정하는데 자꾸 슬라럼 트랙이 자동으로 올라와버림") — 증상 둘이 한 뿌리다.
+
+     예전에는 페이지가 열릴 때마다 **무조건** 데모 GPX 를 fetch 했고, 그
+     응답이 도착하는 순간 화면에 무엇이 있든 loadGpxText 가 덮어썼다.
+     네트워크가 늦으면 저장 세션을 열거나 구간을 편집한 **뒤에** 도착해
+     방금 한 작업을 데모로 갈아치웠다. 그 데모가 §539 제목(sig 기준)을 타고
+     '슬라럼' 이름을 쓰고 있어서 전부 슬라럼으로 보였다.
+
+     그래서 둘 다 고친다:
+       · 진입은 **가장 최근의 다시 열 수 있는 저장 세션**으로. 데모는 저장된
+         게 하나도 없을 때만.
+       · 데모 응답은 그 사이 다른 세션이 올라왔으면 **버린다**(CUR.session
+         가드). 늦게 도착한 응답이 현재 작업을 덮는 일이 다시는 없다. */
+  function latestOpenable() {
+    var best = null;
+    listSessions().forEach(function (r) {
+      if (!r || !r.hasTrack) return;
+      if (!best || (r.dateEpoch || 0) > (best.dateEpoch || 0)
+          || ((r.dateEpoch || 0) === (best.dateEpoch || 0)
+              && (r.savedAt || 0) > (best.savedAt || 0))) best = r;
+    });
+    return best;
+  }
+
+  function bootOpen() {
+    var rec = latestOpenable();
+    if (rec) {
+      CUR.isDemo = false;
+      try {
+        openSavedSession(rec);
+        if (CUR.session) return;        /* 열렸으면 데모는 건드리지 않는다 */
+      } catch (e) {
+        if (window.console) console.warn('[v2 §543] latest session failed to open', e);
+      }
+    }
+    fetch('sample/sample-songjeong-busan.gpx')
+      .then(function (r) { return r.text(); })
+      .then(function (t) {
+        /* ⚠ 늦게 온 응답이 그 사이 올라온 세션을 덮지 않게. 이게 없어서
+           편집 중에 데모가 끼어들었다. */
+        if (CUR.session) return;
+        /* §463 — 데모 세션은 훈련부하 원장에 넣지 않는다. 페이지를 열
+           때마다 자동으로 실려 남의 라이딩이 내 체력 추세가 되어버린다. */
+        CUR.isDemo = true;
+        loadGpxText(t, 'Songjeong, Busan');
+      })
+      .catch(function (err) {
+        if (CUR.session) return;
+        $('hdr-title').textContent = 'Could not load the sample session';
+        $('hdr-date').textContent = String(err && err.message ? err.message : err);
+        if (window.console) console.error('[v2] sample load failed', err);
+      });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     /* 이 페이지는 영어다. 엔진이 돌려주는 안내문(풍향 추정 노트 등)은
        i18n 사전을 타므로 언어를 먼저 영어로 고정해야 한글이 새지 않는다. */
@@ -9109,10 +9171,18 @@
         /* 예전 페이지가 넘기던 옵션을 전부 맞춘다. sessionSig 가 없으면
            영상 업로드·싱크 상태가 저장되지 않고, hasVideoFlag 가 없으면
            '이 기기에 영상 없음' 안내(§423)가 뜨지 않는다. */
+        /* §544 — 비교 상대를 골랐는데 못 만들었으면 **말해 준다**.
+           예전에는 조용히 고스트 없이 열려서 기능이 죽은 것처럼 보였다. */
+        var gh = buildGhost();
+        var gsel = $('replay-ghost');
+        if (!gh && gsel && !gsel.hidden && gsel.value) {
+          alertLine('That comparison session could not be loaded \u2014 opening '
+            + 'the replay without it.');
+        }
         RDReplay.open({
           session: CUR.session,
           analysis: CUR.analysis,
-          ghost: buildGhost(),
+          ghost: gh,
           windDir: CUR.windDir,
           unit: 'kt',
           sessionSig: sessionSig(CUR.session),
@@ -9137,6 +9207,13 @@
       /* 세션 목록·훈련부하는 namespace 를 타므로 다시 그린다 */
       try { renderSessions(); } catch (e) {}
       try { renderTraining(); } catch (e) {}
+      /* §543 — 로그인은 비동기로 복원된다. 부팅 시점엔 anon namespace 라
+         저장 세션이 안 보여 데모가 떴을 수 있다. 아직 데모면 지금 다시
+         고른다 — 로그인해서 들어왔는데 데모가 떠 있으면 안 된다. */
+      if (CUR.isDemo) {
+        var latest = latestOpenable();
+        if (latest) { CUR.isDemo = false; try { openSavedSession(latest); } catch (e) {} }
+      }
     });
 
     var pb = $('btn-pdf');
@@ -9276,19 +9353,7 @@
         }
       });
     });
-    fetch('sample/sample-songjeong-busan.gpx')
-      .then(function (r) { return r.text(); })
-      .then(function (t) {
-        /* §463 — 데모 세션은 훈련부하 원장에 넣지 않는다. 페이지를 열
-           때마다 자동으로 실려 남의 라이딩이 내 체력 추세가 되어버린다. */
-        CUR.isDemo = true;
-        loadGpxText(t, 'Songjeong, Busan');
-      })
-      .catch(function (err) {
-        $('hdr-title').textContent = 'Could not load the sample session';
-        $('hdr-date').textContent = String(err && err.message ? err.message : err);
-        if (window.console) console.error('[v2] sample load failed', err);
-      });
+    bootOpen();
   });
   /* 편집을 코드에서도 걸 수 있게 최소 API 를 연다 — 자동 검증과
      추후 딥링크(공유 URL 에 제외 구간 담기)에 쓴다. */
