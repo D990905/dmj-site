@@ -3728,6 +3728,19 @@
       var wd2 = (rec.windDir != null) ? rec.windDir
                 : (est2 && est2.windDir != null ? est2.windDir : null);
       CUR.gpxText = null;          /* 원문은 더 이상 갖고 있지 않다 */
+      /* §552 — 이 분기가 CUR.fullSession 을 안 비웠다. show() 는
+         `CUR.fullSession = fullSession || CUR.fullSession || session` 이라
+         **직전 세션의 트랙이 그대로 남는다.** 그 뒤 reapplyEdits 가 한 번만
+         돌면 show(CUR.fullSession, …, CUR.name) 이 되어 **이름은 새 세션,
+         트랙·날짜·시그니처는 이전 세션**인 상태가 만들어진다.
+         실측(옥대표 브라우저): 고래불을 열고 저장했더니 이름은 고래불,
+         날짜는 오늘, 거리 29.09km(=직전에 보던 4.0 세션)인 행이 생겼다.
+         저장 시 samples 도 CUR.fullSession 에서 뽑으므로 **남의 트랙이
+         저장된다** — 조용히 일어나서 알아채기 어렵다. */
+      CUR.edit = null;
+      CUR.fullSession = null;
+      CUR.fusion = null;
+      renderFusionBanner(null);
       CUR.est = est2;
       CUR.windDir = wd2;
       var an2 = An.analyzeSession(sess, wd2, analysisOpts(est2));
