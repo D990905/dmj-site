@@ -7350,13 +7350,29 @@
     }
 
     /* 보정 근거 */
+    /* §546 (옥대표 .vkx 복구 중 발각) — 이 자리는 자세값이 **오직 융합
+       경로(IMU 보정)로만** 온다고 가정하고 cal.samples 를 바로 읽었다.
+       그런데 .vkx 는 쿼터니언으로 heel/pitch 를 **자체적으로** 담고 온다.
+       그러면 S 는 채워지는데 cal 은 null 이라 여기서 터졌고, try/catch 가
+       삼켜 '파일을 못 읽었다'는 거짓 메시지만 남았다 — 정작 자세를 기본
+       제공하는 유일한 포맷에서 이 패널이 한 번도 안 그려졌다.
+       ⚠ 기기값을 그대로 쓰면 마운트 각도가 그대로 편향으로 남는다.
+          그 차이를 감추면 안 되므로 안내를 갈라 적는다. */
     var note = el('div', 'alert alert-info');
-    note.textContent = 'Zeroed against ' + (cal.samples || 0).toLocaleString()
-      + ' of the quietest low-speed samples'
-      + ' — heel ' + cal.heelOffset.toFixed(1) + '°, pitch ' + cal.pitchOffset.toFixed(1)
-      + '° removed as mounting offset'
-      + (cal.heelIqr != null ? ' (heel spread in those moments: ' + cal.heelIqr.toFixed(1) + '°)' : '')
-      + '.';
+    if (cal) {
+      note.textContent = 'Zeroed against ' + (cal.samples || 0).toLocaleString()
+        + ' of the quietest low-speed samples'
+        + ' — heel ' + cal.heelOffset.toFixed(1) + '°, pitch ' + cal.pitchOffset.toFixed(1)
+        + '° removed as mounting offset'
+        + (cal.heelIqr != null ? ' (heel spread in those moments: ' + cal.heelIqr.toFixed(1) + '°)' : '')
+        + '.';
+    } else {
+      note.className = 'alert alert-warning';
+      note.textContent = 'Heel and pitch come straight from the device, with no '
+        + 'mounting offset removed \u2014 however the unit sits on the board is '
+        + 'baked into these numbers as a constant tilt. Read the spread and the '
+        + 'left/right difference, not the absolute angle.';
+    }
     host.appendChild(note);
 
     function pct(arr, f) {
