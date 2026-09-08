@@ -8965,6 +8965,42 @@
     CUR.vps = vps;
     autoRecordRideLoad();
     renderKpis(analysis, vps);
+    renderRiderNote(vps);
+    if (window.RDMeanMax) {
+      var mm = RDMeanMax.render($('chart-meanmax'), analysis, THEME);
+      if (mm && mm.plot) track(mm.plot, $('chart-meanmax'));
+    }
+    renderHistogram(analysis);
+    renderTimeline(session, analysis);
+    renderTurns(analysis);
+    renderTurnExtras(analysis);
+    renderPerfExtra(analysis);
+    renderSessions();
+    renderTraining();
+    populateReplayGhost();
+    renderPhysiology(analysis);
+    renderEnvironment(analysis, est);
+    renderTrack(session, analysis);
+    /* §522 — 지도가 만들어진 **다음**이라야 강조 레이어를 얹을 수 있다 */
+    try { renderSegmentStepper(analysis); } catch (e) {}
+    renderAttitude(session, analysis, CUR.fusion);
+    var whatIf = null;
+    if (window.RDCoach && RDCoach.computeWhatIf) {
+      try { whatIf = RDCoach.computeWhatIf(analysis, riderFromForm(), windSpeedFromForm()); }
+      catch (e) { whatIf = null; }
+    }
+    /* §465 — 장비 선택이 바뀌면 코치 탭만 다시 그린다. 그때 쓰려고
+       whatIf 를 남겨 둔다(예전에는 CUR 에 없어 undefined 가 넘어갔다). */
+    CUR.whatIf = whatIf;
+    renderCoach(analysis, vps, whatIf);
+  }
+
+  /* 세션 시그니처 — 영상 blob·싱크 오프셋을 이 키로 저장한다.
+     예전 페이지(app.js sessionSignature)와 동일한 식이어야 같은 영상이
+     두 페이지에서 함께 보인다. */
+  /* §555b — 안내문을 함수로 뺀다. 저장 직후에도 다시 그려야 한다. */
+  function renderRiderNote(vps) {
+    if (vps === undefined) vps = CUR.vps;
     var note = $('rider-note');
     if (note) {
       if (vps && vps.ok === false && vps.missing) {
@@ -9018,38 +9054,8 @@
         }
       }
     }
-    if (window.RDMeanMax) {
-      var mm = RDMeanMax.render($('chart-meanmax'), analysis, THEME);
-      if (mm && mm.plot) track(mm.plot, $('chart-meanmax'));
-    }
-    renderHistogram(analysis);
-    renderTimeline(session, analysis);
-    renderTurns(analysis);
-    renderTurnExtras(analysis);
-    renderPerfExtra(analysis);
-    renderSessions();
-    renderTraining();
-    populateReplayGhost();
-    renderPhysiology(analysis);
-    renderEnvironment(analysis, est);
-    renderTrack(session, analysis);
-    /* §522 — 지도가 만들어진 **다음**이라야 강조 레이어를 얹을 수 있다 */
-    try { renderSegmentStepper(analysis); } catch (e) {}
-    renderAttitude(session, analysis, CUR.fusion);
-    var whatIf = null;
-    if (window.RDCoach && RDCoach.computeWhatIf) {
-      try { whatIf = RDCoach.computeWhatIf(analysis, riderFromForm(), windSpeedFromForm()); }
-      catch (e) { whatIf = null; }
-    }
-    /* §465 — 장비 선택이 바뀌면 코치 탭만 다시 그린다. 그때 쓰려고
-       whatIf 를 남겨 둔다(예전에는 CUR 에 없어 undefined 가 넘어갔다). */
-    CUR.whatIf = whatIf;
-    renderCoach(analysis, vps, whatIf);
   }
 
-  /* 세션 시그니처 — 영상 blob·싱크 오프셋을 이 키로 저장한다.
-     예전 페이지(app.js sessionSignature)와 동일한 식이어야 같은 영상이
-     두 페이지에서 함께 보인다. */
   /* §539 편집 가능한 세션 제목 */
   function setEditableTitle(fallback) {
     var h = $('hdr-title');
@@ -9076,7 +9082,11 @@
     span.title = '클릭해서 제목을 바꿉니다 · click to rename';
 
     function commit() {
-      var v = (span.textContent || '').replace(/\s+/g, ' ').trim();
+      /* 폭 0 문자(zero-width, BOM)는 IME·붙여넣기로 섞여 들어와 눈에 안 보이는
+         채로 제목을 오염시킨다 */
+      var v = (span.textContent || '')
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .replace(/\s+/g, ' ').trim();
       span.style.borderBottomColor = 'transparent';
       if (!sig || !window.RDStorage || !RDStorage.saveSessionTitle) return;
       /* 비우면 **자동 제목으로 되돌린다** — 빈 제목을 저장하면 목록에서
@@ -9094,11 +9104,29 @@
       /* 저장 목록에도 같은 제목이 보이게 */
       try { renderSessions(); } catch (e) {}
     }
+    /* §555 (옥대표 제목이 '도2026-06-11_오륙도' 로 저장됨) — 한글은 **조합
+       입력**이다. 조합이 끝나기 전에 blur/Enter 로 commit 하면 조합 중이던
+       글자가 확정되면서 엉뚱한 자리에 박히거나 잘린다. 영문에서는 안 나고
+       한글에서만 나므로 눈에 늦게 띈다.
+       그래서 조합 중에는 커밋하지 않고, 조합이 끝난 뒤에 미뤄 둔 커밋을
+       실행한다. Enter·Escape 도 조합 중에는 IME 에게 양보한다
+       (그 Enter 는 후보 확정이지 입력 완료가 아니다). */
+    var composing = false, pendingCommit = false;
+    span.addEventListener('compositionstart', function () { composing = true; });
+    span.addEventListener('compositionend', function () {
+      composing = false;
+      if (pendingCommit) { pendingCommit = false; commit(); }
+    });
     span.addEventListener('focus', function () {
       span.style.borderBottomColor = THEME.accent;
     });
-    span.addEventListener('blur', commit);
+    span.addEventListener('blur', function () {
+      if (composing) { pendingCommit = true; return; }
+      commit();
+    });
     span.addEventListener('keydown', function (ev) {
+      /* ev.isComposing 은 조합 중 keydown 에서 true 다 (keyCode 229 도 같은 뜻) */
+      if (composing || ev.isComposing || ev.keyCode === 229) return;
       if (ev.key === 'Enter') { ev.preventDefault(); span.blur(); }
       if (ev.key === 'Escape') { span.textContent = shown; span.blur(); }
     });
@@ -9617,6 +9645,22 @@
           gpxText: CUR.gpxText
         }, CUR.analysis);
         if (res && res.ok) {
+          /* §555b — 저장했으면 이 값들은 이제 **이 세션의 것**이다.
+             안내문을 안 고치면 방금 저장한 뒤에도 "이 세션에 저장되지 않아
+             이전 세션에서 넘어온 값" 이라고 거짓을 말한다 (옥대표가 6/11 에
+             풍향·풍속을 넣고 저장한 뒤 실제로 그 문구가 남아 있었다).
+             이 세션에서 온 것은 저장한 항목이고, 몸무게·스킬은 프로필에서
+             온 것이라는 §549 의 구분은 그대로 유지한다. */
+          var ri0 = CUR.restoredInputs || {};
+          CUR.restoredInputs = {
+            wind: true, wing: true, weight: true, skill: true,
+            gear: ri0.gear,
+            weightFrom: ri0.weightFrom, skillFrom: ri0.skillFrom, wingFrom: ri0.wingFrom
+          };
+          /* §553 — 방금 만든(혹은 이은) 줄이 이 세션의 정체성이 된다.
+             안 잡으면 바로 다음 저장이 또 새 줄을 만든다. */
+          if (res.record && res.record.id) CUR.openedRecId = res.record.id;
+          try { renderRiderNote(); } catch (e) {}
           renderSessions();
           /* 저장하면 부하 원장에 들어가므로 훈련부하 탭도 갱신한다. */
           renderTraining();
