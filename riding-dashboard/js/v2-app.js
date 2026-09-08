@@ -3651,33 +3651,39 @@
     try { rp = (window.RDStorage && RDStorage.loadRider) ? RDStorage.loadRider() : null; }
     catch (e) { rp = null; }
     if (!rp) return got;
+    if (!got.src) got.src = { wind: 'carried', weight: 'carried', wing: 'carried', skill: 'carried' };
     if (!got.weight && rp.weightKg > 0 && $('in-weight')) {
-      $('in-weight').value = rp.weightKg; got.weightFrom = 'profile';
+      $('in-weight').value = rp.weightKg; got.weightFrom = 'profile'; got.src.weight = 'profile';
     }
     if (!got.skill && rp.skill && $('in-skill')) {
-      $('in-skill').value = rp.skill; got.skillFrom = 'profile';
+      $('in-skill').value = rp.skill; got.skillFrom = 'profile'; got.src.skill = 'profile';
     }
     if (!got.wing && rp.wingM2 > 0 && $('in-wing')) {
-      $('in-wing').value = rp.wingM2; got.wingFrom = 'profile';
+      $('in-wing').value = rp.wingM2; got.wingFrom = 'profile'; got.src.wing = 'profile';
     }
     return got;
   }
 
   function restoreRiderInputs(rec) {
     var got = { wind: false, weight: false, wing: false, skill: false };
+    /* §557 (옥대표 "다른 사람의 데이터일 수도 있으니까") — 항목마다 **출처**를
+       남긴다. 세션 기록에서 온 값과 내 프로필에서 온 값은 신뢰도가 다르다.
+       남의 세션이면 내 몸무게는 그냥 틀린 값이고, 그 사실이 화면에 보여야
+       한다. 안내문 한 줄로는 어느 칸이 그런지 알 수 없다. */
+    got.src = { wind: 'carried', weight: 'carried', wing: 'carried', skill: 'carried' };
     if (!rec) { CUR.restoredInputs = seedFromProfile(got); return CUR.restoredInputs; }
     if (rec.windSpeedKt != null && $('in-windspeed')) {
-      $('in-windspeed').value = rec.windSpeedKt; got.wind = true;
+      $('in-windspeed').value = rec.windSpeedKt; got.wind = true; got.src.wind = 'session';
     }
     var rd = rec.rider;
     if (rd) {
-      if (rd.weightKg != null && $('in-weight')) { $('in-weight').value = rd.weightKg; got.weight = true; }
-      if (rd.wingM2 != null && $('in-wing')) { $('in-wing').value = rd.wingM2; got.wing = true; }
-      if (rd.skill && $('in-skill')) { $('in-skill').value = rd.skill; got.skill = true; }
+      if (rd.weightKg != null && $('in-weight')) { $('in-weight').value = rd.weightKg; got.weight = true; got.src.weight = 'session'; }
+      if (rd.wingM2 != null && $('in-wing')) { $('in-wing').value = rd.wingM2; got.wing = true; got.src.wing = 'session'; }
+      if (rd.skill && $('in-skill')) { $('in-skill').value = rd.skill; got.skill = true; got.src.skill = 'session'; }
     }
     /* 윙은 장비 스냅샷이 더 정확하다 — 저장 당시 실제로 고른 윙이다 */
     if (!got.wing && rec.gear && rec.gear.wingM2 > 0 && $('in-wing')) {
-      $('in-wing').value = rec.gear.wingM2; got.wing = true;
+      $('in-wing').value = rec.gear.wingM2; got.wing = true; got.src.wing = 'gear';
     }
     /* §548 — 장비도 그 세션 것으로. 없으면 null 이라 프로필이 그대로 쓰인다. */
     CUR.sessionGear = null;
@@ -7957,7 +7963,9 @@
     }
     CUR.gearDirty = false;
     /* 이제 이 값들이 이 세션의 것이다 — 안내문도 그렇게 바뀌어야 한다 */
-    CUR.restoredInputs = { wind: true, weight: true, wing: true, skill: true };
+    CUR.restoredInputs = { wind: true, weight: true, wing: true, skill: true,
+      src: { wind: 'session', wing: 'session', weight: 'session', skill: 'session' } };
+    try { renderInputSources(); } catch (e) {}
     try { renderSessions(); } catch (e) {}
     try {
       var note = $('rider-note');
@@ -8966,6 +8974,7 @@
     autoRecordRideLoad();
     renderKpis(analysis, vps);
     renderRiderNote(vps);
+    try { renderInputSources(); } catch (e) {}
     if (window.RDMeanMax) {
       var mm = RDMeanMax.render($('chart-meanmax'), analysis, THEME);
       if (mm && mm.plot) track(mm.plot, $('chart-meanmax'));
@@ -8998,6 +9007,40 @@
   /* 세션 시그니처 — 영상 blob·싱크 오프셋을 이 키로 저장한다.
      예전 페이지(app.js sessionSignature)와 동일한 식이어야 같은 영상이
      두 페이지에서 함께 보인다. */
+  /* §557 — 입력칸마다 출처 꼬리표. '이 세션 기록'과 '내 프로필'은 신뢰도가
+     다르다. 남의 세션을 열었다면 내 프로필 몸무게는 틀린 값이고, 그게 어느
+     칸인지 한눈에 보여야 한다. */
+  var SRC_LABEL = {
+    session: { t: 'this session', c: 'ok' },
+    gear:    { t: 'gear log',     c: 'ok' },
+    profile: { t: 'your profile', c: 'soft' },
+    carried: { t: 'carried over', c: 'warn' }
+  };
+  function renderInputSources() {
+    var src = (CUR.restoredInputs && CUR.restoredInputs.src) || null;
+    var map = { 'in-weight': 'weight', 'in-wing': 'wing', 'in-skill': 'skill',
+                'in-windspeed': 'wind' };
+    Object.keys(map).forEach(function (id) {
+      var input = $(id);
+      if (!input) return;
+      var host = input.parentNode;
+      if (!host) return;
+      var tag = host.querySelector('.src-tag');
+      if (!tag) {
+        tag = el('div', 'src-tag lab mt-1');
+        tag.style.cssText = 'font-size:.6875rem;letter-spacing:.01em;line-height:1.2';
+        host.appendChild(tag);
+      }
+      var key = src ? src[map[id]] : null;
+      var def = SRC_LABEL[key];
+      if (!def) { tag.textContent = ''; return; }
+      tag.textContent = def.t;
+      tag.style.opacity = def.c === 'soft' ? '.7' : '1';
+      tag.style.color = def.c === 'warn' ? 'var(--tblr-warning)'
+        : (def.c === 'ok' ? 'var(--tblr-success)' : '');
+    });
+  }
+
   /* §555b — 안내문을 함수로 뺀다. 저장 직후에도 다시 그려야 한다. */
   function renderRiderNote(vps) {
     if (vps === undefined) vps = CUR.vps;
@@ -9655,12 +9698,15 @@
           CUR.restoredInputs = {
             wind: true, wing: true, weight: true, skill: true,
             gear: ri0.gear,
-            weightFrom: ri0.weightFrom, skillFrom: ri0.skillFrom, wingFrom: ri0.wingFrom
+            weightFrom: ri0.weightFrom, skillFrom: ri0.skillFrom, wingFrom: ri0.wingFrom,
+            /* §557 — 저장했으니 네 항목 모두 이 세션의 기록이 됐다 */
+            src: { wind: 'session', wing: 'session', weight: 'session', skill: 'session' }
           };
           /* §553 — 방금 만든(혹은 이은) 줄이 이 세션의 정체성이 된다.
              안 잡으면 바로 다음 저장이 또 새 줄을 만든다. */
           if (res.record && res.record.id) CUR.openedRecId = res.record.id;
           try { renderRiderNote(); } catch (e) {}
+          try { renderInputSources(); } catch (e) {}
           renderSessions();
           /* 저장하면 부하 원장에 들어가므로 훈련부하 탭도 갱신한다. */
           renderTraining();
