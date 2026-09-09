@@ -68,6 +68,8 @@
   .tr-tick { font: 10px "IBM Plex Mono", monospace; fill: var(--tblr-secondary); }
   .tr-val  { font: 10px "IBM Plex Mono", monospace; fill: var(--tblr-body-color);
              font-variant-numeric: tabular-nums; }
+  /* §572 폴라 눈금 — 테마 토큰에서 색을 받아야 양쪽 테마에서 읽힌다 */
+  .pol-tick { font: 10px "IBM Plex Mono", monospace; fill: var(--tblr-secondary); }
 </style>
 </head>
 <body>
@@ -261,6 +263,10 @@
                 <div id="map-host" style="height:460px;border-radius:4px;overflow:hidden"></div>
                 <div id="map-legend" class="d-flex flex-wrap gap-3 mt-2 lab"></div>
                 <div id="map-caveat" class="lab mt-1" style="opacity:.7"></div>
+                <!-- §574 (옥대표 "이건 지도 아래에 바로 놔둬야 아래위로 보면서
+                     참조를 하지") — 맞다. 이 표의 결론이 "트랙을 보고 직접
+                     정하라" 인데, 정작 트랙과 다른 탭에 있었다. -->
+                <div id="wind-sources-host" class="mt-3"></div>
                 <!-- §522 W3 — 구간 스테퍼. 지도 바로 아래라야 강조가 보인다 -->
                 <div id="segment-stepper" class="mt-3"></div>
               </div>
@@ -365,6 +371,6 @@
 <script src="js/trend-analysis.js?v=v558"></script>
 <script src="js/gear-usage.js?v=v559"></script>
 <script src="js/chart-tip.js?v=v560"></script>
-<script src="js/v2-app.js?v=v571"></script>
+<script src="js/v2-app.js?v=v577"></script>
 </body>
 </html>

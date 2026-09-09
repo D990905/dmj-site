@@ -1107,13 +1107,27 @@
       if (cardO.firstChild) colT.appendChild(cardO);
     }
 
-    renderPolarGrid(host, a);
+    /* §577 (옥대표 "폴라그래프랑 상관관계 그래프 모두 퍼포먼스 탭으로 이동시켜")
+       — 둘 다 바람이 어땠는지가 아니라 **그 바람에서 내가 어땠는지**를 말한다.
+       퍼포먼스 탭으로 옮겼다(renderPerfExtra). 환경 탭에는 바람 자체를 다루는
+       것만 남긴다: 풍향 확인·풍향 변화·게인/로스·Bin table. */
     renderBinTable(host, a);
-    renderCorrelation(host, a);
     renderGainLoss(host, a);
     renderWindVariation(host, a);
-    renderTargetComparison(host, a);
-    renderWindSources(host, a);
+    /* §576 (옥대표 "이건 당일 퍼포먼스에 대한 상당히 인사이츠가 있는 내용인데
+       환경에 넣어둘게 아니라 퍼포먼스에 넣어야 하는거 아니니?") — 맞다.
+       이 카드는 바람이 어땠는지가 아니라 **오늘의 나를 내 과거와 견준다**.
+       퍼포먼스 탭으로 옮겼다(renderPerfExtra). */
+    /* §574 (옥대표 "지도 아래에 바로 놔둬야 아래위로 보면서 참조를 하지") —
+       이 표의 결론이 "트랙을 보고 직접 정하라" 인데 정작 트랙과 다른 탭에
+       있었다. 지도 바로 아래로 옮긴다. 호스트가 없으면(옛 레이아웃) 여기에. */
+    var wsHost = $('wind-sources-host');
+    if (wsHost) {
+      while (wsHost.firstChild) wsHost.removeChild(wsHost.firstChild);
+      renderWindSources(wsHost, a);
+    } else {
+      renderWindSources(host, a);
+    }
   }
 
   /* §463 — 파일을 열기만 해도 라이딩 부하를 원장에 남긴다.
@@ -2748,13 +2762,42 @@
      고르고 지표 하나를 채우면 그게 한 화면에 놓인다. */
   var binState = { rowDim: 'zone', colDim: 'tack', metric: 'vmg',
                    formula: 'speed / hr * 100' };
+  /* §573 (옥대표 "반드시 필요한건지. 숨기는게 맞는건지") — 이건 파워
+     사용자용 피벗 도구다. 늘 펼쳐 두면 화면의 대부분을 차지하는데,
+     정작 답하는 질문("포트가 스타보드보다 빠른가")은 위쪽 Tack bias 가
+     이미 더 읽기 쉽게 답한다. 그래서 **접어 두고** 필요할 때 연다.
+     지우지는 않는다 — 임의의 축 조합을 볼 수 있는 건 이것뿐이다. */
+  var BINTABLE_OPEN = false;
   function renderBinTable(host, a) {
     if (!window.RDBinTable || !CUR.session) return;
     var card = el('div', 'card mt-3');
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title', 'Bin table'));
+    var binToggle = el('button', 'btn btn-sm btn-ghost-secondary ms-auto',
+      BINTABLE_OPEN ? 'Hide' : 'Open');
+    binToggle.type = 'button';
+    head.appendChild(binToggle);
     card.appendChild(head);
     var body = el('div', 'card-body');
+    if (!BINTABLE_OPEN) {
+      var hint = el('div', 'text-secondary');
+      hint.style.fontSize = '.8125rem';
+      hint.textContent = 'Cross-tabulate any two of tack, wind angle, speed zone or '
+        + 'heart-rate zone against a metric. Folded away because the everyday question '
+        + '— port against starboard — is answered more legibly by Tack bias above; '
+        + 'open this when you want an axis pair that has no card of its own.';
+      body.appendChild(hint);
+      card.appendChild(body);
+      binToggle.addEventListener('click', function () {
+        /* ⚠ 시그니처는 (a, est) 다. env-body 는 이 함수가 스스로 비운다. */
+        BINTABLE_OPEN = true; renderEnvironment(a, CUR.est);
+      });
+      host.appendChild(card);
+      return;
+    }
+    binToggle.addEventListener('click', function () {
+      BINTABLE_OPEN = false; renderEnvironment(a, CUR.est);
+    });
 
     var maxHr = riderMaxHr();
     var ctlOpts = { windDir: a.windDir, maxHr: maxHr, minSpeedKt: 8 };
@@ -2895,7 +2938,38 @@
     var lo = vals.length ? Math.min.apply(null, vals) : 0;
     var hi = vals.length ? Math.max.apply(null, vals) : 1;
 
+    /* §572 (옥대표 "이 두가지는 눈으로 보기가 대게 힘들다… 읽는데 시간이
+       너무걸려") — 맞다. 이건 **폴라 다이어그램인데 24열 스프레드시트로
+       인쇄**하고 있었다. 각도별 속도는 극좌표로 그리면 한눈에 읽힌다:
+       어느 각도가 빠른지, 바람이 세지면 곡선이 어느 쪽으로 부푸는지.
+       숫자가 필요한 사람을 위해 표는 접어서 남긴다 — 지우지 않는다. */
+    var BUCKET_COLORS = ['#3B7DD8', '#37955F', '#C4841B', '#B3453A', '#2AA5A0'];
+    body.appendChild(polarSvg(live, cols, grid, BUCKET_COLORS));
+
+    var legend = el('div', 'd-flex flex-wrap gap-3 mt-2 mb-1');
+    live.forEach(function (b, bi) {
+      var sp = el('span', 'lab d-inline-flex align-items-center gap-1');
+      sp.style.fontSize = '.8125rem';
+      var dot = el('span');
+      dot.style.cssText = 'width:10px;height:3px;border-radius:2px;display:inline-block;'
+        + 'background:' + BUCKET_COLORS[bi % BUCKET_COLORS.length];
+      sp.appendChild(dot);
+      sp.appendChild(document.createTextNode(b.label + '  ('
+        + b.sessionCount + ' session' + (b.sessionCount > 1 ? 's' : '') + ')'));
+      legend.appendChild(sp);
+    });
+    body.appendChild(legend);
+
     var wrap = el('div', 'table-responsive');
+    wrap.style.display = 'none';                 /* 기본은 접어 둔다 */
+    var toggle = el('button', 'btn btn-sm btn-ghost-secondary mb-1', 'Show the numbers');
+    toggle.type = 'button';
+    toggle.addEventListener('click', function () {
+      var open = wrap.style.display !== 'none';
+      wrap.style.display = open ? 'none' : '';
+      toggle.textContent = open ? 'Show the numbers' : 'Hide the numbers';
+    });
+    body.appendChild(toggle);
     var tbl = el('table', 'table table-sm table-vcenter mb-1');
     var thead = el('thead'), hr = el('tr');
     hr.appendChild(el('th', null, t.rowDim.label));
@@ -2953,6 +3027,87 @@
      아니라 평균이다. 8노트의 각도와 20노트의 각도는 다른 배의 것처럼
      다르다. 순간 풍속은 못 재므로 세션에 적어 둔 풍속으로 세션째 묶는다
      — 한 세션 안의 돌풍·소강은 이 격자가 구분하지 못하고, 그건 밝힌다. */
+  /* §572 — 반원 폴라. 위쪽이 풍상(0°), 아래쪽이 풍하(180°).
+     반지름 = 속도(kt). 바람대마다 한 곡선.
+     ⚠ 표본이 얇아 비어 있는 각도는 **선을 잇지 않는다** — 이으면 없는
+        데이터를 있는 것처럼 그리게 된다. */
+  function polarSvg(buckets, cols, grid, colors) {
+    /* 기하: 0°(풍상)가 위, 180°(풍하)가 아래, 90°가 오른쪽인 **오른쪽 반원**.
+       세로로 2R 을 차지하므로 중심은 가운데 높이에 있어야 한다 — 처음에
+       중심을 위쪽에 두었다가 0° 점이 화면 밖(y=-270)으로 나갔다. */
+    var R = 250, cx = 112, cy = R + 46, W = cx + R + 112, H = 2 * R + 92;
+    var maxKt = 0;
+    buckets.forEach(function (b) {
+      b.cells.forEach(function (c) {
+        if (c.speedMs != null) maxKt = Math.max(maxKt, c.speedMs * KT);
+      });
+    });
+    if (!(maxKt > 0)) return el('div');
+    var top = Math.ceil(maxKt / 5) * 5;
+    /* 0° 를 위로. x = sin, y = -cos 이므로 0°는 위, 180°는 아래로 간다. */
+    function P(deg, kt) {
+      var t = deg * Math.PI / 180, r = (kt / top) * R;
+      return [cx + Math.sin(t) * r, cy - Math.cos(t) * r];
+    }
+    var parts = [];
+    /* 눈금 원 */
+    for (var v = 5; v <= top; v += 5) {
+      var rr = (v / top) * R;
+      var d = 'M' + cx + ' ' + (cy - rr) + ' A' + rr + ' ' + rr + ' 0 0 1 '
+        + cx + ' ' + (cy + rr);          /* 위→오른쪽→아래 반호 */
+      parts.push('<path d="' + d + '" fill="none" stroke="var(--tblr-border-color)" '
+        + 'stroke-width="0.7"/>');
+      parts.push('<text x="' + (cx + 4) + '" y="' + (cy - rr + 11)
+        + '" class="pol-tick">' + v + '</text>');
+    }
+    /* 스포크 */
+    [0, 30, 60, 90, 120, 150, 180].forEach(function (a) {
+      var e = P(a, top);
+      parts.push('<line x1="' + cx + '" y1="' + cy + '" x2="' + e[0].toFixed(1)
+        + '" y2="' + e[1].toFixed(1) + '" stroke="var(--tblr-border-color)" '
+        + 'stroke-width="0.6" stroke-dasharray="3 4"/>');
+      var lx = cx + Math.sin(a * Math.PI / 180) * (R + 22);
+      var ly = cy - Math.cos(a * Math.PI / 180) * (R + 22);
+      parts.push('<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1)
+        + '" text-anchor="middle" class="pol-tick">' + a + '\u00b0</text>');
+    });
+    /* 곡선 — 빈 각도에서 끊는다 */
+    buckets.forEach(function (b, bi) {
+      var col = colors[bi % colors.length];
+      var run = [], segs = [];
+      cols.forEach(function (i) {
+        var c = b.cells[i];
+        if (c && c.speedMs != null) {
+          run.push(P(c.twaCenter, c.speedMs * KT));
+        } else if (run.length) { segs.push(run); run = []; }
+      });
+      if (run.length) segs.push(run);
+      segs.forEach(function (seg) {
+        if (seg.length === 1) {
+          parts.push('<circle cx="' + seg[0][0].toFixed(1) + '" cy="' + seg[0][1].toFixed(1)
+            + '" r="3" fill="' + col + '"/>');
+          return;
+        }
+        var d = 'M' + seg.map(function (q) {
+          return q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' L');
+        parts.push('<path d="' + d + '" fill="none" stroke="' + col
+          + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>');
+        seg.forEach(function (q) {
+          parts.push('<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1)
+            + '" r="2.2" fill="' + col + '"/>');
+        });
+      });
+    });
+    var box = el('div');
+    box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + (H + 10) + '" '
+      + 'style="width:100%;height:auto;display:block;max-width:520px;margin:0 auto" '
+      + 'role="img" aria-label="Polar by wind strength">'
+      + '<text x="' + (cx + 8) + '" y="16" class="pol-tick">'
+      + 'rings are knots \u00b7 0\u00b0 is straight upwind</text>'
+      + parts.join('') + '</svg>';
+    return box;
+  }
+
   function renderPolarGrid(host, a) {
     if (!An.buildPolarGrid || !window.RDStorage) return;
     var entries = [];
@@ -3258,7 +3413,11 @@
       var tbl = el('table', 'table table-sm table-vcenter mb-1');
       var thead = el('thead');
       var hr = el('tr');
-      ['Percentile', 'VMG', 'Speed', 'CWA'].forEach(function (h, i) {
+      /* §575 (옥대표 "p7 90 95에서 p는 뭐를 의미해?") — 물어봤다는 건 라벨이
+         실패했다는 뜻이다. 게다가 같은 표의 마지막 줄은 이미 'best 30%' 로
+         쓰고 있어 한 표 안에 두 어법이 섞여 있었다.
+         p90 = 90번째 백분위 = 창의 90%가 그보다 낮다 = **내 상위 10%**. */
+      ['Your best', 'VMG', 'Speed', 'CWA'].forEach(function (h, i) {
         var th = el('th', i ? 'text-end' : null, h);
         hr.appendChild(th);
       });
@@ -3267,7 +3426,11 @@
       [75, 90, 95].forEach(function (p) {
         var L = b.levels[p];
         var tr = el('tr');
-        tr.appendChild(el('td', null, 'p' + p));
+        var topPct = 100 - p;      /* p90 → 상위 10% */
+        var lab = el('td', null, 'Top ' + topPct + '%');
+        lab.title = p + 'th percentile of your ' + band.windowSec
+          + '-second windows across saved sessions';
+        tr.appendChild(lab);
         if (!L) {
           var td = el('td', 'text-end text-secondary', 'not enough history');
           td.colSpan = 3; tr.appendChild(td);
@@ -3282,7 +3445,7 @@
       if (c) {
         var tr2 = el('tr');
         tr2.style.borderTop = '2px solid rgba(139,152,165,0.3)';
-        tr2.appendChild(el('td', null, 'today (best 30%)'));
+        tr2.appendChild(el('td', null, 'Today, best 30%'));
         tr2.appendChild(el('td', 'text-end num', c.todayVmgKt.toFixed(1) + ' kt'));
         tr2.appendChild(el('td', 'text-end num', c.todaySpeedKt.toFixed(1) + ' kt'));
         tr2.appendChild(el('td', 'text-end num', Math.round(c.todayTwaDeg) + '°'));
@@ -3292,7 +3455,7 @@
       sec.appendChild(tbl);
       if (c && c.pct != null) {
         sec.appendChild(el('div', 'lab',
-          'Today is ' + Math.round(c.pct) + '% of your p90 VMG target.'));
+          'Today is ' + Math.round(c.pct) + '% of your top-10% VMG target.'));
       }
       body.appendChild(sec);
     });
@@ -3463,6 +3626,20 @@
     try { renderTackBias(tbHost, a); } catch (e) {}
 
     renderTackDistribution(host, a);
+
+    /* §576 — 오늘 대 내 과거. 환경 탭에 있던 것을 여기로 옮겼다. */
+    try { renderTargetComparison(host, a); } catch (e) {
+      if (window.console) console.error('[v2 §576] target band', e);
+    }
+    /* §577 — 폴라(바람대별)와 상관 산점도도 퍼포먼스다.
+       "어느 각도가 빠른가"·"각도와 속도가 어떻게 얽히나" 는 성적에 대한
+       질문이지 그날 바람에 대한 질문이 아니다. */
+    try { renderPolarGrid(host, a); } catch (e) {
+      if (window.console) console.error('[v2 §577] polar grid', e);
+    }
+    try { renderCorrelation(host, a); } catch (e) {
+      if (window.console) console.error('[v2 §577] correlation', e);
+    }
 
     /* §450 Speed splits — mean-max 곡선이 모양을 보여주고, 이 표가 그
        곡선의 앵커 값을 숫자로 준다. Waterspeed 의 'Best Speed Splits'
