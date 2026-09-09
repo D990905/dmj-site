@@ -3413,6 +3413,31 @@
   }
 
   /* ---------- 고속 구간 (Run) · 퍼포먼스 통계 ---------- */
+  /* §568 (옥대표 "그냥 숫자만 있는건 큰 의미가 없어보여 … 트랙을 지도에서
+     선택해서 볼 수 있다면") — 맞다. Track 탭의 구간 스테퍼에는 이미
+     'Runs' 모드가 있고(SEG_KINDS), buildSegs('run') 이 읽는 것이 이 표와
+     **같은 배열**(a.runs.runs)이다. 지도 강조까지 이미 된다.
+
+     그런데 옮기지는 않는다 — 둘은 다른 일을 한다:
+       · 표는 **순위**다 (빠른 순 정렬이라 오늘 제일 좋았던 구간이 위)
+       · 스테퍼는 **위치**다 (시간순이라 순위를 알 수 없다)
+     표를 없애면 순위가 사라지고, 표만 두면 위치를 모른다. 그래서 잇는다.
+     같은 배열이므로 표의 i 번째 = 스테퍼의 i 번째다. */
+  function goToSegment(kind, idx) {
+    SEGSTEP.kind = kind;
+    SEGSTEP.idx = idx;
+    var link = document.querySelector('.nav-tabs .nav-link[href="#tab-track"]');
+    if (link) link.click();          /* initTabs 의 핸들러가 지도 크기까지 맞춘다 */
+    /* 탭이 보이게 된 뒤에 그려야 지도 좌표가 맞는다 */
+    setTimeout(function () {
+      try { renderSegmentStepper(CUR.analysis); } catch (e) {
+        if (window.console) console.error('[v2 §568] segment jump', e);
+      }
+      var host = $('segment-stepper') || $('tab-track');
+      if (host && host.scrollIntoView) host.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, 120);
+  }
+
   function renderPerfExtra(a) {
     var host = $('perf-extra');
     if (!host) return;
@@ -3497,6 +3522,22 @@
     h.appendChild(el('div', 'card-actions lab',
       runs.length + ' runs · threshold ' + (rw.thresholdMs ? (rw.thresholdMs * KT).toFixed(1) : '—') + ' kt'));
     card.appendChild(h);
+    /* §568 — 숫자만으로는 "그게 어디였나" 에 답할 수 없다. 지도로 가는 길과,
+       이 임계가 어떻게 정해지는지를 적는다. 포일링 임계와 값이 비슷해
+       "같은 걸 두 번 보여주나" 라는 의문이 생기는데, 실제로 정의가 다르다:
+       이쪽은 그날 속도의 90퍼센타일에 매달린 **상대** 기준이라 빠른 날에는
+       올라가고, 포일링 임계는 고정값이다. */
+    var runNote = el('div', 'card-body py-2 text-secondary');
+    runNote.style.fontSize = '.8125rem';
+    var thrKtRun = rw.thresholdMs ? rw.thresholdMs * KT : null;
+    var thrKtFoil = foilThresholdMs() * KT;
+    runNote.textContent = 'Sorted fastest first — click a row to see that stretch on the map. '
+      + 'The threshold moves with the day: it is set from your own 90th-percentile speed, '
+      + (thrKtRun != null ? 'so ' + thrKtRun.toFixed(1) + ' kt today' : 'not a fixed number')
+      + '. That is why it lands near the ' + thrKtFoil.toFixed(0) + ' kt foiling line on an '
+      + 'ordinary day and pulls away on a fast one \u2014 the foiling stretches above are cut '
+      + 'at a fixed speed, these are cut relative to you.';
+    card.appendChild(runNote);
     if (!runs.length) {
       var b0 = el('div', 'card-body text-secondary', 'No sustained runs above the threshold.');
       card.appendChild(b0);
@@ -3516,6 +3557,10 @@
       var rows = [];
       runs.forEach(function (r, i) {
         var tr = el('tr');
+        /* §568 — 누르면 Track 에서 그 구간이 지도에 잡힌다 */
+        tr.style.cursor = 'pointer';
+        tr.title = 'Show this run on the map';
+        tr.addEventListener('click', function () { goToSegment('run', i); });
         tr.appendChild(el('td', 'num', String(i + 1)));
         tr.appendChild(el('td', 'text-end num', fmtClock(r.durationSec)));
         tr.appendChild(el('td', 'text-end num', (r.distanceM / 1000).toFixed(2) + ' km'));
