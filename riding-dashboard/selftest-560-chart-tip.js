@@ -48,6 +48,14 @@ ok('★ 풍속·거리·점수를 같이 준다', /rows\.push\(\['Wind'/.test(co
 ok('★ 고른 지표가 점수면 점수를 두 번 적지 않는다', /md\.key !== 'sps'/.test(code));
 ok('장비가 없으면 없다고 적는다', /'No gear recorded'/.test(code));
 ok('★ plots 는 {u,host} 라 .u 를 꺼낸다', /plots\[plots\.length - 1\]\.u/.test(code));
+/* §560b — track(u, host) 는 인자 두 개일 때만 plots 에 넣는다. 히스토그램은
+   host 를 안 넘겨서 plots 에 안 들어갔고, plots 의 마지막을 집었다가 다른
+   차트에 붙었다(라이브에서 마우스를 올려도 아무것도 안 떴다). */
+ok('★★ 히스토그램은 인스턴스를 직접 잡는다 (plots 마지막이 아니라)',
+   /var histU = new uPlot\(\{/.test(code));
+ok('★ 그러고도 track 에 제대로 등록한다', /track\(histU, host\);/.test(code));
+ok('★ histU 를 plots 에서 꺼내지 않는다',
+   !/var histU = plots\[/.test(code) && !/var histU = plots\.length/.test(code));
 
 console.log('\n[5] 배선 — 속도 분포는 "비중"을 말한다');
 ok('★ 히스토그램에 붙었다', /RDTip\.attach\(histU/.test(code));

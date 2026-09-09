@@ -273,7 +273,7 @@
     var ys = h.map(function (b) { return (b.seconds || 0) / 60; });
     var binW = h.length > 1 ? (h[0].toKt - h[0].fromKt) : 2;
     while (host.firstChild) host.removeChild(host.firstChild);
-    track(new uPlot({
+    var histU = new uPlot({
       width: host.clientWidth || 420, height: 268, padding: [12, 12, 4, 6],
       cursor: { drag: { x: false, y: false } },
       scales: { x: { time: false, range: [h[0].fromKt - binW * 0.6,
@@ -292,8 +292,13 @@
           paths: uPlot.paths.bars({ size: [0.86, Infinity] }),
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' min'; } }
       ]
-    }, [xs, ys], host));
-    var histU = plots.length ? plots[plots.length - 1].u : null;
+    }, [xs, ys], host);
+    /* §560b — track(u, host) 는 **인자 두 개일 때만** plots 에 넣는다.
+       이 호출은 host 를 안 넘겨 plots 에 안 들어가는데, 그걸 모르고 plots 의
+       마지막을 집었다가 **다른 차트**에 오버레이가 붙었다(라이브에서 발각:
+       히스토그램 위에 마우스를 올려도 아무것도 안 떴다).
+       인스턴스를 직접 잡고, 등록도 제대로 한다. */
+    track(histU, host);
 
     /* §560 — 막대 하나는 속도 구간. 분(分)만으로는 크기를 못 읽으니
        전체에서 차지하는 비중을 같이 준다. */
