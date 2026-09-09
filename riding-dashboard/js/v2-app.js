@@ -3477,7 +3477,16 @@
         stb.appendChild(tr);
       });
       st.appendChild(stb); sw.appendChild(st); sc.appendChild(sw);
-      host.appendChild(sc);
+      /* §563 (옥대표) — 이 표는 왼쪽 mean-max 곡선과 **같은 데이터**다.
+         멀리 떨어져 있으면 같은 것인 줄 알 수 없으므로 곡선 옆자리에 둔다.
+         전용 호스트가 없으면(옛 레이아웃) 예전처럼 여기에 붙인다. */
+      var splitsHost = $('splits-host');
+      if (splitsHost) {
+        while (splitsHost.firstChild) splitsHost.removeChild(splitsHost.firstChild);
+        splitsHost.appendChild(sc);
+      } else {
+        host.appendChild(sc);
+      }
     }
 
     /* Runs — 어느 구간이 진짜 주행이었는지. 세션 전체 평균이 숨기는 것. */

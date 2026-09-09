@@ -191,34 +191,35 @@
                     <div class="card">
                       <div class="card-header">
                         <h3 class="card-title">Best speed by duration</h3>
-                        <!-- §561 (옥대표) — 예전 머리말은 "knots · log scale" 이라
-                             노트가 로그축인 것처럼 읽혔다. 로그는 **가로축(지속시간)**
-                             에 걸려 있다(chart-meanmax.js: scales.x.distr = 3). -->
+                        <!-- §561 — 로그는 노트가 아니라 **가로축(지속시간)** 에 걸려 있다
+                             (chart-meanmax.js: scales.x.distr = 3). -->
                         <div class="card-actions lab">knots · duration on a log scale</div>
                       </div>
                       <div class="card-body"><div id="chart-meanmax" class="chart-host"></div></div>
-                      <!-- §561 — 예전 설명은 "거리 기록을 시간으로 환산" 만 말했는데,
-                           곡선에는 2초·10초 **시간 피크**도 함께 올라간다
-                           (chart-meanmax.js toDurationSeries: peaks + distanceBests).
-                           설명이 그리는 것과 달랐다. -->
+                      <!-- §561 — 곡선에는 거리 기록만이 아니라 2초·10초 시간 피크도
+                           함께 올라간다(toDurationSeries = peaks + distanceBests). -->
                       <div class="card-footer text-secondary" style="font-size:.8125rem">
                         Your best average speed for each length of effort. The 2 s and 10 s points
                         come from time windows; the rest are your best 100 m, 250 m, 500 m and 1 NM
-                        converted to how long they took. Duration runs on a log scale so a two-second
-                        burst and a two-minute run fit in one view. Alpha 500 sits off the curve
-                        because it is a gated course, not free riding.
+                        converted to how long they took. Duration runs on a log scale so a
+                        two-second burst and a two-minute run fit in one view. Alpha 500 sits off
+                        the curve because it is a gated course, not free riding.
                       </div>
                     </div>
                   </div>
-                  <div class="col-lg-5">
+                  <!-- §563 (옥대표 "이 두가지가 혹시 같은 내용이면 … 좌우가 더 좋겟지?") —
+                       맞다. 이 표와 왼쪽 곡선은 **같은 데이터**다: 둘 다
+                       peaks + distanceBests + alpha 에서 나온다. 곡선은 모양을,
+                       표는 정확한 값을 준다. 코드 주석(§450)에도 그렇게 적혀 있었는데
+                       배치만 멀리 떨어져 있어 같은 것인 줄 알 수 없었다. -->
+                  <div class="col-lg-5"><div id="splits-host"></div></div>
+                  <div class="col-12">
                     <div class="card">
                       <div class="card-header">
                         <h3 class="card-title">Time at speed</h3>
                         <div class="card-actions lab">minutes</div>
                       </div>
                       <div class="card-body"><div id="chart-hist" class="chart-host"></div></div>
-                      <!-- §561 — 옥대표: "설명을 할거면 두 그래프들 다 하고 안할거면
-                           둘다 하지말고". 왼쪽만 설명이 있었다. -->
                       <div class="card-footer text-secondary" style="font-size:.8125rem">
                         Where your riding time actually went. The left-hand bars are time on the
                         water below foiling speed — starts, stops, drifting and touchdowns — so a
@@ -362,6 +363,6 @@
 <script src="js/trend-analysis.js?v=v558"></script>
 <script src="js/gear-usage.js?v=v559"></script>
 <script src="js/chart-tip.js?v=v560"></script>
-<script src="js/v2-app.js?v=v562b"></script>
+<script src="js/v2-app.js?v=v563"></script>
 </body>
 </html>
