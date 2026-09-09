@@ -5136,6 +5136,41 @@
     { id: 'hr',   label: 'HR' }
   ];
 
+  /* §580 (옥대표 "풍상은 각이 낮을수록 좋은거고 풍하는 각이 클수록 좋은거잖아.
+     풍상은 숫자가 작은쪽으로 우세하다고 표현해야함") — 맞다. Diff 는
+     '스타보드 − 포트' 라는 **산수**일 뿐이라 어느 쪽이 나은지 모른다.
+     각도 지표는 방향이 반대다:
+       · 속도·VMG   → 클수록 좋다 (양쪽 모두)
+       · CWA·AWA 풍상 → **작을수록** 좋다 (바람에 더 붙는다)
+       · CWA·AWA 풍하 → 클수록 깊다
+       · 힐·심박    → 좋고 나쁨을 여기서 판정하지 않는다
+     ⚠ 풍하는 "클수록 무조건 좋다" 가 아니다 — 폴라 최적점을 지나 더 깊이
+        가면 속도가 무너져 VMG 가 준다. 그래서 'better' 대신 'deeper' 라고
+        적는다. 사실을 넘어서 단정하지 않는다. */
+  function tbBetterSide(metricId, mode, pVal, sVal) {
+    if (pVal == null || sVal == null || !isFinite(pVal) || !isFinite(sVal)) return null;
+    var higherWins;
+    if (metricId === 'sog' || metricId === 'vmg') higherWins = true;
+    else if (metricId === 'twa' || metricId === 'awa') higherWins = (mode !== 'upwind');
+    else return null;                       /* heel·hr 은 판정하지 않는다 */
+
+    var diff = sVal - pVal;
+    if (diff === 0) return { side: null, phrase: 'level' };
+    var sIsAhead = higherWins ? (diff > 0) : (diff < 0);
+    var mag = Math.abs(diff);
+    var verb;
+    if (metricId === 'sog') verb = 'is faster';
+    else if (metricId === 'vmg') verb = 'makes more VMG';
+    else verb = (mode === 'upwind') ? 'points closer' : 'sails deeper';
+    return {
+      side: sIsAhead ? 'S' : 'P',
+      name: sIsAhead ? 'starboard' : 'port',
+      verb: verb,
+      mag: mag,
+      higherWins: higherWins
+    };
+  }
+
   /* rows 값은 기본 단위(속도 m/s)이고 unit 은 내부 키다 — §501 과 같은 규칙 */
   function tbFmt(r, tier) {
     if (!r) return null;
@@ -5372,6 +5407,21 @@
     mid.appendChild(dv);
     mid.appendChild(el('div', 'lab', d != null ? 'starboard vs port'
       : 'starboard vs port \u00b7 too small a base for %'));
+    /* §580 — 어느 쪽이 앞선 것인지 **말로** 적는다. 부호만으로는 각도 지표에서
+       거꾸로 읽힌다: 풍상 CWA 36.2° 대 36.9° 는 '+1.8% starboard' 지만
+       실제로 앞선 쪽은 각이 작은 **포트**다(옥대표 실측). */
+    var better = tbBetterSide(TACKBIAS.metric, TACKBIAS.mode, pf.v, sf.v);
+    if (better) {
+      var bl = el('div', 'lab mt-1');
+      bl.style.cssText = 'font-weight:600';
+      if (!better.side) {
+        bl.textContent = 'level';
+      } else {
+        bl.textContent = better.name + ' ' + better.verb;
+        bl.style.color = sideColor(better.side) || '';
+      }
+      mid.appendChild(bl);
+    }
     row.appendChild(mid);
     row.appendChild(side('S', 'Starboard', sf.txt, sf.unit));
     body.appendChild(row);
@@ -5381,7 +5431,12 @@
       var barWrap = el('div', 'mt-3');
       barWrap.style.cssText = 'position:relative;height:10px;border-radius:5px;'
         + 'background:' + THEME.grid;
-      var half = Math.max(-100, Math.min(100, d)) / 100;   /* −1..1 */
+      /* §580 — 막대는 '큰 쪽' 이 아니라 **앞선 쪽**으로 기울인다. 풍상 각도는
+         작을수록 앞선 것이라 부호를 뒤집어야 한다. 판정하지 않는 지표
+         (힐·심박)는 예전대로 큰 쪽으로 기운다. */
+      var signed = d;
+      if (better && better.higherWins === false) signed = -d;
+      var half = Math.max(-100, Math.min(100, signed)) / 100;   /* −1..1 */
       var seg = el('div');
       var w = Math.min(50, Math.abs(half) * 50 * 4);       /* ±25% 를 꽉 차게 */
       seg.style.cssText = 'position:absolute;top:0;bottom:0;background:' + THEME.accent
@@ -5393,6 +5448,17 @@
         + 'background:' + THEME.axisText;
       barWrap.appendChild(mark);
       body.appendChild(barWrap);
+      /* §580 — 막대만 두면 어느 쪽으로 기운 건지 읽는 사람이 추측해야 한다 */
+      var ends = el('div', 'd-flex justify-content-between lab mt-1');
+      ends.style.fontSize = '.6875rem';
+      var leftTxt = 'port', rightTxt = 'starboard';
+      if (better) {
+        leftTxt = 'port ' + (better.higherWins ? 'higher' : 'lower') + ' \u2192 ahead';
+        rightTxt = 'ahead \u2190 starboard ' + (better.higherWins ? 'higher' : 'lower');
+      }
+      ends.appendChild(el('span', null, leftTxt));
+      ends.appendChild(el('span', null, rightTxt));
+      body.appendChild(ends);
     }
 
     /* ① 원인 자동 분리 — 속도인가 각도인가 */
@@ -5489,8 +5555,12 @@
       if (!cwa || cwa.deg == null) return '';
       return ' You sail ' + Math.abs(cwa.deg).toFixed(1) + '\u00b0 wider on '
            + (cwa.deg > 0 ? 'starboard' : 'port')
-           + (mode === 'upwind' ? ', and that is where the VMG goes.'
-                                : ', which costs downwind VMG the same way.');
+           + (mode === 'upwind'
+                ? ' \u2014 upwind that is the wrong way, and that is where the VMG goes.'
+                /* §580 — 풍하는 깊을수록 무조건 좋은 게 아니다. 폴라 최적점을
+                   지나면 속도가 무너져 VMG 가 준다. 단정하지 않는다. */
+                : ' \u2014 downwind that is deeper, which helps until the extra angle '
+                  + 'costs more speed than it gains.');
     }
 
     /* ★ 부호가 반대 — 가장 확실한 각도 신호 */

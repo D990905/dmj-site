@@ -34,7 +34,12 @@
     satellite: {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/'
          + 'World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      opts: { maxZoom: 19, attribution: 'Imagery \u00a9 Esri, Maxar, Earthstar Geographics' } }
+      /* §581 — maxNativeZoom 없이 z19 를 요청하면 Esri 가 회색 안내판을 준다.
+         실측: 새만금 앞바다는 z18 까지만 영상이 있고 z19 는 안내판이다
+         (부산 송정은 z19 까지 있다 — 커버리지가 장소마다 다르다).
+         z18 타일을 확대해 쓰면 흐릴 뿐 지도는 남는다. */
+      opts: { maxZoom: 19, maxNativeZoom: 18,
+              attribution: 'Imagery \u00a9 Esri, Maxar, Earthstar Geographics' } }
   };
   function tileKey() {
     try {

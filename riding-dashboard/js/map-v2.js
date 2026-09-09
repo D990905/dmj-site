@@ -45,7 +45,15 @@
       global.L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/'
         + 'World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        { maxZoom: 19,
+        { maxZoom: 19, maxNativeZoom: 18,
+          /* §581 (옥대표 "Map data not yet available") — maxNativeZoom 이 없어서
+                     Esri 에 없는 줌까지 타일을 요청했고, Esri 는 회색 안내판을 돌려준다.
+                     커버리지는 **장소마다 다르다** — 실측:
+                       새만금 앞바다  z15~18 영상 있음 · z19 안내판(회색 100%)
+                       부산 송정      z16~19 전부 영상 있음
+                     maxNativeZoom 18 을 두면 z19 에서는 z18 타일을 2배 확대해 쓴다.
+                     약간 흐려지지만 회색 격자보다 낫다 — 지도가 아예 사라지는 것보다
+                     흐린 지도가 낫다. */
           attribution: 'Imagery \u00a9 Esri, Maxar, Earthstar Geographics' }
       ).addTo(map);
     } else {
