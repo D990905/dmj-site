@@ -8478,6 +8478,25 @@
      기록으로 둔갑한다.** 5/19·6/9·6/11 에 5.0/4.0 이 붙은 게 그것이다.
      모르는 건 모르는 채로 두는 게 맞다 — §520 이 'add gear' 로 나중에
      채우는 길을 이미 만들어 뒀다. */
+  /* §585 — 핸드윙 선택기와 Wing(m²) 입력칸을 하나로 맞춘다.
+     선택기가 **이름 있는 윙**을 들고 있으면 그 면적이 진실이다 — 입력칸의
+     숫자는 목록에 없는 윙을 직접 적었을 때만 이긴다. 저장 직전에 맞추지
+     않으면 rider.wingM2 와 gear.wingM2 가 어긋난 채로 굳고, 다시 열 때
+     입력칸(rider)과 선택기(gear)가 서로 다른 윙을 가리킨다. */
+  function riderFromFormSynced() {
+    var r0 = riderFromForm();
+    try {
+      var snap = gearSnapshot();
+      if (snap && snap.handWing && snap.wingM2 > 0
+          && Math.abs((r0.wingM2 || 0) - snap.wingM2) > 0.01) {
+        r0.wingM2 = snap.wingM2;
+        var wi = $('in-wing');
+        if (wi) wi.value = snap.wingM2;
+      }
+    } catch (e) {}
+    return r0;
+  }
+
   function gearForSave() {
     /* §554c — "새로 올린 파일"만으로는 부족하다. 옛 트랙 파일을 다시 올리는
        경우가 있고(복구), 그때 오늘 장비를 붙이면 같은 문제가 그대로 재현된다.
@@ -8577,7 +8596,7 @@
       flash('Not saved yet', false);
       return;
     }
-    var r0 = riderFromForm();
+    var r0 = riderFromFormSynced();      /* §585 — 선택기와 입력칸을 맞춘 뒤 */
     var okGear = true, okIn = true;
     try {
       var snap = gearSnapshot();
@@ -8658,6 +8677,27 @@
           CUR.gearDirty = true;
         } else {
           var p = {}; p[key] = s.value; saveGear(p);
+        }
+        /* §585 (옥대표 "윙사이즈를 6.5로 선택후 저장했는데 자꾸 6.0으로 나오네
+           다시들어가면") — 핸드윙 선택기와 Wing(m²) 입력칸이 **서로 다른 값**을
+           들고 있었다. 저장하면 rider.wingM2 는 입력칸에서, gear.wingM2 는
+           선택기에서 나오므로 한 레코드 안에서 어긋난다. 다시 열 때 입력칸은
+           rider 를, 선택기는 gear 를 읽으니 둘이 다른 윙을 가리킨다.
+           실측: 변산해수욕장#1 = rider 6.5 / gear 6.0, 9/03 = gear 5 / form 4.5.
+           → 핸드윙을 바꾸면 입력칸도 같이 바꾼다. 두 값이 어긋날 수 없게 한다. */
+        if (key === 'handWing' && window.RDGear) {
+          var hw = RDGear.byId(RDGear.HAND_WINGS, s.value);
+          var wi = $('in-wing');
+          if (hw && hw.areaM2 > 0 && wi) {
+            wi.value = hw.areaM2;
+            if (CUR.restoredInputs) {
+              CUR.restoredInputs.wing = false;
+              if (CUR.restoredInputs.src) CUR.restoredInputs.src.wing = 'gear';
+            }
+            try { renderInputSources(); } catch (e) {}
+            /* 윙이 바뀌면 성능 점수의 기준이 바뀐다 — 다시 계산한다 */
+            try { applyWind(null, 'keep'); return; } catch (e) {}
+          }
         }
         renderCoach(CUR.analysis, CUR.vps, CUR.whatIf);
       });
@@ -10317,7 +10357,9 @@
              세션에 그대로 쓰였고, 점수는 그 값으로 계산된다. 5/25 고래불
              (파일명이 12kt)이 25kt 로 채점되고 있었다. */
           rider: (function () {
-            var r0 = riderFromForm();
+            /* §585 — 여기도 맞춘 값을 쓴다. 안 그러면 헤더 저장에서만
+               rider 와 gear 가 어긋난다. */
+            var r0 = riderFromFormSynced();
             return { weightKg: r0.weightKg, wingM2: r0.wingM2, skill: r0.skill };
           })(),
           vps: CUR.vps && CUR.vps.ok !== false ? {
