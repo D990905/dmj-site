@@ -27,7 +27,18 @@
     { key: 'twa', label: 'CWA', unit: '°', color: '#d97706', height: 128,
       get: function (p) { return p.twa == null ? null : p.twa; } },
     { key: 'hr', label: 'Heart rate', unit: 'bpm', color: '#e03131', height: 128,
-      get: function (p) { return p.hr == null || p.hr <= 0 ? null : p.hr; } }
+      get: function (p) { return p.hr == null || p.hr <= 0 ? null : p.hr; } },
+    /* §569 (옥대표 "해당 그래프에 데이터가 있을경우 힐 피치 심박수를 모두
+       선택해서 노출가능하게") — 자세는 .vkx 가 쿼터니언으로 자체 제공하고
+       (§546), IMU 융합(§430)도 채운다. 값이 있는데 타임라인에서는 볼 수
+       없었다. 기본은 꺼 두고 고를 수 있게 한다 — 여섯 판이 한꺼번에 쌓이면
+       화면이 차트 벽이 된다. */
+    { key: 'heel', label: 'Heel', unit: '°', color: '#9775fa', zero: true, height: 128,
+      defaultOff: true,
+      get: function (p) { return p.heel == null ? null : p.heel; } },
+    { key: 'pitch', label: 'Pitch', unit: '°', color: '#f783ac', zero: true, height: 128,
+      defaultOff: true,
+      get: function (p) { return p.pitch == null ? null : p.pitch; } }
   ];
 
   /* 기록 공백·제외 구간에서 선을 끊는다. 이걸 안 하면 지워버린 10분이
@@ -51,14 +62,22 @@
     var legEnd = {};
     (session.legs || []).forEach(function (lg) { legEnd[lg.end] = true; });
 
-    var panels = PANELS.filter(function (p) {
+    /* §569 — 값이 있는 판(available)과 지금 그릴 판(panels)을 나눈다.
+       칩은 available 을 보여주고, 그림은 선택된 것만 그린다. */
+    var available = PANELS.filter(function (p) {
       for (var i = 0; i < S.length; i += step) {
         var v = p.get(S[i]);
         if (v != null && isFinite(v)) return true;
       }
       return false;
     });
-    if (!panels.length) return null;
+    if (!available.length) return null;
+    var pick = opts.channels || null;      /* null = 기본값 사용 */
+    var panels = available.filter(function (p) {
+      if (pick) return pick.indexOf(p.key) >= 0;
+      return !p.defaultOff;
+    });
+    if (!panels.length) panels = available.slice(0, 1);   /* 전부 끄면 하나는 남긴다 */
 
     /* segs[k] = { realFrom, realTo, compFrom } — 압축 좌표와 실제 경과초를
        서로 되돌리기 위한 지도. 구간 제외는 실제 시각으로 해야 하므로
@@ -97,7 +116,7 @@
     }
 
     return {
-      panels: panels, x: xs, y: ys, t0: t0, step: step,
+      panels: panels, available: available, x: xs, y: ys, t0: t0, step: step,
       compressed: compress, segments: segs,
       removedSec: compress ? shift : 0,
       wallDurationSec: prevT,
@@ -225,6 +244,42 @@
 
     var plots = [];
     var width = host.clientWidth || opts.width || 900;
+
+    /* §569 (옥대표 "데이터가 있을경우 힐 피치 심박수를 모두 선택해서 노출가능하게")
+       — 값이 있는 채널을 칩으로 보여주고 고르게 한다. 기본은 speed·VMG·CWA·HR
+       (지금까지의 동작 그대로), 힐·피치는 꺼 둔 채로 고를 수 있게 둔다 —
+       여섯 판이 한꺼번에 쌓이면 화면이 차트 벽이 된다.
+       ⚠ 칩은 **값이 있는 채널만** 올린다. 없는 걸 눌러 놓고 빈 판을 보여 주면
+          고장으로 읽힌다. */
+    if (opts.onChannels && series.available && series.available.length > 1) {
+      var pickBar = document.createElement('div');
+      pickBar.className = 'd-flex flex-wrap align-items-center gap-1 mb-2';
+      var lb = document.createElement('span');
+      lb.className = 'lab me-1';
+      lb.style.cssText = 'font-size:.75rem';
+      lb.textContent = 'Channels';
+      pickBar.appendChild(lb);
+      var shown = series.panels.map(function (p) { return p.key; });
+      series.available.forEach(function (p) {
+        var on = shown.indexOf(p.key) >= 0;
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'btn btn-sm';
+        b.style.cssText = 'padding:.1rem .5rem;font-size:.75rem;line-height:1.4;'
+          + 'border:1px solid ' + p.color + ';'
+          + (on ? 'background:' + p.color + ';color:#fff' : 'background:transparent');
+        b.textContent = p.label;
+        b.addEventListener('click', function () {
+          var next = shown.slice();
+          var i = next.indexOf(p.key);
+          if (i >= 0) { if (next.length > 1) next.splice(i, 1); }
+          else next.push(p.key);
+          opts.onChannels(next);
+        });
+        pickBar.appendChild(b);
+      });
+      host.appendChild(pickBar);
+    }
 
     /* §566 (옥대표 "위 그래프 위에 커서가 움직일때 세 그래프의 지점 데이터가
        오버래이로 노출되게") — 판은 이미 커서가 동기화돼 있다(cursor.sync).

@@ -324,6 +324,8 @@
 
   /* ---------- 세션 시계열 ---------- */
   var stackInst = null;
+  /* §569 — 타임라인에 그릴 채널. null 이면 모듈 기본값(speed·VMG·CWA·HR). */
+  var TL_CHANNELS = null;
   function renderTimeline(session, analysis) {
     var host = $('chart-timeline');
     var S = session.samples || [];
@@ -337,6 +339,13 @@
     stackInst = RDChartStack.render(host, session, analysis, {
       theme: THEME,
       readoutHost: $('timeline-readout'),
+      channels: TL_CHANNELS,
+      /* §569 — 칩을 누르면 고른 채널만 다시 그린다. 선택은 세션을 바꿔도
+         유지한다(같은 사람이 같은 관심으로 다음 세션을 본다). */
+      onChannels: function (next) {
+        TL_CHANNELS = next;
+        renderTimeline(CUR.session, CUR.analysis);
+      },
       onExclude: function (a, b) { addExclusion(a, b); }
     });
     /* §486 — 축이 벽시계가 아니라 '물 위에 있던 시간' 이라는 걸 밝힌다.
@@ -4961,12 +4970,16 @@
     var row = el('div', 'row g-2');
     function box(label, val, sub) {
       var c = el('div', 'col-6 col-md-3');
-      var w = el('div', 'p-2 rounded');
+      var w = el('div', 'p-2 rounded h-100');   /* §570 — 타일 높이를 행에 맞춘다 */
       w.style.background = currentThemeName() === 'light'
         ? 'rgba(0,0,0,.03)' : 'rgba(255,255,255,.04)';
       w.appendChild(el('div', 'lab', label));
       w.appendChild(el('div', 'num fw-bold mt-1', val));
-      if (sub) w.appendChild(el('div', 'lab', sub));
+      /* §570 — sub 가 비면 아랫줄을 안 만들어 그 타일만 짧아진다. 자리는
+         지키되 읽히지 않게 둔다(빈 줄을 넣는 게 아니라 높이만 채운다). */
+      var subEl1 = el('div', 'lab', sub || '');
+      if (!sub) subEl1.style.visibility = 'hidden';
+      w.appendChild(subEl1);
       c.appendChild(w); return c;
     }
     row.appendChild(box('Stretches', String(sum.count),
@@ -5934,14 +5947,21 @@
 
     /* 통계 격자 */
     var grid = el('div', 'row g-2 mt-2');
+    /* §570 (옥대표 "평균 풍향 타일만 왜 사이즈가 작을까") — sub 가 비면
+       아랫줄을 아예 안 만들어 그 타일만 한 줄만큼 짧아졌다(심박이 없는
+       세션에서 'Avg wind angle' 이 그랬다).
+       h-100 으로 타일 높이를 행에 맞추고, sub 자리는 비어도 자리를 지킨다 —
+       빈 줄을 넣는 게 아니라 높이만 채우므로 글자가 늘어나지 않는다. */
     function box(label, val, sub) {
       var c = el('div', 'col-6 col-md-3');
-      var w = el('div', 'p-2 rounded');
+      var w = el('div', 'p-2 rounded h-100');
       w.style.background = currentThemeName() === 'light'
         ? 'rgba(0,0,0,.03)' : 'rgba(255,255,255,.04)';
       w.appendChild(el('div', 'lab', label));
       w.appendChild(el('div', 'num fw-bold mt-1', val));
-      if (sub) w.appendChild(el('div', 'lab', sub));
+      var subEl = el('div', 'lab', sub || '');
+      if (!sub) subEl.style.visibility = 'hidden';   /* 자리는 지키되 읽히지 않게 */
+      w.appendChild(subEl);
       c.appendChild(w); return c;
     }
     function kt(v) { return v == null ? '\u2014' : (v * KT).toFixed(1) + ' kt'; }
@@ -5979,14 +5999,16 @@
     var wrap = el('div', 'row g-2 mt-2');
     function cell(label, val, sub, tone) {
       var c = el('div', 'col-6 col-md-3');
-      var w = el('div', 'p-2 rounded');
+      var w = el('div', 'p-2 rounded h-100');   /* §570 — 타일 높이를 행에 맞춘다 */
       w.style.background = currentThemeName() === 'light'
         ? 'rgba(0,0,0,.03)' : 'rgba(255,255,255,.04)';
       w.appendChild(el('div', 'lab', label));
       var v = el('div', 'num fw-bold mt-1', val);
       if (tone) v.style.color = tone;
       w.appendChild(v);
-      if (sub) w.appendChild(el('div', 'lab', sub));
+      var subEl2 = el('div', 'lab', sub || '');
+      if (!sub) subEl2.style.visibility = 'hidden';
+      w.appendChild(subEl2);
       c.appendChild(w); return c;
     }
     function kt(v) { return v == null ? '\u2014' : (v * KT).toFixed(1) + ' kt'; }

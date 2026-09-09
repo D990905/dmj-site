@@ -61,8 +61,10 @@ console.log('\n[5] 배선 — 속도 분포는 "비중"을 말한다');
 ok('★ 히스토그램에 붙었다', /RDTip\.attach\(histU/.test(code));
 ok('★ 시간과 비중을 함께', /\['Share', share\.toFixed\(1\) \+ '%'\]/.test(code));
 ok('★ 포일링 임계 아래인지 밝힌다', /Below the foiling threshold/.test(code));
+/* ⚠ 단어 경계로 봐야 한다. §568 이 thrKtRun·thrKtFoil 을 새로 만들었는데
+   부분문자열로 검사하면 그 둘에 걸려 헛되이 실패한다. */
 ok('★ §541 에서 지운 thrKt 를 다시 쓰지 않는다 (foilKt 로 새로 낸다)',
-   !/thrKt/.test(code) && /var foilKt = foilThresholdMs\(\) \* KT;/.test(code));
+   !/\bthrKt\b/.test(code) && /var foilKt = foilThresholdMs\(\) \* KT;/.test(code));
 
 console.log('\n[6] §561 축 단위와 설명');
 var mm=fs.readFileSync(path.join(__dirname,'js/chart-meanmax.js'),'utf8');
