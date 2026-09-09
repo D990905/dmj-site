@@ -173,21 +173,29 @@
         <div class="card mt-3">
           <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs" role="tablist">
-              <li class="nav-item"><a href="#tab-perf" class="nav-link active" data-bs-toggle="tab" role="tab">Performance</a></li>
+              <!-- §578 (옥대표 "바람 각도 확인하는것도 파일 업로드하면 처음에
+                   바로 떠야하잖아. 그래야 그 이후에 보는 모든 데이터가 다 확인된
+                   바람각도 아래로 들어가지") — 맞다. 풍향이 틀리면 택/자이브
+                   분류·VMG·폴라·타깃이 전부 틀어진다. 확인이 첫 단계다. -->
+              <li class="nav-item"><a href="#tab-env" class="nav-link active" data-bs-toggle="tab" role="tab">Wind</a></li>
+              <li class="nav-item"><a href="#tab-perf" class="nav-link" data-bs-toggle="tab" role="tab">Performance</a></li>
               <li class="nav-item"><a href="#tab-track" class="nav-link" data-bs-toggle="tab" role="tab">Track</a></li>
               <li class="nav-item"><a href="#tab-turns" class="nav-link" data-bs-toggle="tab" role="tab">Turns</a></li>
               <li class="nav-item"><a href="#tab-attitude" class="nav-link" data-bs-toggle="tab" role="tab">Attitude</a></li>
               <li class="nav-item"><a href="#tab-coach" class="nav-link" data-bs-toggle="tab" role="tab">Coach</a></li>
               <li class="nav-item"><a href="#tab-phys" class="nav-link" data-bs-toggle="tab" role="tab">Physiology</a></li>
               <li class="nav-item"><a href="#tab-sessions" class="nav-link" data-bs-toggle="tab" role="tab">Sessions</a></li>
-              <li class="nav-item"><a href="#tab-env" class="nav-link" data-bs-toggle="tab" role="tab">Environment</a></li>
               <li class="nav-item"><a href="#tab-training" class="nav-link" data-bs-toggle="tab" role="tab">Training load</a></li>
             </ul>
           </div>
           <div class="card-body">
             <div class="tab-content">
 
-              <div id="tab-perf" class="tab-pane active show" role="tabpanel">
+              <div id="tab-env" class="tab-pane active show" role="tabpanel">
+                <div id="env-body" class="text-secondary">—</div>
+              </div>
+
+              <div id="tab-perf" class="tab-pane" role="tabpanel">
                 <div class="row row-cards">
                   <div class="col-lg-7">
                     <div class="card h-100">
@@ -231,6 +239,11 @@
                       </div>
                     </div>
                   </div>
+                  <!-- §578 (옥대표 "환경탭에 있는 대부분이 퍼포먼스 관련된 내용이라서
+                       다들 그쪽으로 옮기는게 맞을것 같고") — 폴라·VMG·최적각은 그 바람에서
+                       **내가 어땠는지**다. 코드를 옮기는 대신 이 호스트에 그린다
+                       (renderEnvironment 가 renderPerfExtra 뒤에 돌아 덮어쓰기 없음). -->
+                  <div class="col-12"><div id="polar-vmg-host"></div></div>
                   <div class="col-12"><div id="perf-extra"></div></div>
                   <div class="col-12">
                     <div class="card">
@@ -301,9 +314,6 @@
                 <div id="sessions-body"></div>
               </div>
 
-              <div id="tab-env" class="tab-pane" role="tabpanel">
-                <div id="env-body" class="text-secondary">—</div>
-              </div>
 
               <!-- §457 훈련부하 — 라이딩과 육상 운동을 한 원장에 합쳐
                    체력·피로·컨디션 추세를 보고, 오늘 뭘 할지 제안한다. -->
@@ -371,6 +381,6 @@
 <script src="js/trend-analysis.js?v=v558"></script>
 <script src="js/gear-usage.js?v=v559"></script>
 <script src="js/chart-tip.js?v=v560"></script>
-<script src="js/v2-app.js?v=v577"></script>
+<script src="js/v2-app.js?v=v578"></script>
 </body>
 </html>

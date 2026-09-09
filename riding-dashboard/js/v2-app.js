@@ -1091,7 +1091,18 @@
     /* 폴라를 먼저(왼쪽), VMG·최적각을 나중에(오른쪽) */
     grid.appendChild(colP);
     grid.appendChild(colT);
-    host.appendChild(grid);
+    /* §578 (옥대표 "환경탭에 있는 대부분이 퍼포먼스 관련된 내용") — 폴라·VMG·
+       최적각은 바람이 어땠는지가 아니라 그 바람에서 **내가 어땠는지**다.
+       코드를 옮기면 RDPolar 그리기까지 따라가야 해서, 대신 퍼포먼스 탭의
+       호스트에 그린다. show() 는 renderPerfExtra 다음에 renderEnvironment 를
+       부르므로 덮어쓰이지 않는다. 호스트가 없으면 예전 자리(환경 탭)로. */
+    var pvHost = $('polar-vmg-host');
+    if (pvHost) {
+      while (pvHost.firstChild) pvHost.removeChild(pvHost.firstChild);
+      pvHost.appendChild(grid);
+    } else {
+      host.appendChild(grid);
+    }
 
     if (window.RDPolar) {
       /* 칼럼이 넓어졌으니 차트도 키운다 — 각도 눈금이 촘촘해서
@@ -2938,38 +2949,7 @@
     var lo = vals.length ? Math.min.apply(null, vals) : 0;
     var hi = vals.length ? Math.max.apply(null, vals) : 1;
 
-    /* §572 (옥대표 "이 두가지는 눈으로 보기가 대게 힘들다… 읽는데 시간이
-       너무걸려") — 맞다. 이건 **폴라 다이어그램인데 24열 스프레드시트로
-       인쇄**하고 있었다. 각도별 속도는 극좌표로 그리면 한눈에 읽힌다:
-       어느 각도가 빠른지, 바람이 세지면 곡선이 어느 쪽으로 부푸는지.
-       숫자가 필요한 사람을 위해 표는 접어서 남긴다 — 지우지 않는다. */
-    var BUCKET_COLORS = ['#3B7DD8', '#37955F', '#C4841B', '#B3453A', '#2AA5A0'];
-    body.appendChild(polarSvg(live, cols, grid, BUCKET_COLORS));
-
-    var legend = el('div', 'd-flex flex-wrap gap-3 mt-2 mb-1');
-    live.forEach(function (b, bi) {
-      var sp = el('span', 'lab d-inline-flex align-items-center gap-1');
-      sp.style.fontSize = '.8125rem';
-      var dot = el('span');
-      dot.style.cssText = 'width:10px;height:3px;border-radius:2px;display:inline-block;'
-        + 'background:' + BUCKET_COLORS[bi % BUCKET_COLORS.length];
-      sp.appendChild(dot);
-      sp.appendChild(document.createTextNode(b.label + '  ('
-        + b.sessionCount + ' session' + (b.sessionCount > 1 ? 's' : '') + ')'));
-      legend.appendChild(sp);
-    });
-    body.appendChild(legend);
-
     var wrap = el('div', 'table-responsive');
-    wrap.style.display = 'none';                 /* 기본은 접어 둔다 */
-    var toggle = el('button', 'btn btn-sm btn-ghost-secondary mb-1', 'Show the numbers');
-    toggle.type = 'button';
-    toggle.addEventListener('click', function () {
-      var open = wrap.style.display !== 'none';
-      wrap.style.display = open ? 'none' : '';
-      toggle.textContent = open ? 'Show the numbers' : 'Hide the numbers';
-    });
-    body.appendChild(toggle);
     var tbl = el('table', 'table table-sm table-vcenter mb-1');
     var thead = el('thead'), hr = el('tr');
     hr.appendChild(el('th', null, t.rowDim.label));
@@ -3157,7 +3137,43 @@
     var cols = Object.keys(used).map(Number).sort(function (x, y) { return x - y; });
     if (!cols.length) return;
 
+    /* §572 (옥대표 "이 두가지는 눈으로 보기가 대게 힘들다… 읽는데 시간이
+       너무걸려") — 이건 **폴라 다이어그램인데 24열 스프레드시트로 인쇄**하고
+       있었다. 극좌표로 그리면 한눈에 읽힌다: 어느 각도가 빠른지, 바람이
+       세지면 곡선이 어느 쪽으로 부푸는지. 숫자가 필요한 사람을 위해 표는
+       접어서 남긴다 — 지우지 않는다.
+       ⚠ 이 앵커(table-responsive)는 파일 안에 여러 번 나온다. 처음에 파일
+          전체 치환으로 넣었다가 drawBinGrid 안에 들어갔고, Bin table 이
+          접혀 있어 실행조차 안 돼 화면에 아무 티도 안 났다(§558b 와 같은 실수). */
+    var BUCKET_COLORS = ['#3B7DD8', '#37955F', '#C4841B', '#B3453A', '#2AA5A0'];
+    body.appendChild(polarSvg(live, cols, grid, BUCKET_COLORS));
+
+    var legend = el('div', 'd-flex flex-wrap gap-3 mt-2 mb-1');
+    live.forEach(function (b, bi) {
+      var sp = el('span', 'lab d-inline-flex align-items-center gap-1');
+      sp.style.fontSize = '.8125rem';
+      var dot = el('span');
+      dot.style.cssText = 'width:10px;height:3px;border-radius:2px;display:inline-block;'
+        + 'background:' + BUCKET_COLORS[bi % BUCKET_COLORS.length];
+      sp.appendChild(dot);
+      sp.appendChild(document.createTextNode(b.label + '  ('
+        + b.sessionCount + ' session' + (b.sessionCount > 1 ? 's' : '') + ')'));
+      legend.appendChild(sp);
+    });
+    body.appendChild(legend);
+
+    var polarToggle = el('button', 'btn btn-sm btn-ghost-secondary mb-1', 'Show the numbers');
+    polarToggle.type = 'button';
+    body.appendChild(polarToggle);
+
     var wrap = el('div', 'table-responsive');
+    wrap.style.display = 'none';                 /* 기본은 접어 둔다 */
+    polarToggle.addEventListener('click', function () {
+      var open = wrap.style.display !== 'none';
+      wrap.style.display = open ? 'none' : '';
+      polarToggle.textContent = open ? 'Show the numbers' : 'Hide the numbers';
+    });
+
     var tbl = el('table', 'table table-sm table-vcenter mb-1');
     var thead = el('thead'), hr = el('tr');
     hr.appendChild(el('th', null, 'Wind'));

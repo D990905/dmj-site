@@ -15,6 +15,21 @@ var html=htmlRaw.replace(/<!--[\s\S]*?-->/g,'');
 console.log('[1] §572 폴라 — 표가 아니라 극좌표로');
 ok('★ 폴라 SVG 빌더가 있다', /function polarSvg\(buckets, cols, grid, colors\)/.test(code));
 ok('★ 차트를 먼저 그린다', /body\.appendChild\(polarSvg\(live, cols, grid, BUCKET_COLORS\)\)/.test(code));
+/* ⚠ 문자열이 파일 어딘가 있는지만 보면 안 된다. 실제로 §572 블록이
+   drawBinGrid 안에 들어갔고, Bin table 이 접혀 있어 실행조차 안 돼
+   화면에 아무 티도 안 났다. 이 테스트는 그걸 못 잡았다(§558b 와 같은 실수).
+   **어느 함수 안인지** 를 고정한다. */
+function enclosingOf(needle){
+  var i=code.indexOf(needle); if(i<0) return null;
+  var re=/\n  function (\w+)\(/g,m,last=null,head=code.slice(0,i);
+  while((m=re.exec(head))) last=m[1]; return last;
+}
+ok('★★ 폴라 차트 호출이 renderPolarGrid 안이다 (drawBinGrid 아님)',
+   enclosingOf('polarSvg(live, cols, grid, BUCKET_COLORS)')==='renderPolarGrid',
+   String(enclosingOf('polarSvg(live, cols, grid, BUCKET_COLORS)')));
+ok('★★ 숫자 접기 토글도 renderPolarGrid 안이다',
+   enclosingOf("'Show the numbers'")==='renderPolarGrid',
+   String(enclosingOf("'Show the numbers'")));
 ok('★ 바람대마다 색 범례', /BUCKET_COLORS\[bi % BUCKET_COLORS\.length\]/.test(code));
 ok('★★ 표는 지우지 않고 접어 둔다', /wrap\.style\.display = 'none'/.test(code)
    && /'Show the numbers'/.test(code));
@@ -86,6 +101,30 @@ ok('★ 환경에는 바람 자체를 다루는 것이 남는다',
 ok('★ 옮긴 셋 모두 실패해도 스택을 남긴다',
    /\[v2 §576\] target band/.test(code) && /\[v2 §577\] polar grid/.test(code)
    && /\[v2 §577\] correlation/.test(code));
+
+console.log('\n[7] §578 바람 확인을 첫 탭으로 · 폴라/VMG 도 퍼포먼스로');
+console.log('    옥대표: "바람 각도 확인하는것도 파일 업로드하면 처음에 바로 떠야하잖아"');
+var navOrder=(html.match(/href="#(tab-[a-z]+)"/g)||[]).map(function(x){return x.slice(7,-1);});
+ok('★★ 첫 탭이 바람(tab-env)', navOrder[0]==='tab-env', navOrder.slice(0,3).join(','));
+ok('★ 그다음이 퍼포먼스', navOrder[1]==='tab-perf');
+ok('★ 첫 탭이 active', /href="#tab-env" class="nav-link active"/.test(html));
+ok('★ 퍼포먼스는 active 아님', /href="#tab-perf" class="nav-link"/.test(html)
+   && !/href="#tab-perf" class="nav-link active"/.test(html));
+var paneOrder=(html.match(/id="(tab-[a-z]+)" class="tab-pane/g)||[]).map(function(x){return x.slice(4).split('"')[0];});
+ok('★★ 패널 순서도 바람이 먼저', paneOrder[0]==='tab-env', paneOrder.slice(0,3).join(','));
+ok('★ 바람 패널이 active show', /id="tab-env" class="tab-pane active show"/.test(html));
+ok('★ 탭 이름이 Wind (Environment 보다 하는 일이 분명하다)', />Wind</.test(html));
+
+ok('★ 폴라·VMG 호스트가 퍼포먼스 탭에 있다', /id="polar-vmg-host"/.test(html));
+var iPv=html.indexOf('id="polar-vmg-host"'), iPerfPane=html.indexOf('id="tab-perf"'),
+    iTrackPane=html.indexOf('id="tab-track"');
+ok('★★ 그 호스트가 퍼포먼스 패널 안이다', iPerfPane<iPv && iPv<iTrackPane);
+ok('★ 그 호스트에 그린다', /pvHost\.appendChild\(grid\)/.test(code));
+ok('★ 다시 그릴 때 쌓이지 않게 비운다',
+   /while \(pvHost\.firstChild\) pvHost\.removeChild\(pvHost\.firstChild\)/.test(code));
+ok('★ 호스트가 없으면 예전 자리 (옛 레이아웃 보호)', /host\.appendChild\(grid\);/.test(code));
+ok('★★ 렌더 순서가 안전하다 (퍼포먼스 먼저, 환경 나중)',
+   code.indexOf('renderPerfExtra(analysis)') < code.indexOf('renderEnvironment(analysis, est)'));
 
 console.log('\n' + (fail ? 'FAIL ' : 'PASS ') + pass + '/' + (pass+fail));
 process.exit(fail ? 1 : 0);
