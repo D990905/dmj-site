@@ -191,12 +191,22 @@
                     <div class="card">
                       <div class="card-header">
                         <h3 class="card-title">Best speed by duration</h3>
-                        <div class="card-actions lab">knots · log scale</div>
+                        <!-- §561 (옥대표) — 예전 머리말은 "knots · log scale" 이라
+                             노트가 로그축인 것처럼 읽혔다. 로그는 **가로축(지속시간)**
+                             에 걸려 있다(chart-meanmax.js: scales.x.distr = 3). -->
+                        <div class="card-actions lab">knots · duration on a log scale</div>
                       </div>
                       <div class="card-body"><div id="chart-meanmax" class="chart-host"></div></div>
+                      <!-- §561 — 예전 설명은 "거리 기록을 시간으로 환산" 만 말했는데,
+                           곡선에는 2초·10초 **시간 피크**도 함께 올라간다
+                           (chart-meanmax.js toDurationSeries: peaks + distanceBests).
+                           설명이 그리는 것과 달랐다. -->
                       <div class="card-footer text-secondary" style="font-size:.8125rem">
-                        Distance bests converted to durations. Alpha 500 is a gated course, so it is
-                        marked separately rather than placed on the curve.
+                        Your best average speed for each length of effort. The 2 s and 10 s points
+                        come from time windows; the rest are your best 100 m, 250 m, 500 m and 1 NM
+                        converted to how long they took. Duration runs on a log scale so a two-second
+                        burst and a two-minute run fit in one view. Alpha 500 sits off the curve
+                        because it is a gated course, not free riding.
                       </div>
                     </div>
                   </div>
@@ -207,6 +217,13 @@
                         <div class="card-actions lab">minutes</div>
                       </div>
                       <div class="card-body"><div id="chart-hist" class="chart-host"></div></div>
+                      <!-- §561 — 옥대표: "설명을 할거면 두 그래프들 다 하고 안할거면
+                           둘다 하지말고". 왼쪽만 설명이 있었다. -->
+                      <div class="card-footer text-secondary" style="font-size:.8125rem">
+                        Where your riding time actually went. The left-hand bars are time on the
+                        water below foiling speed — starts, stops, drifting and touchdowns — so a
+                        tall bar there is not a slow session, it is time not yet spent riding.
+                      </div>
                     </div>
                   </div>
                   <div class="col-12"><div id="perf-extra"></div></div>
@@ -320,7 +337,7 @@
 <script src="../assets/js/supabase-auth.js?v=v528"></script>
 <script src="js/storage.js?v=v553"></script>
 <script src="vendor/uPlot.iife.min.js?v=1.6.32"></script>
-<script src="js/chart-meanmax.js?v=sections-450"></script>
+<script src="js/chart-meanmax.js?v=v561"></script>
 <script src="js/segments.js?v=v523"></script>
 <script src="js/export.js?v=v525"></script>
 <script src="js/fitness.js?v=v526"></script>
@@ -344,6 +361,7 @@
 <script src="js/pdf-export.js?v=pdf-501"></script>
 <script src="js/trend-analysis.js?v=v558"></script>
 <script src="js/gear-usage.js?v=v559"></script>
-<script src="js/v2-app.js?v=v559"></script>
+<script src="js/chart-tip.js?v=v560"></script>
+<script src="js/v2-app.js?v=v562"></script>
 </body>
 </html>

@@ -293,6 +293,28 @@
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' min'; } }
       ]
     }, [xs, ys], host));
+    var histU = plots.length ? plots[plots.length - 1].u : null;
+
+    /* §560 — 막대 하나는 속도 구간. 분(分)만으로는 크기를 못 읽으니
+       전체에서 차지하는 비중을 같이 준다. */
+    if (window.RDTip && histU) {
+      var totalSec = 0;
+      h.forEach(function (b) { totalSec += b.seconds || 0; });
+      var foilKt = foilThresholdMs() * KT;      /* §541 되돌릴 때 지운 값 — 여기서 다시 낸다 */
+      RDTip.attach(histU, function (i) {
+        var b = h[i];
+        if (!b) return null;
+        var sec = b.seconds || 0;
+        var share = totalSec > 0 ? (sec / totalSec * 100) : 0;
+        var mid = (b.fromKt + b.toKt) / 2;
+        return {
+          title: b.fromKt + '–' + b.toKt + ' kt',
+          rows: [['Time', fmtClock(sec)],
+                 ['Share', share.toFixed(1) + '%']],
+          note: mid < foilKt ? 'Below the foiling threshold' : 'On foil'
+        };
+      });
+    }
   }
 
   /* ---------- 세션 시계열 ---------- */
@@ -4273,6 +4295,31 @@
           } }
       ]
     }, [xs, ys], plot), plot);
+
+    /* §560 (옥대표 "동그라미 포인트에 커서가 도달했을때 오버레이로 요약") —
+       이 차트의 점 하나는 **세션 하나**인데, 기본 범례는 값만 적고 그게 어느
+       세션인지 말하지 않는다. 오버레이는 정체부터 적는다.
+       usable 은 xs·ys 와 같은 순서다(둘 다 같은 filter 를 지난다). */
+    var seasonU = plots.length ? plots[plots.length - 1].u : null;
+    if (window.RDTip && seasonU) {
+      RDTip.attach(seasonU, function (i) {
+        var r = usable[i];
+        if (!r) return null;
+        var d = r.dateEpoch ? new Date(Number(r.dateEpoch)) : null;
+        var rows = [[md.label, ys[i] == null ? '—'
+          : ys[i].toFixed(md.dp) + (md.unit ? ' ' + md.unit : '')]];
+        if (r.windSpeedKt != null) rows.push(['Wind', r.windSpeedKt + ' kt']);
+        if (r.distanceM != null) rows.push(['Distance', (r.distanceM / 1000).toFixed(1) + ' km']);
+        if (r.vpsOverall != null && md.key !== 'sps') rows.push(['Score', String(Math.round(r.vpsOverall))]);
+        var gl = null;
+        try { gl = gearLabel(r.gear); } catch (e) {}
+        return {
+          title: (d ? d.toISOString().slice(0, 10) + '  ' : '') + (r.name || 'Session'),
+          rows: rows,
+          note: gl || (r.gear ? null : 'No gear recorded')
+        };
+      });
+    }
   }
 
   /* ---------- 심박 티어 막대 ---------- */
@@ -4866,15 +4913,29 @@
     note.style.fontSize = '.8125rem';
     if (turns) {
       var ratio = sum.count / turns;
-      note.textContent = ratio <= 1.15
-        ? 'You came off the foil about once per turn \u2014 that is what a clean '
-          + 'session looks like, since a turn is where it normally happens. The '
-          + 'number to grow is the longest stretch, not this one.'
-        : 'You came off the foil ' + ratio.toFixed(1) + ' times per turn, so '
+      /* §562 (옥대표 "내가 매 턴마다 빠졌다고 말하는거야? 설명이 좀 이상해") —
+         맞다. 이 분기는 ratio 가 1 근처인 경우만 가정하고 쓰였고, **1보다
+         훨씬 낮은 경우**(= 좋은 경우)를 안 봤다. 12 stretch / 49 turn = 0.24
+         인데 "about once per turn" 이라고 적혔다 — 4턴에 한 번인 것을 매 턴
+         이라고 말한 셈이다. 세 구간으로 나눈다. */
+      if (ratio < 0.7) {
+        /* 회전 몇 번에 한 번 끊겼는지로 말해야 읽힌다 */
+        var perBreak = ratio > 0 ? (1 / ratio) : 0;
+        note.textContent = 'You got up on foil ' + sum.count + ' separate times across '
+          + turns + ' turns \u2014 about one break every ' + perBreak.toFixed(1)
+          + ' turns, so you carried the foil through most of them. '
+          + 'The number to grow now is the longest stretch, not this one.';
+      } else if (ratio <= 1.15) {
+        note.textContent = 'You came off the foil about once per turn \u2014 that is what '
+          + 'a clean session looks like at this stage, since a turn is where it normally '
+          + 'happens. The number to grow is the longest stretch, not this one.';
+      } else {
+        note.textContent = 'You came off the foil ' + ratio.toFixed(1) + ' times per turn, so '
           + 'roughly ' + Math.round(sum.count - turns) + ' of these breaks were '
           + 'not at a turn \u2014 touchdowns in a straight line. That is a '
           + 'different fault from a bad gybe: it is height control or a foil '
           + 'that is loaded up, not turn technique.';
+      }
     } else {
       note.textContent = 'Longest unbroken stretch is the number worth growing \u2014 '
         + 'total foiling time can rise just from a longer session.';

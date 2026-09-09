@@ -112,8 +112,15 @@
         { stroke: opts.dim || '#5F778A', grid: { stroke: opts.grid || '#16283A', width: 1 },
           ticks: { stroke: opts.grid || '#16283A' },
           font: '11px "IBM Plex Mono", monospace',
-          size: 42,
-          values: function (self, ticks) { return ticks.map(function (v) { return v.toFixed(0); }); } }
+          /* §561 (옥대표 "좌측그래프에 세로축 단위추가") — 오른쪽 차트는
+             눈금에 단위를 달고 있는데(30m·25m…) 이쪽만 맨숫자였다.
+             단위가 붙으면 폭이 늘어나므로 size 도 함께 키운다. */
+          size: 54,
+          values: function (self, ticks) {
+            return ticks.map(function (v) {
+              return (v == null || !isFinite(v)) ? null : v.toFixed(0) + ' kt';
+            });
+          } }
       ],
       series: [
         { label: 'Duration',
