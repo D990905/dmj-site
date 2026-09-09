@@ -42,7 +42,10 @@ ok('★ 표보다 아래', iH>iSP);
 ok('★ 전체 폭(col-12)', /col-12">\s*<div class="card">\s*<div class="card-header">\s*<h3 class="card-title">Time at speed/.test(html));
 ok('설명은 그대로 붙어 있다 (§561 — 둘 다 아니면 둘 다 없이)',
    html.slice(iH, iH+1200).indexOf('card-footer')>=0);
-ok('곡선 쪽 설명도 그대로', html.slice(iMM, iMM+1400).indexOf('card-footer')>=0);
+/* §567 — 곡선 쪽 설명은 카드 밖 전체 폭으로 옮겼다(옥대표). 없어진 게
+   아니라 자리가 바뀐 것이므로, 카드 안이 아니라 **행 안에** 있는지 본다. */
+ok('곡선 쪽 설명도 남아 있다 (카드 밖 전체 폭으로 이동)',
+   html.slice(iMM, iH).indexOf('Both panels show the same seven numbers')>=0);
 
 console.log('\n[4] 렌더 배선');
 ok('★ 표를 전용 호스트에 넣는다', /splitsHost\.appendChild\(sc\)/.test(code));
@@ -53,6 +56,37 @@ ok('★ 호스트가 없으면 예전 자리로 (옛 레이아웃 보호)',
 
 console.log('\n[5] PDF 경로에 영향 없음');
 ok('PDF 는 perf-extra 를 직접 쓰지 않는다', !/'perf-extra': /.test(app));
+
+console.log('\n[6] §567 — 곡선에도 오버레이 · 설명은 전체 폭');
+console.log('    옥대표: "마우스오버레이 데이터 노출이 사라짐"');
+console.log('           "하단 설명이 좌측 블록에 치우쳐있는데 전체너비를 사용하도록"');
+ok('★★ mean-max 곡선에 오버레이를 붙인다 (§560 은 여기만 빠져 있었다)',
+   /RDTip\.attach\(mm\.plot, function \(i\)/.test(code));
+ok('★ render() 가 돌려주는 points 로 **어느 구간인지**를 말한다',
+   /var pt = mm\.points && mm\.points\[i\]/.test(code) && /title: pt\.label/.test(code));
+ok('★ 시간 창과 거리 기록을 구분해 적는다',
+   /Best average over a ' \+ pt\.label \+ ' window'/.test(code)
+   && /Best average over ' \+ pt\.label \+ ' of track'/.test(code));
+ok('★ km/h 도 준다 (표와 같은 값이어야 한다)', /\(pt\.kt \/ KT \* 3\.6\)\.toFixed\(1\)/.test(code));
+/* 실제 변환이 표와 맞는지 */
+var KT=1.94384;
+ok('★★ 26.26 kt → 48.6 km/h (표와 일치)', (26.26/KT*3.6).toFixed(1)==='48.6');
+ok('★★ 16.66 kt → 30.9 km/h (표와 일치)', (16.66/KT*3.6).toFixed(1)==='30.9');
+ok('RDTip 이 없어도 안 터진다', /if \(window\.RDTip\) \{/.test(code));
+
+ok('★★ 설명이 곡선 카드 밖 전체 폭에 있다', (function(){
+  var iSp=html.indexOf('id="splits-host"');
+  var seg=html.slice(iSp, iSp+900);
+  return /col-12"[\s\S]{0,120}text-secondary/.test(seg); })());
+ok('★ 곡선 카드에는 더 이상 footer 가 없다', (function(){
+  var i=html.indexOf('id="chart-meanmax"');
+  var seg=html.slice(i, html.indexOf('id="splits-host"'));
+  return seg.indexOf('card-footer') < 0; })());
+ok('★ 설명이 두 패널 다 가리킨다', /Both panels show the same seven numbers/.test(html));
+ok('★ Alpha 가 왜 곡선 밖인지 구체적으로', /500 m out\s+and back inside a 50 m gate/.test(html.replace(/\s+/g,' ')) || /inside a 50 m gate/.test(html));
+ok('Time at speed 설명은 자기 카드에 그대로', (function(){
+  var i=html.indexOf('id="chart-hist"');
+  return html.slice(i, i+1200).indexOf('card-footer')>=0; })());
 
 console.log('\n' + (fail ? 'FAIL ' : 'PASS ') + pass + '/' + (pass+fail));
 process.exit(fail ? 1 : 0);

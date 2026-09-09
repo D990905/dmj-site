@@ -9093,7 +9093,32 @@
     try { renderInputSources(); } catch (e) {}
     if (window.RDMeanMax) {
       var mm = RDMeanMax.render($('chart-meanmax'), analysis, THEME);
-      if (mm && mm.plot) track(mm.plot, $('chart-meanmax'));
+      if (mm && mm.plot) {
+        track(mm.plot, $('chart-meanmax'));
+        /* §567 (옥대표 "마우스오버레이 데이터 노출이 사라짐") — 사라진 게
+           아니라 이 곡선에는 붙인 적이 없었다(§560 은 시즌 흐름·히스토그램만).
+           render() 가 points 를 돌려주므로 **어느 구간인지**까지 말할 수 있다 —
+           uPlot 기본 범례는 '10.0 s · 23.4 kt' 라고만 하고 그게 10초 창인지
+           100m 기록인지 말하지 않는다. */
+        if (window.RDTip) {
+          RDTip.attach(mm.plot, function (i) {
+            var pt = mm.points && mm.points[i];
+            if (!pt) return null;
+            /* kt → m/s → km/h. 표(Best speed splits)와 같은 값이 나와야 한다. */
+            var rows = [['Best speed', pt.kt.toFixed(2) + ' kt'],
+                        ['km/h', (pt.kt / KT * 3.6).toFixed(1)],
+                        ['Held for', pt.sec < 60 ? pt.sec.toFixed(1) + ' s'
+                                                 : (pt.sec / 60).toFixed(1) + ' min']];
+            return {
+              title: pt.label,
+              rows: rows,
+              note: pt.kind === 'time'
+                ? 'Best average over a ' + pt.label + ' window'
+                : 'Best average over ' + pt.label + ' of track'
+            };
+          });
+        }
+      }
     }
     renderHistogram(analysis);
     renderTimeline(session, analysis);

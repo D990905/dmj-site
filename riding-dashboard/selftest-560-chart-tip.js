@@ -80,10 +80,14 @@ ok('★★ 곡선이 시간 피크 + 거리 기록임을 밝힌다',
 ok('★★ 로그축이 **지속시간**임을 밝힌다 (노트가 아니라)',
    /duration on a log scale/.test(html) && !/knots · log scale/.test(html));
 ok('Alpha 가 곡선 밖인 이유가 남아 있다', /gated course/.test(html));
+/* §567 — mean-max 쪽 설명은 카드 안 footer 에서 **카드 밖 전체 폭**으로
+   옮겼다(옥대표 "하단 설명이 좌측 블록에 치우쳐있는데 전체너비를 사용하도록").
+   그래서 'card-footer 가 있는가' 로 보면 안 된다 — 설명 문구 자체를 본다. */
 ok('★ 두 그래프 모두 설명이 있다 (옥대표: 둘 다 아니면 둘 다 없이)', (function(){
   var i=html.indexOf('id="chart-meanmax"'), j=html.indexOf('id="chart-hist"');
-  var a=html.slice(i, i+1400), b=html.slice(j, j+1400);
-  return /card-footer/.test(a) && /card-footer/.test(b); })());
+  var a=html.slice(i, j);                       /* 곡선~히스토그램 사이 */
+  var b=html.slice(j, j+1400);
+  return /Both panels show the same seven numbers/.test(a) && /card-footer/.test(b); })());
 ok('★ 오른쪽 설명이 낮은 속도 막대의 뜻을 말한다',
    /below foiling speed/.test(html) && /not yet spent riding/.test(html));
 
