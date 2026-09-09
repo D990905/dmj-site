@@ -62,6 +62,16 @@
   ];
 
   /* ---------- 기간 버킷 ---------- */
+  /* §582 (옥대표 "일간 그래프도 선택가능하게 해줘") — 하루 단위.
+     ⚠ 그대로 넣으면 4개월 × 하루 = 빈 막대 110개가 되어, §558 에서 지적한
+        Vantage 의 실패(대부분 0인 평평한 차트)를 그대로 재현한다.
+        그래서 일간만은 **탄 날만** 세운다. 주/월은 지금처럼 빈 기간도
+        만든다 — 그 자리의 0 은 "그 주에 안 탔다" 는 뜻이 있지만, 하루
+        단위에서 안 탄 날의 0 은 뜻이 아니라 잡음이다. */
+  function dayKey(ep) {
+    var d = new Date(ep);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
   function weekKey(ep) {
     var d = new Date(ep);
     d.setHours(0, 0, 0, 0);
@@ -74,12 +84,13 @@
   }
   function nextPeriod(ep, mode) {
     var d = new Date(ep);
+    if (mode === 'day') { d.setDate(d.getDate() + 1); return d.getTime(); }
     if (mode === 'week') { d.setDate(d.getDate() + 7); return d.getTime(); }
     return new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
   }
   function periodLabel(ep, mode) {
     var d = new Date(ep);
-    if (mode === 'week') return (d.getMonth() + 1) + '/' + d.getDate();
+    if (mode === 'day' || mode === 'week') return (d.getMonth() + 1) + '/' + d.getDate();
     return (d.getMonth() + 1) + '월';
   }
 
@@ -87,6 +98,17 @@
      Vantage 처럼 앞뒤로 빈 구간을 길게 그리면 차트가 평평한 선이 된다. */
   function buildBuckets(rows, mode) {
     if (!rows.length) return [];
+    /* §582 — 일간은 탄 날만. 빈 날을 채우면 잡음이 데이터를 덮는다. */
+    if (mode === 'day') {
+      var seen = {}, order = [];
+      rows.forEach(function (r) {
+        var k = dayKey(r.dateEpoch);
+        if (!seen[k]) { seen[k] = { key: k, label: periodLabel(k, 'day'), rows: [] }; order.push(k); }
+        seen[k].rows.push(r);
+      });
+      order.sort(function (a, b) { return a - b; });
+      return order.map(function (k) { return seen[k]; });
+    }
     var kf = mode === 'week' ? weekKey : monthKey;
     var first = kf(rows[0].dateEpoch), last = kf(rows[rows.length - 1].dateEpoch);
     var out = [], guard = 0;
@@ -283,11 +305,11 @@
 
       var per = document.createElement('div');
       per.className = 'btn-group btn-group-sm ms-auto';
-      ['week', 'month'].forEach(function (p) {
+      ['day', 'week', 'month'].forEach(function (p) {
         var b = document.createElement('button');
         b.type = 'button';
         b.className = 'btn btn-sm';
-        b.textContent = p === 'week' ? 'Weekly' : 'Monthly';
+        b.textContent = p === 'day' ? 'Daily' : (p === 'week' ? 'Weekly' : 'Monthly');
         b.addEventListener('click', function () { opts.setPeriod(p); draw(); });
         b.dataset.period = p;
         per.appendChild(b);
@@ -378,8 +400,10 @@
       pTotals.badge.textContent = 'Total: ' + fmt(grand, tdef.dp) + (tdef.unit ? ' ' + tdef.unit : '');
       pTotals.plot.innerHTML = chartSvg(tb, tvals,
         { dp: tdef.dp, color: '#4dabf7', aria: tdef.label + ' by ' + st.totalPeriod });
-      pTotals.cap.textContent = 'Summed per ' + st.totalPeriod
-        + '. A period with no sessions is a real zero.';
+      pTotals.cap.textContent = st.totalPeriod === 'day'
+        ? 'Summed per day, and only days you actually rode — a chart of empty days '
+          + 'would be mostly zeros with the riding squeezed into a few bars.'
+        : 'Summed per ' + st.totalPeriod + '. A period with no sessions is a real zero.';
 
       /* ── Performance score ── */
       paintPeriod(pScore.per, st.scorePeriod);
@@ -404,9 +428,12 @@
         ? chartSvg(sb, svals, { dp: 1, color: '#74b816', zeroBased: false,
             aria: sdef.label + ' score by ' + st.scorePeriod })
         : '';
+      /* §582 — 일간은 탄 날만 세우므로 '빈 기간' 이라는 말이 성립하지 않는다 */
       pScore.cap.textContent = have.length
-        ? 'Averaged per ' + st.scorePeriod + '. A period with no sessions is left blank '
-          + '— it is not a zero score.'
+        ? (st.scorePeriod === 'day'
+            ? 'Averaged per day, and only days you actually rode.'
+            : 'Averaged per ' + st.scorePeriod + '. A period with no sessions is left blank '
+              + '— it is not a zero score.')
         : 'No ' + sdef.label.toLowerCase() + ' score recorded on these sessions yet.';
     }
 

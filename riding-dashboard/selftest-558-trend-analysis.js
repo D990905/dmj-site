@@ -106,5 +106,27 @@ ok('★ 스크립트가 v2-app 보다 먼저 로드된다',
 ok('차트 글자 스타일이 테마 토큰을 쓴다',
    /\.tr-tick \{[^}]*fill: var\(--tblr-secondary\)/.test(html));
 
+console.log('\n[8] §582 일간 (옥대표 "일간 그래프도 선택가능하게 해줘")');
+var d=function(x){return Date.parse(x+'T06:00:00Z');};
+var rows6=[{dateEpoch:d('2026-05-19')},{dateEpoch:d('2026-05-25')},{dateEpoch:d('2026-06-09')},
+           {dateEpoch:d('2026-06-11')},{dateEpoch:d('2026-09-07')},{dateEpoch:d('2026-09-09')}];
+var day=T._buckets(rows6,'day');
+ok('★★ 일간은 **탄 날만** 세운다 (4개월치 빈 막대 110개를 만들지 않는다)',
+   day.length===6, String(day.length));
+ok('★ 빈 칸이 하나도 없다', day.every(function(b){return b.rows.length>0;}));
+ok('★ 날짜순 정렬', (function(){for(var i=1;i<day.length;i++) if(day[i].key<=day[i-1].key) return false; return true;})());
+ok('★ 라벨이 M/D', /^\d+\/\d+$/.test(day[0].label), day[0].label);
+ok('★★ 주/월은 예전대로 빈 기간도 만든다 (그 0 은 뜻이 있다)',
+   T._buckets(rows6,'month').length===5 && T._buckets(rows6,'week').length>6);
+var srcT=fs.readFileSync(path.join(__dirname,'js/trend-analysis.js'),'utf8');
+var codeT=srcT.replace(/\/\*[\s\S]*?\*\//g,'');
+ok('★ 버튼이 셋 (Daily·Weekly·Monthly)', /\['day', 'week', 'month'\]/.test(codeT));
+ok('★ 라벨도 셋', /p === 'day' \? 'Daily'/.test(codeT));
+ok('★ 하루 뒤로 넘어간다', /if \(mode === 'day'\) \{ d\.setDate\(d\.getDate\(\) \+ 1\); return d\.getTime\(\); \}/.test(codeT));
+ok('★★ 왜 탄 날만인지 화면에 밝힌다',
+   /only days you actually rode/.test(codeT) && /would be mostly zeros/.test(codeT));
+ok('★ 점수 캡션도 일간을 따로 말한다', /Averaged per day, and only days you actually rode/.test(codeT));
+ok('★ 근거가 주석에 남아 있다 (§558 에서 지적한 그 실패)', /Vantage 의 실패/.test(srcT));
+
 console.log('\n' + (fail ? 'FAIL ' : 'PASS ') + pass + '/' + (pass+fail));
 process.exit(fail ? 1 : 0);
