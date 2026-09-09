@@ -3580,6 +3580,13 @@
       return v.toFixed(0);
     }
 
+    /* §564 (옥대표 "sog vmg cwa aws awa 순서로") — 예전에는 엔진이 뱉는
+       순서를 그대로 썼다(sog·cwa·awa·aws·vmg). 읽는 순서에는 뜻이 있다:
+       내 속도(SOG) → 그중 실제로 나아간 몫(VMG) → 그 각도(CWA) →
+       그때 윙이 받은 바람(AWS·AWA). 목록에 없는 지표(heel·pitch·hr)는
+       뒤에 원래 순서대로 붙는다. */
+    var METRIC_ORDER = ['sog', 'vmg', 'twa', 'aws', 'awa'];
+
     /* metric → mode → side 로 접는다 */
     var byMetric = {}, order = [];
     sp.rows.forEach(function (r) {
@@ -3588,6 +3595,14 @@
       var mode = r.mode || 'all';
       if (!m[mode]) m[mode] = {};
       m[mode][r.side || '-'] = r;
+    });
+
+    order.sort(function (a1, b1) {
+      var ia = METRIC_ORDER.indexOf(a1), ib = METRIC_ORDER.indexOf(b1);
+      if (ia < 0 && ib < 0) return 0;      /* 둘 다 목록 밖 — 원래 순서 유지 */
+      if (ia < 0) return 1;
+      if (ib < 0) return -1;
+      return ia - ib;
     });
 
     var c2 = el('div', 'card mt-3');

@@ -20,13 +20,13 @@
   /* 어떤 판을 그릴지. 표본에 값이 없으면 그 판은 아예 만들지 않는다. */
   var PANELS = [
     { key: 'speed', label: 'Speed', unit: 'kt', color: '#4dabf7',
-      fill: 'rgba(77,171,247,0.14)', height: 150,
+      fill: 'rgba(77,171,247,0.14)', height: 168,
       get: function (p) { return p.speed == null ? null : p.speed * KT; } },
-    { key: 'vmg', label: 'VMG', unit: 'kt', color: '#20c997', zero: true, height: 110,
+    { key: 'vmg', label: 'VMG', unit: 'kt', color: '#20c997', zero: true, height: 128,
       get: function (p) { return p.vmg == null ? null : p.vmg * KT; } },
-    { key: 'twa', label: 'CWA', unit: '°', color: '#d97706', height: 110,
+    { key: 'twa', label: 'CWA', unit: '°', color: '#d97706', height: 128,
       get: function (p) { return p.twa == null ? null : p.twa; } },
-    { key: 'hr', label: 'Heart rate', unit: 'bpm', color: '#e03131', height: 110,
+    { key: 'hr', label: 'Heart rate', unit: 'bpm', color: '#e03131', height: 128,
       get: function (p) { return p.hr == null || p.hr <= 0 ? null : p.hr; } }
   ];
 
@@ -226,6 +226,56 @@
     var plots = [];
     var width = host.clientWidth || opts.width || 900;
 
+    /* §566 (옥대표 "위 그래프 위에 커서가 움직일때 세 그래프의 지점 데이터가
+       오버래이로 노출되게") — 판은 이미 커서가 동기화돼 있다(cursor.sync).
+       같은 x 인덱스가 모든 판에 그대로 통하므로, 한 번의 이동에서 전부 읽어
+       한 상자에 보여 준다. 판마다 따로 띄우면 세 개가 동시에 떠 시야를 가린다.
+       ⚠ host 가 static 이면 absolute 좌표가 페이지 기준이 된다 — relative 로. */
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    var tip = document.createElement('div');
+    tip.className = 'rd-stack-tip';
+    tip.setAttribute('role', 'status');
+    tip.style.cssText = 'position:absolute;z-index:20;pointer-events:none;opacity:0;'
+      + 'transition:opacity .1s;min-width:120px;padding:.4rem .5rem;border-radius:6px;'
+      + 'background:var(--tblr-bg-surface,#1a2234);color:var(--tblr-body-color,#e6e9ef);'
+      + 'border:1px solid var(--tblr-border-color,#2b3a55);'
+      + 'box-shadow:0 6px 18px rgba(0,0,0,.35);font-size:.75rem;line-height:1.35';
+    host.appendChild(tip);
+
+    function hideTip() { tip.style.opacity = '0'; }
+    function showTip(u, idx) {
+      if (idx == null) { hideTip(); return; }
+      var xComp = series.x[idx];
+      if (xComp == null) { hideTip(); return; }
+      var realSec = compToReal(series, xComp);
+      var html = '<div style="font-weight:600;margin-bottom:.2rem">'
+        + fmtClock(realSec) + '</div>';
+      series.panels.forEach(function (pp, pi) {
+        var v = series.y[pi] ? series.y[pi][idx] : null;
+        var txt = (v == null || !isFinite(v)) ? '\u2014'
+          : (Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(1)) + ' ' + pp.unit;
+        html += '<div style="display:flex;gap:.6rem;justify-content:space-between;'
+          + 'align-items:center">'
+          + '<span style="display:inline-flex;align-items:center;gap:.35rem">'
+          + '<i style="width:7px;height:7px;border-radius:50%;background:' + pp.color
+          + ';display:inline-block"></i>' + pp.label + '</span>'
+          + '<span style="font-family:\'IBM Plex Mono\',ui-monospace,monospace;'
+          + 'font-variant-numeric:tabular-nums">' + txt + '</span></div>';
+      });
+      tip.innerHTML = html;
+      var hr = host.getBoundingClientRect();
+      var orr = u.over.getBoundingClientRect();
+      var left = (orr.left - hr.left) + (u.cursor.left || 0) + 14;
+      var top = (orr.top - hr.top) + 8;
+      var w = tip.offsetWidth, h = tip.offsetHeight;
+      if (left + w > host.clientWidth) left = (orr.left - hr.left) + (u.cursor.left || 0) - w - 14;
+      if (left < 0) left = 2;
+      if (top + h > host.clientHeight) top = Math.max(0, host.clientHeight - h - 2);
+      tip.style.left = Math.round(left) + 'px';
+      tip.style.top = Math.round(top) + 'px';
+      tip.style.opacity = '1';
+    }
+
     series.panels.forEach(function (p, k) {
       var wrap = document.createElement('div');
       wrap.className = 'rd-stack-panel';
@@ -237,7 +287,11 @@
         return [-m, m];
       };
       var u = new uPlot({
-        width: width, height: p.height, padding: [8, 14, last ? 4 : 0, 6],
+        /* §565 (옥대표 "세로축 숫자들이 살짝 아래위로 겹치는 현상") —
+           아래 여백이 0 이라 위 판의 맨 아래 눈금과 아래 판의 맨 위 눈금이
+           붙었다(Speed 의 0 과 VMG 의 20, VMG 의 -20 과 CWA 의 200).
+           위아래 여백을 주고, 그만큼 판 높이도 키워 그림이 안 눌리게 한다. */
+        width: width, height: p.height, padding: [14, 14, last ? 4 : 10, 6],
         /* setScale:false — 드래그는 **선택**이지 확대가 아니다. 기본값
            그대로 두면 구간을 잡는 순간 축이 그 구간으로 줌인돼, 방금
            고른 게 전체 중 어디였는지 보이지 않게 된다. */
@@ -263,6 +317,11 @@
         ],
         hooks: {
           draw: [drawManeuvers],
+          /* §566 — 어느 판 위에 있든 세 판의 값을 한 상자에 */
+          setCursor: [function (uu) {
+            if (uu.cursor.left == null || uu.cursor.left < 0) { hideTip(); return; }
+            showTip(uu, uu.cursor.idx);
+          }],
           setSelect: [function (uu) {
             if (!uu.select || uu.select.width < 4) return;
             var a = uu.posToVal(uu.select.left, 'x');
@@ -271,6 +330,7 @@
           }]
         }
       }, [series.x, series.y[k]], wrap);
+      wrap.addEventListener('mouseleave', hideTip);
       /* 판 이름표 — 축 라벨을 판마다 반복하지 않고 왼쪽 위에 한 줄. */
       var tag = document.createElement('div');
       tag.className = 'rd-stack-tag';
