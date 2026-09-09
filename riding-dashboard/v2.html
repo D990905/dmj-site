@@ -62,6 +62,12 @@
   [data-bs-theme="light"] .text-secondary { color: #3f4a5a !important; }
   [data-bs-theme="light"] .lab { color: #465063; }
   [data-bs-theme="light"] .card { border-color: #d3d9e2; }
+  /* §558 Trend analysis — 차트 안 글자. 테마 토큰에서 색을 받아야
+     라이트/다크 양쪽에서 읽힌다. */
+  .tr-svg { width: 100%; height: auto; display: block; }
+  .tr-tick { font: 10px "IBM Plex Mono", monospace; fill: var(--tblr-secondary); }
+  .tr-val  { font: 10px "IBM Plex Mono", monospace; fill: var(--tblr-body-color);
+             font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -336,6 +342,7 @@
 <script src="js/formula.js?v=formula-479"></script>
 <script src="js/wind-confirm.js?v=wc-505"></script>
 <script src="js/pdf-export.js?v=pdf-501"></script>
-<script src="js/v2-app.js?v=v557"></script>
+<script src="js/trend-analysis.js?v=v558"></script>
+<script src="js/v2-app.js?v=v558"></script>
 </body>
 </html>

@@ -2419,6 +2419,18 @@
     });
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
     host.appendChild(card);
+
+    /* §558 (옥대표 "벤티지 추가야" — Vakaros Vantage 스샷 13장) —
+       풍속대로 걸러 비교 가능한 조건끼리만 보고, 주/월로 묶어 보고,
+       성능 점수를 축별(종합·풍상·풍하·택·자이브) 추세로 본다.
+       세션 단위 그래프(아래 'Season trend')와 역할이 다르다 — 그쪽은
+       세션 하나하나, 이쪽은 기간과 조건이다. */
+    if (window.RDTrend) {
+      var trendHost = el('div');
+      host.appendChild(trendHost);
+      try { RDTrend.render(trendHost, list, THEME); }
+      catch (e) { if (window.console) console.error('[v2 §558] trend render', e); }
+    }
   }
 
   /* §462 바람이 자리 문제였나 시간 문제였나 — 다음 세션의 전략이 갈린다.
