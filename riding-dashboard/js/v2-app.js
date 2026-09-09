@@ -4028,6 +4028,17 @@
       catch (e) { if (window.console) console.error('[v2 §558] trend render', e); }
     }
 
+    /* §559 (옥대표 2차 스샷 — Vantage Equipment) — 장비별 사용 통계.
+       §520 부터 세션마다 장비 스냅샷을 박아 왔으므로 굴릴 수 있다.
+       Vantage 는 얼마나 썼는지만 말하지만 우리는 그 장비로 얼마나 잘 탔는지
+       (평균 점수·평균 최고속)도 낸다 — §520 을 만든 이유가 그것이었다. */
+    if (window.RDGearUsage) {
+      var gearHost = el('div');
+      host.appendChild(gearHost);
+      try { RDGearUsage.render(gearHost, list); }
+      catch (e) { if (window.console) console.error('[v2 §559] gear usage render', e); }
+    }
+
     /* §490 시즌 흐름 (옥대표) — 지표·집계를 골라 보고, 같은 세션이 여러 번
        저장돼 있으면 하나로 친다.
        ────────────────────────────────────────────────────────────
