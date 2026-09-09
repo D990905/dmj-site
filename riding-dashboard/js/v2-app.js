@@ -6197,6 +6197,88 @@
 
   /* 지도에 그 구간만 굵게. 지도는 RDMapTactical 이 만들었고 Leaflet
      인스턴스를 들고 있으므로 그 위에 폴리라인을 얹는다. */
+  /* §584 (옥대표 "어딘지 알 수 있게 링크를 주면 클릭해서 해당 트랙으로
+     이동했다가 돌아가기 버튼으로 다시 즉시 원위치로 돌아올 수 있게") —
+     문답은 "33:55–41:12 구간" 이라고만 말하고 그게 **어디였는지**는 안 보여
+     준다. 그 구간을 눌러 지도에서 보고, 한 번에 제자리로 돌아온다.
+
+     ⚠ 시각(초)을 샘플 인덱스로 바꿔야 한다. 표본 간격이 일정하지 않으므로
+        (기록 공백·다운샘플) 비율로 계산하면 어긋난다 — 실제 t 로 찾는다. */
+  var TRACK_RETURN = null;          /* {tabHref, scrollY} */
+
+  function idxAtSec(sec) {
+    var S = (CUR.session && CUR.session.samples) || [];
+    if (!S.length) return -1;
+    var lo = 0, hi = S.length - 1;
+    if (sec <= S[0].t) return 0;
+    if (sec >= S[hi].t) return hi;
+    while (lo < hi) {
+      var mid = (lo + hi) >> 1;
+      if (S[mid].t < sec) lo = mid + 1; else hi = mid;
+    }
+    return lo;
+  }
+
+  function currentTabHref() {
+    var a = document.querySelector('.nav-tabs .nav-link.active');
+    return a ? a.getAttribute('href') : null;
+  }
+
+  /* 돌아가기 막대 — 지도 위에 띄우고, 누르면 왔던 자리로 */
+  function showTrackReturn(label) {
+    var host = $('map-host');
+    if (!host || !host.parentNode) return;
+    var old = document.getElementById('track-return');
+    if (old && old.parentNode) old.parentNode.removeChild(old);
+    var bar = el('div', 'alert alert-info d-flex align-items-center gap-2 mb-2');
+    bar.id = 'track-return';
+    bar.appendChild(el('div', null, 'Showing ' + label + ' on the map.'));
+    var back = el('button', 'btn btn-sm btn-primary ms-auto', '\u2190 Back');
+    back.type = 'button';
+    back.addEventListener('click', function () {
+      var r = TRACK_RETURN;
+      TRACK_RETURN = null;
+      highlightSegment(null);
+      if (bar.parentNode) bar.parentNode.removeChild(bar);
+      if (!r) return;
+      var link = r.tabHref
+        && document.querySelector('.nav-tabs .nav-link[href="' + r.tabHref + '"]');
+      if (link) link.click();
+      /* 탭이 바뀐 뒤에 스크롤해야 좌표가 맞는다 */
+      setTimeout(function () { window.scrollTo({ top: r.scrollY, behavior: 'auto' }); }, 60);
+    });
+    bar.appendChild(back);
+    host.parentNode.insertBefore(bar, host);
+  }
+
+  /* 시각 구간을 지도에서 보여 준다. label 은 돌아가기 막대에 적는다. */
+  function showRangeOnTrack(fromSec, toSec, label) {
+    if (!CUR.session) return;
+    TRACK_RETURN = { tabHref: currentTabHref(), scrollY: window.scrollY || 0 };
+    var a = idxAtSec(fromSec), b = idxAtSec(toSec);
+    if (a < 0 || b < 0 || b <= a) { TRACK_RETURN = null; return; }
+    var link = document.querySelector('.nav-tabs .nav-link[href="#tab-track"]');
+    if (link) link.click();
+    setTimeout(function () {
+      try {
+        highlightSegment({ startIdx: a, endIdx: b });
+        /* 그 구간이 화면에 들어오게 지도를 맞춘다 */
+        var S = CUR.session.samples || [], pts = [];
+        for (var i = a; i <= b && i < S.length; i++) {
+          if (S[i].lat != null && S[i].lng != null) pts.push([S[i].lat, S[i].lng]);
+        }
+        if (pts.length > 1 && mapInst && mapInst.map && window.L) {
+          mapInst.map.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
+        }
+        showTrackReturn(label);
+        var host = $('map-host');
+        if (host && host.scrollIntoView) host.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } catch (e) {
+        if (window.console) console.error('[v2 §584] show range on track', e);
+      }
+    }, 140);
+  }
+
   function highlightSegment(seg) {
     /* ⚠ 이 파일의 IIFE 는 인자가 없다 — `global` 이 스코프에 없어서
        예전엔 여기서 조용히 터졌다(호출부 try/catch 가 삼켰다).
@@ -7007,7 +7089,22 @@
     qs.forEach(function (q) {
       var sec = el('div', 'mb-3');
       sec.appendChild(el('div', 'fw-bold', q.title));
-      sec.appendChild(el('div', 'text-secondary mt-1', q.evidence));
+      var ev = el('div', 'text-secondary mt-1', q.evidence);
+      /* §584 (옥대표 "어딘지 알 수 있게 링크를 주면") — 문답은 "33:55–41:12
+         구간" 이라고만 말하고 그게 **어디였는지**는 안 보여 준다. 그 구간을
+         지도에서 보고 한 번에 돌아온다. 시각을 아는 질문에만 붙인다. */
+      if (q.fromSec != null && q.toSec != null && q.toSec > q.fromSec) {
+        var jump = el('button', 'btn btn-sm btn-ghost-secondary ms-2 p-0 px-1',
+          'Show on map');
+        jump.type = 'button';
+        jump.title = 'Jump to this stretch on the track';
+        jump.addEventListener('click', function () {
+          showRangeOnTrack(q.fromSec, q.toSec,
+            RDSessionQA.fmtClock(q.fromSec) + '\u2013' + RDSessionQA.fmtClock(q.toSec));
+        });
+        ev.appendChild(jump);
+      }
+      sec.appendChild(ev);
       var row = el('div', 'd-flex flex-wrap gap-2 mt-2');
       q.options.forEach(function (o) {
         var picked = answers[q.id] && answers[q.id].key === o.key;
