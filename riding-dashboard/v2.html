@@ -70,6 +70,19 @@
              font-variant-numeric: tabular-nums; }
   /* §572 폴라 눈금 — 테마 토큰에서 색을 받아야 양쪽 테마에서 읽힌다 */
   .pol-tick { font: 10px "IBM Plex Mono", monospace; fill: var(--tblr-secondary); }
+  /* §583 (옥대표 "좌우 아래위 칸을 맞추는게 어떠니") — Tabler 의 .alert 는
+     display:flex 라 칸이 **내용 길이대로** 잡힌다. 그래서 회전 코칭의 첫 칸이
+     행마다 65 / 35 / 83px 로 제각각이었다(실측).
+     각 행을 같은 열 정의를 쓰는 격자로 만들면 행끼리 세로로 맞는다 —
+     행마다 자기 배경색(경고/위험/양호)은 그대로 유지된다. */
+  .tc-row { display: grid;
+    grid-template-columns: minmax(110px, 152px) minmax(150px, 210px)
+                           minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: .2rem 1.1rem; align-items: start; }
+  .tc-row > * { margin-top: 0 !important; }
+  @media (max-width: 900px) {
+    .tc-row { grid-template-columns: 1fr; gap: .35rem; }
+  }
 </style>
 </head>
 <body>
@@ -381,6 +394,6 @@
 <script src="js/trend-analysis.js?v=v582"></script>
 <script src="js/gear-usage.js?v=v559"></script>
 <script src="js/chart-tip.js?v=v560"></script>
-<script src="js/v2-app.js?v=v581"></script>
+<script src="js/v2-app.js?v=v583"></script>
 </body>
 </html>

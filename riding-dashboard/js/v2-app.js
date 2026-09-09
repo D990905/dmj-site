@@ -7695,12 +7695,17 @@
     }
     var TONE = { warn: 'alert alert-warning', bad: 'alert alert-danger',
                  good: 'alert alert-success' };
+    /* §583 (옥대표 "좌우 아래위 칸을 맞추는게 어떠니 좀더 정렬되어 보일 수
+       있게") — .alert 가 display:flex 라 칸 폭이 내용 길이를 따라가 행마다
+       달랐다. 같은 열 정의를 쓰는 격자(.tc-row)로 바꾼다.
+       ⚠ 칸이 비어도 자리를 지켜야 아래 행과 맞는다 — numbers·advice 가
+          없는 행에서 조건부로 빼면 그 행만 열이 밀린다. */
     comments.forEach(function (c) {
-      var box = el('div', (TONE[c.status] || 'alert alert-info') + ' mb-2');
+      var box = el('div', (TONE[c.status] || 'alert alert-info') + ' mb-2 tc-row');
       box.appendChild(el('div', 'fw-bold', tr(c.title)));
-      if (c.numbers) box.appendChild(el('div', 'num mt-1', tr(c.numbers)));
-      box.appendChild(el('div', 'mt-1', tr(c.diagnosis)));
-      if (c.advice) box.appendChild(el('div', 'mt-1 text-secondary', tr(c.advice)));
+      box.appendChild(el('div', 'num', c.numbers ? tr(c.numbers) : ''));
+      box.appendChild(el('div', null, tr(c.diagnosis)));
+      box.appendChild(el('div', 'text-secondary', c.advice ? tr(c.advice) : ''));
       body.appendChild(box);
     });
     card.appendChild(body);
