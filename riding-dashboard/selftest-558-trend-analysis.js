@@ -83,6 +83,20 @@ ok('중복 저장본은 하나로 친다 (§490 과 같은 규칙)',
 console.log('\n[7] 배선');
 var app=fs.readFileSync(path.join(__dirname,'js/v2-app.js'),'utf8');
 ok('★ v2 가 RDTrend 를 부른다', /RDTrend\.render\(trendHost, list, THEME\)/.test(app));
+/* ⚠ 앵커 세 줄(t.appendChild… host.appendChild(card))이 renderLedgerTable 에도
+   똑같이 있다. 처음에 파일 전체 치환으로 훈련부하 원장에 붙었고, 거기엔 list 가
+   없어 조용히 아무것도 안 그려졌다. 어느 함수 안인지 고정한다. */
+ok('★★ 호출이 renderSessions 안에 있다 (renderLedgerTable 아님)', (function(){
+  var i=app.indexOf('RDTrend.render(trendHost');
+  if(i<0) return false;
+  var re=/\n  function (\w+)\(/g, m, last=null;
+  var head=app.slice(0,i);
+  while((m=re.exec(head))) last=m[1];
+  return last==='renderSessions'; })(),
+  (function(){ var i=app.indexOf('RDTrend.render(trendHost');
+    var re=/\n  function (\w+)\(/g,m,last=null,head=app.slice(0,i);
+    while((m=re.exec(head))) last=m[1]; return 'found in '+last; })());
+ok('호출은 한 곳뿐', (app.match(/RDTrend\.render\(trendHost/g)||[]).length===1);
 ok('모듈이 없어도 안 터진다', /if \(window\.RDTrend\) \{/.test(app));
 ok('★ 실패해도 스택을 남긴다 (삼켜진 예외 금지)',
    /\[v2 §558\] trend render/.test(app));

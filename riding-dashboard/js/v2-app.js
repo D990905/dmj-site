@@ -2419,18 +2419,6 @@
     });
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
     host.appendChild(card);
-
-    /* §558 (옥대표 "벤티지 추가야" — Vakaros Vantage 스샷 13장) —
-       풍속대로 걸러 비교 가능한 조건끼리만 보고, 주/월로 묶어 보고,
-       성능 점수를 축별(종합·풍상·풍하·택·자이브) 추세로 본다.
-       세션 단위 그래프(아래 'Season trend')와 역할이 다르다 — 그쪽은
-       세션 하나하나, 이쪽은 기간과 조건이다. */
-    if (window.RDTrend) {
-      var trendHost = el('div');
-      host.appendChild(trendHost);
-      try { RDTrend.render(trendHost, list, THEME); }
-      catch (e) { if (window.console) console.error('[v2 §558] trend render', e); }
-    }
   }
 
   /* §462 바람이 자리 문제였나 시간 문제였나 — 다음 세션의 전략이 갈린다.
@@ -4024,6 +4012,21 @@
     });
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
     host.appendChild(card);
+
+    /* §558 (옥대표 "벤티지 추가야" — Vakaros Vantage 스샷 13장) —
+       풍속대로 걸러 비교 가능한 조건끼리만 보고, 주/월로 묶어 보고,
+       성능 점수를 축별(종합·풍상·풍하·택·자이브) 추세로 본다.
+       바로 아래 'Season trend'(세션 단위)와 역할이 다르다 — 그쪽은
+       세션 하나하나, 이쪽은 기간과 조건이다.
+       ⚠ 이 앵커 세 줄은 renderLedgerTable 에도 똑같이 있다. 처음에 파일
+          전체에서 치환했다가 훈련부하 원장에 붙었고, 거기엔 list 가 없어
+          조용히 아무것도 안 그려졌다(옥대표 화면에서 발각). */
+    if (window.RDTrend) {
+      var trendHost = el('div');
+      host.appendChild(trendHost);
+      try { RDTrend.render(trendHost, list, THEME); }
+      catch (e) { if (window.console) console.error('[v2 §558] trend render', e); }
+    }
 
     /* §490 시즌 흐름 (옥대표) — 지표·집계를 골라 보고, 같은 세션이 여러 번
        저장돼 있으면 하나로 친다.
