@@ -4558,6 +4558,17 @@
         if (TURNFILT.side !== 'all' && d.m.side !== TURNFILT.side) return false;
         return true;
       });
+    /* §571 — 걸러낸 것들을 **세어서 화면에 밝힌다.** 조용히 빼면 개수가
+       왜 줄었는지 알 수 없다. 종류·방향 필터를 통과한 것 중에서 센다. */
+    var dropped = { stalled: 0, 'over-rotated': 0, 'too long': 0, total: 0 };
+    view.forEach(function (d) {
+      var q = turnQuality(d.m);
+      d.q = q;
+      if (!q.ok) { dropped.total++; if (dropped[q.why] != null) dropped[q.why]++; }
+    });
+    if (TURNFILT.clean) {
+      view = view.filter(function (d) { return d.q.ok; });
+    }
     var act2 = el('div', 'card-actions d-flex align-items-center gap-2');
     function filtSel(list, cur, onPick) {
       var sel = el('select', 'form-select form-select-sm');
@@ -4575,6 +4586,10 @@
       TURNFILT.type, function (v) { TURNFILT.type = v; renderTurnExtras(a); }));
     act2.appendChild(filtSel([['all', 'Both tacks'], ['P', 'Port'], ['S', 'Starboard']],
       TURNFILT.side, function (v) { TURNFILT.side = v; renderTurnExtras(a); }));
+    /* §571 — 기본은 '진짜 기동만'. 끄면 전부 보인다. */
+    act2.appendChild(filtSel([['clean', 'Real maneuvers'], ['all', 'Include falls & spins']],
+      TURNFILT.clean ? 'clean' : 'all',
+      function (v) { TURNFILT.clean = (v === 'clean'); renderTurnExtras(a); }));
     /* §518 (옥대표 "모두 한번에 선택하는 기능") — 지금 **걸린 필터에
        보이는 것 전부**를 고른다. 전체가 아니라 보이는 것이라야 뜻이
        있다: 'Gybes · Port 27개' 를 골라 밴드와 궤적을 한 번에 보는 게
@@ -4678,12 +4693,42 @@
         }
       }, 0);
     }
+    /* §571 — 걸러낸 것을 **숫자와 이유로** 밝힌다. 조용히 빼면 개수가 왜
+       줄었는지 알 수 없고, 그 순간 필터는 통계를 조작하는 도구가 된다. */
+    if (dropped.total) {
+      var dw = el('div', 'card-body py-2');
+      var dl = el('div', 'text-secondary');
+      dl.style.fontSize = '.8125rem';
+      var parts = [];
+      if (dropped.stalled) parts.push(dropped.stalled + ' stalled or fell');
+      if (dropped['over-rotated']) parts.push(dropped['over-rotated'] + ' spun past 225°');
+      if (dropped['too long']) parts.push(dropped['too long'] + ' ran over 30 s');
+      dl.textContent = TURNFILT.clean
+        ? dropped.total + ' turn' + (dropped.total > 1 ? 's' : '') + ' left out — '
+          + parts.join(', ') + '. These are falls and in-place spins, not maneuvers; '
+          + 'keeping them drags the averages toward the failures rather than the technique.'
+        : dropped.total + ' of these are falls or in-place spins ('
+          + parts.join(', ') + ') — shown because the filter is off.';
+      dw.appendChild(dl);
+      var db = el('button', 'btn btn-sm btn-ghost-secondary mt-1',
+        TURNFILT.clean ? 'Show them' : 'Hide them again');
+      db.type = 'button';
+      db.addEventListener('click', function () {
+        TURNFILT.clean = !TURNFILT.clean; renderTurnExtras(a);
+      });
+      dw.appendChild(db);
+      card2.appendChild(dw);
+    }
     var fn = el('div', 'card-footer text-secondary');
     fn.style.fontSize = '.8125rem';
     fn.textContent = 'Click a row to open it below; click again to deselect. '
       + 'Loss and efficiency use VMG when the wind angle is reliable (usually gybes) '
       + 'and plain speed otherwise \u2014 the Basis column says which, so a VMG loss '
-      + 'next to rising speed is not a contradiction.';
+      + 'next to rising speed is not a contradiction. '
+      /* 임계가 어디서 왔는지 말한다 — 없으면 임의의 숫자로 보인다 */
+      + 'The cut-offs come from your own turns: 6 kt sits in the valley between turns '
+      + 'that kept moving and turns that stopped, and 225° is where the turn-angle '
+      + 'histogram falls off a cliff.';
     card2.appendChild(fn);
     lh.appendChild(card2);
 
@@ -5287,7 +5332,53 @@
   /* §520 — gear 는 시즌 흐름의 장비 필터(null = 전체) */
   var TREND = { metric: 'max', gear: null };
   /* §488 — 회전 목록 그룹 필터 (종류 × 택 방향) */
-  var TURNFILT = { type: 'all', side: 'all' };
+  /* §571 (옥대표 "제대로 된 메뉴버가 아니면 자동으로 제거할 수는 없을까?
+     터무니 없는 제자리 택자이빙이나 빠지는것들") — clean: true 가 기본이다. */
+  var TURNFILT = { type: 'all', side: 'all', clean: true };
+
+  /* §571 — 기동인 척하는 것들을 걸러낸다. 임계는 **감이 아니라 분포**에서
+     뽑았다(저장된 11세션 · 기동 666개 전수):
+
+       최저속 1kt 구간 히스토그램
+         0–3kt  58개   ← 넘어지거나 멈춘 것
+         4–9kt  23개   ← 골짜기
+         10kt+ 585개   ← 정상 기동
+       → 두 봉우리 사이 골짜기 한가운데가 6kt.
+
+       회전각 45° 구간
+         180–225°  192개
+         225–270°   22개  ← 여기서 절벽
+       → 225° 넘게 도는 것은 택·자이브가 아니라 제자리 회전이다.
+
+       지속시간 p95 = 21초 → 30초 넘는 것은 기동이 아니라 멈췄다 다시 선 것.
+
+     ⚠ maneuver.completed 는 **쓰지 않는다.** false 로 표시된 44건 중 18건이
+       'in17.6→out12.1 · min13.4 · loss24%' 같은 멀쩡한 자이브였다.
+     ⚠ 반경 8m 미만(제자리 회전)은 위 최저속 조건에 **전부 포함**돼 있어
+       따로 두지 않는다(겹침 확인: 40건 전부).
+
+     실측 효과: 666개 중 85개 제외(87.2% 유지), 택 평균 손실 44.1% → 36.0%. */
+  var TURN_STALL_KT = 6;        /* 두 봉우리 사이 골짜기 */
+  var TURN_MAX_ANGLE = 225;     /* 회전각 분포의 절벽 */
+  var TURN_MAX_SEC = 30;        /* p95(21초)의 1.4배 */
+
+  function turnQuality(m) {
+    if (!m) return { ok: false, why: 'missing' };
+    var minKt = (m.minSpeedMs || 0) * KT;
+    if (minKt < TURN_STALL_KT) {
+      return { ok: false, why: 'stalled',
+               note: 'dropped to ' + minKt.toFixed(1) + ' kt' };
+    }
+    if (m.turnAngle != null && m.turnAngle > TURN_MAX_ANGLE) {
+      return { ok: false, why: 'over-rotated',
+               note: Math.round(m.turnAngle) + '° of turn' };
+    }
+    if (m.durationSec != null && m.durationSec > TURN_MAX_SEC) {
+      return { ok: false, why: 'too long',
+               note: Math.round(m.durationSec) + ' s' };
+    }
+    return { ok: true };
+  }
   /* §496 — 회전 목록을 다시 그릴 때 유지할 스크롤 위치 */
   var TURN_KEEP_SCROLL = null;
 
