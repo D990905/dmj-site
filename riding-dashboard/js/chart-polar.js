@@ -216,7 +216,11 @@
     var ctx = cv.getContext('2d');
     ctx.scale(dpr, dpr);
 
-    var cx = size / 2, cy = size * 0.52, R = size * 0.42;
+    /* §579 — 여백을 비율(size×0.08)로 잡으면 작은 크기에서 port/stbd 라벨이
+       캔버스 밖으로 잘린다(280px 에서 실측 -10px). 라벨은 글자 수가 정해져
+       있으므로 **고정 픽셀**로 확보한다: 6(간격) + 'port' 4글자 ≈ 33 → 34.
+       420px 에서는 기존 0.42R 과 사실상 같아 큰 화면의 모양은 안 바뀐다. */
+    var cx = size / 2, cy = size * 0.52, R = Math.max(60, size / 2 - 34);
     var GRID = opts.grid || '#2b3648', DIM = opts.dim || '#8a97a8';
     var PORT = opts.port || '#e03131', STBD = opts.starboard || '#2f9e44';
 
@@ -261,9 +265,16 @@
     /* 라벨 */
     ctx.fillStyle = DIM;
     ctx.font = '11px "IBM Plex Mono", ui-monospace, monospace';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.textBaseline = 'middle';
+    /* §579 (옥대표 "글자겹침해결") — 고리 라벨을 가운데 정렬로 cx+2 에 두면
+       0° 세로 살 위에 걸터앉는다. 살 오른쪽으로 완전히 비켜 세운다. */
+    ctx.textAlign = 'left';
     rings.forEach(function (v) {
-      ctx.fillText(v + ' kt', cx + 2, cy - (v / maxKt) * R - 8);
+      var ry = cy - (v / maxKt) * R;
+      /* 최외곽 고리가 R 에 가까우면 그 라벨이 '0° upwind' 와 부딪힌다.
+         maxKt 가 step 의 배수일 때 실제로 그렇게 된다. */
+      if (ry - (cy - R) < 14) return;
+      ctx.fillText(v + ' kt', cx + 5, ry - 8);
     });
     /* 각도 숫자 — 30° 마다 양쪽에 */
     ctx.font = '10px "IBM Plex Mono", ui-monospace, monospace';
@@ -278,8 +289,13 @@
     ctx.font = '11px "IBM Plex Mono", ui-monospace, monospace';
     ctx.fillText('0° upwind', cx, cy - R - 16);
     ctx.fillText('180° downwind', cx, cy + R + 18);
-    ctx.textAlign = 'right'; ctx.fillText('port', cx - R - 6, cy);
-    ctx.textAlign = 'left';  ctx.fillText('stbd', cx + R + 6, cy);
+    /* §579 (옥대표 "글자겹침해결") — port/stbd 가 90° 각도 라벨과 **같은
+       높이**에 있어 'po90t' · 's90bd' 로 겹쳐 찍혔다.
+       ⚠ 합쳐서 '90° port' 로 적어 봤더니 가로 여백(size×0.08)을 넘어 캔버스
+          밖으로 잘렸다. 넓히는 대신 **세로로 어긋나게** 둔다 — 짧은 라벨
+          그대로라 여백 안에 들어가고, 90° 는 각도 고리에 그대로 남는다. */
+    ctx.textAlign = 'right'; ctx.fillText('port', cx - R - 6, cy + 14);
+    ctx.textAlign = 'left';  ctx.fillText('stbd', cx + R + 6, cy + 14);
 
     /* ---- 띠 (평소 ~ 잘 됐을 때) ----
        두 계열의 각도가 같은 구간에서만 채운다. 한쪽에만 있는 각도를
