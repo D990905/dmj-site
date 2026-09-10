@@ -154,9 +154,7 @@
         });
         pane.classList.add('active', 'show');
         resizePlots(pane);
-        if (sel === '#tab-track' && mapInst && mapInst.map) {
-          setTimeout(function () { mapInst.map.invalidateSize(); }, 60);
-        }
+        if (sel === '#tab-track') setTimeout(ensureTrackFit, 60);
       });
     });
     var rt;
@@ -6257,6 +6255,9 @@
     TRACK_RETURN = { tabHref: currentTabHref(), scrollY: window.scrollY || 0 };
     var a = idxAtSec(fromSec), b = idxAtSec(toSec);
     if (a < 0 || b < 0 || b <= a) { TRACK_RETURN = null; return; }
+    /* §586i — 곧 구간에 맞출 것이므로 전체 트랙 맞춤은 건너뛴다
+       (안 그러면 60ms 에 전체 → 140ms 에 구간으로 한 번 튄다) */
+    if (mapInst) mapInst._fitDone = true;
     var link = document.querySelector('.nav-tabs .nav-link[href="#tab-track"]');
     if (link) link.click();
     setTimeout(function () {
@@ -9105,6 +9106,48 @@
   /* ---------- 트랙 지도 ---------- */
   var mapInst = null, mapMode = 'speed', mapCtx = null;
 
+  /* §586i — 트랙 지도가 최대 배율(z19)로 열리던 것. 데스크톱·폰 모두
+     (라이브 실측: 1280px 셸 꺼진 상태에서도 z19).
+     지도는 숨은 탭에서 만들어진다(첫 탭은 Wind, §578). 크기 0 에서
+     fitBounds 는 최대 배율을 고른다. 지도 모듈의 60ms 재맞춤(§491)도
+     탭이 그때까지 숨어 있으면 똑같이 0 에서 헛돈다. 그리고 탭을 열 때는
+     invalidateSize 만 불렀는데, 그건 크기만 고치지 배율은 못 고친다.
+     → 트랙 탭이 보이는 순간, 아직 제대로 맞춘 적이 없으면 전체 트랙에.
+       이미 맞췄으면(보이는 채로 태어났거나, 한 번 맞췄거나, §584 구간
+       보기) 사용자가 옮긴 화면을 건드리지 않는다. */
+  var TRACK_BORN_VISIBLE = false;
+  function trackLatLngBounds() {
+    var S = (CUR.session && CUR.session.samples) || [];
+    var la0 = 90, la1 = -90, ln0 = 180, ln1 = -180, n = 0;
+    for (var i = 0; i < S.length; i++) {
+      var p = S[i];
+      if (p.lat == null || p.lng == null || !isFinite(p.lat) || !isFinite(p.lng)) continue;
+      if (p.lat < la0) la0 = p.lat;
+      if (p.lat > la1) la1 = p.lat;
+      if (p.lng < ln0) ln0 = p.lng;
+      if (p.lng > ln1) ln1 = p.lng;
+      n++;
+    }
+    return n > 1 ? [[la0, ln0], [la1, ln1]] : null;
+  }
+  function ensureTrackFit() {
+    if (!mapInst || !mapInst.map) return;
+    var m = mapInst.map;
+    try {
+      m.invalidateSize();
+      if (mapInst._fitDone === undefined) mapInst._fitDone = TRACK_BORN_VISIBLE;
+      if (mapInst._fitDone) return;
+      var sz = m.getSize();
+      if (!(sz.x > 0 && sz.y > 0)) return;          /* 아직 숨어 있다 — 다음 기회에 */
+      var b = trackLatLngBounds();
+      if (!b) return;
+      m.fitBounds(b, { padding: [24, 24] });
+      mapInst._fitDone = true;
+    } catch (e) {
+      if (window.console) console.error('[v2 §586i] track fit', e);
+    }
+  }
+
   function mapSwatch(color, w, h, round) {
     var sw = el('span');
     sw.style.cssText = 'width:' + w + 'px;height:' + h + 'px;background:' + color +
@@ -9121,6 +9164,7 @@
     mapCtx = { session: session, analysis: analysis };
     var host = $('map-host');
     if (!host) return;
+    TRACK_BORN_VISIBLE = host.offsetWidth > 0;       /* §586i */
     if (mapInst && mapInst.map) { try { mapInst.map.remove(); } catch (e) {} }
     mapInst = null;
     var lg = $('map-legend'), note = $('map-mode-note'), cav = $('map-caveat');
