@@ -139,6 +139,14 @@
      페이지가 417px 로 밀렸다(실측). 카드 안의 직계 자식은 다 줄어들게. */
   body.rdm .tab-pane .card-body > *,
   body.rdm .tab-pane .card-footer > * { min-width: 0; max-width: 100%; }
+
+  /* 폴라 캔버스는 만들어질 때 host.clientWidth 로 크기를 정하는데
+     (chart-polar.js:210), 그 시점에 탭이 숨어 있으면 0 → 기본값 420px 로
+     태어난다. 데스크톱 1440px 에서는 아무도 몰랐고 375px 에서 페이지를
+     493px 로 밀었다(실측). 비율 유지하며 줄인다.
+     uPlot 캔버스(.u-wrap 안)는 픽셀 단위로 배치되므로 건드리지 않는다. */
+  body.rdm .tab-pane canvas { max-width: 100%; }
+  body.rdm .tab-pane :not(.u-wrap) > canvas { height: auto; }
   /* max-height 로 접는다 — 폭은 그대로라서 uPlot 이 0px 로 그려지지 않는다.
      (display:none 으로 접으면 차트가 폭 0 으로 태어난다) */
   .rdm-fold[data-open="0"] > .card-body,
