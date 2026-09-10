@@ -89,6 +89,21 @@ if (srcB && srcE) {
   ok('★ 지도가 없어도 터지지 않는다', !h6.env.err);
 }
 
+ok('★★ 애니메이션 없이 맞춘다 (가려진 창에서 z19 에 멈춤 · 첫 화면이 날아나옴)',
+   /m\.fitBounds\(b, \{ padding: \[24, 24\], animate: false \}\);/.test(code));
+if (srcB && srcE) {
+  var hA = (function () {
+    var got = null;
+    var fake = { invalidateSize: function () {}, getSize: function () { return { x: 351, y: 460 }; },
+                 fitBounds: function (b, o) { got = o; } };
+    new Function('env', 'var mapInst = env.m, TRACK_BORN_VISIBLE = false, CUR = env.C;' +
+      'var window = { console: { error: function () {} } };' + srcB + srcE + 'ensureTrackFit();')
+      ({ m: { map: fake }, C: { session: { samples: SAMPLES } } });
+    return got;
+  })();
+  ok('★★ 실제 호출 옵션에 animate:false 가 들어간다', hA && hA.animate === false, JSON.stringify(hA));
+}
+
 console.log('\n[3] §584 구간 보기와 겹치지 않게');
 ok('★★ 구간 보기는 탭을 누르기 전에 표시한다 (60ms 전체 → 140ms 구간 튐 방지)', (function () {
   var i = code.indexOf('function showRangeOnTrack');

@@ -9141,7 +9141,12 @@
       if (!(sz.x > 0 && sz.y > 0)) return;          /* 아직 숨어 있다 — 다음 기회에 */
       var b = trackLatLngBounds();
       if (!b) return;
-      m.fitBounds(b, { padding: [24, 24] });
+      /* animate:false — 기본값은 애니메이션인데, 19→15 처럼 4단계 이내면
+         CSS transition 으로 간다. 그러면 (1) 첫 화면이 거리 수준에서 날아
+         나오는 게 보이고 (2) 창이 가려져 있으면 transition 이 멈춰 z19 에
+         그대로 남는다(실측: getBoundsZoom=15 인데 getZoom=19). 첫 화면은
+         그냥 제자리에 놓는다. */
+      m.fitBounds(b, { padding: [24, 24], animate: false });
       mapInst._fitDone = true;
     } catch (e) {
       if (window.console) console.error('[v2 §586i] track fit', e);
