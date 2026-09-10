@@ -255,6 +255,11 @@
   .rdm-sheet__slot .form-select { width: 100% !important; }
   .rdm-sheet__slot #auth-chip { font-size: .875rem; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
   .rdm-sheet__slot #auth-chip .btn { font-size: .875rem; padding: .375rem .75rem !important; min-height: 36px; }
+  /* 로그인 링크가 글자처럼 보여 눌러야 하는 것인지 알 수 없었다 */
+  .rdm-sheet__slot #auth-chip a.btn {
+    background: var(--tblr-primary); color: #fff; border-color: var(--tblr-primary);
+    min-height: 40px; padding: .5rem 1rem !important; font-weight: 600;
+  }
   .rdm-sheet__note { padding: 0 16px 8px; font-size: .75rem; line-height: 1.4; color: #c1c5cd; }
 
   /* 지도·차트가 좁은 화면에서 납작해지지 않도록 */
