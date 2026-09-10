@@ -146,7 +146,10 @@
      493px 로 밀었다(실측). 비율 유지하며 줄인다.
      uPlot 캔버스(.u-wrap 안)는 픽셀 단위로 배치되므로 건드리지 않는다. */
   body.rdm .tab-pane canvas { max-width: 100%; }
-  body.rdm .tab-pane :not(.u-wrap) > canvas { height: auto; }
+  /* height 는 chart-polar 가 인라인으로 460px 을 박아 둔다 — 인라인이
+     이기므로 폭만 줄면 원이 타원(309x460, 비율 0.67)이 된다. 여기서만
+     !important 를 쓴다. 비율은 canvas 의 width/height 속성이 준다. */
+  body.rdm .tab-pane :not(.u-wrap) > canvas { height: auto !important; }
   /* max-height 로 접는다 — 폭은 그대로라서 uPlot 이 0px 로 그려지지 않는다.
      (display:none 으로 접으면 차트가 폭 0 으로 태어난다) */
   .rdm-fold[data-open="0"] > .card-body,
