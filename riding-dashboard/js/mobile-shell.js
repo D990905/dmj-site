@@ -323,9 +323,13 @@
   function decorate(pane) {
     if (!pane) return;
     var cards = $$('.card', pane).filter(function (c) { return isTopCard(c, pane); });
+    /* 접을 수 있는 카드(머리가 있는 것)만 센다. 인덱스를 전체 카드로 세면
+       0번이 머리 없는 카드일 때 아무것도 안 펼쳐진다(tab-env·tab-phys 실측). */
+    var nFold = 0;
     cards.forEach(function (card, i) {
       var head = card.querySelector(':scope > .card-header');
       if (!head) return;
+      var ord = nFold++;
       var key = foldKey(card, i);
       if (!card.classList.contains('rdm-fold')) {
         card.classList.add('rdm-fold');
@@ -344,7 +348,7 @@
       }
       card.setAttribute('data-foldkey', key);
       var remembered = foldState[key];
-      var open = (remembered === undefined) ? (i === 0) : remembered;   // 첫 장만 펼침
+      var open = (remembered === undefined) ? (ord === 0) : remembered;  // 첫 장만 펼침
       card.setAttribute('data-open', open ? '1' : '0');
     });
     hintTables(pane);

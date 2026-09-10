@@ -111,6 +111,28 @@
     transition: transform .18s ease; opacity: .6;
   }
   .rdm-fold[data-open="1"] > .card-header .rdm-chev { transform: rotate(180deg); }
+
+  /* 카드 머리의 필터 단추들(.card-actions)이 줄바꿈을 안 해서 헤더가
+     564~612px 로 벌어졌다 = 페이지 전체가 옆으로 스크롤됨(실측). 제목과
+     같은 줄에 두지 말고 아래로 내리고, 그 안에서 다시 접히게 한다. */
+  .rdm-fold > .card-header > * { min-width: 0; max-width: 100%; }
+  .rdm-fold > .card-header > .card-title {
+    flex: 1 1 auto; font-size: .9375rem; overflow-wrap: anywhere;
+  }
+  .rdm-fold > .card-header > .card-actions {
+    order: 9; flex: 1 1 100%; margin: 6px 0 0 0 !important;
+    display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
+  }
+  .rdm-fold[data-open="0"] > .card-header > .card-actions { display: none; }
+  .rdm-fold > .card-header .btn-group,
+  .rdm-fold > .card-header .nav-pills { flex-wrap: wrap; }
+  .rdm-fold > .card-header .btn { font-size: .75rem; padding: .25rem .5rem; }
+  .rdm-fold > .card-header .form-select,
+  .rdm-fold > .card-header .form-control { width: auto !important; max-width: 100%; font-size: .8125rem; }
+
+  /* 세로 한 줄 배치라 가로 거터가 필요 없다. 남겨 두면 .row 의 음수 여백이
+     감싼 요소 밖으로 삐져나온다(#turn-extra 355 vs 351). */
+  body.rdm .tab-pane .row { --tblr-gutter-x: 0; --bs-gutter-x: 0; }
   /* max-height 로 접는다 — 폭은 그대로라서 uPlot 이 0px 로 그려지지 않는다.
      (display:none 으로 접으면 차트가 폭 0 으로 태어난다) */
   .rdm-fold[data-open="0"] > .card-body,
