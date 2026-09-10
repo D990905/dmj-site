@@ -1,0 +1,209 @@
+/* §586 모바일 셸 — 옥대표 "모바일 버전으로 앱 느낌으로 현재버젼을 재구성"
+ *
+ * 왜 이 파일이 따로인가: 데스크톱 레이아웃은 지난 며칠 동안 고친 것이
+ * 전부 들어 있다(§542 제목 하한, §565 축 간격, §572 폴라, §583 칸 정렬…).
+ * 그걸 건드리면 되돌리기가 어렵다. 그래서 이 파일 전체가 768px 이하에서만
+ * 켜지고, 그 위에서는 한 줄도 적용되지 않는다.
+ *
+ * 실측한 문제 (375x812, 라이브, 2026-09-10):
+ *   - 첫 내용이 나오기까지 위쪽 크롬이 1134px = 화면 1.4장
+ *     (navbar 56 + page-header 220 + 입력카드 234 + KPI 415 + 탭줄 119)
+ *   - 탭 9개가 3줄로 접혀 119px 를 먹는다
+ *   - Performance 탭 한 장이 8867px = 화면 11장, 카드 15개
+ *   - 탭 막대가 화면 맨 위에 있어 엄지가 닿지 않는다
+ */
+
+@media (max-width: 768px) {
+
+  /* ── 1. 데스크톱 크롬을 걷어낸다 ─────────────────────────── */
+  body.rdm .page-header,
+  body.rdm > .page > header.navbar,
+  body.rdm .card > .card-header > .nav-tabs.card-header-tabs { display: none !important; }
+
+  /* 탭 카드는 모바일에서 테두리가 이중이라 껍데기만 벗긴다 */
+  body.rdm .page-body > .container-xl > .card.mt-3 {
+    border: 0; background: transparent; margin-top: 0 !important;
+  }
+  body.rdm .page-body > .container-xl > .card.mt-3 > .card-header { display: none; }
+  body.rdm .page-body > .container-xl > .card.mt-3 > .card-body { padding: 0; }
+
+  body.rdm .page-body > .container-xl { padding-left: 12px; padding-right: 12px; }
+  body.rdm .page-wrapper { padding-top: 0; }
+
+  /* 아래 탭바에 내용이 가리지 않도록 */
+  body.rdm .page-body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ── 2. 상단 앱바 (52px, 고정) ───────────────────────────── */
+  .rdm-appbar {
+    position: sticky; top: 0; z-index: 1030;
+    display: flex; align-items: center; gap: 8px;
+    height: 52px; padding: 0 12px;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--tblr-bg-surface);
+    border-bottom: 1px solid var(--tblr-border-color);
+  }
+  .rdm-appbar__txt { min-width: 0; flex: 1 1 auto; }
+  .rdm-appbar__date {
+    font-size: .6875rem; line-height: 1.1; color: #c1c5cd;
+    font-family: "IBM Plex Mono", monospace;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .rdm-appbar__title {
+    font-size: .9375rem; font-weight: 600; line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .rdm-iconbtn {
+    flex: 0 0 auto;
+    width: 44px; height: 44px;           /* 손가락 최소치 */
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 0; background: transparent; border-radius: 10px;
+    color: var(--tblr-body-color); cursor: pointer;
+  }
+  .rdm-iconbtn:active { background: var(--tblr-border-color); }
+
+  /* ── 3. 라이더 입력 — 한 줄 요약으로 접는다 (234px → 40px) ── */
+  body.rdm .rdm-inputs { margin-bottom: 8px !important; }
+  body.rdm .rdm-inputs > .card-body { padding: 0 !important; }
+  .rdm-inputs__sum {
+    display: flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 0 12px; cursor: pointer;
+    font-size: .8125rem;
+  }
+  .rdm-inputs__sum b { font-family: "IBM Plex Mono", monospace; font-weight: 600; }
+  .rdm-inputs__sum .rdm-chev { margin-left: auto; opacity: .6; }
+  body.rdm .rdm-inputs .row.g-2 { padding: 4px 12px 12px; }
+  body.rdm .rdm-inputs[data-open="0"] .row.g-2 { display: none; }
+  /* 접힌 폼을 열면 세로로 — 가로 고정폭 input 이 밀려나가지 않게 */
+  body.rdm .rdm-inputs .row.g-2 > .col-auto { flex: 1 0 46%; }
+  body.rdm .rdm-inputs input.form-control,
+  body.rdm .rdm-inputs select.form-select { width: 100% !important; }
+
+  /* ── 4. KPI — 가로 스냅 스크롤 띠 (415px → 104px) ────────── */
+  body.rdm #kpi-row {
+    display: flex; flex-wrap: nowrap; gap: 8px;
+    overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -12px 8px; padding: 0 12px 4px;
+    scrollbar-width: none;
+  }
+  body.rdm #kpi-row::-webkit-scrollbar { display: none; }
+  body.rdm #kpi-row > * {
+    flex: 0 0 auto; width: 132px; max-width: 132px;
+    scroll-snap-align: start; margin: 0 !important; padding: 0 !important;
+  }
+  body.rdm #kpi-row .card { height: 100%; }
+  body.rdm #kpi-row .card-body { padding: 10px 12px; }
+  body.rdm #kpi-row .kpi__val { font-size: 1.35rem; }
+
+  /* ── 5. 탭 안의 카드를 접는다 (8867px → 한 화면) ─────────── */
+  body.rdm .tab-pane > .row > [class*="col-"],
+  body.rdm .tab-pane > .row > .col { width: 100%; flex: 0 0 100%; max-width: 100%; }
+
+  .rdm-fold > .card-header {
+    cursor: pointer; min-height: 48px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .rdm-fold > .card-header .rdm-chev {
+    margin-left: auto; flex: 0 0 auto;
+    transition: transform .18s ease; opacity: .6;
+  }
+  .rdm-fold[data-open="1"] > .card-header .rdm-chev { transform: rotate(180deg); }
+  /* max-height 로 접는다 — 폭은 그대로라서 uPlot 이 0px 로 그려지지 않는다.
+     (display:none 으로 접으면 차트가 폭 0 으로 태어난다) */
+  .rdm-fold[data-open="0"] > .card-body,
+  .rdm-fold[data-open="0"] > .table-responsive,
+  .rdm-fold[data-open="0"] > .card-footer,
+  .rdm-fold[data-open="0"] > .list-group { display: none; }
+
+  /* ── 6. 표 ─────────────────────────────────────────────── */
+  body.rdm .table-responsive { position: relative; }
+  body.rdm .table-responsive > .table { font-size: .8125rem; }
+  body.rdm .table-responsive > .table > thead th,
+  body.rdm .table-responsive > .table > tbody td { padding: .35rem .5rem; white-space: nowrap; }
+  /* 첫 칸(이름)은 붙잡아 둔다 — 옆으로 밀면 무슨 줄인지 사라진다 */
+  body.rdm .table-responsive > .table > thead th:first-child,
+  body.rdm .table-responsive > .table > tbody td:first-child {
+    position: sticky; left: 0; z-index: 1;
+    background: var(--tblr-bg-surface);
+  }
+  .rdm-scrollhint {
+    font-size: .6875rem; color: #c1c5cd; padding: 2px 12px 6px;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  /* ── 7. 하단 탭바 ───────────────────────────────────────── */
+  .rdm-tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1040;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    background: var(--tblr-bg-surface);
+    border-top: 1px solid var(--tblr-border-color);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .rdm-tabbar__item {
+    -webkit-appearance: none; appearance: none;
+    border: 0; background: transparent; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; height: 56px; padding: 0 2px;
+    color: #c1c5cd; font-size: .625rem; line-height: 1;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .rdm-tabbar__item svg { width: 22px; height: 22px; }
+  .rdm-tabbar__item[aria-selected="true"] { color: var(--tblr-primary); }
+  .rdm-tabbar__lbl {
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rdm-tabbar__dot {
+    position: absolute; top: 6px; right: calc(50% - 16px);
+    width: 6px; height: 6px; border-radius: 50%; background: var(--tblr-primary);
+  }
+
+  /* ── 8. 시트 (More / 동작) ──────────────────────────────── */
+  .rdm-sheet-back {
+    position: fixed; inset: 0; z-index: 1050;
+    background: rgba(0,0,0,.5);
+    opacity: 0; pointer-events: none; transition: opacity .18s ease;
+  }
+  .rdm-sheet-back[data-open="1"] { opacity: 1; pointer-events: auto; }
+  .rdm-sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 1051;
+    background: var(--tblr-bg-surface);
+    border-top-left-radius: 16px; border-top-right-radius: 16px;
+    border-top: 1px solid var(--tblr-border-color);
+    padding: 8px 0 calc(12px + env(safe-area-inset-bottom, 0px));
+    max-height: 76vh; overflow-y: auto;
+    transform: translateY(102%); transition: transform .22s cubic-bezier(.2,.8,.2,1);
+  }
+  .rdm-sheet[data-open="1"] { transform: translateY(0); }
+  .rdm-sheet__grip {
+    width: 38px; height: 4px; border-radius: 2px; margin: 4px auto 10px;
+    background: var(--tblr-border-color);
+  }
+  .rdm-sheet__ttl {
+    font-size: .6875rem; letter-spacing: .04em; color: #c1c5cd;
+    padding: 6px 16px 4px; font-family: "IBM Plex Mono", monospace;
+  }
+  .rdm-sheet__row {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; min-height: 48px; padding: 0 16px;
+    border: 0; background: transparent; cursor: pointer;
+    color: var(--tblr-body-color); font-size: .9375rem; text-align: left;
+    text-decoration: none;
+  }
+  .rdm-sheet__row:active { background: var(--tblr-border-color); }
+  .rdm-sheet__row[aria-selected="true"] { color: var(--tblr-primary); font-weight: 600; }
+  .rdm-sheet__row svg { flex: 0 0 auto; width: 20px; height: 20px; opacity: .8; }
+  .rdm-sheet__slot { padding: 6px 16px; }
+  .rdm-sheet__slot .form-select { width: 100% !important; }
+
+  /* 지도·차트가 좁은 화면에서 납작해지지 않도록 */
+  body.rdm .chart-host { min-height: 220px; }
+  body.rdm #map, body.rdm .rd-map { min-height: 260px; }
+}
+
+/* 769px 이상에서는 셸 요소 자체가 없어야 한다 */
+@media (min-width: 769px) {
+  .rdm-appbar, .rdm-tabbar, .rdm-sheet, .rdm-sheet-back { display: none !important; }
+}
