@@ -63,6 +63,11 @@
   }
   .rdm-iconbtn:active { background: var(--tblr-border-color); }
 
+  /* 크기가 없는 SVG 는 부모를 꽉 채운다(데스크톱에서 1086px 실측).
+     데스크톱은 위 min-width 블록이 아예 숨기므로 여기서만 크기를 준다. */
+  .rdm-chev { display: inline-flex; width: 18px; height: 18px; }
+  .rdm-chev svg { width: 18px; height: 18px; }
+
   /* ── 3. 라이더 입력 — 한 줄 요약으로 접는다 (234px → 40px) ── */
   body.rdm .rdm-inputs { margin-bottom: 8px !important; }
   body.rdm .rdm-inputs > .card-body { padding: 0 !important; }
@@ -246,7 +251,13 @@
   body.rdm #map, body.rdm .rd-map { min-height: 260px; }
 }
 
-/* 769px 이상에서는 셸 요소 자체가 없어야 한다 */
+/* 769px 이상에서는 셸 요소 자체가 없어야 한다.
+   §586h — JS 가 끄는 데 실패해도(breakpoint change 이벤트가 안 오는 경우
+   실측: CDP 에뮬레이션 해제) 데스크톱에 셸 잔해가 보이면 안 된다.
+   특히 크기 규칙이 모바일 쿼리 안에만 있는 SVG 화살표는 데스크톱에서
+   1086px 로 부풀었다. 그래서 CSS 층에서도 전부 막는다. */
 @media (min-width: 769px) {
-  .rdm-appbar, .rdm-tabbar, .rdm-sheet, .rdm-sheet-back { display: none !important; }
+  .rdm-appbar, .rdm-tabbar, .rdm-sheet, .rdm-sheet-back,
+  .rdm-chev, .rdm-inputs__sum, .rdm-scrollhint { display: none !important; }
 }
+

@@ -216,5 +216,28 @@ if (tl && fl) {
      gaps(235, SPL).some(function (g) { return g < 8; }));
 }
 
+/* ── [10] 끄기 실패에 대한 이중 안전장치 (§586h) ─────────── */
+console.log('\n[10] 넓혔는데 셸이 남던 것 (1280px 에서 on=true)');
+ok('★★ resize 에서도 breakpoint 를 다시 본다',
+   /window\.addEventListener\('resize', function \(\) \{[\s\S]{0,80}setTimeout\(apply, 150\)/.test(js));
+ok('★ apply 는 같은 상태면 아무것도 안 한다 (여러 번 불려도 무해)',
+   /function activate\(\) \{\s*\n\s*if \(on\) return;/.test(js)
+   && /function deactivate\(\) \{\s*\n\s*if \(!on\) return;/.test(js));
+var desk = (css.match(/@media \(min-width: 769px\) \{([\s\S]*?)\n\}/) || ['', ''])[1];
+['.rdm-appbar', '.rdm-tabbar', '.rdm-sheet', '.rdm-sheet-back', '.rdm-chev', '.rdm-inputs__sum', '.rdm-scrollhint']
+  .forEach(function (c) {
+    ok('★★ 데스크톱에서 ' + c + ' 는 CSS 로도 숨는다 (JS 가 못 꺼도)',
+       desk.indexOf(c) >= 0 && /display:\s*none !important/.test(desk));
+  });
+/* 셸이 만드는 클래스는 전부 위 목록이나 body.rdm 범위 안에 있어야 한다 */
+var made = (js.match(/className = '(rdm-[a-z_-]+)'/g) || [])
+  .map(function (m) { return m.slice(13, -1); })
+  .filter(function (v, i, a) { return a.indexOf(v) === i; });
+ok('★★ 셸이 만드는 요소 클래스는 전부 데스크톱에서 숨는다',
+   made.length > 0 && made.every(function (c) { return desk.indexOf('.' + c) >= 0; }),
+   'made=' + made.join(',') + ' 누락=' + made.filter(function (c) { return desk.indexOf('.' + c) < 0; }).join(','));
+ok('★★ 크기 없는 SVG 가 부풀지 않게 화살표에 기본 크기 (1086px 실측)',
+   /\.rdm-chev svg \{ width: 18px; height: 18px; \}/.test(css));
+
 console.log('\n' + (fail ? 'FAIL' : 'PASS') + '  ' + pass + '/' + (pass + fail));
 process.exit(fail ? 1 : 0);

@@ -436,6 +436,14 @@
     apply();
     if (MQ.addEventListener) MQ.addEventListener('change', apply);
     else MQ.addListener(apply);
+    /* §586h — change 이벤트만 믿으면 안 된다. 1280px 로 넓혔는데 셸이 켜진
+       채 남았다(matches=false · on=true, 실측). resize 에서도 다시 본다.
+       apply 는 상태가 같으면 아무것도 안 하므로 여러 번 불려도 무해하다. */
+    var rt = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(rt);
+      rt = setTimeout(apply, 150);
+    });
   }
 
   if (document.readyState === 'loading') {
