@@ -96,7 +96,11 @@
   function syncTitle() {
     var t = $('#hdr-title'), d = $('#hdr-date');
     var mt = $('#rdm-title'), md = $('#rdm-date');
-    if (mt && t) mt.textContent = (t.textContent || '').trim() || '—';
+    // 제목 옆 연필(수정 버튼)까지 딸려 오면 앱바에 '…✎' 로 붙는다
+    if (mt && t) {
+      var s = (t.textContent || '').replace(/[\u270e\u270f\ufe0f]+\s*$/, '').trim();
+      mt.textContent = s || '—';
+    }
     if (md && d) md.textContent = (d.textContent || '').trim() || '—';
   }
 
@@ -304,11 +308,21 @@
     return (pane ? pane.id : '?') + '|' + i + '|' + t;
   }
 
+  /* 최상위 카드 판정 — closest('.card') 를 그냥 쓰면 안 된다. 탭 자체가
+     .card.mt-3 안에 들어 있어서 모든 카드가 '중첩'으로 잡힌다(실측: 13개
+     중 최상위 0개). 판정은 반드시 pane 에서 멈춰야 한다. */
+  function isTopCard(card, pane) {
+    var p = card.parentElement;
+    while (p && p !== pane) {
+      if (p.classList && p.classList.contains('card')) return false;
+      p = p.parentElement;
+    }
+    return true;
+  }
+
   function decorate(pane) {
     if (!pane) return;
-    var cards = $$('.card', pane).filter(function (c) {
-      return !c.parentElement.closest('.card');       // 최상위 카드만
-    });
+    var cards = $$('.card', pane).filter(function (c) { return isTopCard(c, pane); });
     cards.forEach(function (card, i) {
       var head = card.querySelector(':scope > .card-header');
       if (!head) return;
