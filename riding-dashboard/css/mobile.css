@@ -97,6 +97,10 @@
   body.rdm #kpi-row .card { height: 100%; }
   body.rdm #kpi-row .card-body { padding: 10px 12px; }
   body.rdm #kpi-row .kpi__val { font-size: 1.35rem; }
+  /* 점수 옆 등급 배지(Intermediate)가 132px 칸에서 'ntermediate' 로
+     잘렸다(실측). 숫자 아래로 떨어지게 한다. */
+  body.rdm #kpi-row .d-flex { flex-wrap: wrap; row-gap: 2px; }
+  body.rdm #kpi-row .badge { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
   /* ── 5. 탭 안의 카드를 접는다 (8867px → 한 화면) ─────────── */
   body.rdm .tab-pane > .row > [class*="col-"],

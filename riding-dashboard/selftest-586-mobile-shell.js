@@ -177,5 +177,44 @@ ok('★ 대상이 없으면 조용히 죽지 않고 알린다 (§546 교훈)',
    /console\.warn\('\[RDMobile\] action target missing:'/.test(js));
 ok('★ 탭 링크가 없을 때도 알린다', /console\.warn\('\[RDMobile\] no tab link for'/.test(js));
 
+/* ── [9] 눈금 겹침 (§586g) — 실제로 돌려 본다 ─────────────── */
+console.log('\n[9] Best speed by duration 가로축 — 30 s1 min2 min');
+var mm = fs.readFileSync(path.join(__dirname, 'js/chart-meanmax.js'), 'utf8');
+var tl = mm.match(/function tickLabel\(t\) \{[\s\S]*?\n  \}/);
+var fl = mm.match(/filter: function \(self, splits\) \{[\s\S]*?\n          \},/);
+ok('★ tickLabel · filter 를 소스에서 떼어 낼 수 있다', !!(tl && fl));
+if (tl && fl) {
+  var tickLabel = eval('(' + tl[0] + ')');
+  var filterFn = eval('({' + fl[0].replace(/,\s*$/, '') + '})').filter;
+  /* 로그축 px 흉내: 실측 세션 범위 2 s … 120 s, 0.8 / 1.25 패딩 */
+  function fakeSelf(plotW) {
+    var lo = Math.log10(2 * 0.8), hi = Math.log10(120 * 1.25);
+    return { valToPos: function (t) { return (Math.log10(t) - lo) / (hi - lo) * plotW; } };
+  }
+  var SPL = [2, 5, 10, 30, 60, 120];
+  function labelsAt(w) {
+    var f = filterFn.call(null, fakeSelf(w), SPL);
+    return f.filter(function (t) { return t != null; });
+  }
+  function gaps(w, kept) {
+    var s = fakeSelf(w), out = [];
+    for (var i = 1; i < kept.length; i++) {
+      var a = kept[i - 1], b = kept[i];
+      out.push(s.valToPos(b) - s.valToPos(a) - (tickLabel(a).length + tickLabel(b).length) * 6.8 / 2);
+    }
+    return out;
+  }
+  var phone = labelsAt(235), desk = labelsAt(620);
+  ok('★★ 폰 폭(235px)에서 남은 라벨끼리 겹치지 않는다',
+     gaps(235, phone).every(function (g) { return g >= 8; }),
+     'kept=' + phone.join(',') + ' gaps=' + gaps(235, phone).map(function (g) { return g.toFixed(0); }).join(','));
+  ok('★★ 폰에서 1 min 은 살아남는다 (가장 읽히는 기준)', phone.indexOf(60) >= 0, phone.join(','));
+  ok('★ 폰에서 10 s 도 살아남는다', phone.indexOf(10) >= 0, phone.join(','));
+  ok('★★ 데스크톱 폭(620px)에서는 하나도 빠지지 않는다 (데스크톱 불변)',
+     desk.length === SPL.length, desk.join(','));
+  ok('★ 이전 동작 재현: 필터 없이 폰 폭이면 실제로 겹쳤다 (테스트가 헛돌지 않는다)',
+     gaps(235, SPL).some(function (g) { return g < 8; }));
+}
+
 console.log('\n' + (fail ? 'FAIL' : 'PASS') + '  ' + pass + '/' + (pass + fail));
 process.exit(fail ? 1 : 0);

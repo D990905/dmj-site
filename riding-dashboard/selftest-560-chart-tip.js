@@ -95,7 +95,11 @@ ok('★ 오른쪽 설명이 낮은 속도 막대의 뜻을 말한다',
 
 console.log('\n[8] 로드 순서');
 ok('chart-tip 이 v2-app 보다 먼저', html.indexOf('chart-tip.js') < html.indexOf('js/v2-app.js'));
-ok('meanmax 캐시버스트가 갱신됐다', /chart-meanmax\.js\?v=v561/.test(html));
+/* 정확한 문자열(v561)로 박으면 이후 섹션이 이 파일을 고칠 때마다(§586g)
+   거짓 실패한다. 지키려는 것은 "§561 이후로 올라가 있다" 이다. */
+ok('meanmax 캐시버스트가 갱신됐다 (v561 이상)', (function () {
+  var m = html.match(/chart-meanmax\.js\?v=v(\d+)/);
+  return !!m && +m[1] >= 561; })());
 
 console.log('\n[9] ★★ §562 — 포일 끊김 설명이 숫자와 맞는가');
 console.log('    옥대표: "내가 매 턴마다 빠졌다고 말하는거야?" (12 stretch / 49 turn = 0.24)');

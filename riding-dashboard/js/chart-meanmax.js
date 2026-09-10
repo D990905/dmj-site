@@ -60,6 +60,12 @@
     return [Math.max(0, Math.floor(lo - pad)), Math.ceil(hi + pad)];
   }
 
+  function tickLabel(t) {
+    if (t < 60) return t + ' s';
+    if (t < 3600) return (t / 60) + ' min';
+    return (t / 3600) + ' h';
+  }
+
   function render(hostEl, analysis, opts) {
     opts = opts || {};
     if (!hostEl || !global.uPlot) return null;
@@ -100,13 +106,31 @@
              null 로 지워버린다. 우리는 splits 를 사람이 읽는 값으로
              직접 정했으므로 그 필터를 무력화한다 — 그러지 않으면
              지워진 자리에 'null s' 가 찍힌다. */
-          filter: function (self, splits) { return splits; },
+          /* §586g — 좁은 화면(폰 309px)에서 30 s·1 min·2 min 이 36px 간격에
+             라벨 폭 ~33px 이라 '30 s1 min2 min' 으로 붙었다(라이브 실측).
+             겹치는 눈금은 뺀다. 무엇을 남길지는 읽는 사람 기준 우선순위로 —
+             왼쪽부터 탐욕으로 고르면 1 min 이 먼저 빠진다. 데스크톱은 같은
+             간격이 ~90px 라 아무것도 빠지지 않는다. */
+          filter: function (self, splits) {
+            var PRIORITY = [60, 10, 300, 2, 1800, 30, 600, 120, 5];
+            var kept = [];
+            function wid(t) { return tickLabel(t).length * 6.8; }   /* 11px mono */
+            PRIORITY.forEach(function (t) {
+              if (splits.indexOf(t) < 0) return;
+              var px = self.valToPos(t, 'x');
+              if (!isFinite(px)) { kept.push({ t: t, px: px }); return; }
+              var clash = kept.some(function (k) {
+                return isFinite(k.px) && Math.abs(k.px - px) < (wid(t) + wid(k.t)) / 2 + 8;
+              });
+              if (!clash) kept.push({ t: t, px: px });
+            });
+            return splits.map(function (t) {
+              return kept.some(function (k) { return k.t === t; }) ? t : null;
+            });
+          },
           values: function (self, ticks) {
             return ticks.map(function (t) {
-              if (t == null || !isFinite(t)) return null;
-              if (t < 60) return t + ' s';
-              if (t < 3600) return (t / 60) + ' min';
-              return (t / 3600) + ' h';
+              return (t == null || !isFinite(t)) ? null : tickLabel(t);
             });
           } },
         { stroke: opts.dim || '#5F778A', grid: { stroke: opts.grid || '#16283A', width: 1 },
