@@ -133,6 +133,12 @@
   /* 세로 한 줄 배치라 가로 거터가 필요 없다. 남겨 두면 .row 의 음수 여백이
      감싼 요소 밖으로 삐져나온다(#turn-extra 355 vs 351). */
   body.rdm .tab-pane .row { --tblr-gutter-x: 0; --bs-gutter-x: 0; }
+
+  /* flex 아이템은 기본 min-width:auto 라 내용보다 작아지지 못한다. 폴라
+     SVG 는 이미 width:100% 인데도 감싼 flex 아이템이 405px 로 버텨서
+     페이지가 417px 로 밀렸다(실측). 카드 안의 직계 자식은 다 줄어들게. */
+  body.rdm .tab-pane .card-body > *,
+  body.rdm .tab-pane .card-footer > * { min-width: 0; max-width: 100%; }
   /* max-height 로 접는다 — 폭은 그대로라서 uPlot 이 0px 로 그려지지 않는다.
      (display:none 으로 접으면 차트가 폭 0 으로 태어난다) */
   .rdm-fold[data-open="0"] > .card-body,
