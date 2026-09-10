@@ -41,6 +41,7 @@
     save:  svg('<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4"/><rect x="8" y="13" width="8" height="7"/>'),
     file:  svg('<path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5z"/><path d="M14 3v4.5h4.5"/>'),
     home:  svg('<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/>'),
+    user:  svg('<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/>'),
     sun:   svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>')
   };
 
@@ -75,6 +76,11 @@
         '<div class="rdm-appbar__date" id="rdm-date">—</div>' +
         '<div class="rdm-appbar__title" id="rdm-title">…</div>' +
       '</div>' +
+      /* §586k (옥대표 "로그인창이 없는듯") — 로그인 링크는 데스크톱 헤더의
+         #auth-chip 안에 있는데 폰에서는 그 헤더를 숨긴다. ⋮ 시트 맨 아래에
+         이름표 없이 들어가 있어 사실상 안 보였다. 앱바에 꺼내 둔다. */
+      '<button type="button" class="rdm-iconbtn rdm-acct" id="rdm-account" aria-label="Account">' +
+        ICON.user + '<span class="rdm-acct__dot" hidden></span></button>' +
       '<button type="button" class="rdm-iconbtn" id="rdm-upload" aria-label="Upload files">' + ICON.up + '</button>' +
       '<button type="button" class="rdm-iconbtn" id="rdm-actions" aria-label="Actions">' + ICON.dots + '</button>';
     var wrap = $('.page-wrapper');
@@ -85,6 +91,14 @@
       var f = $('#v2-file'); if (f) f.click();
     });
     $('#rdm-actions', bar).addEventListener('click', function () { openSheet('actions'); });
+    $('#rdm-account', bar).addEventListener('click', onAccount);
+    syncAccount();
+    // 로그인 상태가 바뀌면 v2-app 이 #auth-chip 을 다시 그린다 — 따라간다
+    var chip = $('#auth-chip');
+    if (chip) {
+      els.chipObs = new MutationObserver(syncAccount);
+      els.chipObs.observe(chip, { childList: true, subtree: true, characterData: true });
+    }
 
     syncTitle();
     // 세션을 바꾸면 v2-app 이 제목을 다시 쓴다 — 따라간다
@@ -102,6 +116,28 @@
       mt.textContent = s || '—';
     }
     if (md && d) md.textContent = (d.textContent || '').trim() || '—';
+  }
+
+  function signedInUser() {
+    try { return (window.DMJAuth && DMJAuth.currentUser && DMJAuth.currentUser()) || null; }
+    catch (e) { return null; }
+  }
+  function syncAccount() {
+    var b = $('#rdm-account'); if (!b) return;
+    var u = signedInUser();
+    var dot = b.querySelector('.rdm-acct__dot');
+    if (dot) dot.hidden = !u;
+    b.setAttribute('aria-label', u ? 'Account: ' + (u.name || u.email || 'signed in') : 'Sign in');
+  }
+  /* 로그인 전이면 곧장 로그인 화면으로. 주소는 v2-app 이 만든 링크를
+     그대로 쓴다(돌아올 곳 next= 포함) — 여기서 따로 만들면 둘이 갈라진다.
+     링크가 없으면(서버가 멈춤·모듈 없음) 시트를 열어 이유를 보여 준다. */
+  function onAccount() {
+    if (!signedInUser()) {
+      var a = $('#auth-chip a[href]');
+      if (a) { location.href = a.getAttribute('href'); return; }
+    }
+    openSheet('actions');
   }
 
   /* ── 하단 탭바 ──────────────────────────────────────────── */
@@ -213,15 +249,20 @@
   };
 
   function sheetActions() {
-    var h = '<div class="rdm-sheet__ttl">SESSION</div>' +
+    var h = '<div class="rdm-sheet__ttl">ACCOUNT</div>' +
+            '<div class="rdm-sheet__slot" id="rdm-slot-auth"></div>' +
+            /* 사실만 말한다: v2 는 cloud-sync.js 를 싣지 않는다(§586k 확인).
+               로그인해도 기록은 이 기기에만 있다. */
+            '<div class="rdm-sheet__note">Rides are kept on this device. ' +
+            'Moving them between phone and computer is not switched on yet.</div>' +
+            '<div class="rdm-sheet__ttl">SESSION</div>' +
             '<div class="rdm-sheet__slot" id="rdm-slot-ghost"></div>';
     ACTIONS.forEach(function (a) {
       if (a.act === 'theme' || a.act === 'old') return;
       h += '<button type="button" class="rdm-sheet__row" data-act="' + a.act + '">' +
            ICON[a.icon] + '<span>' + a.label + '</span></button>';
     });
-    h += '<div class="rdm-sheet__ttl">APP</div>' +
-         '<div class="rdm-sheet__slot" id="rdm-slot-auth"></div>';
+    h += '<div class="rdm-sheet__ttl">APP</div>';
     ['theme', 'old'].forEach(function (k) {
       var a = ACTIONS.filter(function (x) { return x.act === k; })[0];
       h += '<button type="button" class="rdm-sheet__row" data-act="' + a.act + '">' +
@@ -410,6 +451,7 @@
     if (mo) { mo.disconnect(); mo = null; }
     if (els.titleObs) els.titleObs.disconnect();
     if (els.inputObs) els.inputObs.disconnect();
+    if (els.chipObs) els.chipObs.disconnect();
     ['appbar', 'tabbar', 'sheet', 'back'].forEach(function (k) {
       if (els[k] && els[k].parentNode) els[k].parentNode.removeChild(els[k]);
     });

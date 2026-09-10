@@ -2051,8 +2051,11 @@
                   .catch(function () { out.disabled = false; out.textContent = 'sign out'; });
       });
       host.appendChild(out);
-      host.title = 'Your rides are tied to this account, so they follow you to '
-                 + 'another browser or phone.';
+      /* §586k — 예전 문구 "they follow you to another browser or phone" 는
+         사실이 아니었다. v2 는 cloud-sync.js 를 싣지 않아 로그인해도
+         기록이 이 브라우저에만 있다. 동기화를 켜기 전까지는 그렇게 말한다. */
+      host.title = 'Signed in. Rides on this dashboard are still kept in this '
+                 + 'browser \u2014 moving them between devices is not switched on yet.';
       return;
     }
 
@@ -2082,8 +2085,8 @@
     var link = el('a', 'btn btn-sm btn-ghost-secondary ms-2 p-0 px-1', 'sign in');
     link.href = authLoginUrl();
     host.appendChild(link);
-    host.title = 'Rides are stored in this browser. Sign in and they follow you '
-               + 'to another browser or phone.';
+    host.title = 'Rides are stored in this browser. Moving them between '
+               + 'devices is not switched on in this dashboard yet (§586k).';
   }
 
   function renderTargetExertion(body, decision, rp) {

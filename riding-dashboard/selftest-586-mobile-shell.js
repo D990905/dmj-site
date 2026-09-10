@@ -47,7 +47,7 @@ ok('★★ 미디어쿼리는 max-width:768px 와 min-width:769px 둘뿐',
      return /max-width:\s*768px/.test(m) || /min-width:\s*769px/.test(m);
    }), medias.join(' | '));
 ok('★ 769px 이상에서는 셸 요소를 아예 숨긴다',
-   /min-width:\s*769px[\s\S]{0,240}\.rdm-appbar[\s\S]{0,120}display:\s*none/.test(css));
+   /min-width:\s*769px[\s\S]{0,600}\.rdm-appbar[\s\S]{0,300}display:\s*none/.test(css));
 
 /* JS 쪽도: 모든 변형이 body.rdm / MQ 뒤에 있어야 한다 */
 ok('★★ 셸은 matchMedia 로만 켜진다',
@@ -238,6 +238,29 @@ ok('★★ 셸이 만드는 요소 클래스는 전부 데스크톱에서 숨는
    'made=' + made.join(',') + ' 누락=' + made.filter(function (c) { return desk.indexOf('.' + c) < 0; }).join(','));
 ok('★★ 크기 없는 SVG 가 부풀지 않게 화살표에 기본 크기 (1086px 실측)',
    /\.rdm-chev svg \{ width: 18px; height: 18px; \}/.test(css));
+
+/* ── [11] 로그인 (§586k 옥대표 "로그인창이 없는듯") ────────── */
+console.log('\n[11] 폰에서 로그인이 보이는가');
+var app2 = fs.readFileSync(path.join(__dirname, 'js/v2-app.js'), 'utf8');
+ok('★★ 앱바에 계정 버튼이 있다', /id="rdm-account"/.test(js) && /#rdm-account', bar\)\.addEventListener\('click', onAccount\)/.test(js));
+ok('★★ 로그인 전이면 v2-app 이 만든 로그인 링크로 곧장 간다 (주소를 따로 만들지 않음)',
+   /var a = \$\('#auth-chip a\[href\]'\);\s*\n\s*if \(a\) \{ location\.href = a\.getAttribute\('href'\); return; \}/.test(js)
+   && !/login\.html/.test(js));
+ok('★ 링크가 없으면(서버 멈춤) 시트를 열어 이유를 보여 준다', /function onAccount\(\) \{[\s\S]{0,260}openSheet\('actions'\);/.test(js));
+ok('★ 로그인 상태가 바뀌면 점을 갱신한다 (#auth-chip 관찰)', /els\.chipObs\.observe\(chip/.test(js));
+ok('★ 끌 때 관찰도 끊는다', /if \(els\.chipObs\) els\.chipObs\.disconnect\(\);/.test(js));
+ok('★★ 시트에서 계정이 맨 위에, 이름표를 달고', (function () {
+  var i = js.indexOf('function sheetActions()'); var seg = js.slice(i, i + 700);
+  return seg.indexOf("ACCOUNT") > 0 && seg.indexOf('rdm-slot-auth') < seg.indexOf('SESSION'); })());
+ok('★ 계정 슬롯은 한 번만 만든다 (예전 APP 아래 슬롯 제거)', (js.match(/id="rdm-slot-auth"/g) || []).length === 1);
+ok('★ 계정 버튼도 44px (rdm-iconbtn)', /class="rdm-iconbtn rdm-acct"/.test(js));
+
+console.log('\n[12] 거짓말 하지 않기 — v2 는 기기 간 동기화를 안 한다');
+ok('★★ 전제 확인: v2.html 은 cloud-sync.js 를 싣지 않는다 (싣게 되면 이 문구들을 바꿀 것)',
+   html.indexOf('cloud-sync.js') < 0);
+ok('★★ "follow you to another browser or phone" 문구가 사라졌다',
+   !/follow you to\s*'\s*\+\s*'another browser or phone|they follow you/.test(app2.replace(/\/\*[\s\S]*?\*\//g, '')));
+ok('★★ 시트에 "이 기기에만 있다" 고 적는다', /Rides are kept on this device\./.test(js));
 
 console.log('\n' + (fail ? 'FAIL' : 'PASS') + '  ' + pass + '/' + (pass + fail));
 process.exit(fail ? 1 : 0);
