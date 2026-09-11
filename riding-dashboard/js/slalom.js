@@ -80,10 +80,40 @@
         }
       });
     });
+    /* 둘째 단계 — 가까운(2R 이내) 두 무리를 **같은 경기가 둘 다 돈 적이
+       없으면** 같은 부표로 합친다. 실측(9/11): 한 부표의 정점이 제2·6경기
+       무리와 제3·4·5경기 무리로 79 m 떨어져 둘로 갈렸다. 회전 반경이
+       30~40 m 라 정점은 부표에서 그만큼 벗어난다. 반경만 늘리면 120 m
+       떨어진 **다른** 부표까지 합쳐지므로, 경기 구성으로 가른다 — 한 경기가
+       같은 부표를 두 번 연달아 돌지는 않으니 겹치지 않는 두 무리는 같은
+       부표의 다른 회전이다. 가까운 쌍부터 합친다. */
+    function raceSet(mk) {
+      var o = {};
+      mk.visits.forEach(function (v) { o[v.race] = true; });
+      return o;
+    }
+    for (;;) {
+      var pick = null;
+      for (var i = 0; i < marks.length; i++) {
+        for (var j = i + 1; j < marks.length; j++) {
+          var d = hav(marks[i], marks[j]);
+          if (d > 2 * R) continue;
+          var a = raceSet(marks[i]), b = raceSet(marks[j]), clash = false;
+          Object.keys(a).forEach(function (k) { if (b[k]) clash = true; });
+          if (clash) continue;
+          if (!pick || d < pick.d) pick = { i: i, j: j, d: d };
+        }
+      }
+      if (!pick) break;
+      var A = marks[pick.i], B = marks[pick.j];
+      var na = A.visits.length, nb = B.visits.length;
+      A.lat = (A.lat * na + B.lat * nb) / (na + nb);
+      A.lng = (A.lng * na + B.lng * nb) / (na + nb);
+      A.visits = A.visits.concat(B.visits);
+      marks.splice(pick.j, 1);
+    }
     marks.forEach(function (mk) {
-      var rs = {};
-      mk.visits.forEach(function (v) { rs[v.race] = true; });
-      mk.raceCount = Object.keys(rs).length;
+      mk.raceCount = Object.keys(raceSet(mk)).length;
     });
     return marks;
   }
