@@ -9909,6 +9909,8 @@
     CUR.vps = vps;
     autoRecordRideLoad();
     renderKpis(analysis, vps);
+    try { renderCompare(); }            /* §589 — 세션을 바꿔도 고른 비교는 유지 */
+    catch (e) { if (window.console) console.error('[v2 §589] compare', e); }
     renderRiderNote(vps);
     try { renderInputSources(); } catch (e) {}
     if (window.RDMeanMax) {
@@ -10195,6 +10197,160 @@
     return An.normalizeSession(Gpx.parseGPX(gpx));
   }
 
+  /* ════════════════════════ §589 세션 비교 ════════════════════════
+     점수는 그 세션을 저장할 때 **그 세션의 입력(풍속·체중·윙)으로** 매긴 값을
+     쓴다 — 지금 폼 값으로 다시 매기면 12kt 세션이 25kt 로 채점된다(§547).
+     속도·VMG·회전은 저장된 트랙을 **같은 분석 코드**로 다시 돌려 얻는다 —
+     그래야 두 칸이 같은 자로 잰 값이다. 한 번 계산하면 id+savedAt 로 담아 둔다. */
+  var CMP_CACHE = null;
+  function compareAnalysis(rec) {
+    var key = rec.id + '|' + (rec.savedAt || '');
+    if (CMP_CACHE && CMP_CACHE.key === key) return CMP_CACHE.a;
+    var gpx = Store && Store.loadTrack ? Store.loadTrack(rec.id) : null;
+    if (!gpx) return null;
+    var gs = sessionFromStoredTrack(gpx);
+    if (!gs || !gs.samples || !gs.samples.length) return null;
+    var est = null;
+    try { est = estimateWind(gs); } catch (e) { est = null; }
+    var wd = rec.windDir != null ? rec.windDir : (est && est.windDir != null ? est.windDir : null);
+    var o = {};
+    if (est && est.confidence != null) o.windConfidence = est.confidence;
+    if (rec.windSpeedKt != null) o.windSpeedKt = rec.windSpeedKt;   /* 그 세션의 풍속 */
+    var a = An.analyzeSession(gs, wd, o);
+    CMP_CACHE = { key: key, a: a };
+    return a;
+  }
+
+  function renderCompare() {
+    var host = $('compare-host');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    var sel = $('replay-ghost');
+    if (!sel || sel.hidden || !sel.value || !CUR.analysis) return;
+    var rec = null;
+    listSessions().forEach(function (r) { if (r.id === sel.value) rec = r; });
+    if (!rec) return;
+
+    var card = el('div', 'card mt-3');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Compared with ' + (rec.name || 'session')));
+    var acts = el('div', 'card-actions d-flex align-items-center gap-2');
+    var d = rec.dateEpoch ? new Date(rec.dateEpoch) : null;
+    if (d) acts.appendChild(el('span', 'lab', d.toISOString().slice(0, 10)));
+    var race = el('button', 'btn btn-sm', '\u25b6 Race it in Replay');
+    race.type = 'button';
+    race.title = 'Opens the replay with ' + (rec.name || 'that session') + ' as a purple board';
+    race.addEventListener('click', function () { var b = $('btn-replay'); if (b) b.click(); });
+    acts.appendChild(race);
+    var x = el('button', 'btn btn-sm btn-ghost-secondary', '\u2715');
+    x.type = 'button'; x.title = 'Stop comparing';
+    x.addEventListener('click', function () { sel.value = ''; renderCompare(); });
+    acts.appendChild(x);
+    head.appendChild(acts);
+    card.appendChild(head);
+
+    if (CUR.openedRecId && CUR.openedRecId === rec.id) {
+      card.appendChild(el('div', 'card-body text-secondary',
+        'That is the session you have open \u2014 pick a different one to compare.'));
+      host.appendChild(card);
+      return;
+    }
+
+    var b = null;
+    try { b = compareAnalysis(rec); }
+    catch (e) { if (window.console) console.error('[v2 §589] compare analysis', e); b = null; }
+    var A = CUR.analysis, v = CUR.vps;
+    var sa = A.summary || {}, sb = (b && b.summary) || {};
+    var wa = A.wind || {}, wb = (b && b.wind) || {};
+    var ma = A.maneuverStats || {}, mb = (b && b.maneuverStats) || {};
+    function sc(o) { return o && o.score != null ? o.score : null; }
+    function kt(ms) { return ms != null && isFinite(ms) ? ms * KT : null; }
+
+    /* [이름, 이 세션, 비교 세션, 단위, 소수, 좋은 방향(+1 클수록·-1 작을수록·0 중립)] */
+    var rows = [
+      ['Performance score', sc(v && v.overall), rec.vpsOverall, '', 0, 1],
+      ['  upwind', sc(v && v.upwind), rec.vpsUpwind, '', 0, 1],
+      ['  downwind', sc(v && v.downwind), rec.vpsDownwind, '', 0, 1],
+      ['Top speed (2 s)', kt(sa.maxSpeedMs), kt(sb.maxSpeedMs), 'kt', 1, 1],
+      ['Average speed, moving', kt(sa.avgSpeedMovingMs), kt(sb.avgSpeedMovingMs), 'kt', 1, 1],
+      ['Upwind VMG, best 20%', kt(wa.vmgUpwindTop20Ms), kt(wb.vmgUpwindTop20Ms), 'kt', 1, 1],
+      ['Downwind VMG, best 20%', kt(wa.vmgDownwindTop20Ms), kt(wb.vmgDownwindTop20Ms), 'kt', 1, 1],
+      ['Time on foil', sa.activeRatio != null ? sa.activeRatio * 100 : null,
+                       sb.activeRatio != null ? sb.activeRatio * 100 : null, '%', 0, 1],
+      ['Tack success', ma.tackSuccessRate, mb.tackSuccessRate, '%', 0, 1],
+      ['Gybe success', ma.gybeSuccessRate, mb.gybeSuccessRate, '%', 0, 1],
+      ['Speed lost in tacks', ma.avgTackLossPct, mb.avgTackLossPct, '%', 0, -1],
+      ['Speed lost in gybes', ma.avgGybeLossPct, mb.avgGybeLossPct, '%', 0, -1],
+      ['Distance', sa.totalDistanceM != null ? sa.totalDistanceM / 1000 : null,
+                   sb.totalDistanceM != null ? sb.totalDistanceM / 1000 : null, 'km', 2, 0],
+      ['Tacks · gybes', null, null, '', 0, 0,
+        (ma.tack != null ? ma.tack : '—') + ' · ' + (ma.gybe != null ? ma.gybe : '—'),
+        (mb.tack != null ? mb.tack : '—') + ' · ' + (mb.gybe != null ? mb.gybe : '—')]
+    ];
+
+    var wrap = el('div', 'table-responsive');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    [['', null], ['This session', 'text-end'], [rec.name || 'Compared', 'text-end'], ['Difference', 'text-end']]
+      .forEach(function (h) { htr.appendChild(el('th', h[1], h[0])); });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+    rows.forEach(function (r) {
+      var tr = el('tr');
+      var name = el('td', null, r[0].trim());
+      if (/^\s/.test(r[0])) { name.style.paddingLeft = '1.5rem'; name.className = 'text-secondary'; }
+      tr.appendChild(name);
+      function fmt(x) { return x == null || !isFinite(x) ? '\u2014' : x.toFixed(r[4]) + (r[3] ? ' ' + r[3] : ''); }
+      if (r.length > 6) {
+        tr.appendChild(el('td', 'text-end num', r[6]));
+        tr.appendChild(el('td', 'text-end num', r[7]));
+        tr.appendChild(el('td', 'text-end num text-secondary', ''));
+        tb.appendChild(tr); return;
+      }
+      tr.appendChild(el('td', 'text-end num', fmt(r[1])));
+      tr.appendChild(el('td', 'text-end num', fmt(r[2])));
+      var dc = el('td', 'text-end num');
+      if (r[1] != null && r[2] != null && isFinite(r[1]) && isFinite(r[2])) {
+        var diff = r[1] - r[2];
+        var step = Math.pow(10, -r[4]);
+        if (Math.abs(diff) < step / 2) { dc.textContent = 'same'; dc.className += ' text-secondary'; }
+        else {
+          dc.textContent = (diff > 0 ? '+' : '\u2212') + Math.abs(diff).toFixed(r[4]) + (r[3] ? ' ' + r[3] : '');
+          /* 색은 '이 세션이 나은가' — 방향이 없는 줄(거리·횟수)은 칠하지 않는다 */
+          if (r[5]) {
+            var better = (diff > 0) === (r[5] > 0);
+            dc.style.color = better ? THEME.stbd : THEME.port;
+            dc.title = better ? 'this session is better here' : (rec.name || 'the other one') + ' is better here';
+          } else dc.className += ' text-secondary';
+        }
+      } else { dc.textContent = '\u2014'; dc.className += ' text-secondary'; }
+      tr.appendChild(dc);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
+
+    /* 조건이 다르면 숫자 차이의 상당 부분은 사람이 아니라 조건이다 — 그걸 말한다 */
+    var foot = el('div', 'card-footer text-secondary');
+    foot.style.fontSize = '.8125rem';
+    var notes = [];
+    var wsA = windSpeedFromForm(), wsB = rec.windSpeedKt;
+    notes.push('Wind ' + (wsA != null ? wsA + ' kt' : '?') + ' vs ' + (wsB != null ? wsB + ' kt' : 'not recorded') + '.');
+    if (wsA != null && wsB != null && Math.abs(wsA - wsB) >= 3) {
+      notes.push('That is a ' + Math.abs(wsA - wsB).toFixed(0) + ' kt gap \u2014 speed and VMG '
+        + 'differences are mostly the wind, not you. The performance score already '
+        + 'allows for wind speed, so it is the fairer line to compare.');
+    }
+    var ga = null, gb = rec.gear ? gearLabel(rec.gear) : null;
+    try { ga = gearLabel(gearSnapshot()); } catch (e) { ga = null; }
+    if (ga || gb) notes.push('Gear: ' + (ga || 'not recorded') + ' vs ' + (gb || 'not recorded') + '.');
+    if (!b) notes.push('The other session\u2019s track could not be re-read, so only its saved scores are shown.');
+    notes.push('Green = this session is better on that line, red = the other one is. '
+      + 'Distance and turn counts depend on how long you rode, so they are not coloured.');
+    foot.textContent = notes.join(' ');
+    card.appendChild(foot);
+    host.appendChild(card);
+  }
+
   function buildGhost() {
     var sel = $('replay-ghost');
     if (!sel || sel.hidden || !sel.value || !Store || !Store.loadTrack) return null;
@@ -10219,14 +10375,22 @@
     var keep = sel.value;
     while (sel.firstChild) sel.removeChild(sel.firstChild);
     var none = document.createElement('option');
-    none.value = ''; none.textContent = 'No comparison';
+    none.value = ''; none.textContent = 'Compare with\u2026';
     sel.appendChild(none);
-    /* §544 — 이름표가 없어서 무엇에 쓰는 물건인지 알 수 없었다
-       (옥대표 "어떤방식으로 비교하기 위해서 만들었는지 기억이 안나는데").
-       고스트는 **리플레이에서만** 나타난다 — 대시보드 숫자는 안 바뀐다. */
-    sel.title = 'Pick a past session to race against in Replay \u2014 it appears '
-      + 'as a second (purple) board starting at the same moment. '
-      + 'This does not change any of the numbers on the dashboard.';
+    /* §589 (옥대표 "비교기능은 대체 뭐를 하는거냐... 전혀 비교되는게 없는데?")
+       — 맞다. 고르면 **아무 일도 안 일어났다.** 결과는 ▶ Replay 를 눌러야
+       보라색 보드로만 나왔고, 그 설명은 마우스를 올려야 뜨는 툴팁뿐이었다
+       (폰에서는 영영 안 뜬다). 이제 고르는 순간 요약 바로 아래에 두 세션이
+       나란히 뜬다. 리플레이 고스트는 그대로 남는다. */
+    sel.title = 'Pick a saved session: its numbers appear side by side under the '
+      + 'summary, and Replay races it as a second (purple) board.';
+    if (!sel._rdCmp) {
+      sel._rdCmp = true;
+      sel.addEventListener('change', function () {
+        try { renderCompare(); }
+        catch (e) { if (window.console) console.error('[v2 §589] compare', e); }
+      });
+    }
     var n = 0;
     listSessions().forEach(function (r) {
       if (!r || !r.hasTrack) return;
