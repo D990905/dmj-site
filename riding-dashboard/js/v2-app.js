@@ -1072,6 +1072,10 @@
     });
     var res = RDSlalom.analyze(races, '__cur');
     if (!res.ok) return;
+    /* 다른 코스를 탄 경기는 표에서 빠진다(전부 '—' 인 줄) — 이름은 밝힌다 */
+    var kept = {};
+    res.races.forEach(function (r) { kept[r.key] = true; });
+    races = races.filter(function (r) { return kept[r.key]; });
     /* 이 경기가 한 번도 안 돈 부표만 있으면 이 경기에 대해 할 말이 없다 */
     var mine = res.roundings.filter(function (rd) { return rd.cells.__cur; });
     if (!mine.length) return;
@@ -1227,17 +1231,26 @@
     var f2 = el('div', 'card-footer text-secondary');
     f2.style.fontSize = '.8125rem';
     var b = res.best, txt = '';
-    if (b && b.bestActual) {
-      txt = 'Best of the day, ' + b.sequence.join(' then ') + ': ' + Math.round(b.possibleSec) + ' s \u2014 '
+    if (b) {
+      txt = 'Best of the day over ' + b.sequence.join(', ') + ': ' + Math.round(b.possibleSec) + ' s \u2014 '
         + b.bestSegments.map(function (sg) { return sg.key + ' from ' + nameOf[sg.race] + ' (' + Math.round(sg.sec) + ' s)'; }).join(' + ')
-        + '. Fastest real race over that stretch: ' + nameOf[b.bestActual.race] + ', '
-        + Math.round(b.bestActual.sec) + ' s, so ' + Math.max(0, Math.round(b.gainSec)) + ' s was left on the table.';
-      var me = null;
-      b.races.forEach(function (x) { if (x.race === '__cur') me = x; });
-      if (me && me.race !== b.bestActual.race) {
-        txt += ' This race: ' + Math.round(me.sec) + ' s (+' + Math.round(me.sec - b.possibleSec) + ' s on the best line).';
+        + '.';
+      if (b.ref) {
+        txt += ' This race took ' + Math.round(b.ref.sec) + ' s over the same marks \u2014 '
+          + Math.max(0, Math.round(b.refGainSec)) + ' s off that line.';
+      }
+      if (b.othersCompleted) {
+        var fo = null;
+        b.races.forEach(function (x) { if (!fo && x.race !== '__cur') fo = x; });
+        if (fo) txt += ' Fastest other race over all of it: ' + nameOf[fo.race] + ', ' + Math.round(fo.sec) + ' s.';
+      } else if (b.ref) {
+        txt += ' No other race rounded all of these marks in this order, so the line is built from pieces.';
       }
       txt += ' ';
+    }
+    if (res.offCourse && res.offCourse.length) {
+      txt += res.offCourse.join(', ') + (res.offCourse.length > 1 ? ' sailed' : ' sailed')
+        + ' a different course and ' + (res.offCourse.length > 1 ? 'are' : 'is') + ' left out. ';
     }
     f2.textContent = txt + 'Start and finish lines are not known \u2014 they depend on where each track '
       + 'was cut \u2014 so only rounding-to-rounding times are compared.';

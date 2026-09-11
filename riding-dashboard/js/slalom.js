@@ -196,29 +196,39 @@
     return per;
   }
 
-  /* 오늘의 최고 구간들을 이은 '이론상 최고' — 기준 순서(가장 많은 경기가
-     다 돈 순서)로. 그 순서를 다 돈 경기 중 가장 빠른 것과 견준다. */
-  function bestLine(perRace, races) {
-    var bySeq = {};
-    Object.keys(perRace).forEach(function (k) {
-      var keys = perRace[k].map(function (s) { return s.key; });
-      for (var len = keys.length; len >= 1; len--) {
-        for (var st = 0; st + len <= keys.length; st++) {
-          var sq = keys.slice(st, st + len).join('|');
-          bySeq[sq] = bySeq[sq] || {};
-          bySeq[sq][k] = true;
+  /* 오늘의 최고 구간들을 이은 '이론상 최고'.
+     기준 순서는 **보고 있는 경기가 돈 순서 전체**다 — 그 경기에 대해
+     "여기서 몇 초를 줄일 수 있었나" 를 답해야 하므로. 구간마다 그날 가장
+     빠른 값을 쓴다(그 구간을 돈 경기가 하나라도 있으면). 기준 경기에
+     구간이 없으면, 두 경기 이상이 다 돈 가장 긴 순서로 대신한다.
+     (실측 9/11: 처음엔 '가장 많은 경기가 돈 순서'를 골라 제6경기를 보면서
+      A→B→C 두 구간만 보여 줬다 — 제6경기는 D 까지 돌았는데.) */
+  function bestLine(perRace, races, refKey) {
+    var seq = null;
+    if (refKey && perRace[refKey] && perRace[refKey].length) {
+      seq = perRace[refKey].map(function (s) { return s.key; });
+    } else {
+      var bySeq = {};
+      Object.keys(perRace).forEach(function (k) {
+        var keys = perRace[k].map(function (s) { return s.key; });
+        for (var len = keys.length; len >= 1; len--) {
+          for (var st = 0; st + len <= keys.length; st++) {
+            var sq = keys.slice(st, st + len).join('|');
+            bySeq[sq] = bySeq[sq] || {};
+            bySeq[sq][k] = true;
+          }
         }
-      }
-    });
-    /* 두 경기 이상이 다 돈 순서 중 가장 긴 것 */
-    var pick = null;
-    Object.keys(bySeq).forEach(function (sq) {
-      var n = Object.keys(bySeq[sq]).length, len = sq.split('|').length;
-      if (n < 2) return;
-      if (!pick || len > pick.len || (len === pick.len && n > pick.n)) pick = { sq: sq, len: len, n: n };
-    });
-    if (!pick) return null;
-    var seq = pick.sq.split('|');
+      });
+      var pick = null;
+      Object.keys(bySeq).forEach(function (sq) {
+        var n = Object.keys(bySeq[sq]).length, len = sq.split('|').length;
+        if (n < 2) return;
+        if (!pick || len > pick.len || (len === pick.len && n > pick.n)) pick = { sq: sq, len: len, n: n };
+      });
+      if (!pick) return null;
+      seq = pick.sq.split('|');
+    }
+    var joined = seq.join('|');
     var bestSeg = seq.map(function (key) {
       var b = null;
       Object.keys(perRace).forEach(function (rk) {
@@ -233,7 +243,7 @@
     Object.keys(perRace).forEach(function (rk) {
       var segs = perRace[rk], keys = segs.map(function (s) { return s.key; });
       for (var st = 0; st + seq.length <= keys.length; st++) {
-        if (keys.slice(st, st + seq.length).join('|') === pick.sq) {
+        if (keys.slice(st, st + seq.length).join('|') === joined) {
           var sum = 0;
           for (var j = 0; j < seq.length; j++) sum += segs[st + j].sec;
           actual.push({ race: rk, sec: sum });
@@ -242,9 +252,14 @@
       }
     });
     actual.sort(function (a, b) { return a.sec - b.sec; });
+    var ref = null;
+    actual.forEach(function (x) { if (x.race === refKey) ref = x; });
+    var others = actual.filter(function (x) { return x.race !== refKey; });
     return { sequence: seq, bestSegments: bestSeg, possibleSec: possible,
              races: actual, bestActual: actual[0] || null,
-             gainSec: actual[0] ? actual[0].sec - possible : null };
+             gainSec: actual[0] ? actual[0].sec - possible : null,
+             ref: ref, refGainSec: ref ? ref.sec - possible : null,
+             othersCompleted: others.length };
   }
 
   /* 한 번에 — v2 가 부르는 입구 */
@@ -257,7 +272,19 @@
     if (!marks.length) return { ok: false, reason: 'no_shared_marks', races: rs };
     var rnd = roundings(rs, marks);
     var per = markToMark(rs, marks);
-    return { ok: true, races: rs, marks: marks, roundings: rnd, legs: per, best: bestLine(per, rs) };
+    /* 공유 부표를 하나도 안 돈 경기(다른 코스)는 표에서 뺀다 — 전부 '—' 인
+       줄은 정보가 없다. 빠진 경기는 이름을 돌려줘 화면이 밝히게 한다. */
+    var used = {};
+    marks.forEach(function (mk) { mk.visits.forEach(function (v) { used[v.race] = true; }); });
+    var offCourse = rs.filter(function (r) { return !used[r.key]; }).map(function (r) { return r.name || r.key; });
+    var kept = rs.filter(function (r) { return used[r.key]; });
+    var rnd2 = rnd.map(function (rd) {
+      var cells = {};
+      kept.forEach(function (r) { cells[r.key] = rd.cells[r.key]; });
+      return Object.assign({}, rd, { cells: cells });
+    });
+    return { ok: true, races: kept, offCourse: offCourse, marks: marks, roundings: rnd2, legs: per,
+             best: bestLine(per, kept, refKey) };
   }
 
   var API = {

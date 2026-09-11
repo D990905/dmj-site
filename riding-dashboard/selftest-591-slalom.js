@@ -35,7 +35,7 @@ function run(ref) {
   var marks = SL.labelMarks(all, rs, ref || 'r6');
   var rnd = SL.roundings(rs, marks);
   var per = SL.markToMark(rs, marks);
-  return { rs: rs, marks: marks, rnd: rnd, per: per, best: SL.bestLine(per, rs) };
+  return { rs: rs, marks: marks, rnd: rnd, per: per, best: SL.bestLine(per, rs, ref || 'r6') };
 }
 
 console.log('[1] ★★ 부표 찾기 — 옥대표 9/11 배치');
@@ -65,17 +65,41 @@ ok('★ 안 돈 부표는 비어 있다 (제3경기는 D 없음)', R.rnd[3].cell
 console.log('\n[3] ★★ 부표 사이 · 이론상 최고');
 var legs6 = R.per.r6.map(function (s) { return s.key + ' ' + s.sec; }).join(', ');
 ok('★ 제6경기 구간: A→B 22, B→C 16, C→D 39', legs6 === 'A→B 22, B→C 16, C→D 39', legs6);
-ok('★★ 기준 순서 B→C→D (두 경기 이상이 다 돈 가장 긴 순서)', R.best.sequence.join(' ') === 'B→C C→D', R.best.sequence.join(' '));
-ok('★★ 이론상 46 s = B→C 제3경기 15 + C→D 제4경기 31', R.best.possibleSec === 46
-   && R.best.bestSegments[0].race === 'r3' && R.best.bestSegments[1].race === 'r4', JSON.stringify(R.best.bestSegments));
-ok('★★ 실제 최고 제4경기 48 s → 2 s', R.best.bestActual.race === 'r4' && R.best.bestActual.sec === 48 && R.best.gainSec === 2);
-ok('★ 제6경기 55 s', R.best.races.some(function (x) { return x.race === 'r6' && x.sec === 55; }));
+/* 기준 = 보고 있는 경기(제6경기)가 돈 순서 전체 — A→B→C→D */
+ok('★★ 기준 순서는 보고 있는 경기 전체: A→B, B→C, C→D', R.best.sequence.join(' ') === 'A→B B→C C→D', R.best.sequence.join(' '));
+ok('★★ 이론상 68 s = A→B 제6경기 22 + B→C 제3경기 15 + C→D 제4경기 31', R.best.possibleSec === 68
+   && R.best.bestSegments.map(function (b) { return b.race; }).join(',') === 'r6,r3,r4', JSON.stringify(R.best.bestSegments));
+ok('★★ 제6경기 77 s → 그 선보다 9 s', R.best.ref && R.best.ref.sec === 77 && R.best.refGainSec === 9,
+   JSON.stringify(R.best.ref));
+ok('★ 다른 경기는 넷 다 돈 적 없다 — 조각으로 만든 선이라고 밝힐 수 있다', R.best.othersCompleted === 0);
+/* 제4경기를 기준으로 보면 — B→C→D */
+var R4 = run('r4');
+/* 이름은 기준 경기가 도는 순서로 다시 붙는다 — 제4경기 기준이면 옛 B·C·D 가 A·B·C */
+ok('★★ 제4경기 기준: 두 구간, 이론상 46 s, 제4경기 48 s (2 s)', R4.best.sequence.length === 2
+   && R4.best.possibleSec === 46 && R4.best.ref.sec === 48 && R4.best.refGainSec === 2,
+   R4.best.sequence.join(' ') + ' ' + R4.best.possibleSec + ' ' + JSON.stringify(R4.best.ref));
+ok('★ 제4경기 기준 글자: A→B, B→C', R4.best.sequence.join(' ') === 'A→B B→C');
+ok('★ 제4경기 기준 다른 완주: 제2·6경기', R4.best.othersCompleted === 2);
+/* 기준 경기에 구간이 없으면 가장 긴 공통 순서로 */
+var rsX = races(); var mkX = SL.labelMarks(SL.clusterMarks(rsX), rsX, 'r6'); var perX = SL.markToMark(rsX, mkX);
+perX.none = [];
+ok('★ 기준 경기에 구간이 없으면 두 경기 이상이 다 돈 가장 긴 순서로', (function () {
+  var bl = SL.bestLine(perX, rsX, 'none'); return bl && bl.sequence.length === 2 && !bl.ref; })());
 /* 탈출 → 다음 구간 */
 var c6 = C.cells.r6, c4 = C.cells.r4;
 var cd6 = R.per.r6.filter(function (s) { return s.key === 'C→D'; })[0].sec;
 var cd4 = R.per.r4.filter(function (s) { return s.key === 'C→D'; })[0].sec;
 ok('★★ C 를 빨리 나온 경기가 D 에 먼저 닿는다 (19.5 kt → 31 s, 14.7 kt → 39 s)',
    c4.exitKt > c6.exitKt && cd4 < cd6, c4.exitKt + '/' + cd4 + ' vs ' + c6.exitKt + '/' + cd6);
+
+/* 다른 코스 경기 */
+var rsO = races(); rsO.push({ key: 'r1', name: '제1경기', apexes: [P(900, 900), P(1400, 300)].map(function (p, i) {
+  return { lat: p.lat, lng: p.lng, t: i * 60, cumM: i * 600, entryKt: 18, minKt: 12, exitKt: 12 }; }) });
+var fakeAn = function (r) { return r; };
+var mkO = SL.labelMarks(SL.clusterMarks(rsO), rsO, 'r6');
+ok('★★ 다른 코스(제1경기)는 공유 부표가 없다', !mkO.some(function (m) { return m.visits.some(function (v) { return v.race === 'r1'; }); }));
+var srcA = fs.readFileSync(path.join(__dirname, 'js/slalom.js'), 'utf8');
+ok('★★ analyze 는 그런 경기를 표에서 빼고 이름을 돌려준다', /offCourse: offCourse/.test(srcA) && /races: kept/.test(srcA));
 
 console.log('\n[4] 풍향이 틀려도 — 분류가 아니라 정점으로');
 var src = fs.readFileSync(path.join(__dirname, 'js/slalom.js'), 'utf8');
