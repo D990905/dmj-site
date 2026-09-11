@@ -70,7 +70,9 @@ ok('★ 원본 위에 다시 적용 (Restore 가 저장 뒤에도 됨)', /if \(!
    && /reapplyEdits\(\);/.test(code));
 ok('★★ 비교도 그 세션의 제거 구간을 빼고 잰다', /gs = An\.applyEdits\(gs, \{ excludeRanges: rec\.excludeRanges \}\)/.test(code));
 ok('★ 실패는 삼키지 않는다', /\[v2 §590\] restore exclusions/.test(app) && /\[v2 §590\] compare edits/.test(app));
-ok('★ storage·v2-app 캐시버스트', /storage\.js\?v=v590/.test(html) && /v2-app\.js\?v=v59\d/.test(html));
+ok('★ storage·v2-app 캐시버스트 (v590 이상)', (function () {
+  var a = html.match(/storage\.js\?v=v(\d+)/), b = html.match(/v2-app\.js\?v=v(\d+)/);
+  return !!a && !!b && +a[1] >= 590 && +b[1] >= 590; })());
 
 console.log('\n' + (fail ? 'FAIL' : 'PASS') + '  ' + pass + '/' + (pass + fail));
 process.exit(fail ? 1 : 0);

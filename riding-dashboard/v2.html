@@ -217,6 +217,10 @@
               </div>
 
               <div id="tab-perf" class="tab-pane" role="tabpanel">
+                <!-- §591 (옥대표 "슬라럼 경기에서는 폴라그램이 별로 의미가 없어 보이고") —
+                     같은 날 같은 부표를 돈 경기가 있으면 맨 위에 부표별·구간별 비교가 뜬다.
+                     없으면(프리라이드) 비어 있다. -->
+                <div id="race-host"></div>
                 <div class="row row-cards">
                   <div class="col-lg-7">
                     <div class="card h-100">
@@ -378,7 +382,7 @@
      defer 를 쓰지 않는 이유: defer 는 실행이 문서 파싱 뒤로 밀려서
      storage.js 가 먼저 돌아버린다(그러면 첫 read 가 bare namespace 로 나간다). -->
 <script src="../assets/js/supabase-auth.js?v=v528"></script>
-<script src="js/storage.js?v=v590"></script>
+<script src="js/storage.js?v=v591"></script>
 <script src="vendor/uPlot.iife.min.js?v=1.6.32"></script>
 <script src="js/chart-meanmax.js?v=v586g"></script>
 <script src="js/segments.js?v=v523"></script>
@@ -405,7 +409,8 @@
 <script src="js/trend-analysis.js?v=v582"></script>
 <script src="js/gear-usage.js?v=v559"></script>
 <script src="js/chart-tip.js?v=v560"></script>
-<script src="js/v2-app.js?v=v590"></script>
+<script src="js/slalom.js?v=v591"></script>
+<script src="js/v2-app.js?v=v591"></script>
 <script src="js/mobile-shell.js?v=v588"></script>
 </body>
 </html>

@@ -25,7 +25,10 @@ function fnBody(name) {
   }
   return '';
 }
-var rc = fnBody('renderCompare'), ca = fnBody('compareAnalysis'), pg = fnBody('populateReplayGhost');
+/* §591 — 재분석은 비교와 레이스 분석이 같이 쓰는 storedAnalysisFresh 로 옮겼다.
+   compareAnalysis 는 그걸 부르기만 한다. 검사는 실제로 분석하는 곳을 본다. */
+var rc = fnBody('renderCompare'), ca = fnBody('storedAnalysisFresh'), pg = fnBody('populateReplayGhost');
+ok('★ compareAnalysis 는 공용 재분석을 쓴다', /var v = storedAnalysis\(rec\);/.test(fnBody('compareAnalysis')));
 
 console.log('[1] 고르면 바로 보인다');
 ok('★★ 요약(KPI) 바로 아래에 자리가 있다',
@@ -47,7 +50,8 @@ ok('★★ 재분석은 그 세션의 풍속으로 (지금 폼 풍속 X)',
    /o\.windSpeedKt = rec\.windSpeedKt/.test(ca) && ca.indexOf('analysisOpts(') < 0 && ca.indexOf('windSpeedFromForm') < 0);
 ok('★ 풍향도 그 세션에 저장된 값 먼저', /var wd = rec\.windDir != null \? rec\.windDir/.test(ca));
 ok('★ 같은 분석 코드', /An\.analyzeSession\(gs, wd, o\)/.test(ca) && /sessionFromStoredTrack\(gpx\)/.test(ca));
-ok('★ 한 번 계산하면 담아 둔다 (id + savedAt)', /var key = rec\.id \+ '\|' \+ \(rec\.savedAt \|\| ''\);/.test(ca));
+ok('★ 한 번 계산하면 담아 둔다 (id + savedAt + 풍향 + 제거구간)',
+   /var key = rec\.id \+ '\|' \+ \(rec\.savedAt \|\| ''\) \+ '\|' \+ \(rec\.windDir != null/.test(fnBody('storedAnalysis')));
 ok('★ 트랙을 못 읽으면 점수만 보여 주고 그렇다고 말한다', /could not be re-read, so only its saved scores are shown/.test(code));
 
 console.log('\n[3] 줄과 색');

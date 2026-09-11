@@ -686,6 +686,9 @@
       if (patch.rider) arr[i].rider = patch.rider;
       if (patch.windSpeedKt != null) arr[i].windSpeedKt = patch.windSpeedKt;
       if (patch.windDir != null) arr[i].windDir = patch.windDir;
+      /* §591 — 풍향을 나중에 바꾸면 저장된 점수는 옛 풍향으로 매긴 것이다.
+         표시만 해 둔다. 다시 저장하면 buildRecord 가 새로 만들어 지워진다. */
+      if (patch.scoreStale != null) arr[i].scoreStale = !!patch.scoreStale;
       break;
     }
     if (!found) return { ok: false, error: 'not found' };

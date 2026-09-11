@@ -996,6 +996,255 @@
      옮겨 온 곳: 구간 제거 = Performance 타임라인 · 장비 = Coach 맨 위 ·
      해상 상태 = 장비 선택기 안 'Water state' · 신체 = Training load.
      새로 만든 건 없다 — 이미 있던 것을 한 자리에 모으고 원래 자리에서 뺐다. */
+  /* 지금 세션과 같은 날(현지 날짜)의 저장 세션. 열려 있는 그 줄도 포함한다
+     — 풍향 일괄 적용은 그 줄에도 써야 하므로. 레이스 비교는 따로 거른다. */
+  function sameDaySaved() {
+    if (!CUR.session) return [];
+    var day = sessionYmd();
+    return listSessions().filter(function (r) {
+      if (!r || !r.dateEpoch) return false;
+      var d = new Date(r.dateEpoch);
+      var ymd = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+              + '-' + String(d.getDate()).padStart(2, '0');
+      return ymd === day;
+    });
+  }
+
+  function applyWindToDay(dir) {
+    var list = sameDaySaved();
+    if (!list.length || !Store || !Store.setSessionInputs) return;
+    var lines = list.map(function (r) {
+      return '  ' + (r.name || 'Session') + '   '
+        + (r.windDir != null ? Math.round(r.windDir) + '\u00b0' : 'no direction') + ' \u2192 ' + dir + '\u00b0';
+    });
+    /* 저장 레코드 여러 개를 고치는 일이라 무엇이 바뀌는지 먼저 보여 준다 */
+    if (!window.confirm('Save wind direction ' + dir + '\u00b0 to these ' + list.length
+        + ' sessions?\n\n' + lines.join('\n')
+        + '\n\nTheir saved scores were calculated with the old direction and will be '
+        + 'marked \u21bb until you open each one and press Save session.')) return;
+    var bad = 0;
+    list.forEach(function (r) {
+      if (r.windDir != null && Math.round(r.windDir) === dir) return;   /* 이미 같으면 표시도 안 한다 */
+      var res = Store.setSessionInputs(r.id, { windDir: dir, scoreStale: true });
+      if (!res || res.ok === false) bad++;
+    });
+    if (bad && window.console) console.error('[v2 §591] wind to day: ' + bad + ' writes failed');
+    if (CUR.windDir == null || Math.round(CUR.windDir) !== dir) applyWind(dir, null);
+    else { try { renderSessions(); } catch (e) {} try { renderRace(); } catch (e) {} }
+    alertLine('Wind ' + dir + '\u00b0 saved to ' + (list.length - bad) + ' session'
+      + (list.length - bad === 1 ? '' : 's') + ' on ' + sessionYmd()
+      + (bad ? ' (' + bad + ' failed)' : '') + '. Scores marked \u21bb in Sessions still use the old '
+      + 'direction \u2014 open each and press Save session to refresh them.');
+  }
+
+  /* ════════════════════════ §591 레이스 (슬라럼) ════════════════════════
+     같은 날 같은 부표를 돈 경기가 둘 이상이면 Performance 맨 위에:
+       ① 부표마다 경기별 진입 → 최저 → 탈출
+       ② 부표 사이 구간 시간과 오늘의 최고 구간을 이은 '이론상 최고'
+     출발선·결승선은 모른다(트랙을 어디서 잘랐는지에 달림) — 부표 사이만 잰다. */
+  function renderRace() {
+    var host = $('race-host');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    if (!window.RDSlalom || !CUR.session || !CUR.analysis) return;
+    var st0 = CUR.session.startEpoch || 0;
+    var sibs = sameDaySaved().filter(function (r) {
+      if (!r.hasTrack) return false;
+      if (CUR.openedRecId && r.id === CUR.openedRecId) return false;
+      /* 방금 올린 파일이 이미 저장돼 있으면 그 사본은 빼야 자기 자신과 겨루지 않는다 */
+      if (st0 && r.dateEpoch && Math.abs(r.dateEpoch - st0) < 5000) return false;
+      return true;
+    }).slice(0, 12);
+    if (!sibs.length) return;
+    var races = [{ key: '__cur', name: CUR.name || 'This session',
+                   analysis: CUR.analysis, session: CUR.session }];
+    sibs.forEach(function (r) {
+      var v = null;
+      try { v = storedAnalysis(r); }
+      catch (e) { if (window.console) console.error('[v2 §591] sibling ' + r.name, e); }
+      if (v && v.analysis) races.push({ key: r.id, name: r.name || 'Session', analysis: v.analysis, session: v.session });
+    });
+    if (races.length < 2) return;
+    races.sort(function (a, b) {
+      if (a.key === '__cur') return -1;
+      if (b.key === '__cur') return 1;
+      return ((a.session && a.session.startEpoch) || 0) - ((b.session && b.session.startEpoch) || 0);
+    });
+    var res = RDSlalom.analyze(races, '__cur');
+    if (!res.ok) return;
+    /* 이 경기가 한 번도 안 돈 부표만 있으면 이 경기에 대해 할 말이 없다 */
+    var mine = res.roundings.filter(function (rd) { return rd.cells.__cur; });
+    if (!mine.length) return;
+    var nameOf = {};
+    races.forEach(function (r) { nameOf[r.key] = r.key === '__cur' ? (r.name + ' (this one)') : r.name; });
+    function f1(v) { return v == null || !isFinite(v) ? '\u2014' : v.toFixed(1); }
+
+    condSection(host, 'Race', 'same marks, ' + races.length + ' races on ' + sessionYmd()
+      + ' \u2014 found where two or more races turned within ~' + RDSlalom.MARK_RADIUS_M + ' m', true);
+
+    /* ── ① 부표별 회전 ── */
+    var c1 = el('div', 'card mb-3');
+    var h1 = el('div', 'card-header');
+    h1.appendChild(el('h3', 'card-title', 'Mark by mark'));
+    h1.appendChild(el('div', 'card-actions lab', 'speed in \u2192 lowest \u2192 out, kt'));
+    c1.appendChild(h1);
+    var w1 = el('div', 'table-responsive');
+    var t1 = el('table', 'table table-vcenter card-table table-sm');
+    var th1 = el('thead'), hr1 = el('tr');
+    hr1.appendChild(el('th', null, 'Race'));
+    res.roundings.forEach(function (rd) { hr1.appendChild(el('th', 'text-end', 'Mark ' + rd.mark)); });
+    th1.appendChild(hr1); t1.appendChild(th1);
+    var tb1 = el('tbody');
+    races.forEach(function (r) {
+      var tr = el('tr');
+      var nm = el('td', r.key === '__cur' ? 'fw-bold' : null, nameOf[r.key]);
+      tr.appendChild(nm);
+      res.roundings.forEach(function (rd) {
+        var c = rd.cells[r.key];
+        var td = el('td', 'text-end num');
+        if (!c) { td.textContent = '\u2014'; td.className += ' text-secondary'; tr.appendChild(td); return; }
+        var top = el('div');
+        top.appendChild(document.createTextNode(f1(c.entryKt) + ' \u2192 ' + f1(c.minKt) + ' \u2192 '));
+        var ex = el('span', 'fw-bold', f1(c.exitKt));
+        /* 색은 탈출 속도 — 회전이 끝나고 다음 구간으로 가져가는 속도다 */
+        if (rd.bestExit && rd.worstExit && rd.bestExit.key !== rd.worstExit.key) {
+          if (rd.bestExit.key === r.key) { ex.style.color = THEME.stbd; ex.title = 'best exit at this mark'; }
+          else if (rd.worstExit.key === r.key) { ex.style.color = THEME.port; ex.title = 'slowest exit at this mark'; }
+        }
+        top.appendChild(ex);
+        td.appendChild(top);
+        var sub = [];
+        if (c.radiusM != null) sub.push('r ' + Math.round(c.radiusM) + ' m');
+        if (c.turnSec != null) sub.push(Math.round(c.turnSec) + ' s');
+        if (sub.length) td.appendChild(el('div', 'lab', sub.join(' \u00b7 ')));
+        tr.appendChild(td);
+      });
+      tb1.appendChild(tr);
+    });
+    /* 부표별 편차 줄 */
+    var trS = el('tr');
+    trS.appendChild(el('td', 'text-secondary', 'Exit spread'));
+    var widest = null;
+    res.roundings.forEach(function (rd) {
+      if (rd.exitSpreadKt != null && (!widest || rd.exitSpreadKt > widest.exitSpreadKt)) widest = rd;
+    });
+    res.roundings.forEach(function (rd) {
+      var td = el('td', 'text-end num', rd.exitSpreadKt != null ? rd.exitSpreadKt.toFixed(1) + ' kt' : '\u2014');
+      td.className += (widest && rd === widest) ? ' fw-bold' : ' text-secondary';
+      trS.appendChild(td);
+    });
+    tb1.appendChild(trS);
+    t1.appendChild(tb1); w1.appendChild(t1); c1.appendChild(w1);
+
+    /* 가장 들쭉날쭉한 부표 — 그리고 그게 다음 구간에 얼마를 물렸는지 */
+    var say = [];
+    if (widest && widest.exitSpreadKt >= 1.5 && widest.bestExit && widest.worstExit) {
+      var bc = widest.cells[widest.bestExit.key];
+      say.push('Mark ' + widest.mark + ' is where your races differ most: out at '
+        + f1(widest.worstExit.v) + ' to ' + f1(widest.bestExit.v) + ' kt. Best rounding there: '
+        + nameOf[widest.bestExit.key] + ' (' + f1(bc.entryKt) + ' \u2192 ' + f1(bc.minKt)
+        + ' \u2192 ' + f1(bc.exitKt) + ').');
+      var nextKey = null;
+      (res.best ? res.best.sequence : []).forEach(function (k) { if (k.indexOf(widest.mark + '\u2192') === 0) nextKey = k; });
+      if (!nextKey) {
+        Object.keys(res.legs).forEach(function (rk) {
+          res.legs[rk].forEach(function (sg) { if (!nextKey && sg.key.indexOf(widest.mark + '\u2192') === 0) nextKey = sg.key; });
+        });
+      }
+      if (nextKey) {
+        var pairs = [];
+        Object.keys(res.legs).forEach(function (rk) {
+          var c = widest.cells[rk];
+          res.legs[rk].forEach(function (sg) {
+            if (sg.key === nextKey && c && c.exitKt != null) pairs.push({ rk: rk, exit: c.exitKt, sec: sg.sec });
+          });
+        });
+        if (pairs.length >= 2) {
+          pairs.sort(function (a, b) { return b.exit - a.exit; });
+          var hi = pairs[0], lo = pairs[pairs.length - 1];
+          if (hi.sec < lo.sec) {
+            say.push('It carries into the next leg: ' + nameOf[hi.rk] + ' left at ' + f1(hi.exit)
+              + ' kt and took ' + Math.round(hi.sec) + ' s to ' + nextKey.split('\u2192')[1] + '; '
+              + nameOf[lo.rk] + ' left at ' + f1(lo.exit) + ' kt and took ' + Math.round(lo.sec) + ' s.');
+          }
+        }
+      }
+    }
+    var f1c = el('div', 'card-footer text-secondary');
+    f1c.style.fontSize = '.8125rem';
+    f1c.textContent = (say.length ? say.join(' ') + ' ' : '')
+      + 'Green = best exit at that mark, red = slowest. Marks are lettered in the order this race '
+      + 'reached them. Speeds come from 1-second GPS, so the lowest speed and radius are approximate.';
+    c1.appendChild(f1c);
+    host.appendChild(c1);
+
+    /* ── ② 부표 사이 ── */
+    var segKeys = [];
+    if (res.best) res.best.sequence.forEach(function (k) { if (segKeys.indexOf(k) < 0) segKeys.push(k); });
+    Object.keys(res.legs).forEach(function (rk) {
+      res.legs[rk].forEach(function (sg) { if (segKeys.indexOf(sg.key) < 0) segKeys.push(sg.key); });
+    });
+    if (!segKeys.length) return;
+    var bestSec = {};
+    segKeys.forEach(function (k) {
+      Object.keys(res.legs).forEach(function (rk) {
+        res.legs[rk].forEach(function (sg) {
+          if (sg.key === k && (bestSec[k] == null || sg.sec < bestSec[k])) bestSec[k] = sg.sec;
+        });
+      });
+    });
+    var c2 = el('div', 'card mb-3');
+    var h2 = el('div', 'card-header');
+    h2.appendChild(el('h3', 'card-title', 'Mark to mark'));
+    h2.appendChild(el('div', 'card-actions lab', 'seconds \u00b7 average kt, rounding to rounding'));
+    c2.appendChild(h2);
+    var w2 = el('div', 'table-responsive');
+    var t2 = el('table', 'table table-vcenter card-table table-sm');
+    var th2 = el('thead'), hr2 = el('tr');
+    hr2.appendChild(el('th', null, 'Race'));
+    segKeys.forEach(function (k) { hr2.appendChild(el('th', 'text-end', k)); });
+    th2.appendChild(hr2); t2.appendChild(th2);
+    var tb2 = el('tbody');
+    races.forEach(function (r) {
+      var tr = el('tr');
+      tr.appendChild(el('td', r.key === '__cur' ? 'fw-bold' : null, nameOf[r.key]));
+      segKeys.forEach(function (k) {
+        var sg = null;
+        (res.legs[r.key] || []).forEach(function (x) { if (!sg && x.key === k) sg = x; });
+        var td = el('td', 'text-end num');
+        if (!sg) { td.textContent = '\u2014'; td.className += ' text-secondary'; }
+        else {
+          var s1 = el('span', null, Math.round(sg.sec) + ' s');
+          if (bestSec[k] != null && Math.round(sg.sec) === Math.round(bestSec[k])) { s1.style.color = THEME.stbd; s1.className = 'fw-bold'; }
+          td.appendChild(s1);
+          if (sg.avgKt != null) td.appendChild(el('div', 'lab', f1(sg.avgKt) + ' kt'));
+        }
+        tr.appendChild(td);
+      });
+      tb2.appendChild(tr);
+    });
+    t2.appendChild(tb2); w2.appendChild(t2); c2.appendChild(w2);
+    var f2 = el('div', 'card-footer text-secondary');
+    f2.style.fontSize = '.8125rem';
+    var b = res.best, txt = '';
+    if (b && b.bestActual) {
+      txt = 'Best of the day, ' + b.sequence.join(' then ') + ': ' + Math.round(b.possibleSec) + ' s \u2014 '
+        + b.bestSegments.map(function (sg) { return sg.key + ' from ' + nameOf[sg.race] + ' (' + Math.round(sg.sec) + ' s)'; }).join(' + ')
+        + '. Fastest real race over that stretch: ' + nameOf[b.bestActual.race] + ', '
+        + Math.round(b.bestActual.sec) + ' s, so ' + Math.max(0, Math.round(b.gainSec)) + ' s was left on the table.';
+      var me = null;
+      b.races.forEach(function (x) { if (x.race === '__cur') me = x; });
+      if (me && me.race !== b.bestActual.race) {
+        txt += ' This race: ' + Math.round(me.sec) + ' s (+' + Math.round(me.sec - b.possibleSec) + ' s on the best line).';
+      }
+      txt += ' ';
+    }
+    f2.textContent = txt + 'Start and finish lines are not known \u2014 they depend on where each track '
+      + 'was cut \u2014 so only rounding-to-rounding times are compared.';
+    c2.appendChild(f2);
+    host.appendChild(c2);
+  }
+
   function condSection(host, title, sub, first) {
     var h = el('div', 'd-flex flex-wrap align-items-baseline gap-2 mb-2 ' + (first ? 'mt-1' : 'mt-4'));
     h.appendChild(el('h3', 'mb-0', title));
@@ -1203,6 +1452,28 @@
       applyWind(((v % 360) + 360) % 360, null);
     });
     reBtn.addEventListener('click', function () { applyWind(null, 're-estimate'); });
+
+    /* §591 — 같은 날 같은 코스인데 저장된 풍향이 경기마다 달랐다(9/11:
+       제2경기 55°, 나머지 ≈348°). 그러면 같은 부표 회전이 한 경기에선
+       자이브, 다른 경기에선 택으로 분류된다. 그날 전부에 한 번에 준다. */
+    var sameDay = sameDaySaved();
+    var others = sameDay.filter(function (r) { return r.id !== CUR.openedRecId; });
+    if (others.length) {                     /* 자기 하나뿐이면 일괄 적용할 게 없다 */
+      var c5 = el('div', 'col-auto');
+      var dayBtn = el('button', 'btn', 'Use for all ' + sameDay.length
+        + ' saved sessions on ' + sessionYmd());
+      dayBtn.type = 'button';
+      dayBtn.title = 'Same day, same water: saves this wind direction to every saved '
+        + 'session of ' + sessionYmd() + '.';
+      dayBtn.addEventListener('click', function () {
+        var v = parseFloat(inp.value);
+        if (!isFinite(v)) v = CUR.windDir;
+        if (v == null || !isFinite(v)) return;
+        applyWindToDay(((Math.round(v) % 360) + 360) % 360);
+      });
+      c5.appendChild(dayBtn);
+      row.insertBefore(c5, c4);
+    }
 
     var w = a.wind;
     if (!w) host.appendChild(el('div', 'text-secondary mt-2', 'Wind not resolved.'));
@@ -4482,8 +4753,16 @@
         r.avgSpeedMovingMs != null ? (r.avgSpeedMovingMs * KT).toFixed(1) : '—'));
       tr.appendChild(el('td', 'text-end num',
         r.maneuverTotal != null ? String(r.maneuverTotal) : '—'));
-      tr.appendChild(el('td', 'text-end num',
-        r.vpsOverall != null ? String(Math.round(r.vpsOverall)) : '—'));
+      var tdS = el('td', 'text-end num',
+        r.vpsOverall != null ? String(Math.round(r.vpsOverall)) : '—');
+      /* §591 — 풍향을 나중에 바꾼 세션: 점수가 옛 풍향 기준이다 */
+      if (r.scoreStale) {
+        var st = el('span', 'lab ms-1', '\u21bb');
+        st.title = 'The wind direction was changed after this score was calculated '
+          + '\u2014 open the session and press Save session to update it.';
+        tdS.appendChild(st);
+      }
+      tr.appendChild(tdS);
       /* §543 (옥대표 "세션을 삭제하는 기능추가해줘") — 삭제는 되돌릴 수
          없으니 무엇을 지우는지 이름·날짜·거리로 확인시킨다. 행 클릭(열기)과
          섞이면 지우려다 열게 되므로 stopPropagation 이 필수다. */
@@ -9926,6 +10205,8 @@
     renderKpis(analysis, vps);
     try { renderCompare(); }            /* §589 — 세션을 바꿔도 고른 비교는 유지 */
     catch (e) { if (window.console) console.error('[v2 §589] compare', e); }
+    try { renderRace(); }               /* §591 — 같은 날 같은 부표 경기 */
+    catch (e) { if (window.console) console.error('[v2 §591] race', e); }
     renderRiderNote(vps);
     try { renderInputSources(); } catch (e) {}
     if (window.RDMeanMax) {
@@ -10217,10 +10498,22 @@
      쓴다 — 지금 폼 값으로 다시 매기면 12kt 세션이 25kt 로 채점된다(§547).
      속도·VMG·회전은 저장된 트랙을 **같은 분석 코드**로 다시 돌려 얻는다 —
      그래야 두 칸이 같은 자로 잰 값이다. 한 번 계산하면 id+savedAt 로 담아 둔다. */
-  var CMP_CACHE = null;
+  /* §591 — 저장된 세션 하나를 다시 분석한 결과(세션+분석)를 담아 둔다.
+     비교(§589)와 레이스 분석(§591)이 같이 쓴다. 풍향이 바뀌면 다시 계산. */
+  var STORED_AN = {};
+  function storedAnalysis(rec) {
+    var key = rec.id + '|' + (rec.savedAt || '') + '|' + (rec.windDir != null ? rec.windDir : '')
+      + '|' + JSON.stringify(rec.excludeRanges || null);
+    if (STORED_AN[rec.id] && STORED_AN[rec.id].key === key) return STORED_AN[rec.id].v;
+    var v = storedAnalysisFresh(rec);
+    STORED_AN[rec.id] = { key: key, v: v };
+    return v;
+  }
   function compareAnalysis(rec) {
-    var key = rec.id + '|' + (rec.savedAt || '');
-    if (CMP_CACHE && CMP_CACHE.key === key) return CMP_CACHE.a;
+    var v = storedAnalysis(rec);
+    return v ? v.analysis : null;
+  }
+  function storedAnalysisFresh(rec) {
     var gpx = Store && Store.loadTrack ? Store.loadTrack(rec.id) : null;
     if (!gpx) return null;
     var gs = sessionFromStoredTrack(gpx);
@@ -10237,8 +10530,7 @@
     if (est && est.confidence != null) o.windConfidence = est.confidence;
     if (rec.windSpeedKt != null) o.windSpeedKt = rec.windSpeedKt;   /* 그 세션의 풍속 */
     var a = An.analyzeSession(gs, wd, o);
-    CMP_CACHE = { key: key, a: a };
-    return a;
+    return { analysis: a, session: gs };
   }
 
   function renderCompare() {
@@ -10364,6 +10656,8 @@
     try { ga = gearLabel(gearSnapshot()); } catch (e) { ga = null; }
     if (ga || gb) notes.push('Gear: ' + (ga || 'not recorded') + ' vs ' + (gb || 'not recorded') + '.');
     if (!b) notes.push('The other session\u2019s track could not be re-read, so only its saved scores are shown.');
+    if (rec.scoreStale) notes.push('Its saved score was calculated before its wind direction was changed '
+      + '\u2014 open it and press Save session to refresh that line.');
     notes.push('Green = this session is better on that line, red = the other one is. '
       + 'Distance and turn counts depend on how long you rode, so they are not coloured.');
     foot.textContent = notes.join(' ');
