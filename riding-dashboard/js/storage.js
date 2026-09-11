@@ -432,6 +432,18 @@
     return isFinite(n) ? n : null;
   }
 
+  /* §590 — {from,to} 숫자만, to>from 만, 최대 500개. 이상한 값이 저장되면
+     다시 열 때 applyEdits 가 엉뚱한 데를 지운다. 없으면 null. */
+  function cleanRanges(R) {
+    if (!R || !R.length) return null;
+    var out = [];
+    for (var i = 0; i < R.length && out.length < 500; i++) {
+      var a = Number(R[i] && R[i].from), b = Number(R[i] && R[i].to);
+      if (isFinite(a) && isFinite(b) && b > a) out.push({ from: a, to: b });
+    }
+    return out.length ? out : null;
+  }
+
   function buildRecord(meta, analysis) {
     var s = analysis.summary || {};
     var ms = analysis.maneuverStats || {};
@@ -451,6 +463,10 @@
          ' · 편집본' 접미사를 붙여 저장했으나, 제목을 사용자가 직접
          편집하게 되면서 편집 상태는 별도 플래그로 분리한다(헤더 배지용). */
       edited: !!meta.edited,
+      /* §590 — 제거한 구간(원본 세션 기준 상대초). 트랙은 원본 전체를
+         저장하므로 이게 없으면 다시 열 때 제거가 조용히 사라지고, 목록의
+         숫자(편집본)와 다시 연 화면의 숫자(원본)가 달라진다. */
+      excludeRanges: cleanRanges(meta.excludeRanges),
       /* 숫자로 고정 — Date 객체가 들어오면 직렬화될 때 문자열이 되고,
          그 뒤로는 산술이 전부 NaN 이다(시즌 흐름 그래프가 그렇게 죽었다) */
       dateEpoch: numEpoch(meta.dateEpoch) || Date.now(),

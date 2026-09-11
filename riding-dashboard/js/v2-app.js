@@ -413,6 +413,19 @@
   }
   function resetEdits() { CUR.edit = null; reapplyEdits(); }
 
+  /* §590 — 저장할 때 담아 둔 제거 구간을 다시 연 세션에 되살린다.
+     원본 트랙 위에 다시 적용하므로 'Restore full track' 은 저장 뒤에도 된다. */
+  function restoreSavedExclusions(rec) {
+    var R = rec && rec.excludeRanges;
+    if (!R || !R.length || !CUR.fullSession) return;
+    CUR.edit = { excludeRanges: R.map(function (r) { return { from: +r.from, to: +r.to }; }) };
+    try { reapplyEdits(); }
+    catch (e) {
+      if (window.console) console.error('[v2 §590] restore exclusions', e);
+      CUR.edit = null;
+    }
+  }
+
   /* §487 — 문답 답변이 만든 제외구간을 수동 제외와 합친다. "옆에서
      봐주느라 천천히 다녔다" 는 답 하나가 그 구간을 성능 통계에서
      빼야 의미가 있다 — 답만 받고 숫자를 그대로 두면 물어본 보람이 없다. */
@@ -4238,6 +4251,7 @@
       var an2 = An.analyzeSession(sess, wd2, analysisOpts(est2));
       CUR.openedRecId = rec.id;        /* §554 — 여기까지 왔으면 진짜 열렸다 */
       show(sess, an2, rec.name || 'Session', est2);
+      restoreSavedExclusions(rec);     /* §590 */
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
       return;
     }
@@ -4265,6 +4279,7 @@
         CUR.windDir = rec.windDir;
         reapplyEdits();
       }
+      restoreSavedExclusions(rec);     /* §590 */
       var el2 = document.getElementById('chart-timeline');
       if (el2) el2.scrollIntoView({ block: 'start', behavior: 'smooth' });
       CUR.restoringSaved = false;
@@ -10210,6 +10225,11 @@
     if (!gpx) return null;
     var gs = sessionFromStoredTrack(gpx);
     if (!gs || !gs.samples || !gs.samples.length) return null;
+    /* §590 — 그 세션에서 제거해 둔 구간을 빼고 잰다(저장 목록의 숫자와 맞게) */
+    if (rec.excludeRanges && rec.excludeRanges.length && An.applyEdits) {
+      try { gs = An.applyEdits(gs, { excludeRanges: rec.excludeRanges }); }
+      catch (e) { if (window.console) console.error('[v2 §590] compare edits', e); }
+    }
     var est = null;
     try { est = estimateWind(gs); } catch (e) { est = null; }
     var wd = rec.windDir != null ? rec.windDir : (est && est.windDir != null ? est.windDir : null);
@@ -10767,7 +10787,14 @@
       try {
         var res = Store.saveSession({
           name: CUR.name || 'Session',
-          edited: false,
+          /* §590 — 제거한 구간을 레코드에 같이 담는다(트랙은 원본 전체).
+             예전엔 edited:false 고정 + 구간 미저장이라, 다시 열면 제거가
+             조용히 사라지고 목록 숫자(편집본)와 화면 숫자(원본)가 달랐다.
+             실측(옥대표 제5경기): 목록 1.12 km, 다시 열면 1.24 km. */
+          edited: !!(CUR.edit && CUR.edit.excludeRanges && CUR.edit.excludeRanges.length),
+          excludeRanges: (CUR.edit && CUR.edit.excludeRanges)
+            ? CUR.edit.excludeRanges.map(function (r) { return { from: r.from, to: r.to }; })
+            : null,
           dateEpoch: (CUR.session && CUR.session.startEpoch) || Date.now(),
           sport: 'wingfoil',
           windDir: CUR.windDir,
