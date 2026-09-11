@@ -149,7 +149,9 @@ ok('★★ v2.html 이 셸을 읽는다', /js\/mobile-shell\.js\?v=/.test(html))
 ok('★★ 셸이 v2-app 보다 뒤에 온다 (v2-app 이 그린 걸 장식한다)',
    html.indexOf('js/mobile-shell.js') > html.indexOf('js/v2-app.js'));
 ok('★ 캐시버스트가 붙어 있다 (재방문자가 옛 파일을 안 받게)',
-   /mobile\.css\?v=v586[a-z]?/.test(html) && /mobile-shell\.js\?v=v586[a-z]?/.test(html));
+   (function () {   /* 정확한 문자열로 박으면 이후 섹션마다 거짓 실패(§560 교훈) */
+     var a = html.match(/mobile\.css\?v=v(\d+)/), b = html.match(/mobile-shell\.js\?v=v(\d+)/);
+     return !!a && !!b && +a[1] >= 586 && +b[1] >= 586; })());
 
 /* 하단 탭바에 없는 탭은 More 시트에서 반드시 닿아야 한다 */
 var tabsInHtml = (html.match(/href="(#tab-[a-z]+)"/g) || [])

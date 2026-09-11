@@ -24,6 +24,7 @@
       d + (extra || '') + '</svg>';
   }
   var ICON = {
+    cond:  svg('<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
     wind:  svg('<path d="M4 8h9a3 3 0 1 0-3-3"/><path d="M3 13h13a3 3 0 1 1-3 3"/><path d="M4 18h6"/>'),
     perf:  svg('<path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/>'),
     track: svg('<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
@@ -47,7 +48,7 @@
 
   /* 탭 → 아이콘/짧은 이름. 하단 탭바에 다섯 자리뿐이라 나머지는 More 로. */
   var TABMETA = {
-    '#tab-env':      { icon: 'wind',  label: 'Wind' },
+    '#tab-env':      { icon: 'cond',  label: 'Condition' },   /* §588 */
     '#tab-perf':     { icon: 'perf',  label: 'Perf' },
     '#tab-track':    { icon: 'track', label: 'Track' },
     '#tab-turns':    { icon: 'turns', label: 'Turns' },

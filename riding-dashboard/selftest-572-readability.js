@@ -60,8 +60,13 @@ ok('★ 여닫는 버튼', /BINTABLE_OPEN \? 'Hide' : 'Open'/.test(code));
 ok('★★ 왜 접었는지 설명한다 (Tack bias 가 더 읽기 쉽다)',
    /answered more legibly by Tack bias above/.test(code));
 ok('★ 지우지 않았다 (열면 그대로)', /function renderBinTable\(host, a\)/.test(code));
-ok('★★ 재렌더 시그니처가 맞다 (a, est) — env-body 는 스스로 비운다',
-   /renderEnvironment\(a, CUR\.est\)/.test(code) && !/renderEnvironment\(host, a\)/.test(code));
+/* §588 — Bin table 은 퍼포먼스 탭(#wind-analysis-host)으로 옮겼다. 접기를
+   누르면 그 호스트만 다시 그린다. 컨디션 탭 전체(웰니스·트랙 차트)를
+   다시 그리면 입력 중이던 화면이 통째로 바뀐다. */
+ok('★★ 재렌더는 그 호스트만 — renderWindAnalysis(a), 스스로 비운다',
+   (code.match(/BINTABLE_OPEN = (true|false); renderWindAnalysis\(a\);/g) || []).length === 2
+   && /function renderWindAnalysis\(a\) \{\s*\n\s*var h = \$\('wind-analysis-host'\);\s*\n\s*if \(h\) \{ while \(h\.firstChild\) h\.removeChild\(h\.firstChild\); \}/.test(code)
+   && !/renderEnvironment\(host, a\)/.test(code));
 
 console.log('\n[4] §574 풍향 출처를 지도 아래로');
 ok('★ 지도 아래 호스트가 있다', /id="wind-sources-host"/.test(html));
@@ -96,8 +101,14 @@ ok('★★ 상관 산점도가 퍼포먼스에 있다', enclosing('renderCorrela
 ok('★ 환경 탭에서는 빠졌다',
    !/    renderPolarGrid\(host, a\);\n    renderBinTable/.test(code)
    && !/    renderCorrelation\(host, a\);\n    renderGainLoss/.test(code));
-ok('★ 환경에는 바람 자체를 다루는 것이 남는다',
-   /renderBinTable\(host, a\);\s*\n\s*renderGainLoss\(host, a\);/.test(code));
+/* §588 (옥대표 "컨디션 ... 다른곳에서는 해당 항목을 제거") — 컨디션 탭에는
+   조건(바람·트랙·장비·바다·몸)만. Bin table·회전 손실은 결과라 퍼포먼스로. */
+ok('★ Bin table · 회전 손실은 퍼포먼스 호스트로',
+   /try \{ renderBinTable\(h, a\); \}/.test(code) && /try \{ renderGainLoss\(h, a\); \}/.test(code)
+   && /id="wind-analysis-host"/.test(html)
+   && html.indexOf('id="wind-analysis-host"') > html.indexOf('id="tab-perf"')
+   && html.indexOf('id="wind-analysis-host"') < html.indexOf('id="tab-track"'));
+ok('★ 풍향 변화(그날 바람)는 컨디션에 남는다', /try \{ renderWindVariation\(host, a\); \}/.test(code));
 ok('★ 옮긴 셋 모두 실패해도 스택을 남긴다',
    /\[v2 §576\] target band/.test(code) && /\[v2 §577\] polar grid/.test(code)
    && /\[v2 §577\] correlation/.test(code));
@@ -113,7 +124,8 @@ ok('★ 퍼포먼스는 active 아님', /href="#tab-perf" class="nav-link"/.test
 var paneOrder=(html.match(/id="(tab-[a-z]+)" class="tab-pane/g)||[]).map(function(x){return x.slice(4).split('"')[0];});
 ok('★★ 패널 순서도 바람이 먼저', paneOrder[0]==='tab-env', paneOrder.slice(0,3).join(','));
 ok('★ 바람 패널이 active show', /id="tab-env" class="tab-pane active show"/.test(html));
-ok('★ 탭 이름이 Wind (Environment 보다 하는 일이 분명하다)', />Wind</.test(html));
+/* §588 — Wind → Condition (옥대표 "윈드라고 하지말고 컨디션이라고") */
+ok('★ 첫 탭 이름이 Condition', /href="#tab-env" class="nav-link active"[^>]*>Condition</.test(html));
 
 ok('★ 폴라·VMG 호스트가 퍼포먼스 탭에 있다', /id="polar-vmg-host"/.test(html));
 var iPv=html.indexOf('id="polar-vmg-host"'), iPerfPane=html.indexOf('id="tab-perf"'),

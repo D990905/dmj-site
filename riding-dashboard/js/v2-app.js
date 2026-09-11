@@ -343,8 +343,10 @@
       onChannels: function (next) {
         TL_CHANNELS = next;
         renderTimeline(CUR.session, CUR.analysis);
-      },
-      onExclude: function (a, b) { addExclusion(a, b); }
+      }
+      /* §588 — onExclude(구간 제거)는 컨디션 탭의 Track 카드로 옮겼다.
+         여기서는 구간을 골라 평균만 본다. 두 곳에서 지우면 어디서 무엇을
+         지웠는지 헷갈린다(옥대표 "다른곳에서는 해당 항목을 제거해줘"). */
     });
     /* §486 — 축이 벽시계가 아니라 '물 위에 있던 시간' 이라는 걸 밝힌다.
        접힌 시간이 있을 때만 적는다 — 없는데 적으면 군더더기다. */
@@ -973,9 +975,169 @@
   }
 
   /* ---------- 환경 (풍향 · VMG · 폴라) ---------- */
+  /* ════════════════════════ §588 컨디션 탭 ════════════════════════
+     옥대표: "좌측 첫 페이지를 윈드라고 하지말고 컨디션이라고 하고. 그 안에
+     바람 방향설정. 그날의 트랙선택(불필요한곳 제거기능), 장비선택,
+     해상컨디션, 신체컨디션(수면포함) 을 넣어줘. 그리고 다른곳에서는 해당
+     항목을 제거해줘."
+     옮겨 온 곳: 구간 제거 = Performance 타임라인 · 장비 = Coach 맨 위 ·
+     해상 상태 = 장비 선택기 안 'Water state' · 신체 = Training load.
+     새로 만든 건 없다 — 이미 있던 것을 한 자리에 모으고 원래 자리에서 뺐다. */
+  function condSection(host, title, sub, first) {
+    var h = el('div', 'd-flex flex-wrap align-items-baseline gap-2 mb-2 ' + (first ? 'mt-1' : 'mt-4'));
+    h.appendChild(el('h3', 'mb-0', title));
+    if (sub) h.appendChild(el('span', 'lab', sub));
+    host.appendChild(h);
+  }
+
+  /* 신체 컨디션은 **세션 날짜** 로 읽고 쓴다. 9/03 세션을 열었는데 오늘의
+     수면이 보이면 그건 그 세션의 조건이 아니다. */
+  function sessionYmd() {
+    var st = CUR.session && CUR.session.startEpoch;
+    if (!st) return todayYmd();
+    var d = new Date(st);
+    if (isNaN(d.getTime())) return todayYmd();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+         + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function renderConditionSetup(host) {
+    /* ── 트랙: 탄 부분만 남긴다 ── */
+    condSection(host, 'Track',
+      'cut out what was not riding \u2014 everything else in the dashboard is recomputed without it');
+    var tc = el('div', 'card');
+    var th = el('div', 'card-header');
+    th.appendChild(el('h3', 'card-title', 'The part you rode'));
+    th.appendChild(el('div', 'card-actions lab', 'drag across the chart, then Exclude this range'));
+    tc.appendChild(th);
+    var tb = el('div', 'card-body');
+    var chart = el('div', 'chart-host'); chart.id = 'trim-chart';
+    chart.style.minHeight = '0';
+    var ro = el('div', 'mt-2 lab'); ro.id = 'trim-readout';
+    tb.appendChild(chart); tb.appendChild(ro);
+    tc.appendChild(tb);
+    var tf = el('div', 'card-footer');
+    var eb = el('div'); eb.id = 'edit-bar';
+    tf.appendChild(eb); tc.appendChild(tf);
+    host.appendChild(tc);
+    renderTrimChart();
+    renderEditBar();
+
+    /* ── 장비 ── */
+    condSection(host, 'Gear', 'what you rode \u2014 foil area sets take-off, spans set how far you can heel');
+    var gh = el('div'); gh.id = 'cond-gear';
+    host.appendChild(gh);
+    renderGearPicker(gh);
+
+    /* ── 바다 ── */
+    condSection(host, 'Sea', 'the water that day');
+    var sh = el('div'); sh.id = 'cond-sea';
+    host.appendChild(sh);
+    renderSeaState(sh);
+
+    /* ── 몸 ── */
+    var day = sessionYmd();
+    condSection(host, 'Body', 'sleep and how you felt on ' + day);
+    var bh = el('div'); bh.id = 'cond-body';
+    host.appendChild(bh);
+    renderWellness(bh, day);
+  }
+
+  /* 속도 한 줄. 드래그 → 평균 + 'Exclude this range'. 차트 모듈은 압축된
+     시간축을 실제 시각으로 되돌려 넘기므로(realFromSec) 타임라인에서 쓰던
+     addExclusion 을 그대로 쓴다 — 제거 로직은 한 벌이다. */
+  var trimInst = null;
+  function renderTrimChart() {
+    var host = $('trim-chart');
+    if (!host) return;
+    if (trimInst) { try { trimInst.destroy(); } catch (e) {} trimInst = null; }
+    while (host.firstChild) host.removeChild(host.firstChild);
+    var S = (CUR.session && CUR.session.samples) || [];
+    if (!S.length || !window.uPlot || !window.RDChartStack) {
+      host.textContent = 'No track loaded.'; return;
+    }
+    try {
+      trimInst = RDChartStack.render(host, CUR.session, CUR.analysis, {
+        theme: THEME,
+        readoutHost: $('trim-readout'),
+        channels: ['speed'],
+        syncId: 'trim',
+        onExclude: function (a, b) { addExclusion(a, b); }
+      });
+    } catch (e) {
+      if (window.console) console.error('[v2 §588] trim chart', e);
+      host.textContent = 'Could not draw the track chart.';
+    }
+  }
+
+  /* 해상 상태 — 예전엔 장비 선택기 안의 'Water state' 칸이었다. 값은 그대로
+     gear.surface 에 저장한다(힐 한계 계산이 읽는 자리). */
+  function renderSeaState(host) {
+    if (!window.RDGear || !RDGear.SURFACE) return;
+    var sel = gearSelection();
+    var card = el('div', 'card');
+    var head = el('div', 'card-header');
+    head.appendChild(el('h3', 'card-title', 'Water state'));
+    var acts = el('div', 'card-actions d-flex align-items-center gap-2');
+    var sv = el('button', 'btn btn-sm btn-primary', 'Save to this session');
+    sv.type = 'button'; sv.id = 'btn-sea-save';
+    sv.addEventListener('click', function () { saveInputsToSession(sv); });
+    acts.appendChild(sv);
+    head.appendChild(acts);
+    card.appendChild(head);
+    var body = el('div', 'card-body');
+    var grp = el('div', 'btn-group w-100');
+    RDGear.SURFACE.forEach(function (o) {
+      var b = el('button', 'btn' + (o.id === sel.surface ? ' active' : ''), o.label);
+      b.type = 'button';
+      b.addEventListener('click', function () {
+        if (CUR.sessionGear) { CUR.sessionGear.surface = o.id; CUR.gearDirty = true; }
+        else saveGear({ surface: o.id });
+        refreshGearViews();
+      });
+      grp.appendChild(b);
+    });
+    body.appendChild(grp);
+    var cur = RDGear.byId(RDGear.SURFACE, sel.surface);
+    body.appendChild(el('div', 'text-secondary mt-2',
+      'Rougher water needs more room between the tips and the surface, so it '
+      + 'lowers the heel available in the Gear card'
+      + (cur ? ' \u2014 ' + cur.label.toLowerCase() + ' keeps ' + cur.foilMarginCm
+        + ' cm at the foil tip and ' + cur.wingMarginCm + ' cm at the wing tip.' : '.')));
+    card.appendChild(body);
+    host.appendChild(card);
+  }
+
+  /* 장비나 바다를 바꾸면: 컨디션의 두 카드와, 장비를 읽는 코치를 다시 그린다.
+     (예전엔 선택기가 코치 안에 있어서 renderCoach 하나로 됐다) */
+  function refreshGearViews() {
+    var gh = $('cond-gear');
+    if (gh) { while (gh.firstChild) gh.removeChild(gh.firstChild); renderGearPicker(gh); }
+    var sh = $('cond-sea');
+    if (sh) { while (sh.firstChild) sh.removeChild(sh.firstChild); renderSeaState(sh); }
+    try { renderCoach(CUR.analysis, CUR.vps, CUR.whatIf); }
+    catch (e) { if (window.console) console.error('[v2 §588] coach refresh', e); }
+  }
+
+  /* Bin table · 회전 손실 — 퍼포먼스 탭으로 */
+  function renderWindAnalysis(a) {
+    var h = $('wind-analysis-host');
+    if (h) { while (h.firstChild) h.removeChild(h.firstChild); }
+    else h = $('env-body');
+    if (!h || !a) return;
+    try { renderBinTable(h, a); }
+    catch (e) { if (window.console) console.error('[v2 §588] bin table', e); }
+    try { renderGainLoss(h, a); }
+    catch (e) { if (window.console) console.error('[v2 §588] gain/loss', e); }
+  }
+
   function renderEnvironment(a, est) {
     var host = $('env-body');
     while (host.firstChild) host.removeChild(host.firstChild);
+    /* §588 — 컨디션 탭: 바람 → 트랙 → 장비 → 바다 → 몸. 분석 전에 그날의
+       조건을 정하는 곳이다. 풍향이 제일 먼저인 이유는 §578 그대로 —
+       풍향이 틀리면 택/자이브·VMG·폴라가 전부 틀어진다. */
+    condSection(host, 'Wind', 'set this first \u2014 every tack, VMG and polar is measured against it', true);
 
     /* 풍향 컨트롤 — 자동추정이 낮은 신뢰도일 때 사람이 고칠 수 있어야 한다.
        풍향이 틀리면 택/자이브 분류·VMG·폴라가 전부 틀어진다. */
@@ -1030,7 +1192,14 @@
     reBtn.addEventListener('click', function () { applyWind(null, 're-estimate'); });
 
     var w = a.wind;
-    if (!w) { host.appendChild(el('div', 'text-secondary', 'Wind not resolved.')); return; }
+    if (!w) host.appendChild(el('div', 'text-secondary mt-2', 'Wind not resolved.'));
+    /* 풍향 변화는 '그날 바람이 어땠는지' 라 바람 묶음에 둔다 */
+    try { renderWindVariation(host, a); }
+    catch (e) { if (window.console) console.error('[v2 §588] wind variation', e); }
+    /* 트랙·장비·바다·몸은 풍향이 안 풀려도 보여야 한다 — return 앞에 */
+    try { renderConditionSetup(host); }
+    catch (e) { if (window.console) console.error('[v2 §588] condition setup', e); }
+    if (!w) { renderWindAnalysis(a); return; }
 
     /* §535 (옥대표 "좌측을 이렇게 비워둘 필요가 있을가?") — 그럴 필요 없었다.
        예전 배치: 왼쪽 col-7 에 VMG 표(두 줄, ~150px) · 오른쪽 col-5 에
@@ -1120,9 +1289,7 @@
        — 둘 다 바람이 어땠는지가 아니라 **그 바람에서 내가 어땠는지**를 말한다.
        퍼포먼스 탭으로 옮겼다(renderPerfExtra). 환경 탭에는 바람 자체를 다루는
        것만 남긴다: 풍향 확인·풍향 변화·게인/로스·Bin table. */
-    renderBinTable(host, a);
-    renderGainLoss(host, a);
-    renderWindVariation(host, a);
+    renderWindAnalysis(a);
     /* §576 (옥대표 "이건 당일 퍼포먼스에 대한 상당히 인사이츠가 있는 내용인데
        환경에 넣어둘게 아니라 퍼포먼스에 넣어야 하는거 아니니?") — 맞다.
        이 카드는 바람이 어땠는지가 아니라 **오늘의 나를 내 과거와 견준다**.
@@ -1246,7 +1413,14 @@
     renderTrainingState(host, ledger);
     renderWorkoutForm(host, rp);
     /* §514 — 오늘의 제안 **앞에** 둔다. 제안이 이 입력을 쓰기 때문이다. */
-    try { renderWellness(host); } catch (e) {}
+    /* §588 — 수면·피로·스트레스·근육통 입력은 컨디션 탭으로 옮겼다(세션
+       날짜로). 아래 제안은 저장된 값을 그대로 읽는다. */
+    var wPtr = el('div', 'card mt-3');
+    var wPb = el('div', 'card-body text-secondary');
+    wPb.textContent = 'Sleep, fatigue, stress and soreness are entered in the Condition '
+      + 'tab (first tab), next to the session they belong to. The suggestion below '
+      + 'still reads them.';
+    wPtr.appendChild(wPb); host.appendChild(wPtr);
     /* §538 — 제안은 웰니스 값에 딸려 있으므로 전용 호스트에 담아
        그 안만 다시 그릴 수 있게 한다(탭 전체 재렌더 = 스크롤 튐). */
     var sugHost = el('div'); sugHost.id = 'today-suggestion';
@@ -1721,16 +1895,19 @@
     return svg;
   }
 
-  function renderWellness(host) {
+  function renderWellness(host, ymd) {
     if (!RDStorage || !RDStorage.saveWellness) return;
-    var today = todayYmd();
+    /* §588 — 컨디션 탭에서는 **세션 날짜** 로 읽고 쓴다. 변수 이름은 저장
+       경로를 안 건드리려고 today 그대로 둔다. */
+    var today = ymd || todayYmd();
     var existing = (RDStorage.loadWellness() || []).filter(function (r) {
       return r.date === today;
     })[0] || {};
 
     var card = el('div', 'card mt-3');
     var head = el('div', 'card-header');
-    head.appendChild(el('h3', 'card-title', 'How you feel today'));
+    head.appendChild(el('h3', 'card-title',
+      today === todayYmd() ? 'How you feel today' : 'How you felt on ' + today));
     var hact = el('div', 'card-actions d-flex align-items-center gap-3');
     /* §538 — 자동 저장이라는 걸 보이게. 저장 버튼을 두면 누르지 않고
        떠난 입력이 사라지는데 그게 더 나쁘다. */
@@ -1748,8 +1925,8 @@
     body.appendChild(el('div', 'text-secondary mb-2',
       'Four questions, five seconds. This is the Hooper index — the standard '
       + 'subjective wellness measure in sports science, and the single cheapest '
-      + 'thing you can add to a recovery decision. Without it the call below is '
-      + 'made on training load alone.'));
+      + 'thing you can add to a recovery decision. Without it the training-load '
+      + 'suggestion is made on load alone.'));
 
     var vals = Object.assign({}, existing.hooper || {});
     var grid = el('div', 'row g-3');
@@ -2802,13 +2979,13 @@
       card.appendChild(body);
       binToggle.addEventListener('click', function () {
         /* ⚠ 시그니처는 (a, est) 다. env-body 는 이 함수가 스스로 비운다. */
-        BINTABLE_OPEN = true; renderEnvironment(a, CUR.est);
+        BINTABLE_OPEN = true; renderWindAnalysis(a);     /* §588 */
       });
       host.appendChild(card);
       return;
     }
     binToggle.addEventListener('click', function () {
-      BINTABLE_OPEN = false; renderEnvironment(a, CUR.est);
+      BINTABLE_OPEN = false; renderWindAnalysis(a);     /* §588 */
     });
 
     var maxHr = riderMaxHr();
@@ -8725,7 +8902,7 @@
             try { applyWind(null, 'keep'); return; } catch (e) {}
           }
         }
-        renderCoach(CUR.analysis, CUR.vps, CUR.whatIf);
+        refreshGearViews();                 /* §588 — 선택기가 컨디션 탭에 있다 */
       });
       col.appendChild(s);
       return col;
@@ -8745,8 +8922,13 @@
       function (o) { return o.label + '  ' + o.spanCm + 'cm'; }));
     row.appendChild(pick('Harness', 'harness', RDGear.HARNESS,
       function (o) { return o.label; }));
-    row.appendChild(pick('Water state', 'surface', RDGear.SURFACE,
-      function (o) { return o.label; }));
+    /* §588 — 보드 선택기(목록에 자리표시 하나뿐이라 없었다). 해상 상태는
+       컨디션의 Sea 카드로 — 장비가 아니라 그날의 바다다. */
+    row.appendChild(pick('Board', 'board', RDGear.BOARDS,
+      function (o) {
+        return o.label + (o.weightKg ? '  ' + o.weightKg + ' kg' : '')
+          + (o.thicknessAssumed ? '  (thickness est.)' : '');
+      }));
     body.appendChild(row);
 
     /* 이 조합이 만드는 한계 */
@@ -8974,7 +9156,8 @@
     var host = $('coach-body');
     while (host.firstChild) host.removeChild(host.firstChild);
 
-    renderGearPicker(host);
+    /* §588 — 장비 선택기는 컨디션 탭으로 옮겼다. 코치는 gearSelection() 을
+       읽기만 한다. */
 
     /* 1) SPS 분해 — 총점만 보여주면 무엇을 고쳐야 할지 알 수 없다 */
     host.appendChild(el('h3', 'mb-2', 'Sailing Performance Score'));

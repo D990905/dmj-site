@@ -192,7 +192,10 @@
                    바로 떠야하잖아. 그래야 그 이후에 보는 모든 데이터가 다 확인된
                    바람각도 아래로 들어가지") — 맞다. 풍향이 틀리면 택/자이브
                    분류·VMG·폴라·타깃이 전부 틀어진다. 확인이 첫 단계다. -->
-              <li class="nav-item"><a href="#tab-env" class="nav-link active" data-bs-toggle="tab" role="tab">Wind</a></li>
+              <!-- §588 (옥대표 "좌측 첫 페이지를 윈드라고 하지말고 컨디션이라고 하고. 그 안에
+                   바람 방향설정. 그날의 트랙선택, 장비선택, 해상컨디션, 신체컨디션") —
+                   분석 전에 그날의 조건을 정하는 곳. id 는 #tab-env 그대로(링크·테스트 호환). -->
+              <li class="nav-item"><a href="#tab-env" class="nav-link active" data-bs-toggle="tab" role="tab">Condition</a></li>
               <li class="nav-item"><a href="#tab-perf" class="nav-link" data-bs-toggle="tab" role="tab">Performance</a></li>
               <li class="nav-item"><a href="#tab-track" class="nav-link" data-bs-toggle="tab" role="tab">Track</a></li>
               <li class="nav-item"><a href="#tab-turns" class="nav-link" data-bs-toggle="tab" role="tab">Turns</a></li>
@@ -259,6 +262,9 @@
                        **내가 어땠는지**다. 코드를 옮기는 대신 이 호스트에 그린다
                        (renderEnvironment 가 renderPerfExtra 뒤에 돌아 덮어쓰기 없음). -->
                   <div class="col-12"><div id="polar-vmg-host"></div></div>
+                  <!-- §588 — Bin table · 회전 손실은 바람이 아니라 그 바람에서 내가 어땠는지다.
+                       컨디션 탭을 입력만 남기면서 이쪽으로. -->
+                  <div class="col-12"><div id="wind-analysis-host"></div></div>
                   <div class="col-12"><div id="perf-extra"></div></div>
                   <div class="col-12">
                     <div class="card">
@@ -268,7 +274,7 @@
                         <div id="chart-timeline" class="chart-host"></div>
                         <div id="timeline-readout" class="mt-2 lab"></div>
                       </div>
-                      <div class="card-footer"><div id="edit-bar"></div></div>
+                      <!-- §588 — 구간 제거(#edit-bar)는 컨디션 탭으로 옮겼다. 여기서는 보기만. -->
                     </div>
                   </div>
                 </div>
@@ -359,7 +365,7 @@
 <!-- §456 Gain/Loss — 바람 축 진행과 회전 손실 -->
 <script src="js/analysis-gainloss.js?v=auto-463"></script>
 <!-- §465 장비 스펙·기하 한계 -->
-<script src="js/gear-levitaz.js?v=gear-482"></script>
+<script src="js/gear-levitaz.js?v=gear-588"></script>
 <script src="js/rig-limits.js?v=gear-482"></script>
 <script src="js/analysis-imu.js?v=auto-463"></script>
 <script src="js/analysis-hr.js?v=auto-463"></script>
@@ -396,7 +402,7 @@
 <script src="js/trend-analysis.js?v=v582"></script>
 <script src="js/gear-usage.js?v=v559"></script>
 <script src="js/chart-tip.js?v=v560"></script>
-<script src="js/v2-app.js?v=v587"></script>
-<script src="js/mobile-shell.js?v=v586k"></script>
+<script src="js/v2-app.js?v=v588"></script>
+<script src="js/mobile-shell.js?v=v588"></script>
 </body>
 </html>

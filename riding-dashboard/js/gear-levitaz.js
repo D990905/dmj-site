@@ -103,8 +103,16 @@
   ];
 
   /* 보드 — 두께는 손 높이(힐 시 윙 팁 클리어런스) 계산에 쓴다. */
+  /* §588 (옥대표 "보드를 선택하는게 없던데? 보드는 현재 ppc r1 83l 를
+     타고 있어") — 목록에 자리표시 하나뿐이라 선택기를 만들 이유가 없었다.
+     PPC R1 83L: 5'3" x 21", 83 L, 3.95 kg (제조사 페이지 ppcfoiling.com,
+     2026-09-11 확인). 두께는 제조사가 공개하지 않는다 — 예전 가정값 12 cm 를
+     그대로 두고 가정이라고 표시한다(힐 여유 계산에 들어가므로 숨기면 안 됨). */
   var BOARDS = [
-    { id: 'board_default', label: 'Board', thicknessCm: 12, weightKg: 4.8 }
+    { id: 'ppc_r1_83', label: 'PPC R1 83L', volumeL: 83, lengthCm: 160, widthCm: 53,
+      thicknessCm: 12, thicknessAssumed: true, weightKg: 3.95 },
+    { id: 'board_default', label: 'Other board', thicknessCm: 12, weightKg: 4.8,
+      thicknessAssumed: true }
   ];
 
   /* 하네스 위치 — 윙을 잡는 높이가 힐 여유를 바꾼다.
@@ -178,7 +186,7 @@
     byId: byId, rigMassKg: rigMassKg,
     /* 기본 선택 — 옥대표 상용 세팅 */
     DEFAULT: { frontWing: 'r6v1', rearWing: 'rear_v1', mast: 'mast_v1',
-               handWing: 'sonic_50', board: 'board_default', surface: 'chop',
+               handWing: 'sonic_50', board: 'ppc_r1_83', surface: 'chop',
                harness: 'waist' }
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
