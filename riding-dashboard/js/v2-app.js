@@ -8588,11 +8588,33 @@
       setTimeout(function () { btn.textContent = was; btn.className = cls; }, 2200);
     }
     if (!CUR.session || !Store) { flash('No session', false); return; }
-    var sig = null;
-    try { sig = sessionSig(CUR.session); } catch (e) { sig = null; }
+    /* §587 (옥대표 "오늘경기 모두 v3로 뛰고 다 업데이트 했는데 안바뀌는게
+       있어") — 제1·2·6경기는 V3 로 바뀌고 제3·4·5경기는 V1 그대로였다.
+       이 버튼은 저장 레코드를 **시그니처**(점 개수_거리_시작시각)로 찾았다.
+       그런데 저장된 트랙은 §509 압축(RDTRK1)이라 손실이 있어, 목록에서
+       다시 연 세션은 거리가 몇 m 달라지고 → 시그니처가 자기 레코드와
+       안 맞는다. 결과: "Not saved yet" 을 띄우고 **아무것도 안 썼다**
+       (재현: 저장 → 새로고침 → 포일 변경 → 이 버튼 = Not saved yet,
+       레코드 gear 는 그대로). 업로드 직후 같은 화면에서 누른 세션만
+       됐다 — 그래서 일부만 바뀌었다.
+       헤더 Save 는 §553 에서 이미 id(CUR.openedRecId)로 바꿨는데 이 버튼만
+       남아 있었다. 열려 있는 레코드 id 를 먼저 쓴다. 시그니처는 한 번도
+       열거나 저장한 적 없는 세션(방금 올린 파일)에만 쓴다. */
     var rec = null;
-    if (sig) {
-      listSessions().forEach(function (r) { if (r.sig === sig) rec = r; });
+    if (CUR.openedRecId) {
+      listSessions().forEach(function (r) { if (r.id === CUR.openedRecId) rec = r; });
+      if (!rec) {
+        alertLine('This session is no longer in your saved list \u2014 it may have '
+          + 'been deleted. Press "Save session" in the header to store it again.');
+        flash('Not in saved list', false);
+        return;
+      }
+    } else {
+      var sig = null;
+      try { sig = sessionSig(CUR.session); } catch (e) { sig = null; }
+      if (sig) {
+        listSessions().forEach(function (r) { if (r.sig === sig) rec = r; });
+      }
     }
     if (!rec) {
       alertLine('This session is not saved yet \u2014 press "Save session" in the '
