@@ -998,10 +998,10 @@
      새로 만든 건 없다 — 이미 있던 것을 한 자리에 모으고 원래 자리에서 뺐다. */
   /* 지금 세션과 같은 날(현지 날짜)의 저장 세션. 열려 있는 그 줄도 포함한다
      — 풍향 일괄 적용은 그 줄에도 써야 하므로. 레이스 비교는 따로 거른다. */
-  function sameDaySaved() {
+  function sameDaySaved(withGuests) {
     if (!CUR.session) return [];
     var day = sessionYmd();
-    return listSessions().filter(function (r) {
+    return listSessions(withGuests ? { guests: 'all' } : null).filter(function (r) {
       if (!r || !r.dateEpoch) return false;
       var d = new Date(r.dateEpoch);
       var ymd = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
@@ -1048,7 +1048,8 @@
     while (host.firstChild) host.removeChild(host.firstChild);
     if (!window.RDSlalom || !CUR.session || !CUR.analysis) return;
     var st0 = CUR.session.startEpoch || 0;
-    var sibs = sameDaySaved().filter(function (r) {
+    /* §594 — 같은 날 같은 부표를 돈 게스트(다른 선수)도 겨룬다 */
+    var sibs = sameDaySaved(true).filter(function (r) {
       if (!r.hasTrack) return false;
       if (CUR.openedRecId && r.id === CUR.openedRecId) return false;
       /* 방금 올린 파일이 이미 저장돼 있으면 그 사본은 빼야 자기 자신과 겨루지 않는다 */
@@ -1062,7 +1063,7 @@
       var v = null;
       try { v = storedAnalysis(r); }
       catch (e) { if (window.console) console.error('[v2 §591] sibling ' + r.name, e); }
-      if (v && v.analysis) races.push({ key: r.id, name: r.name || 'Session', analysis: v.analysis, session: v.session });
+      if (v && v.analysis) races.push({ key: r.id, name: (r.name || 'Session') + (r.guest ? ' (' + (r.guest.name || 'guest') + ')' : ''), analysis: v.analysis, session: v.session });
     });
     if (races.length < 2) return;
     races.sort(function (a, b) {
@@ -4588,9 +4589,58 @@
   }
 
   /* ---------- 저장된 세션 · 시즌 흐름 ---------- */
-  function listSessions() {
-    try { return (Store && Store.listSessions) ? (Store.listSessions() || []) : []; }
+  /* §594 — 기본은 내 세션만(게스트 제외). 게스트까지 볼 곳만 {guests:'all'} */
+  function listSessions(opts) {
+    try { return (Store && Store.listSessions) ? (Store.listSessions(opts) || []) : []; }
     catch (e) { return []; }
+  }
+  function openedRec() {
+    if (!CUR.openedRecId) return null;
+    var rec = null;
+    listSessions({ guests: 'all' }).forEach(function (r) { if (r.id === CUR.openedRecId) rec = r; });
+    return rec;
+  }
+
+  /* §594 (옥대표 "이 데터는 중국선수껀데 내꺼에 더해지지않도록 독립적으로
+     게스트 모드로 별도 저장 ... 전체통계 데이터에서 뺴야하거덩") */
+  function renderGuestBanner() {
+    var host = $('guest-host');
+    if (!host) return;
+    while (host.firstChild) host.removeChild(host.firstChild);
+    var rec = openedRec();
+    if (!rec || !rec.guest) return;
+    var box = el('div', 'alert alert-warning d-flex align-items-center gap-2 flex-wrap mb-3');
+    box.appendChild(el('span', 'fw-bold', 'Guest session — ' + (rec.guest.name || 'guest')));
+    box.appendChild(el('span', null, 'Not counted in your career totals, bests, season trend, gear '
+      + 'usage or training load. Its score was calculated with the inputs saved with it.'));
+    var back = el('button', 'btn btn-sm ms-auto', 'Move to my sessions');
+    back.type = 'button';
+    back.addEventListener('click', function () { setGuest(rec, null); });
+    box.appendChild(back);
+    host.appendChild(box);
+  }
+
+  function setGuest(rec, name) {
+    if (!Store || !Store.setSessionGuest) return;
+    if (name === undefined) {
+      var n = window.prompt('Whose session is "' + (rec.name || 'this') + '"?\n'
+        + 'It moves to Guest sessions and stops counting in your totals, bests, trend and training load.',
+        (rec.guest && rec.guest.name) || '');
+      if (n == null) return;
+      name = n.trim() || 'Guest';
+    }
+    var res = Store.setSessionGuest(rec.id, name);
+    if (!res || res.ok === false) {
+      if (window.console) console.error('[v2 §594] set guest failed', res);
+      alertLine('Could not move that session \u2014 nothing was changed.');
+      return;
+    }
+    try { renderSessions(); } catch (e) { if (window.console) console.error('[v2 §594] sessions', e); }
+    try { renderTraining(); } catch (e) {}
+    try { populateReplayGhost(); } catch (e) {}
+    try { renderGuestBanner(); } catch (e) {}
+    alertLine(name ? '"' + (rec.name || 'Session') + '" is now a guest session (' + name + ').'
+                   : '"' + (rec.name || 'Session') + '" is back in your sessions.');
   }
   /* §543 — 삭제. RDStorage.deleteSession 은 **이미 있었는데**(옛 대시보드는
      쓰고 있었다) v2 가 부르지 않고 있었다 — §482·§494·§511·§514·§539·§540 과
@@ -4629,6 +4679,55 @@
     }
   }
 
+  /* §594 — 게스트 세션: 따로 표. 열기·비교·삭제·되돌리기만. 통계에는 안 들어간다. */
+  function renderGuestSessions(host) {
+    var gl = listSessions({ guests: 'only' });
+    if (!gl.length) return;
+    var card = el('div', 'card mt-3');
+    var h = el('div', 'card-header');
+    h.appendChild(el('h3', 'card-title', 'Guest sessions'));
+    h.appendChild(el('div', 'card-actions lab', gl.length + ' \u00b7 not counted in anything above or in training load'));
+    card.appendChild(h);
+    var wrap = el('div', 'table-responsive');
+    var t = el('table', 'table table-vcenter card-table table-sm');
+    var th = el('thead'), htr = el('tr');
+    ['Date', 'Rider', 'Name', 'Distance', 'Top', 'Avg', 'SPS', ''].forEach(function (x, i) {
+      htr.appendChild(el('th', i > 2 ? 'text-end' : null, x));
+    });
+    th.appendChild(htr); t.appendChild(th);
+    var tb = el('tbody');
+    gl.forEach(function (r) {
+      var tr = el('tr');
+      if (r.hasTrack) {
+        tr.style.cursor = 'pointer'; tr.title = 'Open this guest session';
+        tr.addEventListener('click', function () { openSavedSession(r); });
+      }
+      var d = r.dateEpoch ? new Date(r.dateEpoch) : null;
+      tr.appendChild(el('td', 'num', d ? d.toISOString().slice(0, 10) : '\u2014'));
+      tr.appendChild(el('td', 'fw-bold', (r.guest && r.guest.name) || 'Guest'));
+      tr.appendChild(el('td', null, r.name || 'Session'));
+      tr.appendChild(el('td', 'text-end num', r.distanceM != null ? (r.distanceM / 1000).toFixed(2) + ' km' : '\u2014'));
+      tr.appendChild(el('td', 'text-end num', r.maxSpeedMs != null ? (r.maxSpeedMs * KT).toFixed(1) : '\u2014'));
+      tr.appendChild(el('td', 'text-end num', r.avgSpeedMovingMs != null ? (r.avgSpeedMovingMs * KT).toFixed(1) : '\u2014'));
+      tr.appendChild(el('td', 'text-end num', r.vpsOverall != null ? String(Math.round(r.vpsOverall)) : '\u2014'));
+      var tdX = el('td', 'text-end text-nowrap');
+      var back = el('button', 'btn btn-sm btn-ghost-secondary p-0 px-2 me-1', 'mine');
+      back.type = 'button'; back.title = 'This is actually my ride \u2014 move it back';
+      back.addEventListener('click', function (ev) { ev.stopPropagation(); setGuest(r, null); });
+      var ren = el('button', 'btn btn-sm btn-ghost-secondary p-0 px-2 me-1', 'rename');
+      ren.type = 'button'; ren.title = 'Change the rider name';
+      ren.addEventListener('click', function (ev) { ev.stopPropagation(); setGuest(r); });
+      var del = el('button', 'btn btn-sm btn-ghost-danger p-0 px-2', '\u00d7');
+      del.type = 'button'; del.title = 'Delete this session';
+      del.addEventListener('click', function (ev) { ev.stopPropagation(); deleteSavedSession(r); });
+      tdX.appendChild(back); tdX.appendChild(ren); tdX.appendChild(del);
+      tr.appendChild(tdX);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
+    host.appendChild(card);
+  }
+
   function renderSessions() {
     var host = $('sessions-body');
     if (!host) return;
@@ -4637,6 +4736,7 @@
     if (!list.length) {
       host.appendChild(el('div', 'alert alert-info',
         'No saved sessions yet. Use "Save session" in the header to start building a season trend.'));
+      try { renderGuestSessions(host); } catch (e) {}
       return;
     }
     renderCareer(host);
@@ -4791,12 +4891,20 @@
         ev.stopPropagation();
         deleteSavedSession(r);
       });
+      /* §594 — 다른 사람 세션을 게스트로 옮긴다 */
+      var gBtn = el('button', 'btn btn-sm btn-ghost-secondary p-0 px-2 me-1', 'guest');
+      gBtn.type = 'button';
+      gBtn.title = 'Someone else\u2019s ride \u2014 move it to Guest sessions so it stops counting in your stats';
+      gBtn.addEventListener('click', function (ev) { ev.stopPropagation(); setGuest(r); });
+      tdX.appendChild(gBtn);
       tdX.appendChild(del);
       tr.appendChild(tdX);
       tb.appendChild(tr);
     });
     t.appendChild(tb); wrap.appendChild(t); card.appendChild(wrap);
     host.appendChild(card);
+    try { renderGuestSessions(host); }
+    catch (e) { if (window.console) console.error('[v2 §594] guest sessions', e); }
 
     /* §558 (옥대표 "벤티지 추가야" — Vakaros Vantage 스샷 13장) —
        풍속대로 걸러 비교 가능한 조건끼리만 보고, 주/월로 묶어 보고,
@@ -9166,7 +9274,7 @@
        열거나 저장한 적 없는 세션(방금 올린 파일)에만 쓴다. */
     var rec = null;
     if (CUR.openedRecId) {
-      listSessions().forEach(function (r) { if (r.id === CUR.openedRecId) rec = r; });
+      listSessions({ guests: 'all' }).forEach(function (r) { if (r.id === CUR.openedRecId) rec = r; });
       if (!rec) {
         alertLine('This session is no longer in your saved list \u2014 it may have '
           + 'been deleted. Press "Save session" in the header to store it again.');
@@ -9177,7 +9285,7 @@
       var sig = null;
       try { sig = sessionSig(CUR.session); } catch (e) { sig = null; }
       if (sig) {
-        listSessions().forEach(function (r) { if (r.sig === sig) rec = r; });
+        listSessions({ guests: 'all' }).forEach(function (r) { if (r.sig === sig) rec = r; });
       }
     }
     if (!rec) {
@@ -10299,6 +10407,8 @@
     renderKpis(analysis, vps);
     try { renderCompare(); }            /* §589 — 세션을 바꿔도 고른 비교는 유지 */
     catch (e) { if (window.console) console.error('[v2 §589] compare', e); }
+    try { renderGuestBanner(); }        /* §594 */
+    catch (e) { if (window.console) console.error('[v2 §594] guest banner', e); }
     try { renderRace(); }               /* §591 — 같은 날 같은 부표 경기 */
     catch (e) { if (window.console) console.error('[v2 §591] race', e); }
     renderRiderNote(vps);
@@ -10634,7 +10744,7 @@
     var sel = $('replay-ghost');
     if (!sel || sel.hidden || !sel.value || !CUR.analysis) return;
     var rec = null;
-    listSessions().forEach(function (r) { if (r.id === sel.value) rec = r; });
+    listSessions({ guests: 'all' }).forEach(function (r) { if (r.id === sel.value) rec = r; });
     if (!rec) return;
 
     var card = el('div', 'card mt-3');
@@ -10800,10 +10910,10 @@
       });
     }
     var n = 0;
-    listSessions().forEach(function (r) {
+    listSessions({ guests: 'all' }).forEach(function (r) {   /* §594 — 게스트와도 비교 */
       if (!r || !r.hasTrack) return;
       var o = document.createElement('option');
-      o.value = r.id; o.textContent = r.name || 'Session';
+      o.value = r.id; o.textContent = (r.name || 'Session') + (r.guest ? '  (guest: ' + (r.guest.name || '') + ')' : '');
       sel.appendChild(o); n++;
     });
     sel.hidden = (n === 0);

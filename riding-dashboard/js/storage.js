@@ -463,6 +463,8 @@
          ' · 편집본' 접미사를 붙여 저장했으나, 제목을 사용자가 직접
          편집하게 되면서 편집 상태는 별도 플래그로 분리한다(헤더 배지용). */
       edited: !!meta.edited,
+      /* §594 — 게스트(다른 사람) 세션 */
+      guest: (meta.guest && meta.guest.name) ? { name: String(meta.guest.name).slice(0, 60), since: Date.now() } : undefined,
       /* §590 — 제거한 구간(원본 세션 기준 상대초). 트랙은 원본 전체를
          저장하므로 이게 없으면 다시 열 때 제거가 조용히 사라지고, 목록의
          숫자(편집본)와 다시 연 화면의 숫자(원본)가 달라진다. */
@@ -638,6 +640,8 @@
       var prev = arr[replacedIdx];
       rec.id = prev.id;                     /* 트랙 키·문답 답변이 id 에 묶인다 */
       if (prev.gear && !rec.gear) rec.gear = prev.gear;   /* 붙여 둔 장비 보존 */
+      /* §594 — 게스트 세션을 다시 저장해도 게스트로 남는다 */
+      if (prev.guest && !rec.guest) rec.guest = prev.guest;
       /* §545 — 옛 줄을 이어받을 때 그 줄의 이름을 지키지 않으면, 되살린
          세션이 갑자기 파일명으로 바뀐다. 사용자가 알아보던 이름이 우선이다. */
       if (!prev.sig && prev.name && prev.name !== rec.name) rec.name = prev.name;
@@ -718,8 +722,36 @@
     return w.ok ? { ok: true } : w;
   }
 
-  function listSessions() {
-    return readAll().sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
+  /* §594 (옥대표 "이 데터는 중국선수껀데 내꺼에 더해지지않도록 독립적으로
+     게스트 모드로 별도 저장되게 ... 전체통계 데이터에서 뺴야하거덩") —
+     게스트 세션은 rec.guest = { name } 표시를 단다.
+     **기본 목록에서 빠진다.** 호출부가 스무 곳이 넘어(시즌 추세·장비 사용·
+     개인 최고·훈련부하·폴라 누적·타깃 밴드·프로필 스킬 진단·구 대시보드)
+     하나하나 거르면 반드시 빠뜨린다([[engine-exists-no-wiring]]). 그래서
+     기본을 '내 것만' 으로 두고, 게스트를 보려는 곳만 명시적으로 부른다:
+       listSessions({ guests: 'all' })   전부
+       listSessions({ guests: 'only' })  게스트만 */
+  function isGuest(r) { return !!(r && r.guest); }
+  function listSessions(opts) {
+    var mode = opts && opts.guests;
+    return readAll().filter(function (r) {
+      if (mode === 'all') return true;
+      if (mode === 'only') return isGuest(r);
+      return !isGuest(r);
+    }).sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
+  }
+  /* 게스트로 옮기거나(name 문자열) 내 것으로 되돌린다(null). */
+  function setSessionGuest(id, name) {
+    var arr = readAll(), found = false;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].id !== id) continue;
+      if (name == null || name === false) delete arr[i].guest;
+      else arr[i].guest = { name: String(name).slice(0, 60) || 'Guest', since: Date.now() };
+      found = true;
+      break;
+    }
+    if (!found) return { ok: false, error: 'not_found' };
+    return writeAll(arr);
   }
   /* §543 (옥대표 "세션을 삭제하는 기능추가해줘") — 레코드와 트랙만 지우면
      안 된다. sig 로 걸린 곁가지가 남으면 훈련부하 원장은 **없어진 세션을
@@ -774,7 +806,7 @@
      세션의 id·hasTrack 도 함께 담아, 대시보드에서 '최고 기록 타일
      클릭 → 그 세션 분석으로 이동'을 가능하게 한다 (Danny §A2). */
   function personalBests() {
-    var arr = readAll();
+    var arr = listSessions();          /* §594 — 게스트 제외 */
     if (!arr.length) return null;
     var metrics = ['maxSpeedMs', 'peak2sMs', 'peak10sMs', 'best500mMs', 'best1nmMs',
                    'alphaMs', 'avgSpeedMovingMs', 'distanceM'];
@@ -797,7 +829,7 @@
      평균 속도는 세션 평균의 단순평균이 아니라 누적 거리 ÷ 누적
      이동시간으로 — 짧은 세션이 과대대표되지 않게(과학적 집계). */
   function careerStats() {
-    var arr = readAll();
+    var arr = listSessions();          /* §594 — 게스트 제외 */
     if (!arr.length) return null;
     var totDist = 0, totMoving = 0, totDuration = 0;
     arr.forEach(function (r) {
@@ -1162,6 +1194,9 @@
     var out = [], savedSigs = {};
     readAll().forEach(function (r) {
       if (r.sig) savedSigs[String(r.sig)] = true;
+      /* §594 — 남의 라이딩은 내 훈련부하가 아니다. sig 는 위에서 표시해
+         두었으므로 같은 세션의 자동 기록분도 함께 빠진다. */
+      if (isGuest(r)) return;
       if (r.trimp != null && isFinite(r.trimp)) {
         out.push({ dateEpoch: r.dateEpoch, trimp: r.trimp,
                    kind: 'ride', name: r.name, method: r.loadMethod || null,
@@ -2132,6 +2167,7 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     setSessionGear: setSessionGear,
     setSessionInputs: setSessionInputs,
     listSessions: listSessions,
+    setSessionGuest: setSessionGuest,
     deleteSession: deleteSession,
     clearAll: clearAll,
     loadTrack: loadTrack,
