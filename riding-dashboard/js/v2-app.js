@@ -6106,6 +6106,29 @@
      터무니 없는 제자리 택자이빙이나 빠지는것들") — clean: true 가 기본이다. */
   var TURNFILT = { type: 'all', side: 'all', clean: true };
 
+  /* §593 (옥대표 "데이터 선택된것 외에 너무 많은것들이 섞여서 노출되고 있어")
+     — 선택(TURNSEL)은 필터를 바꿔도 남는다(§488). 그래서 스타보드 4개를
+     고른 뒤 Port 로 바꿔 'Select all 16' 을 누르면 선택은 **20개**가 되고,
+     목록은 16개인데 상세·곡선·위에서 본 궤적·지도는 20개를 그렸다.
+     캡션은 "20 gybes on port" 라고 거짓말했다(4개는 스타보드).
+     상세에 쓰는 선택은 **지금 필터를 통과한 것만**이다. 필터 밖 선택은
+     지우지 않고 몇 개가 가려졌는지 밝힌다. */
+  function turnPassesFilter(m) {
+    if (!m) return false;
+    if (TURNFILT.type !== 'all' && m.type !== TURNFILT.type) return false;
+    if (TURNFILT.side !== 'all' && m.side !== TURNFILT.side) return false;
+    if (TURNFILT.clean && !turnQuality(m).ok) return false;
+    return true;
+  }
+  /* 지도에서 필터 밖 회전을 고르면 필터를 풀어 보이게 한다 — 안 그러면
+     눌렀는데 아무 일도 안 일어난 것처럼 보인다. */
+  function revealTurn(m) {
+    if (!m || turnPassesFilter(m)) return;
+    if (TURNFILT.type !== 'all' && m.type !== TURNFILT.type) TURNFILT.type = 'all';
+    if (TURNFILT.side !== 'all' && m.side !== TURNFILT.side) TURNFILT.side = 'all';
+    if (TURNFILT.clean && !turnQuality(m).ok) TURNFILT.clean = false;
+  }
+
   /* §571 — 기동인 척하는 것들을 걸러낸다. 임계는 **감이 아니라 분포**에서
      뽑았다(저장된 11세션 · 기동 666개 전수):
 
@@ -6196,7 +6219,8 @@
       /* 지도 → 목록: 점을 누르면 그 회전을 고른다(토글) */
       mk.on('click', function () {
         var pos = TURNSEL.indexOf(k);
-        if (pos < 0) TURNSEL.push(k); else TURNSEL.splice(pos, 1);
+        if (pos < 0) { TURNSEL.push(k); revealTurn(m); }    /* §593 */
+        else TURNSEL.splice(pos, 1);
         renderTurnExtras(a);
         scrollTurnRowIntoView(k);
       });
@@ -6238,11 +6262,40 @@
     }, 30);
   }
 
+  function turnHiddenNote(n, a, standalone) {
+    var box = el('div', standalone ? 'alert alert-secondary mt-3 d-flex align-items-center gap-2 flex-wrap'
+                                   : 'lab mb-2 d-flex align-items-center gap-2 flex-wrap');
+    box.appendChild(el('span', null, n + ' more selected turn' + (n === 1 ? ' is' : 's are')
+      + ' outside the current filter and not shown here.'));
+    var show = el('button', 'btn btn-sm btn-ghost-secondary', 'Show them');
+    show.type = 'button';
+    show.addEventListener('click', function () {
+      TURNFILT.type = 'all'; TURNFILT.side = 'all'; TURNFILT.clean = false;
+      renderTurnExtras(a);
+    });
+    var drop = el('button', 'btn btn-sm btn-ghost-secondary', 'Deselect them');
+    drop.type = 'button';
+    drop.addEventListener('click', function () {
+      var mans = a.maneuvers || [];
+      var keep = TURNSEL.filter(function (i) { return turnPassesFilter(mans[i]); });
+      TURNSEL.length = 0;
+      keep.forEach(function (i) { TURNSEL.push(i); });
+      renderTurnExtras(a);
+    });
+    box.appendChild(show); box.appendChild(drop);
+    return box;
+  }
+
   function renderTurnDetail(host, a) {
     var mans = a.maneuvers || [];
-    var sel = TURNSEL.filter(function (i) { return mans[i]; })
-                     .sort(function (x, y) { return x - y; });
-    if (!sel.length) return;
+    var allSel = TURNSEL.filter(function (i) { return mans[i]; });
+    var sel = allSel.filter(function (i) { return turnPassesFilter(mans[i]); })
+                    .sort(function (x, y) { return x - y; });
+    var hiddenN = allSel.length - sel.length;          /* §593 */
+    if (!sel.length) {
+      if (hiddenN) host.appendChild(turnHiddenNote(hiddenN, a, true));
+      return;
+    }
     var picked = sel.map(function (i) { return mans[i]; });
 
     var card = el('div', 'card mt-3');
@@ -6257,6 +6310,7 @@
     head.appendChild(act);
     card.appendChild(head);
     var body = el('div', 'card-body');
+    if (hiddenN) body.appendChild(turnHiddenNote(hiddenN, a, false));
 
     /* §496 A1 (옥대표) — 고른 회전이 **어디서** 일어났는지.
        "해당하는 메뉴버가 어디서 일어난건지 확인이 가능해."
@@ -9766,6 +9820,7 @@
              열고, 그 회전만 고른 뒤 목록에서 보이게 스크롤한다. */
           onPick: function (idx) {
             TURNSEL.length = 0; TURNSEL.push(idx);
+            revealTurn((analysis.maneuvers || [])[idx]);   /* §593 */
             var tab = document.querySelector('a[href="#tab-turns"]');
             if (tab) tab.click();
             try { renderTurnExtras(analysis); } catch (e) {}

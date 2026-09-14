@@ -33,5 +33,5 @@ ok('통계표 라벨', /heel: 'Heel \(°\)',\s*\n\s*pitch:'Pitch \(°\)'/.test(a
 ok('분포 선택지', /metricOpts\.push\(\['heel', 'Heel'\], \['pitch', 'Pitch'\]\)/.test(app));
 ok('타임라인', /key: 'pitch', label: 'Pitch'/.test(cs));
 ok('자세 탭', /statRow\('Pitch'/.test(app));
-ok('캐시버스트', /v2-app\.js\?v=v592/.test(html) && /chart-stack\.js\?v=v592/.test(html));
+ok('캐시버스트 (v592 이상)', (function(){var a=html.match(/v2-app\.js\?v=v(\d+)/),b=html.match(/chart-stack\.js\?v=v(\d+)/);return a&&b&&+a[1]>=592&&+b[1]>=592;})());
 console.log('\n'+(fail?'FAIL':'PASS')+'  '+pass+'/'+(pass+fail));process.exit(fail?1:0);
