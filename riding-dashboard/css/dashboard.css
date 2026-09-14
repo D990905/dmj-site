@@ -2915,3 +2915,14 @@ input::placeholder { color:var(--text-dim); }
   border-color: var(--accent, #1F8FFF);
   outline: none;
 }
+
+/* §596 두 선수 겹쳐 보기 — 누구를 진하게 */
+.replay-lead {flex:0 0 auto; background:var(--rp-panel); backdrop-filter:blur(8px);
+  border:1px solid var(--rp-line); border-radius:var(--radius-md); padding:6px 8px;}
+.replay-lead__row {display:flex; flex-wrap:wrap; gap:4px;}
+.replay-lead__btn {border:1px solid var(--rp-line); background:transparent; color:var(--rp-text);
+  font:700 .66rem system-ui,sans-serif; padding:3px 7px; border-radius:var(--radius-xs); cursor:pointer;
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.replay-lead__btn.is-on {background:var(--rp-accent); border-color:var(--rp-accent); color:var(--rp-text);}
+.replay-lead__now {font:600 .66rem system-ui,sans-serif; color:var(--rp-text); margin-top:4px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}

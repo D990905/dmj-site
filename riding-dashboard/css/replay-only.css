@@ -376,3 +376,14 @@
   display: inline-block; width: 10px; height: 10px; border-radius: 2px;
   margin-right: 8px; vertical-align: baseline;
 }
+
+/* §596 두 선수 겹쳐 보기 — 누구를 진하게 */
+.replay-lead {flex:0 0 auto; background:var(--rp-panel); backdrop-filter:blur(8px);
+  border:1px solid var(--rp-line); border-radius:10px; padding:6px 8px;}
+.replay-lead__row {display:flex; flex-wrap:wrap; gap:4px;}
+.replay-lead__btn {border:1px solid var(--rp-line); background:transparent; color:#dce8f4;
+  font:700 .66rem system-ui,sans-serif; padding:3px 7px; border-radius:6px; cursor:pointer;
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.replay-lead__btn.is-on {background:#33A1FF; border-color:#33A1FF; color:#fff;}
+.replay-lead__now {font:600 .66rem system-ui,sans-serif; color:#dce8f4; margin-top:4px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}

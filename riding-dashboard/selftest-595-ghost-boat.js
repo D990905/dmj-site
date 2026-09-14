@@ -16,5 +16,5 @@ ok('★★ 고스트 헤드는 더 이상 circleMarker 가 아니다', !/mapGhos
 ok('★★ 고스트도 헤딩으로 회전', /function updateGhostPlayhead[\s\S]{0,900}rot\.style\.transform = \(st\.heading != null\)/.test(src));
 ok('★★ 고스트 세일 방향은 따로 기억 (내 세일과 섞이지 않게)', /updateSailIcon\(st, R\.ghostSail/.test(src) && /holder\.sailSide = target/.test(src) && !/R\.sailSide \+=/.test(src));
 ok('★ twa 없는 고스트 표본은 헤딩으로 낸다', /var twaRaw = st\.twa != null \? st\.twa : angDiff\(R\.windDir, st\.heading\)/.test(src));
-ok('★ 캐시버스트 두 대시보드', /replay\.js\?v=v595/.test(fs.readFileSync(path.join(__dirname,'v2.html'),'utf8')) && /replay\.js\?v=v595/.test(fs.readFileSync(path.join(__dirname,'index.html'),'utf8')));
+ok('★ 캐시버스트 두 대시보드', [ 'v2.html','index.html' ].every(function(f){var m=fs.readFileSync(path.join(__dirname,f),'utf8').match(/replay\.js\?v=v(\d+)/);return m&&+m[1]>=595;}));
 console.log('\n'+(fail?'FAIL':'PASS')+'  '+pass+'/'+(pass+fail));process.exit(fail?1:0);

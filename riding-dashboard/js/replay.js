@@ -1060,10 +1060,137 @@
   /* ============================================================
    * 6) 우측 — 미니그래프 (30초 창 · 흰색 선 · 윈도우 자동 스케일)
    * ============================================================ */
+  /* ════════════════ §596 두 선수 겹쳐 보기 ════════════════
+     옥대표: "우측 실시간 그래프에도 두명의 데이터를 오버레이해서 나타내줘.
+     하나를 조금 희미하게 ... 두 선수중에 선택해서 진하게 보이는걸 선택할 수
+     있는 모드랑 vmg가 높을떄 높은선수를 진하게 나타내게 하는 자동 리더기능,
+     또는 앞선배를 찐하게 나타내도록 하는것도 좋을듯."
+     모드: me · ghost (고정) · vmg (최근 3초 |VMG| 평균이 큰 쪽) ·
+           ahead (출발 후 더 멀리 간 쪽 — 같은 코스일 때 앞선 배).
+     깜빡임 방지: 새 리더가 이 여유(VMG 0.15 m/s · 거리 3 m)를 넘어야 바뀐다. */
+  var LEAD_WIN = 3, LEAD_VMG_HYST = 0.15, LEAD_DIST_HYST = 3;
+
+  /* 고스트 표본을 주 세션 시간축에 올리고, 풍향이 있으면 빠진 twa·vmg 를
+     채우고, 누적 거리를 단다. 한 번만 한다. */
+  function prepGhostSeries() {
+    if (!R.ghost || R.ghost.mt) return;
+    var gs = R.ghost.session.samples, off = R.ghost.align.offsetSec;
+    var mt = new Array(gs.length), cum = new Array(gs.length);
+    var wd = R.windDir;
+    for (var i = 0; i < gs.length; i++) {
+      var g = gs[i];
+      mt[i] = R.t0 + off + (g.t - gs[0].t);
+      if (wd != null && g.heading != null && isFinite(g.heading)) {
+        var twa = Math.abs(angDiff(wd, g.heading));
+        if (g.twa == null) g.twa = twa;
+        if (g.vmg == null && g.speed != null) g.vmg = g.speed * Math.cos(twa * Math.PI / 180);
+      }
+      cum[i] = i ? cum[i - 1] + distM(gs[i - 1], g) : 0;
+    }
+    R.ghost.mt = mt;
+    R.ghost.cum = cum;
+    var ps = R.samples, pc = new Array(ps.length);
+    for (var k = 0; k < ps.length; k++) pc[k] = k ? pc[k - 1] + distM(ps[k - 1], ps[k]) : 0;
+    R.primaryCum = pc;
+  }
+  function distM(a, b) {
+    if (!a || !b || !isFinite(a.lat) || !isFinite(b.lat)) return 0;
+    var r = Math.PI / 180, dl = (b.lat - a.lat) * r, dn = (b.lng - a.lng) * r;
+    var x = Math.sin(dl / 2) * Math.sin(dl / 2)
+      + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dn / 2) * Math.sin(dn / 2);
+    return 12742000 * Math.asin(Math.min(1, Math.sqrt(x)));
+  }
+  /* 정렬된 시간 배열에서 t 이하 마지막 인덱스 */
+  function idxAt(tArr, t) {
+    var lo = 0, hi = tArr.length - 1;
+    if (!tArr.length || t < tArr[0]) return -1;
+    while (lo < hi) { var m = (lo + hi + 1) >> 1; if (tArr[m] <= t) lo = m; else hi = m - 1; }
+    return lo;
+  }
+  function meanAbsVmg(samples, tArr, lo, hi) {
+    var i = Math.max(0, idxAt(tArr, lo)), sum = 0, n = 0;
+    for (; i < samples.length && tArr[i] <= hi; i++) {
+      var v = samples[i].vmg;
+      if (v != null && isFinite(v)) { sum += Math.abs(v); n++; }
+    }
+    return n ? sum / n : null;
+  }
+  /* 지금 누구를 진하게: 'me' | 'ghost'. 판정할 수 없으면 직전 리더를 유지 */
+  function currentLead(playT) {
+    if (!R.ghost) return 'me';
+    var mode = R.leadMode || 'me';
+    if (mode === 'me' || mode === 'ghost') { R.lead = mode; return mode; }
+    prepGhostSeries();
+    var prev = R.lead || 'me', next = prev, why = '';
+    if (mode === 'vmg') {
+      if (!R.primaryT) R.primaryT = R.samples.map(function (x) { return x.t; });
+      var a = meanAbsVmg(R.samples, R.primaryT, playT - LEAD_WIN, playT);
+      var b = meanAbsVmg(R.ghost.session.samples, R.ghost.mt, playT - LEAD_WIN, playT);
+      if (a != null && b != null) {
+        if (prev !== 'me' && a > b + LEAD_VMG_HYST) next = 'me';
+        else if (prev !== 'ghost' && b > a + LEAD_VMG_HYST) next = 'ghost';
+        why = 'VMG ' + fmtKt(a) + ' vs ' + fmtKt(b);
+      } else if (a != null && b == null) { next = 'me'; why = 'only one has VMG'; }
+      else if (b != null && a == null) { next = 'ghost'; why = 'only one has VMG'; }
+    } else if (mode === 'ahead') {
+      var ia = idxAt(R.primaryT || (R.primaryT = R.samples.map(function (x) { return x.t; })), playT);
+      var ib = idxAt(R.ghost.mt, playT);
+      if (ia >= 0 && ib >= 0) {
+        var da = R.primaryCum[ia], db = R.ghost.cum[ib];
+        if (prev !== 'me' && da > db + LEAD_DIST_HYST) next = 'me';
+        else if (prev !== 'ghost' && db > da + LEAD_DIST_HYST) next = 'ghost';
+        why = Math.round(Math.abs(da - db)) + ' m ' + (da >= db ? 'ahead' : 'behind');
+      } else if (ia >= 0) { next = 'me'; why = 'the other has not started'; }
+      else if (ib >= 0) { next = 'ghost'; why = 'the other has not started'; }
+    }
+    R.lead = next;
+    R.leadWhy = why;
+    return next;
+  }
+  function fmtKt(ms) { return (ms * KT).toFixed(1); }
+
+  function buildLeadControls(box) {
+    if (!R.ghost) return;
+    var bar = document.createElement('div');
+    bar.className = 'replay-lead';
+    var modes = [['me', R.title || 'Me'], ['ghost', R.ghost.label], ['vmg', 'Auto: VMG'], ['ahead', 'Auto: ahead']];
+    var html = '<div class="replay-lead__row" role="group" aria-label="Which rider is drawn bold">';
+    modes.forEach(function (m) {
+      html += '<button type="button" class="replay-lead__btn" data-mode="' + m[0] + '" title="'
+        + (m[0] === 'vmg' ? 'Bold = whoever has the higher VMG over the last 3 s'
+          : m[0] === 'ahead' ? 'Bold = whoever has covered more distance since the start (same course)'
+          : 'Always draw this rider bold') + '">'
+        + escapeHtml(String(m[1]).slice(0, 18)) + '</button>';
+    });
+    html += '</div><div class="replay-lead__now" id="replay-lead-now"></div>';
+    bar.innerHTML = html;
+    box.appendChild(bar);
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('.replay-lead__btn');
+      if (!b) return;
+      R.leadMode = b.getAttribute('data-mode');
+      R.lead = R.leadMode === 'ghost' ? 'ghost' : 'me';
+      paintLeadControls();
+      drawMiniGraphs(R.playT, R.curState);
+    });
+    paintLeadControls();
+  }
+  function paintLeadControls() {
+    var box = el('replay-graphs');
+    if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll('.replay-lead__btn'), function (b) {
+      b.classList.toggle('is-on', b.getAttribute('data-mode') === (R.leadMode || 'me'));
+    });
+  }
+  function escapeHtml(t) {
+    return t.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+  }
+
   function buildGraphs() {
     var box = el('replay-graphs');
     box.innerHTML = '';
     R.graphs = [];
+    buildLeadControls(box);                /* §596 */
     R.metricSlots.forEach(function (slot) {
       var def = slot.def;
       var card = document.createElement('div');
@@ -1154,6 +1281,17 @@
       if (v > hi) hi = v;
       n++;
     }
+    /* §596 — 두 선수가 같은 축을 써야 높이가 거짓말을 안 한다 */
+    if (R && R.ghost && R.ghost.mt) {
+      var gs = R.ghost.session.samples, mt = R.ghost.mt;
+      for (var j = Math.max(0, idxAt(mt, winLo)); j < gs.length && mt[j] <= winHi; j++) {
+        var gv = gs[j][g.def.field];
+        if (gv == null || !isFinite(gv)) continue;
+        if (gv < lo) lo = gv;
+        if (gv > hi) hi = gv;
+        n++;
+      }
+    }
     if (n === 0) return [g.vmin, g.vmax];
     if (hi - lo < 1e-9) { lo -= 1; hi += 1; }       // 평탄한 창 — 최소 폭
     var pad = (hi - lo) * 0.14;
@@ -1227,10 +1365,37 @@
 
     // 창 안 데이터 곡선 (양옆 1샘플 여유 — 선이 가장자리까지 이어지게).
     // 선은 흰색으로 통일한다 (§D1).
+    /* §596 — 누가 진한가. 흐린 쪽을 먼저 그려 진한 선이 위에 오게 한다. */
+    var lead = R.ghost ? (R.leadNow || 'me') : 'me';
+    var DIM = 0.32;
+    function drawGhostLine(alpha, width) {
+      if (!R.ghost || !R.ghost.mt) return;
+      var gs = R.ghost.session.samples, mt = R.ghost.mt;
+      var j0 = Math.max(0, idxAt(mt, winLo) - 1);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = R.ghost.color; ctx.lineWidth = width;
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.beginPath();
+      var gpen = false;
+      for (var j = j0; j < gs.length; j++) {
+        var gv = gs[j][def.field];
+        if (gv == null || !isFinite(gv)) { gpen = false; if (mt[j] > winHi) break; continue; }
+        var gx = xFor(mt[j]), gy = yFor(gv);
+        if (!gpen) { ctx.moveTo(gx, gy); gpen = true; } else ctx.lineTo(gx, gy);
+        if (mt[j] > winHi) break;
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+    if (R.ghost && lead === 'me') drawGhostLine(DIM, 1.6);
+
     var i0 = sampleIndexAtTime(R.samples, winLo);
     if (i0 > 0) i0--;
+    ctx.save();
+    ctx.globalAlpha = (R.ghost && lead === 'ghost') ? DIM : 1;
     ctx.strokeStyle = MINI_LINE;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = (R.ghost && lead === 'ghost') ? 1.6 : 2;
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     ctx.beginPath();
     var pen = false;
@@ -1250,6 +1415,8 @@
       if (!pen) { ctx.moveTo(x, y); pen = true; } else ctx.lineTo(x, y);
     }
     ctx.stroke();
+    ctx.restore();
+    if (R.ghost && lead === 'ghost') drawGhostLine(1, 2.2);
 
     // 재생 헤드 — 가로 중앙 세로선
     var cx = padL + plotW / 2;
@@ -1259,16 +1426,44 @@
 
     // 현재값 점
     var cv = st ? st[def.field] : null;
-    if (cv != null && isFinite(cv)) {
-      var cy = yFor(cv);
-      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-      ctx.fillStyle = MINI_LINE; ctx.fill();
+    var gst = R.ghost ? R.ghostState : null;
+    var gcv = gst ? gst[def.field] : null;
+    function dot(val, fill, bold) {
+      if (val == null || !isFinite(val)) return;
+      ctx.save();
+      ctx.globalAlpha = bold ? 1 : 0.55;
+      ctx.beginPath(); ctx.arc(cx, yFor(val), bold ? 4 : 3, 0, Math.PI * 2);
+      ctx.fillStyle = fill; ctx.fill();
       ctx.strokeStyle = '#0B1018'; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.restore();
     }
-    if (g.valEl) g.valEl.textContent = fmtMetric(def, cv);
+    if (R.ghost && lead === 'ghost') { dot(cv, MINI_LINE, false); dot(gcv, R.ghost.color, true); }
+    else { if (R.ghost) dot(gcv, R.ghost.color, false); dot(cv, MINI_LINE, true); }
+    if (g.valEl) {
+      if (!R.ghost) g.valEl.textContent = fmtMetric(def, cv);
+      else {
+        /* 두 값을 나란히, 진한 쪽이 앞 */
+        var a1 = '<span style="color:#fff;opacity:' + (lead === 'me' ? 1 : 0.5) + '">' + fmtMetric(def, cv) + '</span>';
+        var b1 = '<span style="color:' + R.ghost.color + ';opacity:' + (lead === 'ghost' ? 1 : 0.5) + '">' + fmtMetric(def, gcv) + '</span>';
+        g.valEl.innerHTML = lead === 'ghost' ? b1 + ' \u00b7 ' + a1 : a1 + ' \u00b7 ' + b1;
+      }
+    }
   }
 
   function drawMiniGraphs(playT, st) {
+    if (R.ghost) {                          /* §596 — 리더는 프레임마다 한 번만 판정 */
+      prepGhostSeries();
+      R.leadNow = currentLead(playT);
+      var now = el('replay-lead-now');
+      if (now) {
+        var nm = R.leadNow === 'ghost' ? R.ghost.label : (R.title || 'Me');
+        var col = R.leadNow === 'ghost' ? R.ghost.color : '#FFFFFF';
+        now.innerHTML = (R.leadMode === 'vmg' || R.leadMode === 'ahead')
+          ? 'Leader: <b style="color:' + col + '">' + escapeHtml(String(nm)) + '</b>'
+            + (R.leadWhy ? ' <span style="opacity:.7">\u00b7 ' + escapeHtml(R.leadWhy) + '</span>' : '')
+          : 'Bold: <b style="color:' + col + '">' + escapeHtml(String(nm)) + '</b>';
+      }
+    }
     for (var i = 0; i < R.graphs.length; i++) {
       var g = R.graphs[i];
       if (g.state !== 'data' || !R.shown[g.def.key]) continue;
@@ -3462,6 +3657,7 @@
     R = {
       session: session, analysis: opts.analysis || {}, samples: samples,
       ghost: ghost, ghostState: null, ghostTrackScale: null,
+      leadMode: 'me', lead: 'me', leadNow: 'me', leadWhy: '', primaryT: null, primaryCum: null,   /* §596 */
       windDir: windDir,
       unit: opts.unit === 'kmh' ? 'kmh' : 'kt',
       sessionSig: opts.sessionSig || '',
