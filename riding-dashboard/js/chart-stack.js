@@ -33,12 +33,15 @@
        (§546), IMU 융합(§430)도 채운다. 값이 있는데 타임라인에서는 볼 수
        없었다. 기본은 꺼 두고 고를 수 있게 한다 — 여섯 판이 한꺼번에 쌓이면
        화면이 차트 벽이 된다. */
+    /* §592 (옥대표 "음수양수는 단순히 택을 의미하기때문에 힐이나 피치에서는
+       무시해") — 크기만 그린다. 부호를 두면 택마다 선이 0 을 건너뛰어
+       같은 기울기가 위아래로 갈라져 보인다. */
     { key: 'heel', label: 'Heel', unit: '°', color: '#9775fa', zero: true, height: 128,
       defaultOff: true,
-      get: function (p) { return p.heel == null ? null : p.heel; } },
+      get: function (p) { return p.heel == null ? null : Math.abs(p.heel); } },
     { key: 'pitch', label: 'Pitch', unit: '°', color: '#f783ac', zero: true, height: 128,
       defaultOff: true,
-      get: function (p) { return p.pitch == null ? null : p.pitch; } }
+      get: function (p) { return p.pitch == null ? null : Math.abs(p.pitch); } }
   ];
 
   /* 기록 공백·제외 구간에서 선을 끊는다. 이걸 안 하면 지워버린 10분이

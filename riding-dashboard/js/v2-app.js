@@ -4297,6 +4297,8 @@
     };
     function fmtVal(row, v) {
       if (v == null || !isFinite(v)) return '—';
+      /* §592 — 힐·피치 부호는 택을 뜻할 뿐이라 크기만 적는다 */
+      if (row.metric === 'heel' || row.metric === 'pitch') v = Math.abs(v);
       if (row.unit === 'speed') return (v * KT).toFixed(1);
       if (row.unit === 'bpm') return String(Math.round(v));
       return v.toFixed(0);
@@ -5618,6 +5620,7 @@
     { id: 'twa',  label: 'CWA' },
     { id: 'awa',  label: 'AWA' },
     { id: 'heel', label: 'Heel' },
+    { id: 'pitch', label: 'Pitch' },   /* §592 옥대표 "피치앵글이 없네. 추가해줘" */
     { id: 'hr',   label: 'HR' }
   ];
 
@@ -5657,11 +5660,17 @@
   }
 
   /* rows 값은 기본 단위(속도 m/s)이고 unit 은 내부 키다 — §501 과 같은 규칙 */
+  /* §592 (옥대표 "힐을 202퍼센트 차이라고 표현하는건 잘못됨. 음수양수는
+     단순히 택을 의미하기때문에 힐이나 피치에서는 무시해") — 포트 −51.5° 와
+     스타보드 +52.9° 를 (52.9−(−51.5))/51.5 로 나눠 +202.7% 를 냈다.
+     기울기는 **크기**만 비교한다. 비율도 내지 않고 도(°) 차이로 말한다. */
+  function tbIsAttitude(metricId) { return metricId === 'heel' || metricId === 'pitch'; }
   function tbFmt(r, tier) {
     if (!r) return null;
     var key = tier || TACKBIAS.tier || 'avg';
     var v = (key === 'avg') ? r.avg : r[key];
     if (v == null || !isFinite(v)) return null;
+    if (tbIsAttitude(r.metric)) v = Math.abs(v);
     if (r.unit === 'speed') return { v: v * KT, txt: (v * KT).toFixed(1), unit: 'kt' };
     if (r.unit === 'bpm') return { v: v, txt: String(Math.round(v)), unit: 'bpm' };
     return { v: v, txt: v.toFixed(1), unit: '°' };
@@ -5860,6 +5869,8 @@
       card.appendChild(body); host.appendChild(card); return;
     }
     var d = tbDiff(pf.v, sf.v, pf.unit);
+    var attitude = tbIsAttitude(TACKBIAS.metric);
+    if (attitude) d = null;        /* §592 — 기울기는 % 로 말하지 않는다 */
 
     /* 한 줄 요약 — Port | Diff | Stbd */
     var row = el('div', 'd-flex align-items-center justify-content-between');
@@ -5891,7 +5902,18 @@
     dv.style.color = THEME.accent;
     mid.appendChild(dv);
     mid.appendChild(el('div', 'lab', d != null ? 'starboard vs port'
+      : attitude ? 'starboard vs port \u00b7 size of the angle'
       : 'starboard vs port \u00b7 too small a base for %'));
+    if (attitude && absDelta != null && Math.abs(absDelta) >= 0.05) {
+      var lean = el('div', 'lab mt-1');
+      lean.style.fontWeight = '600';
+      var more = absDelta > 0 ? 'S' : 'P';
+      lean.textContent = (more === 'S' ? 'starboard' : 'port') + ' '
+        + Math.abs(absDelta).toFixed(1) + '\u00b0 more '
+        + (TACKBIAS.metric === 'heel' ? 'heel' : 'pitch');
+      lean.style.color = sideColor(more) || '';
+      mid.appendChild(lean);
+    }
     /* §580 — 어느 쪽이 앞선 것인지 **말로** 적는다. 부호만으로는 각도 지표에서
        거꾸로 읽힌다: 풍상 CWA 36.2° 대 36.9° 는 '+1.8% starboard' 지만
        실제로 앞선 쪽은 각이 작은 **포트**다(옥대표 실측). */
@@ -8123,8 +8145,10 @@
     function val(x) {
       var v = x[M];
       if (v == null || !isFinite(v)) return null;
-      if (M === 'pitch') return v;
-      if (M === 'twa' || M === 'heel') return Math.abs(v);
+      /* §592 — 피치도 부호를 뗀다(옥대표 "힐이나 피치에서는 무시해"). 실측:
+         두 .vkx 모두 포트·스타보드 중앙 피치가 −61° 로 같아 부호는 택과도,
+         노즈업/다운과도 구분이 안 된다(장착 각도 오프셋). */
+      if (M === 'twa' || M === 'heel' || M === 'pitch') return Math.abs(v);
       return Math.abs(v) * KT;
     }
     var pv = P.map(val).filter(function (v) { return v != null; });
@@ -8611,8 +8635,10 @@
     var heels = S.map(function (p) { return p.heel; });
     var pitches = S.map(function (p) { return p.pitch; });
     var row = el('div', 'row row-cards');
-    row.appendChild(statRow('Heel', heels, '°'));
-    row.appendChild(statRow('Pitch', pitches, '°'));
+    /* §592 — 분포는 크기로(부호=택). 아래 좌우 균형 카드는 부호로 택을 가른다. */
+    function absOf(a) { return a.map(function (v) { return v == null ? v : Math.abs(v); }); }
+    row.appendChild(statRow('Heel', absOf(heels), '°'));
+    row.appendChild(statRow('Pitch', absOf(pitches), '°'));
     host.appendChild(row);
 
     /* 좌우 비대칭 — 한쪽 택으로 더 깊게 눕는지 */

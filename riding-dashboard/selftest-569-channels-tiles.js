@@ -15,8 +15,9 @@ ok('★ 피치 판이 있다', /key: 'pitch', label: 'Pitch'/.test(csc));
 ok('심박 판은 원래 있었다', /key: 'hr', label: 'Heart rate'/.test(csc));
 ok('★ 힐·피치는 0 기준선을 갖는다 (좌우·앞뒤 부호가 뜻을 갖는다)',
    /key: 'heel'[\s\S]{0,120}zero: true/.test(csc) && /key: 'pitch'[\s\S]{0,120}zero: true/.test(csc));
-ok('★ 샘플에서 직접 읽는다', /p\.heel == null \? null : p\.heel/.test(csc)
-   && /p\.pitch == null \? null : p\.pitch/.test(csc));
+/* §592 — 부호는 택이라 크기로 그린다 */
+ok('★ 샘플에서 직접 읽는다 (크기)', /p\.heel == null \? null : Math\.abs\(p\.heel\)/.test(csc)
+   && /p\.pitch == null \? null : Math\.abs\(p\.pitch\)/.test(csc));
 
 console.log('\n[2] ★ 값이 있는 채널과 그릴 채널을 나눈다');
 ok('★ available 을 따로 만든다', /var available = PANELS\.filter/.test(csc));

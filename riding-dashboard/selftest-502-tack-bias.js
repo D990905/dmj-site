@@ -18,6 +18,7 @@ function grabVar(decl) {
 }
 var F = new Function('KT', 'TACKBIAS',
   grabVar('  var TB_PCT_FLOOR = {') + '\n'
+  + "function tbIsAttitude(m) { return m === 'heel' || m === 'pitch'; }\n"   /* §592 — tbFmt 가 쓴다 */
   + grab('tbFmt') + grab('tbPick') + grab('tbDiff') + grab('tbUpDownSanity').replace(/var box[\s\S]*?return box;/, 'return { ratio: ratio };') + grab('tbCauseNote') +
   '\nreturn { tbFmt: tbFmt, tbPick: tbPick, tbDiff: tbDiff, tbCauseNote: tbCauseNote,'
   + ' tbUpDownSanity: tbUpDownSanity, setTier: function (t) { TACKBIAS.tier = t; } };')(
