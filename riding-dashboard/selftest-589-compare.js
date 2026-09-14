@@ -36,8 +36,8 @@ ok('★★ 요약(KPI) 바로 아래에 자리가 있다',
    && html.indexOf('id="compare-host"') < html.indexOf('card-header-tabs'));
 ok('★★ 선택을 바꾸면 그린다', /sel\.addEventListener\('change', function \(\) \{\s*try \{ renderCompare\(\); \}/.test(pg));
 ok('★ 리스너는 한 번만 단다 (목록을 다시 채울 때마다 쌓이지 않게)', /if \(!sel\._rdCmp\) \{\s*sel\._rdCmp = true;/.test(pg));
-ok('★★ 세션을 바꿔도 비교는 유지 (show 에서 다시 그린다)', /renderKpis\(analysis, vps\);\s*try \{ renderCompare\(\); \}/.test(code));
-ok('★ 이름표가 하는 일을 말한다', /none\.textContent = 'Compare with\\u2026'/.test(pg));
+ok('★★ show 에서 다시 그린다 (§597: 다른 세션이면 비교를 푼 뒤)', /CUR\.cmpIdent = cmpIdent;\s*try \{ renderCompare\(\); \}/.test(code));
+ok('★ 끄는 선택지가 보인다 (§597 No comparison)', /none\.textContent = 'No comparison'/.test(pg));
 ok('★★ "숫자는 안 바뀐다" 옛 안내 문구가 사라졌다', !/This does not change any of the numbers/.test(code));
 ok('★ 리플레이는 그대로 — 카드에서 바로 부를 수 있다', /Race it in Replay/.test(rc) && /\$\('btn-replay'\)/.test(rc));
 ok('★ 비교 끄기', /sel\.value = ''; renderCompare\(\);/.test(rc));

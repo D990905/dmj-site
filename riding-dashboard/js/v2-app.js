@@ -10405,7 +10405,17 @@
     CUR.vps = vps;
     autoRecordRideLoad();
     renderKpis(analysis, vps);
-    try { renderCompare(); }            /* §589 — 세션을 바꿔도 고른 비교는 유지 */
+    /* §597 (옥대표 "다시 나가려고 해도 계속 비교창으로 유지") — 다른 세션을
+       열면 비교를 푼다. §589 는 '세션을 바꿔도 유지' 로 만들었는데, 그러면
+       나가도 비교가 계속 따라온다. 같은 세션을 다시 그릴 때(풍향·입력 변경)는 둔다. */
+    /* 식별은 트랙 시작 시각 — 저장 직후 openedRecId 가 생겨도 같은 세션이다 */
+    var cmpIdent = (session && session.startEpoch) || CUR.openedRecId || null;
+    if (CUR.cmpIdent !== undefined && CUR.cmpIdent !== cmpIdent) {
+      var gsel = $('replay-ghost');
+      if (gsel) gsel.value = '';
+    }
+    CUR.cmpIdent = cmpIdent;
+    try { renderCompare(); }
     catch (e) { if (window.console) console.error('[v2 §589] compare', e); }
     try { renderGuestBanner(); }        /* §594 */
     catch (e) { if (window.console) console.error('[v2 §594] guest banner', e); }
@@ -10893,7 +10903,7 @@
     var keep = sel.value;
     while (sel.firstChild) sel.removeChild(sel.firstChild);
     var none = document.createElement('option');
-    none.value = ''; none.textContent = 'Compare with\u2026';
+    none.value = ''; none.textContent = 'No comparison';   /* §597 — 끄는 길이 보이게 */
     sel.appendChild(none);
     /* §589 (옥대표 "비교기능은 대체 뭐를 하는거냐... 전혀 비교되는게 없는데?")
        — 맞다. 고르면 **아무 일도 안 일어났다.** 결과는 ▶ Replay 를 눌러야
@@ -11204,7 +11214,13 @@
           title: CUR.name || 'Session',
           hasVideoFlag: CUR.hasVideoFlag || false,
           videoUploadedAt: CUR.videoUploadedAt || null,
-          onClose: function () {}
+          onClose: function () {},
+          /* §597 — 리플레이 안에서 비교를 끄면 대시보드 선택도 비운다 */
+          onStopCompare: function () {
+            var gs = $('replay-ghost');
+            if (gs) gs.value = '';
+            try { renderCompare(); } catch (e) {}
+          }
         });
       } catch (e) {
         rp.textContent = 'Replay failed';

@@ -39,8 +39,8 @@ ok('★★ 풍향 0°·헤딩 60° → twa 60, vmg = 5·cos60 = 2.5', Math.abs(g
 console.log('\n[5] 그리기 배선');
 ok('★★ 흐린 쪽 먼저, 진한 쪽 나중 (진한 선이 위)', /if \(R\.ghost && lead === 'me'\) drawGhostLine\(DIM, 1\.6\);/.test(src) && /if \(R\.ghost && lead === 'ghost'\) drawGhostLine\(1, 2\.2\);/.test(src));
 ok('★★ 같은 Y축 (창 범위에 고스트 포함)', /두 선수가 같은 축을 써야/.test(src));
-ok('★ 값 두 개 표시', /g\.valEl\.innerHTML = lead === 'ghost'/.test(src));
+ok('★ 값 두 개 — 순서는 늘 나 · 상대', /g\.valEl\.innerHTML = a1 \+ ' \\u00b7 ' \+ b1;/.test(src));
 ok('★ 모드 버튼 넷', /\['vmg', 'Auto: VMG'\], \['ahead', 'Auto: ahead'\]/.test(src));
 ok('★ 리더 판정은 프레임당 한 번', /R\.leadNow = currentLead\(playT\);/.test(src));
-ok('캐시버스트', /replay\.js\?v=v596/.test(fs.readFileSync(path.join(__dirname,'v2.html'),'utf8')));
+ok('캐시버스트 (v596 이상)', (function(){var m=fs.readFileSync(path.join(__dirname,'v2.html'),'utf8').match(/replay\.js\?v=v(\d+)/);return m&&+m[1]>=596;})());
 console.log('\n'+(fail?'FAIL':'PASS')+'  '+pass+'/'+(pass+fail));process.exit(fail?1:0);

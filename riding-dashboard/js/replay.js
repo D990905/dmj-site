@@ -1129,7 +1129,7 @@
       if (a != null && b != null) {
         if (prev !== 'me' && a > b + LEAD_VMG_HYST) next = 'me';
         else if (prev !== 'ghost' && b > a + LEAD_VMG_HYST) next = 'ghost';
-        why = 'VMG ' + fmtKt(a) + ' vs ' + fmtKt(b);
+        why = '3 s VMG ' + fmtKt(a) + ' vs ' + fmtKt(b) + ' kt';
       } else if (a != null && b == null) { next = 'me'; why = 'only one has VMG'; }
       else if (b != null && a == null) { next = 'ghost'; why = 'only one has VMG'; }
     } else if (mode === 'ahead') {
@@ -1162,12 +1162,15 @@
           : 'Always draw this rider bold') + '">'
         + escapeHtml(String(m[1]).slice(0, 18)) + '</button>';
     });
+    html += '<button type="button" class="replay-lead__btn replay-lead__stop" data-stop="1" '
+      + 'title="Remove the second rider and go back to a normal replay">\u2715 Stop comparing</button>';
     html += '</div><div class="replay-lead__now" id="replay-lead-now"></div>';
     bar.innerHTML = html;
     box.appendChild(bar);
     bar.addEventListener('click', function (e) {
       var b = e.target.closest('.replay-lead__btn');
       if (!b) return;
+      if (b.getAttribute('data-stop')) { stopComparing(); return; }
       R.leadMode = b.getAttribute('data-mode');
       R.lead = R.leadMode === 'ghost' ? 'ghost' : 'me';
       paintLeadControls();
@@ -1175,6 +1178,29 @@
     });
     paintLeadControls();
   }
+  /* §597 (옥대표 "비교하는 창에서 다시 나가려고 해도 계속 비교창으로 유지되는것 같아")
+     — 리플레이 안에서 비교를 끌 길이 없었다. 닫고 대시보드에서 선택을 비워야
+     했다. 여기서 바로 끄고, 대시보드 선택도 같이 비운다(onStopCompare). */
+  function stopComparing() {
+    if (!R || !R.ghost) return;
+    if (R.map) {
+      if (R.mapGhostPlayhead) { try { R.map.removeLayer(R.mapGhostPlayhead); } catch (e) {} }
+      (R.mapGhostTrack || []).forEach(function (ly) { try { R.map.removeLayer(ly); } catch (e) {} });
+    }
+    R.mapGhostPlayhead = null; R.mapGhostTrack = [];
+    R.ghost = null; R.ghostState = null; R.ghostTrackScale = null;
+    R.leadMode = 'me'; R.lead = 'me'; R.leadNow = 'me';
+    var labels = el('replay-track-labels');
+    if (labels && labels.parentNode) labels.parentNode.removeChild(labels);
+    buildGraphs();
+    sizeGraphs();
+    rebuildTrack();
+    updateMapWindow();
+    seek(R.playT);
+    try { if (R.onStopCompare) R.onStopCompare(); }
+    catch (e) { if (global.console) console.error('[replay §597] stop compare', e); }
+  }
+
   function paintLeadControls() {
     var box = el('replay-graphs');
     if (!box) return;
@@ -1445,7 +1471,9 @@
         /* 두 값을 나란히, 진한 쪽이 앞 */
         var a1 = '<span style="color:#fff;opacity:' + (lead === 'me' ? 1 : 0.5) + '">' + fmtMetric(def, cv) + '</span>';
         var b1 = '<span style="color:' + R.ghost.color + ';opacity:' + (lead === 'ghost' ? 1 : 0.5) + '">' + fmtMetric(def, gcv) + '</span>';
-        g.valEl.innerHTML = lead === 'ghost' ? b1 + ' \u00b7 ' + a1 : a1 + ' \u00b7 ' + b1;
+        /* 순서는 늘 나 · 상대 — 진하기만 바뀐다. 순서까지 바꾸면 왼쪽 패널
+           (늘 내 값)과 어긋나 읽힌다(라이브 확인). */
+        g.valEl.innerHTML = a1 + ' \u00b7 ' + b1;
       }
     }
   }
@@ -3668,6 +3696,7 @@
       title: opts.title || session.trackName || 'Riding Session',
       riderName: opts.riderName || opts.title || session.trackName || 'Rider',
       onClose: typeof opts.onClose === 'function' ? opts.onClose : noop,
+      onStopCompare: typeof opts.onStopCompare === 'function' ? opts.onStopCompare : null,   /* §597 */
       t0: t0, t1: t1, dur: dur, playT: t0, maxKt: maxKt,
       playing: false, scrubbing: false, scrubWasPlaying: false, trackDrag: false,
       speed: 1, raf: null, lastTs: null,
