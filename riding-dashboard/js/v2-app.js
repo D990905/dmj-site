@@ -1572,7 +1572,7 @@
     if (window.RDPolar) {
       /* 칼럼이 넓어졌으니 차트도 키운다 — 각도 눈금이 촘촘해서
          작으면 읽으려고 만든 눈금이 도리어 뭉갠다 */
-      RDPolar.render(polarHost, a.polar,
+      RDPolar.render(polarHost, heldPolar(a),
         { grid: THEME.grid, dim: THEME.dim, port: THEME.port, starboard: THEME.stbd,
           size: Math.min(520, polarHost.clientWidth || 460),
           band: true, minN: 5 });
@@ -6704,15 +6704,82 @@
 
      그리고 못 낼 때는 숫자 대신 **왜 못 내는지**를 적는다 — 그들이
      "풍하 최적각 173°" 를 낸 자리가 정확히 이 검산이 없는 자리다. */
+  /* §598 (옥대표 "말이안됨" — 풍상 최적각 4°, VMG 13.4 kt) — 폴라 빈은
+     표본을 **지나가기만 해도** 센다. 택을 돌면 보드가 0° 부근을 한순간
+     통과하는데, 25 Hz 기기에서는 그 0.4 초가 56표본이 되어 빈 하나를 채우고,
+     그 순간 속도 13.4 kt × cos 4° 가 '최고 VMG' 로 뽑혔다. 카드가 스스로
+     "Longest hold 0.4 s · 0.2% — not a target" 라고 적으면서도 숫자는 그대로
+     크게 보여 줬다.
+     각도는 **붙잡은 시간**으로 거른다: 한 번에 HELD_MIN_SEC 이상, 또는 그 각도에
+     머문 총합이 HELD_MIN_SHARE 이상이어야 그 빈을 폴라와 최적각에 쓴다.
+     통과만 한 각도는 그리지도, 최적으로 뽑지도 않는다. */
+  /* 판단 결과 (실측 9/14, 4세션): 빈마다 '붙잡은 시간' 으로 거르는 방식은
+     풍하 파도 타기에서 흔들림 때문에 진짜 각도(130~140°)를 잘랐고, 창을
+     넓히면 이웃 빈 덕에 34° 같은 통과각이 다시 살아났다. 원인은 빈이 아니라
+     **회전 중인 표본이 섞인 것** 이므로 그것을 뺀다: 엔진이 찾은 회전
+     (택·자이브) 구간 ±TURN_PAD_SEC 의 표본을 빼고 폴라를 다시 모은다.
+     그러면 통과각은 표본이 사라져 자연히 그려지지 않는다. */
+  var TURN_PAD_SEC = 2;
+  var OPT_MIN_SEC = 15;        /* 최적각 후보가 되려면 그 각도에서 이만큼(초) 탔어야 한다 */
+  function heldPolar(a) {
+    if (!a || !a.polar || !CUR.session || a.windDir == null) return a && a.polar;
+    if (a._heldPolar) return a._heldPolar;
+    var S = CUR.session.samples || [], bd = a.polar.binDeg || 7.5;
+    var nB = Math.ceil(180 / bd), port = [], stbd = [], all = [], i, k;
+    for (k = 0; k < nB; k++) { port.push([]); stbd.push([]); all.push([]); }
+    var inTurn = new Uint8Array(S.length);
+    (a.maneuvers || []).forEach(function (m) {
+      if (m.startIdx == null || m.endIdx == null || !S[m.startIdx] || !S[m.endIdx]) return;
+      var t0 = S[m.startIdx].t - TURN_PAD_SEC, t1 = S[m.endIdx].t + TURN_PAD_SEC;
+      for (var j = m.startIdx; j >= 0 && S[j].t >= t0; j--) inTurn[j] = 1;
+      for (var j2 = m.startIdx; j2 < S.length && S[j2].t <= t1; j2++) inTurn[j2] = 1;
+    });
+    var removed = 0, removedLow = 0;
+    var wd = ((a.windDir % 360) + 360) % 360;
+    for (i = 0; i < S.length; i++) {
+      var p = S[i];
+      if (p.speed == null || p.speed < 1.0 || p.heading == null) continue;
+      var sg = ((p.heading - wd + 540) % 360) - 180, twa = Math.abs(sg);
+      if (inTurn[i]) { removed++; if (twa < 30) removedLow++; continue; }
+      var bi = Math.min(nB - 1, Math.floor(twa / bd));
+      (sg >= 0 ? port : stbd)[bi].push(p.speed);
+      all[bi].push(p.speed);
+    }
+    function pct(sorted, q) {
+      if (!sorted.length) return 0;
+      var x = (sorted.length - 1) * q / 100, lo = Math.floor(x), hi = Math.ceil(x);
+      return sorted[lo] + (sorted[hi] - sorted[lo]) * (x - lo);
+    }
+    function reduce(arr) {
+      return arr.map(function (list, bi) {
+        list.sort(function (x, y) { return x - y; });
+        var sum = 0; for (var n = 0; n < list.length; n++) sum += list[n];
+        return { twaCenter: (bi + 0.5) * bd, count: list.length,
+                 p95Ms: pct(list, 95), p90Ms: pct(list, 90), avgMs: list.length ? sum / list.length : 0 };
+      });
+    }
+    var out = Object.assign({}, a.polar, { port: reduce(port), starboard: reduce(stbd), combined: reduce(all) });
+    out.turnSamplesRemoved = removed;
+    out.turnSamplesBelow30 = removedLow;
+    a._heldPolar = out;
+    return out;
+  }
+
   function renderOptimalAngles(card, a) {
     if (!window.RDPolar || !RDPolar.optimalAngle || !a || !a.polar) return;
-    var bins = a.polar.combined || a.polar.starboard;
+    var hp = heldPolar(a);                 /* §598 — 붙잡은 각도만 */
+    var bins = hp.combined || hp.starboard;
     if (!bins || !bins.length) return;
     /* ⚠ minN 을 넘기지 않는다. 넘기면 그리기 기준(5)이 최적 각도에도
        적용돼 13표본짜리 빈이 '최적' 으로 뽑힌다(실측). 최적은 하나의
        숫자로 단언하는 것이라 더 두꺼운 근거(OPT_MIN_N=15)를 써야 한다. */
-    var up = RDPolar.optimalAngle(bins, 'upwind');
-    var dn = RDPolar.optimalAngle(bins, 'downwind');
+    /* §598 — 표본 '개수' 기준(15)은 기록 간격에 따라 뜻이 달라진다: 1 Hz 에서는
+       15 초, 25 Hz RaceBox 에서는 0.6 초다. 최적각은 **시간**으로 요구한다. */
+    var S0 = (CUR.session && CUR.session.samples) || [];
+    var hz = S0.length > 1 ? (S0.length - 1) / Math.max(1, S0[S0.length - 1].t - S0[0].t) : 1;
+    var needN = Math.max(15, Math.round(OPT_MIN_SEC * hz));
+    var up = RDPolar.optimalAngle(bins, 'upwind', needN);
+    var dn = RDPolar.optimalAngle(bins, 'downwind', needN);
     if (!up.ok && !dn.ok && up.reason === 'no_data' && dn.reason === 'no_data') return;
 
     var body = el('div', 'card-body border-top pt-3');
@@ -6724,7 +6791,7 @@
     var row = el('div', 'row g-3 mt-1');
     function why(r) {
       if (r.reason === 'need_more_samples') {
-        return 'No angle has ' + (r.need || 5) + ' or more samples here yet.';
+        return 'No angle here was sailed for ' + OPT_MIN_SEC + ' s or more (turns excluded).';
       }
       if (r.reason === 'only_implausible_high') {
         return 'Every upwind angle with enough samples is closer than 30\u00b0 to '
@@ -6750,7 +6817,7 @@
       box.appendChild(el('div', 'lab mt-1', mode === 'upwind'
         ? 'best VMG ' + r.vmgKt.toFixed(1) + ' kt  (at ' + r.speedKt.toFixed(1) + ' kt)'
         : 'fastest ' + r.speedKt.toFixed(1) + ' kt  (VMG ' + r.vmgKt.toFixed(1) + ' kt)'));
-      box.appendChild(el('div', 'lab', r.count + ' samples'));
+      box.appendChild(el('div', 'lab', Math.round(r.count / hz) + ' s at this angle'));
       if (r.atEdge) {
         var w = el('div', 'lab mt-1');
         w.style.color = THEME.warn;
@@ -6816,6 +6883,14 @@
     row.appendChild(cell('Upwind', up, 'upwind', a));
     row.appendChild(cell('Downwind', dn, 'downwind', a));
     body.appendChild(row);
+    if (hp.turnSamplesRemoved) {
+      var dr = el('div', 'lab mt-2');
+      dr.textContent = 'Turns are left out of the polar and these picks ('
+        + hp.turnSamplesRemoved.toLocaleString() + ' samples within ' + TURN_PAD_SEC
+        + ' s of a tack or gybe). A board passes through every angle while it turns \u2014 '
+        + 'counting that would put your best upwind angle right into the wind.';
+      body.appendChild(dr);
+    }
 
     var note = el('div', 'text-secondary mt-2');
     note.style.fontSize = '.8125rem';

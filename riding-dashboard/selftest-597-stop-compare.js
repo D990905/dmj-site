@@ -11,5 +11,5 @@ ok('★★ 대시보드 선택도 비운다', /onStopCompare: function \(\) \{\s
 ok('★★ 다른 세션을 열면 비교가 풀린다', /if \(CUR\.cmpIdent !== undefined && CUR\.cmpIdent !== cmpIdent\) \{\s*var gsel = \$\('replay-ghost'\);\s*if \(gsel\) gsel\.value = '';/.test(app));
 ok('★★ 저장 직후는 같은 세션 (시작 시각 우선)', /var cmpIdent = \(session && session\.startEpoch\) \|\| CUR\.openedRecId \|\| null;/.test(app));
 ok('★ 선택지 이름 No comparison', /none\.textContent = 'No comparison'/.test(app));
-ok('캐시버스트', /replay\.js\?v=v597/.test(html) && /v2-app\.js\?v=v597/.test(html));
+ok('캐시버스트 (v597 이상)', (function(){var a=html.match(/replay\.js\?v=v(\d+)/),b=html.match(/v2-app\.js\?v=v(\d+)/);return a&&b&&+a[1]>=597&&+b[1]>=597;})());
 console.log('\n'+(fail?'FAIL':'PASS')+'  '+pass+'/'+(pass+fail));process.exit(fail?1:0);
