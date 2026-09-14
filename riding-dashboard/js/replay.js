@@ -1718,28 +1718,7 @@
        세일은 보드 앞 1/3 피벗(0,SAIL.pivotY)을 축으로 회전한다
        (.rd-ph__sail · updateSailIcon). 보드는 노즈가 위(−y)를 향한
        로컬 좌표로 그린다. (Danny 2026-05-24) */
-    var html =
-      '<div class="rd-ph"><div class="rd-ph__rot">' +
-        '<svg viewBox="-44 -44 88 88" width="56" height="56">' +
-          /* 보드 아웃라인 — 둥근 노즈·앞쪽 최대폭·둥근 테일 */
-          '<path class="rd-ph__board" d="M0,-26 C4.2,-25.4 8.4,-18 9.2,-7 ' +
-            'C9.7,1 8.2,15 4.6,23.5 C3,27.2 -3,27.2 -4.6,23.5 ' +
-            'C-8.2,15 -9.7,1 -9.2,-7 C-8.4,-18 -4.2,-25.4 0,-26 Z" ' +
-            'fill="#0A2540" stroke="#FFFFFF" stroke-width="1.8" ' +
-            'stroke-linejoin="round"/>' +
-          /* 데크 패드 — 방향감을 주는 옅은 안쪽 면 */
-          '<path d="M0,-3 C3,-3 5.4,0.5 5.4,6.5 C5.4,14 3.4,19 0,19 ' +
-            'C-3.4,19 -5.4,14 -5.4,6.5 C-5.4,0.5 -3,-3 0,-3 Z" ' +
-            'fill="#22425E"/>' +
-          /* 세일(윙) — 앞쪽 1/3 피벗에서 회전. 좌우 대칭 블레이드라
-             택 전환 시 회전 부호만으로 양쪽을 표현한다. */
-          '<g class="rd-ph__sail">' +
-            '<path d="M0,-13 C4.8,-11 5.8,3 3.3,17 C2.1,21.5 0.7,23 0,23 ' +
-              'C-0.7,23 -2.1,21.5 -3.3,17 C-5.8,3 -4.8,-11 0,-13 Z" ' +
-              'fill="#FFB000" stroke="#0A2540" stroke-width="1.4" ' +
-              'stroke-linejoin="round"/>' +
-          '</g>' +
-        '</svg></div></div>';
+    var html = boardIconHtml(BOARD_ME);
     var icon = L.divIcon({
       className: 'rd-ph-icon', html: html, iconSize: [56, 56], iconAnchor: [28, 28]
     });
@@ -1748,17 +1727,52 @@
     }).addTo(R.map);
 
     if (R.ghost) {
-      R.mapGhostPlayhead = L.circleMarker(
+      R.mapGhostPlayhead = L.marker(
         [R.ghost.session.samples[0].lat, R.ghost.session.samples[0].lng], {
-          radius: 7, color: '#FFFFFF', weight: 2,
-          fillColor: R.ghost.color, fillOpacity: 0, opacity: 0
+          icon: L.divIcon({ className: 'rd-ph-icon rd-ph-icon--ghost',
+                            html: boardIconHtml(ghostBoardColors(R.ghost.color)),
+                            iconSize: [56, 56], iconAnchor: [28, 28] }),
+          interactive: false, keyboard: false, zIndexOffset: 900, opacity: 0
         }).addTo(R.map);
+      R.ghostSail = { sailSide: null };
     }
 
     R.mapTrack = [];
     R.mapMans = [];
     R.mapGhostTrack = [];
     updateMapWindow();
+  }
+
+  /* §595 (옥대표 "두 배를 비교하고 있는데 하나는 그냥 점으로 나오네. 같은 배모양으로
+     만들되 색깔만 바꿔서") — 비교 상대가 7px 원이었다. 같은 보드·세일 SVG 를 쓰고
+     색만 바꾼다. 헤딩 회전·세일 방향도 같은 규칙으로. */
+  var BOARD_ME = { board: '#0A2540', deck: '#22425E', sail: '#FFB000' };
+  function ghostBoardColors(color) {
+    return { board: color || '#B86BFF', deck: 'rgba(255,255,255,0.28)', sail: '#FFFFFF' };
+  }
+  function boardIconHtml(c) {
+    return (
+      '<div class="rd-ph"><div class="rd-ph__rot">' +
+        '<svg viewBox="-44 -44 88 88" width="56" height="56">' +
+          /* 보드 아웃라인 — 둥근 노즈·앞쪽 최대폭·둥근 테일 */
+          '<path class="rd-ph__board" d="M0,-26 C4.2,-25.4 8.4,-18 9.2,-7 ' +
+            'C9.7,1 8.2,15 4.6,23.5 C3,27.2 -3,27.2 -4.6,23.5 ' +
+            'C-8.2,15 -9.7,1 -9.2,-7 C-8.4,-18 -4.2,-25.4 0,-26 Z" ' +
+            'fill="' + c.board + '" stroke="#FFFFFF" stroke-width="1.8" ' +
+            'stroke-linejoin="round"/>' +
+          /* 데크 패드 — 방향감을 주는 옅은 안쪽 면 */
+          '<path d="M0,-3 C3,-3 5.4,0.5 5.4,6.5 C5.4,14 3.4,19 0,19 ' +
+            'C-3.4,19 -5.4,14 -5.4,6.5 C-5.4,0.5 -3,-3 0,-3 Z" ' +
+            'fill="' + c.deck + '"/>' +
+          /* 세일(윙) — 앞쪽 1/3 피벗에서 회전. 좌우 대칭 블레이드라
+             택 전환 시 회전 부호만으로 양쪽을 표현한다. */
+          '<g class="rd-ph__sail">' +
+            '<path d="M0,-13 C4.8,-11 5.8,3 3.3,17 C2.1,21.5 0.7,23 0,23 ' +
+              'C-0.7,23 -2.1,21.5 -3.3,17 C-5.8,3 -4.8,-11 0,-13 Z" ' +
+              'fill="' + c.sail + '" stroke="' + c.board + '" stroke-width="1.4" ' +
+              'stroke-linejoin="round"/>' +
+          '</g>' +
+        '</svg></div></div>');
   }
 
   /* 지도에 표시할 트랙 시간범위를 갱신 — 연동 켜짐이면 트랙 줌 창,
@@ -1848,11 +1862,13 @@
        · 크기 = TWA 기반 기본각 + SOG 기반 개폐 (SAIL 상수)
        · 부호 = 택 (풍향 대비 헤딩이 어느 쪽인지) · 택/자이브 시
          R.sailSide 를 보간해 세일이 반대쪽으로 부드럽게 넘어간다 */
-  function updateSailIcon(st) {
-    if (!st || st.heading == null || R.windDir == null || st.twa == null) {
-      return null;
-    }
-    var twa = Math.abs(st.twa);
+  function updateSailIcon(st, holder) {
+    holder = holder || R;             /* §595 — 고스트는 자기 세일 방향을 따로 기억 */
+    if (!st || st.heading == null || R.windDir == null) return null;
+    /* 고스트 표본에는 twa 가 없을 수 있다(분석을 안 돌린 저장 트랙) — 헤딩으로 낸다 */
+    var twaRaw = st.twa != null ? st.twa : angDiff(R.windDir, st.heading);
+    if (twaRaw == null || !isFinite(twaRaw)) return null;
+    var twa = Math.abs(twaRaw);
     var sogKt = (st.speed || 0) * KT;
     /* 기본 받음각 — TWA 를 [twaMin,twaMax] → [angMin,angMax] 로 매핑 */
     var f = (twa - SAIL.twaMin) / (SAIL.twaMax - SAIL.twaMin);
@@ -1875,12 +1891,12 @@
        전환), 정지·스크럽 중엔 즉시 스냅(부분 전환 잔상 방지). */
     var awa = angDiff(R.windDir, st.heading);
     var target = (awa >= 0) ? -1 : 1;
-    if (R.sailSide == null || !R.playing) {
-      R.sailSide = target;
+    if (holder.sailSide == null || !R.playing) {
+      holder.sailSide = target;
     } else {
-      R.sailSide += (target - R.sailSide) * SAIL.flipLerp;
+      holder.sailSide += (target - holder.sailSide) * SAIL.flipLerp;
     }
-    return R.sailSide * mag;
+    return holder.sailSide * mag;
   }
 
   /* 재생 헤드 — 마커 이동·헤딩 회전·세일 거동. 보드 추적 시 화면
@@ -1934,11 +1950,28 @@
   function updateGhostPlayhead(st) {
     if (!R.map || !R.mapGhostPlayhead) return;
     if (!st || !isFinite(st.lat) || !isFinite(st.lng)) {
-      R.mapGhostPlayhead.setStyle({ opacity: 0, fillOpacity: 0 });
+      R.mapGhostPlayhead.setOpacity(0);
       return;
     }
     R.mapGhostPlayhead.setLatLng([st.lat, st.lng]);
-    R.mapGhostPlayhead.setStyle({ opacity: 1, fillOpacity: 0.95 });
+    R.mapGhostPlayhead.setOpacity(1);
+    /* §595 — 내 보드와 똑같이: 헤딩으로 돌리고 세일을 풍하측에 */
+    var rootEl = R.mapGhostPlayhead.getElement();
+    if (!rootEl) return;
+    var rot = rootEl.querySelector('.rd-ph__rot');
+    if (rot) {
+      rot.style.transform = (st.heading != null) ? 'rotate(' + st.heading + 'deg)' : 'rotate(0deg)';
+      rot.style.opacity = (st.heading != null) ? '1' : '0.35';
+    }
+    var sail = rootEl.querySelector('.rd-ph__sail');
+    if (sail) {
+      var sa = updateSailIcon(st, R.ghostSail || (R.ghostSail = { sailSide: null }));
+      if (sa == null) sail.style.display = 'none';
+      else {
+        sail.style.display = '';
+        sail.setAttribute('transform', 'rotate(' + sa.toFixed(1) + ' 0 ' + SAIL.pivotY + ')');
+      }
+    }
   }
 
   function recenterMap() {
