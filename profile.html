@@ -419,7 +419,7 @@
     <!-- DO_NOT_REVERT §169-N v3 — Danny 2026-05-13: §E 대시보드 + 자세히 보기 토글.
          compact = mini pentagon SVG (160×160) + score/100 + tier pill + stat row (약점·강점·Speed·Stance).
          empty state = greyed pentagon + CTA, 토글 X. -->
-    <section class="profile-section profile-section--dashboard">
+    <section class="card" style="padding:24px;margin:24px 0"><h2>계정 백업</h2><p>이 브라우저의 라이딩 기록을 계정에 백업해 다른 기기에서도 불러옵니다</p><button type="button" id="member-backup" class="btn btn-primary">라이딩 기록 계정에 백업</button><p id="member-backup-status" role="status" aria-live="polite"></p></section><section class="profile-section profile-section--dashboard">
       <h2 class="profile-section__title">스킬 진단 결과</h2>
       <!-- v2 — 데이터 주도 스킬 레벨 재평가 추천·동의 카드 (불일치 시에만 노출) -->
       <div id="skill-level-rec" hidden></div>
@@ -599,7 +599,7 @@
 <!-- §415 (Sprint 1.1) — 트랙·메타 cloud sync. 로그인 시 Supabase 의 라이딩
      세션을 로컬 namespace 로 pull → 위 '최근 라이딩' 목록이 cross-device 로 채워진다.
      DMJAuth 만 의존 (storage.js 불필요하지만 동일 namespace 키를 공유). -->
-<script src="riding-dashboard/js/cloud-sync.js?v=cloud-415-20260618" defer></script>
+<script src="riding-dashboard/js/cloud-sync.js?v=backup-20260925" defer></script>
 <!-- v2 데이터 주도 스킬 레벨 평가 — 추천·동의 카드 -->
 <script src="assets/js/skill-level.js" defer></script>
 <!-- §171-B cart system — for nav badge. -->
@@ -3216,5 +3216,5 @@
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="assets/css/agent-deny.css?tone=20260925-soft">
   <script src="assets/js/agent-deny.js" defer></script>
-<script src="assets/js/account-sync-status.js?v=1"></script><script src="assets/js/member-operations.js?v=20260925-names"></script></body>
+<script src="assets/js/account-sync-status.js?v=1"></script><script src="assets/js/member-operations.js?v=20260925-names"></script><script src="assets/js/member-backup.js?v=20260925"></script></body>
 </html>

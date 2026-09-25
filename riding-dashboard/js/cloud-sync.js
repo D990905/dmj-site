@@ -313,7 +313,7 @@
       /* 병합: 로컬 → cloud 덮어쓰기 (cloud-first), id 기준 합집합. tombstone 제외. */
       var byId = {};
       readSessions().forEach(function (rec) { if (rec && rec.id) byId[rec.id] = rec; });
-      cloudRecs.forEach(function (rec) { if (rec && rec.id) byId[rec.id] = rec; });
+      cloudRecs.forEach(function (rec) { if (rec && rec.id) { if (readLocalTrack(rec.id)) rec.hasTrack = true; byId[rec.id] = rec; } });
       var merged = [];
       for (var id in byId) { if (byId.hasOwnProperty(id) && !tomb[id]) merged.push(byId[id]); }
       merged.sort(function (a, b) { return (a.dateEpoch || 0) - (b.dateEpoch || 0); });
@@ -324,6 +324,53 @@
       console.warn('[RDCloud §415] pullSessions failed', e);
       return { ok: false, error: String((e && e.message) || e) };
     });
+  }
+
+  // Add missing account records and tracks without overwriting existing server data.
+  // Re-runnable after an interruption; local originals are never removed.
+  var _backupJob = null;
+  function backupMissingSessions() {
+    if (_backupJob) return _backupJob;
+    var owner = uid(), originals = readSessions().slice();
+    if (!owner) return Promise.resolve({ok:false, reason:'not-logged-in'});
+    var result = {ok:true, total:originals.length, completed:0, failed:0};
+    _backupJob = client().then(function (sb) {
+      return sb.auth.getUser().then(function (authRes) {
+        if (authRes.error || !authRes.data.user || authRes.data.user.id !== owner) throw new Error('로그인을 다시 확인해 주세요');
+        var chain = Promise.resolve();
+        originals.forEach(function (rec) {
+          chain = chain.then(function () {
+            if (uid() !== owner) throw new Error('계정이 변경되어 백업을 중단했습니다');
+            if (!rec || !rec.id || readTomb()[rec.id]) return;
+            var gpx = readLocalTrack(rec.id);
+            return sb.from('riding_sessions').upsert(recordToRow(owner, rec, false), {onConflict:'user_id,client_session_id',ignoreDuplicates:true})
+              .then(function (res) {
+                if (res.error) throw res.error;
+                return sb.from('riding_sessions').select('id').eq('user_id',owner).eq('client_session_id',rec.id).single();
+              }).then(function (res) {
+                if (res.error || !res.data) throw (res.error || new Error('세션 확인 실패'));
+                if (!gpx) return;
+                var rowId=res.data.id;
+                return sb.from('riding_files').select('id').eq('user_id',owner).eq('session_id',rowId).eq('kind','track').then(function(files) {
+                  if (files.error) throw files.error;
+                  if (files.data && files.data.length) return;
+                  return gzip(gpx).then(function(g) {
+                    if (uid() !== owner) throw new Error('계정 변경');
+                    var path=trackPath(owner,rec.id,g.gz),mime=g.gz?'application/gzip':'application/gpx+xml';
+                    return sb.storage.from(BUCKET).upload(path,g.blob,{upsert:false,contentType:mime}).then(function(up) {
+                      if (up.error && String(up.error.statusCode)!=='409') throw up.error;
+                      return sb.from('riding_files').upsert({session_id:rowId,user_id:owner,kind:'track',storage_bucket:BUCKET,storage_path:path,file_name:g.gz?'track.gpx.gz':'track.gpx',mime_type:mime,size_bytes:g.blob.size},{onConflict:'storage_bucket,storage_path',ignoreDuplicates:true});
+                    }).then(function(saved){if(saved.error)throw saved.error;});
+                  });
+                });
+              }).then(function(){result.completed++;}).catch(function(){result.failed++;result.ok=false;})
+              .then(function(){dispatch('rd:backup-progress',result);});
+          });
+        });
+        return chain;
+      });
+    }).then(function(){return result;}).catch(function(e){result.ok=false;result.error=String(e.message||e);return result;}).then(function(r){_backupJob=null;return r;});
+    return _backupJob;
   }
 
   /* ============================================================
@@ -479,6 +526,7 @@
   if (uid()) { try { autoSync(); } catch (e) {} }
 
   var RDCloud = {
+    backupMissingSessions: backupMissingSessions,
     pushSession: pushSession,
     pullSessions: pullSessions,
     ensureTrack: ensureTrack,
