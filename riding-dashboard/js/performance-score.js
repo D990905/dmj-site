@@ -25,13 +25,13 @@
         var c=domain[side], g=a.wind&&a.wind.tackSplit&&a.wind.tackSplit[key]&&a.wind.tackSplit[key][side];
         c.basis=key==='upwind'?'upwind-vmg-model':'downwind-sog-upwind-model';
         if (!g) { if (!windUsable) c.status='wind-unavailable'; return; }
-        c.count=g.count||0;c.seconds=g.timeSec||0;
+        c.count=finite(g.count)&&g.count>=0?g.count:0;c.seconds=finite(g.timeSec)&&g.timeSec>=0?g.timeSec:0;
         var m=g[key==='upwind'?'vmg':'sog'];
         var measured=m&&finite(m.top50)?m.top50*KT:null;
         var predicted=key==='upwind'?detail.predUpwindVmgKt:detail.predUpwindVboatKt;
         c.metrics={measuredKt:measured,referenceKt:finite(predicted)?predicted:null,scale:key==='upwind'?1.2:2.6};
         if (!windUsable) {c.status='wind-unavailable';return;}
-        if (!(measured>=0)||!(predicted>0)) {c.status='model-unavailable';return;}
+        if (!finite(measured)||!(measured>=0)||!finite(predicted)||!(predicted>0)) {c.status='model-unavailable';return;}
         if (c.seconds<60) {c.status=c.seconds>0?'insufficient':'no-data';return;}
         c.score=round(clamp(measured/predicted/c.metrics.scale*100));
         c.eligible=true;c.status='eligible';c.confidence=c.seconds>=180?'more-coverage':'limited';
@@ -48,7 +48,7 @@
           if(finite(m.lossPct))losses.push(m.lossPct);
           var observed=m.recoveryStatus==='recovered'||m.recoveryStatus==='not-recovered';
           if(!observed){censored++;return;}
-          if(!(m.refSpeedMs>0)||!finite(m.minSpeedMs)||typeof m.turnSuccess!=='boolean')return;
+          if(!finite(m.refSpeedMs)||!(m.refSpeedMs>0)||!finite(m.minSpeedMs)||m.minSpeedMs<0||typeof m.turnSuccess!=='boolean')return;
           if(m.recoveryStatus==='recovered'&&(!finite(m.recoverySec)||m.recoverySec<0))return;
           var recovery=m.recoveryStatus==='recovered'?m.recoverySec:null;
           if(recovery!=null)recoveries.push(recovery);
@@ -57,7 +57,7 @@
           scores.push(.4*retention+.3*recScore+.3*(m.turnSuccess?100:0));
         });
         c.validCount=scores.length;c.censoredCount=censored;
-        c.metrics={lossPct:mean(losses),recoverySec:mean(recoveries),recoveredCount:recoveries.length,successCount:success,attemptCount:turns.length,successRate:turns.length?100*success/turns.length:null};
+        c.metrics={lossPct:mean(losses),recoverySec:mean(recoveries),recoveredCount:recoveries.length,notRecoveredCount:turns.filter(function(m){return m.recoveryStatus==='not-recovered';}).length,censoredCount:censored,successCount:success,attemptCount:turns.length,successRate:turns.length?100*success/turns.length:null};
         if(!windUsable){c.status='wind-unavailable';return;}
         if(!turns.length)return;
         // Do not drop poorly observed attempts and inflate the remaining score.
