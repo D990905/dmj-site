@@ -5918,13 +5918,13 @@
       "category": "accessory",
       "subcategory": "harness",
       "path": "products/wip/wing-belt-3-0.html",
-      "image": "",
-      "description": "주문 모델은 Wing Belt 3.0입니다. 본사 주소가 현재 4.0 정보로 연결되어 3.0의 사진과 세부 사양은 추가 확인 후 안내합니다.",
-      "headline": "Wing Belt 3.0",
-      "manufacturerSummary": "주문 모델은 Wing Belt 3.0입니다. 본사 주소가 현재 4.0 정보로 연결되어 3.0의 사진과 세부 사양은 추가 확인 후 안내합니다.",
-      "source": "https://www.forward-wip.com/site-map/",
-      "verifiedAt": "2026-09-24",
-      "sourceStatus": "model-confirmation-needed",
+      "image": "assets/images/wip/ordered/wing-belt-3-0.jpg",
+      "description": "등 지지부를 보강한 경량 윙 벨트입니다. 50mm 복합소재 훅과 윙 리시용 다이니마 루프 두 개를 갖췄습니다.",
+      "headline": "등 지지력을 더한 가벼운 윙 벨트",
+      "manufacturerSummary": "등 지지부를 보강한 경량 윙 벨트입니다. 50mm 복합소재 훅과 윙 리시용 다이니마 루프 두 개를 갖췄습니다.",
+      "source": "https://www.forward-wip.com/fr/produit/wing-belt-3-0/",
+      "verifiedAt": "2026-09-25",
+      "sourceStatus": "manufacturer-verified",
       "options": [
         "원 사이즈"
       ],
@@ -5942,8 +5942,11 @@
       ],
       "purposes": [],
       "specs": {
-        "모델": "Wing Belt 3.0",
-        "세부 사양": "주문 연식 확인 필요"
+        "모델 코드": "HAWIPWIN33",
+        "사이즈": "One Size",
+        "훅": "50mm 플라스틱 복합소재",
+        "윙 리시 연결": "다이니마 루프 2개",
+        "후면": "탈착식 보드 리시 연결"
       },
       "notes": [
         "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
@@ -5973,13 +5976,13 @@
       "category": "accessory",
       "subcategory": "harness",
       "path": "products/wip/wing-wind-hybrid-belt.html",
-      "image": "",
-      "description": "주문 모델은 Wing-Wind Hybrid Belt입니다. 현재 본사 Wing Belt 4.0과 모델 코드가 달라 해당 모델의 사진·세부 사양 확인이 필요합니다.",
-      "headline": "Wing-Wind Hybrid Belt",
-      "manufacturerSummary": "주문 모델은 Wing-Wind Hybrid Belt입니다. 현재 본사 Wing Belt 4.0과 모델 코드가 달라 해당 모델의 사진·세부 사양 확인이 필요합니다.",
-      "source": "https://www.forward-wip.com/site-map/",
-      "verifiedAt": "2026-09-24",
-      "sourceStatus": "model-confirmation-needed",
+      "image": "assets/images/wip/ordered/wing-wind-hybrid-belt.jpg",
+      "description": "윙포일과 윈드서핑에 사용하는 하이브리드 벨트입니다. 측면 스트랩으로 조절하며 등 지지부와 후면 보드 리시 루프를 갖췄습니다.",
+      "headline": "윙과 윈드서핑을 위한 하이브리드 벨트",
+      "manufacturerSummary": "윙포일과 윈드서핑에 사용하는 하이브리드 벨트입니다. 측면 스트랩으로 조절하며 등 지지부와 후면 보드 리시 루프를 갖췄습니다.",
+      "source": "https://windforce.ca/products/forward-wip-wing-wind-hybrid-belt",
+      "verifiedAt": "2026-09-25",
+      "sourceStatus": "retailer-model-matched",
       "options": [
         "S/M"
       ],
@@ -5997,10 +6000,10 @@
       ],
       "purposes": [],
       "specs": {
-        "주문 모델": "Wing-Wind Hybrid Belt",
-        "주문 사이즈": "S/M",
         "모델 코드": "HAWIPWIN44",
-        "주문 구성에서 선택": "S/M"
+        "주문 사이즈": "S/M",
+        "조절 방식": "측면 스트랩",
+        "후면": "보드 리시 연결 루프"
       },
       "notes": [
         "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
