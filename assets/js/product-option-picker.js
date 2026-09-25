@@ -2,13 +2,14 @@
  const original=document.getElementById('detail-option'),inquiry=document.getElementById('detail-inquiry');
  if(!original||!inquiry)return;
  const id=new URL(inquiry.href,location.href).searchParams.get('product');
- if(!id?.startsWith('ppc-'))return;
+ const takoonParawing=['takoon-cloud-one','takoon-parawing-cloud','takoon-parawing-cloud-lw'].includes(id);
+ if(!id?.startsWith('ppc-')&&!takoonParawing)return;
  const rows=Array.from(original.options).filter(o=>o.value).map(o=>({value:o.value,parts:o.value.split(' / '),price:Number(o.dataset.priceKrw)}));
  if(!rows.length||rows.some(r=>!r.price||r.parts.length!==rows[0].parts.length))return;
  const count=rows[0].parts.length,chosen=Array(count).fill('');
  let edition='26/27'; const splitEdition=id==='ppc-m2';
  if(count<1||count>3)return;
- const labels=count===3?['사이즈','색상','핸들 구성']:id==='ppc-r1'?['보드 사이즈','포일 연결 방식']:id==='ppc-orbit'?['사이즈','색상']:['사이즈','핸들 구성'];
+ const labels=count===3?['사이즈','색상','핸들 구성']:id==='ppc-r1'?['보드 사이즈','포일 연결 방식']:id==='ppc-orbit'||takoonParawing?['사이즈','색상']:['사이즈','핸들 구성'];
  function korean(s){return s.replace(/ \(2[56]\/2[67]\)/g,'').replaceAll('White/Grey','화이트 / 그레이').replaceAll('Green/Grey','그린 / 그레이').replaceAll('Dual Handles','듀얼 핸들').replaceAll('Single Boom','싱글 붐').replaceAll('(long bag incl)','(긴 가방 포함)').replaceAll('Leading Edge Handle','리딩엣지 핸들').replaceAll('Orange/Peacock','오렌지 / 피콕').replaceAll('Track','트랙').replaceAll('Tuttle','터틀');}
  const host=document.createElement('div');host.className='product-option-picker';host.setAttribute('aria-label','제품 옵션 선택');
  if(splitEdition){

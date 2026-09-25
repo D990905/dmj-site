@@ -7045,6 +7045,454 @@
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "priceFixedAt": "2026-09-25"
+    },
+    {
+      "id": "takoon-cloud-one",
+      "brand": "takoon",
+      "name": "Parawing Cloud One",
+      "category": "parawing",
+      "path": "products/takoon/cloud-one.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---Fuchsia---Image-02.png?v=1778138889",
+      "description": "54 g/㎡ 트리플 립스톱 원단과 카본 바를 적용한 모델입니다. Cloud와 같은 설계를 바탕으로 파라윙 입문과 단계적인 숙련에 초점을 맞췄습니다.",
+      "headline": "내구성과 가성비로 시작하는 파라윙",
+      "options": [
+        "2m / Fushia",
+        "2m / Orange",
+        "2m / Turquoise",
+        "3m / Fushia",
+        "3m / Orange",
+        "3m / Turquoise",
+        "4m / Fushia",
+        "4m / Orange",
+        "4m / Turquoise"
+      ],
+      "retailVariants": [
+        {
+          "option": "2m / Fushia",
+          "priceKRW": 540000,
+          "sku": "TKPARAONE2C3",
+          "estimated": false
+        },
+        {
+          "option": "2m / Orange",
+          "priceKRW": 540000,
+          "sku": "TKPARACONE25C2",
+          "estimated": false
+        },
+        {
+          "option": "2m / Turquoise",
+          "priceKRW": 540000,
+          "sku": "TKPARACONE25C1",
+          "estimated": false
+        },
+        {
+          "option": "3m / Fushia",
+          "priceKRW": 590000,
+          "sku": "TKPARAONE3C3",
+          "estimated": false
+        },
+        {
+          "option": "3m / Orange",
+          "priceKRW": 590000,
+          "sku": "TKPARACONE03C2",
+          "estimated": false
+        },
+        {
+          "option": "3m / Turquoise",
+          "priceKRW": 590000,
+          "sku": "TKPARACONE03C1",
+          "estimated": false
+        },
+        {
+          "option": "4m / Fushia",
+          "priceKRW": 640000,
+          "sku": "TKPARAONE4C3",
+          "estimated": false
+        },
+        {
+          "option": "4m / Orange",
+          "priceKRW": 640000,
+          "sku": "TKPARACONE04C2",
+          "estimated": false
+        },
+        {
+          "option": "4m / Turquoise",
+          "priceKRW": 640000,
+          "sku": "TKPARACONE04C1",
+          "estimated": false
+        }
+      ],
+      "price": 540000,
+      "priceMax": 640000,
+      "priceStatus": "fixed",
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/cloud-one",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "parawing",
+      "purposes": [
+        "parawing"
+      ],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---Fuchsia---Image-02.png?v=1778138889",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---Fuchsia---Image-05.png?v=1778138893",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---Fuchsia---Image-01.png?v=1778138899",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---C2---Image-01.png?v=1770287486"
+      ],
+      "verifiedAt": "2026-09-25",
+      "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
+      "priceFixedAt": "2026-09-25",
+      "notes": [
+        "파라윙 조작 경험과 보드·포일 조합을 함께 확인"
+      ],
+      "tables": [
+        [
+          [
+            "면적 (㎡)",
+            "2",
+            "3",
+            "4"
+          ],
+          [
+            "스팬 (m)",
+            "2.26",
+            "2.77",
+            "3.2"
+          ],
+          [
+            "코드 (m)",
+            "1.05",
+            "1.29",
+            "1.49"
+          ],
+          [
+            "라인 길이 (m)",
+            "1.42",
+            "1.70",
+            "1.76"
+          ],
+          [
+            "라인 포함 중량 · 바 제외 (g)",
+            "445",
+            "585",
+            "700"
+          ],
+          [
+            "바 중량 (g)",
+            "130",
+            "130",
+            "130"
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "takoon-parawing-cloud",
+      "brand": "takoon",
+      "name": "Parawing Cloud",
+      "category": "parawing",
+      "path": "products/takoon/parawing-cloud.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---Image-10.png?v=1775658233",
+      "description": "Skytex 캐노피를 적용해 가벼움과 반응성을 강조한 모델입니다. 풍상 주행과 부드러운 출력 조절을 고려했으며 카본 바와 색상별 브라이들로 조작과 정리를 돕습니다.",
+      "headline": "가벼운 조작감과 풍상 성능을 위한 파라윙",
+      "options": [
+        "2.5 / C5",
+        "2.5 / C6",
+        "2.5 / White",
+        "3.0 / C5",
+        "3.0 / C6",
+        "3.0 / White",
+        "3.5 / C5",
+        "3.5 / C6",
+        "3.5 / White",
+        "4.0 / C5",
+        "4.0 / C6",
+        "4.0 / White",
+        "4.7 / C5",
+        "4.7 / C6",
+        "4.7 / White"
+      ],
+      "retailVariants": [
+        {
+          "option": "2.5 / C5",
+          "priceKRW": 640000,
+          "sku": "TKPCLC5GB25",
+          "estimated": false
+        },
+        {
+          "option": "2.5 / C6",
+          "priceKRW": 640000,
+          "sku": "TKPCLC6GR25",
+          "estimated": false
+        },
+        {
+          "option": "2.5 / White",
+          "priceKRW": 640000,
+          "sku": "TKPARAC25",
+          "estimated": false
+        },
+        {
+          "option": "3.0 / C5",
+          "priceKRW": 680000,
+          "sku": "TKPCLC5GB30",
+          "estimated": false
+        },
+        {
+          "option": "3.0 / C6",
+          "priceKRW": 680000,
+          "sku": "TKPCLC6GR30",
+          "estimated": false
+        },
+        {
+          "option": "3.0 / White",
+          "priceKRW": 680000,
+          "sku": "TKPARAC30",
+          "estimated": false
+        },
+        {
+          "option": "3.5 / C5",
+          "priceKRW": 710000,
+          "sku": "TKPCLC5GB35",
+          "estimated": false
+        },
+        {
+          "option": "3.5 / C6",
+          "priceKRW": 710000,
+          "sku": "TKPCLC6GR35",
+          "estimated": false
+        },
+        {
+          "option": "3.5 / White",
+          "priceKRW": 710000,
+          "sku": "TKPARAC35",
+          "estimated": false
+        },
+        {
+          "option": "4.0 / C5",
+          "priceKRW": 730000,
+          "sku": "TKPCLC5GB40",
+          "estimated": false
+        },
+        {
+          "option": "4.0 / C6",
+          "priceKRW": 730000,
+          "sku": "TKPCLC6GR40",
+          "estimated": false
+        },
+        {
+          "option": "4.0 / White",
+          "priceKRW": 730000,
+          "sku": "TKPARAC40",
+          "estimated": false
+        },
+        {
+          "option": "4.7 / C5",
+          "priceKRW": 920000,
+          "sku": "TKPCLC5GB47",
+          "estimated": false
+        },
+        {
+          "option": "4.7 / C6",
+          "priceKRW": 770000,
+          "sku": "TKPCLC6GR47",
+          "estimated": false
+        },
+        {
+          "option": "4.7 / White",
+          "priceKRW": 770000,
+          "sku": "TKPARAC45",
+          "estimated": false
+        }
+      ],
+      "price": 640000,
+      "priceMax": 920000,
+      "priceStatus": "fixed",
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/parawing-cloud",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "parawing",
+      "purposes": [
+        "parawing"
+      ],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---Image-10.png?v=1775658233",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---Image-09.png?v=1775658233",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---C6---Image-01.png?v=1775658233",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---C6---Image-02.png?v=1775658233"
+      ],
+      "verifiedAt": "2026-09-25",
+      "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
+      "priceFixedAt": "2026-09-25",
+      "notes": [
+        "파라윙 조작 경험과 보드·포일 조합을 함께 확인"
+      ],
+      "tables": [
+        [
+          [
+            "면적 (㎡)",
+            "2.5",
+            "3",
+            "3.5",
+            "4",
+            "4.7"
+          ],
+          [
+            "스팬 (m)",
+            "2.53",
+            "2.77",
+            "2.99",
+            "3.2",
+            "3.47"
+          ],
+          [
+            "코드 (m)",
+            "1.17",
+            "1.29",
+            "1.39",
+            "1.49",
+            "1.61"
+          ],
+          [
+            "라인 길이 (m)",
+            "1.55",
+            "1.70",
+            "1.70",
+            "1.76",
+            "1.80"
+          ],
+          [
+            "라인 포함 중량 · 바 제외 (g)",
+            "350",
+            "420",
+            "490",
+            "560",
+            "630"
+          ],
+          [
+            "바 중량 (g)",
+            "130",
+            "130",
+            "130",
+            "130",
+            "130"
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "takoon-parawing-cloud-lw",
+      "brand": "takoon",
+      "name": "Parawing Cloud LW",
+      "category": "parawing",
+      "path": "products/takoon/parawing-cloud-lw.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-01_updated.png?v=1783525112",
+      "description": "28 g Lightex 원단을 사용한 약풍용 모델입니다. 저속에서의 견인력과 빠른 이륙을 지향하며 충분한 볼륨의 미드렝스 보드와 조합하는 구성을 본사가 권장합니다.",
+      "headline": "약한 바람에 집중한 대면적 파라윙",
+      "options": [
+        "5.5",
+        "6.0",
+        "6.5"
+      ],
+      "retailVariants": [
+        {
+          "option": "5.5",
+          "priceKRW": 880000,
+          "sku": "TKPARAWINGCLW55",
+          "estimated": false
+        },
+        {
+          "option": "6.0",
+          "priceKRW": 920000,
+          "sku": "TKPARAWINGCLW6",
+          "estimated": false
+        },
+        {
+          "option": "6.5",
+          "priceKRW": 970000,
+          "sku": "TKPARAWINGCLW65",
+          "estimated": false
+        }
+      ],
+      "price": 880000,
+      "priceMax": 970000,
+      "priceStatus": "fixed",
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/parawing-cloud-lw",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "parawing",
+      "purposes": [
+        "parawing"
+      ],
+      "environments": [
+        "light"
+      ],
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-01_updated.png?v=1783525112",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-01_1a1e5834-19f2-4deb-ad05-c20cbf7d4968.png?v=1783516410",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-02_9d7ef0ce-f648-489b-8cd8-482d92319c3e.png?v=1783516410",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-03_663d412a-5a9e-48bd-a8cc-94e4ac6678f3.png?v=1783516410"
+      ],
+      "verifiedAt": "2026-09-25",
+      "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
+      "priceFixedAt": "2026-09-25",
+      "notes": [
+        "파라윙 조작 경험과 보드·포일 조합을 함께 확인"
+      ],
+      "tables": [
+        [
+          [
+            "면적 (㎡)",
+            "5.5",
+            "6",
+            "6.5"
+          ],
+          [
+            "스팬 (m)",
+            "3.75",
+            "3.92",
+            "4.08"
+          ],
+          [
+            "코드 (m)",
+            "1.74",
+            "1.81",
+            "1.89"
+          ],
+          [
+            "라인 길이 (m)",
+            "1.82",
+            "1.90",
+            "1.98"
+          ],
+          [
+            "라인 포함 중량 · 바 제외 (g)",
+            "730",
+            "770",
+            "810"
+          ],
+          [
+            "바 중량 (g)",
+            "130",
+            "130",
+            "130"
+          ]
+        ]
+      ]
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님"
