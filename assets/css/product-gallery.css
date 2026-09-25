@@ -1,0 +1,11 @@
+.detail-photo{position:relative}
+.gallery-expand{position:absolute;right:16px;bottom:16px;border:1px solid #d5d8d0;border-radius:24px;background:#fff;color:#202621;padding:8px 16px;font-size:14px}
+.product-lightbox{width:min(1100px,94vw);max-width:94vw;height:min(850px,92dvh);max-height:92dvh;padding:64px 24px 72px;border:0;border-radius:12px;background:#fff;color:#202621;overflow:hidden}
+.product-lightbox::backdrop{background:rgb(15 22 18 / 80%)}
+.gallery-frame{width:100%;height:100%;display:grid;place-items:center;overflow:hidden}
+.product-lightbox .gallery-large{width:100%;height:100%;max-height:100%;object-fit:contain}
+.gallery-close{position:absolute;right:16px;top:12px;border:0;background:#f2f3ef;padding:10px 16px;border-radius:24px;z-index:1}
+.gallery-controls{position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:center;align-items:center;gap:24px;background:#fff}
+.gallery-controls button{border:0;background:#f2f3ef;border-radius:24px;padding:10px 16px;min-height:44px;color:#202621}
+.gallery-controls p{font-size:14px;margin:0;text-align:center}
+@media(max-width:600px){.product-lightbox{padding:64px 16px 76px;height:82dvh}.gallery-controls{gap:12px}.gallery-controls button{padding:10px 12px}}
