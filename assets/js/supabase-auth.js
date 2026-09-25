@@ -798,6 +798,41 @@
   }
 
   // 로그인 시 cloud → localStorage pull (다른 디바이스에서 변경된 데이터 동기화)
+  // Import only authenticated account-scoped legacy fields missing on the server.
+  // ignoreDuplicates prevents overwriting data concurrently saved on another device.
+  function _importMissingMemberFields(owner, present) {
+    var chain = Promise.resolve();
+    ['gear', 'profile_extra'].forEach(function (suffix) {
+      chain = chain.then(function () {
+        if (!cachedSession || cachedSession.user.id !== owner || currentUserId() !== owner) return;
+        if (present[suffix] || _readPending(owner, suffix)) return;
+        if (localStorage.getItem('dmj_synced_' + owner + '_' + suffix)) return;
+        var raw = localStorage.getItem(USER_NS_PREFIX + owner + '_' + suffix), value;
+        try { value = JSON.parse(raw); } catch (_) { return; }
+        if (suffix === 'gear' ? !Array.isArray(value) || !value.length : !value || Array.isArray(value) || typeof value !== 'object' || !Object.keys(value).length) return;
+        var key = owner + ':' + suffix;
+        if (_syncRunning[key]) return;
+        var revision = _syncRevision[key] || 0;
+        var pendingImport = sb.auth.getUser().then(function (auth) {
+          if (auth.error || !auth.data.user || auth.data.user.id !== owner || !cachedSession || cachedSession.user.id !== owner) return;
+          if (_readPending(owner, suffix) || (_syncRevision[key] || 0) !== revision) return;
+          return sb.from('user_data').upsert({user_id:owner, suffix:suffix, data:value}, {onConflict:'user_id,suffix', ignoreDuplicates:true}).select('suffix').then(function (res) {
+            if (res.error) throw res.error;
+            if (res.data && res.data.length) _markCloudKnown(owner, suffix);
+          });
+        }).catch(function () {
+          // Keep original local fields intact; a later login can retry.
+        }).then(function () {
+          delete _syncRunning[key];
+          if (_readPending(owner, suffix)) return _drainCloudWrite(owner, suffix);
+        });
+        _syncRunning[key] = pendingImport;
+        return pendingImport;
+      });
+    });
+    return chain;
+  }
+
   var _pullGeneration = 0;
   function pullUserDataFromCloud() {
     return ensureClient().then(function () {
@@ -861,6 +896,7 @@
           }
         }
         _retryPending();
+        if (!udRes.error && Array.isArray(udRes.data)) return _importMissingMemberFields(uid, present);
       });
     });
   }

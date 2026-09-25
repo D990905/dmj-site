@@ -590,7 +590,7 @@
   <option value="Flash 3/2mm Wetsuit"><option value="Flash 4/3mm Wetsuit"><option value="Wetsuit Boots 3mm">
 </datalist>
 
-<script src="assets/js/supabase-auth.js?v=supabase-187-20260604" defer></script>
+<script src="assets/js/supabase-auth.js?v=member-import-20260925" defer></script>
 <!-- §412 (Alex Park #4 · 2026-06-11) — 라이딩 storage per-user namespace + legacy
      마이그레이션 (RDStorage.migrateLegacyIfNeeded). 마이페이지는 storage.js 를
      쓰지 않았으나, 전역 bare 'rd_*' 키 제거(데이터 격리)를 위해 마이그레이션을
@@ -3075,7 +3075,7 @@
           '</div>';
         }
 
-        var detailHref = 'riding-dashboard/?session=' + encodeURIComponent(r.id || '');
+        var detailHref = 'riding-dashboard/v2.html?session=' + encodeURIComponent(r.id || '');
         return '<a class="ride-row" href="' + detailHref + '">' +
           commonCells +
           '<span class="ride-row__chev" aria-hidden="true">→</span>' +
@@ -3089,7 +3089,7 @@
           '<div class="rides-empty">' +
             '<p class="rides-empty__title">아직 저장된 라이딩이 없습니다.</p>' +
             '<p class="rides-empty__sub">라이딩 대시보드에서 GPX 파일을 업로드하면 이 곳에 표시됩니다.</p>' +
-            '<a href="riding-dashboard/" class="rides-empty__cta">라이딩 대시보드로 이동 →</a>' +
+            '<a href="riding-dashboard/v2.html" class="rides-empty__cta">라이딩 대시보드로 이동 →</a>' +
           '</div>';
         actionsEl.hidden = true;
         if (countBadge) countBadge.textContent = '';
