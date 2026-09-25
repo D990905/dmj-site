@@ -1,0 +1,17 @@
+/* Shared DMJ service palette: coach and account forms. */
+:root,:root[data-dmj-theme="light"],:root[data-dmj-theme="dark"] {
+  --s-page:#f9f9f5; --s-card:#ffffff; --s-sunk:#f0f0e9; --s-hover:#e9eadf;
+  --t-main:#202522; --t-mid:#535b51; --t-dim:#666d61; --t-on-accent:#202522;
+  --line:#dedfd5; --line-firm:#c6c9bc;
+  --navy:#202522; --sea:#626b32; --sea-deep:#424923; --sun:#e2e635;
+  --warn:#8a5b27; --ok:#347a44; --bad:#b04436;
+  --shadow:0 1px 2px rgb(32 37 34 / 4%),0 8px 20px -6px rgb(32 37 34 / 8%);
+  color-scheme:light;
+}
+.dmj .btn--primary {background:#e2e635;border-color:#d1d329;color:#202522;}
+.dmj .btn--primary:hover {background:#d5da2c;filter:none;}
+.dmj .dmj-bridge a {color:#202522;}
+.dmj :is(h1,h2,h3,p,label) {word-break:keep-all;overflow-wrap:break-word;}
+.dmj .t-lead {line-height:1.8;max-width:72ch;}
+.dmj .input:focus {border-color:#92995a;outline-color:#626b32;box-shadow:0 0 0 3px rgb(146 153 90 / 16%);}
+.dmj :is(a,button):focus-visible {outline:2px solid #626b32;outline-offset:3px;}

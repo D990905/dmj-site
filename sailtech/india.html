@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Team India Techno 293 — Go Get Gold</title>
+<meta name="description" content="India's Techno 293 youth national squad — follow the campaign, meet the sailors, support the team." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* CSS vars kept for markup injected by the data scripts (inline var() styles) */
+  :root { --mono:'IBM Plex Mono',monospace; --gold:#E2AE3D; --saf:#FF9933; --grn:#138808; --dim:#a1a895; --mute:#b9bdb0; }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: #202522; color: #EDEFF3; font-family: "Barlow", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: #E2AE3D; text-decoration: none; }
+  a:hover { color: #FF9933; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: #FF9933; color: #202522; }
+  .lockmark { width: .78em; height: .78em; margin-left: .34em; vertical-align: -.04em; fill: none; stroke: currentColor; stroke-width: 1.8; display: inline-block; }
+
+  .nav-link { padding: 8px 12px; color: #b9bdb0; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; }
+  .nav-link:hover { color: #fff; }
+  .nav-link.on { color: #fff; border-bottom-color: #FF9933; }
+  .cta-saf { display: inline-flex; padding: 14px 24px; background: #FF9933; color: #202522; border-radius: 2px; font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 500; }
+  .cta-saf:hover { background: #E2AE3D; color: #202522; }
+  .cta-ghost { display: inline-flex; margin-top: 20px; padding: 12px 20px; border: 1px solid #555d4d; color: #E2AE3D; border-radius: 2px; font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; }
+  .cta-ghost:hover { border-color: #E2AE3D; }
+  .cta-dark { justify-self: start; display: inline-flex; padding: 16px 28px; background: #202522; color: #fff; border-radius: 2px; font-family: "IBM Plex Mono", monospace; font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; }
+  .cta-dark:hover { background: #FF9933; color: #202522; }
+
+  /* --- injected by team/data scripts: highlight cards (.h) --- */
+  #hl { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+  #hl:empty { display: none; }
+  .h { background: linear-gradient(160deg, #2b322a 0%, #242b24 100%); border: 1px solid #484f41; border-left: 3px solid #E2AE3D; border-radius: 3px; padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 7px; }
+  .h strong, .h b { font-family: "Archivo", sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -.01em; color: #fff; }
+  .h span, .h small, .h em { font-family: "IBM Plex Mono", monospace; font-style: normal; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: #b9bdb0; }
+  .h .m { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #b9bdb0; }
+  .h .rank, .h .pos, .h u { font-family: "Archivo", sans-serif; font-weight: 900; font-size: 40px; line-height: 1; color: #E2AE3D; text-decoration: none; }
+
+  /* --- injected by team/data scripts: athlete cards (.ath) --- */
+  #squad, .staff { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .ath { background: #292f29; border: 1px solid #484f41; border-radius: 3px; overflow: hidden; display: flex; flex-direction: column; padding-bottom: 15px; transition: border-color .18s ease, transform .18s ease; }
+  .ath:hover { border-color: #FF9933; transform: translateY(-2px); }
+  .ath img { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top center; background: #333a31; filter: saturate(.92) contrast(1.04); }
+  .ath .ph { width: 100%; aspect-ratio: 3/4; background: repeating-linear-gradient(135deg, #333a31 0 10px, #3b4238 10px 20px); display: flex; align-items: center; justify-content: center; font-size: 34px; }
+  .ath b, .ath strong, .ath .n { display: block; font-family: "Archivo", sans-serif; font-weight: 700; font-size: 16px; letter-spacing: -.005em; color: #fff; margin: 13px 14px 0; }
+  .ath .m { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #b9bdb0; margin: 4px 14px 0; min-height: 14px; }
+  .ath .rk { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; letter-spacing: .08em; color: #E2AE3D; margin: 5px 14px 0; min-height: 15px; }
+  .staff .ath { border-color: rgba(226,174,61,.55); }
+  .staff .ath .m { color: #E2AE3D; }
+
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; }
+  @media (max-width: 860px) { .grid4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .grid4 { grid-template-columns: 1fr; } }
+
+  /* --- season timeline --- */
+  .ev { position: relative; display: grid; grid-template-columns: 14px 1fr; align-items: stretch; }
+  .ev-mark { grid-row: 1 / span 2; }
+  .ev-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; padding: 22px 26px 0 12px; }
+  .ev-step { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .16em; color: #a1a895; }
+  .ev-name { font-family: "Archivo", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -.01em; margin: 0; color: #fff; }
+  .ev-venue { font-family: "IBM Plex Mono", monospace; font-weight: 400; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: #b9bdb0; margin-left: 10px; }
+  .ev-status { margin-left: auto; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; border: 1px solid #555d4d; color: #b9bdb0; }
+  .ev-status[data-state="live"] { border-color: #FF9933; color: #FF9933; }
+  .ev-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; padding: 18px 26px 26px 12px; }
+  @media (max-width: 820px) { .ev-body { grid-template-columns: 1fr; gap: 20px; } .ev-status { margin-left: 0; } }
+  .ev-col { display: flex; flex-direction: column; gap: 8px; }
+  .ev-label { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #a1a895; }
+  .ev-note { margin: 0; font-size: 15px; line-height: 1.62; color: #AAB6C6; }
+  .ev-note[data-slot] { color: #a1a895; font-style: italic; }
+  .ev-result { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; line-height: 1.7; color: #E2AE3D; border-left: 2px solid #E2AE3D; padding-left: 12px; }
+
+  /* --- VMG proof bands (rendered from canonical data at runtime) --- */
+  .bands { display: flex; flex-direction: column; gap: 14px; margin-top: 34px; }
+  .band { display: grid; grid-template-columns: 168px 1fr 110px; align-items: center; gap: 18px; }
+  @media (max-width: 700px) { .band { grid-template-columns: 1fr; gap: 6px; } }
+  .bl { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #b9bdb0; }
+  .bl em { display: block; font-style: normal; font-size: 9.5px; letter-spacing: .06em; color: #a1a895; text-transform: none; margin-top: 2px; }
+  .bt { position: relative; height: 26px; background: #101E32; border: 1px solid #1C2B41; }
+  .bt i { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, #C86A1E 0%, #FF9933 100%); }
+  .bt b { position: absolute; top: -3px; width: 2px; height: calc(100% + 6px); background: #EDEFF3; }
+  .bt b::after { content: attr(data-was); position: absolute; left: 50%; transform: translateX(-50%); top: -17px; font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: .06em; color: #b9bdb0; white-space: nowrap; }
+  .bv { font-family: "Archivo", sans-serif; font-weight: 800; font-size: 19px; color: #fff; text-align: right; }
+  .bv em { display: block; font-family: "IBM Plex Mono", monospace; font-style: normal; font-weight: 400; font-size: 11px; letter-spacing: .08em; color: #a1a895; margin-top: 2px; }
+  .bv em.up { color: #4FB47A; }
+</style>
+<link rel="stylesheet" href="india-dmj.css?tone=20260925-soft"><link rel="stylesheet" href="../assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<body>
+<div style="max-width:100%;overflow-x:hidden">
+
+  <header style="position:sticky;top:0;z-index:50;background:rgba(10,20,34,.9);backdrop-filter:blur(12px);border-bottom:1px solid #1C2B41">
+    <div style="max-width:1200px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="india.html" style="display:flex;align-items:center;gap:11px;color:#fff">
+        <span style="display:flex;width:26px;height:18px;border-radius:2px;overflow:hidden;flex-direction:column"><i style="flex:1;background:#FF9933"></i><i style="flex:1;background:#fff"></i><i style="flex:1;background:#138808"></i></span>
+        <span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;letter-spacing:.02em">TEAM INDIA <span style="color:#b9bdb0;font-weight:600">· T293</span></span>
+      </a>
+      <nav style="display:flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase">
+        <a href="home.html" class="nav-link">Coach</a>
+        <a href="india.html" class="nav-link on">Team India</a>
+        <a href="https://sailtechco.com/team/" class="nav-link">Team Hub<svg class="lockmark" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="11" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg></a>
+      </nav>
+    </div>
+  </header>
+
+  <section style="position:relative;border-bottom:1px solid #1C2B41;background:radial-gradient(120% 90% at 78% 8%, #16304E 0%, #202522 62%)">
+    <div style="max-width:1200px;margin:0 auto;padding:76px 24px 60px">
+      <p style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#b9bdb0;margin:0 0 26px">India · Techno 293 Youth National Squad</p>
+      <h1 style="font-family:'Archivo',sans-serif;font-weight:900;font-size:clamp(40px,8vw,104px);line-height:.94;letter-spacing:-.03em;margin:0;color:#fff;max-width:14ch;text-wrap:balance">Eight young sailors. <span style="display:block;color:#E2AE3D">One goal —</span><span style="display:block"><span style="color:#FF9933">GO</span> <span style="color:#fff">GET</span> <span style="color:#138808">GOLD</span>.</span></h1>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:36px;margin-top:40px;align-items:start">
+        <p style="margin:0;font-size:17px;line-height:1.62;color:#AAB6C6;max-width:56ch">India's Techno 293 windsurfing squad is racing its first full international season — the Worlds, the Europeans, and the Asian Championships — backed by a professional, data-driven coaching program. This is where the campaign lives.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+          <div id="evLine" class="live-slot" style="display:inline-flex;align-items:center;gap:10px;padding:11px 16px;border:1px solid #555d4d;border-radius:999px;background:#101E32;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.06em;color:#AAB6C6">Campaign 2026 · loading…</div>
+          <a href="mailto:kor22@me.com?subject=Team%20India%20T293%20—%20partnership" class="cta-saf">Back the team →</a>
+        </div>
+      </div>
+    </div>
+    <div style="height:5px;display:grid;grid-template-columns:1fr 1fr 1fr"><div style="background:#FF9933"></div><div style="background:#EDEFF3"></div><div style="background:#138808"></div></div>
+  </section>
+
+  <section style="max-width:1200px;margin:0 auto;padding:64px 24px 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px 24px;margin-bottom:22px">
+      <h2 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.01em;margin:0;color:#fff">Campaign highlights</h2>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:#b9bdb0">From the organisers' official final standings.</span>
+    </div>
+    <div id="hl"></div>
+  </section>
+
+  <section style="max-width:1200px;margin:0 auto;padding:60px 24px 0">
+    <h2 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.01em;margin:0 0 22px;color:#fff">The squad</h2>
+    <div id="squad"></div>
+    <div class="staff" style="margin-top:14px">
+      <figure class="ath" style="margin:0"><img src="https://sailtechco.com/photos/team/staff-prakash.jpg" alt="Prakash Alexander, National Coach"><b>Prakash Alexander</b><div class="m">National Coach</div></figure>
+      <figure class="ath" style="margin:0"><img src="https://sailtechco.com/photos/team/staff-danny.jpg" alt="Danny Ok, Head Coach"><b>Danny Ok</b><div class="m">Head Coach</div></figure>
+    </div>
+  </section>
+
+  <section style="max-width:1200px;margin:0 auto;padding:72px 24px 0">
+    <div style="border-top:1px solid #1C2B41;padding-top:44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:44px">
+      <div>
+        <h2 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:-.02em;margin:0;color:#fff;max-width:16ch">2026 is the year this team went global.</h2>
+        <p style="margin:20px 0 0;font-size:16px;line-height:1.68;color:#AAB6C6">A World Championship start, a European Championship where the squad measured itself against the deepest youth fleet in the sport, and the Asian Championships in Langkawi — three continents of racing in a single season.</p>
+      </div>
+      <div>
+        <p style="margin:0;font-size:16px;line-height:1.68;color:#AAB6C6">Behind the results is a professional program rare at youth level anywhere: every race analysed against the fleet's best, wind-graded equipment and technique frameworks, daily conditioning and wellness monitoring, and a briefing–debrief loop that turns each race day into the next day's plan — led by a PhD sport scientist and national-team coach.</p>
+        <a href="home.html" class="cta-ghost">Meet the coach →</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1200px;margin:0 auto;padding:66px 24px 0">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px 24px;margin-bottom:24px">
+      <h2 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.01em;margin:0;color:#fff">The season so far</h2>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;color:#b9bdb0">Three championships · one continuous training block</span>
+    </div>
+
+    <ol class="timeline" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px;background:#1C2B41;border:1px solid #1C2B41">
+
+      <li class="ev" style="background:#242b24">
+        <div class="ev-mark" style="border-left:3px solid #555d4d"></div>
+        <div class="ev-head">
+          <span class="ev-step">01</span>
+          <h3 class="ev-name">World Championship <span class="ev-venue">Foça, Türkiye · Apr 5–9</span></h3>
+          <span class="ev-status" data-state="done">Completed</span>
+        </div>
+        <div class="ev-body">
+          <div class="ev-col">
+            <span class="ev-label">Going in</span>
+            <p class="ev-note">The squad’s first world championship — eight sailors into a 259-board, 18-nation entry. The goal was not a result. It was a measurement: where does this team actually stand against the world’s best?</p>
+          </div>
+          <div class="ev-col">
+            <span class="ev-label">What we worked on</span>
+            <p class="ev-note">Every race was recorded and analysed against the class Top-5. Boat speed came back as the gap — and that analysis became the training plan for the next three months.</p>
+          </div>
+          <div class="ev-col">
+            <span class="ev-label">Result</span>
+            <div class="ev-result" id="resWorlds">—</div>
+          </div>
+        </div>
+      </li>
+
+      <li class="ev" style="background:#242b24">
+        <div class="ev-mark" style="border-left:3px solid #555d4d"></div>
+        <div class="ev-head">
+          <span class="ev-step">02</span>
+          <h3 class="ev-name">European Championship <span class="ev-venue">Sopot, Poland · Jul 18–25</span></h3>
+          <span class="ev-status" data-state="done">Completed</span>
+        </div>
+        <div class="ev-body">
+          <div class="ev-col">
+            <span class="ev-label">Going in</span>
+            <p class="ev-note">Three months later, into the deepest youth fleet in the sport — up to 57 boards per class, and a fifteen-race series. The question was simple: did the training move the numbers?</p>
+          </div>
+          <div class="ev-col">
+            <span class="ev-label">What we worked on</span>
+            <p class="ev-note">The Foça gaps, trained directly: boat speed and starting. Progress was tracked on the same GPS measurements as the Worlds, so improvement could be proven rather than claimed.</p>
+          </div>
+          <div class="ev-col">
+            <span class="ev-label">Result</span>
+            <div class="ev-result" id="resEuro">—</div>
+          </div>
+        </div>
+      </li>
+
+      <li class="ev" style="background:#101E32">
+        <div class="ev-mark" style="border-left:3px solid #FF9933"></div>
+        <div class="ev-head">
+          <span class="ev-step" style="color:#FF9933">03</span>
+          <h3 class="ev-name">Asian Championship <span class="ev-venue">Langkawi, Malaysia · 30 Jul – 9 Aug</span></h3>
+          <span class="ev-status" data-state="live">Final</span>
+        </div>
+        <div class="ev-body">
+          <div class="ev-col">
+            <span class="ev-label">Going in</span>
+            <p class="ev-note" data-slot="brief-asians">— brief to be written —</p>
+          </div>
+          <div class="ev-col">
+            <span class="ev-label">What we worked on</span>
+            <p class="ev-note" data-slot="training-asians">— coach note to be written —</p>
+          </div>
+          <div class="ev-col">
+            <span class="ev-label">Result</span>
+            <div class="ev-result" id="resAsians">—</div>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <div style="border:1px solid #1C2B41;border-top:0;background:#0B1626;padding:34px 30px 36px">
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px">
+        <h3 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.01em;margin:0;color:#fff">Proof it is working — boat speed, Worlds → Europeans</h3>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#b9bdb0">Squad VMG index · % of class Top-5</span>
+      </div>
+      <p style="margin:12px 0 0;font-size:15px;line-height:1.62;color:#b9bdb0;max-width:74ch">The same GPS measurement, taken at both championships. 100&thinsp;% would mean matching the average of the fastest five sailors in the class — the VMG index is the mean of upwind and downwind velocity made good against that Top-5.</p>
+      <div class="bands" id="vmgBands"></div>
+      <p style="margin:16px 0 0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:#a1a895;line-height:1.7" id="vmgFoot"></p>
+    </div>
+
+    <div class="grid4" style="background:#1C2B41;border:1px solid #1C2B41;border-top:0">
+      <div style="background:#0B1626;padding:20px 22px"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#b9bdb0">Championships</div><div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:24px;color:#fff;margin-top:6px">3</div></div>
+      <div style="background:#0B1626;padding:20px 22px"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#b9bdb0">Continents</div><div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:24px;color:#fff;margin-top:6px">3</div></div>
+      <div style="background:#0B1626;padding:20px 22px"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#b9bdb0">Asian medals — squad</div><div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:24px;color:#fff;margin-top:6px" id="statMedals">—</div></div>
+      <div style="background:#0B1626;padding:20px 22px"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#b9bdb0">Squad</div><div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:24px;color:#fff;margin-top:6px" id="statSquad">—</div></div>
+    </div>
+  </section>
+
+  <section style="max-width:1200px;margin:0 auto;padding:72px 24px 8px">
+    <div style="border:1px solid #1C2B41;border-top:3px solid #E2AE3D;background:linear-gradient(165deg,#101E32 0%,#0B1626 100%);padding:44px 40px 46px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#E2AE3D">The long game</span>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px;margin-top:16px;align-items:start">
+        <h2 style="font-family:'Archivo',sans-serif;font-weight:900;font-size:clamp(30px,4.6vw,52px);line-height:1.02;letter-spacing:-.025em;margin:0;color:#fff;max-width:15ch">This isn't a season. It's a ten-year runway to <span style="color:#FF9933">2036</span>.</h2>
+        <div>
+          <p style="margin:0;font-size:16px;line-height:1.68;color:#AAB6C6">India's target is the 2036 Olympic Games — and the athletes who could sail it are twelve to sixteen years old today. That is the whole logic of this squad: start now, build the base early, and give a generation ten uninterrupted years of international racing and professional coaching.</p>
+          <p style="margin:16px 0 0;font-size:16px;line-height:1.68;color:#AAB6C6">Techno 293 is where that pathway begins. Every race analysed, every athlete's development tracked year over year — so progress is measured, not hoped for.</p>
+        </div>
+      </div>
+      <div class="grid4" style="background:#1C2B41;border:1px solid #1C2B41;margin-top:38px">
+        <div style="background:#0C1829;padding:22px 22px 24px;border-top:2px solid #138808">
+          <div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:26px;color:#fff">2026</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#b9bdb0;margin-top:8px">Now · Techno 293</div>
+          <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#AAB6C6">First full international season. U15 &amp; U17, learning to race the world.</p>
+        </div>
+        <div style="background:#0C1829;padding:22px 22px 24px;border-top:2px solid #b9bdb0">
+          <div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:26px;color:#fff">2027–30</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#b9bdb0;margin-top:8px">Build</div>
+          <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#AAB6C6">Youth championships every year. Technique, physiology and race craft compounding.</p>
+        </div>
+        <div style="background:#0C1829;padding:22px 22px 24px;border-top:2px solid #E2AE3D">
+          <div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:26px;color:#fff">2031–35</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#b9bdb0;margin-top:8px">Transition</div>
+          <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#AAB6C6">Into senior Olympic equipment and senior fleets, as young adults.</p>
+        </div>
+        <div style="background:#0C1829;padding:22px 22px 24px;border-top:2px solid #FF9933">
+          <div style="font-family:'Archivo',sans-serif;font-weight:900;font-size:26px;color:#FF9933">2036</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#FF9933;margin-top:8px">The Games</div>
+          <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#AAB6C6">Today's teenagers are in their mid-twenties — a sailor's prime.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-top:76px;background:#EDEFF3;color:#202522">
+    <div style="height:5px;display:grid;grid-template-columns:1fr 1fr 1fr"><div style="background:#FF9933"></div><div style="background:#EDEFF3"></div><div style="background:#138808"></div></div>
+    <div style="max-width:1200px;margin:0 auto;padding:64px 24px 72px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#6E7A8A">Support the team</span>
+      <h2 style="font-family:'Archivo',sans-serif;font-weight:900;font-size:clamp(32px,5.4vw,58px);line-height:1.04;letter-spacing:-.025em;margin:16px 0 0;max-width:18ch">Partner with India's next generation of sailors.</h2>
+      <p style="margin:22px 0 0;font-size:17px;line-height:1.62;color:#3A4452;max-width:60ch">These athletes are teenagers racing the world with their families and federation carrying the load. Partnership directly funds what performance depends on:</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:#CDD3DB;border:1px solid #CDD3DB;margin-top:34px">
+        <article style="background:#fff;padding:30px 26px 34px;display:flex;flex-direction:column;gap:10px;border-top:3px solid #FF9933">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#6E7A8A">01</span>
+          <h3 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:21px;margin:0;letter-spacing:-.01em">International competition</h3>
+          <p style="margin:0;font-size:15px;line-height:1.62;color:#4A5563">Travel, entries, equipment freight — the cost of putting eight sailors on a world-class start line.</p>
+        </article>
+        <article style="background:#fff;padding:30px 26px 34px;display:flex;flex-direction:column;gap:10px;border-top:3px solid #E2AE3D">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#6E7A8A">02</span>
+          <h3 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:21px;margin:0;letter-spacing:-.01em">Race equipment</h3>
+          <p style="margin:0;font-size:15px;line-height:1.62;color:#4A5563">Sails, boards, fins and rig tuning stock — matched to each athlete and each wind range.</p>
+        </article>
+        <article style="background:#fff;padding:30px 26px 34px;display:flex;flex-direction:column;gap:10px;border-top:3px solid #138808">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#6E7A8A">03</span>
+          <h3 style="font-family:'Archivo',sans-serif;font-weight:800;font-size:21px;margin:0;letter-spacing:-.01em">The performance program</h3>
+          <p style="margin:0;font-size:15px;line-height:1.62;color:#4A5563">Coaching, analysis systems and athlete monitoring — the work that turns talent into results.</p>
+        </article>
+      </div>
+      <div style="margin-top:38px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;align-items:center">
+        <p style="margin:0;font-size:15.5px;line-height:1.65;color:#3A4452;max-width:52ch">Sponsors are welcomed into the story we tell here and on the water — team branding, campaign updates, and a squad worth being behind. Come in at the start of a ten-year road and the whole journey carries your name.</p>
+        <a href="mailto:kor22@me.com?subject=Team%20India%20T293%20—%20partnership" class="cta-dark">Talk to us about partnership</a>
+      </div>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid #1C2B41;background:#202522">
+    <div style="max-width:1200px;margin:0 auto;padding:28px 24px 42px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:#6E7D93">
+      <span>TEAM INDIA · TECHNO 293 — GO · GET · GOLD</span>
+      <span style="max-width:62ch">Results shown are from the event organisers' official final standings. · <a href="home.html">Coach Danny Ok</a> · <a href="https://sailtechco.com/team/" style="display:inline-flex;align-items:center">Team Hub<svg class="lockmark" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10.5" width="16" height="11" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg></a> (staff)</span>
+    </div>
+  </footer>
+</div>
+
+<script data-cfasync="false" src="https://sailtechco.com/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://sailtechco.com/team/data/event.js"></script>
+<script src="https://sailtechco.com/team/data/athletes.js"></script>
+<script src="https://sailtechco.com/team/data/asian-results.js"></script>
+<script src="https://sailtechco.com/team/data/canonical.js"></script>
+<script src="https://sailtechco.com/team/data/canonical-worlds.js"></script>
+<script>
+(function(){
+  var EV=window.T293_EVENT||{}, R=window.T293_ASIAN_RESULTS;
+  var SHORT=window.T293_SHORTNAMES||{};
+  /* live event line + highlight cards — same canonical data as the Team Hub (single source) */
+  if(R&&EV.id===R.event){
+    var tag=R.final?'FINAL':'LIVE', tail=R.final?'final standings':('Day '+R.day+' · '+R.sailed+' races sailed');
+    document.getElementById('evLine').textContent=tag+' · '+(EV.label||'Asian Championships 2026')+' — '+tail;
+    var cards=[];
+    (R.fleets||[]).forEach(function(f){
+      (f.rows||[]).forEach(function(r){
+        if(!r.squad || r.rank>3) return;
+        var medal=r.rank===1?'🥇 1st':r.rank===2?'🥈 2nd':'🥉 3rd';
+        cards.push('<div class="h"><b>'+(SHORT[r.squad]||r.name.split(' ')[0])+'</b><span style="font-family:var(--mono);font-size:12.5px;color:var(--gold)">'+medal+' / '+f.entries+'</span><div class="m">'+f.label.replace('T293 ','').replace('T293_','')+'</div></div>');
+      });
+    });
+    document.getElementById('hl').innerHTML=cards.join('');
+    /* squad medal tally + Asians result block — computed from the same official rows */
+    var g=0,s=0,b=0;
+    (R.fleets||[]).forEach(function(f){(f.rows||[]).forEach(function(r){ if(r.squad){ if(r.rank===1)g++; else if(r.rank===2)s++; else if(r.rank===3)b++; } });});
+    var tot=g+s+b;
+    if(tot){
+      document.getElementById('statMedals').textContent=tot+' · '+g+'G '+s+'S '+b+'B';
+      if(R.final){
+        document.getElementById('resAsians').innerHTML=tot+' squad medals — '+g+' gold · '+s+' silver · '+b+' bronze<br>Perfect series in U15 Girls — 13 wins from 13 races<br>U15 Boys podium swept 1 · 2 · 3';
+      }
+    }
+  } else {
+    document.getElementById('evLine').textContent=EV.label||'Between campaigns';
+  }
+  /* squad grid — roster single source + final series rank */
+  var PHOTOS={IND01:'udaiveer',IND7:'vihaan',IND4:'om',IND02:'vaishnavi',IND16:'mohit',IND261:'soham',IND11:'priyanshi',IND18:'rashmitha'};
+  var rank={};
+  if(R)(R.fleets||[]).forEach(function(f){(f.rows||[]).forEach(function(r){if(r.squad)rank[r.squad]={rk:r.rank,n:f.entries,cls:f.label.replace('T293 ','').replace('T293_','')};});});
+  var ids=window.T293_COMPETING||[];
+  document.getElementById('squad').innerHTML=ids.map(function(id){
+    var nm=SHORT[id]||id, ph=PHOTOS[id], rr=rank[id];
+    var img=ph?'<img src="https://sailtechco.com/team/photos/'+ph+'.jpeg" alt="'+nm+'" loading="lazy" onerror="this.outerHTML=\'<div class=ph>🏄</div>\'">':'<div class="ph">🏄</div>';
+    return '<div class="ath">'+img+'<b>'+nm+'</b><div class="m">'+(rr?rr.cls:'')+'</div><div class="rk">'+(rr?('#'+rr.rk+' of '+rr.n):'')+'</div></div>';
+  }).join('');
+  if(ids.length)document.getElementById('statSquad').textContent=ids.length+' · U15 / U17';
+
+  /* ── Worlds → Europeans proof — rendered FROM canonical data (single source, no hardcoding).
+     Worlds has NO per-band team values (wind speed not measured at Foça → A–X blocked in CANON);
+     only the all-conditions baseline is real. Missing data renders as nothing, never a guess. */
+  var ET=(window.CANON_TEAM||{}).byGrade||{};
+  var WT=((window.CANON_WORLDS_TEAM||{}).byGrade||{}).All||null;
+  var euAll=ET.All||null;
+  var host=document.getElementById('vmgBands'), rows='';
+  function bar(fill,tick,tickLabel){
+    return '<div class="bt"><i style="width:'+fill+'%"></i>'+(tick!=null?'<b style="left:'+tick+'%" data-was="'+tickLabel+'"></b>':'')+'</div>';
+  }
+  if(euAll&&euAll.vmgIndex!=null){
+    var d=(WT&&WT.vmgIndex!=null)?(euAll.vmgIndex-WT.vmgIndex):null;
+    rows+='<div class="band"><span class="bl">All conditions<em>'+euAll.n+' athlete-races</em></span>'
+        +bar(euAll.vmgIndex,(WT&&WT.vmgIndex!=null)?WT.vmgIndex:null,WT?('Foça '+WT.vmgIndex+'%'):'')
+        +'<span class="bv">'+euAll.vmgIndex+'%'+(d!=null?('<em class="'+(d>0?'up':'')+'">'+(d>0?'+':'')+d+' pts</em>'):'')+'</span></div>';
+  }
+  var BANDS={B:'B · 6–8 kt',C:'C · 9–12 kt',D:'D · 13–16 kt',X:'X · 17+ kt'};
+  Object.keys(BANDS).forEach(function(k){
+    var r=ET[k]; if(!r||r.vmgIndex==null)return;
+    rows+='<div class="band"><span class="bl">'+BANDS[k]+'<em>'+r.n+' athlete-races</em></span>'+bar(r.vmgIndex,null,'')+'<span class="bv">'+r.vmgIndex+'%<em>Europeans</em></span></div>';
+  });
+  if(rows){
+    host.innerHTML=rows;
+    document.getElementById('vmgFoot').textContent='Orange bar = European Championships, Sopot. White tick = World Championships baseline, Foça — all-conditions only: wind speed was not measured at the Worlds, so per-band Worlds baselines are not computable. VMG index = mean of upwind + downwind VMG vs the class Top-5 (100 % = parity).';
+  }
+  /* timeline result blocks from the same canonical aggregates */
+  if(WT&&WT.vmgIndex!=null){
+    document.getElementById('resWorlds').innerHTML='8 sailors · 4 classes · 10 races<br>Squad VMG '+WT.vmgIndex+'% of class Top-5 (all conditions)<br>Baseline established';
+  }
+  if(euAll&&euAll.vmgIndex!=null){
+    var d2=(WT&&WT.vmgIndex!=null)?(euAll.vmgIndex-WT.vmgIndex):null;
+    /* best single-race finish computed from CANON per-athlete series */
+    var best=null,bestCls=null,C=window.CANON||{};
+    Object.keys(C).forEach(function(cls){Object.keys(C[cls]).forEach(function(a){
+      var s=C[cls][a].series||{}; if(s.bestRank!=null&&(best==null||s.bestRank<best)){best=s.bestRank;bestCls=cls;}
+    });});
+    var ord=function(n){return n+(n%10===1&&n%100!==11?'st':n%10===2&&n%100!==12?'nd':n%10===3&&n%100!==13?'rd':'th');};
+    document.getElementById('resEuro').innerHTML='Squad VMG '+euAll.vmgIndex+'% of class Top-5'+(d2!=null?(' ('+(d2>0?'+':'')+d2+' pts on Foça)'):'')
+      +(best!=null?('<br>Best race finish '+ord(best)+' — '+bestCls):'')+'<br>Six sailors · up to 15-race series';
+  }
+})();
+</script>
+</body>
+</html>

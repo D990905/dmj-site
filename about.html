@@ -61,16 +61,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet">
 
 <!-- Site CSS -->
-<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
-</head>
-<body>
+<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526&tone=20260925-soft">
+<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<body class="dmj-legacy"><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="catalog.html">장비 둘러보기</a><a href="riding-dashboard/v2.html">라이딩 분석</a><a href="inquiry.html">구매 상담 ↗</a></div></nav>
 
 <!-- ========== Trust Bar ========== -->
 <div class="trust-bar" role="region" aria-label="신뢰 정보">
   <div class="container">
     <div class="trust-bar__inner">
       <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
-      <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
+      <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>입고·배송 일정 상담</span>
       <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
     </div>
   </div>
@@ -80,15 +80,13 @@
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="/" class="nav__logo" aria-label="단무지 홈">
-        <span class="nav__logo-mark">D</span>
-        <span>단무지</span>
+      <a href="/" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>GEAR &amp; RIDING</small></span>
       </a>
 
       <div class="nav__primary" role="menubar">
         <!-- 1. 브랜드 -->
         <div class="nav__has-sub" role="none">
-          <a href="index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <a href="catalog.html" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
           <div class="nav__sub" role="menu">
             <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
             <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
@@ -99,7 +97,7 @@
 
         <!-- 2. 라이딩 스타일 -->
         <div class="nav__has-sub" role="none">
-          <a href="index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <a href="find-my-gear.html" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
           <div class="nav__sub" role="menu">
             <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
             <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
@@ -121,7 +119,7 @@
 
         <!-- 4. 실력 수준 -->
         <div class="nav__has-sub" role="none">
-          <a href="index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <a href="premium.html" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
           <div class="nav__sub nav__sub--wide" role="menu">
             <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
             <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
@@ -221,7 +219,7 @@
     <div class="hero__inner hero__inner--cine">
       <div class="hero__text">
         <span class="hero__eyebrow"><span class="dot"></span>About · 단무지를 소개합니다</span>
-        <h1 class="hero__title">단무지를<br><em>소개합니다.</em></h1>
+        <h1 class="hero__title">단무지를<br><em>소개합니다</em></h1>
         <p class="hero__lead">
           한국 라이더의 입문부터 선수까지, 모든 순간을 위한 <strong>윙포일 퍼포먼스 컨설팅 서비스</strong>.
           현장에서 검증한 네 브랜드를 라이더 한 명 한 명에게 맞춰 큐레이션합니다.
@@ -262,7 +260,7 @@
 
       <span class="section-head__eyebrow" style="display:inline-block;margin-bottom:16px;color:var(--color-sea-dark)">우리의 철학</span>
       <h2 class="section-head__title" style="margin-bottom:24px;letter-spacing:-0.025em">
-        단순하고 무식하게,<br><em style="font-style:normal;color:var(--color-sea)">그러나 지혜롭게</em>
+        단순하고 무식하게<br><em style="font-style:normal;color:var(--color-sea)">그러나 지혜롭게</em>
       </h2>
       <p style="font-size:1.0625rem;line-height:1.75;color:var(--color-charcoal);margin:0 0 16px;max-width:56ch;margin-left:auto;margin-right:auto">
         라이딩 셋업은 복잡할 이유가 없습니다. 전문 퍼포먼스 어드바이저의 추천은 거침없고 간결합니다. 하지만 그 한 줄 추천 뒤에는 라이더 체중·바람·컨디션·실력 단계까지 짚는 충분한 고민이 있습니다.
@@ -325,7 +323,7 @@
         <span class="pill pill--accent" style="margin-bottom:12px">운동생리학박사 · 퍼포먼스 컨설팅</span>
         <h3 class="t-h2" style="margin:0 0 12px">옥덕필 박사</h3>
         <p style="color:var(--text-secondary);font-size:1rem;line-height:1.75;margin:0 0 16px">
-          대한민국 최초의 아시안게임 금메달리스트이자, 올림픽에 3회 연속 단독 출전한 윈드서핑 선수 출신입니다. 선수 생활 이후에는 운동생리학박사로서 3개국 윈드서핑 국가대표팀 코치를 역임하며 엘리트 라이더의 퍼포먼스를 직접 길러 왔습니다.
+          아시안게임과 올림픽 무대에서 활동한 윈드서핑 선수 출신입니다. 선수 생활 이후에는 운동생리학박사로서 3개국 윈드서핑 국가대표팀 코치를 역임하며 엘리트 라이더의 퍼포먼스를 직접 길러 왔습니다.
         </p>
         <p style="color:var(--text-secondary);font-size:1rem;line-height:1.75;margin:0">
           이 경험을 바탕으로 단무지의 라이더 맞춤 컨설팅을 설계합니다. 체중·바람·실력 단계를 운동생리학 관점에서 읽어, 입문자에게도 선수에게도 과하지도 부족하지도 않은 셋업을 권합니다.
@@ -351,7 +349,7 @@
           국가대표 포뮬러 카이트 선수로, 하이드로포일 레이스의 최전선에서 경쟁하는 현역 라이더입니다. 마스트·포일·보드 셋업을 가장 빠른 속도 영역에서 직접 검증하는 사람입니다.
         </p>
         <p style="color:var(--text-secondary);font-size:1rem;line-height:1.75;margin:0">
-          포뮬러 카이트와 윙포일은 같은 하이드로포일 플랫폼을 공유합니다. 그 cross-platform 감각으로 단무지의 레이스·상급 셋업 컨설팅에 현장 라이더의 시선을 더합니다.
+          포뮬러 카이트와 윙포일은 같은 하이드로포일 플랫폼을 공유합니다. 서로 다른 종목에서 쌓은 경험으로 단무지의 레이스·상급 셋업 컨설팅에 현장 라이더의 시선을 더합니다.
         </p>
       </article>
     </div>
@@ -391,35 +389,44 @@
     <div class="grid grid-2 reveal" style="max-width:1080px;margin-left:auto;margin-right:auto">
       <div class="value-card">
         <span class="value-card__num">01</span>
-        <h3 class="t-h3" style="margin:0 0 8px">입문~선수, 한 창구에서</h3>
+        <h3 class="t-h3" style="margin:0 0 8px">입문~선수 한 창구에서</h3>
         <p style="color:var(--text-secondary);margin:0;line-height:1.65">
-          Takoon으로 부담 없이 시작해 PPC 중급, Levitaz 상급·레이스로 올라가고, Forward WIP 안전장비를 cross-sell합니다. 라이더 평생 사이클을 단무지 한 창구에서 잇습니다.
+          Takoon은 입문·초중급의 가성비 장비와 액세서리, PPC는 중상급·선수의 퍼포먼스 장비를 중심으로 소개합니다. Levitaz는 R6 포일 중심의 윙포일 레이스 장비, WIP는 프리미엄 액세서리를 담당합니다. 실력과 예산뿐 아니라 목적과 사용 환경을 함께 살펴 선택합니다.
         </p>
       </div>
       <div class="value-card">
         <span class="value-card__num">02</span>
-        <h3 class="t-h3" style="margin:0 0 8px">현장 spot에서 검증한 큐레이션</h3>
+        <h3 class="t-h3" style="margin:0 0 8px">사용 환경에 맞춘 장비 선택</h3>
         <p style="color:var(--text-secondary);margin:0;line-height:1.65">
-          본사 카탈로그를 그대로 옮기지 않습니다. 한국의 여러 spot 환경에서 직접 타본 SKU만 골라, 우리 바다와 바람에 맞는 조합으로 권합니다.
+          제품의 공식 사양과 라이딩 경험을 함께 살펴봅니다. 주로 타는 장소의 바람과 수면 상태, 체중과 현재 실력에 맞는 조합을 안내합니다.
         </p>
       </div>
       <div class="value-card">
         <span class="value-card__num">03</span>
         <h3 class="t-h3" style="margin:0 0 8px">단일 채널 AS</h3>
         <p style="color:var(--text-secondary);margin:0;line-height:1.65">
-          네 브랜드 모두 단무지가 직접 한국에서 운영합니다. 본사로 보내는 절차 없이, 한국 카톡 한 창구에서 빠르게 응대합니다.
+          구매와 사후관리 문의는 DMJ 카카오채널에서 접수합니다. 제품 상태와 브랜드별 보증 기준을 확인한 뒤 수리·교환 가능 여부와 필요한 절차를 안내합니다.
         </p>
       </div>
       <div class="value-card">
         <span class="value-card__num">04</span>
-        <h3 class="t-h3" style="margin:0 0 8px">Cross-brand 호환 정보</h3>
+        <h3 class="t-h3" style="margin:0 0 8px">장비 조합과 부품 호환 확인</h3>
         <p style="color:var(--text-secondary);margin:0;line-height:1.65">
-          "이 Levitaz 마스트와 호환되는 PPC 윙", "WIP 웻수트와 어울리는 Takoon 풀세트" — 한 브랜드만 다루는 사이트에서는 얻기 어려운 정보를 함께 안내합니다.
+          윙·보드·포일은 라이딩 목적에 맞춰 조합합니다. 직접 연결되는 마스트·퓨슬라지·프런트윙·스태빌라이저는 모델과 연식별 체결 규격을 별도로 확인합니다.
         </p>
       </div>
     </div>
   </div>
 </section>
+
+<section class="section" id="our-work"><div class="container">
+<div class="section-head"><span class="t-eyebrow">함께 이어지는 세 영역</span><h2 class="section-head__title">장비 선택부터 배움과 개발까지</h2><p class="section-head__lead">분야별 역할을 나누고 라이더의 경험으로 연결합니다</p></div>
+<div class="grid grid-3">
+<article class="value-card"><h3>단무지공방 · DMJ</h3><p>윙포일 장비의 유통·판매와 구매 상담을 담당합니다. 제품별 옵션과 가격을 확인하고 내 조건에 맞는 장비를 선택할 수 있습니다.</p><a href="catalog.html">장비 둘러보기 ↗</a></article>
+<article class="value-card"><h3>윙포일퍼포먼스연구소</h3><p>교육과 연구를 담당합니다. 입문 교육부터 규칙 교육, 온·오프라인 강의와 교재 집필·편찬 등 교육 콘텐츠를 개발합니다.</p><a href="premium.html">무료 입문 교육 보기 ↗</a></article>
+<article class="value-card"><h3>세일테코 · sailtechco</h3><p>세일 테크놀로지를 기반으로 프로젝트 기획과 제작·제조를 담당합니다. 현장에서 얻은 요구를 구체적인 개발 프로젝트로 이어갑니다.</p><a href="sailtech/home.html">세일테코 알아보기 ↗</a></article>
+</div></div></section>
+<section class="section" id="purchase-guide"><div class="container container--narrow"><h2>구매는 이렇게 진행됩니다</h2><ol><li>제품 상세에서 사이즈와 구성을 선택합니다</li><li>카카오 상담으로 재고와 최종 금액을 확인합니다</li><li>결제와 출고 또는 선주문 일정을 안내받습니다</li></ol><p>재고 상품과 선주문 상품의 일정은 다를 수 있습니다. 제품별 확정 가격과 예상 가격 표시를 확인해 주세요.</p><p><a href="policy/shipping.html">배송 안내</a> · <a href="policy/refund.html">교환·환불 안내</a> · <a href="inquiry.html">구매 상담</a></p></div></section>
 
 <!-- ========== CTA ========== -->
 <section class="section section--darker" id="contact">
@@ -451,11 +458,11 @@
       <div class="footer-col">
         <h4>도움말</h4>
         <ul>
-          <li><a href="skill-assessment.html">스킬 진단 (Phase B)</a></li>
+          <li><a href="skill-assessment.html">스킬 진단</a></li>
           <li><a href="membership.html">회원 등급 안내</a></li>
           <li><a href="glossary.html">윙포일 용어 사전</a></li>
-          <li><a href="calculator.html">Lift Calculator</a></li>
-          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="calculator.html">장비 계산기</a></li>
+          <li><a href="find-my-gear.html">내 장비 찾기</a></li>
           <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
         </ul>
       </div>
@@ -466,7 +473,7 @@
           <li><a href="level/intermediate.html">중급 가이드</a></li>
           <li><a href="level/advanced.html">상급 가이드</a></li>
           <li><a href="level/pro.html">선수 가이드</a></li>
-          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">무료 입문 교육</span></a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -513,7 +520,7 @@
   <script src="assets/js/cart.js" defer></script>
   <script src="assets/js/nav-auth.js" defer></script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
-  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <link rel="stylesheet" href="assets/css/agent-deny.css?tone=20260925-soft">
   <script src="assets/js/agent-deny.js" defer></script>
 </body>
 </html>

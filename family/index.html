@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526">
+<link rel="stylesheet" href="../assets/css/style.css?v=ios-link-svg-fix-20260526&tone=20260925-soft">
 
 <style>
   .demo-hero {
@@ -218,8 +218,8 @@
     color: rgba(255,255,255,0.78); margin: 0 0 24px;
   }
 </style>
-</head>
-<body>
+<link rel="stylesheet" href="../assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<body class="dmj-legacy">
 
 <!-- Trust bar -->
 <div class="trust-bar"><div class="container"><div class="trust-bar__inner">
@@ -233,15 +233,13 @@
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="../index.html" class="nav__logo" aria-label="단무지 홈">
-        <span class="nav__logo-mark">D</span>
-        <span>단무지</span>
+      <a href="../index.html" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>GEAR &amp; RIDING</small></span>
       </a>
 
       <div class="nav__primary" role="menubar">
         <!-- 1. 브랜드 -->
         <div class="nav__has-sub" role="none">
-          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <a href="../catalog.html" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
           <div class="nav__sub" role="menu">
             <a href="../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
             <a href="../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
@@ -252,7 +250,7 @@
 
         <!-- 2. 라이딩 스타일 -->
         <div class="nav__has-sub" role="none">
-          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <a href="../find-my-gear.html" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
           <div class="nav__sub" role="menu">
             <a href="../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
             <a href="../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
@@ -274,7 +272,7 @@
 
         <!-- 4. 실력 수준 -->
         <div class="nav__has-sub" role="none">
-          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <a href="../premium.html" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
           <div class="nav__sub nav__sub--wide" role="menu">
             <a href="../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="../level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
             <a href="../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
@@ -353,10 +351,10 @@
 <!-- Hero -->
 <section class="demo-hero">
   <div class="container">
-    <nav class="demo-hero__crumb"><a href="../index.html">단무지</a><span class="sep">/</span><a href="../index.html#consultation">컨설팅</a><span class="sep">/</span><span style="color:#fff">가족 라이딩</span></nav>
+    <nav class="demo-hero__crumb"><a href="../index.html">단무지</a><span class="sep">/</span><a href="../inquiry.html">컨설팅</a><span class="sep">/</span><span style="color:#fff">가족 라이딩</span></nav>
     <span class="demo-hero__eyebrow">For Family Riders</span>
     <h1 class="demo-hero__title">가족이 함께 타는<br><em>윙포일</em></h1>
-    <p class="demo-hero__lead">엄마·아빠·자녀가 같이 즐기는 워터스포츠. 전문 퍼포먼스 어드바이저가 가족 구성·체중·레벨에 맞춰 3-4 set bundle을 큐레이션합니다. 한국 family-friendly spot 가이드 + 가족 1:1 컨설팅 무료.</p>
+    <p class="demo-hero__lead">엄마·아빠·자녀가 같이 즐기는 워터스포츠. 전문 퍼포먼스 어드바이저가 가족 구성·체중·레벨에 맞춰 3-4 set bundle을 큐레이션합니다. 한국 family-friendly spot 가이드 + 가족 1:1 컨설팅 무료</p>
     <div class="demo-hero__ctas">
       <a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener" class="btn btn--accent btn--lg">가족 1:1 컨설팅 시작</a>
       <a href="../find-my-gear.html" class="btn btn--ghost-light btn--lg">개별 셋업 찾기 →</a>
@@ -526,7 +524,7 @@
     <div class="demo-section__head">
       <span class="demo-section__eyebrow">Bundle Curation</span>
       <h2 class="demo-section__title">가족 패키지 — 3-4 set bundle 견적</h2>
-      <p class="demo-section__lead">가족 단위 3-4 set 동시 구입 시 전문 퍼포먼스 어드바이저가 직접 패키지 견적을 산출합니다. 네 가지 브랜드 라인업 cross-sell로 brand 단일 매장 대비 효율적인 구성 가능. 구체적 가격은 가족 구성·시즌·재고에 따라 변동 → 카톡 1:1 견적.</p>
+      <p class="demo-section__lead">가족 단위 3-4 set 동시 구입 시 전문 퍼포먼스 어드바이저가 직접 패키지 견적을 산출합니다. 네 가지 브랜드 라인업 cross-sell로 brand 단일 매장 대비 효율적인 구성 가능. 구체적 가격은 가족 구성·시즌·재고에 따라 변동 → 카톡 1:1 견적</p>
     </div>
     <div style="background:linear-gradient(135deg, var(--color-mist), #fff);border:1px solid var(--border);border-radius:16px;padding:32px 28px">
       <h3 style="font-size:1.25rem;font-weight:700;color:var(--color-navy);margin:0 0 16px;letter-spacing:-0.01em">패키지 산출 시 고려 항목</h3>
@@ -552,7 +550,7 @@
     <div class="demo-section__head">
       <span class="demo-section__eyebrow">Family-Friendly Spots</span>
       <h2 class="demo-section__title">한국 가족 라이딩 spot 가이드</h2>
-      <p class="demo-section__lead">전문 퍼포먼스 어드바이저가 가족 라이딩에 추천하는 스팟. protected (방파제·만), shallow water, 강습 partnership 가능, 가족 편의시설 (주차·화장실·식당) 기준 큐레이션.</p>
+      <p class="demo-section__lead">전문 퍼포먼스 어드바이저가 가족 라이딩에 추천하는 스팟. protected (방파제·만), shallow water, 강습 partnership 가능, 가족 편의시설 (주차·화장실·식당) 기준 큐레이션</p>
     </div>
     <div class="spot-grid">
 <article class="spot-card">
@@ -663,8 +661,8 @@
         <ul>
           <li><a href="../membership.html">회원 등급 안내</a></li>
           <li><a href="../glossary.html">윙포일 용어 사전</a></li>
-          <li><a href="../calculator.html">Lift Calculator</a></li>
-          <li><a href="../find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="../calculator.html">장비 계산기</a></li>
+          <li><a href="../find-my-gear.html">내 장비 찾기</a></li>
           <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
         </ul>
       </div>
@@ -675,7 +673,7 @@
           <li><a href="../level/intermediate.html">중급 가이드</a></li>
           <li><a href="../level/advanced.html">상급 가이드</a></li>
           <li><a href="../level/pro.html">선수 가이드</a></li>
-          <li><a href="../premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+          <li><a href="../premium.html"><span style="color:var(--color-sun);font-weight:700">무료 입문 교육</span></a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -718,7 +716,7 @@
 <script src="../assets/js/main.js" defer></script>
   <script src="../assets/js/nav-auth.js" defer></script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
-  <link rel="stylesheet" href="../assets/css/agent-deny.css">
+  <link rel="stylesheet" href="../assets/css/agent-deny.css?tone=20260925-soft">
   <script src="../assets/js/agent-deny.js" defer></script>
 </body>
 </html>

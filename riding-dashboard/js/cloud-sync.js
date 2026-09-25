@@ -222,6 +222,7 @@
     var hasGpx = !!(gpxText && record.hasTrack);
 
     return client().then(function (sb) {
+      if (uid() !== u) throw new Error('account-changed');
       var row = recordToRow(u, record, opts.hasVideo);
       return sb.from('riding_sessions')
         .upsert(row, { onConflict: 'user_id,client_session_id' })
@@ -284,6 +285,7 @@
           .eq('user_id', u).eq('kind', 'track')
       ]);
     }).then(function (r) {
+      if (uid() !== u) return {ok:false, reason:'account-changed'};
       var sRes = r[0], fRes = r[1];
       if (sRes.error) throw sRes.error;
       /* session row id → track file (존재 여부) */
@@ -331,13 +333,14 @@
    * 반환 Promise<{ok, source}>. 실패해도 reject 안 함.
    * ============================================================ */
   function ensureTrack(id) {
+    var downloadOwner = null;
     if (!id) return Promise.resolve({ ok: false, reason: 'no-id' });
     if (readLocalTrack(id)) return Promise.resolve({ ok: true, source: 'local' });
 
     /* uid 는 client() 안에서 읽는다 — ?session 딥링크는 auth 해소 전에
        호출될 수 있어, _ensureClient() 가 끝난 뒤라야 uid 가 확정된다. */
     return client().then(function (sb) {
-      var u = uid();
+      var u = uid(); downloadOwner = u;
       if (!u) throw new Error('not-logged-in');
       function tryDownload(gz) {
         return sb.storage.from(BUCKET).download(trackPath(u, id, gz)).then(function (res) {
@@ -348,6 +351,7 @@
       /* 압축본 우선, 없으면 평문(구버전/CompressionStream 미지원 업로드) */
       return tryDownload(true).catch(function () { return tryDownload(false); });
     }).then(function (text) {
+      if (uid() !== downloadOwner) return {ok:false,reason:'account-changed'};
       if (typeof text !== 'string' || !text) return { ok: false, reason: 'empty' };
       return writeLocalTrack(id, text)
         ? { ok: true, source: 'cloud' }
@@ -442,8 +446,8 @@
     if (_syncing) return Promise.resolve({ ok: false, reason: 'in-progress' });
     if (!force && _syncedUid === u) return Promise.resolve({ ok: true, skipped: 'done' });
     _syncing = true;
-    return migrateLocalToCloud().then(pullSessions).then(function (res) {
-      _syncedUid = u; _syncing = false;
+    return pullSessions().then(function (res) {
+      _syncedUid = res && res.ok ? u : null; _syncing = false;
       return res;
     }).catch(function (e) {
       _syncing = false;

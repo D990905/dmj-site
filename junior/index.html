@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=mobile-tap-fix-20260526">
+<link rel="stylesheet" href="../assets/css/style.css?v=mobile-tap-fix-20260526&tone=20260925-soft">
 
 <style>
   .demo-hero {
@@ -250,8 +250,8 @@
   .placeholder-card__title { font-size: 1.125rem; font-weight: 700; color: var(--color-navy); margin: 0 0 6px; }
   .placeholder-card__sub { font-size: 0.9375rem; line-height: 1.55; color: var(--color-slate); margin: 0; }
 </style>
-</head>
-<body>
+<link rel="stylesheet" href="../assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<body class="dmj-legacy">
 
 <!-- Trust bar -->
 <div class="trust-bar"><div class="container"><div class="trust-bar__inner">
@@ -265,15 +265,13 @@
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="../index.html" class="nav__logo" aria-label="단무지 홈">
-        <span class="nav__logo-mark">D</span>
-        <span>단무지</span>
+      <a href="../index.html" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>GEAR &amp; RIDING</small></span>
       </a>
 
       <div class="nav__primary" role="menubar">
         <!-- 1. 브랜드 -->
         <div class="nav__has-sub" role="none">
-          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <a href="../catalog.html" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
           <div class="nav__sub" role="menu">
             <a href="../levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
             <a href="../ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
@@ -284,7 +282,7 @@
 
         <!-- 2. 라이딩 스타일 -->
         <div class="nav__has-sub" role="none">
-          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <a href="../find-my-gear.html" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
           <div class="nav__sub" role="menu">
             <a href="../style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
             <a href="../style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
@@ -306,7 +304,7 @@
 
         <!-- 4. 실력 수준 -->
         <div class="nav__has-sub" role="none">
-          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <a href="../premium.html" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
           <div class="nav__sub nav__sub--wide" role="menu">
             <a href="../level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="../level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
             <a href="../level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
@@ -386,7 +384,7 @@
 <section class="demo-hero">
   <img class="demo-hero__bg-image" src="../assets/images/junior/junior-hero.jpg" alt="빨강·파랑 윙과 보드를 들고 해변에 선 유소년 라이더 — 단무지 유소년·어린이 가이드" loading="eager" onerror="this.style.opacity=0" />
   <div class="container">
-    <nav class="demo-hero__crumb"><a href="../index.html">단무지</a><span class="sep">/</span><a href="../index.html#consultation">컨설팅</a><span class="sep">/</span><span style="color:#fff">유소년·어린이</span></nav>
+    <nav class="demo-hero__crumb"><a href="../index.html">단무지</a><span class="sep">/</span><a href="../inquiry.html">컨설팅</a><span class="sep">/</span><span style="color:#fff">유소년·어린이</span></nav>
     <span class="demo-hero__eyebrow">Junior · Child · Safety First</span>
     <h1 class="demo-hero__title">다음 세대 라이더<br><em>안전한 첫 시즌</em></h1>
     <p class="demo-hero__lead">단무지는 13-17세 유소년과 8-12세 어린이 라이더의 안전한 입문을 함께합니다. 안전 장비 — WIP impact vest·helmet — 우선, 강습·인솔자 동반 권장, 부모님 1:1 컨설팅 무료</p>
@@ -557,7 +555,7 @@
       <article class="gear-card" style="border-color:#C03030;border-width:2px">
         <span class="gear-card__cat" style="color:#C03030">Safety · 필수</span>
         <h3 class="gear-card__name">WIP Forward Impact Vest</h3>
-        <p class="gear-card__why">XS/S Junior 사이즈 정식 수입. 부력 + 충격 보호. <strong style="color:#C03030">없이 라이딩 X.</strong></p>
+        <p class="gear-card__why">XS/S Junior 사이즈 정식 수입. 부력 + 충격 보호 <strong style="color:#C03030">없이 라이딩 X.</strong></p>
         <div class="gear-card__sizes">
           <span class="gear-card__size">XS Junior</span>
           <span class="gear-card__size">S</span>
@@ -644,8 +642,8 @@
         <ul>
           <li><a href="../membership.html">회원 등급 안내</a></li>
           <li><a href="../glossary.html">윙포일 용어 사전</a></li>
-          <li><a href="../calculator.html">Lift Calculator</a></li>
-          <li><a href="../find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="../calculator.html">장비 계산기</a></li>
+          <li><a href="../find-my-gear.html">내 장비 찾기</a></li>
           <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
         </ul>
       </div>
@@ -656,7 +654,7 @@
           <li><a href="../level/intermediate.html">중급 가이드</a></li>
           <li><a href="../level/advanced.html">상급 가이드</a></li>
           <li><a href="../level/pro.html">선수 가이드</a></li>
-          <li><a href="../premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+          <li><a href="../premium.html"><span style="color:var(--color-sun);font-weight:700">무료 입문 교육</span></a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -699,7 +697,7 @@
 <script src="../assets/js/main.js" defer></script>
   <script src="../assets/js/nav-auth.js" defer></script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
-  <link rel="stylesheet" href="../assets/css/agent-deny.css">
+  <link rel="stylesheet" href="../assets/css/agent-deny.css?tone=20260925-soft">
   <script src="../assets/js/agent-deny.js" defer></script>
 </body>
 </html>

@@ -46,7 +46,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
+<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526&tone=20260925-soft">
 
 <style>
 /* Glossary-only page styles */
@@ -319,8 +319,8 @@
   flex-wrap: wrap;
 }
 </style>
-</head>
-<body>
+<link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<body class="dmj-legacy">
 
 <div class="trust-bar"><div class="container"><div class="trust-bar__inner">
 <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>3회 올림픽 출전 코치 운영</span>
@@ -332,14 +332,12 @@
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="index.html" class="nav__logo" aria-label="단무지 홈">
-        <span class="nav__logo-mark">D</span>
-        <span>단무지</span>
+      <a href="index.html" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>GEAR &amp; RIDING</small></span>
       </a>
 
       <div class="nav__primary" role="menubar">
         <div class="nav__has-sub" role="none">
-          <a href="#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <a href="catalog.html" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
           <div class="nav__sub" role="menu">
             <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
             <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
@@ -349,7 +347,7 @@
         </div>
 
         <div class="nav__has-sub" role="none">
-          <a href="#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <a href="find-my-gear.html" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
           <div class="nav__sub" role="menu">
             <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
             <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
@@ -370,7 +368,7 @@
         </div>
 
         <div class="nav__has-sub" role="none">
-          <a href="#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <a href="premium.html" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
           <div class="nav__sub nav__sub--wide" role="menu">
             <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
             <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
@@ -445,7 +443,7 @@
       <nav class="glossary-hero__crumb"><a href="index.html">단무지</a><span class="sep">/</span><span style="color:#fff">윙포일 용어 사전</span></nav>
       <span class="glossary-hero__eyebrow">Glossary · Wingfoil Terminology</span>
       <h1 class="glossary-hero__title">윙포일 <em>용어 사전</em></h1>
-      <p class="glossary-hero__lead">단무지가 컨설팅에서 자주 쓰는 용어를 한곳에 모았습니다. 입문·초급 라이더가 셋업 추천을 자연스럽게 따라올 수 있도록, 그리고 라이더 사이의 대화에서 같은 단어를 같은 의미로 쓰기 위해.</p>
+      <p class="glossary-hero__lead">단무지가 컨설팅에서 자주 쓰는 용어를 한곳에 모았습니다. 입문·초급 라이더가 셋업 추천을 자연스럽게 따라올 수 있도록, 그리고 라이더 사이의 대화에서 같은 단어를 같은 의미로 쓰기 위해</p>
     </div>
   </div>
 </section>
@@ -484,19 +482,19 @@
     <div class="glossary-list">
       <article class="glossary-item" id="wing">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">윙</span><span class="glossary-item__term-en">Wing · Sail</span></div>
-        <div class="glossary-item__def">손에 들고 바람을 받아 추진력을 만드는 인플레이트블 세일. 면적은 보통 <strong>2.5–7.5m²</strong> 사이로 라이더 체중·풍속에 맞춰 선택. <em>Wingfoil</em>의 "Wing"이 바로 이것</div>
+        <div class="glossary-item__def">손에 들고 바람을 받아 추진력을 만드는 인플레이트블 세일. 면적은 보통 <strong>2.5–7.5m²</strong> 사이로 라이더 체중·풍속에 맞춰 선택 <em>Wingfoil</em>의 "Wing"이 바로 이것</div>
       </article>
       <article class="glossary-item" id="foil">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">포일</span><span class="glossary-item__term-en">Foil · Hydrofoil</span></div>
-        <div class="glossary-item__def">보드 아래에 부착되어 양력을 만드는 수중 날개 시스템. <strong>Front wing + Stab(ilizer) + Mast + Fuselage</strong>의 4개 부품으로 구성. 속도가 일정 수준 이상 올라가면 보드가 물 위로 떠오르는 원리</div>
+        <div class="glossary-item__def">보드 아래에 부착되어 양력을 만드는 수중 날개 시스템 <strong>Front wing + Stab(ilizer) + Mast + Fuselage</strong>의 4개 부품으로 구성. 속도가 일정 수준 이상 올라가면 보드가 물 위로 떠오르는 원리</div>
       </article>
       <article class="glossary-item" id="front-wing">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">프론트 윙</span><span class="glossary-item__term-en">Front Wing</span></div>
-        <div class="glossary-item__def">포일 시스템에서 양력의 주력을 담당하는 큰 날개. <strong>면적·AR(<a href="#ar">Aspect Ratio</a>)·형상</strong>에 따라 라이딩 특성이 결정됨. 입문·초급 라이더는 큰 면적 + low-AR, 숙련자는 작은 면적 + high-AR 선호</div>
+        <div class="glossary-item__def">포일 시스템에서 양력의 주력을 담당하는 큰 날개 <strong>면적·AR(<a href="#ar">Aspect Ratio</a>)·형상</strong>에 따라 라이딩 특성이 결정됨. 입문·초급 라이더는 큰 면적 + low-AR, 숙련자는 작은 면적 + high-AR 선호</div>
       </article>
       <article class="glossary-item" id="stab">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">스테빌라이저</span><span class="glossary-item__term-en">Stab(ilizer) · Rear Wing</span></div>
-        <div class="glossary-item__def">프론트 윙 뒤쪽에 위치한 작은 날개. <strong>피치(앞뒤 기울기) 제어와 안정성</strong>을 담당. 면적이 큰 stab은 안정성 ↑, 면적이 작은 stab은 반응성 ↑</div>
+        <div class="glossary-item__def">프론트 윙 뒤쪽에 위치한 작은 날개 <strong>피치(앞뒤 기울기) 제어와 안정성</strong>을 담당. 면적이 큰 stab은 안정성 ↑, 면적이 작은 stab은 반응성 ↑</div>
       </article>
       <article class="glossary-item" id="mast">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">마스트</span><span class="glossary-item__term-en">Mast</span></div>
@@ -537,23 +535,23 @@
       </article>
       <article class="glossary-item" id="lift">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">양력</span><span class="glossary-item__term-en">Lift</span></div>
-        <div class="glossary-item__def">포일이 물에서 만들어내는 위로 향하는 힘. <strong>속도² × 면적 × CL</strong>에 비례. 양력이 보드 무게(라이더 + 보드)를 넘어서면 보드가 물 위로 떠오름. <strong>동일 원리가 윈드서핑 세일·윙포일 윙에도 적용</strong> — 유체(공기·물)에서 airfoil 단면이 만드는 보편 양력</div>
+        <div class="glossary-item__def">포일이 물에서 만들어내는 위로 향하는 힘 <strong>속도² × 면적 × CL</strong>에 비례. 양력이 보드 무게(라이더 + 보드)를 넘어서면 보드가 물 위로 떠오름 <strong>동일 원리가 윈드서핑 세일·윙포일 윙에도 적용</strong> — 유체(공기·물)에서 airfoil 단면이 만드는 보편 양력</div>
       </article>
       <article class="glossary-item" id="cl">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">양력계수</span><span class="glossary-item__term-en">CL · Coefficient of Lift</span></div>
-        <div class="glossary-item__def">양력 공식의 계수. 포일의 <strong>AR·받음각·단면 형상</strong>에 따라 결정되는 무차원 숫자. <a href="calculator.html">Lift Calculator</a>에서 본인 체중·포일·풍속으로 take-off 풍속을 직접 계산할 수 있음</div>
+        <div class="glossary-item__def">양력 공식의 계수. 포일의 <strong>AR·받음각·단면 형상</strong>에 따라 결정되는 무차원 숫자 <a href="calculator.html">장비 계산기</a>에서 본인 체중·포일·풍속으로 take-off 풍속을 직접 계산할 수 있음</div>
       </article>
       <article class="glossary-item" id="ld-ratio">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">양력항력비</span><span class="glossary-item__term-en">L/D Ratio · Lift-to-Drag</span></div>
-        <div class="glossary-item__def">양력이 항력의 몇 배인지 나타내는 효율 지표. 클수록 같은 추진력으로 더 멀리·더 빠르게 갈 수 있음. 단무지 <a href="calculator.html">Lift Calculator</a> 공식 — <strong>포일 L/D ≈ 9.13·√AR</strong>(예: R6 V1 AR 13.7 → L/D ≈ 33.8), <strong>인플레이트블 윙 L/D ≈ 1.83·√AR</strong>(LEI 단면 typical e≈0.42·CD₀≈0.098). 둘 다 고전 lifting-line 이론(<a href="#ref-anderson2017">Anderson 2017</a>)에서 유도, 윙 측은 <a href="#ref-folkersma2019">Folkersma·Schmehl·Viré 2019</a> 측정 데이터와 일치</div>
+        <div class="glossary-item__def">양력이 항력의 몇 배인지 나타내는 효율 지표. 클수록 같은 추진력으로 더 멀리·더 빠르게 갈 수 있음. 단무지 <a href="calculator.html">장비 계산기</a> 공식 — <strong>포일 L/D ≈ 9.13·√AR</strong>(예: R6 V1 AR 13.7 → L/D ≈ 33.8), <strong>인플레이트블 윙 L/D ≈ 1.83·√AR</strong>(LEI 단면 typical e≈0.42·CD₀≈0.098). 둘 다 고전 lifting-line 이론(<a href="#ref-anderson2017">Anderson 2017</a>)에서 유도, 윙 측은 <a href="#ref-folkersma2019">Folkersma·Schmehl·Viré 2019</a> 측정 데이터와 일치</div>
       </article>
       <article class="glossary-item" id="aoa">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">어택앵글</span><span class="glossary-item__term-en">Angle of Attack · AoA</span></div>
-        <div class="glossary-item__def">포일·윙·세일의 chord line과 유체 흐름이 만드는 각도. <strong>AoA가 커질수록 양력 증가</strong>하지만 <em>임계각(stall angle)</em>을 넘으면 양력 급감 + drag 급증. 윙포일에서는 마스트 trim·라이더 발 위치가 AoA를 결정 — 너무 크면 stall, 너무 작으면 양력 부족</div>
+        <div class="glossary-item__def">포일·윙·세일의 chord line과 유체 흐름이 만드는 각도 <strong>AoA가 커질수록 양력 증가</strong>하지만 <em>임계각(stall angle)</em>을 넘으면 양력 급감 + drag 급증. 윙포일에서는 마스트 trim·라이더 발 위치가 AoA를 결정 — 너무 크면 stall, 너무 작으면 양력 부족</div>
       </article>
       <article class="glossary-item" id="glide">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">글라이딩</span><span class="glossary-item__term-en">Glide</span></div>
-        <div class="glossary-item__def">동력 입력 없이 부드럽게 미끄러져 나가는 상태. 고AR 포일은 글라이딩이 길어 펌핑 사이 간격을 길게 유지할 수 있음. <strong>속도 유지 = 적은 펌핑 = 덜 피곤한 라이딩</strong></div>
+        <div class="glossary-item__def">동력 입력 없이 부드럽게 미끄러져 나가는 상태. 고AR 포일은 글라이딩이 길어 펌핑 사이 간격을 길게 유지할 수 있음 <strong>속도 유지 = 적은 펌핑 = 덜 피곤한 라이딩</strong></div>
       </article>
       <article class="glossary-item" id="pumping">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">펌핑</span><span class="glossary-item__term-en">Pumping</span></div>
@@ -586,7 +584,7 @@
     <div class="glossary-list">
       <article class="glossary-item" id="true-wind">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">참바람</span><span class="glossary-item__term-en">True Wind</span></div>
-        <div class="glossary-item__def">정지 상태에서 측정되는 실제 바람. 풍속 예보·spot 평가에 사용되는 기준값. <strong>참바람 12노트</strong>면 정지한 사람이 12노트 바람을 맞고 있다는 뜻</div>
+        <div class="glossary-item__def">정지 상태에서 측정되는 실제 바람. 풍속 예보·spot 평가에 사용되는 기준값 <strong>참바람 12노트</strong>면 정지한 사람이 12노트 바람을 맞고 있다는 뜻</div>
       </article>
       <article class="glossary-item" id="apparent-wind">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">겉보기 바람</span><span class="glossary-item__term-en">Apparent Wind</span></div>
@@ -602,11 +600,11 @@
       </article>
       <article class="glossary-item" id="vmg">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">VMG · 풍상 속도</span><span class="glossary-item__term-en">Velocity Made Good</span></div>
-        <div class="glossary-item__def">목표 방향으로의 실효 속도. 풍상으로 직접 갈 수 없으니 지그재그(<a href="#tack">택</a>)로 진행할 때, 실제 풍상 방향으로 얼마나 빠르게 전진하는지의 지표. <strong>SOG × cos(풍상 진행 각도)</strong>로 계산. 레이스에서 핵심 지표 — 보드 속도(<a href="#sog">SOG</a>)가 빨라도 너무 넓은 각으로 가면 VMG 는 낮아짐</div>
+        <div class="glossary-item__def">목표 방향으로의 실효 속도. 풍상으로 직접 갈 수 없으니 지그재그(<a href="#tack">택</a>)로 진행할 때, 실제 풍상 방향으로 얼마나 빠르게 전진하는지의 지표 <strong>SOG × cos(풍상 진행 각도)</strong>로 계산. 레이스에서 핵심 지표 — 보드 속도(<a href="#sog">SOG</a>)가 빨라도 너무 넓은 각으로 가면 VMG 는 낮아짐</div>
       </article>
       <article class="glossary-item" id="sog">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">SOG · 대지 속도</span><span class="glossary-item__term-en">Speed Over Ground</span></div>
-        <div class="glossary-item__def">GPS 기준 보드의 절대 진행 속도. 방향에 관계없이 "보드가 얼마나 빠르게 움직이는가"를 그대로 측정. 강풍 <a href="#points-of-sail">빔리치~브로드리치</a>에서는 SOG 30+ 노트도 가능하지만, 풍상 방향 실효 속도(<a href="#vmg">VMG</a>)는 그 일부만 반영. <strong>SOG vs VMG 짝개념</strong> — SOG 는 단순 속도, VMG 는 풍상 방향 실효 전진. 라이더가 GPS 앱(KaiRunner / Woo 등)에서 보는 숫자는 대부분 SOG</div>
+        <div class="glossary-item__def">GPS 기준 보드의 절대 진행 속도. 방향에 관계없이 "보드가 얼마나 빠르게 움직이는가"를 그대로 측정. 강풍 <a href="#points-of-sail">빔리치~브로드리치</a>에서는 SOG 30+ 노트도 가능하지만, 풍상 방향 실효 속도(<a href="#vmg">VMG</a>)는 그 일부만 반영 <strong>SOG vs VMG 짝개념</strong> — SOG 는 단순 속도, VMG 는 풍상 방향 실효 전진. 라이더가 GPS 앱(KaiRunner / Woo 등)에서 보는 숫자는 대부분 SOG</div>
       </article>
       <article class="glossary-item" id="points-of-sail">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">바람 방향 7 코스</span><span class="glossary-item__term-en">Points of Sail</span></div>
@@ -651,11 +649,11 @@
     <div class="glossary-list">
       <article class="glossary-item" id="jibe">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">자이브</span><span class="glossary-item__term-en">Jibe · Gybe</span></div>
-        <div class="glossary-item__def">풍하 방향으로 회전하는 기술. 윙을 풍하 쪽으로 넘기며 진행 방향을 180도 바꿈. <a href="#tack">택</a>보다 일반적으로 더 쉬움. 입문·초급 라이더가 중급로 진화하는 첫 관문</div>
+        <div class="glossary-item__def">풍하 방향으로 회전하는 기술. 윙을 풍하 쪽으로 넘기며 진행 방향을 180도 바꿈 <a href="#tack">택</a>보다 일반적으로 더 쉬움. 입문·초급 라이더가 중급로 진화하는 첫 관문</div>
       </article>
       <article class="glossary-item" id="tack">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">택</span><span class="glossary-item__term-en">Tack</span></div>
-        <div class="glossary-item__def">풍상 방향으로 회전하는 기술. 보드의 노즈가 바람을 거슬러 돌아가며, 회전 중 일시적으로 윙이 흔들리는 영역(<a href="#wind-window">윈드 윈도우</a> 외부)을 지나야 함. <a href="#jibe">자이브</a>보다 어려운 기술</div>
+        <div class="glossary-item__def">풍상 방향으로 회전하는 기술. 보드의 노즈가 바람을 거슬러 돌아가며, 회전 중 일시적으로 윙이 흔들리는 영역(<a href="#wind-window">윈드 윈도우</a> 외부)을 지나야 함 <a href="#jibe">자이브</a>보다 어려운 기술</div>
       </article>
       <article class="glossary-item" id="sitting-start">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">싯팅 스타트</span><span class="glossary-item__term-en">Sitting Start</span></div>
@@ -663,7 +661,7 @@
       </article>
       <article class="glossary-item" id="beach-launch">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">비치 론칭</span><span class="glossary-item__term-en">Beach Launching</span></div>
-        <div class="glossary-item__def"><strong>포일이 바닥에 닿지 않을 정도의 깊이까지</strong> 보드를 끌고 들어가는 동작. <em>파도가 높을 경우가 아니더라도 늘 파도와 직각으로 보드를 유지</em>하며 바다로 진입</div>
+        <div class="glossary-item__def"><strong>포일이 바닥에 닿지 않을 정도의 깊이까지</strong> 보드를 끌고 들어가는 동작 <em>파도가 높을 경우가 아니더라도 늘 파도와 직각으로 보드를 유지</em>하며 바다로 진입</div>
       </article>
       <article class="glossary-item" id="toeside-tack">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">토사이드 택킹</span><span class="glossary-item__term-en">Toeside Tacking</span></div>
@@ -683,7 +681,7 @@
       </article>
       <article class="glossary-item" id="jumping">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">점핑</span><span class="glossary-item__term-en">Jumping</span></div>
-        <div class="glossary-item__def">보드와 포일이 물 밖으로 완전히 떠오르는 동작. <strong>swell·chop 진입 + 윙 power 동기화 + 코어 활용</strong>의 조합이 필요한 상급 이상 스킬</div>
+        <div class="glossary-item__def">보드와 포일이 물 밖으로 완전히 떠오르는 동작 <strong>swell·chop 진입 + 윙 power 동기화 + 코어 활용</strong>의 조합이 필요한 상급 이상 스킬</div>
       </article>
     </div>
   </section>
@@ -700,11 +698,11 @@
     <div class="glossary-list">
       <article class="glossary-item" id="catapult">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">카타폴트</span><span class="glossary-item__term-en">Catapult</span></div>
-        <div class="glossary-item__def">라이더가 갑자기 앞으로 튕겨 나가는 사고. <strong>포일이 물 밖으로 솟구치거나(over-foiling), 윙 팁에 <a href="#ventilation">벤틸레이션</a>이 발생할 때</strong> 빈발. 임팩트자켓·헬멧 같은 안전장비의 핵심 사용 사유</div>
+        <div class="glossary-item__def">라이더가 갑자기 앞으로 튕겨 나가는 사고 <strong>포일이 물 밖으로 솟구치거나(over-foiling), 윙 팁에 <a href="#ventilation">벤틸레이션</a>이 발생할 때</strong> 빈발. 임팩트자켓·헬멧 같은 안전장비의 핵심 사용 사유</div>
       </article>
       <article class="glossary-item" id="ventilation">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">벤틸레이션</span><span class="glossary-item__term-en">Ventilation</span></div>
-        <div class="glossary-item__def">포일 윙 표면에 공기가 침입하여 양력이 급감하는 현상. <strong>보드를 과도하게 기울이거나 마스트가 짧을 때</strong>, 또는 <a href="#cavitation">케비테이션</a>이 발달했을 때 발생. 양력 손실 → 포일 dive → <a href="#catapult">카타폴트</a>로 이어지는 사고 사슬의 중간 단계</div>
+        <div class="glossary-item__def">포일 윙 표면에 공기가 침입하여 양력이 급감하는 현상 <strong>보드를 과도하게 기울이거나 마스트가 짧을 때</strong>, 또는 <a href="#cavitation">케비테이션</a>이 발달했을 때 발생. 양력 손실 → 포일 dive → <a href="#catapult">카타폴트</a>로 이어지는 사고 사슬의 중간 단계</div>
       </article>
       <article class="glossary-item" id="cavitation">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">케비테이션</span><span class="glossary-item__term-en">Cavitation</span></div>
@@ -770,19 +768,19 @@
     <div class="glossary-list">
       <article class="glossary-item" id="skill-5tier">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">5등급 스킬 체계</span><span class="glossary-item__term-en">5-Tier Skill System</span></div>
-        <div class="glossary-item__def">단무지 컨설팅 표준 5단계. <strong>입문 → 초급 → 중급 → 상급 → 선수</strong>. 각 등급은 <a href="#lean-angle">린 각도</a> 임계와 매핑: <strong>9° / 19° / 29° / 39° / 50°</strong>. <a href="calculator.html">Lift Calculator</a> 윙 사이즈 추천 알고리즘은 등급별 heel-out 한계로 안전 cap을 계산함</div>
+        <div class="glossary-item__def">단무지 컨설팅 표준 5단계 <strong>입문 → 초급 → 중급 → 상급 → 선수</strong>. 각 등급은 <a href="#lean-angle">린 각도</a> 임계와 매핑: <strong>9° / 19° / 29° / 39° / 50°</strong>. <a href="calculator.html">장비 계산기</a> 윙 사이즈 추천 알고리즘은 등급별 heel-out 한계로 안전 cap을 계산함</div>
       </article>
       <article class="glossary-item" id="plane-sagittal">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">시상면</span><span class="glossary-item__term-en">Sagittal Plane</span></div>
-        <div class="glossary-item__def">몸을 좌·우 반으로 나누는 가상의 면. <strong>앞뒤 움직임</strong>이 일어나는 평면. 윙포일 매핑 — <a href="#aoa">어택앵글</a> 조절 (앞뒤 trim, 발 위치 미세조정). 12주 land program 약점 진단 8동작 중 4번째 (한발 데드리프트·런지)에서 평가</div>
+        <div class="glossary-item__def">몸을 좌·우 반으로 나누는 가상의 면 <strong>앞뒤 움직임</strong>이 일어나는 평면. 윙포일 매핑 — <a href="#aoa">어택앵글</a> 조절 (앞뒤 trim, 발 위치 미세조정). 12주 land program 약점 진단 8동작 중 4번째 (한발 데드리프트·런지)에서 평가</div>
       </article>
       <article class="glossary-item" id="plane-frontal">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">관상면</span><span class="glossary-item__term-en">Frontal Plane · Coronal</span></div>
-        <div class="glossary-item__def">몸을 앞·뒤 반으로 나누는 가상의 면. <strong>좌우 움직임</strong>이 일어나는 평면. 윙포일 매핑 — <a href="#lean-angle">린 각도</a>·heel/toe edge 컨트롤. 약쪽(약한 발) 진단의 1차 plane이며, 좌우 비대칭이 가장 크게 드러남</div>
+        <div class="glossary-item__def">몸을 앞·뒤 반으로 나누는 가상의 면 <strong>좌우 움직임</strong>이 일어나는 평면. 윙포일 매핑 — <a href="#lean-angle">린 각도</a>·heel/toe edge 컨트롤. 약쪽(약한 발) 진단의 1차 plane이며, 좌우 비대칭이 가장 크게 드러남</div>
       </article>
       <article class="glossary-item" id="plane-transverse">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">횡단면</span><span class="glossary-item__term-en">Transverse Plane · Horizontal</span></div>
-        <div class="glossary-item__def">몸을 위·아래 반으로 나누는 가상의 면. <strong>회전 움직임</strong>이 일어나는 평면. 윙포일 매핑 — tack·jibe 회전, 어깨·골반 분리 (separation). <a href="#spl">스파이럴 라인</a>이 작동하는 plane</div>
+        <div class="glossary-item__def">몸을 위·아래 반으로 나누는 가상의 면 <strong>회전 움직임</strong>이 일어나는 평면. 윙포일 매핑 — tack·jibe 회전, 어깨·골반 분리 (separation). <a href="#spl">스파이럴 라인</a>이 작동하는 plane</div>
       </article>
       <article class="glossary-item" id="plane-balance">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">균형 plane</span><span class="glossary-item__term-en">Balance · Multi-planar</span></div>
@@ -794,11 +792,11 @@
       </article>
       <article class="glossary-item" id="spl">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">스파이럴 라인</span><span class="glossary-item__term-en">SPL · Spiral Line</span></div>
-        <div class="glossary-item__def">근막경선 중 몸을 <strong>나선형</strong>으로 감싸는 기능선. 후두근 → 척추기립근 → 반대편 복사근 → 대퇴부 외측. <a href="#plane-transverse">횡단면</a> 회전 (tack/jibe) 의 주력이며, <a href="#stance-preference">스탠스 비대칭</a> 진단의 해부학적 근거. 출처 — Myers <em>Anatomy Trains</em> 4판 (<a href="#ref-myers2020">Myers 2020</a>)</div>
+        <div class="glossary-item__def">근막경선 중 몸을 <strong>나선형</strong>으로 감싸는 기능선. 후두근 → 척추기립근 → 반대편 복사근 → 대퇴부 외측 <a href="#plane-transverse">횡단면</a> 회전 (tack/jibe) 의 주력이며, <a href="#stance-preference">스탠스 비대칭</a> 진단의 해부학적 근거. 출처 — Myers <em>Anatomy Trains</em> 4판 (<a href="#ref-myers2020">Myers 2020</a>)</div>
       </article>
       <article class="glossary-item" id="stance-preference">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">스탠스 선호도</span><span class="glossary-item__term-en">Stance Preference · Footedness</span></div>
-        <div class="glossary-item__def">왼발이 앞(Regular) 인지 오른발이 앞(Goofy) 인지의 선호. 손잡이(handedness) 와 비슷한 lateral asymmetry로, 학습 빈도와 함께 결정됨. <strong>약 12-24%가 atypical footedness</strong> (<a href="#ref-packheiser2020">Packheiser et al. 2020</a> 메타분석, n=145,135). 단무지 1:1 코칭은 약쪽을 <em>결함이 아닌 학습 빈도의 결과</em>로 framing — Waterloo Footedness Questionnaire (WFQ-R) + skill-assessment 8동작 + 약쪽 tack 실측 3-test 일치 여부로 진단</div>
+        <div class="glossary-item__def">왼발이 앞(Regular) 인지 오른발이 앞(Goofy) 인지의 선호. 손잡이(handedness) 와 비슷한 lateral asymmetry로, 학습 빈도와 함께 결정됨 <strong>약 12-24%가 atypical footedness</strong> (<a href="#ref-packheiser2020">Packheiser et al. 2020</a> 메타분석, n=145,135). 단무지 1:1 코칭은 약쪽을 <em>결함이 아닌 학습 빈도의 결과</em>로 framing — Waterloo Footedness Questionnaire (WFQ-R) + skill-assessment 8동작 + 약쪽 tack 실측 3-test 일치 여부로 진단</div>
       </article>
       <article class="glossary-item" id="fitt-vp">
         <div class="glossary-item__term"><span class="glossary-item__term-ko">FITT-VP 원칙</span><span class="glossary-item__term-en">FITT-VP Principle</span></div>
@@ -851,7 +849,7 @@
       </article>
     </div>
     <p style="font-size:13px;color:var(--color-slate);margin:24px 0 0;text-align:center">
-      🔒 Fabrication 정책: 모든 인용은 외부 verification (CrossRef·PubMed·publisher) 통과 후 등재.
+      🔒 Fabrication 정책: 모든 인용은 외부 verification (CrossRef·PubMed·publisher) 통과 후 등재
     </p>
   </section>
 
@@ -869,7 +867,7 @@
     </div>
     <div class="glossary-cta__buttons">
       <a href="consult.html" class="btn btn--accent">1:1 구매 상담하기</a>
-      <a href="find-my-gear.html" class="btn btn--ghost">Find My Gear 퀴즈</a>
+      <a href="find-my-gear.html" class="btn btn--ghost">내 장비 찾기</a>
     </div>
   </div>
 
@@ -884,8 +882,8 @@
         <ul>
           <li><a href="membership.html">회원 등급 안내</a></li>
           <li><a href="glossary.html">윙포일 용어 사전</a></li>
-          <li><a href="calculator.html">Lift Calculator</a></li>
-          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="calculator.html">장비 계산기</a></li>
+          <li><a href="find-my-gear.html">내 장비 찾기</a></li>
           <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
         </ul>
       </div>
@@ -896,7 +894,7 @@
           <li><a href="level/intermediate.html">중급 가이드</a></li>
           <li><a href="level/advanced.html">상급 가이드</a></li>
           <li><a href="level/pro.html">선수 가이드</a></li>
-          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">무료 입문 교육</span></a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -963,7 +961,7 @@
 </script>
   <script src="assets/js/nav-auth.js" defer></script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
-  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <link rel="stylesheet" href="assets/css/agent-deny.css?tone=20260925-soft">
   <script src="assets/js/agent-deny.js" defer></script>
 </body>
 </html>

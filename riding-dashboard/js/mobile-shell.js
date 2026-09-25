@@ -80,10 +80,10 @@
       /* §586k (옥대표 "로그인창이 없는듯") — 로그인 링크는 데스크톱 헤더의
          #auth-chip 안에 있는데 폰에서는 그 헤더를 숨긴다. ⋮ 시트 맨 아래에
          이름표 없이 들어가 있어 사실상 안 보였다. 앱바에 꺼내 둔다. */
-      '<button type="button" class="rdm-iconbtn rdm-acct" id="rdm-account" aria-label="Account">' +
+      '<button type="button" class="rdm-iconbtn rdm-acct" id="rdm-account" aria-label="내 계정">' +
         ICON.user + '<span class="rdm-acct__dot" hidden></span></button>' +
       '<button type="button" class="rdm-iconbtn" id="rdm-upload" aria-label="Upload files">' + ICON.up + '</button>' +
-      '<button type="button" class="rdm-iconbtn" id="rdm-actions" aria-label="Actions">' + ICON.dots + '</button>';
+      '<button type="button" class="rdm-iconbtn" id="rdm-actions" aria-label="동작 메뉴">' + ICON.dots + '</button>';
     var wrap = $('.page-wrapper');
     wrap.insertBefore(bar, wrap.firstChild);
     els.appbar = bar;
@@ -128,7 +128,7 @@
     var u = signedInUser();
     var dot = b.querySelector('.rdm-acct__dot');
     if (dot) dot.hidden = !u;
-    b.setAttribute('aria-label', u ? 'Account: ' + (u.name || u.email || 'signed in') : 'Sign in');
+    b.setAttribute('aria-label', u ? '내 계정: ' + (u.name || u.email || '로그인됨') : '로그인');
   }
   /* 로그인 전이면 곧장 로그인 화면으로. 주소는 v2-app 이 만든 링크를
      그대로 쓴다(돌아올 곳 next= 포함) — 여기서 따로 만들면 둘이 갈라진다.
@@ -237,12 +237,11 @@
   var ACTIONS = [
     { act: 'upload', icon: 'up',   label: 'Upload files' },
     { act: 'replay', icon: 'play', label: 'Replay' },
-    { act: 'save',   icon: 'save', label: 'Save session' },
+    { act: 'save',   icon: 'save', label: '분석·기록 저장' },
     { act: 'pdf',    icon: 'file', label: 'PDF' },
-    { act: 'csv',    icon: 'file', label: 'Export CSV' },
-    { act: 'gpx',    icon: 'file', label: 'Export GPX' },
-    { act: 'theme',  icon: 'sun',  label: 'Light / Dark' },
-    { act: 'old',    icon: 'home', label: 'Old dashboard' }
+    { act: 'csv',    icon: 'file', label: 'CSV 내보내기' },
+    { act: 'gpx',    icon: 'file', label: 'GPX 내보내기' },
+    { act: 'theme',  icon: 'sun',  label: '밝은 화면 · 어두운 화면' }
   ];
   var ACT_SEL = {
     upload: '#v2-file', replay: '#btn-replay', save: '#btn-save',
@@ -250,24 +249,23 @@
   };
 
   function sheetActions() {
-    var h = '<div class="rdm-sheet__ttl">ACCOUNT</div>' +
+    var h = '<div class="rdm-sheet__ttl">내 계정</div>' +
             '<div class="rdm-sheet__slot" id="rdm-slot-auth"></div>' +
-            /* 사실만 말한다: v2 는 cloud-sync.js 를 싣지 않는다(§586k 확인).
-               로그인해도 기록은 이 기기에만 있다. */
-            '<div class="rdm-sheet__note">Rides are kept on this device. ' +
-            'Moving them between phone and computer is not switched on yet.</div>' +
-            '<div class="rdm-sheet__ttl">SESSION</div>' +
+            /* Local persistence and account sync are separate outcomes. */
+            '<div class="rdm-sheet__note">기록은 우선 이 기기에 저장됩니다. ' +
+            '로그인한 계정의 동기화 성공 여부는 저장 결과에서 확인하세요.</div>' +
+            '<div class="rdm-sheet__ttl">라이딩 기록</div>' +
             '<div class="rdm-sheet__slot" id="rdm-slot-ghost"></div>';
     ACTIONS.forEach(function (a) {
       if (a.act === 'theme' || a.act === 'old') return;
       h += '<button type="button" class="rdm-sheet__row" data-act="' + a.act + '">' +
-           ICON[a.icon] + '<span>' + a.label + '</span></button>';
+           ICON[a.icon] + '<span>' + (a.act === 'save' && $('#btn-save') ? $('#btn-save').textContent : a.label) + '</span></button>';
     });
-    h += '<div class="rdm-sheet__ttl">APP</div>';
-    ['theme', 'old'].forEach(function (k) {
+    h += '<div class="rdm-sheet__ttl">화면 설정</div>';
+    ['theme'].forEach(function (k) {
       var a = ACTIONS.filter(function (x) { return x.act === k; })[0];
       h += '<button type="button" class="rdm-sheet__row" data-act="' + a.act + '">' +
-           ICON[a.icon] + '<span>' + a.label + '</span></button>';
+           ICON[a.icon] + '<span>' + (a.act === 'save' && $('#btn-save') ? $('#btn-save').textContent : a.label) + '</span></button>';
     });
     return h;
   }
@@ -301,10 +299,10 @@
       closeSheet();
       return;
     }
-    if (act === 'old') { location.href = 'index.html'; return; }
     var sel = ACT_SEL[act];
     var el = sel && $(sel);
     if (!el) { console.warn('[RDMobile] action target missing:', act, sel); return; }
+    if (el.disabled) return;
     closeSheet();
     el.click();
   }

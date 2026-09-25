@@ -48,6 +48,8 @@
   // user_data 테이블로 가는 suffix 목록 (cart 는 별도 cart_items)
   var USER_DATA_SUFFIXES = [
     'skill_assessment_v1',
+    'skill_level_v1',
+    'agent_chat_history',
     'self_assessment_v1',
     'fmg_history',
     'land_phase',
@@ -142,6 +144,7 @@
         return Array.isArray(arr) ? arr : [];
       }
       // 레거시 dmj_users 1회 이관 — 옛 localStorage 회원 시스템에 등록했던 장비 복구
+      if (localStorage.getItem('dmj_synced_' + uid + '_gear')) return [];
       if (email) {
         var usersRaw = localStorage.getItem('dmj_users');
         if (usersRaw) {
@@ -178,6 +181,7 @@
         return (obj && typeof obj === 'object' && !Array.isArray(obj)) ? obj : {};
       }
       // 레거시 dmj_users 1회 이관 — 옛 localStorage 회원 시스템 기본정보 복구
+      if (localStorage.getItem('dmj_synced_' + uid + '_profile_extra')) return {};
       if (email) {
         var usersRaw = localStorage.getItem('dmj_users');
         if (usersRaw) {
@@ -251,13 +255,15 @@
 
   function refreshProfile() {
     if (!cachedSession || !sb) return Promise.resolve(null);
-    return sb.from('profiles').select('*').eq('id', cachedSession.user.id).single()
+    var profileOwner=cachedSession.user.id, profileAuthUser=cachedSession.user;
+    return sb.from('profiles').select('*').eq('id', profileOwner).single()
       .then(function (res) {
+        if (!cachedSession || cachedSession.user.id !== profileOwner || !res.data || res.data.id !== profileOwner) return null;
         if (res.error) {
           console.warn('[DMJAuth §180] refreshProfile error', res.error);
           return null;
         }
-        cachedProfile = mapDbToLegacy(res.data, cachedSession.user);
+        cachedProfile = mapDbToLegacy(res.data, profileAuthUser);
         try { localStorage.setItem(USER_CACHE_KEY, JSON.stringify(cachedProfile)); } catch (e) {}
         return cachedProfile;
       });
@@ -481,6 +487,8 @@
 
   function updateUser(patch) {
     if (!patch || typeof patch !== 'object') return Promise.resolve(cachedProfile);
+    var updateOwner=currentUserId(), beforeProfile=cachedProfile ? Object.assign({},cachedProfile) : null;
+    if (!cachedSession || !updateOwner || cachedSession.user.id !== updateOwner) return Promise.reject(new Error('로그인이 필요합니다'));
     // §184 (데이빗 2026-06-04) — gear 는 profiles 컬럼이 없어 user_data 'gear' 로 저장.
     // 동기 반영 (저장 직후 currentUser().gear 를 읽는 기존 사용처 호환 — 옛 shim 과 동일 semantics).
     if ('gear' in patch) {
@@ -540,16 +548,20 @@
       }
     }
     return ensureClient().then(function () {
-      if (!cachedSession) return null;
+      if (!cachedSession || cachedSession.user.id !== updateOwner) throw new Error('계정이 변경되어 저장을 중단했습니다');
       var dbPatch = mapLegacyPatchToDb(patch);
       if (Object.keys(dbPatch).length === 0) return cachedProfile;
-      return sb.from('profiles').update(dbPatch).eq('id', cachedSession.user.id)
+      return sb.from('profiles').update(dbPatch).eq('id', updateOwner).select('id').single()
         .then(function (res) {
-          if (res.error) {
-            console.warn('[DMJAuth §180] updateUser error', res.error);
-            return cachedProfile;
+          if (!cachedSession || cachedSession.user.id !== updateOwner) throw new Error('계정이 변경되었습니다');
+          if (res.error || !res.data || res.data.id !== updateOwner) {
+            if (cachedProfile && cachedProfile.id===updateOwner && beforeProfile) {
+              for (var key in patch) if (Object.prototype.hasOwnProperty.call(patch,key) && cachedProfile[key]===patch[key]) cachedProfile[key]=beforeProfile[key];
+              try { localStorage.setItem(USER_CACHE_KEY,JSON.stringify(cachedProfile)); } catch (_) {}
+            }
+            throw new Error('서버에 기본 정보를 저장하지 못했습니다. 입력 내용을 확인하고 다시 저장해 주세요.');
           }
-          return refreshProfile();
+          return refreshProfile().then(function(profile){if(!profile)throw new Error('저장 결과를 확인하지 못했습니다');return profile;});
         });
     });
   }
@@ -647,24 +659,89 @@
 
   // 백그라운드 sync — 1초 debounce per suffix
   var _syncTimers = {};
+  var _syncRunning = {};
+  var _syncRevision = {};
+  function _markCloudKnown(owner, suffix) {
+    try { localStorage.setItem('dmj_synced_' + owner + '_' + suffix, '1'); } catch (e) {}
+  }
+  function _pendingKey(owner, suffix) { return 'dmj_pending_' + owner + '_' + suffix; }
+  function _readPending(owner, suffix) {
+    try { return JSON.parse(localStorage.getItem(_pendingKey(owner, suffix)) || 'null'); } catch (e) { return null; }
+  }
+  function _markPending(owner, suffix, op, value) {
+    if (!owner || USER_DATA_SUFFIXES.concat(['cart']).indexOf(suffix) < 0) return;
+    var key = owner + ':' + suffix;
+    _syncRevision[key] = (_syncRevision[key] || 0) + 1;
+    try { localStorage.setItem(_pendingKey(owner, suffix), JSON.stringify({op:op,value:value})); } catch (e) {}
+  }
+  function _clearPending(owner, suffix, op, value) {
+    var pending = _readPending(owner, suffix);
+    if (pending && pending.op === op && pending.value === value) {
+      try { localStorage.removeItem(_pendingKey(owner, suffix)); } catch (e) {}
+    }
+  }
+  function _retryPending() {
+    if (!cachedSession || currentUserId() !== cachedSession.user.id) return;
+    var owner = cachedSession.user.id;
+    USER_DATA_SUFFIXES.concat(['cart']).forEach(function (suffix) {
+      var p = _readPending(owner, suffix);
+      if (p && p.op === 'upsert') _scheduleCloudSync(suffix, p.value);
+      if (p && p.op === 'remove') _scheduleCloudRemove(suffix);
+    });
+  }
+  window.addEventListener('online', _retryPending);
   function _scheduleCloudSync(suffix, valueStr) {
-    clearTimeout(_syncTimers[suffix]);
-    _syncTimers[suffix] = setTimeout(function () {
-      _cloudUpsert(suffix, valueStr).catch(function (e) {
-        console.warn('[DMJAuth §180] cloud sync failed', suffix, e);
-      });
-    }, 1000);
+    var owner = currentUserId();
+    _markPending(owner, suffix, 'upsert', valueStr);
+    _queueCloudWrite(owner, suffix);
   }
   function _scheduleCloudRemove(suffix) {
-    clearTimeout(_syncTimers[suffix]);
-    _syncTimers[suffix] = setTimeout(function () {
-      _cloudRemove(suffix).catch(function () {});
-    }, 1000);
+    var owner = currentUserId();
+    _markPending(owner, suffix, 'remove');
+    _queueCloudWrite(owner, suffix);
   }
 
-  function _cloudUpsert(suffix, valueStr) {
+  // Serialize writes per account + field. A slower old request must finish
+  // before the latest change is sent, including a remove following an upsert.
+  function _queueCloudWrite(owner, suffix) {
+    var key = owner + ':' + suffix;
+    clearTimeout(_syncTimers[key]);
+    _syncTimers[key] = setTimeout(function () { return _drainCloudWrite(owner, suffix); }, 1000);
+  }
+  function _drainCloudWrite(owner, suffix) {
+    var key = owner + ':' + suffix;
+    if (_syncRunning[key]) return _syncRunning[key];
+    if (!cachedSession || cachedSession.user.id !== owner || currentUserId() !== owner) return Promise.resolve();
+    var pending = _readPending(owner, suffix);
+    if (!pending) return Promise.resolve();
+    var revision = _syncRevision[key] || 0;
+    _syncRunning[key] = Promise.resolve().then(function () {
+      return pending.op === 'remove' ? _cloudRemove(suffix, owner) : _cloudUpsert(suffix, pending.value, owner);
+    }).then(function (res) {
+        if (res && res.error) throw res.error;
+        if (res && res.skipped) return;
+        if ((_syncRevision[key] || 0) !== revision) return;
+        _markCloudKnown(owner, suffix);
+        _clearPending(owner, suffix, pending.op, pending.value);
+        window.dispatchEvent(new CustomEvent('dmj-data-sync', {detail:{ok:true,owner:owner,suffix:suffix}}));
+      }).catch(function () {
+        if ((_syncRevision[key] || 0) !== revision) return;
+        window.dispatchEvent(new CustomEvent('dmj-data-sync', {detail:{ok:false,owner:owner,suffix:suffix}}));
+      }).then(function () {
+        delete _syncRunning[key];
+        // A failed unchanged write waits for an online event or explicit retry;
+        // only a newer edit gets another attempt here.
+        if ((_syncRevision[key] || 0) !== revision && _readPending(owner, suffix)) {
+          clearTimeout(_syncTimers[key]);
+          return _drainCloudWrite(owner, suffix);
+        }
+      });
+    return _syncRunning[key];
+  }
+
+  function _cloudUpsert(suffix, valueStr, owner) {
     return ensureClient().then(function () {
-      if (!cachedSession) return;
+      if (!cachedSession || cachedSession.user.id !== owner) return {skipped:true};
       if (USER_DATA_SUFFIXES.indexOf(suffix) >= 0) {
         var data;
         try { data = JSON.parse(valueStr); } catch (e) { data = valueStr; }
@@ -680,12 +757,14 @@
         var cartData;
         try { cartData = JSON.parse(valueStr); } catch (e) { cartData = []; }
         // cart_items 테이블에 sync — 기존 row 모두 삭제 후 재삽입 (단순화)
-        return sb.from('cart_items').delete().eq('user_id', cachedSession.user.id)
-          .then(function () {
+        return sb.from('cart_items').delete().eq('user_id', owner)
+          .then(function (result) {
+            if (result && result.error) throw result.error;
+            if (!cachedSession || cachedSession.user.id !== owner) return {skipped:true};
             if (!Array.isArray(cartData) || cartData.length === 0) return;
             var rows = cartData.map(function (c) {
               return {
-                user_id: cachedSession.user.id,
+                user_id: owner,
                 product_id: String(c.productId || c.product_id || c.sku || 'unknown'),
                 variant_size: c.size || c.variantSize || null,
                 variant_color: c.color || c.variantColor || null,
@@ -697,19 +776,15 @@
             return sb.from('cart_items').insert(rows);
           });
       }
-      // total_spend — profiles 테이블 컬럼으로 별도 처리
-      if (suffix === 'total_spend') {
-        return sb.from('profiles').update({
-          total_spend_krw: Math.max(0, Number(valueStr) || 0)
-        }).eq('id', cachedSession.user.id).then(function () { return refreshProfile(); });
-      }
+      // Purchase totals and membership benefits are server-managed only.
+      if (suffix === 'total_spend') return {skipped:true, reason:'server-managed'};
       // 기타 suffix — 무시 (legacy ad-hoc 데이터)
     });
   }
 
-  function _cloudRemove(suffix) {
+  function _cloudRemove(suffix, owner) {
     return ensureClient().then(function () {
-      if (!cachedSession) return;
+      if (!cachedSession || cachedSession.user.id !== owner) return {skipped:true};
       if (USER_DATA_SUFFIXES.indexOf(suffix) >= 0) {
         return sb.from('user_data').delete().match({
           user_id: cachedSession.user.id,
@@ -723,22 +798,47 @@
   }
 
   // 로그인 시 cloud → localStorage pull (다른 디바이스에서 변경된 데이터 동기화)
+  var _pullGeneration = 0;
   function pullUserDataFromCloud() {
     return ensureClient().then(function () {
       if (!cachedSession) return;
       var uid = cachedSession.user.id;
+      var generation = ++_pullGeneration;
+      var before = {};
+      USER_DATA_SUFFIXES.concat(['cart']).forEach(function (suffix) {
+        before[suffix] = {revision: _syncRevision[uid + ':' + suffix] || 0, pending: !!_readPending(uid, suffix)};
+      });
+      function canApply(suffix) {
+        return before[suffix] && !before[suffix].pending && !_readPending(uid, suffix)
+          && before[suffix].revision === (_syncRevision[uid + ':' + suffix] || 0);
+      }
       return Promise.all([
         sb.from('user_data').select('suffix, data').eq('user_id', uid),
         sb.from('cart_items').select('*').eq('user_id', uid)
       ]).then(function (results) {
+        if (!cachedSession || cachedSession.user.id !== uid || generation !== _pullGeneration) return;
         var udRes = results[0];
         var cartRes = results[1];
         // user_data 8종
         if (!udRes.error && Array.isArray(udRes.data)) {
+          var present = {};
           udRes.data.forEach(function (row) {
+            present[row.suffix] = true;
+            if (!canApply(row.suffix)) return;
             var k = USER_NS_PREFIX + uid + '_' + row.suffix;
             var v = typeof row.data === 'string' ? row.data : JSON.stringify(row.data);
             try { localStorage.setItem(k, v); } catch (e) {}
+            _markCloudKnown(uid, row.suffix);
+          });
+          // Only previously synchronized fields can be cleared by a confirmed
+          // server absence. Preserve unuploaded legacy data and pending edits.
+          USER_DATA_SUFFIXES.forEach(function (suffix) {
+            if (present[suffix] || !canApply(suffix)) return;
+            try {
+              if (localStorage.getItem('dmj_synced_' + uid + '_' + suffix)) {
+                localStorage.removeItem(USER_NS_PREFIX + uid + '_' + suffix);
+              }
+            } catch (e) {}
           });
         }
         // cart_items → cart suffix 로 reconstruct
@@ -756,8 +856,11 @@
             };
           });
           var ckey = USER_NS_PREFIX + uid + '_cart';
-          try { localStorage.setItem(ckey, JSON.stringify(legacyCart)); } catch (e) {}
+          if (canApply('cart')) {
+            try { localStorage.setItem(ckey, JSON.stringify(legacyCart)); } catch (e) {}
+          }
         }
+        _retryPending();
       });
     });
   }
@@ -768,24 +871,8 @@
   var TIER_THRESHOLD_DANMUJI = 1000000;
 
   function recomputeTotalSpend() {
-    try {
-      var raw = getUserData('orders');
-      if (!raw) return 0;
-      var orders = JSON.parse(raw);
-      if (!Array.isArray(orders)) return 0;
-      var total = 0;
-      for (var i = 0; i < orders.length; i++) {
-        var o = orders[i];
-        if (!o) continue;
-        total += Number(o.totalKRW) || 0;
-      }
-      // 백엔드 profiles.total_spend_krw 업데이트 → DB trigger profiles_auto_tier 가 등급 자동 변경
-      setUserData('total_spend', String(total));   // _cloudUpsert 가 'total_spend' branch 로 처리
-      return total;
-    } catch (e) {
-      console.warn('[DMJAuth §180 §175] recomputeTotalSpend failed', e);
-      return 0;
-    }
+    // Never promote unverified browser order data into financial records.
+    return getTotalSpend();
   }
 
   function getTotalSpend() {
@@ -793,8 +880,7 @@
   }
 
   function autoUpgradeTier() {
-    // DB trigger profiles_auto_tier 가 자동 처리. recompute → refresh.
-    recomputeTotalSpend();
+    // Read server-confirmed totals and membership; no browser-side upgrades.
     return ensureClient().then(refreshProfile);
   }
 

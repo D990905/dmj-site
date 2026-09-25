@@ -86,7 +86,8 @@
         tSec: m.tSec,
         type: m.type,                         /* 'tack' | 'gybe' | 'turn' */
         dir: m.turnDir,                       /* 'port' | 'starboard' */
-        ok: !!m.completed,
+        ok: m.turnSuccess != null ? !!m.turnSuccess
+          : !!m.completed && m.minSpeedMs != null && m.minSpeedMs * KT >= foilKt,
         lossPct: m.lossPct,
         recSec: m.recoverySec,
         inKt: (m.entrySpeedMs || 0) * KT,
@@ -301,7 +302,7 @@
     var area = line + ' L' + (padL + (W - padL - padR)).toFixed(1) + ' ' + (H - padB)
       + ' L' + padL + ' ' + (H - padB) + ' Z';
 
-    /* 포일링 임계선 — 이 선 위가 '떠 있는' 상태다 */
+    /* 속도 기준 포일링 추정선 — 실제 이륙·착수 관측값은 아니다. */
     var fy = H - padB - Math.min(1, D.foilKt / yMax) * (H - padT - padB);
 
     var ticks = '';
@@ -325,7 +326,7 @@
       + '<line x1="' + padL + '" y1="' + fy.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + fy.toFixed(1)
       + '" stroke="var(--foil)" stroke-width="1" stroke-dasharray="4 4"/>'
       + '<text x="' + (W - padR) + '" y="' + (fy - 6).toFixed(1) + '" text-anchor="end" class="fig-tick" '
-      + 'fill="var(--foil)">' + D.foilKt + 'kt — 이 위가 떠 있는 상태</text>'
+      + 'fill="var(--foil)">' + D.foilKt + 'kt 이상 — 포일링 추정 (속도 기준)</text>'
       + '<path d="' + line + '" fill="none" stroke="var(--foil)" stroke-width="1.1" stroke-linejoin="round"/>'
       + '<text x="' + (padL - 8) + '" y="' + (padT + 2) + '" text-anchor="end" class="fig-tick">kt</text>'
       + xt

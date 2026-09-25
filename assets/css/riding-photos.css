@@ -1,0 +1,21 @@
+/* Supplied riding photography: retain the rider and wing within each layout. */
+.home-hero .hero-photo{object-position:70% 0%}
+.home-hero .hero-shade{background:linear-gradient(90deg,rgba(15,29,28,.76),rgba(15,29,28,.4) 42%,rgba(15,29,28,0) 72%),linear-gradient(0deg,rgba(15,29,28,.2),transparent 25%)}
+.home-hero .hero-copy{max-width:56%;padding-top:clamp(60px,7vw,105px)}
+.home-hero .hero-copy h1{font-size:clamp(40px,4.4vw,70px)}
+.brand-card.ppc>img{object-position:76% 62%}
+.commerce[data-page=ppc] .brand-hero>img{object-position:78% 60%}
+@media(max-width:900px){
+ .home-hero{height:auto;min-height:0;max-height:none;display:flex;flex-direction:column;background:var(--ink)}
+ .home-hero .hero-photo{position:relative;width:100%;height:auto;aspect-ratio:1672/941;object-fit:contain}
+ .home-hero .hero-shade{display:none}
+ .home-hero .hero-copy{max-width:none;padding:32px var(--space) 38px}
+ .home-hero .hero-copy>.eyebrow{margin-bottom:18px}
+ .home-hero .hero-copy h1{font-size:clamp(33px,5.5vw,50px)}
+ .home-hero .hero-copy p{font-size:16px;margin-top:18px}
+ .home-hero .hero-actions{margin-top:24px;flex-wrap:wrap;gap:16px}
+ .home-hero .hero-caption{display:none}
+}
+@media(max-width:600px){
+ .commerce[data-page=ppc] .brand-hero>img{height:auto;min-height:0;aspect-ratio:1.5;object-fit:contain}
+}

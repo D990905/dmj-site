@@ -76,14 +76,14 @@
      지도의 흐린 배경 트랙·안 고른 회전 점에도 쓰인다. 글자를 밝히자고
      그 표식까지 밝히면 '고른 것 vs 안 고른 것' 대비가 무너진다.
      → 글자·축라벨은 axisText, 표식은 dim 그대로. */
-  var THEME_DARK = { accent: '#4dabf7', warn: '#f59f00', grid: '#2b3648',
-                     dim: '#8a97a8', axisText: '#bfc6cf', bg: '#1a2234',
-                     port: '#e03131', stbd: '#2f9e44', gybe: '#f76707',
-                     ink: '#e6edf5' };
-  var THEME_LIGHT = { accent: '#0d6efd', warn: '#b45309', grid: '#d3d9e2',
-                      dim: '#465063', axisText: '#465063', bg: '#ffffff',
-                      port: '#c92a2a', stbd: '#1e7e34', gybe: '#c2410c',
-                      ink: '#111827' };
+  var THEME_DARK = { accent: '#c9d58b', warn: '#d6ae67', grid: '#3b413c',
+                     dim: '#929985', axisText: '#b0b7ae', bg: '#232725',
+                     port: '#e03131', stbd: '#2f9e44', gybe: '#d09275',
+                     ink: '#f1f2e9' };
+  var THEME_LIGHT = { accent: '#626f40', warn: '#946d2e', grid: '#d9dbd0',
+                      dim: '#73776c', axisText: '#62675e', bg: '#ffffff',
+                      port: '#c92a2a', stbd: '#1e7e34', gybe: '#a75e45',
+                      ink: '#202522' };
   function currentThemeName() {
     try {
       var t = localStorage.getItem('rd_theme');
@@ -239,16 +239,17 @@
     var turns = (a.maneuvers || []).length;
     var dPct = s.activeDistRatio != null ? Math.round(s.activeDistRatio * 100) : null;
     var tPct = s.activeRatio != null ? Math.round(s.activeRatio * 100) : null;
-    host.appendChild(spsCard(vps));
+    var reviewed = window.RDPerformanceScore && RDPerformanceScore.compute(a,vps,{windConfidence:CUR.est&&CUR.est.confidence});
+    host.appendChild(kpiCard('종합 참고 점수', reviewed && reviewed.total.score != null ? String(reviewed.total.score) : '—', '', reviewed ? '산출 가능 '+reviewed.total.eligibleCells+'/8 항목' : '분석 준비 중'));
     host.appendChild(kpiCard('Top speed',
       s.maxSpeedMs != null ? (s.maxSpeedMs * KT).toFixed(1) : '—', 'kt', '2-second peak'));
     host.appendChild(kpiCard('Avg speed',
       s.avgSpeedMovingMs != null ? (s.avgSpeedMovingMs * KT).toFixed(1) : '—', 'kt', 'while moving'));
     host.appendChild(kpiCard('Distance',
       s.totalDistanceM != null ? (s.totalDistanceM / 1000).toFixed(2) : '—', 'km',
-      dPct == null ? '' : dPct + '% on foil'));
-    host.appendChild(kpiCard('Foiling time', fmtClock(s.activeTimeSec), '',
-      tPct == null ? '' : tPct + '% of time analysed'));
+      dPct == null ? '' : dPct + '% · 속도 기준 포일링 추정 거리'));
+    host.appendChild(kpiCard('포일링 추정 시간', fmtClock(s.activeTimeSec), '',
+      tPct == null ? '' : tPct + '% · 분석 시간 대비'));
     /* §459 — 분모는 '분석 대상 시간'이다. 기록 공백과 제외 구간을 뺀
        값으로, 이게 있어야 구간을 지운 효과가 정직하게 보인다.
        벽시계와 다르면 얼마가 빠졌는지 함께 적는다. */
@@ -256,8 +257,8 @@
       ? s.analyzedDurationSec : s.totalDurationSec;
     var dropped = s.excludedSec || 0;
     host.appendChild(kpiCard('Moving time', fmtClock(s.movingTimeSec), '',
-      'of ' + fmtClock(analyzed)
-      + (dropped > 30 ? '  \u00b7 ' + fmtClock(dropped) + ' removed' : '')));
+      '분석 대상 ' + fmtClock(analyzed)
+      + (dropped > 30 ? ' · 제외 ' + fmtClock(dropped) : '')));
 
   }
 
@@ -286,7 +287,7 @@
       ],
       series: [
         { label: 'Speed', value: function (u, v) { return v == null ? '—' : v.toFixed(0) + ' kt'; } },
-        { label: 'Time', stroke: THEME.accent, fill: 'rgba(77,171,247,0.32)', width: 1,
+        { label: 'Time', stroke: THEME.accent, fill: 'rgba(126,145,82,0.18)', width: 1,
           paths: uPlot.paths.bars({ size: [0.86, Infinity] }),
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' min'; } }
       ]
@@ -486,10 +487,7 @@
     if (ranges.length) {
       var caveat = el('div', 'text-secondary mt-1');
       caveat.style.cssText = 'font-size:.8125rem;opacity:.9';
-      caveat.textContent = 'The performance score barely moves, and that is '
-        + 'expected \u2014 its turn half scores each turn (the same turns either '
-        + 'way) and its speed half is anchored on your best 20% upwind VMG, '
-        + 'which the slow time was never part of.';
+      caveat.textContent = '점수는 회전 효율과 풍상 VMG 상위 50% 등을 반영하므로 느린 구간을 제외해도 변화가 작을 수 있습니다.';
       host.appendChild(caveat);
     }
     if (!ranges.length) return;
@@ -821,6 +819,11 @@
     var slider = el('input', 'form-range');
     slider.type = 'range'; slider.min = '0'; slider.max = '359'; slider.step = '1';
     slider.value = String(Math.round(curDir));
+    slider.id = 'rd-wind-slider';
+    slider.setAttribute('aria-label','지도 풍향 조절');
+    var windNumber = $('rd-wind-number');
+    if (windNumber) windNumber.addEventListener('input',function(){slider.value=windNumber.value;slider.dispatchEvent(new Event('input'));});
+    slider.addEventListener('input',function(){if(windNumber)windNumber.value=slider.value;});
     slider.style.flex = '1';
     var readout = el('div', 'kpi__val num');
     readout.style.minWidth = '86px';
@@ -828,7 +831,7 @@
     ctl.appendChild(slider); ctl.appendChild(readout);
     var applyBtn = el('button', 'btn btn-primary', 'Use this direction');
     applyBtn.type = 'button';
-    ctl.appendChild(applyBtn);
+    applyBtn.hidden = true; // One explicit wind-apply button in the shared control above.
     body.appendChild(ctl);
 
     /* 실시간 대칭 판정 */
@@ -963,6 +966,8 @@
         useBest.type = 'button';
         useBest.addEventListener('click', function () {
           slider.value = String(Math.round(vd.bestDir));
+          if(windNumber)windNumber.value=slider.value;
+          document.dispatchEvent(new CustomEvent('rd:dirty'));
           readout.textContent = Math.round(vd.bestDir) + '°';
           spinArrows(vd.bestDir);
           updateLive(vd.bestDir);
@@ -1279,8 +1284,6 @@
 
   function renderConditionSetup(host) {
     /* ── 트랙: 탄 부분만 남긴다 ── */
-    condSection(host, 'Track',
-      'cut out what was not riding \u2014 everything else in the dashboard is recomputed without it');
     var tc = el('div', 'card');
     var th = el('div', 'card-header');
     th.appendChild(el('h3', 'card-title', 'The part you rode'));
@@ -1300,20 +1303,17 @@
     renderEditBar();
 
     /* ── 장비 ── */
-    condSection(host, 'Gear', 'what you rode \u2014 foil area sets take-off, spans set how far you can heel');
     var gh = el('div'); gh.id = 'cond-gear';
     host.appendChild(gh);
     renderGearPicker(gh);
 
     /* ── 바다 ── */
-    condSection(host, 'Sea', 'the water that day');
     var sh = el('div'); sh.id = 'cond-sea';
     host.appendChild(sh);
     renderSeaState(sh);
 
     /* ── 몸 ── */
     var day = sessionYmd();
-    condSection(host, 'Body', 'sleep and how you felt on ' + day);
     var bh = el('div'); bh.id = 'cond-body';
     host.appendChild(bh);
     renderWellness(bh, day);
@@ -1358,7 +1358,7 @@
     var sv = el('button', 'btn btn-sm btn-primary', 'Save to this session');
     sv.type = 'button'; sv.id = 'btn-sea-save';
     sv.addEventListener('click', function () { saveInputsToSession(sv); });
-    acts.appendChild(sv);
+    // Session save is available once in the workflow header.
     head.appendChild(acts);
     card.appendChild(head);
     var body = el('div', 'card-body');
@@ -1368,7 +1368,8 @@
       b.type = 'button';
       b.addEventListener('click', function () {
         if (CUR.sessionGear) { CUR.sessionGear.surface = o.id; CUR.gearDirty = true; }
-        else saveGear({ surface: o.id });
+        else { CUR.sessionGear = Object.assign({}, gearSelection(), { surface: o.id }); CUR.gearDirty = true; }
+        document.dispatchEvent(new CustomEvent('rd:dirty'));
         refreshGearViews();
       });
       grp.appendChild(b);
@@ -1426,11 +1427,12 @@
     var inp = el('input', 'form-control num'); inp.type = 'number';
     inp.min = '0'; inp.max = '359'; inp.step = '1'; inp.style.width = '120px';
     inp.value = a.windDir != null ? String(Math.round(a.windDir)) : '';
-    c1.appendChild(inp); row.appendChild(c1);
+    inp.id = 'rd-wind-number'; c1.appendChild(inp); row.appendChild(c1);
 
     var c2 = el('div', 'col-auto');
     var btn = el('button', 'btn btn-primary', 'Apply'); btn.type = 'button';
     c2.appendChild(btn); row.appendChild(c2);
+    btn.id = 'rd-wind-apply';
 
     var c3 = el('div', 'col-auto');
     var reBtn = el('button', 'btn', 'Re-estimate from track'); reBtn.type = 'button';
@@ -1463,9 +1465,10 @@
     btn.addEventListener('click', function () {
       var v = parseFloat(inp.value);
       if (!isFinite(v)) return;
+      document.dispatchEvent(new CustomEvent('rd:dirty'));
       applyWind(((v % 360) + 360) % 360, null);
     });
-    reBtn.addEventListener('click', function () { applyWind(null, 're-estimate'); });
+    reBtn.addEventListener('click', function () { document.dispatchEvent(new CustomEvent('rd:dirty')); applyWind(null, 're-estimate'); });
 
     /* §591 — 같은 날 같은 코스인데 저장된 풍향이 경기마다 달랐다(9/11:
        제2경기 55°, 나머지 ≈348°). 그러면 같은 부표 회전이 한 경기에선
@@ -1492,7 +1495,7 @@
     var w = a.wind;
     if (!w) host.appendChild(el('div', 'text-secondary mt-2', 'Wind not resolved.'));
     /* 풍향 변화는 '그날 바람이 어땠는지' 라 바람 묶음에 둔다 */
-    try { renderWindVariation(host, a); }
+    try { var variationHost = document.getElementById("rd-wind-variation"); if (variationHost) { variationHost.replaceChildren(); renderWindVariation(variationHost, a); } }
     catch (e) { if (window.console) console.error('[v2 §588] wind variation', e); }
     /* 트랙·장비·바다·몸은 풍향이 안 풀려도 보여야 한다 — return 앞에 */
     try { renderConditionSetup(host); }
@@ -1539,7 +1542,7 @@
     var colP = el('div', 'col-lg-7');
     var cardP = el('div', 'card');
     var hP = el('div', 'card-header'); hP.appendChild(el('h3', 'card-title', 'Polar'));
-    hP.appendChild(el('div', 'card-actions lab', 'top 5% speed per angle'));
+    hP.appendChild(el('div', 'card-actions lab', '각도별 속도 95백분위'));
     cardP.appendChild(hP);
     var bodyP = el('div', 'card-body d-flex justify-content-center');
     var polarHost = el('div'); polarHost.id = 'chart-polar';
@@ -1751,7 +1754,7 @@
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title', 'Your numbers'));
     head.appendChild(el('div', 'card-actions lab',
-      'shared with the old dashboard'));
+      '개인 프로필 · 변경 시 자동 저장'));
     card.appendChild(head);
     var body = el('div', 'card-body');
     var row = el('div', 'row g-2 align-items-end');
@@ -3026,24 +3029,15 @@
     /* 판정 */
     var verdict = null;
     if (w.dominant === 'time') {
-      verdict = { tone: 'alert-info', head: 'It was about when, not where.',
-        body: 'At any one point in the session the areas you sailed differed by only '
-          + w.placeSpreadKt.toFixed(1) + ' kt, while the whole area changed by '
-          + w.timeSpreadKt.toFixed(1) + ' kt from the best quarter to the worst. '
-          + 'Hunting for a windier patch had little to find — the wind was even '
-          + 'across the water and simply faded. On a day like this the payoff is in '
-          + 'timing: get the volume done while it is blowing rather than moving '
-          + 'around looking for more.' };
+      verdict = {tone:'alert-info', head:'장소보다 시간대별 주행 속도 차이가 큽니다.',
+        body:'같은 시간대의 구역별 차이는 ' + w.placeSpreadKt.toFixed(1) + ' kt, 시간대별 차이는 ' + w.timeSpreadKt.toFixed(1) + ' kt입니다. 이는 GPS 주행 속도의 비교이며 바람의 세기나 감소를 직접 측정한 결과는 아닙니다.'};
     } else if (w.dominant === 'place') {
-      verdict = { tone: 'alert-success', head: 'It was about where.',
-        body: 'Areas differed by ' + w.placeSpreadKt.toFixed(1) + ' kt at the same '
-          + 'moment, more than the session drifted over time. Finding the better '
-          + 'patch and working it was worth the effort here.' };
+      verdict = {tone:'alert-info', head:'같은 시간대에도 구역별 주행 속도 차이가 있습니다.',
+        body:'구역별 차이는 ' + w.placeSpreadKt.toFixed(1) + ' kt입니다. 주행 방향·장비 조작·파도 등의 영향도 있으므로 바람이 더 강한 장소라고 단정할 수 없습니다.'};
     } else if (w.placeSpreadKt != null && w.timeSpreadKt != null) {
-      verdict = { tone: 'alert-info', head: 'Neither dominated.',
-        body: 'Place and time moved the speed by about the same amount, so nothing '
-          + 'here argues strongly for either strategy.' };
+      verdict = {tone:'alert-info', head:'장소와 시간대의 차이가 비슷합니다.', body:'주행 속도만으로 어떤 조건의 영향이 더 큰지 판단하기 어렵습니다.'};
     }
+
     if (verdict) {
       var v = el('div', 'alert ' + verdict.tone + ' mt-3');
       v.appendChild(el('div', 'fw-bold', verdict.head));
@@ -3814,7 +3808,7 @@
           { label: res.x.label },
           { label: res.y.label, stroke: 'rgba(77,171,247,0.9)', width: 0,
             points: { show: true, size: 6, stroke: 'rgba(77,171,247,0.9)',
-                      fill: 'rgba(77,171,247,0.35)' } },
+                      fill: 'rgba(126,145,82,0.24)' } },
           { label: 'fit', stroke: '#f76707', width: 1.6, points: { show: false } }
         ]
       }, [sx, sy, fitY], plotHost);
@@ -4441,6 +4435,8 @@
   }
 
   function restoreRiderInputs(rec) {
+    var purpose = $('in-purpose');
+    if(purpose) purpose.value = rec && rec.purpose || 'freeride';
     var got = { wind: false, weight: false, wing: false, skill: false };
     /* §557 (옥대표 "다른 사람의 데이터일 수도 있으니까") — 항목마다 **출처**를
        남긴다. 세션 기록에서 온 값과 내 프로필에서 온 값은 신뢰도가 다르다.
@@ -4477,7 +4473,16 @@
     return got;
   }
 
-  function openSavedSession(rec) {
+  function openSavedSession(rec, cloudAttempted) {
+    if (!cloudAttempted && window.RDCloud && !RDStorage.loadTrack(rec.id)) {
+      var owner = window.DMJAuth && DMJAuth.currentUserId();
+      RDCloud.ensureTrack(rec.id).then(function(result){
+        if (owner !== DMJAuth.currentUserId()) return;
+        if (result.ok) openSavedSession(rec, true);
+        else alertLine("기록 복원 실패: 연결을 확인한 뒤 다시 시도하세요.");
+      });
+      return;
+    }
     if (!rec || !window.RDStorage) return;
     /* §554 — 정체성(CUR.openedRecId)은 **세션이 실제로 열린 뒤에만** 잡는다.
        §553 은 이걸 함수 첫 줄에 뒀는데, 이 함수에는 일찍 빠져나가는 길이
@@ -5159,7 +5164,7 @@
       series: [
         {},
         { label: md.label, stroke: THEME.accent, width: 2,
-          fill: 'rgba(77,171,247,0.14)', points: { show: true, size: 7 },
+          fill: 'rgba(126,145,82,0.10)', points: { show: true, size: 7 },
           value: function (u, v) {
             return v == null ? '—'
               : v.toFixed(md.dp) + (md.unit ? ' ' + md.unit : '');
@@ -6315,12 +6320,11 @@
       var on = !!selSet[k];
       var col = m.type === 'gybe' ? THEME.gybe : THEME.accent;
       var mk = L.circleMarker([p.lat, p.lng], {
-        radius: on ? 8 : 3.5,
-        color: on ? col : THEME.dim,
-        weight: on ? 2.5 : 1,
-        opacity: on ? 1 : 0.6,
+        radius: on ? 6 : 3.5,
+        stroke: false,
+        weight: 0,
         fillColor: col,
-        fillOpacity: on ? 0.9 : 0.25
+        fillOpacity: on ? 0.6 : 0.25
       }).addTo(map);
       mk.bindTooltip((m.type === 'gybe' ? 'Gybe' : 'Tack') + ' #' + (k + 1)
         + ' · ' + fmtClock(m.tSec), { direction: 'top' });
@@ -9122,7 +9126,7 @@
       frontWing: g.frontWing || D.frontWing,
       rearWing: g.rearWing || D.rearWing,
       mast: g.mast || D.mast,
-      handWing: g.handWing || D.handWing,
+      handWing: g.handWing === 'custom' ? 'custom' : (g.handWing || D.handWing),
       board: g.board || D.board,
       surface: g.surface || D.surface,
       harness: g.harness || D.harness
@@ -9327,98 +9331,24 @@
      아직 저장된 적이 없으면 붙일 곳이 없으므로 그렇게 말한다 — 조용히
      아무 일도 안 일어나면 눌러도 되는 버튼인지 알 수 없다. */
   function saveInputsToSession(btn) {
-    function flash(msg, okState) {
-      if (!btn) return;
-      var was = btn.textContent, cls = btn.className;
-      btn.textContent = msg;
-      btn.className = 'btn btn-sm ' + (okState ? 'btn-success' : 'btn-warning');
-      setTimeout(function () { btn.textContent = was; btn.className = cls; }, 2200);
-    }
-    if (!CUR.session || !Store) { flash('No session', false); return; }
-    /* §587 (옥대표 "오늘경기 모두 v3로 뛰고 다 업데이트 했는데 안바뀌는게
-       있어") — 제1·2·6경기는 V3 로 바뀌고 제3·4·5경기는 V1 그대로였다.
-       이 버튼은 저장 레코드를 **시그니처**(점 개수_거리_시작시각)로 찾았다.
-       그런데 저장된 트랙은 §509 압축(RDTRK1)이라 손실이 있어, 목록에서
-       다시 연 세션은 거리가 몇 m 달라지고 → 시그니처가 자기 레코드와
-       안 맞는다. 결과: "Not saved yet" 을 띄우고 **아무것도 안 썼다**
-       (재현: 저장 → 새로고침 → 포일 변경 → 이 버튼 = Not saved yet,
-       레코드 gear 는 그대로). 업로드 직후 같은 화면에서 누른 세션만
-       됐다 — 그래서 일부만 바뀌었다.
-       헤더 Save 는 §553 에서 이미 id(CUR.openedRecId)로 바꿨는데 이 버튼만
-       남아 있었다. 열려 있는 레코드 id 를 먼저 쓴다. 시그니처는 한 번도
-       열거나 저장한 적 없는 세션(방금 올린 파일)에만 쓴다. */
-    var rec = null;
-    if (CUR.openedRecId) {
-      listSessions({ guests: 'all' }).forEach(function (r) { if (r.id === CUR.openedRecId) rec = r; });
-      if (!rec) {
-        alertLine('This session is no longer in your saved list \u2014 it may have '
-          + 'been deleted. Press "Save session" in the header to store it again.');
-        flash('Not in saved list', false);
-        return;
-      }
-    } else {
-      var sig = null;
-      try { sig = sessionSig(CUR.session); } catch (e) { sig = null; }
-      if (sig) {
-        listSessions({ guests: 'all' }).forEach(function (r) { if (r.sig === sig) rec = r; });
-      }
-    }
-    if (!rec) {
-      alertLine('This session is not saved yet \u2014 press "Save session" in the '
-        + 'header first, then these inputs stay with it.');
-      flash('Not saved yet', false);
-      return;
-    }
-    var r0 = riderFromFormSynced();      /* §585 — 선택기와 입력칸을 맞춘 뒤 */
-    var okGear = true, okIn = true;
-    try {
-      var snap = gearSnapshot();
-      if (snap && Store.setSessionGear) {
-        var g = Store.setSessionGear(rec.id, snap);
-        okGear = !!(g && g.ok !== false);
-      }
-    } catch (e) { okGear = false; }
-    try {
-      var res = Store.setSessionInputs(rec.id, {
-        rider: { weightKg: r0.weightKg, wingM2: r0.wingM2, skill: r0.skill },
-        windSpeedKt: windSpeedFromForm(),
-        windDir: CUR.windDir
-      });
-      okIn = !!(res && res.ok !== false);
-    } catch (e) { okIn = false; }
-    if (!okGear || !okIn) {
-      if (window.console) console.error('[v2 §548] save to session failed',
-        { gear: okGear, inputs: okIn });
-      flash('Save failed', false);
-      return;
-    }
-    CUR.gearDirty = false;
-    /* 이제 이 값들이 이 세션의 것이다 — 안내문도 그렇게 바뀌어야 한다 */
-    CUR.restoredInputs = { wind: true, weight: true, wing: true, skill: true,
-      src: { wind: 'session', wing: 'session', weight: 'session', skill: 'session' } };
-    try { renderInputSources(); } catch (e) {}
-    try { renderSessions(); } catch (e) {}
-    try {
-      var note = $('rider-note');
-      if (note) {
-        note.textContent = 'Used by the performance score \u2014 saved with this session.';
-        note.className = 'lab';
-      }
-    } catch (e) {}
-    flash('Saved', true);
+    // One write path: inputs, analysis, track and account sync stay consistent.
+    var save = $('btn-save');
+    if (save) save.click();
   }
 
   function renderGearPicker(host) {
     if (!window.RDGear || !window.RDRigLimits) return;
     var sel = gearSelection();
+    var wingInput = $('in-wing');
+    if (wingInput && sel.handWing !== 'custom') { var chosenWing=RDGear.byId(RDGear.HAND_WINGS,sel.handWing); if(chosenWing&&chosenWing.areaM2) wingInput.value=chosenWing.areaM2; }
+    if (wingInput) { wingInput.readOnly = sel.handWing !== 'custom'; wingInput.title = wingInput.readOnly ? '장비에서 윙을 선택하면 크기가 자동으로 반영됩니다.' : '사용한 윙 크기를 직접 입력하세요.'; }
 
     var card = el('div', 'card mb-3');
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title',
       CUR.sessionGear ? 'Gear for this session' : 'Your gear today'));
     var acts = el('div', 'card-actions d-flex align-items-center gap-2');
-    acts.appendChild(el('span', 'lab',
-      'foil area sets take-off, spans set how far you can heel'));
+
     /* §548 (옥대표 "여기도 입력하고 나면 그 세션에 해당 정보를 저장하는
        저장 버튼이 필요해") — 없으면 세션을 옮겨 다닐 때마다 그 세션과
        상관없는 장비가 뜬다. 헤더의 'Save session' 은 멀고 뜻이 다르다. */
@@ -9426,7 +9356,7 @@
     gsave.type = 'button';
     gsave.id = 'btn-gear-save';
     gsave.addEventListener('click', function () { saveInputsToSession(gsave); });
-    acts.appendChild(gsave);
+    // Session save is available once in the workflow header.
     head.appendChild(acts);
     card.appendChild(head);
     var body = el('div', 'card-body');
@@ -9436,6 +9366,7 @@
       var col = el('div', cls || 'col-6 col-md-4');
       col.appendChild(el('label', 'form-label lab', label));
       var s = el('select', 'form-select');
+      if (key === 'handWing') { var custom = document.createElement('option'); custom.value = 'custom'; custom.textContent = '다른 윙 · 크기 직접 입력'; custom.selected = sel.handWing === 'custom'; s.appendChild(custom); }
       list.forEach(function (o) {
         var op = document.createElement('option');
         op.value = o.id; op.textContent = fmt(o);
@@ -9443,13 +9374,16 @@
         s.appendChild(op);
       });
       s.addEventListener('change', function () {
+        document.dispatchEvent(new CustomEvent('rd:dirty'));
         /* §548 — 저장된 세션을 보고 있으면 프로필을 건드리지 않는다.
            옛 세션의 장비를 고치려다 오늘의 기본 장비가 바뀌면 안 된다. */
         if (CUR.sessionGear) {
           CUR.sessionGear[key] = s.value;
           CUR.gearDirty = true;
         } else {
-          var p = {}; p[key] = s.value; saveGear(p);
+          CUR.sessionGear = Object.assign({}, gearSelection());
+          CUR.sessionGear[key] = s.value;
+          CUR.gearDirty = true;
         }
         /* §585 (옥대표 "윙사이즈를 6.5로 선택후 저장했는데 자꾸 6.0으로 나오네
            다시들어가면") — 핸드윙 선택기와 Wing(m²) 입력칸이 **서로 다른 값**을
@@ -9730,7 +9664,8 @@
        읽기만 한다. */
 
     /* 1) SPS 분해 — 총점만 보여주면 무엇을 고쳐야 할지 알 수 없다 */
-    host.appendChild(el('h3', 'mb-2', 'Sailing Performance Score'));
+    var reference = el('details','mb-3'); reference.appendChild(el('summary',null,'기존 모델 점수 참고')); host.appendChild(reference);
+    var referenceHost = reference;
     /* §482 — 어떤 포일로 예측했는지 밝힌다. 포일 종횡비가 예측 VMG 를
        크게 바꾸는데(AR 6.5 → 13.7 은 약풍에서 +2kt) 그걸 안 적으면
        점수가 왜 움직였는지 알 길이 없다. */
@@ -9752,7 +9687,7 @@
       row.appendChild(segCard('Overall', vps.overall));
       row.appendChild(segCard('Upwind', vps.upwind));
       row.appendChild(segCard('Downwind', vps.downwind));
-      host.appendChild(row);
+      referenceHost.appendChild(row);
     }
 
     /* 2) 윙 what-if */
@@ -9859,7 +9794,7 @@
       series: [
         { label: 'Wing', value: function (u, v) { return v == null ? '—' : v + ' m²'; } },
         { label: 'Upwind VMG', stroke: THEME.accent, width: 2.2,
-          fill: 'rgba(77,171,247,0.14)',
+          fill: 'rgba(126,145,82,0.10)',
           points: { show: true, size: 7 },
           value: function (u, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } }
       ],
@@ -9874,7 +9809,7 @@
           ctx.fillStyle = '#e6edf5';
           ctx.font = '11px "IBM Plex Mono", monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(p.isOptimum ? 'optimum' : 'you rode', cx, cy - 12);
+          ctx.fillText(p.isOptimum ? '최적 추정' : '사용한 윙', cx, cy - 12);
           ctx.restore();
         });
       }] }
@@ -10465,12 +10400,12 @@
     setEditableTitle(name || 'Session');
     var d = session.startEpoch ? new Date(session.startEpoch) : null;
     $('hdr-date').textContent = d ? d.toISOString().slice(0, 10).replace(/-/g, '.') : '';
-    $('nav-meta').textContent = (session.samples || []).length.toLocaleString() + ' points'
-      + (analysis.windDir != null ? ' · wind ' + Math.round(analysis.windDir) + '°' : '');
+    $('nav-meta').textContent = (session.samples || []).length.toLocaleString() + '개 기록점'
+      + (analysis.windDir != null ? ' · 풍향 ' + Math.round(analysis.windDir) + '°' : '');
     var vps = null;
     if (window.RDCoach && RDCoach.computeVPS) {
       try {
-        vps = RDCoach.computeVPS(analysis, riderFromForm(), analysis.windDir, windSpeedFromForm());
+        vps = RDCoach.computeVPS(analysis, riderFromFormSynced(), analysis.windDir, windSpeedFromForm());
       } catch (e) { vps = null; }
     }
     /* §452 — CUR.vps 는 여기서 담는다. 예전에는 이 계산보다 위에서
@@ -10480,6 +10415,7 @@
     CUR.vps = vps;
     autoRecordRideLoad();
     renderKpis(analysis, vps);
+    if(window.RDPurposeView) RDPurposeView.render(analysis,vps,{session:session,windConfidence:est&&est.confidence,windSource:est?'track':'manual'});
     /* §597 (옥대표 "다시 나가려고 해도 계속 비교창으로 유지") — 다른 세션을
        열면 비교를 푼다. §589 는 '세션을 바꿔도 유지' 로 만들었는데, 그러면
        나가도 비교가 계속 따라온다. 같은 세션을 다시 그릴 때(풍향·입력 변경)는 둔다. */
@@ -10528,7 +10464,7 @@
       }
     }
     renderHistogram(analysis);
-    renderTimeline(session, analysis);
+    try { renderTimeline(session, analysis); } catch(e) { alertLine('시간축 표시 오류: '+e.message); }
     renderTurns(analysis);
     renderTurnExtras(analysis);
     renderPerfExtra(analysis);
@@ -10550,6 +10486,7 @@
        whatIf 를 남겨 둔다(예전에는 CUR 에 없어 undefined 가 넘어갔다). */
     CUR.whatIf = whatIf;
     renderCoach(analysis, vps, whatIf);
+    document.dispatchEvent(new CustomEvent('rd:rendered', {detail:{identity:session.startEpoch, demo:!!CUR.isDemo, saved:!!CUR.openedRecId, wind:CUR.windDir}}));
   }
 
   /* 세션 시그니처 — 영상 blob·싱크 오프셋을 이 키로 저장한다.
@@ -11240,6 +11177,7 @@
         loadGpxText(t, 'Songjeong, Busan');
       })
       .catch(function (err) {
+        alertLine('분석 화면 오류: '+err.message);
         if (CUR.session) return;
         $('hdr-title').textContent = 'Could not load the sample session';
         $('hdr-date').textContent = String(err && err.message ? err.message : err);
@@ -11247,13 +11185,14 @@
       });
   }
 
+  window.addEventListener('rd:cloud-synced', function(){ try { renderSessions(); } catch(e) {} });
   document.addEventListener('DOMContentLoaded', function () {
     /* 이 페이지는 영어다. 엔진이 돌려주는 안내문(풍향 추정 노트 등)은
        i18n 사전을 타므로 언어를 먼저 영어로 고정해야 한글이 새지 않는다. */
-    try { localStorage.setItem('dmj_rd_lang', 'en'); } catch (e) {}
+    try { localStorage.setItem('dmj_rd_lang', 'ko'); } catch (e) {}
     if (window.RDI18n && RDI18n.T) {
       /* 이미 로드된 사전의 현재 언어도 맞춘다 */
-      try { document.documentElement.lang = 'en'; } catch (e) {}
+      try { document.documentElement.lang = 'ko'; } catch (e) {}
     }
     initTabs();
     /* §549 — 저장 세션을 열기 전에 프로필을 먼저 폼에 싣는다. 데모나 새로
@@ -11284,6 +11223,7 @@
           analysis: CUR.analysis,
           ghost: gh,
           windDir: CUR.windDir,
+          windSpeedKt: windSpeedFromForm(),
           unit: 'kt',
           sessionSig: sessionSig(CUR.session),
           title: CUR.name || 'Session',
@@ -11372,8 +11312,12 @@
     var sb = $('btn-save');
     if (sb) sb.addEventListener('click', function () {
       if (!CUR.session || !Store || !Store.saveSession) return;
-      /* 실제 시그니처 = saveSession(meta, analysis) → { ok, error } */
+      sb.disabled = true;
+      document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'saving', text:'분석과 기록을 저장하는 중…'}}));
+      /* Recompute with exactly the inputs being persisted; preserve wind. */
       try {
+        riderFromFormSynced();
+        applyWind(null, 'keep');
         var res = Store.saveSession({
           name: CUR.name || 'Session',
           /* §590 — 제거한 구간을 레코드에 같이 담는다(트랙은 원본 전체).
@@ -11386,7 +11330,10 @@
             : null,
           dateEpoch: (CUR.session && CUR.session.startEpoch) || Date.now(),
           sport: 'wingfoil',
+          purpose: ($('in-purpose')||{}).value || 'freeride',
+          performanceV1: window.RDPerformanceScore ? RDPerformanceScore.compute(CUR.analysis,CUR.vps,{windConfidence:CUR.est&&CUR.est.confidence,windSource:CUR.est?'track':'manual'}) : null,
           windDir: CUR.windDir,
+          windSpeedKt: windSpeedFromForm(),
           windSpeedKt: windSpeedFromForm(),
           /* §547 (옥대표 "어떤 세션을 선택해도 신체정보랑 기본 정보입력은
              늘 같거나 최종 사용했던게 반복적으로 나타남") — 몸무게·윙·스킬은
@@ -11453,21 +11400,38 @@
           renderSessions();
           /* 저장하면 부하 원장에 들어가므로 훈련부하 탭도 갱신한다. */
           renderTraining();
-          sb.textContent = 'Saved';
+          CUR.gearDirty = false;
+          sb.textContent = '저장 완료';
+          document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'saved', text:'이 기기에 저장 완료'}}));
+          if (window.RDCloud && DMJAuth.currentUserId()) {
+            var saveOwner = DMJAuth.currentUserId();
+            sb.textContent = '계정에 저장 중…';
+            document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'syncing', text:'이 기기에 저장됨 · 계정 동기화 중…'}}));
+            RDCloud.pushSession(res.record, Store.loadTrack(res.record.id)).then(function(result){
+              if (saveOwner !== DMJAuth.currentUserId()) return;
+              sb.textContent = result.ok ? '계정 저장 완료' : '동기화 다시 시도';
+              sb.disabled = result.ok;
+              document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:result.ok?'saved':'error', text:result.ok?'이 기기와 계정에 저장 완료':'이 기기에 저장됨 · 계정 동기화 실패, 다시 저장해 주세요.'}}));
+            }).catch(function(){sb.disabled=false;sb.textContent='동기화 다시 시도';document.dispatchEvent(new CustomEvent('rd:save-state',{detail:{state:'error',text:'이 기기에 저장됨 · 계정 연결을 확인하고 다시 저장해 주세요.'}}));});
+          }
         } else {
-          sb.textContent = 'Save failed';
+          sb.textContent = '다시 저장';
+          document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'error', text:'저장하지 못했습니다. 입력값은 유지됩니다.'}}));
           if (window.console) console.warn('[v2] save failed', res);
         }
       } catch (e) {
-        sb.textContent = 'Save failed';
+        sb.textContent = '다시 저장';
+        document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'error', text:'저장하지 못했습니다. 입력값은 유지됩니다.'}}));
         if (window.console) console.error('[v2] save threw', e);
       }
-      setTimeout(function () { sb.textContent = 'Save session'; }, 2000);
+      sb.disabled = /저장 완료|계정에 저장 중/.test(sb.textContent);
     });
     var rb = $('btn-rider');
     if (rb) rb.addEventListener('click', function () {
       if (!CUR.session) return;
-      applyWind(CUR.est ? null : undefined, CUR.est ? 're-estimate' : 'keep');
+      riderFromFormSynced();
+      applyWind(null, 'keep');
+      document.dispatchEvent(new CustomEvent('rd:analyzed'));
     });
     /* §498 — 풍속 입력에 핸들러가 **아예 없었다.** 값을 바꿔도 아무 일도
        일어나지 않았고, 다른 버튼이 재분석을 부를 때까지 반영되지 않았다.

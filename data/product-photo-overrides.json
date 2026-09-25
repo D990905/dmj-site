@@ -1,0 +1,34 @@
+{
+  "takoon-cruise": {
+    "image": "assets/images/products/takoon/cruise-2026-official.png",
+    "source": "https://takoon.com/products/cruise-2026"
+  },
+  "ppc-m2": {
+    "image": "assets/images/products/ppc/m2/product-official.jpg",
+    "source": "https://ppcfoiling.com"
+  },
+  "ppc-m1x": {
+    "image": "assets/images/products/ppc/m1-x/product-top-official.jpg",
+    "source": "https://ppcfoiling.com"
+  },
+  "ppc-m1": {
+    "image": "assets/images/products/ppc/m1/product-official.png",
+    "source": "https://ppcfoiling.com"
+  },
+  "ppc-fds": {
+    "image": "assets/images/products/ppc/fds/product-official.png",
+    "source": "https://ppcfoiling.com"
+  },
+  "ppc-r1": {
+    "image": "assets/images/products/ppc/r1/product-official.png",
+    "source": "https://ppcfoiling.com"
+  },
+  "ppc-orbit": {
+    "image": "assets/images/products/ppc/orbit/product-official.png",
+    "source": "https://ppcfoiling.com/products/ppc-orbit-parawing"
+  },
+  "lvz-boom-rs": {
+    "image": "assets/images/products/levitaz/boom/boom-rs-official.jpg",
+    "source": "https://levitaz.com/shop/product/boom-44-race-series/"
+  }
+}

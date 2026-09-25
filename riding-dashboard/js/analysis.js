@@ -422,7 +422,7 @@
     res.totalDurationSec = S[S.length - 1].t - S[0].t;
     var movingMs = cfg.movingSpeedKt / Geo.MS_TO_KNOTS;
     var activeMs = cfg.activeSpeedKt / Geo.MS_TO_KNOTS;
-    var movingTime = 0, activeTime = 0, instMax = 0, activeDist = 0;
+    var movingTime = 0, movingDist = 0, activeTime = 0, instMax = 0, activeDist = 0;
 
     /* §459 — 분석 대상 시간은 레그 길이의 합이다. totalDurationSec 은
        첫 샘플~마지막 샘플의 벽시계라 **제외한 구간과 기록 공백이 그대로
@@ -436,7 +436,7 @@
         var sp = S[i].speed;
         analyzedTime += dt;
         if (sp > instMax) instMax = sp;
-        if (sp >= movingMs) movingTime += dt;
+        if (sp >= movingMs) { movingTime += dt; movingDist += (S[i].segDist || 0); }
         if (sp >= activeMs) { activeTime += dt; activeDist += (S[i].segDist || 0); }
       }
     });
@@ -458,7 +458,7 @@
     res.maxSpeedMs = pk2.speedMs > 0 ? pk2.speedMs : instMax;
     res.maxSpeedIdx = pk2.startIdx;
     res.instantMaxSpeedMs = instMax;   // 참고용 — 노이즈 포함 순간 최고
-    res.avgSpeedMovingMs = movingTime > 0 ? session.totalDistanceM / movingTime : 0;
+    res.avgSpeedMovingMs = movingTime > 0 ? movingDist / movingTime : 0;
     /* 비율·평균의 분모는 분석 대상 시간이다 — 지운 구간은 분모에서도
        빠져야 지운 효과가 정직하게 반영된다. */
     var denom = analyzedTime > 0 ? analyzedTime : res.totalDurationSec;
@@ -775,6 +775,10 @@
     for (var k = apexIdx; k <= leg.end && S[k].t - S[apexIdx].t <= 45; k++) {
       if (S[k].speed >= 0.95 * refSpeed) { recoverySec = S[k].t - S[apexIdx].t; break; }
     }
+    // 새 참고 점수용 관측 범위. 기존 recoverySec 계산값은 유지한다.
+    var recoveryObservedSec = Math.min(45, Math.max(0, S[ceilIdx].t - S[apexIdx].t));
+    var recoveryStatus = recoverySec != null && recoverySec <= recoveryObservedSec
+      ? 'recovered' : (recoveryObservedSec >= 45 ? 'not-recovered' : 'censored');
 
     var turnDir = signed >= 0 ? 'starboard' : 'port'; // 시계방향 = 우현쪽
     var omega = totalTurn * Math.PI / 180 / Math.max(1, durationSec); // rad/s
@@ -841,6 +845,7 @@
       avgTurnRateDegSec: durationSec > 0 ? totalTurn / durationSec : 0,
       entrySpeedMs: entry, exitSpeedMs: exit, minSpeedMs: minSpeed,
       refSpeedMs: refSpeed, lossPct: lossPct, recoverySec: recoverySec,
+      recoveryObservedSec: recoveryObservedSec, recoveryStatus: recoveryStatus,
       turnDir: turnDir, radiusM: radiusM, type: type, completed: completed,
       entryVmgMs: entryVmgMs, exitVmgMs: exitVmgMs,
       vmgLossPct: vmgLossPct, vmgGainPct: vmgGainPct,

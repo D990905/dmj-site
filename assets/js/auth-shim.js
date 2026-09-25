@@ -443,26 +443,8 @@
     } catch (e) { return 0; }
   }
   function autoUpgradeTier() {
-    try {
-      var u = currentUser();
-      if (!u || !u.id) return null;
-      var total = recomputeTotalSpend();
-      var curDisc = Number(u.tierDiscount) || 0;
-      // Auto-upgrade: 회원(0%) → 단무지 회원(10%) when total >= 1,000,000
-      if (curDisc === 0 && total >= TIER_THRESHOLD_DANMUJI) {
-        u.tierLabel = '단무지 회원';
-        u.tierDiscount = 10;
-        u.tierSlug = 'danmuji';
-        u.tierUpgradedAt = new Date().toISOString();
-        updateUser(u);
-        console.info('[DMJAuth §175] auto-upgraded to 단무지 회원 (10%) — total_spend ₩' + total.toLocaleString());
-        return u;
-      }
-      return null;
-    } catch (e) {
-      console.warn('[DMJAuth §175] autoUpgradeTier failed', e);
-      return null;
-    }
+    // Legacy local records cannot establish paid spend or award membership benefits.
+    return null;
   }
 
   window.DMJAuth = {

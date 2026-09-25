@@ -51,29 +51,27 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=mobile-tap-fix-20260526">
-</head>
-<body>
+<link rel="stylesheet" href="assets/css/style.css?v=mobile-tap-fix-20260526&tone=20260925-soft">
+<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-profile-theme.css?tone=20260925-soft"><style>.member-operation-card{padding:20px;margin:16px 0;background:#eef1e6;border:1px solid #d4dac7;overflow-wrap:anywhere}.member-operation-card h3{margin-top:0}.member-operation-card p{font-size:14px}#member-operations-refresh{padding:12px 18px;background:#e2e635;color:#202522;border:1px solid #202522;cursor:pointer}#member-operations-status{font-size:14px;color:#626b56}</style><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<body class="dmj-legacy"><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="catalog.html">장비 둘러보기</a><a href="riding-dashboard/v2.html">라이딩 분석</a><a href="inquiry.html">구매 상담 ↗</a></div></nav>
 
 <div class="trust-bar"><div class="container"><div class="trust-bar__inner">
 <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
-<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
+<span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>입고·배송 일정 상담</span>
 <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
 </div></div></div>
 
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="index.html" class="nav__logo" aria-label="단무지 홈">
-        <span class="nav__logo-mark">D</span>
-        <span>단무지</span>
+      <a href="index.html" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>GEAR &amp; RIDING</small></span>
       </a>
 
       <!-- DO_NOT_REVERT §145-G v4 — Danny 2026-05-13: profile.html nav 6-item canonical 복원.
            이전 abbreviated (브랜드/스마트컨설팅/마이페이지 만) 회귀 영구 X. 전 페이지 nav 일관 적용. -->
       <div class="nav__primary" role="menubar">
         <div class="nav__has-sub" role="none">
-          <a href="index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <a href="catalog.html" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
           <div class="nav__sub" role="menu">
             <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
             <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
@@ -83,7 +81,7 @@
         </div>
 
         <div class="nav__has-sub" role="none">
-          <a href="index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <a href="find-my-gear.html" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
           <div class="nav__sub" role="menu">
             <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
             <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
@@ -104,7 +102,7 @@
         </div>
 
         <div class="nav__has-sub" role="none">
-          <a href="index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <a href="premium.html" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
           <div class="nav__sub nav__sub--wide" role="menu">
             <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a><a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
             <a href="level/intermediate.html" class="nav__sub-link" role="menuitem"><b>중급</b><span>Jibe·tack 정복</span></a>
@@ -343,7 +341,7 @@
          supabase fetch 로 전환. 그 전까지는 같은 브라우저 안 세션만 표시. -->
     <section class="profile-section" id="section-rides">
       <h2 class="profile-section__title">최근 라이딩 <small id="rides-count-badge"></small></h2>
-      <p class="profile-section__lead">라이딩 대시보드에 저장된 세션 — 최근 5개. 더보기로 전체 목록.</p>
+      <p class="profile-section__lead">라이딩 대시보드에 저장된 세션 — 최근 5개. 더보기로 전체 목록</p>
       <div class="rides-list" id="rides-list" data-state="loading" aria-live="polite" aria-busy="true">
         <div class="rides-skel" aria-hidden="true">
           <div class="rides-skel__row"></div>
@@ -469,8 +467,8 @@
          compact = mini progress bar + 현재 stage / expanded = full vertical timeline + admin messages.
          dash-section + 토글 패턴 (§169-N v3 일관). data store = dmj_user_<uid>_orders.
          empty state = "주문 진행 중인 견적 없음" + FMG CTA. -->
-    <section class="profile-section profile-section--dashboard" id="section-orders">
-      <h2 class="profile-section__title">주문 진행 <small>견적요청부터 배송까지 8단계</small></h2>
+<section class="profile-section" id="member-operations"><h2 class="profile-section__title">내 상담·주문</h2><p>관리자가 확인한 주문 상태와 이 계정으로 접수한 상담입니다.</p><button type="button" id="member-operations-refresh">최신 내역 확인</button><p id="member-operations-status" role="status"></p><h3>주문·입고 현황</h3><div id="member-order-list"></div><h3>회원 상담</h3><div id="member-inquiry-list"></div><a href="inquiry.html">새 구매 상담 접수 →</a></section>    <section class="profile-section profile-section--dashboard" id="section-orders">
+      <h2 class="profile-section__title">이전 견적·주문 메모 <small>회원이 저장한 참고 기록</small></h2>
       <div class="dash-section" data-section="orders">
         <div class="dash-section__compact" id="orders-compact"></div>
         <button type="button" class="dash-section__toggle" data-toggle="orders" hidden>자세히 보기 ↓</button>
@@ -492,7 +490,7 @@
             <option value="phase3">Phase 3 — Power · Agility</option>
             <option value="done">완료</option>
           </select>
-          <p class="training-progress-card__sub">PhD 운동생리학 기반 6 progression. Danny 단독 책임.</p>
+          <p class="training-progress-card__sub">PhD 운동생리학 기반 6 progression. Danny 단독 책임</p>
         </div>
         <div class="training-progress-card">
           <h4>해상 13주 7-stage</h4>
@@ -507,7 +505,7 @@
             <option value="s7">Stage 7 — HS+TS Tack</option>
             <option value="done">졸업</option>
           </select>
-          <p class="training-progress-card__sub">1회 2h × 주 3-5회 · 78-130h 정규 커리큘럼.</p>
+          <p class="training-progress-card__sub">1회 2h × 주 3-5회 · 78-130h 정규 커리큘럼</p>
         </div>
       </div>
       <div id="weakness-hint" style="margin-top:16px"></div>
@@ -527,8 +525,8 @@
         <ul>
           <li><a href="membership.html">회원 등급 안내</a></li>
           <li><a href="glossary.html">윙포일 용어 사전</a></li>
-          <li><a href="calculator.html">Lift Calculator</a></li>
-          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="calculator.html">장비 계산기</a></li>
+          <li><a href="find-my-gear.html">내 장비 찾기</a></li>
           <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
         </ul>
       </div>
@@ -540,7 +538,7 @@
           <li><a href="level/intermediate.html">중급 가이드</a></li>
           <li><a href="level/advanced.html">상급 가이드</a></li>
           <li><a href="level/pro.html">선수 가이드</a></li>
-          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">무료 입문 교육</span></a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -1092,8 +1090,7 @@
           var sx = (img.width - min) / 2; var sy = (img.height - min) / 2;
           ctx.drawImage(img, sx, sy, min, min, 0, 0, SZ, SZ);
           var b64 = c.toDataURL('image/jpeg', 0.85);
-          var u2 = window.DMJAuth.updateUser({ avatarBase64: b64 });
-          if (u2) { renderAvatar(u2); renderHero(u2); toast('프로필 사진 저장됨'); }
+          Promise.resolve(window.DMJAuth.updateUser({ avatarBase64: b64 })).then(function(u2){if(u2){renderAvatar(u2);renderHero(u2);toast('프로필 사진 저장됨');}}).catch(function(){toast('프로필 사진 저장에 실패했습니다. 다시 시도해 주세요.');});
           if (sourceInput) sourceInput.value = '';
         };
         img.src = rd.result;
@@ -1113,8 +1110,7 @@
       heroAvatarBtn.addEventListener('click', function () { heroAvatarInput.click(); });
     }
     avRemove.addEventListener('click', function () {
-      var u2 = window.DMJAuth.updateUser({ avatarBase64: '' });
-      if (u2) { renderAvatar(u2); renderHero(u2); toast('프로필 사진 삭제됨'); }
+      Promise.resolve(window.DMJAuth.updateUser({ avatarBase64: '' })).then(function(u2){if(u2){renderAvatar(u2);renderHero(u2);toast('프로필 사진 삭제됨');}}).catch(function(){toast('프로필 사진 삭제에 실패했습니다.');});
     });
     // Right-click on hero avatar → ask to delete (works on desktop). On mobile, long press 도 가능.
     if (heroAvatarBtn) {
@@ -1123,8 +1119,7 @@
         if (!cu.avatarBase64) return; // no avatar to delete
         e.preventDefault();
         if (confirm('프로필 사진을 삭제할까요?')) {
-          var u2 = window.DMJAuth.updateUser({ avatarBase64: '' });
-          if (u2) { renderAvatar(u2); renderHero(u2); toast('프로필 사진 삭제됨'); }
+          Promise.resolve(window.DMJAuth.updateUser({ avatarBase64: '' })).then(function(u2){if(u2){renderAvatar(u2);renderHero(u2);toast('프로필 사진 삭제됨');}}).catch(function(){toast('프로필 사진 삭제에 실패했습니다.');});
         }
       });
     }
@@ -2774,11 +2769,11 @@
 
       if (!orders.length) {
         compact.innerHTML = '<div class="order-empty">'
-          + '<p class="order-empty__title">주문 진행 중인 견적이 없습니다.</p>'
-          + '<p class="order-empty__sub">Find My Gear 추천을 받은 뒤 장바구니에서 견적을 요청하시면 여기서 진행 상황을 확인할 수 있습니다.</p>'
+          + '<p class="order-empty__title">이전에 저장한 견적 메모가 없습니다.</p>'
+          + '<p class="order-empty__sub">새 상담은 구매 상담에서 접수해 주세요. 확인된 주문·입고 상태는 위의 내 상담·주문에 표시됩니다.</p>'
           + '<div class="order-empty__cta">'
           +   '<a class="profile-hero__btn" href="find-my-gear.html" style="text-decoration:none">Find My Gear 시작 →</a>'
-          +   '<a class="profile-hero__btn" href="cart.html" style="text-decoration:none">장바구니 보기</a>'
+          +   '<a class="profile-hero__btn" href="inquiry.html" style="text-decoration:none">구매 상담</a>'
           + '</div>'
           + '</div>';
         expanded.innerHTML = '';
@@ -3219,7 +3214,7 @@
 })();
 </script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
-  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <link rel="stylesheet" href="assets/css/agent-deny.css?tone=20260925-soft">
   <script src="assets/js/agent-deny.js" defer></script>
-</body>
+<script src="assets/js/account-sync-status.js?v=1"></script><script src="assets/js/member-operations.js?v=20260925-names"></script></body>
 </html>

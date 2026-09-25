@@ -45,7 +45,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526">
+<link rel="stylesheet" href="assets/css/style.css?v=ios-link-svg-fix-20260526&tone=20260925-soft">
 
 <style>
   .calc-hero { background: linear-gradient(180deg, var(--color-mist) 0%, #fff 100%); padding: 56px 0 32px; }
@@ -169,15 +169,15 @@
   .wso-curve__caption b { color: var(--color-charcoal); }
   .wso-curve__empty { font-size: 0.8125rem; color: var(--color-slate); text-align: center; padding: 32px 12px; line-height: 1.6; }
 </style>
-</head>
-<body>
+<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<body class="dmj-legacy"><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="catalog.html">장비 둘러보기</a><a href="riding-dashboard/v2.html">라이딩 분석</a><a href="inquiry.html">구매 상담 ↗</a></div></nav>
 
 <!-- ========== Trust Bar ========== -->
 <div class="trust-bar" role="region" aria-label="신뢰 정보">
   <div class="container">
     <div class="trust-bar__inner">
       <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>정식 수입·정품 보증</span>
-      <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>당일 출고 (14시 이전)</span>
+      <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>입고·배송 일정 상담</span>
       <span class="trust-bar__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>카톡 상담 가능</span>
     </div>
   </div>
@@ -187,14 +187,12 @@
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="index.html" class="nav__logo" aria-label="단무지 홈">
-        <span class="nav__logo-mark">D</span>
-        <span>단무지</span>
+      <a href="index.html" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>GEAR &amp; RIDING</small></span>
       </a>
 
       <div class="nav__primary" role="menubar">
         <div class="nav__has-sub" role="none">
-          <a href="index.html#brands" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
+          <a href="catalog.html" class="nav__link" role="menuitem" aria-haspopup="true">브랜드</a>
           <div class="nav__sub" role="menu">
             <a href="levitaz.html" class="nav__sub-link" role="menuitem"><b>Levitaz</b><span>올림픽공인 하이드로포일/보드</span></a>
             <a href="ppc.html" class="nav__sub-link" role="menuitem"><b>PPC</b><span>하이퍼포먼스 윙</span></a>
@@ -204,7 +202,7 @@
         </div>
 
         <div class="nav__has-sub" role="none">
-          <a href="index.html#styles" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
+          <a href="find-my-gear.html" class="nav__link" role="menuitem" aria-haspopup="true">라이딩 스타일</a>
           <div class="nav__sub" role="menu">
             <a href="style/flat-speed.html" class="nav__sub-link" role="menuitem"><b>Flat·Speed</b><span>평수면·속도</span></a>
             <a href="style/choppy-freeride.html" class="nav__sub-link" role="menuitem"><b>Choppy·Freeride</b><span>한국 일반 스팟</span></a>
@@ -224,7 +222,7 @@
         </div>
 
         <div class="nav__has-sub" role="none">
-          <a href="index.html#consultation" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
+          <a href="premium.html" class="nav__link" role="menuitem" aria-haspopup="true">실력 수준</a>
           <div class="nav__sub nav__sub--wide" role="menu">
             <a href="level/beginner.html" class="nav__sub-link" role="menuitem"><b>입문</b><span>글라이딩 단계</span></a>
             <a href="level/novice.html" class="nav__sub-link" role="menuitem"><b>초급</b><span>테이크오프·기본 라이딩</span></a>
@@ -373,7 +371,7 @@
           <label><input type="radio" name="surface" value="swell"><span><b>너울</b><small>×0.95</small></span></label>
           <label><input type="radio" name="surface" value="mixed"><span><b>초피+너울</b><small>×1.00</small></span></label>
         </div>
-        <p class="form-hint" style="font-size:0.75rem;color:var(--color-slate);margin:6px 0 0">너울은 swell face 활강(중력 어시스트)으로 takeoff·글라이딩이 쉬워짐 → 페널티가 아니라 어시스트(×0.95). 초피+너울은 상쇄 ≈ 중립.</p>
+        <p class="form-hint" style="font-size:0.75rem;color:var(--color-slate);margin:6px 0 0">너울은 swell face 활강(중력 어시스트)으로 takeoff·글라이딩이 쉬워짐 → 페널티가 아니라 어시스트(×0.95). 초피+너울은 상쇄 ≈ 중립</p>
       </div>
 
       <p class="calc-disclaimer">
@@ -425,7 +423,7 @@
   <section class="calc-card wso-card" id="wso-section" aria-labelledby="wso-title">
     <h2 class="calc-card__title" id="wso-title">윙 사이즈 추천</h2>
     <p style="font-size:0.875rem;line-height:1.6;color:var(--color-charcoal);margin:0 0 16px">
-      위 입력값 기반 권장 윙 사이즈. <b>퍼포먼스 추천</b>은 풍상 VMG 가 최대가 되는
+      위 입력값 기반 권장 윙 사이즈 <b>퍼포먼스 추천</b>은 풍상 VMG 가 최대가 되는
       윙(곡선 정점)으로 항상 메인입니다. <b>실사용 추천</b>은 아래 '바람 상태' 선택을
       반영합니다 — 깨끗한 바람이면 퍼포먼스 그대로, 변풍이 심할수록 더 작은(다루기
       쉬운) 윙을 제시합니다.
@@ -584,7 +582,7 @@
           <br><b style="color:#8a5a00">¹ "라이더 한계" 표시</b>: 강풍·큰 윙 조합에서는 라이더가 옆으로 받는 힘이 한계에 닿아
           윙이 풀 파워를 못 냅니다. 이 영역에서는 보드 속도가 윙 사이즈가 아니라 라이더의 기댐 한계로 결정 → 세 셀이 같은 값으로 수렴.
           작은 사이즈가 차이를 만드는 구간은 그 직전 (윙이 자유롭게 풀파워를 낼 수 있는) 영역입니다.
-          <br><small style="color:var(--color-slate)">스킬별 풍상 진행 각도: 입문 65° / 초급 60° / 중급 55° / 상급 50° / 선수 45° (5° 균등). 라이더 기댐 한계 (선수) 42°. 보드 속도 모델 상한 35노트.</small>
+          <br><small style="color:var(--color-slate)">스킬별 풍상 진행 각도: 입문 65° / 초급 60° / 중급 55° / 상급 50° / 선수 45° (5° 균등). 라이더 기댐 한계 (선수) 42°. 보드 속도 모델 상한 35노트</small>
           <details style="margin-top:8px"><summary style="cursor:pointer;font-size:0.75rem;color:var(--color-slate)">📐 물리 모델 수식 (개발자용)</summary>
           <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem">
           V_app² = V_b² + V_t² + 2·V_t·V_b·cos(θ_tack),  cos β = (V_b + V_t·cos θ_tack)/V_app,
@@ -654,8 +652,8 @@
         <ul>
           <li><a href="membership.html">회원 등급 안내</a></li>
           <li><a href="glossary.html">윙포일 용어 사전</a></li>
-          <li><a href="calculator.html">Lift Calculator</a></li>
-          <li><a href="find-my-gear.html">Find My Gear 퀴즈</a></li>
+          <li><a href="calculator.html">장비 계산기</a></li>
+          <li><a href="find-my-gear.html">내 장비 찾기</a></li>
           <li><a href="https://pf.kakao.com/_VITZX/chat" target="_blank" rel="noopener">카톡 1:1 상담</a></li>
         </ul>
       </div>
@@ -666,7 +664,7 @@
           <li><a href="level/intermediate.html">중급 가이드</a></li>
           <li><a href="level/advanced.html">상급 가이드</a></li>
           <li><a href="level/pro.html">선수 가이드</a></li>
-          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">★ 프리미엄</span> (무료)</a></li>
+          <li><a href="premium.html"><span style="color:var(--color-sun);font-weight:700">무료 입문 교육</span></a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -1653,7 +1651,7 @@
 })();
 </script>
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
-  <link rel="stylesheet" href="assets/css/agent-deny.css">
+  <link rel="stylesheet" href="assets/css/agent-deny.css?tone=20260925-soft">
   <script src="assets/js/agent-deny.js" defer></script>
 </body>
 </html>

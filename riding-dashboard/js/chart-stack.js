@@ -20,7 +20,7 @@
   /* 어떤 판을 그릴지. 표본에 값이 없으면 그 판은 아예 만들지 않는다. */
   var PANELS = [
     { key: 'speed', label: 'Speed', unit: 'kt', color: '#4dabf7',
-      fill: 'rgba(77,171,247,0.14)', height: 168,
+      fill: 'rgba(126,145,82,0.10)', height: 168,
       get: function (p) { return p.speed == null ? null : p.speed * KT; } },
     { key: 'vmg', label: 'VMG', unit: 'kt', color: '#20c997', zero: true, height: 128,
       get: function (p) { return p.vmg == null ? null : p.vmg * KT; } },

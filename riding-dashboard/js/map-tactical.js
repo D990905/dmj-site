@@ -43,12 +43,12 @@
   };
   function tileKey() {
     try {
-      var v = global.localStorage && global.localStorage.getItem('rd_map_tiles');
-      return (v === 'satellite') ? 'satellite' : 'map';
+      var v = global.localStorage && global.localStorage.getItem('rd_map_tiles_studio');
+      return v === 'map' ? 'map' : 'satellite';
     } catch (e) { return 'map'; }
   }
   function setTileKey(k) {
-    try { global.localStorage.setItem('rd_map_tiles', k === 'satellite' ? 'satellite' : 'map'); }
+    try { global.localStorage.setItem('rd_map_tiles_studio', k === 'satellite' ? 'satellite' : 'map'); }
     catch (e) {}
   }
   function addTiles(map) {
@@ -248,9 +248,8 @@
       var col = m.type === 'gybe' ? '#f76707' : '#4dabf7';
       var mk = global.L.circleMarker([p.lat, p.lng], {
         radius: lossRadius(lossM, maxLoss),
-        color: col, weight: lossM == null ? 1 : 1.5,
-        opacity: lossM == null ? 0.5 : 0.9,
-        fillColor: col, fillOpacity: lossM == null ? 0 : 0.35
+        stroke: false, weight: 0,
+        fillColor: col, fillOpacity: lossM == null ? 0.15 : 0.35
       }).addTo(map);
       var lbl = (m.type === 'gybe' ? 'Gybe' : 'Tack') + ' ' + (k + 1)
         + ' · ' + Math.floor(m.tSec / 60) + ':' + ('0' + Math.round(m.tSec % 60)).slice(-2);

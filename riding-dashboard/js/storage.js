@@ -64,11 +64,10 @@
   var MIGRATION_FLAG = 'rd_legacy_migrated_v1';
   var _migrationTriedFor = {};   /* in-memory: uid 별 1회만 localStorage 프로빙 */
 
-  var MAX_SESSIONS = 50;
   /* 트랙 1건 상한 — 공백 압축 후에도 이보다 크면 요약만 저장한다.
      realistic 세션(수 시간·1Hz GPS)은 압축 후 이 한도 안에 들어와
      전부 '다시 보기'가 가능하다. 전체 저장 용량은 아래
-     storeTrackWithEviction 이 오래된 트랙을 비우며 따로 관리한다. */
+     저장 실패 시 기존 기록을 보존하고 오류를 반환한다. */
   var MAX_TRACK_CHARS = 8000000;
 
   /* §412 — legacy 전역 데이터 → 로그인 사용자 namespace 마이그레이션.
@@ -232,7 +231,7 @@
       global.localStorage.setItem(K_SESSIONS(), JSON.stringify(arr));
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: '브라우저 저장 공간이 가득 찼습니다. 오래된 세션을 삭제해 주세요.' };
+      return { ok: false, error: '브라우저 저장 공간이 부족해 저장하지 못했습니다. 기존 기록은 유지됩니다. 원본 파일을 보관해 주세요.' };
     }
   }
 
@@ -344,14 +343,6 @@
   function storeTrackWithEviction(id, text, arr) {
     try { storeTrackRaw(id, text); return true; }
     catch (e) { /* 용량 초과 — 아래에서 오래된 트랙 정리 */ }
-    var evictable = arr.filter(function (r) { return r.id !== id && r.hasTrack; })
-                       .sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
-    for (var i = 0; i < evictable.length; i++) {
-      removeTrack(evictable[i].id);
-      evictable[i].hasTrack = false;
-      try { storeTrackRaw(id, text); return true; }
-      catch (e2) { /* 아직 부족 — 계속 비운다 */ }
-    }
     return false;
   }
 
@@ -473,6 +464,8 @@
          그 뒤로는 산술이 전부 NaN 이다(시즌 흐름 그래프가 그렇게 죽었다) */
       dateEpoch: numEpoch(meta.dateEpoch) || Date.now(),
       sport: meta.sport || 'wingfoil',
+      performanceV1: meta.performanceV1 && meta.performanceV1.version === 'draft-v1' ? JSON.parse(JSON.stringify(meta.performanceV1)) : null,
+      purpose: ['freeride','race','wave','maneuver','slalom','speed'].indexOf(meta.purpose)>=0 ? meta.purpose : 'freeride',
       windDir: meta.windDir != null ? meta.windDir : null,
       windSpeedKt: meta.windSpeedKt != null ? meta.windSpeedKt : null,
       /* §551 — §547 이 v2 에서 rider 를 넘기게 해 놓고 **여기서 복사하지
@@ -650,14 +643,9 @@
       arr.push(rec);
     }
     arr.sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
-    if (arr.length > MAX_SESSIONS) {
-      /* 상한 초과로 밀려나는 오래된 세션 — 트랙도 함께 정리 */
-      arr.slice(0, arr.length - MAX_SESSIONS).forEach(function (d) { removeTrack(d.id); });
-      arr = arr.slice(arr.length - MAX_SESSIONS);
-    }
     /* 원본 GPX 저장 — '다시 보기' 재분석용. 공백 압축 후 저장하며,
        압축 후에도 상한을 넘거나 저장에 실패하면 요약만 저장된다. */
-    rec.hasTrack = false;
+    rec.hasTrack = !!loadTrack(rec.id);
     /* §509 — 트랙은 **압축 형식(RDTRK1)** 으로 담는다. GPX 원문을 그대로
        넣으면 점당 97 bytes 라 47km 세션 하나가 0.57 MB 이고, localStorage
        가 UTF-16 이라 6세션이면 5 MB 상한을 넘어 오래된 트랙부터 쫓겨났다.
@@ -670,8 +658,12 @@
     if (!payload && typeof meta.gpxText === 'string') {
       payload = compactGpx(meta.gpxText);
     }
-    if (payload && payload.length <= MAX_TRACK_CHARS) {
+    if (payload && payload.length > MAX_TRACK_CHARS) {
+      return {ok:false,error:"기록 용량이 너무 커 저장하지 못했습니다. 기존 기록은 유지됩니다. 원본 파일을 보관해 주세요."};
+    }
+    if (payload) {
       rec.hasTrack = storeTrackWithEviction(rec.id, payload, arr);
+      if (!rec.hasTrack) return {ok:false,error:"저장 공간이 부족합니다. 기존 기록은 삭제하지 않았습니다. 원본 파일을 보관하고 공간을 확보한 뒤 다시 저장해 주세요."};
     }
     var w = writeAll(arr);
     return w.ok ? { ok: true, record: rec } : w;

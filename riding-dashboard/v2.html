@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-bs-theme="dark">
+<html lang="ko" data-bs-theme="light">
 <!-- §491 — 테마는 CSS 가 그려지기 전에 정한다. 나중에 JS 로 바꾸면
      어두운 화면이 한 번 번쩍인 뒤 밝아진다(FOUC). -->
 <script>
@@ -11,13 +11,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Riding Dashboard — Session</title>
-<link rel="stylesheet" href="vendor/tabler.min.css?v=1.4.0">
+<title>라이딩 분석 대시보드</title>
+<link rel="stylesheet" href="vendor/tabler.min.css?v=1.4.0&tone=20260925-soft">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="vendor/uPlot.min.css?v=1.6.32">
-<link rel="stylesheet" href="css/replay-only.css?v=v596">
+<link rel="stylesheet" href="vendor/uPlot.min.css?v=1.6.32&tone=20260925-soft">
+<link rel="stylesheet" href="css/replay-only.css?v=v596&tone=20260925-soft">
 <!-- §586 모바일 셸 — 768px 이하에서만 적용된다 -->
-<link rel="stylesheet" href="css/mobile.css?v=v586l">
+<link rel="stylesheet" href="css/mobile.css?v=v586l&tone=20260925-soft">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
@@ -86,8 +86,8 @@
     .tc-row { grid-template-columns: 1fr; gap: .35rem; }
   }
 </style>
-</head>
-<body>
+<link rel="stylesheet" href="../assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="css/dmj-theme.css?v=studio-20260925"><link rel="stylesheet" href="../assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"><link rel="stylesheet" href="css/workflow.css?v=summary-restored-20260925"><link rel="stylesheet" href="css/replay-refinement.css?v=map-studio-20260925"></head>
+<body><script>window.addEventListener("error",function(e){var h=document.getElementById("rd-runtime-error");if(!h){h=document.createElement("p");h.id="rd-runtime-error";h.setAttribute("role","alert");document.body.appendChild(h);}h.textContent="화면을 구성하는 중 오류가 발생했습니다: "+e.message;});</script><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="../index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="../catalog.html">장비 둘러보기</a><a href="../inquiry.html">구매 상담</a><a href="../spots.html">전국 스폿 · 현황</a><a href="../connect.html">코칭 · 커뮤니티 ↗</a></div></nav>
 <div class="page">
   <header class="navbar navbar-expand-md d-print-none">
     <div class="container-xl">
@@ -132,7 +132,7 @@
               <!-- §525 W13 — 서버 없이 되는 내보내기 -->
               <button type="button" class="btn" id="btn-export-csv">CSV</button>
               <button type="button" class="btn" id="btn-export-gpx">GPX</button>
-              <a class="btn" href="index.html">Old dashboard</a>
+
               <!-- §528 계정 — 데이터가 이 브라우저에만 있는지, 계정에 묶였는지 -->
               <span id="auth-chip" class="lab ms-2"></span>
             </div>
@@ -144,53 +144,24 @@
     <div class="page-body">
       <div class="container-xl">
 
-        <div id="fusion-banner"></div>
+        <details id="rd-glossary" class="card p-3 mb-3"><summary>분석 용어 안내</summary><p class="mt-2 mb-0">VMG: 바람을 기준으로 풍상·풍하 방향으로 나아가는 유효 속도 · SOG: GPS 지면 기준 속도 · TWA: 실제 바람과 진행 방향 사이의 각도 · kt: 노트(속도 단위) · Tack: 택킹 · Gybe: 자이빙</p></details><div id="fusion-banner"></div>
 
-        <!-- 라이더 입력 — SPS 산출에 필요 -->
-        <div class="card mb-3">
-          <div class="card-body py-2">
-            <div class="row g-2 align-items-end">
-              <div class="col-auto">
-                <label class="form-label lab mb-1">Weight (kg)</label>
-                <input type="number" class="form-control num" id="in-weight" value="75" style="width:96px">
-              </div>
-              <div class="col-auto">
-                <label class="form-label lab mb-1">Wing (m²)</label>
-                <input type="number" step="0.1" class="form-control num" id="in-wing" value="6.0" style="width:96px">
-              </div>
-              <div class="col-auto">
-                <label class="form-label lab mb-1">Skill</label>
-                <select class="form-select" id="in-skill" style="width:150px">
-                  <option value="입문">Novice</option>
-                  <option value="초급">Beginner</option>
-                  <option value="중급" selected>Intermediate</option>
-                  <option value="상급">Advanced</option>
-                  <option value="상급-선수">Advanced-Pro</option>
-                  <option value="선수">Pro</option>
-                </select>
-              </div>
-              <div class="col-auto">
-                <label class="form-label lab mb-1">Wind speed (kt)</label>
-                <input type="number" class="form-control num" id="in-windspeed" value="18" style="width:110px">
-              </div>
-              <div class="col-auto">
-                <button type="button" class="btn btn-primary" id="btn-rider">Recalculate</button>
-              </div>
-              <div class="col text-secondary" style="font-size:.8125rem" id="rider-note"></div>
-            </div>
-          </div>
-        </div>
-
+        <section class="rd-workflow" aria-label="라이딩 분석 순서">
+          <div><span class="lab">기록 불러오기 → 조건 확인 → 결과 보기</span><h2 id="rd-flow-title">라이딩 조건을 확인하세요</h2><p id="rd-flow-summary">기록 파일을 불러온 뒤, 당시의 바람과 사용 장비를 확인하세요.</p></div>
+          <div class="rd-flow-actions"><button type="button" class="btn btn-primary" id="rd-analyze">조건 확인 · 분석 결과 보기</button><button type="button" class="btn" id="rd-edit" hidden>조건 수정</button><span id="rd-save-state" role="status" aria-live="polite">아직 저장하지 않았습니다</span></div>
+        </section>
+        <p class="rd-analysis-note">점수는 입력한 풍속·장비·라이딩 수준을 반영한 모델 기준입니다. 포일링 시간은 GPS 속도로 추정하며 실제 비행 여부를 측정한 값이 아닙니다.</p>
         <!-- KPI 행 -->
-        <div class="row row-deck row-cards" id="kpi-row"></div>
+        <div class="row row-deck row-cards" id="kpi-row"></div><div id="purpose-results"></div>
         <!-- §589 (옥대표 "비교기능은 대체 뭐를 하는거냐... 전혀 비교되는게 없는데?")
              — 헤더에서 세션을 고르면 여기에 나란히 뜬다. 예전엔 리플레이에서만 보였다. -->
         <!-- §594 게스트(다른 사람) 세션을 열었을 때 -->
         <div id="guest-host"></div>
         <div id="compare-host"></div>
 
+        <div class="rd-mobile-result-actions"><button type="button" class="btn" id="rd-upload-again">기록 불러오기</button><button type="button" class="btn" id="rd-mobile-replay">라이딩 재생</button><button type="button" class="btn btn-primary" id="rd-mobile-save">분석·기록 저장</button></div><div class="rd-detail-actions" id="rd-detail-actions"><button type="button" class="btn" id="rd-show-details" aria-expanded="false" aria-controls="rd-domain-card">상세 분석 열기</button><button type="button" class="btn" id="rd-overview" hidden>요약으로 돌아가기</button></div>
         <!-- 도메인 탭 -->
-        <div class="card mt-3">
+        <div class="card mt-3" id="rd-domain-card">
           <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs" role="tablist">
               <!-- §578 (옥대표 "바람 각도 확인하는것도 파일 업로드하면 처음에
@@ -215,7 +186,42 @@
             <div class="tab-content">
 
               <div id="tab-env" class="tab-pane active show" role="tabpanel">
-                <div id="env-body" class="text-secondary">—</div>
+                        <!-- 라이더 입력 — SPS 산출에 필요 -->
+        <div class="card mb-3" id="rider-input-card">
+          <div class="card-body py-2">
+            <div class="row g-2 align-items-end"><div class="col-auto"><label class="form-label lab mb-1" for="in-purpose">이번 라이딩 목적</label><select id="in-purpose" class="form-select"><option value="freeride">프리라이드</option><option value="race">레이스 · 시합</option><option value="wave">웨이브</option><option value="maneuver">태킹 · 자이빙 연습</option><option value="slalom">슬라럼 연습</option><option value="speed">스피드 기록</option></select></div>
+              <div class="col-auto">
+                <label class="form-label lab mb-1">Weight (kg)</label>
+                <input type="number" class="form-control num" id="in-weight" value="75" style="width:96px">
+              </div>
+              <div class="col-auto">
+                <label class="form-label lab mb-1">Wing (m²)</label>
+                <input type="number" step="0.1" class="form-control num" id="in-wing" value="6.0" style="width:96px">
+              </div>
+              <div class="col-auto">
+                <label class="form-label lab mb-1">Skill</label>
+                <select class="form-select" id="in-skill" style="width:150px">
+                  <option value="입문">Novice</option>
+                  <option value="초급">Beginner</option>
+                  <option value="중급" selected>Intermediate</option>
+                  <option value="상급">Advanced</option>
+                  <option value="상급-선수">Advanced-Pro</option>
+                  <option value="선수">Pro</option>
+                </select>
+              </div>
+              <div class="col-auto">
+                <label class="form-label lab mb-1">Wind speed (kt)</label>
+                <input type="number" class="form-control num" id="in-windspeed" value="18" style="width:110px">
+              </div>
+              <div class="col-auto">
+                <button type="button" class="btn" id="btn-rider">조건 반영</button>
+              </div>
+              <div class="col text-secondary" style="font-size:.8125rem" id="rider-note"></div>
+            </div>
+          </div>
+        </div>
+
+<div id="env-body" class="text-secondary">—</div>
               </div>
 
               <div id="tab-perf" class="tab-pane" role="tabpanel">
@@ -273,7 +279,7 @@
                   <div class="col-12"><div id="polar-vmg-host"></div></div>
                   <!-- §588 — Bin table · 회전 손실은 바람이 아니라 그 바람에서 내가 어땠는지다.
                        컨디션 탭을 입력만 남기면서 이쪽으로. -->
-                  <div class="col-12"><div id="wind-analysis-host"></div></div>
+                  <div class="col-12"><div id="wind-analysis-host"></div><div id="rd-wind-variation"></div></div>
                   <div class="col-12"><div id="perf-extra"></div></div>
                   <div class="col-12">
                     <div class="card">
@@ -379,29 +385,31 @@
 <script src="js/analysis-imu.js?v=auto-463"></script>
 <script src="js/analysis-hr.js?v=auto-463"></script>
 <script src="js/session-merger.js?v=auto-463"></script>
-<script src="js/analysis.js?v=v516"></script>
+<script src="js/analysis.js?v=review-20260925-final2"></script>
 <!-- §528 인증 — storage 가 DMJAuth 를 보고 namespace 를 정하므로 **먼저** 실어야 한다.
      defer 를 쓰지 않는 이유: defer 는 실행이 문서 파싱 뒤로 밀려서
      storage.js 가 먼저 돌아버린다(그러면 첫 read 가 bare namespace 로 나간다). -->
 <script src="../assets/js/supabase-auth.js?v=v528"></script>
-<script src="js/storage.js?v=v594"></script>
+<script src="js/storage.js?v=preserve-20260925-1"></script>
+<script src="js/cloud-sync.js?v=account-fix1"></script>
 <script src="vendor/uPlot.iife.min.js?v=1.6.32"></script>
-<script src="js/chart-meanmax.js?v=v586g"></script>
+<script src="js/chart-meanmax.js?v=studio-20260925"></script>
 <script src="js/segments.js?v=v523"></script>
 <script src="js/export.js?v=v525"></script>
 <script src="js/fitness.js?v=v526"></script>
 <script src="js/chart-polar.js?v=v579"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="../assets/js/lift-calculator.js?v=auto-463"></script>
-<script src="js/coach.js?v=auto-463"></script>
+<script src="js/coach.js?v=review-20260925-final2"></script>
+<script>try{localStorage.setItem("dmj_rd_lang","ko")}catch(e){}</script>
 <script src="js/i18n.js?v=auto-463"></script>
-<script src="js/chart-theme.js?v=auto-463"></script>
+<script src="js/chart-theme.js?v=dmj-lime1"></script>
 <script src="js/anim.js?v=auto-463"></script>
 <script src="js/charts.js?v=auto-463"></script>
-<script src="js/replay.js?v=v597"></script>
+<script src="js/replay.js?v=map-studio-20260925"></script>
 <script src="js/map-v2.js?v=v581"></script>
-<script src="js/map-tactical.js?v=v581"></script>
-<script src="js/chart-stack.js?v=v592"></script>
+<script src="js/map-tactical.js?v=map-studio-20260925"></script>
+<script src="js/chart-stack.js?v=studio-20260925"></script>
 <script src="js/session-qa.js?v=qa-487"></script>
 <script src="js/bin-table.js?v=bin-477"></script>
 <script src="js/correlation.js?v=corr-478"></script>
@@ -412,7 +420,7 @@
 <script src="js/gear-usage.js?v=v559"></script>
 <script src="js/chart-tip.js?v=v560"></script>
 <script src="js/slalom.js?v=v591b"></script>
-<script src="js/v2-app.js?v=v598"></script>
-<script src="js/mobile-shell.js?v=v588"></script>
-</body>
+<script src="js/performance-score.js?v=review-20260925-final2"></script><script src="js/purpose-view.js?v=summary-restored-20260925"></script><script src="js/v2-app.js?v=release-20260925-fixed"></script>
+<script src="js/mobile-shell.js?v=review-20260925-final2"></script>
+<script src="js/v2-korean-extra.js?v=review-20260925-final2"></script><script src="js/v2-korean.js?v=review-20260925-punctuation"></script><script src="js/v2-workflow.js?v=dedup-20260925-1"></script></body>
 </html>

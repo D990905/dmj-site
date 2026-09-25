@@ -1,0 +1,71 @@
+{
+  "version": "20260924",
+  "siteName": "DMJ",
+  "siteUrl": "https://dmjgroup.kr",
+  "kakao": "https://pf.kakao.com/_VITZX/chat",
+  "channels": [
+    {
+      "id": "personal",
+      "label": "Danny Ok · 개인 인스타그램",
+      "url": "https://www.instagram.com/kor22danny/",
+      "role": "개인 브랜드·현장 이야기",
+      "group": "personal"
+    },
+    {
+      "id": "lab-instagram",
+      "label": "연구소 인스타그램",
+      "url": "https://www.instagram.com/wingfoil_performance_lab/",
+      "role": "교육·라이딩 콘텐츠",
+      "group": "learn"
+    },
+    {
+      "id": "youtube",
+      "label": "연구소 유튜브",
+      "url": "https://www.youtube.com/@wingfoilperformancelab",
+      "role": "교육 영상",
+      "group": "learn"
+    },
+    {
+      "id": "band-lab",
+      "label": "연구소 밴드",
+      "url": "https://band.us/@wpl",
+      "role": "교육 커뮤니티",
+      "group": "learn"
+    },
+    {
+      "id": "instagram",
+      "label": "PPC Korea 인스타그램",
+      "url": "https://www.instagram.com/ppc_foiling_korea/",
+      "role": "장비 소식·DMJ 전환 검토",
+      "group": "gear"
+    },
+    {
+      "id": "band-ppc",
+      "label": "PPC 정보공유 밴드",
+      "url": "https://band.us/@ppc",
+      "role": "기존 고객 커뮤니티",
+      "group": "gear"
+    },
+    {
+      "id": "facebook",
+      "label": "PPC 페이스북",
+      "url": "https://www.facebook.com/profile.php?id=61573521688772",
+      "role": "장비 콘텐츠",
+      "group": "gear"
+    },
+    {
+      "id": "kakao",
+      "label": "DMJ 카카오채널",
+      "url": "https://pf.kakao.com/_VITZX/chat",
+      "role": "구매 상담·주문 문의",
+      "group": "contact"
+    },
+    {
+      "id": "whatsapp",
+      "label": "WhatsApp Business",
+      "url": "https://wa.me/85290338522",
+      "role": "해외·기존 고객 문의",
+      "group": "contact"
+    }
+  ]
+}

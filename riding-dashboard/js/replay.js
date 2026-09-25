@@ -648,6 +648,78 @@
   var CURSOR = '#FF5A1F';          // 재생 헤드(주황)
   var TRACK_MIN_SPAN = 20;         // 하단 트랙 최소 줌 범위(초)
 
+  function updateMapWindow() {
+    if (!R.map || typeof global.L === 'undefined') return;
+    var L = global.L;
+    var lo = R.mapLinked ? R.winStart : R.t0;
+    var hi = R.mapLinked ? R.winEnd : R.t1;
+
+    (R.mapTrack || []).forEach(function (ly) {
+      try { R.map.removeLayer(ly); } catch (e) {}
+    });
+    (R.mapMans || []).forEach(function (ly) {
+      try { R.map.removeLayer(ly); } catch (e) {}
+    });
+    (R.mapGhostTrack || []).forEach(function(ly){try{R.map.removeLayer(ly);}catch(e){}});
+    R.mapTrack = []; R.mapMans = []; R.mapGhostTrack = [];
+
+    var i0 = sampleIndexAtTime(R.samples, lo);
+    var i1 = sampleIndexAtTime(R.samples, hi);
+    if (i1 < R.samples.length - 1) i1++;
+    var maxKt = R.maxKt;
+    var legend = el('replay-speedlegend');
+    if (legend) legend.innerHTML = '<span>항적 속도 · kt</span><i style="background:linear-gradient(90deg,' + speedRamp(0) + ',' + speedRamp(.5) + ',' + speedRamp(1) + ')"></i><span>0 — ' + maxKt.toFixed(1) + '</span>';
+    var pts = [];
+    var legStarts = {};
+    ((R.session && R.session.legs) || []).forEach(function(leg){legStarts[leg.start]=true;});
+    for (var i = i0; i < i1; i++) {
+      var p0 = R.samples[i], p1 = R.samples[i + 1];
+      if (legStarts[i + 1] || !replaySegmentValid(p0, p1)) continue;
+      var kt = ((p1.speed || 0)) * KT;
+      var seg = L.polyline([[p0.lat, p0.lng], [p1.lat, p1.lng]], {
+        /* 가는 선 — 트랙이 마커·바람 격자를 가리지 않게 (Danny
+           2026-05-24: 항적선이 굵다 → 가늘게). */
+        color: speedRamp(maxKt > 0 ? kt / maxKt : 0), weight: 2.5, opacity: 0.95
+      });
+      seg.addTo(R.map);
+      R.mapTrack.push(seg);
+      pts.push([p0.lat, p0.lng]);
+    }
+    if (R.samples[i1]) pts.push([R.samples[i1].lat, R.samples[i1].lng]);
+
+    if (R.ghost && R.ghost.session) {
+      var gs=R.ghost.session.samples, ghostLegStarts={};
+      (R.ghost.session.legs || []).forEach(function(leg){ghostLegStarts[leg.start]=true;});
+      var shift=R.t0-gs[0].t+R.ghost.align.offsetSec;
+      for(var gi=1;gi<gs.length;gi++){
+        if(gs[gi].t+shift<lo || gs[gi-1].t+shift>hi || ghostLegStarts[gi] || !replaySegmentValid(gs[gi-1],gs[gi]))continue;
+        var ghostPts=[[gs[gi-1].lat,gs[gi-1].lng],[gs[gi].lat,gs[gi].lng]];
+        R.mapGhostTrack.push(L.polyline(ghostPts,{color:R.ghost.color||'#B86BFF',weight:2.5,opacity:.7}).addTo(R.map));
+        Array.prototype.push.apply(pts,ghostPts);
+      }
+    }
+    // 회전 마커 — 범위 안의 것만
+    var mans = (R.analysis && R.analysis.maneuvers) || [];
+    mans.forEach(function (m) {
+      var ap = R.samples[m.apexIdx];
+      if (!ap || ap.t < lo || ap.t > hi) return;
+      var col = m.type === 'gybe' ? '#EF7D00'
+        : (m.type === 'tack' ? '#33A1FF' : '#8295A8');
+      var mk = L.circleMarker([ap.lat, ap.lng], {
+        radius: 5, stroke: false, weight: 0, fillColor: col, fillOpacity: 0.45
+      });
+      mk.addTo(R.map); R.mapMans.push(mk);
+    });
+
+    // 선택 프레임 범위가 지도에 꽉 차게
+    if (pts.length > 1 && !R.mapUserMoved) {
+      try {
+        R._mapProg = true;
+        R.map.fitBounds(L.latLngBounds(pts), { padding: [36, 36], maxZoom: 18 });
+      } catch (e) { R._mapProg = false; }
+    }
+  }
+
   /* 동적 보드 아이콘 — 세일 거동 매핑 상수 (보기 좋은 기본값, Danny
      튜닝용). 세일각 = TWA 기반 기본 받음각 + SOG 기반 개폐.
      · TWA 작음(풍상) → 기본각 작음(닫힘) / TWA 큼(풍하) → 큼(열림)
@@ -810,7 +882,11 @@
                레드라인. 격자보다 위 레이어(z 6 · C · Danny 2026-05-24). */
             '<canvas id="replay-ladder" class="replay__ladder" ' +
               'aria-hidden="true"></canvas>' +
+            '<div class="replay__speedlegend" id="replay-speedlegend" aria-label="항적 속도 범례"></div>' +
             '<div class="replay__mapctl">' +
+              '<button type="button" class="replay__mapbtn" id="replay-tiles" aria-pressed="false">위성 지도</button>' +
+              '<button type="button" class="replay__mapbtn" id="replay-prev-turn" title="이전 회전으로 이동">‹ 이전 회전</button>' +
+              '<button type="button" class="replay__mapbtn" id="replay-next-turn" title="다음 회전으로 이동">다음 회전 ›</button>' +
               '<button type="button" class="replay__mapbtn replay__mapbtn--ico" ' +
                 'id="replay-map-zoomout" aria-label="Zoom out map">－</button>' +
               '<button type="button" class="replay__mapbtn replay__mapbtn--ico" ' +
@@ -1908,6 +1984,38 @@
   /* ============================================================
    * 8) 무대 — 지도 (Leaflet · 보드 중앙 · 윈도우 트랙)
    * ============================================================ */
+  function setReplayTiles(key) {
+    if (!R || !R.map || !global.L) return;
+    var satellite = key === 'satellite';
+    R.map.getContainer().classList.add('rd-analysis-map');
+    R.map.getContainer().classList.toggle('rd-satellite-map', satellite);
+    if (R.tileLayer) R.map.removeLayer(R.tileLayer);
+    R.tileLayer = global.L.tileLayer(satellite
+      ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', satellite
+      ? {maxZoom:19,maxNativeZoom:18,attribution:'Imagery © Esri, Maxar, Earthstar Geographics'}
+      : {maxZoom:19,attribution:'© OpenStreetMap'}).addTo(R.map);
+    R.tileKey = satellite ? 'satellite' : 'map';
+    try { global.localStorage.setItem('rd_map_tiles_studio', R.tileKey); } catch (e) {}
+    var b = el('replay-tiles');
+    if (b) { b.textContent = satellite ? '분석 지도' : '위성 지도'; b.setAttribute('aria-pressed', satellite ? 'true' : 'false'); }
+  }
+  function replaySegmentValid(a, b) {
+    return !!a && !!b && isFinite(a.lat) && isFinite(a.lng) &&
+      isFinite(b.lat) && isFinite(b.lng) && b.t > a.t && b.t - a.t <= GAP_SEC &&
+      !(a.legId != null && b.legId != null && a.legId !== b.legId);
+  }
+  function jumpManeuver(direction) {
+    if (!R) return;
+    var times = ((R.analysis && R.analysis.maneuvers) || []).map(function (m) {
+      var sample = R.samples[m.apexIdx];
+      return sample ? sample.t : m.tSec;
+    }).filter(function (t) { return typeof t === 'number' && isFinite(t); }).sort(function (a,b) {return a-b;});
+    if (direction < 0) times.reverse();
+    for (var i=0;i<times.length;i++) {
+      if ((times[i]-R.playT)*direction > 0.1) { seek(times[i], !R.playing); return; }
+    }
+  }
   function ensureMap() {
     if (R.map || typeof global.L === 'undefined') return;
     var L = global.L;
@@ -1919,9 +2027,11 @@
       R.map = L.map(mapEl, {
         zoomControl: false, attributionControl: true, preferCanvas: true
       });
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19, attribution: '© OpenStreetMap'
-      }).addTo(R.map);
+      var savedTiles = 'satellite';
+      try { savedTiles = global.localStorage.getItem('rd_map_tiles_studio') || 'satellite'; } catch (e) {}
+      setReplayTiles(savedTiles);
+      L.control.scale({position:"bottomleft",imperial:false}).addTo(R.map);
+      var north=L.control({position:"topleft"});north.onAdd=function(){var n=L.DomUtil.create("div","rd-map-north");n.textContent="↑ N";n.title="북쪽 · 지도는 북쪽 고정";return n;};north.addTo(R.map);
     } catch (e) { R.map = null; return; }
 
     // 사용자가 직접 팬/줌하면 보드 자동추적을 끈다 (프로그램 이동은 제외)
@@ -1969,113 +2079,21 @@
   /* §595 (옥대표 "두 배를 비교하고 있는데 하나는 그냥 점으로 나오네. 같은 배모양으로
      만들되 색깔만 바꿔서") — 비교 상대가 7px 원이었다. 같은 보드·세일 SVG 를 쓰고
      색만 바꾼다. 헤딩 회전·세일 방향도 같은 규칙으로. */
-  var BOARD_ME = { board: '#0A2540', deck: '#22425E', sail: '#FFB000' };
+  // Restrained top-view board: pearl hull, graphite deck and a small bow accent.
+  // Keep rotation hooks and the existing wind-driven sail pivot unchanged.
+  var BOARD_ME = { board: '#E9EEEC', deck: '#34434A', sail: '#D9E5E5', accent: '#DCEB81' };
   function ghostBoardColors(color) {
-    return { board: color || '#B86BFF', deck: 'rgba(255,255,255,0.28)', sail: '#FFFFFF' };
+    return { board: color || '#B8A3DA', deck: '#34434A', sail: '#D9E5E5', accent: '#FFFFFF' };
   }
   function boardIconHtml(c) {
-    return (
-      '<div class="rd-ph"><div class="rd-ph__rot">' +
-        '<svg viewBox="-44 -44 88 88" width="56" height="56">' +
-          /* 보드 아웃라인 — 둥근 노즈·앞쪽 최대폭·둥근 테일 */
-          '<path class="rd-ph__board" d="M0,-26 C4.2,-25.4 8.4,-18 9.2,-7 ' +
-            'C9.7,1 8.2,15 4.6,23.5 C3,27.2 -3,27.2 -4.6,23.5 ' +
-            'C-8.2,15 -9.7,1 -9.2,-7 C-8.4,-18 -4.2,-25.4 0,-26 Z" ' +
-            'fill="' + c.board + '" stroke="#FFFFFF" stroke-width="1.8" ' +
-            'stroke-linejoin="round"/>' +
-          /* 데크 패드 — 방향감을 주는 옅은 안쪽 면 */
-          '<path d="M0,-3 C3,-3 5.4,0.5 5.4,6.5 C5.4,14 3.4,19 0,19 ' +
-            'C-3.4,19 -5.4,14 -5.4,6.5 C-5.4,0.5 -3,-3 0,-3 Z" ' +
-            'fill="' + c.deck + '"/>' +
-          /* 세일(윙) — 앞쪽 1/3 피벗에서 회전. 좌우 대칭 블레이드라
-             택 전환 시 회전 부호만으로 양쪽을 표현한다. */
-          '<g class="rd-ph__sail">' +
-            '<path d="M0,-13 C4.8,-11 5.8,3 3.3,17 C2.1,21.5 0.7,23 0,23 ' +
-              'C-0.7,23 -2.1,21.5 -3.3,17 C-5.8,3 -4.8,-11 0,-13 Z" ' +
-              'fill="' + c.sail + '" stroke="' + c.board + '" stroke-width="1.4" ' +
-              'stroke-linejoin="round"/>' +
-          '</g>' +
-        '</svg></div></div>');
-  }
-
-  /* 지도에 표시할 트랙 시간범위를 갱신 — 연동 켜짐이면 트랙 줌 창,
-     꺼짐이면 전체 세션. 속도색 폴리라인으로 다시 그린다. */
-  function updateMapWindow() {
-    if (!R.map || typeof global.L === 'undefined') return;
-    var L = global.L;
-    var lo = R.mapLinked ? R.winStart : R.t0;
-    var hi = R.mapLinked ? R.winEnd : R.t1;
-
-    (R.mapTrack || []).forEach(function (ly) {
-      try { R.map.removeLayer(ly); } catch (e) {}
-    });
-    (R.mapMans || []).forEach(function (ly) {
-      try { R.map.removeLayer(ly); } catch (e) {}
-    });
-    (R.mapGhostTrack || []).forEach(function (ly) {
-      try { R.map.removeLayer(ly); } catch (e) {}
-    });
-    R.mapTrack = []; R.mapMans = []; R.mapGhostTrack = [];
-
-    var i0 = sampleIndexAtTime(R.samples, lo);
-    var i1 = sampleIndexAtTime(R.samples, hi);
-    if (i1 < R.samples.length - 1) i1++;
-    var maxKt = R.maxKt;
-    var pts = [];
-    for (var i = i0; i < i1; i++) {
-      var p0 = R.samples[i], p1 = R.samples[i + 1];
-      var kt = ((p1.speed || 0)) * KT;
-      var seg = L.polyline([[p0.lat, p0.lng], [p1.lat, p1.lng]], {
-        /* 가는 선 — 트랙이 마커·바람 격자를 가리지 않게 (Danny
-           2026-05-24: 항적선이 굵다 → 가늘게). */
-        color: speedRamp(maxKt > 0 ? kt / maxKt : 0), weight: 2.5, opacity: 0.95
-      });
-      seg.addTo(R.map);
-      R.mapTrack.push(seg);
-      pts.push([p0.lat, p0.lng]);
-    }
-    if (R.samples[i1]) pts.push([R.samples[i1].lat, R.samples[i1].lng]);
-
-    // 고스트 공간 궤적 — primary 창에 겹치는 구간만 고유색 점선으로.
-    if (R.ghost) {
-      var gs = R.ghost.session.samples;
-      var ghostPts = [];
-      for (var gi = 0; gi < gs.length; gi++) {
-        var primaryT = R.t0 + R.ghost.align.offsetSec + (gs[gi].t - gs[0].t);
-        if (primaryT >= lo && primaryT <= hi &&
-            isFinite(gs[gi].lat) && isFinite(gs[gi].lng)) {
-          ghostPts.push([gs[gi].lat, gs[gi].lng]);
-        }
-      }
-      if (ghostPts.length > 1) {
-        var ghostLine = L.polyline(ghostPts, {
-          color: R.ghost.color, weight: 3, opacity: 0.82, dashArray: '8 6'
-        }).addTo(R.map);
-        R.mapGhostTrack.push(ghostLine);
-        Array.prototype.push.apply(pts, ghostPts);
-      }
-    }
-
-    // 회전 마커 — 범위 안의 것만
-    var mans = (R.analysis && R.analysis.maneuvers) || [];
-    mans.forEach(function (m) {
-      var ap = R.samples[m.apexIdx];
-      if (!ap || ap.t < lo || ap.t > hi) return;
-      var col = m.type === 'gybe' ? '#EF7D00'
-        : (m.type === 'tack' ? '#33A1FF' : '#8295A8');
-      var mk = L.circleMarker([ap.lat, ap.lng], {
-        radius: 6, color: '#fff', weight: 2, fillColor: col, fillOpacity: 0.95
-      });
-      mk.addTo(R.map); R.mapMans.push(mk);
-    });
-
-    // 선택 프레임 범위가 지도에 꽉 차게
-    if (pts.length > 1 && !R.mapUserMoved) {
-      try {
-        R._mapProg = true;
-        R.map.fitBounds(L.latLngBounds(pts), { padding: [36, 36], maxZoom: 18 });
-      } catch (e) { R._mapProg = false; }
-    }
+    return '<div class="rd-ph"><div class="rd-ph__rot">' +
+      '<svg viewBox="-44 -44 88 88" width="56" height="56" aria-hidden="true">' +
+      '<path class="rd-ph__board" d="M0,-26 C5,-20 7,-8 6,8 L4,21 Q0,23 -4,21 L-6,8 C-7,-8 -5,-20 0,-26Z" fill="' + c.board + '"/>' +
+      '<path d="M-2,0 L2,0 L2,17 L-2,17Z" fill="' + c.deck + '" fill-opacity=".65"/>' +
+      '<g class="rd-ph__sail">' +
+      '<path d="M0,-13 Q9,0 6,19 Q2,16 0,13Z" fill="' + c.sail + '" fill-opacity=".86"/>' +
+      '<path d="M0,-13 L0,14" stroke="' + c.board + '" stroke-width="1"/>' +
+      '</g></svg></div></div>';
   }
 
   /* 동적 보드 아이콘 — 세일 신호각 산출 (Danny 2026-05-24).
@@ -2085,41 +2103,22 @@
        · 크기 = TWA 기반 기본각 + SOG 기반 개폐 (SAIL 상수)
        · 부호 = 택 (풍향 대비 헤딩이 어느 쪽인지) · 택/자이브 시
          R.sailSide 를 보간해 세일이 반대쪽으로 부드럽게 넘어간다 */
+  // Apparent wind FROM angle relative to GPS course (no heading sensor available).
+  function apparentWindAngle(courseDeg, speedMs, windFromDeg, windSpeedKt) {
+    if (![courseDeg,speedMs,windFromDeg,windSpeedKt].every(function(v){return typeof v==='number' && isFinite(v);}) || speedMs<0 || windSpeedKt<=0) return null;
+    var delta=(windFromDeg-courseDeg)*Math.PI/180, tws=windSpeedKt/KT;
+    var across=tws*Math.sin(delta), ahead=tws*Math.cos(delta)+speedMs;
+    if(Math.hypot(across,ahead)<0.05)return null;
+    return Math.atan2(across,ahead)*180/Math.PI;
+  }
   function updateSailIcon(st, holder) {
-    holder = holder || R;             /* §595 — 고스트는 자기 세일 방향을 따로 기억 */
-    if (!st || st.heading == null || R.windDir == null) return null;
-    /* 고스트 표본에는 twa 가 없을 수 있다(분석을 안 돌린 저장 트랙) — 헤딩으로 낸다 */
-    var twaRaw = st.twa != null ? st.twa : angDiff(R.windDir, st.heading);
-    if (twaRaw == null || !isFinite(twaRaw)) return null;
-    var twa = Math.abs(twaRaw);
-    var sogKt = (st.speed || 0) * KT;
-    /* 기본 받음각 — TWA 를 [twaMin,twaMax] → [angMin,angMax] 로 매핑 */
-    var f = (twa - SAIL.twaMin) / (SAIL.twaMax - SAIL.twaMin);
-    f = f < 0 ? 0 : (f > 1 ? 1 : f);
-    var mag = SAIL.angMin + f * (SAIL.angMax - SAIL.angMin);
-    /* 속도 개폐 — 빠르면 닫힘(−), 느리면 열림(+) */
-    var adj = (SAIL.sogMid - sogKt) * SAIL.sogGain;
-    if (adj > SAIL.sogClamp) adj = SAIL.sogClamp;
-    if (adj < -SAIL.sogClamp) adj = -SAIL.sogClamp;
-    mag += adj;
-    if (mag < SAIL.hardMin) mag = SAIL.hardMin;
-    if (mag > SAIL.hardMax) mag = SAIL.hardMax;
-    /* 세일은 풍하측(리워드 사이드)에 놓인다 — 바람이 부는 쪽 반대.
-       awa = angDiff(풍향, 헤딩)  (풍향 = 바람이 불어오는 쪽 = 풍상).
-       awa > 0 → 바람이 보드 좌현(포트)에서 와 세일은 우현(스타보드)으로,
-       awa < 0 → 바람이 우현에서 와 세일은 좌현(포트)으로 간다. SVG 에서
-       rotate(+) 는 세일을 좌현(−x)으로, rotate(−) 는 우현(+x)으로 돌리
-       므로 부호는 −sign(awa) 가 된다 (Danny 2026-05-24: 세일이 풍향
-       정반대로 렌더되던 버그 — 부호 정정). 재생 중엔 보간(부드러운
-       전환), 정지·스크럽 중엔 즉시 스냅(부분 전환 잔상 방지). */
-    var awa = angDiff(R.windDir, st.heading);
-    var target = (awa >= 0) ? -1 : 1;
-    if (holder.sailSide == null || !R.playing) {
-      holder.sailSide = target;
-    } else {
-      holder.sailSide += (target - holder.sailSide) * SAIL.flipLerp;
-    }
-    return holder.sailSide * mag;
+    holder=holder||R;
+    if(!st)return null;
+    var angle=apparentWindAngle(st.heading,st.speed,R.windDir,R.windSpeedKt);
+    if(angle==null){holder.sailAngle=null;return null;}
+    // Aft-facing sail trails leeward; positive apparent FROM angle rotates it to port.
+    holder.sailAngle=angle;
+    return angle;
   }
 
   /* 재생 헤드 — 마커 이동·헤딩 회전·세일 거동. 보드 추적 시 화면
@@ -3258,6 +3257,15 @@
     if ((mode === 'video' || mode === 'both') && !R.videoReady) mode = 'map';
     R.layout = mode;
     var view = el('replay-view');
+    view.classList.toggle('replay--no-video', !R.videoReady);
+    if (!el('replay-detail-toggle')) {
+      var detailButton=document.createElement('button');detailButton.id='replay-detail-toggle';detailButton.className='replay__tool';detailButton.textContent='미니 그래프';detailButton.setAttribute('aria-pressed','false');
+      detailButton.addEventListener('click',function(){var open=view.classList.toggle('replay--graphs-open');detailButton.setAttribute('aria-pressed',String(open));relayout();});
+      el('replay-tools').appendChild(detailButton);
+      var lines=document.createElement('button');lines.id='replay-lines-toggle';lines.className='replay__mapbtn';lines.textContent='분석선 설정';lines.setAttribute('aria-expanded','false');
+      lines.addEventListener('click',function(){lines.setAttribute('aria-expanded',String(view.classList.toggle('replay--lines-open')));});
+      el('replay-axis-toggle').parentElement.appendChild(lines);
+    }
     view.classList.toggle('replay--video', mode === 'video');
     view.classList.toggle('replay--map', mode === 'map');
     view.classList.toggle('replay--both', mode === 'both');
@@ -3459,6 +3467,12 @@
     el('replay-close-x').onclick = close;
     el('replay-play').onclick = function () { setPlaying(!R.playing); };
     el('replay-stop').onclick = stop;
+    el('replay-tiles').onclick = function () { setReplayTiles(R.tileKey === 'satellite' ? 'map' : 'satellite'); };
+    var haveTurns = !!(R.analysis && R.analysis.maneuvers && R.analysis.maneuvers.length);
+    el('replay-prev-turn').disabled = !haveTurns;
+    el('replay-next-turn').disabled = !haveTurns;
+    el('replay-prev-turn').onclick = function () { jumpManeuver(-1); };
+    el('replay-next-turn').onclick = function () { jumpManeuver(1); };
 
     el('replay-speed').onclick = function (e) {
       var b = e.target.closest('button');
@@ -3687,6 +3701,7 @@
       ghost: ghost, ghostState: null, ghostTrackScale: null,
       leadMode: 'me', lead: 'me', leadNow: 'me', leadWhy: '', primaryT: null, primaryCum: null,   /* §596 */
       windDir: windDir,
+      windSpeedKt: opts.windSpeedKt,
       unit: opts.unit === 'kmh' ? 'kmh' : 'kt',
       sessionSig: opts.sessionSig || '',
       /* §423 — cloud 기록상 영상이 있던(_hasVideo) 세션인지 + 저장 시각.
@@ -3846,6 +3861,7 @@
     setWindDir: setWindDir,
     /* Node self-test 용 순수 함수 묶음 */
     _test: {
+      apparentWindAngle: apparentWindAngle,
       clamp: clamp,
       sampleIndexAtTime: sampleIndexAtTime,
       lerpAngle: lerpAngle,

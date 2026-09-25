@@ -118,14 +118,7 @@
    * 3) 범주색 — 지표 단순 구분 (좋·나쁨 의미 없음)
    *    빨강·초록 절대 금지 — 중립 팔레트. 필요 시 끝에서 확장.
    * ============================================================ */
-  var CATEGORY = [
-    '#0A2540',   /* navy */
-    '#1F8FFF',   /* sea blue */
-    '#1FB6B6',   /* teal */
-    '#6B7A8D',   /* slate */
-    '#7A5FA8',   /* muted violet (확장) */
-    '#C58A2E'    /* muted amber (확장) */
-  ];
+  var CATEGORY = ['#202522', '#626b32', '#a75e45', '#817e70', '#85738c', '#af8d48'];
   function categoryColor(i) {
     var n = CATEGORY.length;
     return CATEGORY[((i % n) + n) % n];
@@ -169,21 +162,21 @@
     '"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif';
 
   var BASE = {
-    ink:       '#5C6F7E',            /* 축 눈금·범례·축 제목 (slate) */
-    inkStrong: '#0A2540',            /* 강조 라벨 (navy) */
-    inkDim:    '#6E7C8A',            /* 보조·캡션 */
+    ink:       '#62675e',            /* 축 눈금·범례·축 제목 (slate) */
+    inkStrong: '#202522',            /* 강조 라벨 (navy) */
+    inkDim:    '#73776c',            /* 보조·캡션 */
     onDark:    '#FFFFFF',
-    grid:      'rgba(10,37,64,0.07)',
+    grid:      'rgba(32,37,34,0.07)',
     gridWidth: 1,
-    line:      '#0A2540',            /* 기본 속도/SOG 곡선 (navy) */
-    fill:      'rgba(31,143,255,0.10)',
-    cursor:    '#FFB800',            /* hover 커서 점 */
-    panel:     'rgba(10,37,64,0.92)',/* crosshair 라벨 박스 */
-    faintLine: 'rgba(10,37,64,0.20)' /* 다중 회전 개별 곡선 */
+    line:      '#202522',            /* 기본 속도/SOG 곡선 (navy) */
+    fill:      'rgba(98,107,50,0.10)',
+    cursor:    '#92995a',            /* hover 커서 점 */
+    panel:     'rgba(32,37,34,0.92)',/* crosshair 라벨 박스 */
+    faintLine: 'rgba(32,37,34,0.20)' /* 다중 회전 개별 곡선 */
   };
 
   /* 회전 종류색 — 택/자이브/회전. 범주 성격(좋·나쁨 의미 없음). */
-  var MANEUVER = { tack: '#1F8FFF', gybe: '#EF7D00', turn: '#8295A8' };
+  var MANEUVER = { tack: '#626b32', gybe: '#a75e45', turn: '#817e70' };
 
   /* 차트 chrome 색 — 데이터 인코딩이 아닌 에디터·플롯 보조 요소. */
   var CHROME = {

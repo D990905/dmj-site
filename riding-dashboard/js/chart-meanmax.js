@@ -153,7 +153,7 @@
             return v < 60 ? v.toFixed(1) + ' s' : (v / 60).toFixed(1) + ' min';
           } },
         { label: 'Best speed', stroke: opts.accent || '#1F8FFF', width: 2.4,
-          fill: opts.fill || 'rgba(31,143,255,0.16)',
+          fill: opts.fill || 'rgba(126,145,82,0.12)',
           points: { show: true, size: 8, stroke: opts.accent || '#1F8FFF',
                     fill: opts.bg || '#08131E', width: 2 },
           value: function (self, v) { return v == null ? '—' : v.toFixed(1) + ' kt'; } }

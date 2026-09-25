@@ -1,0 +1,74 @@
+/* Hand-authored replay refinement; load after generated replay-only.css. */
+.replay{--rp-bg:#202722;--rp-panel:rgba(28,36,30,.94);--rp-panel-2:rgba(244,244,228,.08);--rp-line:rgba(238,241,217,.2);--rp-text:#f4f3e7;--rp-dim:#bec5b9;--rp-accent:#d2ef72;--rp-accent-dim:rgba(210,239,114,.14)}
+.replay .replay__btn--play,.replay .replay__upload{background:var(--rp-accent);border-color:var(--rp-accent);color:#202722}
+.replay .replay__chip.is-on,.replay .replay__mapbtn.is-on,.replay .replay__spd.is-active,.replay .replay__tlink.is-on{color:#e3f6a6;border-color:var(--rp-accent);background:var(--rp-accent-dim)}
+.replay .replay__mapctl{flex-wrap:wrap;max-width:calc(100% - 20px);gap:5px;bottom:25px}
+.replay .replay__mapbtn{min-height:36px;border-radius:7px;background:rgba(28,36,30,.95);color:#f4f3e7;font-size:.73rem}
+.replay .replay__mapbtn:disabled{opacity:.4;cursor:default}
+.replay button:focus-visible{outline:2px solid #d2ef72;outline-offset:3px}
+.replay__speedlegend{position:absolute;top:12px;right:12px;z-index:600;display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(28,36,30,.94);border:1px solid rgba(238,241,217,.2);border-radius:7px;color:#f4f3e7;font:600 11px system-ui,sans-serif;pointer-events:none}
+.replay__speedlegend i{display:block;width:70px;height:7px;border-radius:5px}
+.replay .leaflet-control-attribution{background:rgba(244,243,231,.95);color:#283227}
+.replay .replay__scrubrow{border-top:1px solid var(--rp-line)}
+@media(max-width:620px){.replay .replay__mapctl{gap:4px;bottom:25px}.replay .replay__mapbtn{min-height:34px;padding:5px 7px;font-size:.68rem}.replay__speedlegend{top:8px;right:8px;font-size:10px;gap:5px}.replay__speedlegend i{width:45px}}
+
+.replay.replay--no-video .replay__lcol>.replay__vpanel{display:none!important}.replay:not(.replay--graphs-open) .replay__graphs{display:none}.replay:not(.replay--lines-open) #replay-axis-toggle,.replay:not(.replay--lines-open) #replay-ladder-toggle{display:none}.replay.replay--no-video .replay__lcol{flex-basis:220px;background:var(--rp-panel)}.replay.replay--no-video .replay__rider{border:0;border-radius:0;background:transparent}.replay .replay-rider__num{font-size:28px}.replay .replay__speedlegend{top:12px;right:12px}.replay .replay__mapctl{right:12px}.replay .replay__graphs{top:58px;bottom:85px}.replay .replay__rider{color:#f4f3e7}.replay .replay__nohint{line-height:1.65}@media(max-width:768px){.replay.replay--no-video .replay__lcol{flex:0 0 auto;max-height:145px}.replay.replay--no-video .replay-rider__metrics{display:flex;gap:18px;flex-wrap:wrap}.replay .replay-rider__num{font-size:22px}.replay .replay__graphs{width:180px}.replay .replay__speedlegend{font-size:10px}}
+/* Keep tool labels readable when the desktop toolbar wraps. */
+.replay #replay-detail-toggle{min-width:92px;flex-shrink:0;white-space:nowrap;padding:8px 12px}.replay .replay__tools{flex-wrap:wrap;gap:6px}.replay .replay__mapctl{flex-wrap:wrap}
+@media(max-width:768px){
+.replay .replay__tools{flex:1 1 100%;min-width:0;max-width:100%;flex-wrap:wrap}
+.replay.replay--no-video .replay__lcol{max-height:none}
+.replay.replay--no-video .replay__lcol>.replay__rider{flex:0 0 auto;min-height:0;padding:10px 14px}
+.replay.replay--no-video .replay-rider__metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.replay.replay--no-video .replay-rider__m{display:flex;flex-wrap:wrap;gap:3px}
+.replay.replay--no-video .replay-rider__lbl{flex:0 0 100%}
+.replay .replay__scrubrow{flex-wrap:wrap;gap:8px}
+.replay .replay__scrubwrap{flex:1 1 100%;min-width:0;order:5}
+.replay .replay__speed{margin-left:auto}
+.replay .replay__clock{font-size:12px}
+}
+@media(max-width:768px){.replay.replay--no-video .replay__cstage>.replay__mpanel{flex:0 0 28vh;min-height:220px}.replay.replay--no-video .replay-rider__name{font-size:14px}.replay.replay--no-video .replay-rider__clock{margin-bottom:6px}}
+
+/* Basemap treatment is isolated from tracks, tactical lines and markers. */
+.rd-analysis-map{background:#161d22!important}
+.rd-analysis-map:not(.rd-satellite-map) .leaflet-tile-pane{filter:grayscale(1) invert(1) brightness(.62) contrast(.85)}
+.rd-analysis-map .leaflet-control-attribution{background:rgba(20,27,32,.85)!important;color:#bdc5c8!important;font-size:9px}
+.rd-analysis-map .leaflet-control-attribution a{color:#cbd3d7!important}
+.rd-map-tools{display:flex;gap:4px;padding:4px;background:rgba(19,27,33,.92);border:1px solid #485158;border-radius:8px;box-shadow:0 4px 16px #0003}
+.rd-map-tools button{border:0;background:transparent;color:#e7edef;font-family:inherit;font-weight:500;font-size:11px;padding:7px 9px;cursor:pointer;border-radius:5px}
+.rd-map-tools button:hover,.rd-map-tools button:focus-visible{background:#39454d}
+.rd-map-speed{display:flex;align-items:center;gap:7px;background:rgba(19,27,33,.9);border-radius:5px;padding:6px 9px;color:#e7edef;font-size:10px;font-variant-numeric:tabular-nums}
+.rd-map-speed i{display:block;width:76px;height:4px;border-radius:3px;background:linear-gradient(90deg,#e74c3c,#f39c12,#2ecc71)}
+.rd-summary-map{height:340px!important;border:1px solid #303b42;border-radius:10px!important}
+@media(max-width:600px){.rd-summary-map{height:280px!important}.rd-map-tools button{font-size:11px;padding:7px}}
+
+/* Map-first replay studio. No colour inversion of geographic imagery. */
+.rd-analysis-map:not(.rd-satellite-map) .leaflet-tile-pane{filter:grayscale(.85) saturate(.25)!important}
+.rd-analysis-map.rd-satellite-map .leaflet-tile-pane{filter:saturate(.7) brightness(.82) contrast(1.08)}
+.rd-summary-map{height:clamp(380px,55vh,640px)!important;border:0!important;border-radius:12px!important}
+.rd-map-north{color:#fff;background:rgba(20,27,29,.86);border:1px solid #ffffff30;border-radius:24px;padding:10px 12px;font:600 12px system-ui;box-shadow:0 3px 15px #0002}
+.rd-map-launch{background:#dce65a;color:#202622;border:0;padding:12px 18px;border-radius:8px;font:600 13px system-ui;box-shadow:0 4px 18px #0003;cursor:pointer}
+.rd-analysis-map .leaflet-control-scale-line{background:#182126d9;color:#fff;border-color:#fff9;text-shadow:none}
+.replay{--rp-bg:#151b1e;--rp-panel:rgba(23,31,35,.94);--rp-line:rgba(255,255,255,.13);--rp-accent:#dce65a;--rp-text:#f5f6f1;--rp-dim:#adb8bb}
+.replay.replay--no-video .replay__stage{position:relative}
+.replay.replay--no-video .replay__lcol{position:absolute;top:62px;left:16px;width:180px;max-height:calc(100% - 150px);overflow:auto;z-index:700;border:1px solid #ffffff24;border-radius:12px;background:rgba(20,29,33,.9);backdrop-filter:blur(14px);padding:4px;box-shadow:0 8px 30px #0003}
+.replay.replay--no-video .replay__cstage{width:100%;height:100%;padding:0}
+.replay.replay--no-video .replay__cstage>.replay__mpanel{flex:1!important;height:100%;min-height:320px}
+.replay .replay-rider__num{font-size:32px;font-weight:500;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.replay .replay-rider__lbl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#adb8bb}
+.replay .replay__bar,.replay .replay__scrubrow{background:#182126;border-color:#ffffff18}
+.replay .replay__scrubrow{padding:14px 20px;gap:12px}
+.replay .replay__btn--play{border:0;border-radius:50%;width:44px;height:44px}
+.replay .replay__mapctl{bottom:30px;right:14px;left:auto;max-width:calc(100% - 220px);padding:6px;border-radius:10px;background:#182126e8;box-shadow:0 4px 20px #0003}
+.replay .replay__mapbtn{background:transparent;border:0;color:#e7edef;min-height:36px}
+.replay .replay__trackrow{background:#182126}
+@media(max-width:768px){
+ .rd-summary-map{height:420px!important;max-height:65vh}
+ .replay.replay--no-video .replay__lcol{top:54px;left:10px;width:136px;max-height:180px;padding:0}
+ .replay.replay--no-video .replay-rider__metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .replay.replay--no-video .replay-rider__num{font-size:22px}
+ .replay.replay--no-video .replay__cstage>.replay__mpanel{min-height:260px;flex:1!important}
+ .replay .replay__mapctl{max-width:calc(100% - 20px);left:10px;right:10px;bottom:26px;gap:2px}
+ .replay .replay__mapbtn{font-size:10px;padding:5px 6px}
+ .replay .replay__scrubrow{padding:10px;gap:6px}
+}
