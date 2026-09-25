@@ -52,7 +52,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css?v=mobile-tap-fix-20260526&tone=20260925-soft">
-<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-profile-theme.css?tone=20260925-soft"><style>.member-operation-card{padding:20px;margin:16px 0;background:#eef1e6;border:1px solid #d4dac7;overflow-wrap:anywhere}.member-operation-card h3{margin-top:0}.member-operation-card p{font-size:14px}#member-operations-refresh{padding:12px 18px;background:#e2e635;color:#202522;border:1px solid #202522;cursor:pointer}#member-operations-status{font-size:14px;color:#626b56}</style><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-profile-theme.css?tone=20260925-soft"><style>.member-operation-card{padding:20px;margin:16px 0;background:#eef1e6;border:1px solid #d4dac7;overflow-wrap:anywhere}.member-operation-card h3{margin-top:0}.member-operation-card p{font-size:14px}#member-operations-refresh{padding:12px 18px;background:#e2e635;color:#202522;border:1px solid #202522;cursor:pointer}#member-operations-status{font-size:14px;color:#626b56}</style><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"><style>.gear-use-list{list-style:none;padding:0;display:grid;gap:0}.gear-use-list li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #d9ddd5}.gear-use-list li span{overflow-wrap:anywhere}.gear-use-list strong{white-space:nowrap}#riding-gear-usage details{margin-top:16px}#riding-gear-usage details p{color:#596159;line-height:1.7}</style></head>
 <body class="dmj-legacy"><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="catalog.html">장비 둘러보기</a><a href="riding-dashboard/v2.html">라이딩 분석</a><a href="inquiry.html">구매 상담 ↗</a></div></nav>
 
 <div class="trust-bar"><div class="container"><div class="trust-bar__inner">
@@ -419,7 +419,7 @@
     <!-- DO_NOT_REVERT §169-N v3 — Danny 2026-05-13: §E 대시보드 + 자세히 보기 토글.
          compact = mini pentagon SVG (160×160) + score/100 + tier pill + stat row (약점·강점·Speed·Stance).
          empty state = greyed pentagon + CTA, 토글 X. -->
-    <section class="card" style="padding:24px;margin:24px 0"><h2>계정 백업</h2><p>이 브라우저의 라이딩 기록을 계정에 백업해 다른 기기에서도 불러옵니다</p><button type="button" id="member-backup" class="btn btn-primary">라이딩 기록 계정에 백업</button><p id="member-backup-status" role="status" aria-live="polite"></p></section><section class="profile-section profile-section--dashboard">
+    <section class="profile-section"><h2 class="profile-section__title">라이딩 장비 사용 기록</h2><div id="riding-gear-usage" aria-live="polite"></div></section><section class="card" style="padding:24px;margin:24px 0"><h2>계정 백업</h2><p>이 브라우저의 라이딩 기록을 계정에 백업해 다른 기기에서도 불러옵니다</p><button type="button" id="member-backup" class="btn btn-primary">라이딩 기록 계정에 백업</button><p id="member-backup-status" role="status" aria-live="polite"></p></section><section class="profile-section profile-section--dashboard">
       <h2 class="profile-section__title">스킬 진단 결과</h2>
       <!-- v2 — 데이터 주도 스킬 레벨 재평가 추천·동의 카드 (불일치 시에만 노출) -->
       <div id="skill-level-rec" hidden></div>
@@ -3216,5 +3216,5 @@
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="assets/css/agent-deny.css?tone=20260925-soft">
   <script src="assets/js/agent-deny.js" defer></script>
-<script src="assets/js/account-sync-status.js?v=1"></script><script src="assets/js/member-operations.js?v=20260925-names"></script><script src="assets/js/member-backup.js?v=20260925"></script></body>
+<script src="assets/js/account-sync-status.js?v=1"></script><script src="assets/js/member-operations.js?v=20260925-names"></script><script src="assets/js/member-backup.js?v=20260925"></script><script defer src="assets/js/riding-gear-usage.js?v=20260925"></script></body>
 </html>
