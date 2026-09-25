@@ -85,6 +85,34 @@
       return true;
     } catch (e) { return false; }
   }
+  // Preserve divergent local metadata before a server merge. Never prune recovery
+  // versions automatically. If backup storage fails, abort rather than overwrite.
+  function preserveMergeVersions(local, incoming) {
+    var key = ns() + 'merge_recovery_v1';
+    var raw = global.localStorage.getItem(key);
+    var journal = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(journal)) throw new Error('invalid-recovery-backup');
+    function comparable(rec) {
+      var clean = {};
+      Object.keys(rec).sort().forEach(function(k) {
+        if (k !== '_cloud' && k !== 'hasTrack' && k !== '_hasVideo') clean[k] = rec[k];
+      });
+      return JSON.stringify(clean);
+    }
+    var byId = {};
+    local.forEach(function(rec) { if (rec && rec.id) byId[rec.id] = rec; });
+    var added = 0;
+    incoming.forEach(function(rec) {
+      var old = byId[rec.id];
+      if (!old || comparable(old) === comparable(rec)) return;
+      var previous = comparable(old);
+      if (journal.some(function(v) { return v.record && v.record.id === old.id && comparable(v.record) === previous; })) return;
+      journal.push({savedAt:new Date().toISOString(), reason:'before-cloud-merge', record:old});
+      added++;
+    });
+    if (added) global.localStorage.setItem(key, JSON.stringify(journal));
+    return added;
+  }
   function readLocalTrack(id) {
     try {
       var k = trackKey(id); if (!k) return null;
@@ -260,6 +288,13 @@
               });
           });
         });
+    }).then(function(result) {
+      if (result.ok && global.DMJRegions && gpxText) {
+        global.DMJRegions.onSavedSession(record, gpxText).catch(function() {
+          dispatch('rd:region-sync-failed', {message:'지역 통계 반영 실패 · 지도에서 다시 업데이트할 수 있습니다'});
+        });
+      }
+      return result;
     }).catch(function (e) {
       console.warn('[RDCloud §415] pushSession failed', e);
       return { ok: false, error: String((e && e.message) || e) };
@@ -288,6 +323,7 @@
       if (uid() !== u) return {ok:false, reason:'account-changed'};
       var sRes = r[0], fRes = r[1];
       if (sRes.error) throw sRes.error;
+      if (fRes.error) throw fRes.error;
       /* session row id → track file (존재 여부) */
       var trackBySessionRow = {};
       if (!fRes.error && Array.isArray(fRes.data)) {
@@ -312,14 +348,16 @@
 
       /* 병합: 로컬 → cloud 덮어쓰기 (cloud-first), id 기준 합집합. tombstone 제외. */
       var byId = {};
-      readSessions().forEach(function (rec) { if (rec && rec.id) byId[rec.id] = rec; });
+      var local = readSessions();
+      var preserved = preserveMergeVersions(local, cloudRecs);
+      local.forEach(function (rec) { if (rec && rec.id) byId[rec.id] = rec; });
       cloudRecs.forEach(function (rec) { if (rec && rec.id) { if (readLocalTrack(rec.id)) rec.hasTrack = true; byId[rec.id] = rec; } });
       var merged = [];
       for (var id in byId) { if (byId.hasOwnProperty(id) && !tomb[id]) merged.push(byId[id]); }
       merged.sort(function (a, b) { return (a.dateEpoch || 0) - (b.dateEpoch || 0); });
-      writeSessions(merged);
+      if (!writeSessions(merged)) throw new Error('기기 저장 공간이 부족합니다. 기존 기록은 유지됩니다');
       dispatch('rd:cloud-synced', { count: cloudRecs.length, total: merged.length });
-      return { ok: true, count: cloudRecs.length, total: merged.length };
+      return { ok: true, count: cloudRecs.length, total: merged.length, preserved: preserved };
     }).catch(function (e) {
       console.warn('[RDCloud §415] pullSessions failed', e);
       return { ok: false, error: String((e && e.message) || e) };
