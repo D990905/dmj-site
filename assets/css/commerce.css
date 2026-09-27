@@ -63,3 +63,9 @@
 /* Shared warm neutral backdrop for every product category. */
 .commerce .product-card .product-image{background:#f0f1ec!important;isolation:isolate}
 .commerce .product-card .product-image img{mix-blend-mode:multiply}
+
+/* Align prices along the bottom of each shared product row. */
+.commerce .product-grid>.product-card{display:flex;flex-direction:column;align-self:stretch}
+.commerce .product-grid>.product-card>.product-image{flex-shrink:0}
+.commerce .product-grid>.product-card>.product-info{display:flex;flex-direction:column;flex:1}
+.commerce .product-grid>.product-card>.product-info>.product-price{margin-top:auto!important;padding-top:20px;margin-bottom:0}
