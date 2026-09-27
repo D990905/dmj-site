@@ -3870,7 +3870,7 @@
         "R6 V3 (with R6V1 mast)",
         "R6 V3 (with R6V2 mast)"
       ],
-      "price": 6972000,
+      "price": 8172000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/r6-race-series",
       "priority": "performance",
@@ -3924,51 +3924,57 @@
       "retailVariants": [
         {
           "option": "R6 V1 (with R6V1 mast)",
-          "priceKRW": 6972000,
+          "priceKRW": 8172000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "R6 V1 · 프론트 479cm² · 리어 172cm² · 마스트 V1 113cm"
         },
         {
           "option": "R6 V1 (with R6V2 mast)",
-          "priceKRW": 6972000,
+          "priceKRW": 8172000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "R6 V1 · 프론트 479cm² · 리어 172cm² · 마스트 V2 113cm"
         },
         {
           "option": "R6 V2 (with R6V1 mast)",
-          "priceKRW": 6972000,
+          "priceKRW": 8172000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "R6 V2 · 프론트 430cm² · 리어 172cm² · 마스트 V1 113cm"
         },
         {
           "option": "R6 V2 (with R6V2 mast)",
-          "priceKRW": 6972000,
+          "priceKRW": 8172000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "R6 V2 · 프론트 430cm² · 리어 172cm² · 마스트 V2 113cm"
         },
         {
           "option": "R6 V3 (with R6V1 mast)",
-          "priceKRW": 6972000,
+          "priceKRW": 8172000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "R6 V3 · 프론트 530cm² · 리어 172cm² · 마스트 V1 113cm"
         },
         {
           "option": "R6 V3 (with R6V2 mast)",
-          "priceKRW": 6972000,
+          "priceKRW": 8172000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "R6 V3 · 프론트 530cm² · 리어 172cm² · 마스트 V2 113cm"
         }
       ],
-      "priceMax": 6972000,
+      "priceMax": 8172000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
+      "priceSource": "2026-09-27 사용자 지정 환율 EUR 1600원 및 운임 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-27",
       "mediaGroups": [
         {
           "id": "18745",
-          "label": "R6 V1 (with R6V1 mast)",
+          "label": "R6 V1 · 프론트 479cm² · 리어 172cm² · 마스트 V1 113cm",
           "option": "R6 V1 (with R6V1 mast)",
           "images": [
             {
@@ -4006,7 +4012,7 @@
         },
         {
           "id": "18757",
-          "label": "R6 V1 (with R6V2 mast)",
+          "label": "R6 V1 · 프론트 479cm² · 리어 172cm² · 마스트 V2 113cm",
           "option": "R6 V1 (with R6V2 mast)",
           "images": [
             {
@@ -4044,7 +4050,7 @@
         },
         {
           "id": "24507",
-          "label": "R6 V2 (with R6V1 mast)",
+          "label": "R6 V2 · 프론트 430cm² · 리어 172cm² · 마스트 V1 113cm",
           "option": "R6 V2 (with R6V1 mast)",
           "images": [
             {
@@ -4082,7 +4088,7 @@
         },
         {
           "id": "25772",
-          "label": "R6 V2 (with R6V2 mast)",
+          "label": "R6 V2 · 프론트 430cm² · 리어 172cm² · 마스트 V2 113cm",
           "option": "R6 V2 (with R6V2 mast)",
           "images": [
             {
@@ -4120,7 +4126,7 @@
         },
         {
           "id": "25778",
-          "label": "R6 V3 (with R6V1 mast)",
+          "label": "R6 V3 · 프론트 530cm² · 리어 172cm² · 마스트 V1 113cm",
           "option": "R6 V3 (with R6V1 mast)",
           "images": [
             {
@@ -4150,7 +4156,7 @@
         },
         {
           "id": "24513",
-          "label": "R6 V3 (with R6V2 mast)",
+          "label": "R6 V3 · 프론트 530cm² · 리어 172cm² · 마스트 V2 113cm",
           "option": "R6 V3 (with R6V2 mast)",
           "images": [
             {
@@ -4267,7 +4273,14 @@
           ],
           "source": "https://levitaz.com/shop/product/r6-components/?variant=25528"
         }
-      ]
+      ],
+      "pricingBasis": {
+        "fxEURKRW": 1600,
+        "freightEUR": 300,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "discount": 0.0
+      }
     },
     {
       "id": "lvz-boom-rs-scc",
@@ -4282,7 +4295,7 @@
         "Boom Race Series 83 SCC",
         "Boom Race Series 95 SCC"
       ],
-      "price": 4691000,
+      "price": 5131000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/boom-scc-boards-2/",
       "priority": "performance",
@@ -4331,33 +4344,36 @@
       "retailVariants": [
         {
           "option": "Boom Race Series 63 SCC",
-          "priceKRW": 4691000,
+          "priceKRW": 5131000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "Boom RS SCC · 63L"
         },
         {
           "option": "Boom Race Series 83 SCC",
-          "priceKRW": 4830000,
+          "priceKRW": 5273000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "Boom RS SCC · 83L"
         },
         {
           "option": "Boom Race Series 95 SCC",
-          "priceKRW": 4968000,
+          "priceKRW": 5416000,
           "sku": "",
-          "estimated": false
+          "estimated": false,
+          "label": "Boom RS SCC · 95L"
         }
       ],
-      "priceMax": 4968000,
+      "priceMax": 5416000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
+      "priceSource": "2026-09-27 사용자 지정 환율 EUR 1600원 및 운임 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-27",
       "mediaGroups": [
         {
           "id": "25606",
-          "label": "63 L",
+          "label": "Boom RS SCC · 63L",
           "option": "Boom Race Series 63 SCC",
           "source": "https://levitaz.com/shop/product/boom-scc-boards-2/?variant=25606",
           "images": [
@@ -4381,7 +4397,7 @@
         },
         {
           "id": "25612",
-          "label": "83 L",
+          "label": "Boom RS SCC · 83L",
           "option": "Boom Race Series 83 SCC",
           "source": "https://levitaz.com/shop/product/boom-scc-boards-2/?variant=25612",
           "images": [
@@ -4405,7 +4421,7 @@
         },
         {
           "id": "25618",
-          "label": "95 L",
+          "label": "Boom RS SCC · 95L",
           "option": "Boom Race Series 95 SCC",
           "source": "https://levitaz.com/shop/product/boom-scc-boards-2/?variant=25618",
           "images": [
@@ -4427,7 +4443,14 @@
             }
           ]
         }
-      ]
+      ],
+      "pricingBasis": {
+        "fxEURKRW": 1600,
+        "freightEUR": 500,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "discount": 0.1
+      }
     },
     {
       "id": "tkn-starter",
