@@ -59,3 +59,7 @@
 .product-price small{display:block;font-size:.76em;font-weight:400;color:var(--muted);margin-top:5px}.price-basis{margin-top:16px;font-size:13px;line-height:1.8}.price-basis summary{cursor:pointer;text-decoration:underline;text-underline-offset:4px}.price-basis p{margin-top:12px}
 
 .all-option-prices{border-top:1px solid #ccd0c5;border-bottom:1px solid #ccd0c5;padding:20px 0}.all-option-prices>summary{cursor:pointer;font-size:18px;font-weight:650;list-style-position:inside}.all-option-prices[open]>summary{margin-bottom:20px}
+
+/* Shared warm neutral backdrop for every product category. */
+.commerce .product-card .product-image{background:#f0f1ec!important;isolation:isolate}
+.commerce .product-card .product-image img{mix-blend-mode:multiply}
