@@ -3,7 +3,7 @@
   const hero = document.querySelector('.detail-photo img');
   if (!hero || typeof HTMLDialogElement === 'undefined') return;
   const thumbs = [...document.querySelectorAll('[data-product-photo]')];
-  const photos = [...new Map([{src: hero.src, alt: hero.alt}, ...thumbs.map(b => ({src: new URL(b.dataset.productPhoto, location.href).href, alt: b.querySelector('img')?.alt || hero.alt}))].map(p => [p.src, p])).values()];
+  let photos = [];
   let index = 0, previousOverflow = '';
   const trigger = document.createElement('button');
   trigger.type = 'button'; trigger.className = 'gallery-expand'; trigger.textContent = '사진 확대';
@@ -34,6 +34,7 @@
   }
   image.addEventListener('error', () => { status.textContent = '사진을 불러오지 못했습니다'; });
   trigger.addEventListener('click', () => {
+    photos = [...new Map([{src: hero.src, alt: hero.alt}, ...thumbs.filter(b => !b.hidden).map(b => ({src: new URL(b.dataset.productPhoto, location.href).href, alt: b.querySelector('img')?.alt || hero.alt}))].map(p => [p.src, p])).values()];
     show(Math.max(0, photos.findIndex(p => p.src === hero.src)));
     previousOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden'; modal.showModal(); fit(); close.focus();
   });

@@ -3862,7 +3862,14 @@
       "path": "products/levitaz/r6-race.html",
       "image": "assets/images/products/levitaz/r6/r6-foil-official.jpg",
       "description": "본사는 R6 Race Series를 WING·KITE 용도로 분류합니다. DMJ는 윙포일 레이스용으로 구성하고 Boom RS SCC와 함께 상담합니다.",
-      "options": [],
+      "options": [
+        "R6 V1 (with R6V1 mast)",
+        "R6 V1 (with R6V2 mast)",
+        "R6 V2 (with R6V1 mast)",
+        "R6 V2 (with R6V2 mast)",
+        "R6 V3 (with R6V1 mast)",
+        "R6 V3 (with R6V2 mast)"
+      ],
       "price": 6972000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/r6-race-series",
@@ -3895,7 +3902,23 @@
         "보드": "Boom RS SCC 터틀 모델과 구성 상담"
       },
       "gallery": [
-        "assets/images/products/levitaz/r6/r6-foil-official.jpg"
+        "assets/images/products/levitaz/verified/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_R6V2_vl1000x1000px_2024.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024_2024-08-05-102025_zpav.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1-rwV2-config_set_vl2000x2000px_2026-04-14-120834_qtvz.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1V2-rwV2-config_set_v.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV2-rwV2-config_set_vl2000x2000px_2026-05-11-132601_dtxd.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg"
       ],
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
@@ -3941,7 +3964,310 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "mediaGroups": [
+        {
+          "id": "18745",
+          "label": "R6 V1 (with R6V1 mast)",
+          "option": "R6 V1 (with R6V1 mast)",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg",
+              "alt": "R6 V1 (with R6V1 mast) · 전체"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024.jpg",
+              "alt": "R6 V1 (with R6V1 mast) · 정면"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+              "alt": "프론트윙 V1 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+              "alt": "프론트윙 V1 · 본사 정면 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg",
+              "alt": "리어윙 V1 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg",
+              "alt": "마스트 V1 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-race-series/?variant=18745",
+          "note": "선택한 본사 세트와 구성품 사진",
+          "components": [
+            "25469",
+            "25519",
+            "25525"
+          ]
+        },
+        {
+          "id": "18757",
+          "label": "R6 V1 (with R6V2 mast)",
+          "option": "R6 V1 (with R6V2 mast)",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_R6V2_vl1000x1000px_2024.jpg",
+              "alt": "R6 V1 (with R6V2 mast) · 전체"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024_2024-08-05-102025_zpav.jpg",
+              "alt": "R6 V1 (with R6V2 mast) · 정면"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+              "alt": "프론트윙 V1 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+              "alt": "프론트윙 V1 · 본사 정면 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg",
+              "alt": "리어윙 V1 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg",
+              "alt": "마스트 V2 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-race-series/?variant=18757",
+          "note": "선택한 본사 세트와 구성품 사진",
+          "components": [
+            "25469",
+            "25519",
+            "25528"
+          ]
+        },
+        {
+          "id": "24507",
+          "label": "R6 V2 (with R6V1 mast)",
+          "option": "R6 V2 (with R6V1 mast)",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1-rwV2-config_set_vl2000x2000px_2026-04-14-120834_qtvz.jpg",
+              "alt": "R6 V2 (with R6V1 mast) · 전체"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1V2-rwV2-config_set_v.jpg",
+              "alt": "R6 V2 (with R6V1 mast) · 정면"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+              "alt": "프론트윙 V2 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg",
+              "alt": "프론트윙 V2 · 본사 정면 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+              "alt": "리어윙 V2 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg",
+              "alt": "마스트 V1 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-race-series/?variant=24507",
+          "note": "선택한 본사 세트와 구성품 사진",
+          "components": [
+            "25513",
+            "25522",
+            "25525"
+          ]
+        },
+        {
+          "id": "25772",
+          "label": "R6 V2 (with R6V2 mast)",
+          "option": "R6 V2 (with R6V2 mast)",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV2-rwV2-config_set_vl2000x2000px_2026-05-11-132601_dtxd.jpg",
+              "alt": "R6 V2 (with R6V2 mast) · 전체"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1V2-rwV2-config_set_v.jpg",
+              "alt": "R6 V2 (with R6V2 mast) · 정면"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+              "alt": "프론트윙 V2 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg",
+              "alt": "프론트윙 V2 · 본사 정면 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+              "alt": "리어윙 V2 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg",
+              "alt": "마스트 V2 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-race-series/?variant=25772",
+          "note": "선택한 본사 세트와 구성품 사진",
+          "components": [
+            "25513",
+            "25522",
+            "25528"
+          ]
+        },
+        {
+          "id": "25778",
+          "label": "R6 V3 (with R6V1 mast)",
+          "option": "R6 V3 (with R6V1 mast)",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+              "alt": "프론트윙 V3 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg",
+              "alt": "프론트윙 V3 · 본사 정면 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+              "alt": "리어윙 V2 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg",
+              "alt": "마스트 V1 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-race-series/?variant=25778",
+          "note": "V3는 확인된 구성품 사진으로 안내합니다",
+          "components": [
+            "25516",
+            "25522",
+            "25525"
+          ]
+        },
+        {
+          "id": "24513",
+          "label": "R6 V3 (with R6V2 mast)",
+          "option": "R6 V3 (with R6V2 mast)",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+              "alt": "프론트윙 V3 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg",
+              "alt": "프론트윙 V3 · 본사 정면 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+              "alt": "리어윙 V2 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg",
+              "alt": "마스트 V2 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-race-series/?variant=24513",
+          "note": "V3는 확인된 구성품 사진으로 안내합니다",
+          "components": [
+            "25516",
+            "25522",
+            "25528"
+          ]
+        },
+        {
+          "id": "25469",
+          "label": "프론트윙 V1",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+              "alt": "프론트윙 V1 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+              "alt": "프론트윙 V1 · 본사 정면 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-components/?variant=25469"
+        },
+        {
+          "id": "25513",
+          "label": "프론트윙 V2",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+              "alt": "프론트윙 V2 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg",
+              "alt": "프론트윙 V2 · 본사 정면 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-components/?variant=25513"
+        },
+        {
+          "id": "25516",
+          "label": "프론트윙 V3",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+              "alt": "프론트윙 V3 · 본사 제품 사진"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg",
+              "alt": "프론트윙 V3 · 본사 정면 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-components/?variant=25516"
+        },
+        {
+          "id": "25519",
+          "label": "리어윙 V1",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg",
+              "alt": "리어윙 V1 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-components/?variant=25519"
+        },
+        {
+          "id": "25522",
+          "label": "리어윙 V2",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+              "alt": "리어윙 V2 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-components/?variant=25522"
+        },
+        {
+          "id": "25525",
+          "label": "마스트 V1",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg",
+              "alt": "마스트 V1 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-components/?variant=25525"
+        },
+        {
+          "id": "25528",
+          "label": "마스트 V2",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg",
+              "alt": "마스트 V2 · 본사 제품 사진"
+            }
+          ],
+          "source": "https://levitaz.com/shop/product/r6-components/?variant=25528"
+        }
+      ]
     },
     {
       "id": "lvz-boom-rs-scc",
@@ -3952,9 +4278,9 @@
       "image": "assets/images/products/levitaz/boom/boom-rs-scc-official.jpg",
       "description": "본사 제품명은 Boom RS SCC이며 윙용 Race Series 63·83·95 옵션이 있습니다. DMJ 레이스 셋업은 사용자가 지정한 터틀 모델을 기준으로 구성합니다.",
       "options": [
-        "63",
-        "83",
-        "95"
+        "Boom Race Series 63 SCC",
+        "Boom Race Series 83 SCC",
+        "Boom Race Series 95 SCC"
       ],
       "price": 4691000,
       "availability": "inquiry",
@@ -3988,7 +4314,18 @@
         "함께 상담할 포일": "R6 Race Series"
       },
       "gallery": [
-        "assets/images/products/levitaz/boom/boom-rs-scc-official.jpg"
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_overview2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_deck2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_rail2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_bottom2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_overview2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_deck2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_rail2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_bottom2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_overview2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_deck2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_side2000x2000px.jpg",
+        "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_bottom2000x2000px.jpg"
       ],
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
@@ -4016,7 +4353,81 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "mediaGroups": [
+        {
+          "id": "25606",
+          "label": "63 L",
+          "option": "Boom Race Series 63 SCC",
+          "source": "https://levitaz.com/shop/product/boom-scc-boards-2/?variant=25606",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_overview2000x2000px.jpg",
+              "alt": "Boom RS SCC 63 L · 전체"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_deck2000x2000px.jpg",
+              "alt": "Boom RS SCC 63 L · 데크"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_rail2000x2000px.jpg",
+              "alt": "Boom RS SCC 63 L · 측면"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_bottom2000x2000px.jpg",
+              "alt": "Boom RS SCC 63 L · 바닥"
+            }
+          ]
+        },
+        {
+          "id": "25612",
+          "label": "83 L",
+          "option": "Boom Race Series 83 SCC",
+          "source": "https://levitaz.com/shop/product/boom-scc-boards-2/?variant=25612",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_overview2000x2000px.jpg",
+              "alt": "Boom RS SCC 83 L · 전체"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_deck2000x2000px.jpg",
+              "alt": "Boom RS SCC 83 L · 데크"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_rail2000x2000px.jpg",
+              "alt": "Boom RS SCC 83 L · 측면"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_bottom2000x2000px.jpg",
+              "alt": "Boom RS SCC 83 L · 바닥"
+            }
+          ]
+        },
+        {
+          "id": "25618",
+          "label": "95 L",
+          "option": "Boom Race Series 95 SCC",
+          "source": "https://levitaz.com/shop/product/boom-scc-boards-2/?variant=25618",
+          "images": [
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_overview2000x2000px.jpg",
+              "alt": "Boom RS SCC 95 L · 전체"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_deck2000x2000px.jpg",
+              "alt": "Boom RS SCC 95 L · 데크"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_side2000x2000px.jpg",
+              "alt": "Boom RS SCC 95 L · 측면"
+            },
+            {
+              "src": "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_bottom2000x2000px.jpg",
+              "alt": "Boom RS SCC 95 L · 바닥"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "tkn-starter",
