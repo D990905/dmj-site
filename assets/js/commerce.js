@@ -32,9 +32,11 @@
   if(params.has('product')&&Array.from(product.options).some(o=>o.value===params.get('product')))product.value=params.get('product');
   if(params.has('size'))inquiry.elements.size.value=params.get('size').slice(0,80);
   const message=document.querySelector('#inquiry-message');
+  let retailProducts=[];
+  fetch(root+'data/commerce.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('catalog');return r.json()}).then(data=>{retailProducts=data.products||[];compose()}).catch(()=>{});
   const recommendation=params.get('recommendation');if(recommendation)inquiry.elements.note.value='추천 조건: '+recommendation.slice(0,400);else if(params.has('note'))inquiry.elements.note.value=params.get('note').slice(0,600);
   function compose(){const e=inquiry.elements;let attribution={};try{attribution=JSON.parse(sessionStorage.getItem('dmj_campaign_v1')||'{}')}catch(error){}
-   message.textContent=DMJCommerce.inquiryText({product:product.options[product.selectedIndex].text,size:e.size.value,experience:e.experience.value,setup:e.setup.value,note:e.note.value},attribution);
+   message.textContent=DMJCommerce.inquiryText({product:product.options[product.selectedIndex].text,size:e.size.value,price:DMJCommerce.selectedRetailPrice(retailProducts,product.value,e.size.value),experience:e.experience.value,setup:e.setup.value,note:e.note.value},attribution);
   }
   inquiry.addEventListener('submit',e=>e.preventDefault());inquiry.addEventListener('input',compose);inquiry.addEventListener('change',compose);document.querySelector('#copy-inquiry').addEventListener('click',()=>copy(message.textContent));compose();
  }

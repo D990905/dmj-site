@@ -5,6 +5,7 @@
  function inquiryText(fields,campaign={}){
   const str=(v,n)=>String(v||'').trim().slice(0,n);
   const lines=['안녕하세요. DMJ 장비 구매 문의드립니다.','',`관심 제품: ${str(fields.product,180)||'아직 정하지 못했어요'}`,`희망 사이즈·볼륨: ${str(fields.size,80)||'상담 필요'}`];
+  if(Number.isFinite(fields.price)&&fields.price>0)lines.push(`사이트 표시 판매가: ₩${Math.round(fields.price).toLocaleString('ko-KR')}`);
   if(fields.experience&&fields.experience!=='선택하지 않음')lines.push(`라이딩 경험: ${str(fields.experience,80)}`);
   if(str(fields.setup,180))lines.push(`타는 곳·현재 장비: ${str(fields.setup,180)}`);
   if(str(fields.note,600))lines.push('',`궁금한 점: ${str(fields.note,600)}`);
@@ -19,5 +20,10 @@
   u.search='';u.hash='';u.searchParams.set('utm_source',clean(source));u.searchParams.set('utm_medium','social');u.searchParams.set('utm_campaign',clean(campaign)||'gear-collection');return u.href;
  }
  function matches(product,brand,category,query){const q=String(query||'').trim().toLocaleLowerCase();return(brand==='all'||product.brand===brand)&&(category==='all'||product.category===category)&&(!q||(product.name+' '+product.brand).toLocaleLowerCase().includes(q))}
- return{campaignFrom,inquiryText,campaignUrl,matches};
+ function selectedRetailPrice(products,id,option){
+  const p=products.find(p=>p.id===id);if(!p)return null;
+  const match=(p.retailVariants||[]).find(v=>v.option===String(option||'').trim());
+  return match&&Number.isFinite(match.priceKRW)&&match.priceKRW>0?match.priceKRW:null;
+ }
+ return{campaignFrom,inquiryText,campaignUrl,matches,selectedRetailPrice};
 });
