@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // Reject absolute URLs and protocol-relative ones.
       if (/^(https?:|\/\/)/i.test(r)) return null;
       // Whitelist common destinations.
-      var allow = ['cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
+      var allow = ['inquiry.html', 'cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
       if (allow.indexOf(r) >= 0) return r;
       return null;
     } catch (e) { return null; }

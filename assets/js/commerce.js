@@ -38,7 +38,7 @@
   function compose(){const e=inquiry.elements;let attribution={};try{attribution=JSON.parse(sessionStorage.getItem('dmj_campaign_v1')||'{}')}catch(error){}
    message.textContent=DMJCommerce.inquiryText({product:product.options[product.selectedIndex].text,size:e.size.value,price:DMJCommerce.selectedRetailPrice(retailProducts,product.value,e.size.value),experience:e.experience.value,setup:e.setup.value,note:e.note.value},attribution);
   }
-  inquiry.addEventListener('submit',e=>e.preventDefault());inquiry.addEventListener('input',compose);inquiry.addEventListener('change',compose);document.querySelector('#copy-inquiry').addEventListener('click',()=>copy(message.textContent));compose();
+  inquiry.addEventListener('submit',e=>e.preventDefault());inquiry.addEventListener('input',compose);inquiry.addEventListener('change',compose);document.querySelector('#copy-inquiry')?.addEventListener('click',()=>copy(message.textContent));compose();
  }
  if(document.querySelector('#channel-links'))fetch(root+'data/channels.json').then(r=>{if(!r.ok)throw new Error('channel config');return r.json()}).then(c=>{const list=c.channels.filter(x=>x.url&&x.id!=='kakao'&&/^https:\/\//.test(x.url));if(!list.length)return;const area=document.querySelector('#channel-links');list.forEach(x=>{const a=document.createElement('a');a.href=x.url;a.textContent=x.label+' ↗';a.target='_blank';a.rel='noopener';area.append(a)});document.querySelector('.connected-channels').hidden=false}).catch(e=>console.warn('채널 목록을 불러오지 못했습니다.',e));
 })();
