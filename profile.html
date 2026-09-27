@@ -52,7 +52,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css?v=mobile-tap-fix-20260526&tone=20260925-soft">
-<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-profile-theme.css?tone=20260925-soft"><style>.member-operation-card{padding:20px;margin:16px 0;background:#eef1e6;border:1px solid #d4dac7;overflow-wrap:anywhere}.member-operation-card h3{margin-top:0}.member-operation-card p{font-size:14px}#member-operations-refresh{padding:12px 18px;background:#e2e635;color:#202522;border:1px solid #202522;cursor:pointer}#member-operations-status{font-size:14px;color:#626b56}</style><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"><style>.gear-use-list{list-style:none;padding:0;display:grid;gap:0}.gear-use-list li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #d9ddd5}.gear-use-list li span{overflow-wrap:anywhere}.gear-use-list strong{white-space:nowrap}#riding-gear-usage details{margin-top:16px}#riding-gear-usage details p{color:#596159;line-height:1.7}</style><style>.member-operation-card p{white-space:pre-wrap;overflow-wrap:anywhere}</style></head>
+<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-profile-theme.css?tone=20260925-soft"><style>.member-operation-card{padding:20px;margin:16px 0;background:#eef1e6;border:1px solid #d4dac7;overflow-wrap:anywhere}.member-operation-card h3{margin-top:0}.member-operation-card p{font-size:14px}#member-operations-refresh{padding:12px 18px;background:#e2e635;color:#202522;border:1px solid #202522;cursor:pointer}#member-operations-status{font-size:14px;color:#626b56}</style><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"><style>.gear-use-list{list-style:none;padding:0;display:grid;gap:0}.gear-use-list li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #d9ddd5}.gear-use-list li span{overflow-wrap:anywhere}.gear-use-list strong{white-space:nowrap}#riding-gear-usage details{margin-top:16px}#riding-gear-usage details p{color:#596159;line-height:1.7}</style><style>.member-operation-card p{white-space:pre-wrap;overflow-wrap:anywhere}</style><style>[data-store-hidden]{display:none!important}.store-account-nav{display:flex;gap:24px;flex-wrap:wrap;padding:18px 24px;border-bottom:1px solid #ddd}.site-header .nav__primary{display:none!important}</style></head>
 <body class="dmj-legacy"><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="catalog.html">장비 둘러보기</a><a href="riding-dashboard/v2.html">라이딩 분석</a><a href="inquiry.html">구매 상담 ↗</a></div></nav>
 
 <div class="trust-bar"><div class="container"><div class="trust-bar__inner">
@@ -64,7 +64,7 @@
 <header class="site-header" id="site-header">
   <div class="container">
     <nav class="nav" aria-label="주 메뉴">
-      <a href="index.html" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>GEAR &amp; RIDING</small></span>
+      <a href="index.html" class="nav__logo" aria-label="단무지 홈"><span class="dmj-unified-wordmark">DMJ<small>FOILING EQUIPMENT</small></span>
       </a>
 
       <!-- DO_NOT_REVERT §145-G v4 — Danny 2026-05-13: profile.html nav 6-item canonical 복원.
@@ -164,7 +164,7 @@
 </div>
 
 <!-- ========== Profile Page ========== -->
-<main class="profile-page">
+<nav class="store-account-nav" aria-label="쇼핑 메뉴"><a href="catalog.html">전체 장비</a><a href="find-my-gear.html">내 장비 찾기</a><a href="inquiry.html">구매 문의</a><a href="#member-operations">내 문의·주문</a></nav><main class="profile-page">
   <div class="container">
 
     <!-- 1. Hero -->
@@ -323,7 +323,7 @@
     </section>
 
     <!-- 4. §C 라이딩 영상 클립 -->
-    <section class="profile-section">
+    <section data-store-hidden class="profile-section">
       <h2 class="profile-section__title">라이딩 영상 클립 <small>곧 공개</small></h2>
       <div class="video-placeholder">
         <p class="video-placeholder__title">영상 업로드 — Phase 12에서 지원 예정</p>
@@ -339,7 +339,7 @@
          아직 write 안 함). 본 section = localStorage source. Cross-device sync =
          Phase 12 추가 sprint 영역 — storage.js 에 upsert pipeline 추가 후 본 read 도
          supabase fetch 로 전환. 그 전까지는 같은 브라우저 안 세션만 표시. -->
-    <section class="profile-section" id="section-rides">
+    <section data-store-hidden class="profile-section" id="section-rides">
       <h2 class="profile-section__title">최근 라이딩 <small id="rides-count-badge"></small></h2>
       <p class="profile-section__lead">라이딩 대시보드에 저장된 세션 — 최근 5개. 더보기로 전체 목록</p>
       <div class="rides-list" id="rides-list" data-state="loading" aria-live="polite" aria-busy="true">
@@ -419,7 +419,7 @@
     <!-- DO_NOT_REVERT §169-N v3 — Danny 2026-05-13: §E 대시보드 + 자세히 보기 토글.
          compact = mini pentagon SVG (160×160) + score/100 + tier pill + stat row (약점·강점·Speed·Stance).
          empty state = greyed pentagon + CTA, 토글 X. -->
-    <section class="profile-section"><h2 class="profile-section__title">라이딩 장비 사용 기록</h2><p><a href="community.html">장비 나눔·장터·구매희망 →</a> · <a href="challenges.html">월간 챌린지 →</a></p><div id="riding-gear-usage" aria-live="polite"></div></section><section class="card" style="padding:24px;margin:24px 0"><h2>계정 백업</h2><p>이 브라우저의 라이딩 기록을 계정에 백업해 다른 기기에서도 불러옵니다</p><button type="button" id="member-backup" class="btn btn-primary">라이딩 기록 계정에 백업</button><button type="button" id="merge-recovery-download" class="btn" hidden>동기화 이전 수정 내용 내려받기</button><p id="member-backup-status" role="status" aria-live="polite"></p></section><section class="profile-section profile-section--dashboard">
+    <section data-store-hidden class="profile-section"><h2 class="profile-section__title">라이딩 장비 사용 기록</h2><p><a href="community.html">장비 나눔·장터·구매희망 →</a> · <a href="challenges.html">월간 챌린지 →</a></p><div id="riding-gear-usage" aria-live="polite"></div></section><section data-store-hidden class="card" style="padding:24px;margin:24px 0"><h2>계정 백업</h2><p>이 브라우저의 라이딩 기록을 계정에 백업해 다른 기기에서도 불러옵니다</p><button type="button" id="member-backup" class="btn btn-primary">라이딩 기록 계정에 백업</button><button type="button" id="merge-recovery-download" class="btn" hidden>동기화 이전 수정 내용 내려받기</button><p id="member-backup-status" role="status" aria-live="polite"></p></section><section data-store-hidden class="profile-section profile-section--dashboard">
       <h2 class="profile-section__title">스킬 진단 결과</h2>
       <!-- v2 — 데이터 주도 스킬 레벨 재평가 추천·동의 카드 (불일치 시에만 노출) -->
       <div id="skill-level-rec" hidden></div>
@@ -434,7 +434,7 @@
     <!-- DO_NOT_REVERT §169-N v3 — Danny 2026-05-13: §F 대시보드 + 자세히 보기 토글.
          compact = 3 stat cards (추천 횟수 · 평균 가격 · top SKU) + mini timeline (last 5 bars).
          empty state = greyed timeline + CTA, 토글 X. -->
-    <section class="profile-section profile-section--dashboard">
+    <section data-store-hidden class="profile-section profile-section--dashboard">
       <h2 class="profile-section__title">Find My Gear 추천 기록</h2>
       <div class="dash-section" data-section="fmg">
         <div class="dash-section__compact" id="fmg-compact"></div>
@@ -447,7 +447,7 @@
     <!-- DO_NOT_REVERT §169-N v3 — Danny 2026-05-13: §G 대시보드 + 자세히 보기 토글.
          compact = horizontal ladder (9 markers · current dot) + 현재 등급/할인 + 다음 등급 1-line + membership.html link.
          expanded = 기존 progress bar + tier benefits. -->
-    <section class="profile-section profile-section--dashboard">
+    <section data-store-hidden class="profile-section profile-section--dashboard">
       <h2 class="profile-section__title">회원 등급 진행 상태</h2>
       <div class="dash-section" data-section="tier">
         <div class="dash-section__compact" id="tier-compact"></div>
@@ -477,7 +477,7 @@
     </section>
 
     <!-- 10. §I 트레이닝 progress (ex-§H, §174 로 letter shift) -->
-    <section class="profile-section">
+    <section data-store-hidden class="profile-section">
       <h2 class="profile-section__title">트레이닝 진행</h2>
       <p class="profile-section__lead">현재 진행 중인 단계를 선택해 두면 다음 트레이닝 추천에 반영됩니다.</p>
       <div class="training-progress-grid">
