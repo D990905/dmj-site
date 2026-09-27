@@ -305,7 +305,47 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-v4_carousel-1_1200x.jpg?v=17676473061028214441",
+            "kind": "riding",
+            "local": "assets/images/product-stories/bcdc690db65ec29247.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-v4_carousel-2_1200x.jpg?v=7761493924296030112",
+            "kind": "riding",
+            "local": "assets/images/product-stories/27b72d6c1da711655d.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V4-Green---Image-02_1a95c502-e912-4ce1-a6fa-78276a78354e_1200x.png?v=1766932284",
+            "kind": "feature",
+            "local": "assets/images/product-stories/4673c1e6dd8536141b.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V4-Green---Image-04_eea3b6a7-8b83-4e46-adb8-76faf84054b6_1200x.png?v=1768060133",
+            "kind": "feature",
+            "local": "assets/images/product-stories/473bc65d22a03d2ae8.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wing_V4-Details_1200x.png?v=1768209756",
+            "kind": "feature",
+            "local": "assets/images/product-stories/242fd453706f7cdf68.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V4-Green---Image-10_1200x.png?v=1766932286",
+            "kind": "feature",
+            "local": "assets/images/product-stories/43ee52503012a3c59a.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/JKhiP8lOnq8",
+          "https://cdn.shopify.com/videos/c/o/v/6e1746140f3e43d19911f037274811a7.mp4"
+        ],
+        "source": "https://takoon.com/products/wing-v4",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-v4-pro",
@@ -660,7 +700,43 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-v4-pro_carousel-1_1200x.jpg?v=2667641110568904933",
+            "kind": "riding",
+            "local": "assets/images/product-stories/812b1ebfee497f37cf.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-v4-pro_carousel-2_1200x.jpg?v=9550180512232708540",
+            "kind": "riding",
+            "local": "assets/images/product-stories/91ef4d76e9257682c4.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/White_Fabric_-_Image_04_1200x.jpg?v=1770915647",
+            "kind": "feature",
+            "local": "assets/images/product-stories/d109bfe574542a663e.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wing_V4_pro-Details_2_1200x.png?v=1768209730",
+            "kind": "feature",
+            "local": "assets/images/product-stories/6d7bdcda790122ea07.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V4-Pro---Image-12_1200x.png?v=1768061971",
+            "kind": "feature",
+            "local": "assets/images/product-stories/ec44617957c5c13372.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/yUrkwm7mamU",
+          "https://youtu.be/RajOG-oFmZ0",
+          "https://cdn.shopify.com/videos/c/o/v/461ce81644ee4527a5d613a2ea733d26.mp4"
+        ],
+        "source": "https://takoon.com/products/wing-v4-pro",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-vx-pro-2",
@@ -911,7 +987,43 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-vx-pro-v2_carousel-1_1200x.jpg?v=7028903966989421488",
+            "kind": "riding",
+            "local": "assets/images/product-stories/2936a8d0e128d4d547.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-vx-pro-v2_carousel-2_1200x.jpg?v=293383036378359048",
+            "kind": "riding",
+            "local": "assets/images/product-stories/5cd18551c8708b240b.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/White_Fabric_-_Image_04_1200x.jpg?v=1770915647",
+            "kind": "feature",
+            "local": "assets/images/product-stories/d109bfe574542a663e.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-VX-pro2-5.0_1200x.png?v=1768053953",
+            "kind": "feature",
+            "local": "assets/images/product-stories/a9c6e1fcf602bbbc4b.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V3-Pro---Image-10_1200x1300_c01e1ef8-414e-4dca-8ff7-a7b653db775a_1200x.png?v=1768047377",
+            "kind": "feature",
+            "local": "assets/images/product-stories/081809f7825830ef44.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/yUrkwm7mamU",
+          "https://youtu.be/iizJUcrADiA",
+          "https://cdn.shopify.com/videos/c/o/v/374b24a7f0a242a9af2663520225f3a5.mp4"
+        ],
+        "source": "https://takoon.com/products/wing-vx-pro-2",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-cruise",
@@ -1178,7 +1290,36 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Cruise-Board-5_10---Image-03_d9968e88-e4e3-4804-a302-86e3c8fd04af_1200x.png?v=1788477374",
+            "kind": "feature",
+            "local": "assets/images/product-stories/247b90c985c2c09920.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Cruise-Board-5_10---Image-11_65caba8d-55e8-4dfc-8059-edc16a1dab8a_1200x.png?v=1788477374",
+            "kind": "feature",
+            "local": "assets/images/product-stories/bf17e49cf9dee64191.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Cruise-Board-5_10---Image-01_cf263430-7b7d-408d-81b3-3cbcecd345ba_1200x.png?v=1788477323",
+            "kind": "feature",
+            "local": "assets/images/product-stories/4f58ac53fc7e51c9f8.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Cruise-Board-5_10---Image-05_c989fb7c-1ef2-4c4f-b773-70a5db5c4132_1200x.png?v=1788477325",
+            "kind": "feature",
+            "local": "assets/images/product-stories/00d45b9176515fef2f.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/e81417ba3b384e7aa00f2c8ddf979c2a.mp4"
+        ],
+        "source": "https://takoon.com/products/cruise-2026",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-slide",
@@ -1506,7 +1647,41 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/slide_carousel-1_1200x.jpg?v=443001944441350720",
+            "kind": "riding",
+            "local": "assets/images/product-stories/f2c93cd9b3cb7b3a7b.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/slide_carousel-2_1200x.jpg?v=8845356530765546936",
+            "kind": "riding",
+            "local": "assets/images/product-stories/5834a48e0833829976.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Slide-6_0-Board---Image-03_1200x.png?v=1768816916",
+            "kind": "feature",
+            "local": "assets/images/product-stories/2573bc675725870fd0.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Slide_Section_1200x.png?v=1768817618",
+            "kind": "feature",
+            "local": "assets/images/product-stories/b67c7ec01b750d4b5a.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Slide-6_0-Board---Image-04_b5f02380-a6f7-43c6-a79b-5544254b0c1d_1200x.png?v=1768816914",
+            "kind": "feature",
+            "local": "assets/images/product-stories/99aa3b867bbf11ef28.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/3eaf946dc5d74f76847873c2af408d5b.mp4"
+        ],
+        "source": "https://takoon.com/products/slide",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-glide",
@@ -1774,7 +1949,31 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Glide-5_0-White---Image-01_283f6872-0da7-486b-b94d-831528684f9a_1200x.png?v=1771456177",
+            "kind": "feature",
+            "local": "assets/images/product-stories/83258370705abdc6f4.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Glide-5_0-White---Image-07_49f8f5e5-8250-4552-a351-c8afa8b380df_1200x.png?v=1770941583",
+            "kind": "feature",
+            "local": "assets/images/product-stories/0ae13ffe0adfc4e026.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Glide-5_0-White---Image-04_93c31ea3-80b3-4977-b7f7-d2c658a6ca4e_1200x.png?v=1771456022",
+            "kind": "feature",
+            "local": "assets/images/product-stories/3b273ee5fce7aadbb7.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/9f9f3562842d437881114a312bb3eaf2.mp4"
+        ],
+        "source": "https://takoon.com/products/glide",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-glide-midlength",
@@ -2177,7 +2376,26 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Glide-Midlength---White-6_0---Image-01_2bebc0d4-9d3b-4909-9524-2ee00027f547_1200x.png?v=1770024017",
+            "kind": "feature",
+            "local": "assets/images/product-stories/7204a7a24c07f6b499.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Glide-Midlength---White-6_0---Image-07_0f1803d5-c574-49a1-bfd3-149b07add4a9_1200x.png?v=1770024022",
+            "kind": "feature",
+            "local": "assets/images/product-stories/9fe67071625b40c8a4.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/6f35dc0f6296405e93b62a07b79c64fb.mp4"
+        ],
+        "source": "https://takoon.com/products/glide-midlength",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-ultra-glide",
@@ -2519,7 +2737,31 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Ultra-Glide-6_6-White---Image-01_4c208a62-1287-4d05-b9d9-d25ee76d5a9c_1200x.png?v=1770939253",
+            "kind": "feature",
+            "local": "assets/images/product-stories/de92889dbdaec0b165.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Slide_Section_1200x.png?v=1768817618",
+            "kind": "feature",
+            "local": "assets/images/product-stories/b67c7ec01b750d4b5a.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Ultra-Glide-6_6-White---Image-04_72846819-7e07-41d1-aa6a-d1d2048fbd63_1200x.png?v=1770938948",
+            "kind": "feature",
+            "local": "assets/images/product-stories/9288fdb9bc5fc51f1c.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/8bb36cf00ef5445696ab08eec0a394b9.mp4"
+        ],
+        "source": "https://takoon.com/products/ultra-glide",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-prosurf",
@@ -2760,7 +3002,31 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Prosurf-5_0-White---Image-01_95be22c9-2101-4cb3-8e41-4fe43824fefb_1200x.png?v=1771455837",
+            "kind": "feature",
+            "local": "assets/images/product-stories/94e04b770bc186855d.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Prosurf-5_0-White---Image-10_2d31404c-55bd-4145-b0bc-8ee94088e9dc_1200x.png?v=1770979797",
+            "kind": "feature",
+            "local": "assets/images/product-stories/ead3c99f3838c3c30d.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Prosurf-5_0-White---Image-04_ae1b78fb-3298-4a12-8090-5ebd6f087dee_1200x.png?v=1771455785",
+            "kind": "feature",
+            "local": "assets/images/product-stories/2b3ad44cf33925e4d1.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/3edf8610d6944bce86659f273789af78.mp4"
+        ],
+        "source": "https://takoon.com/products/prosurf",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "ppc-m2",
@@ -2929,7 +3195,26 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/1a6e2e259684e41c47c52fa8eacf7ff5.jpg?v=1774912416&width=1200",
+            "alt": "PPC M2 all-round wing foiling wing — in-flight view",
+            "local": "assets/images/product-stories/137580ad3db962e627.jpg"
+          },
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/6af55148e8f8580eb1820a8d0496ef09.jpg?v=1774912416&width=1200",
+            "alt": "PPC M2 all-round wing foiling wing — leading edge detail",
+            "local": "assets/images/product-stories/5dd07874688d4e7b39.jpg"
+          }
+        ],
+        "videos": [
+          "https://www.youtube.com/embed/VEY3ZuY-E18"
+        ],
+        "source": "https://ppcfoiling.com/products/m2-wing-1",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "ppc-m1x",
@@ -3180,7 +3465,31 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/7be0af3017c162cb89d8d8f5114c1bd2.jpg?v=1788726569&width=895",
+            "alt": "M1-X Wing",
+            "local": "assets/images/product-stories/8316a8db3f3223f1ed.jpg"
+          },
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/c9dcc73f12da023018bef3b7fe59b54f.jpg?v=1788726569&width=859",
+            "alt": "M1-X Wing",
+            "local": "assets/images/product-stories/8be411db7bb62f63bd.jpg"
+          },
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/3def8830b81b6c2580c2e88e4133ded9.jpg?v=1776403592&width=1200",
+            "alt": "PPC M1-X lightweight wing foiling wing — canopy close-up",
+            "local": "assets/images/product-stories/39032860f7a9d1c744.jpg"
+          }
+        ],
+        "videos": [
+          "https://www.youtube.com/embed/dHVe_9SMOn0"
+        ],
+        "source": "https://ppcfoiling.com/products/m1-x-wing",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "ppc-m1",
@@ -3362,7 +3671,26 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/fc96d1c482f2fbab05a5bbca379f5f74.jpg?v=1773888787&width=5000",
+            "alt": "PPC M1 high-performance wing foiling wing — in-flight view",
+            "local": "assets/images/product-stories/47d3fe5bb923c177a3.jpg"
+          },
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/fad188bd248c86f285293295b14ffb4e.jpg?v=1773888787&width=5000",
+            "alt": "PPC M1 high-performance wing foiling wing — leading edge detail",
+            "local": "assets/images/product-stories/4168b7d6131464ac82.jpg"
+          }
+        ],
+        "videos": [
+          "https://www.youtube.com/embed/dHVe_9SMOn0"
+        ],
+        "source": "https://ppcfoiling.com/products/m1-wing",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "ppc-fds",
@@ -3593,7 +3921,29 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/b6200a01278cd0ffe8f121f568550ea2.png?v=1775258010&width=1200",
+            "alt": "PPC Sonic FDS dual-skin race wing foiling wing — in-flight view",
+            "local": "assets/images/product-stories/70149ef3cf6663e513.png"
+          },
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/9ca423d0dc28ef8ec5eac50324f99095.png?v=1775258010&width=900",
+            "alt": "PPC Sonic FDS dual-skin race wing foiling wing — leading edge detail",
+            "local": "assets/images/product-stories/8527247448c1ea538b.png"
+          },
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/6e60e41060675adb1e89592b672cd2f6.png?v=1775258011&width=900",
+            "alt": "PPC Sonic FDS dual-skin race wing foiling wing — canopy close-up",
+            "local": "assets/images/product-stories/f06651cc33ef08039b.png"
+          }
+        ],
+        "videos": [],
+        "source": "https://ppcfoiling.com/products/ppc-sonic-fds-full-dual-skin-wing",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "ppc-r1",
@@ -3852,7 +4202,19 @@
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://ppcfoiling.com/cdn/shop/files/f5dbf31c6faa6986a51c95755eb26a3e.png?v=1790066524&width=1200",
+            "alt": "PPC Orbit Parawing",
+            "local": "assets/images/product-stories/f4f2a569bb0dc2a9e2.png"
+          }
+        ],
+        "videos": [],
+        "source": "https://ppcfoiling.com/products/ppc-orbit-parawing",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "lvz-r6",
@@ -4280,6 +4642,14 @@
         "dutyAssumption": 0.08,
         "vat": 0.1,
         "discount": 0.0
+      },
+      "detailMedia": {
+        "photos": [],
+        "videos": [
+          "https://www.youtube.com/embed/RLbfKOrZJC0"
+        ],
+        "source": "https://levitaz.com/shop/product/r6-race-series",
+        "checkedAt": "2026-09-27"
       }
     },
     {
@@ -4692,7 +5062,41 @@
       "priceSource": "https://takoon.com/products/foil-starter",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/foil-starter_carousel-1_1200x.jpg?v=3370464838025225697",
+            "kind": "riding",
+            "local": "assets/images/product-stories/a6aa6eef379f9ec236.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/foil-starter_carousel-2_1200x.jpg?v=10375080234961335486",
+            "kind": "riding",
+            "local": "assets/images/product-stories/921de4de919aeb5923.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Starter_5_1200x.png?v=1716820410",
+            "kind": "feature",
+            "local": "assets/images/product-stories/d055755a6eeb8e727d.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Starter_-_Top_Cropped_View_-_2000_e501b444-934d-48a5-aca3-2753db4c51f0_1200x.png?v=1718188776",
+            "kind": "feature",
+            "local": "assets/images/product-stories/cc8fb57957af00fdba.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Starter_1_1200x.png?v=1716587972",
+            "kind": "feature",
+            "local": "assets/images/product-stories/5df63333b38a4d2f35.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/d11352d9f8c74c18bf22cb811c44512f.mp4"
+        ],
+        "source": "https://takoon.com/products/foil-starter",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "tkn-xglide-v2",
@@ -5004,7 +5408,46 @@
       "priceSource": "https://takoon.com/products/foil-x-glide-v2",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/foil-x-glide-v2_carousel-1_1200x.jpg?v=16617515395158091718",
+            "kind": "riding",
+            "local": "assets/images/product-stories/8c9631fbee1850e34c.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/foil-x-glide-v2_carousel-2_1200x.jpg?v=16589441859177272055",
+            "kind": "riding",
+            "local": "assets/images/product-stories/00b88748fde8b357f2.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/X-Glide_V2_7_d686befc-539b-4604-b40a-acff232b4fb0_1200x.png?v=1716814370",
+            "kind": "feature",
+            "local": "assets/images/product-stories/5458f635f4976ab7e8.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/1.8_af3aa362-170b-4cf4-ac58-ac9c86c10346_1200x.png?v=1716680686",
+            "kind": "feature",
+            "local": "assets/images/product-stories/513805615aaf0ad086.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/X_Glide_V2_1200x1200_A_1200x.png?v=1719062760",
+            "kind": "feature",
+            "local": "assets/images/product-stories/9f3227181bb1b41802.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/X-Glide_V2_6_729e4afe-f7dc-4365-af5b-31bf5e0950dd_1200x.png?v=1730460902",
+            "kind": "feature",
+            "local": "assets/images/product-stories/b01faad884793fbe5b.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/f8297a6b103547ea8b102751c737a804.mp4"
+        ],
+        "source": "https://takoon.com/products/foil-x-glide-v2",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-boom-v2",
@@ -5265,7 +5708,30 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/b0a33684615b6f6613.jpg",
+        "assets/images/product-stories/24046fb2087f55caa5.jpg",
+        "assets/images/product-stories/950187a9038d0c2298.jpg",
+        "assets/images/product-stories/c66c67b2a480a0e7a3.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-FLYING-MASK-2-2.0.jpg",
+            "alt": "FLYING MASK 2.0 - Image 2",
+            "local": "assets/images/product-stories/24046fb2087f55caa5.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/6.-FLYING-MASK-2-2.0.jpg",
+            "alt": "FLYING MASK 2.0 - Image 3",
+            "local": "assets/images/product-stories/950187a9038d0c2298.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/flying-mask-2-0/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-steamer-mk3",
@@ -5329,7 +5795,30 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/fae26d00d63caa9970.jpg",
+        "assets/images/product-stories/133ba8c77eb14ed374.jpg",
+        "assets/images/product-stories/829ece86c15264f690.jpg",
+        "assets/images/product-stories/f04c22e8691321a4b3.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/13.-STEAMER-MK3.jpg",
+            "alt": "STEAMER MK3 - Image 2",
+            "local": "assets/images/product-stories/133ba8c77eb14ed374.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/14.-STEAMER-MK3.jpg",
+            "alt": "STEAMER MK3 - Image 3",
+            "local": "assets/images/product-stories/829ece86c15264f690.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/steamer-mk3/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-steamy-ls",
@@ -5393,7 +5882,15 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [],
+        "videos": [
+          "https://youtu.be/SYKkptzUtUQ"
+        ],
+        "source": "https://www.forward-wip.com/produit/steamy-ls/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-steamy-3-2",
@@ -5457,7 +5954,32 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/10f718575b0348a73b.jpg",
+        "assets/images/product-stories/c01c5666763bf0a3b1.jpg",
+        "assets/images/product-stories/f9ffe0cc870260b011.jpg",
+        "assets/images/product-stories/4fbc6f7e79ccda5acc.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/01/6.-STEAMY-scaled.jpg",
+            "alt": "STEAMY - Image 2",
+            "local": "assets/images/product-stories/c01c5666763bf0a3b1.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/01/7.-STEAMY-scaled.jpg",
+            "alt": "STEAMY - Image 3",
+            "local": "assets/images/product-stories/f9ffe0cc870260b011.jpg"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/SYKkptzUtUQ"
+        ],
+        "source": "https://www.forward-wip.com/produit/steamy-3-2/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-hybrid-semi-dry",
@@ -5521,7 +6043,15 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [],
+        "videos": [
+          "https://youtu.be/pjk3Acyh_KM"
+        ],
+        "source": "https://www.forward-wip.com/produit/hybrid-semi-dry/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-neo-long-john-mk2",
@@ -5593,7 +6123,25 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/285b9c287e5ec07e1c.png",
+        "assets/images/product-stories/efeabf9e716b854f9e.png"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/neo-long-MK2-back-.png",
+            "alt": "NEO LONG JOHN MK2 - Image 2",
+            "local": "assets/images/product-stories/efeabf9e716b854f9e.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/9ZuWh99iYxg"
+        ],
+        "source": "https://www.forward-wip.com/produit/neo-long-john-mk2/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-neo-long-john-women-mk2",
@@ -5665,7 +6213,33 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/dc65a170368729bcff.png",
+        "assets/images/product-stories/e3ece6c532d77d66df.jpg",
+        "assets/images/product-stories/551dc337344d7dc098.jpg",
+        "assets/images/product-stories/40d6fb4114b3e37272.jpg",
+        "assets/images/product-stories/68ca502a19bf6c60a9.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/4.-WIPEE-1.jpg",
+            "alt": "NEO LONG JOHN WOMEN MK2 - Image 2",
+            "local": "assets/images/product-stories/e3ece6c532d77d66df.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/3.-WIPEE-1.jpg",
+            "alt": "NEO LONG JOHN WOMEN MK2 - Image 3",
+            "local": "assets/images/product-stories/551dc337344d7dc098.jpg"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/28xm6WMVbKU"
+        ],
+        "source": "https://www.forward-wip.com/produit/neo-long-john-women-mk2/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-summer-neo-long-john-mk2",
@@ -5989,7 +6563,15 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [],
+        "videos": [
+          "https://youtu.be/9ZuWh99iYxg"
+        ],
+        "source": "https://www.forward-wip.com/produit/3ds-neo-top-3mm-women/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-flow-vortex-rashguard",
@@ -6069,7 +6651,31 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/fb0c5384ff28dcfd9a.jpg",
+        "assets/images/product-stories/1c88ff161ab6afaff4.png",
+        "assets/images/product-stories/d69c126038d3c94564.png"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/Image1.png",
+            "alt": "FLOW VORTEX RASHGUARD - Image 2",
+            "local": "assets/images/product-stories/1c88ff161ab6afaff4.png"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/Capture-decran-2021-03-23-154916.png",
+            "alt": "FLOW VORTEX RASHGUARD - Image 3",
+            "local": "assets/images/product-stories/d69c126038d3c94564.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/8OhSp9CwnrQ"
+        ],
+        "source": "https://www.forward-wip.com/produit/flow-vortex-rashguard/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-hooded-uv-rashguard-long-sleeve",
@@ -6141,7 +6747,23 @@
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/089be11582fcc8ac69.jpg",
+        "assets/images/product-stories/fe045a6f27064537fa.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/02/3.-RASGUARD-UV-HOODED.jpg",
+            "alt": "HOODED UV RASHGUARD - Image 2",
+            "local": "assets/images/product-stories/fe045a6f27064537fa.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/hooded-uv-rashguard-long-sleeve/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-quickdry-tshirt-long-3-0",
@@ -6279,7 +6901,25 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/b0ad122cb8564877c2.png",
+        "assets/images/product-stories/774db1b539978a7891.png"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/04/2.-SALOPETTE.png",
+            "alt": "COASTAL RACING SALOPETTE - Image 2",
+            "local": "assets/images/product-stories/774db1b539978a7891.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/ozd4DCgfS1w"
+        ],
+        "source": "https://www.forward-wip.com/produit/coastal-racing-salopette/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-waistfoil-harness-3-0",
@@ -6343,7 +6983,29 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/245bacee0d705201ca.jpg",
+        "assets/images/product-stories/ddbc12c388181747b5.jpg",
+        "assets/images/product-stories/da83abe65c93b8a171.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/07/2.-WAISTFOIL-HARNESS-3.0-.jpg",
+            "alt": "WAISTFOIL HARNESS 3.0 - Image 2",
+            "local": "assets/images/product-stories/ddbc12c388181747b5.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/03/3.-WAISTFOIL-HARNESS-3.0.jpg",
+            "alt": "WAISTFOIL HARNESS 3.0 - Image 3",
+            "local": "assets/images/product-stories/da83abe65c93b8a171.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/waistfoil-harness-3-0/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-wing-belt-3-0",
@@ -6516,7 +7178,23 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/8d60dd1216c6cfc545.jpg",
+        "assets/images/product-stories/916178ea8b1e1c55a2.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/2.-PUFFER-JACKET.jpg",
+            "alt": "PUFFER JACKET - Image 2",
+            "local": "assets/images/product-stories/916178ea8b1e1c55a2.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/puffer-jacket/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-tech-hoodie",
@@ -6582,7 +7260,29 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/72f75bdc53b56ca23e.jpg",
+        "assets/images/product-stories/1d25343a13b74cb557.jpg",
+        "assets/images/product-stories/db62cf35fcf819956e.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/2.-TECH-HOODIE.jpg",
+            "alt": "TECH HOODIE - Image 2",
+            "local": "assets/images/product-stories/1d25343a13b74cb557.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/3.-TECH-HOODIE.jpg",
+            "alt": "TECH HOODIE - Image 3",
+            "local": "assets/images/product-stories/db62cf35fcf819956e.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/tech-hoodie/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-poncho",
@@ -6648,7 +7348,23 @@
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/37d171170521d02efa.png",
+        "assets/images/product-stories/c6cc86f54491d891d5.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-PONCHO-FLIP-FLOP.jpg",
+            "alt": "PONCHO FLIP OVER - Image 2",
+            "local": "assets/images/product-stories/c6cc86f54491d891d5.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/poncho/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-dry-sailing-short-2-0",
@@ -6706,7 +7422,31 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/ae9f882e82bcc4b6d8.jpg",
+        "assets/images/product-stories/19c4270f4dca20fc30.jpg",
+        "assets/images/product-stories/b3ff68e52f98970e5b.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-DRY-SAILING-SHORT-1.jpg",
+            "alt": "DRY SAILING SHORT 2.0 - Image 2",
+            "local": "assets/images/product-stories/19c4270f4dca20fc30.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/4.-DRY-SAILING-SHORT-1.jpg",
+            "alt": "DRY SAILING SHORT 2.0 - Image 3",
+            "local": "assets/images/product-stories/b3ff68e52f98970e5b.jpg"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/vnnEdV4dQeg"
+        ],
+        "source": "https://www.forward-wip.com/produit/dry-sailing-short-2-0/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-light-sailing-short-2-0",
@@ -6764,7 +7504,29 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/0be6734c993d59b18a.jpg",
+        "assets/images/product-stories/e1aed01c5a79013a55.jpg",
+        "assets/images/product-stories/66f94f75b7b620334b.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-LIGHT-SAILING-SHORT-1.jpg",
+            "alt": "LIGHT SAILING SHORT 2.0 - Image 2",
+            "local": "assets/images/product-stories/e1aed01c5a79013a55.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/3.-LIGHT-SAILING-SHORT-2.jpg",
+            "alt": "LIGHT SAILING SHORT 2.0 - Image 3",
+            "local": "assets/images/product-stories/66f94f75b7b620334b.jpg"
+          }
+        ],
+        "videos": [],
+        "source": "https://www.forward-wip.com/produit/light-sailing-short-2-0/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-gearpack-100l",
@@ -7187,7 +7949,31 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/63a72dbf8b8a2100ab.jpg",
+        "assets/images/product-stories/e2030c56f81ed95749.jpg",
+        "assets/images/product-stories/0f97dcc8e507aa6ef7.jpg"
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/14.COASTAL-JACKET.jpg",
+            "alt": "COASTAL RACING JACKET - Image 2",
+            "local": "assets/images/product-stories/e2030c56f81ed95749.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/13.COASTAL-JACKET.jpg",
+            "alt": "COASTAL RACING JACKET - Image 3",
+            "local": "assets/images/product-stories/0f97dcc8e507aa6ef7.jpg"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/ozd4DCgfS1w"
+        ],
+        "source": "https://www.forward-wip.com/produit/coastal-racing-jacket/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "wip-wing-wind-pro-harness",
@@ -7248,7 +8034,15 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [],
+        "videos": [
+          "https://youtu.be/2mKYCBhuu80"
+        ],
+        "source": "https://www.forward-wip.com/produit/wing-wind-pro-harness/",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-slide-hollow",
@@ -7478,7 +8272,43 @@
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/slide-hollow_carousel-1_1200x.jpg?v=15011009086190157561",
+            "kind": "riding",
+            "local": "assets/images/product-stories/503e60df13a6d7e3fe.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/slide-hollow_carousel-2_1200x.jpg?v=17754490670383952353",
+            "kind": "riding",
+            "local": "assets/images/product-stories/b99fceb616008b87b2.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Construction_1200x.png?v=1781034900",
+            "kind": "feature",
+            "local": "assets/images/product-stories/8d530d1f9d0db8fc0b.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Slide-6_0-Hollow---Image-03_9d146188-7cb8-4335-93f1-9d1fdb94b0ab_1200x.png?v=1780091861",
+            "kind": "feature",
+            "local": "assets/images/product-stories/f34369009746b7c972.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Slide-6_0-Hollow---Image-01_1200x.png?v=1780091795",
+            "kind": "feature",
+            "local": "assets/images/product-stories/a159f454f29500accf.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/201bb9081dbe4c288433bef7b657d7a0.mp4",
+          "https://youtu.be/fI4cSQ2XK0c",
+          "https://youtu.be/o7u11Je9MiI"
+        ],
+        "source": "https://takoon.com/products/slide-hollow",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-cloud-one",
@@ -7624,7 +8454,48 @@
             "130"
           ]
         ]
-      ]
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/parawing-cloud-one_carousel-1_1200x.jpg?v=16355747931693965014",
+            "kind": "riding",
+            "local": "assets/images/product-stories/c04e4de9707d891b73.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/parawing-cloud-one_carousel-2_1200x.jpg?v=4840901914786258931",
+            "kind": "riding",
+            "local": "assets/images/product-stories/31e1e8f896bd175c7a.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---C2---Image-05_80ef4062-a2d4-4c9c-ac35-0b67a424731a_1200x.png?v=1770144413",
+            "kind": "feature",
+            "local": "assets/images/product-stories/14da501c27becc5fa9.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---Image-05_40cm_1200x.png?v=1770982373",
+            "kind": "feature",
+            "local": "assets/images/product-stories/6d6a85ae1b6b74dcc2.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing_Cloud_one_C2_description_1200x.jpg?v=1770139073",
+            "kind": "feature",
+            "local": "assets/images/product-stories/789ace0e26eff48265.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Ripstop-Fabric---Orange---Image-01_edited2_110747f8-eac6-4dfc-b520-14b0ccbab6ae_1200x.png?v=1777783567",
+            "kind": "feature",
+            "local": "assets/images/product-stories/ef11f6d8c5ebdb40f0.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/E2VE9eWCCnU",
+          "https://youtu.be/na2ASjHSxQo",
+          "https://cdn.shopify.com/videos/c/o/v/8d37cf26309e4e29835ca70e9ef10745.mp4"
+        ],
+        "source": "https://takoon.com/en-int/products/cloud-one",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-parawing-cloud",
@@ -7824,7 +8695,42 @@
             "130"
           ]
         ]
-      ]
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/parawing-cloud_carousel-1_1200x.jpg?v=11977055881426673651",
+            "kind": "riding",
+            "local": "assets/images/product-stories/2597bcd48ff109047a.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/parawing-cloud_carousel-2_1200x.jpg?v=5108744344919842123",
+            "kind": "riding",
+            "local": "assets/images/product-stories/17b3ac7747417aec07.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---Image-09_502c0134-9026-4ee3-9474-c14c0e576e63_1200x.png?v=1760538939",
+            "kind": "feature",
+            "local": "assets/images/product-stories/5d47a7fd9712d69ed9.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---Image-05_40cm_1200x.png?v=1770982373",
+            "kind": "feature",
+            "local": "assets/images/product-stories/6d6a85ae1b6b74dcc2.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---description_updated_1200x.jpg?v=1760520057",
+            "kind": "feature",
+            "local": "assets/images/product-stories/aa4a2b9075ce8c8806.jpg"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/E2VE9eWCCnU",
+          "https://cdn.shopify.com/videos/c/o/v/462ec510fa0f499fb33a3f618e4bf8ac.mp4"
+        ],
+        "source": "https://takoon.com/en-int/products/parawing-cloud",
+        "checkedAt": "2026-09-27"
+      }
     },
     {
       "id": "takoon-parawing-cloud-lw",
@@ -7926,7 +8832,41 @@
             "130"
           ]
         ]
-      ]
+      ],
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/parawing-cloud-lw_carousel-1_1200x.jpg?v=14258577260450857171",
+            "kind": "riding",
+            "local": "assets/images/product-stories/d90c1b4976f6efe386.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/parawing-cloud-lw_carousel-2_1200x.jpg?v=1432179741394610998",
+            "kind": "riding",
+            "local": "assets/images/product-stories/957acb572359646249.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-02_36210abe-7fcc-4cb3-bb4e-77783295198f_1200x.png?v=1783516497",
+            "kind": "feature",
+            "local": "assets/images/product-stories/3f10e56120bd78c045.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---Image-05_40cm_f16fe9e7-43f2-4dd9-8fab-bae0ce82178a_1200x.png?v=1783067899",
+            "kind": "feature",
+            "local": "assets/images/product-stories/d6d2a23929680415e8.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---description_a44f3fff-ea6a-4d29-b00a-0c4f6a60f343_1200x.png?v=1783525406",
+            "kind": "feature",
+            "local": "assets/images/product-stories/800be96252f3aa18b0.png"
+          }
+        ],
+        "videos": [
+          "https://cdn.shopify.com/videos/c/o/v/dd7b399694f241cd9e6fbde3f33e171c.mp4"
+        ],
+        "source": "https://takoon.com/en-int/products/parawing-cloud-lw",
+        "checkedAt": "2026-09-27"
+      }
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님"
