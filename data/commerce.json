@@ -4211,9 +4211,12 @@
             "local": "assets/images/product-stories/f4f2a569bb0dc2a9e2.png"
           }
         ],
-        "videos": [],
+        "videos": [
+          "https://www.youtube.com/watch?v=3tVCS7XvmZM"
+        ],
         "source": "https://ppcfoiling.com/products/ppc-orbit-parawing",
-        "checkedAt": "2026-09-27"
+        "checkedAt": "2026-09-27",
+        "videoSource": "https://ppcfoiling.com/pages/technology"
       }
     },
     {
