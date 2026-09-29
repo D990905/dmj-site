@@ -18,7 +18,7 @@
   const g = groups.find(g => g.option === e.target.value); if (g) display(g.id);
  });
  document.querySelectorAll('[data-show-photo-group]').forEach(b => b.addEventListener('click', () => {
-  display(b.dataset.showPhotoGroup); select.scrollIntoView({block:'center',behavior:'auto'}); select.focus();
+  const group=groups.find(g=>g.id===b.dataset.showPhotoGroup), option=document.getElementById('detail-option'); if(group?.option&&option){option.value=group.option;option.dispatchEvent(new Event('change',{bubbles:true}));} display(b.dataset.showPhotoGroup); select.scrollIntoView({block:'center',behavior:'auto'}); select.focus();
  }));
  const chosen = document.getElementById('detail-option')?.value;
  display(groups.find(g => g.option === chosen)?.id || groups[0].id);
