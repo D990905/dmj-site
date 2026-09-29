@@ -74,3 +74,20 @@ body.commerce{--space:clamp(20px,5vw,80px);font-size:16px}
 .commerce .store-header nav a{font-size:14px;padding:8px 0}
 .commerce .store-header .nav-analysis{margin-left:0}
 }
+/* Responsive repair: anchor the image control to its image, not the page. */
+.commerce .gallery .detail-photo{position:relative}
+@media(max-width:800px){
+ .commerce .utility{display:flex;justify-content:space-between;gap:12px}
+ .commerce .utility>span:nth-of-type(2){display:none}
+ .commerce .utility-links{flex-shrink:0}
+ .commerce .store-header nav.is-open{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 20px;max-height:calc(100dvh - 110px);overflow-y:auto}
+ .commerce .store-header nav a{min-height:44px;display:flex;align-items:center}
+ .commerce :is(input:not([type=checkbox]):not([type=radio]),select,textarea){font-size:16px;min-width:0;max-width:100%}
+ .commerce .gallery-expand{min-height:44px;font-size:12px;padding:8px 12px;right:10px;bottom:10px}
+ .commerce .gallery-thumbs{scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+ .commerce .gallery-thumb{scroll-snap-align:start}
+ .commerce :is(.detail-copy,.inquiry-preview,.product-info,.spec-scroll){min-width:0}
+ .commerce .table-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+ .commerce .product-info h3{overflow-wrap:anywhere}
+}
+@media(max-width:360px){.commerce .footer-top{grid-template-columns:repeat(2,minmax(0,1fr))}.commerce .header-contact{padding:10px}.commerce .store-header{gap:12px}.commerce .product-grid{column-gap:12px}}

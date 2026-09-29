@@ -44,7 +44,7 @@
       "name": "Wing V4",
       "category": "wing",
       "path": "products/takoon/wing-v4.html",
-      "image": "assets/images/products/takoon/verified/takoon-v4.png",
+      "image": "assets/images/products/official-details/d88d105969a0e9.png",
       "description": "본사는 입문자부터 숙련자까지 프리라이드와 웨이브 용도로 안내합니다. 가벼운 조작감과 안정성을 중심으로 선택하는 윙입니다.",
       "options": [
         "2.5 / 직물 핸들 (기본)",
@@ -572,7 +572,7 @@
       "name": "Wing V4 Pro",
       "category": "wing",
       "path": "products/takoon/wing-v4-pro.html",
-      "image": "assets/images/products/takoon/verified/takoon-v4-pro.png",
+      "image": "assets/images/products/official-details/954e68ba83eac8.png",
       "description": "UPE Project 85 프레임을 사용하는 윙으로, 본사는 프리라이드와 웨이브에서 가벼운 무게와 강성을 강조합니다.",
       "options": [
         "2.5 / Orange / 직물 핸들 (기본)",
@@ -1442,7 +1442,7 @@
       "name": "Wing VX Pro V2",
       "category": "wing",
       "path": "products/takoon/wing-vx-pro-2.html",
-      "image": "assets/images/products/takoon/verified/takoon-vx-pro-2.png",
+      "image": "assets/images/products/official-details/b0700012670877.png",
       "description": "본사는 레이스, 빅에어, 프리스타일과 웨이브를 포함한 퍼포먼스 용도로 소개합니다. UPE Project 85 프레임과 Aerotech 캐노피를 사용합니다.",
       "options": [
         "3.0 / 직물 핸들 (기본)",
@@ -2210,7 +2210,19 @@
         ],
         "source": "https://takoon.com/products/cruise-2026",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "galleryImages": [
+        "assets/images/products/board-details/eaec2c0cdddf7f55.png",
+        "assets/images/products/board-details/ecd2b3bc44a78df0.png",
+        "assets/images/products/board-details/7817c633bcf971c8.png",
+        "assets/images/products/board-details/e94b6768c78d190e.png",
+        "assets/images/products/board-details/0105e79c224a8f74.png",
+        "assets/images/products/board-details/b247b8eca8db68a8.png",
+        "assets/images/products/board-details/a93c73681bf10fef.png",
+        "assets/images/products/board-details/cb111f05d7b7f1d2.png",
+        "assets/images/products/board-details/48ac2862abb0ba96.png",
+        "assets/images/products/board-details/1ff650e6ef5d784e.png"
+      ]
     },
     {
       "id": "takoon-slide",
@@ -2572,7 +2584,18 @@
         ],
         "source": "https://takoon.com/products/slide",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "galleryImages": [
+        "assets/images/products/board-details/d3249957ba4f93da.png",
+        "assets/images/products/board-details/1c7b2b7bffdbe5a9.png",
+        "assets/images/products/board-details/b31faf3768dedf5a.png",
+        "assets/images/products/board-details/7ca3beae5a54783a.png",
+        "assets/images/products/board-details/af985ab429cd04bd.png",
+        "assets/images/products/board-details/c9cba9e0aa313038.png",
+        "assets/images/products/board-details/a3f02c5a951cc7e3.png",
+        "assets/images/products/board-details/5f5a34a0301d933a.png",
+        "assets/images/products/board-details/46e074ad7496b7dd.png"
+      ]
     },
     {
       "id": "takoon-glide",
@@ -2864,7 +2887,19 @@
         ],
         "source": "https://takoon.com/products/glide",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "galleryImages": [
+        "assets/images/products/board-details/db7077929baed137.png",
+        "assets/images/products/board-details/65a4fed11be7ee6f.png",
+        "assets/images/products/board-details/c64d58e0a2bc1288.png",
+        "assets/images/products/board-details/a53da51792e436ef.png",
+        "assets/images/products/board-details/3833cdba1750faa6.png",
+        "assets/images/products/board-details/4caae1f9925bf1dc.png",
+        "assets/images/products/board-details/fc3b9d85aef9a70f.png",
+        "assets/images/products/board-details/b9f7fe9f42159f8f.png",
+        "assets/images/products/board-details/cc857c097b3bb5f7.png",
+        "assets/images/products/board-details/054ca55c8ec085f8.png"
+      ]
     },
     {
       "id": "takoon-glide-midlength",
@@ -3286,7 +3321,18 @@
         ],
         "source": "https://takoon.com/products/glide-midlength",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "galleryImages": [
+        "assets/images/products/board-details/c1a58079a5a5230f.png",
+        "assets/images/products/board-details/9cccabf51508d3c2.png",
+        "assets/images/products/board-details/2904e7b9775f21cc.png",
+        "assets/images/products/board-details/59b638e3d0b232dd.png",
+        "assets/images/products/board-details/ac2f262f1e7c4272.png",
+        "assets/images/products/board-details/ee9b57a8fda33891.png",
+        "assets/images/products/board-details/7ad6a4080977f819.png",
+        "assets/images/products/board-details/b1a3fd8043c4466a.png",
+        "assets/images/products/board-details/fc8444428e85b966.png"
+      ]
     },
     {
       "id": "takoon-ultra-glide",
@@ -3652,7 +3698,19 @@
         ],
         "source": "https://takoon.com/products/ultra-glide",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "galleryImages": [
+        "assets/images/products/board-details/21afec8c0c863d0e.png",
+        "assets/images/products/board-details/1f32309296c145ac.png",
+        "assets/images/products/board-details/63404dab0c0e3999.png",
+        "assets/images/products/board-details/78e2a033bbc8b37f.png",
+        "assets/images/products/board-details/fde2718968a1076b.png",
+        "assets/images/products/board-details/38b830daf2f8b7b1.png",
+        "assets/images/products/board-details/73f62a0072711bc1.png",
+        "assets/images/products/board-details/4612203e951ba56f.png",
+        "assets/images/products/board-details/262e402cc7aecef4.png",
+        "assets/images/products/board-details/ca9ce7e7c5a092e8.png"
+      ]
     },
     {
       "id": "takoon-prosurf",
@@ -3917,7 +3975,19 @@
         ],
         "source": "https://takoon.com/products/prosurf",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "galleryImages": [
+        "assets/images/products/board-details/02662d58023a22a5.png",
+        "assets/images/products/board-details/dbced13517465e7b.png",
+        "assets/images/products/board-details/f6c089fe993bff77.png",
+        "assets/images/products/board-details/c1ff10389099f785.png",
+        "assets/images/products/board-details/6421d288975f8396.png",
+        "assets/images/products/board-details/bffa6e159b9d2d22.png",
+        "assets/images/products/board-details/30debca7bdbe877b.png",
+        "assets/images/products/board-details/61aaf2b3d6b2904e.png",
+        "assets/images/products/board-details/ebfd7d306368b4e0.png",
+        "assets/images/products/board-details/527bd8697bc08962.png"
+      ]
     },
     {
       "id": "ppc-m2",
@@ -9211,7 +9281,17 @@
         ],
         "source": "https://takoon.com/products/slide-hollow",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "galleryImages": [
+        "assets/images/products/board-details/50e07ef3f72c9252.png",
+        "assets/images/products/board-details/f9ac25e4b40ea56a.png",
+        "assets/images/products/board-details/dee2e3850a62491c.png",
+        "assets/images/products/board-details/f2338f83379f8e97.png",
+        "assets/images/products/board-details/4cbe0a65db36d048.png",
+        "assets/images/products/board-details/0a2c974c5342eb72.png",
+        "assets/images/products/board-details/eb428441fcebc94f.png",
+        "assets/images/products/board-details/63e9aa533a929c3d.png"
+      ]
     },
     {
       "id": "takoon-cloud-one",
@@ -9770,6 +9850,194 @@
         "source": "https://takoon.com/en-int/products/parawing-cloud-lw",
         "checkedAt": "2026-09-27"
       }
+    },
+    {
+      "id": "lvz-fs540",
+      "brand": "levitaz",
+      "name": "Free Series FW 540",
+      "category": "foil",
+      "path": "products/levitaz/fw-540.html",
+      "image": "assets/images/levitaz/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
+      "description": "속도와 민첩한 반응",
+      "headline": "속도와 민첩한 반응",
+      "price": null,
+      "options": [
+        "프론트윙 540cm² 단품",
+        "세트 상담 · 프론트윙 540cm² + 마스트 + 리어윙"
+      ],
+      "retailVariants": [
+        {
+          "option": "프론트윙 540cm² 단품",
+          "priceKRW": null
+        },
+        {
+          "option": "세트 상담 · 프론트윙 540cm² + 마스트 + 리어윙",
+          "priceKRW": null
+        }
+      ],
+      "priority": "performance",
+      "minLevel": 2,
+      "raceOnly": false,
+      "purposes": [
+        "freeride",
+        "wave",
+        "parawing"
+      ],
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "availability": "inquiry",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "galleryImages": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_540_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_540_v2000x2000px.jpg"
+      ]
+    },
+    {
+      "id": "lvz-fs680",
+      "brand": "levitaz",
+      "name": "Free Series FW 680",
+      "category": "foil",
+      "path": "products/levitaz/fw-680.html",
+      "image": "assets/images/levitaz/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
+      "description": "속도와 글라이드의 균형",
+      "headline": "속도와 글라이드의 균형",
+      "price": null,
+      "options": [
+        "프론트윙 680cm² 단품",
+        "세트 상담 · 프론트윙 680cm² + 마스트 + 리어윙"
+      ],
+      "retailVariants": [
+        {
+          "option": "프론트윙 680cm² 단품",
+          "priceKRW": null
+        },
+        {
+          "option": "세트 상담 · 프론트윙 680cm² + 마스트 + 리어윙",
+          "priceKRW": null
+        }
+      ],
+      "priority": "performance",
+      "minLevel": 1,
+      "raceOnly": false,
+      "purposes": [
+        "freeride",
+        "wave",
+        "parawing"
+      ],
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "availability": "inquiry",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "galleryImages": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_680_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_680_v2000x2000px.jpg"
+      ]
+    },
+    {
+      "id": "lvz-fs790",
+      "brand": "levitaz",
+      "name": "Free Series FW 790",
+      "category": "foil",
+      "path": "products/levitaz/fw-790.html",
+      "image": "assets/images/levitaz/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
+      "description": "이륙과 부드러운 글라이드",
+      "headline": "이륙과 부드러운 글라이드",
+      "price": null,
+      "options": [
+        "프론트윙 790cm² 단품",
+        "세트 상담 · 프론트윙 790cm² + 마스트 + 리어윙"
+      ],
+      "retailVariants": [
+        {
+          "option": "프론트윙 790cm² 단품",
+          "priceKRW": null
+        },
+        {
+          "option": "세트 상담 · 프론트윙 790cm² + 마스트 + 리어윙",
+          "priceKRW": null
+        }
+      ],
+      "priority": "performance",
+      "minLevel": 1,
+      "raceOnly": false,
+      "purposes": [
+        "freeride",
+        "wave",
+        "parawing"
+      ],
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "availability": "inquiry",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "galleryImages": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_790_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_790_v2000x2000px.jpg"
+      ]
+    },
+    {
+      "id": "lvz-fs900",
+      "brand": "levitaz",
+      "name": "Free Series FW 900",
+      "category": "foil",
+      "path": "products/levitaz/fw-900.html",
+      "image": "assets/images/levitaz/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
+      "description": "넓은 스팬과 효율적인 글라이드",
+      "headline": "넓은 스팬과 효율적인 글라이드",
+      "price": null,
+      "options": [
+        "프론트윙 900cm² 단품",
+        "세트 상담 · 프론트윙 900cm² + 마스트 + 리어윙"
+      ],
+      "retailVariants": [
+        {
+          "option": "프론트윙 900cm² 단품",
+          "priceKRW": null
+        },
+        {
+          "option": "세트 상담 · 프론트윙 900cm² + 마스트 + 리어윙",
+          "priceKRW": null
+        }
+      ],
+      "priority": "performance",
+      "minLevel": 1,
+      "raceOnly": false,
+      "purposes": [
+        "freeride",
+        "wave",
+        "parawing"
+      ],
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "availability": "inquiry",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "galleryImages": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_900_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_900_v2000x2000px.jpg"
+      ]
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님"

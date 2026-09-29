@@ -28,7 +28,9 @@
     image.alt = photos[index].alt; image.src = photos[index].src;
     // Match the existing product framing without modifying source assets.
     const probe = hero.cloneNode(false); probe.src = image.src; probe.style.visibility = 'hidden';
-    hero.parentElement.append(probe); image.style.transform = getComputedStyle(probe).transform; probe.remove();
+    hero.parentElement.append(probe); const matrix = getComputedStyle(probe).transform; probe.remove();
+    const angle = matrix.startsWith('matrix(') ? (()=>{const v=matrix.slice(7,-1).split(',').map(Number);return Math.round(Math.atan2(v[1],v[0])*180/Math.PI)})() : 0;
+    image.style.transform = angle ? 'rotate('+angle+'deg)' : 'none';
     status.textContent = (index + 1) + ' / ' + photos.length;
     prev.hidden = next.hidden = photos.length < 2; fit();
   }
