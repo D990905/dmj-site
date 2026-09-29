@@ -3720,7 +3720,7 @@
         "7.5m / No Leading Edge Handle",
         "8.0m / No Leading Edge Handle"
       ],
-      "price": 3046000,
+      "price": 3810000,
       "availability": "inquiry",
       "source": "https://ppcfoiling.com/products/ppc-sonic-fds-full-dual-skin-wing",
       "priority": "performance",
@@ -3809,119 +3809,119 @@
       "retailVariants": [
         {
           "option": "4.0m / Leading Edge Handle",
-          "priceKRW": 3046000,
+          "priceKRW": 3810000,
           "sku": "SNC40M",
           "estimated": false
         },
         {
           "option": "4.5m / Leading Edge Handle",
-          "priceKRW": 3117000,
+          "priceKRW": 3899000,
           "sku": "SNC45M",
           "estimated": false
         },
         {
           "option": "5.0m / Leading Edge Handle",
-          "priceKRW": 3175000,
+          "priceKRW": 3973000,
           "sku": "SNC50M",
           "estimated": false
         },
         {
           "option": "5.5m / Leading Edge Handle",
-          "priceKRW": 3280000,
+          "priceKRW": 4107000,
           "sku": "SNC55M",
           "estimated": false
         },
         {
           "option": "6.0m / Leading Edge Handle",
-          "priceKRW": 3351000,
+          "priceKRW": 4196000,
           "sku": "SNC60M",
           "estimated": false
         },
         {
           "option": "6.5m / Leading Edge Handle",
-          "priceKRW": 3479000,
+          "priceKRW": 4360000,
           "sku": "SNC65M",
           "estimated": false
         },
         {
           "option": "7.0m / Leading Edge Handle",
-          "priceKRW": 3608000,
+          "priceKRW": 4523000,
           "sku": "SNC70M",
           "estimated": false
         },
         {
           "option": "7.5m / Leading Edge Handle",
-          "priceKRW": 3737000,
+          "priceKRW": 4687000,
           "sku": "SNC75M",
           "estimated": false
         },
         {
           "option": "8.0m / Leading Edge Handle",
-          "priceKRW": 3848000,
+          "priceKRW": 4828000,
           "sku": "SNC80M",
           "estimated": false
         },
         {
           "option": "4.0m / No Leading Edge Handle",
-          "priceKRW": 3046000,
+          "priceKRW": 3810000,
           "sku": "SNC40MNH",
           "estimated": false
         },
         {
           "option": "4.5m / No Leading Edge Handle",
-          "priceKRW": 3117000,
+          "priceKRW": 3899000,
           "sku": "SNC45MNH",
           "estimated": false
         },
         {
           "option": "5.0m / No Leading Edge Handle",
-          "priceKRW": 3175000,
+          "priceKRW": 3973000,
           "sku": "SNC50MNH",
           "estimated": false
         },
         {
           "option": "5.5m / No Leading Edge Handle",
-          "priceKRW": 3280000,
+          "priceKRW": 4107000,
           "sku": "SNC55MNH",
           "estimated": false
         },
         {
           "option": "6.0m / No Leading Edge Handle",
-          "priceKRW": 3351000,
+          "priceKRW": 4196000,
           "sku": "SNC60MNH",
           "estimated": false
         },
         {
           "option": "6.5m / No Leading Edge Handle",
-          "priceKRW": 3479000,
+          "priceKRW": 4360000,
           "sku": "SNC65MNH",
           "estimated": false
         },
         {
           "option": "7.0m / No Leading Edge Handle",
-          "priceKRW": 3608000,
+          "priceKRW": 4523000,
           "sku": "SNC70MNH",
           "estimated": false
         },
         {
           "option": "7.5m / No Leading Edge Handle",
-          "priceKRW": 3737000,
+          "priceKRW": 4687000,
           "sku": "SNC75MNH",
           "estimated": false
         },
         {
           "option": "8.0m / No Leading Edge Handle",
-          "priceKRW": 3848000,
+          "priceKRW": 4828000,
           "sku": "SNC80MNH",
           "estimated": false
         }
       ],
-      "priceMax": 3848000,
+      "priceMax": 4828000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "2026-09-29 PPC 공식 정상가 · USD 1390원 · 운임 가정 20만원",
+      "priceReviewedAt": "2026-09-29",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-29",
       "detailMedia": {
         "photos": [
           {
@@ -3943,6 +3943,15 @@
         "videos": [],
         "source": "https://ppcfoiling.com/products/ppc-sonic-fds-full-dual-skin-wing",
         "checkedAt": "2026-09-27"
+      },
+      "pricingBasis": {
+        "currency": "USD",
+        "fx": 1390,
+        "sourcePriceType": "compare_at_price",
+        "freightAllowanceKRW": 200000,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "discount": 0.1
       }
     },
     {
