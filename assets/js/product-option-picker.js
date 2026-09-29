@@ -3,14 +3,15 @@
  if(!original||!inquiry)return;
  const id=new URL(inquiry.href,location.href).searchParams.get('product');
  const takoonParawing=['takoon-cloud-one','takoon-parawing-cloud','takoon-parawing-cloud-lw'].includes(id);
- if(!id?.startsWith('ppc-')&&!takoonParawing)return;
+ const takoonWing=['takoon-v4','takoon-v4-pro','takoon-vx-pro-2'].includes(id);
+ if(!id?.startsWith('ppc-')&&!takoonParawing&&!takoonWing)return;
  const rows=Array.from(original.options).filter(o=>o.value).map(o=>({value:o.value,parts:o.value.split(' / '),price:Number(o.dataset.priceKrw)}));
  if(!rows.length||rows.some(r=>!r.price||r.parts.length!==rows[0].parts.length))return;
  const count=rows[0].parts.length,chosen=Array(count).fill('');
  let edition='26/27'; const splitEdition=id==='ppc-m2';
  if(count<1||count>3)return;
  const labels=count===3?['사이즈','색상','핸들 구성']:id==='ppc-r1'?['보드 사이즈','포일 연결 방식']:id==='ppc-orbit'||takoonParawing?['사이즈','색상']:['사이즈','핸들 구성'];
- function korean(s){return s.replace(/ \(2[56]\/2[67]\)/g,'').replaceAll('White/Grey','화이트 / 그레이').replaceAll('Green/Grey','그린 / 그레이').replaceAll('Dual Handles','듀얼 핸들').replaceAll('Single Boom','싱글 붐').replaceAll('(long bag incl)','(긴 가방 포함)').replaceAll('Leading Edge Handle','리딩엣지 핸들').replaceAll('Orange/Peacock','오렌지 / 피콕').replaceAll('Track','트랙').replaceAll('Tuttle','터틀');}
+ function korean(s){if(takoonWing){if(s==='Orange')return '오렌지';if(s==='White')return '화이트';if(/^\d/.test(s))return s+'㎡';if(s.startsWith('싱글 붐'))return s+' (+226,000원)';if(s.startsWith('투바'))return s+' (+183,000원)';}return s.replace(/ \(2[56]\/2[67]\)/g,'').replaceAll('White/Grey','화이트 / 그레이').replaceAll('Green/Grey','그린 / 그레이').replaceAll('Dual Handles','듀얼 핸들').replaceAll('Single Boom','싱글 붐').replaceAll('(long bag incl)','(긴 가방 포함)').replaceAll('Leading Edge Handle','리딩엣지 핸들').replaceAll('Orange/Peacock','오렌지 / 피콕').replaceAll('Track','트랙').replaceAll('Tuttle','터틀');}
  const host=document.createElement('div');host.className='product-option-picker';host.setAttribute('aria-label','제품 옵션 선택');
  if(splitEdition){
   const editions=document.createElement('div');editions.className='model-editions';
@@ -27,7 +28,7 @@
   host.querySelectorAll('[data-edition]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.edition===edition)));
   for(let i=0;i<count;i++){
    const eligible=candidates(i),values=[...new Set(eligible.map(r=>r.parts[i]))];
-   if(!values.includes(chosen[i]))chosen[i]='';
+   if(!values.includes(chosen[i]))chosen[i]=takoonWing&&i===count-1&&values.includes('직물 핸들 (기본)')?'직물 핸들 (기본)':'';
 
    groups[i].replaceChildren();
    const select=document.createElement('select');select.className='option-select';select.setAttribute('aria-label',labels[i]||'구성');

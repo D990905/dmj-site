@@ -47,14 +47,30 @@
       "image": "assets/images/products/takoon/verified/takoon-v4.png",
       "description": "본사는 입문자부터 숙련자까지 프리라이드와 웨이브 용도로 안내합니다. 가벼운 조작감과 안정성을 중심으로 선택하는 윙입니다.",
       "options": [
-        "2.5",
-        "3.0",
-        "3.5",
-        "4.0",
-        "4.5",
-        "5.0",
-        "5.5",
-        "6.0"
+        "2.5 / 직물 핸들 (기본)",
+        "2.5 / 싱글 붐 950mm",
+        "2.5 / 투바 카본 핸들 (앞·뒤)",
+        "3.0 / 직물 핸들 (기본)",
+        "3.0 / 싱글 붐 950mm",
+        "3.0 / 투바 카본 핸들 (앞·뒤)",
+        "3.5 / 직물 핸들 (기본)",
+        "3.5 / 싱글 붐 950mm",
+        "3.5 / 투바 카본 핸들 (앞·뒤)",
+        "4.0 / 직물 핸들 (기본)",
+        "4.0 / 싱글 붐 950mm",
+        "4.0 / 투바 카본 핸들 (앞·뒤)",
+        "4.5 / 직물 핸들 (기본)",
+        "4.5 / 싱글 붐 950mm",
+        "4.5 / 투바 카본 핸들 (앞·뒤)",
+        "5.0 / 직물 핸들 (기본)",
+        "5.0 / 싱글 붐 1010mm",
+        "5.0 / 투바 카본 핸들 (앞·뒤)",
+        "5.5 / 직물 핸들 (기본)",
+        "5.5 / 싱글 붐 1010mm",
+        "5.5 / 투바 카본 핸들 (앞·뒤)",
+        "6.0 / 직물 핸들 (기본)",
+        "6.0 / 싱글 붐 1010mm",
+        "6.0 / 투바 카본 핸들 (앞·뒤)"
       ],
       "price": 1000000,
       "availability": "inquiry",
@@ -253,6 +269,198 @@
       },
       "retailVariants": [
         {
+          "option": "2.5 / 직물 핸들 (기본)",
+          "priceKRW": 1000000,
+          "sku": "TKWV425C9",
+          "estimated": false,
+          "baseOption": "2.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "2.5 / 싱글 붐 950mm",
+          "priceKRW": 1226000,
+          "sku": "TKWV425C9",
+          "estimated": false,
+          "baseOption": "2.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "2.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1183000,
+          "sku": "TKWV425C9",
+          "estimated": false,
+          "baseOption": "2.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.0 / 직물 핸들 (기본)",
+          "priceKRW": 1040000,
+          "sku": "TKWV430C9",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.0 / 싱글 붐 950mm",
+          "priceKRW": 1266000,
+          "sku": "TKWV430C9",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1223000,
+          "sku": "TKWV430C9",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.5 / 직물 핸들 (기본)",
+          "priceKRW": 1070000,
+          "sku": "TKWV435C9",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.5 / 싱글 붐 950mm",
+          "priceKRW": 1296000,
+          "sku": "TKWV435C9",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1253000,
+          "sku": "TKWV435C9",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.0 / 직물 핸들 (기본)",
+          "priceKRW": 1110000,
+          "sku": "TKWV440C9",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.0 / 싱글 붐 950mm",
+          "priceKRW": 1336000,
+          "sku": "TKWV440C9",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1293000,
+          "sku": "TKWV440C9",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.5 / 직물 핸들 (기본)",
+          "priceKRW": 1150000,
+          "sku": "TKWV445C9",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.5 / 싱글 붐 950mm",
+          "priceKRW": 1376000,
+          "sku": "TKWV445C9",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1333000,
+          "sku": "TKWV445C9",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.0 / 직물 핸들 (기본)",
+          "priceKRW": 1200000,
+          "sku": "TKWV450C9",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.0 / 싱글 붐 1010mm",
+          "priceKRW": 1426000,
+          "sku": "TKWV450C9",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1383000,
+          "sku": "TKWV450C9",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.5 / 직물 핸들 (기본)",
+          "priceKRW": 1220000,
+          "sku": "TKWV455C9",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.5 / 싱글 붐 1010mm",
+          "priceKRW": 1446000,
+          "sku": "TKWV455C9",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1403000,
+          "sku": "TKWV455C9",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "6.0 / 직물 핸들 (기본)",
+          "priceKRW": 1250000,
+          "sku": "TKWV460C9",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "6.0 / 싱글 붐 1010mm",
+          "priceKRW": 1476000,
+          "sku": "TKWV460C9",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "6.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1433000,
+          "sku": "TKWV460C9",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
           "option": "2.5",
           "priceKRW": 1000000,
           "sku": "TKWV425C9",
@@ -301,7 +509,7 @@
           "estimated": false
         }
       ],
-      "priceMax": 1250000,
+      "priceMax": 1476000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -345,6 +553,17 @@
         ],
         "source": "https://takoon.com/products/wing-v4",
         "checkedAt": "2026-09-27"
+      },
+      "handlePricing": {
+        "EURKRW": 1600,
+        "freightAllowanceKRW": 20000,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "discount": 0.1,
+        "boomEUR": 120,
+        "dualHandleEUR": 95,
+        "textileIncludedByDMJ": true,
+        "reviewedAt": "2026-09-29"
       }
     },
     {
@@ -356,24 +575,60 @@
       "image": "assets/images/products/takoon/verified/takoon-v4-pro.png",
       "description": "UPE Project 85 프레임을 사용하는 윙으로, 본사는 프리라이드와 웨이브에서 가벼운 무게와 강성을 강조합니다.",
       "options": [
-        "2.5 / Orange",
-        "2.5 / White",
-        "3.0 / Orange",
-        "3.0 / White",
-        "3.5 / Orange",
-        "3.5 / White",
-        "4.0 / Orange",
-        "4.0 / White",
-        "4.5 / Orange",
-        "4.5 / White",
-        "5.0 / Orange",
-        "5.0 / White",
-        "5.5 / Orange",
-        "5.5 / White",
-        "6.0 / Orange",
-        "6.0 / White",
-        "6.5 / Orange",
-        "6.5 / White"
+        "2.5 / Orange / 직물 핸들 (기본)",
+        "2.5 / Orange / 싱글 붐 950mm",
+        "2.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "2.5 / White / 직물 핸들 (기본)",
+        "2.5 / White / 싱글 붐 950mm",
+        "2.5 / White / 투바 카본 핸들 (앞·뒤)",
+        "3.0 / Orange / 직물 핸들 (기본)",
+        "3.0 / Orange / 싱글 붐 950mm",
+        "3.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "3.0 / White / 직물 핸들 (기본)",
+        "3.0 / White / 싱글 붐 950mm",
+        "3.0 / White / 투바 카본 핸들 (앞·뒤)",
+        "3.5 / Orange / 직물 핸들 (기본)",
+        "3.5 / Orange / 싱글 붐 950mm",
+        "3.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "3.5 / White / 직물 핸들 (기본)",
+        "3.5 / White / 싱글 붐 950mm",
+        "3.5 / White / 투바 카본 핸들 (앞·뒤)",
+        "4.0 / Orange / 직물 핸들 (기본)",
+        "4.0 / Orange / 싱글 붐 950mm",
+        "4.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "4.0 / White / 직물 핸들 (기본)",
+        "4.0 / White / 싱글 붐 950mm",
+        "4.0 / White / 투바 카본 핸들 (앞·뒤)",
+        "4.5 / Orange / 직물 핸들 (기본)",
+        "4.5 / Orange / 싱글 붐 950mm",
+        "4.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "4.5 / White / 직물 핸들 (기본)",
+        "4.5 / White / 싱글 붐 950mm",
+        "4.5 / White / 투바 카본 핸들 (앞·뒤)",
+        "5.0 / Orange / 직물 핸들 (기본)",
+        "5.0 / Orange / 싱글 붐 950mm",
+        "5.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "5.0 / White / 직물 핸들 (기본)",
+        "5.0 / White / 싱글 붐 950mm",
+        "5.0 / White / 투바 카본 핸들 (앞·뒤)",
+        "5.5 / Orange / 직물 핸들 (기본)",
+        "5.5 / Orange / 싱글 붐 1010mm",
+        "5.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "5.5 / White / 직물 핸들 (기본)",
+        "5.5 / White / 싱글 붐 1010mm",
+        "5.5 / White / 투바 카본 핸들 (앞·뒤)",
+        "6.0 / Orange / 직물 핸들 (기본)",
+        "6.0 / Orange / 싱글 붐 1010mm",
+        "6.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "6.0 / White / 직물 핸들 (기본)",
+        "6.0 / White / 싱글 붐 1010mm",
+        "6.0 / White / 투바 카본 핸들 (앞·뒤)",
+        "6.5 / Orange / 직물 핸들 (기본)",
+        "6.5 / Orange / 싱글 붐 1010mm",
+        "6.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+        "6.5 / White / 직물 핸들 (기본)",
+        "6.5 / White / 싱글 붐 1010mm",
+        "6.5 / White / 투바 카본 핸들 (앞·뒤)"
       ],
       "price": 1210000,
       "availability": "inquiry",
@@ -588,6 +843,438 @@
       },
       "retailVariants": [
         {
+          "option": "2.5 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1210000,
+          "sku": "TKWV4P25C8",
+          "estimated": false,
+          "baseOption": "2.5 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "2.5 / Orange / 싱글 붐 950mm",
+          "priceKRW": 1436000,
+          "sku": "TKWV4P25C8",
+          "estimated": false,
+          "baseOption": "2.5 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "2.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1393000,
+          "sku": "TKWV4P25C8",
+          "estimated": false,
+          "baseOption": "2.5 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "2.5 / White / 직물 핸들 (기본)",
+          "priceKRW": 1210000,
+          "sku": "TKWV4P25C0",
+          "estimated": false,
+          "baseOption": "2.5 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "2.5 / White / 싱글 붐 950mm",
+          "priceKRW": 1436000,
+          "sku": "TKWV4P25C0",
+          "estimated": false,
+          "baseOption": "2.5 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "2.5 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1393000,
+          "sku": "TKWV4P25C0",
+          "estimated": false,
+          "baseOption": "2.5 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.0 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1250000,
+          "sku": "TKWV4P30C8",
+          "estimated": false,
+          "baseOption": "3.0 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.0 / Orange / 싱글 붐 950mm",
+          "priceKRW": 1476000,
+          "sku": "TKWV4P30C8",
+          "estimated": false,
+          "baseOption": "3.0 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1433000,
+          "sku": "TKWV4P30C8",
+          "estimated": false,
+          "baseOption": "3.0 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.0 / White / 직물 핸들 (기본)",
+          "priceKRW": 1250000,
+          "sku": "TKWV4P30C0",
+          "estimated": false,
+          "baseOption": "3.0 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.0 / White / 싱글 붐 950mm",
+          "priceKRW": 1476000,
+          "sku": "TKWV4P30C0",
+          "estimated": false,
+          "baseOption": "3.0 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.0 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1433000,
+          "sku": "TKWV4P30C0",
+          "estimated": false,
+          "baseOption": "3.0 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.5 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1300000,
+          "sku": "TKWV4P35C8",
+          "estimated": false,
+          "baseOption": "3.5 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.5 / Orange / 싱글 붐 950mm",
+          "priceKRW": 1526000,
+          "sku": "TKWV4P35C8",
+          "estimated": false,
+          "baseOption": "3.5 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1483000,
+          "sku": "TKWV4P35C8",
+          "estimated": false,
+          "baseOption": "3.5 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.5 / White / 직물 핸들 (기본)",
+          "priceKRW": 1300000,
+          "sku": "TKWV4P35C0",
+          "estimated": false,
+          "baseOption": "3.5 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.5 / White / 싱글 붐 950mm",
+          "priceKRW": 1526000,
+          "sku": "TKWV4P35C0",
+          "estimated": false,
+          "baseOption": "3.5 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.5 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1483000,
+          "sku": "TKWV4P35C0",
+          "estimated": false,
+          "baseOption": "3.5 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.0 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1340000,
+          "sku": "TKWV4P40C8",
+          "estimated": false,
+          "baseOption": "4.0 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.0 / Orange / 싱글 붐 950mm",
+          "priceKRW": 1566000,
+          "sku": "TKWV4P40C8",
+          "estimated": false,
+          "baseOption": "4.0 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1523000,
+          "sku": "TKWV4P40C8",
+          "estimated": false,
+          "baseOption": "4.0 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.0 / White / 직물 핸들 (기본)",
+          "priceKRW": 1340000,
+          "sku": "TKWV4P40C0",
+          "estimated": false,
+          "baseOption": "4.0 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.0 / White / 싱글 붐 950mm",
+          "priceKRW": 1566000,
+          "sku": "TKWV4P40C0",
+          "estimated": false,
+          "baseOption": "4.0 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.0 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1523000,
+          "sku": "TKWV4P40C0",
+          "estimated": false,
+          "baseOption": "4.0 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.5 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1380000,
+          "sku": "TKWV4P45C8",
+          "estimated": false,
+          "baseOption": "4.5 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.5 / Orange / 싱글 붐 950mm",
+          "priceKRW": 1606000,
+          "sku": "TKWV4P45C8",
+          "estimated": false,
+          "baseOption": "4.5 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1563000,
+          "sku": "TKWV4P45C8",
+          "estimated": false,
+          "baseOption": "4.5 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.5 / White / 직물 핸들 (기본)",
+          "priceKRW": 1380000,
+          "sku": "TKWV4P45C0",
+          "estimated": false,
+          "baseOption": "4.5 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.5 / White / 싱글 붐 950mm",
+          "priceKRW": 1606000,
+          "sku": "TKWV4P45C0",
+          "estimated": false,
+          "baseOption": "4.5 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.5 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1563000,
+          "sku": "TKWV4P45C0",
+          "estimated": false,
+          "baseOption": "4.5 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.0 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1440000,
+          "sku": "TKWV4P50C8",
+          "estimated": false,
+          "baseOption": "5.0 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.0 / Orange / 싱글 붐 950mm",
+          "priceKRW": 1666000,
+          "sku": "TKWV4P50C8",
+          "estimated": false,
+          "baseOption": "5.0 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1623000,
+          "sku": "TKWV4P50C8",
+          "estimated": false,
+          "baseOption": "5.0 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.0 / White / 직물 핸들 (기본)",
+          "priceKRW": 1440000,
+          "sku": "TKWV4P50C0",
+          "estimated": false,
+          "baseOption": "5.0 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.0 / White / 싱글 붐 950mm",
+          "priceKRW": 1666000,
+          "sku": "TKWV4P50C0",
+          "estimated": false,
+          "baseOption": "5.0 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.0 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1623000,
+          "sku": "TKWV4P50C0",
+          "estimated": false,
+          "baseOption": "5.0 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.5 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1500000,
+          "sku": "TKWV4P55C8",
+          "estimated": false,
+          "baseOption": "5.5 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.5 / Orange / 싱글 붐 1010mm",
+          "priceKRW": 1726000,
+          "sku": "TKWV4P55C8",
+          "estimated": false,
+          "baseOption": "5.5 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1683000,
+          "sku": "TKWV4P55C8",
+          "estimated": false,
+          "baseOption": "5.5 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.5 / White / 직물 핸들 (기본)",
+          "priceKRW": 1500000,
+          "sku": "TKWV4P55C0",
+          "estimated": false,
+          "baseOption": "5.5 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.5 / White / 싱글 붐 1010mm",
+          "priceKRW": 1726000,
+          "sku": "TKWV4P55C0",
+          "estimated": false,
+          "baseOption": "5.5 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.5 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1683000,
+          "sku": "TKWV4P55C0",
+          "estimated": false,
+          "baseOption": "5.5 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "6.0 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1550000,
+          "sku": "TKWV4P60C8",
+          "estimated": false,
+          "baseOption": "6.0 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "6.0 / Orange / 싱글 붐 1010mm",
+          "priceKRW": 1776000,
+          "sku": "TKWV4P60C8",
+          "estimated": false,
+          "baseOption": "6.0 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "6.0 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1733000,
+          "sku": "TKWV4P60C8",
+          "estimated": false,
+          "baseOption": "6.0 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "6.0 / White / 직물 핸들 (기본)",
+          "priceKRW": 1550000,
+          "sku": "TKWV4P60C0",
+          "estimated": false,
+          "baseOption": "6.0 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "6.0 / White / 싱글 붐 1010mm",
+          "priceKRW": 1776000,
+          "sku": "TKWV4P60C0",
+          "estimated": false,
+          "baseOption": "6.0 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "6.0 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1733000,
+          "sku": "TKWV4P60C0",
+          "estimated": false,
+          "baseOption": "6.0 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "6.5 / Orange / 직물 핸들 (기본)",
+          "priceKRW": 1610000,
+          "sku": "TKWV4P65C8",
+          "estimated": false,
+          "baseOption": "6.5 / Orange",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "6.5 / Orange / 싱글 붐 1010mm",
+          "priceKRW": 1836000,
+          "sku": "TKWV4P65C8",
+          "estimated": false,
+          "baseOption": "6.5 / Orange",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "6.5 / Orange / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1793000,
+          "sku": "TKWV4P65C8",
+          "estimated": false,
+          "baseOption": "6.5 / Orange",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "6.5 / White / 직물 핸들 (기본)",
+          "priceKRW": 1610000,
+          "sku": "TKWV4P65C0",
+          "estimated": false,
+          "baseOption": "6.5 / White",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "6.5 / White / 싱글 붐 1010mm",
+          "priceKRW": 1836000,
+          "sku": "TKWV4P65C0",
+          "estimated": false,
+          "baseOption": "6.5 / White",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "6.5 / White / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1793000,
+          "sku": "TKWV4P65C0",
+          "estimated": false,
+          "baseOption": "6.5 / White",
+          "handleAdditionalKRW": 183000
+        },
+        {
           "option": "2.5 / Orange",
           "priceKRW": 1210000,
           "sku": "TKWV4P25C8",
@@ -696,7 +1383,7 @@
           "estimated": false
         }
       ],
-      "priceMax": 1610000,
+      "priceMax": 1836000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -736,6 +1423,17 @@
         ],
         "source": "https://takoon.com/products/wing-v4-pro",
         "checkedAt": "2026-09-27"
+      },
+      "handlePricing": {
+        "EURKRW": 1600,
+        "freightAllowanceKRW": 20000,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "discount": 0.1,
+        "boomEUR": 120,
+        "dualHandleEUR": 95,
+        "textileIncludedByDMJ": true,
+        "reviewedAt": "2026-09-29"
       }
     },
     {
@@ -747,13 +1445,27 @@
       "image": "assets/images/products/takoon/verified/takoon-vx-pro-2.png",
       "description": "본사는 레이스, 빅에어, 프리스타일과 웨이브를 포함한 퍼포먼스 용도로 소개합니다. UPE Project 85 프레임과 Aerotech 캐노피를 사용합니다.",
       "options": [
-        "3.0",
-        "3.5",
-        "4.0",
-        "4.5",
-        "5.0",
-        "5.5",
-        "6.0"
+        "3.0 / 직물 핸들 (기본)",
+        "3.0 / 싱글 붐 950mm",
+        "3.0 / 투바 카본 핸들 (앞·뒤)",
+        "3.5 / 직물 핸들 (기본)",
+        "3.5 / 싱글 붐 950mm",
+        "3.5 / 투바 카본 핸들 (앞·뒤)",
+        "4.0 / 직물 핸들 (기본)",
+        "4.0 / 싱글 붐 950mm",
+        "4.0 / 투바 카본 핸들 (앞·뒤)",
+        "4.5 / 직물 핸들 (기본)",
+        "4.5 / 싱글 붐 950mm",
+        "4.5 / 투바 카본 핸들 (앞·뒤)",
+        "5.0 / 직물 핸들 (기본)",
+        "5.0 / 싱글 붐 950mm",
+        "5.0 / 투바 카본 핸들 (앞·뒤)",
+        "5.5 / 직물 핸들 (기본)",
+        "5.5 / 싱글 붐 1010mm",
+        "5.5 / 투바 카본 핸들 (앞·뒤)",
+        "6.0 / 직물 핸들 (기본)",
+        "6.0 / 싱글 붐 1010mm",
+        "6.0 / 투바 카본 핸들 (앞·뒤)"
       ],
       "price": 1220000,
       "availability": "inquiry",
@@ -941,6 +1653,174 @@
       },
       "retailVariants": [
         {
+          "option": "3.0 / 직물 핸들 (기본)",
+          "priceKRW": 1220000,
+          "sku": "TKWVXPROV23",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.0 / 싱글 붐 950mm",
+          "priceKRW": 1446000,
+          "sku": "TKWVXPROV23",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1403000,
+          "sku": "TKWVXPROV23",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.5 / 직물 핸들 (기본)",
+          "priceKRW": 1280000,
+          "sku": "TKWVXPROV235",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.5 / 싱글 붐 950mm",
+          "priceKRW": 1506000,
+          "sku": "TKWVXPROV235",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1463000,
+          "sku": "TKWVXPROV235",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.0 / 직물 핸들 (기본)",
+          "priceKRW": 1320000,
+          "sku": "TKWVXPROV24",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.0 / 싱글 붐 950mm",
+          "priceKRW": 1546000,
+          "sku": "TKWVXPROV24",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1503000,
+          "sku": "TKWVXPROV24",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.5 / 직물 핸들 (기본)",
+          "priceKRW": 1370000,
+          "sku": "TKWVXPROV245",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.5 / 싱글 붐 950mm",
+          "priceKRW": 1596000,
+          "sku": "TKWVXPROV245",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1553000,
+          "sku": "TKWVXPROV245",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.0 / 직물 핸들 (기본)",
+          "priceKRW": 1420000,
+          "sku": "TKWVXPROV25",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.0 / 싱글 붐 950mm",
+          "priceKRW": 1646000,
+          "sku": "TKWVXPROV25",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1603000,
+          "sku": "TKWVXPROV25",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.5 / 직물 핸들 (기본)",
+          "priceKRW": 1480000,
+          "sku": "TKWVXPROV255",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.5 / 싱글 붐 1010mm",
+          "priceKRW": 1706000,
+          "sku": "TKWVXPROV255",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1663000,
+          "sku": "TKWVXPROV255",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "6.0 / 직물 핸들 (기본)",
+          "priceKRW": 1540000,
+          "sku": "TKWVXPROV26",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "6.0 / 싱글 붐 1010mm",
+          "priceKRW": 1766000,
+          "sku": "TKWVXPROV26",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "6.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1723000,
+          "sku": "TKWVXPROV26",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
           "option": "3.0",
           "priceKRW": 1220000,
           "sku": "TKWVXPROV23",
@@ -983,7 +1863,7 @@
           "estimated": false
         }
       ],
-      "priceMax": 1540000,
+      "priceMax": 1766000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -1023,6 +1903,17 @@
         ],
         "source": "https://takoon.com/products/wing-vx-pro-2",
         "checkedAt": "2026-09-27"
+      },
+      "handlePricing": {
+        "EURKRW": 1600,
+        "freightAllowanceKRW": 20000,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "discount": 0.1,
+        "boomEUR": 120,
+        "dualHandleEUR": 95,
+        "textileIncludedByDMJ": true,
+        "reviewedAt": "2026-09-29"
       }
     },
     {
