@@ -474,7 +474,9 @@
   function logout() {
     return ensureClient().then(function () {
       return sb.auth.signOut();
-    }).then(function () {
+    }).then(function (result) {
+      if (result && result.error) throw result.error;
+      try { sessionStorage.setItem('dmj_logout_complete', '1'); } catch (e) {}
       cachedSession = null;
       cachedProfile = null;
       try { localStorage.removeItem(USER_CACHE_KEY); } catch (e) {}

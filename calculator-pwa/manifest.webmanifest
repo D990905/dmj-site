@@ -1,7 +1,7 @@
 {
   "name": "DMJ Lifting Calculator",
   "short_name": "Lifting Calc",
-  "description": "윙포일 라이딩 윙 사이즈·속도 계산기 — 단무지공방",
+  "description": "윙포일 라이딩 윙 사이즈·속도 계산기 — 단무지상사",
   "lang": "ko",
   "dir": "ltr",
   "start_url": "./",

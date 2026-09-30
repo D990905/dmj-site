@@ -1099,7 +1099,7 @@
       <div class="panel-meta">
         <span class="panel-meta__item"><span class="panel-meta__dot s-active"></span>활동 중</span>
         <span class="panel-meta__item">운동생리학 PhD · NSCA-CSCS</span>
-        <span class="panel-meta__item">단무지공방 · SailTechCo CEO</span>
+        <span class="panel-meta__item">단무지상사 · SailTechCo CEO</span>
       </div>
 
       <div class="panel-current">

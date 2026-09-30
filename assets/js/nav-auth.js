@@ -168,7 +168,7 @@
         '<a href="' + prefix + 'skill-assessment.html" class="nav__sub-link" role="menuitem"><b>스킬 진단</b><span>10축 + Speed</span></a>' +
         '<a href="' + prefix + 'find-my-gear.html" class="nav__sub-link" role="menuitem"><b>Find My Gear</b><span>1분 셋업 진단</span></a>' +
         '<a href="' + prefix + 'membership.html" class="nav__sub-link" role="menuitem"><b>회원 등급</b><span>현재 등급 · 혜택</span></a>' +
-        '<a href="#" class="nav__sub-link nav-auth__logout" role="menuitem" data-nav-logout><b>로그아웃</b><span>다음 30일 자동 로그인</span></a>' +
+        '<a href="#" class="nav__sub-link nav-auth__logout" role="menuitem" data-nav-logout><b>로그아웃</b><span>계정 연결 종료</span></a>' +
       '</div>';
     loginLink.parentNode.replaceChild(wrapper, loginLink);
 
@@ -218,8 +218,8 @@
           if (window.DMJAuth && typeof window.DMJAuth.logout === 'function') {
             var r = window.DMJAuth.logout();
             if (r && typeof r.then === 'function') {
-              r.then(function(){ location.href = prefix + 'index.html'; })
-               .catch(function(){ location.href = prefix + 'index.html'; });
+              r.then(function(){ location.href = prefix + 'login.html'; })
+               .catch(function(){ alert('로그아웃하지 못했습니다. 잠시 후 다시 시도해 주세요.'); });
               try { localStorage.removeItem('dmj_session'); } catch (_) {}
               return;
             }

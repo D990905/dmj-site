@@ -1,5 +1,5 @@
 /* ==========================================================================
-   단무지공방 — Lifting Calculator PWA Service Worker
+   단무지상사 — Lifting Calculator PWA Service Worker
    v1 (2026-05-19) — Cache-first for app shell, network fallback.
    ========================================================================== */
 

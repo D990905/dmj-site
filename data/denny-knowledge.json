@@ -472,7 +472,7 @@
       ],
       "source": "site/policies.html",
       "title": "단무지 사업자 정보",
-      "content": "**단무지공방** (개인사업자)\n- 사업자번호: **144-55-01008**\n- 대표자: 이정희\n- 운영자: 옥덕필 박사 (Danny Ok) + 조수철 선수\n- 컨설팅 문의: consulting@dmjgroup.kr"
+      "content": "**단무지상사** (개인사업자)\n- 사업자번호: **144-55-01008**\n- 대표자: 이정희\n- 운영자: 옥덕필 박사 (Danny Ok) + 조수철 선수\n- 컨설팅 문의: consulting@dmjgroup.kr"
     },
     {
       "id": "kb-find-my-gear",
@@ -757,7 +757,7 @@
       ],
       "source": "site/quote.html + DO_NOT_REVERT §149",
       "title": "단무지 가격·견적·결제 flow",
-      "content": "**v5.3 가격 표기 통일**:\n- 환율 USD 1500 / EUR 1800 / CHF 1900\n- 본사가격 reference 표기 + 사이트가 표기\n- 모든 SKU 재고 있음 가정 (사이트 visible UI)\n\n**결제 flow (Phase 1, Cafe24 launch 전)**:\n1. 장바구니 담기\n2. **견적 요청** (quote.html)\n3. 단무지공방 정식 견적서 발행 (사업자번호 144-55-01008)\n4. 회원 등급별 자동 할인 (10/15/20/25/30/35/40%)\n5. 무통장 입금 → 입금 확인 → 배송\n\n**환불·교환·배송** 정책은 policy 페이지에 명시."
+      "content": "**v5.3 가격 표기 통일**:\n- 환율 USD 1500 / EUR 1800 / CHF 1900\n- 본사가격 reference 표기 + 사이트가 표기\n- 모든 SKU 재고 있음 가정 (사이트 visible UI)\n\n**결제 flow (Phase 1, Cafe24 launch 전)**:\n1. 장바구니 담기\n2. **견적 요청** (quote.html)\n3. 단무지상사 정식 견적서 발행 (사업자번호 144-55-01008)\n4. 회원 등급별 자동 할인 (10/15/20/25/30/35/40%)\n5. 무통장 입금 → 입금 확인 → 배송\n\n**환불·교환·배송** 정책은 policy 페이지에 명시."
     },
     {
       "id": "kb-takoon-board-overview",
