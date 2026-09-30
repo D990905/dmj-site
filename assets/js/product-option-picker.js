@@ -11,7 +11,7 @@
  let lastPhotoColor;
  let edition='26/27'; const splitEdition=id==='ppc-m2';
  if(count<1||count>3)return;
- const labels=count===3?['사이즈','색상','핸들 구성']:id==='ppc-r1'?['보드 사이즈','포일 연결 방식']:id==='ppc-orbit'||takoonParawing?['사이즈','색상']:['사이즈','핸들 구성'];
+ const labels=count===1?['사이즈']:count===3?['사이즈','색상','핸들 구성']:id==='ppc-r1'?['보드 사이즈','포일 연결 방식']:id==='ppc-orbit'||takoonParawing?['사이즈','색상']:['사이즈','핸들 구성'];
  function korean(s){if(takoonWing){if(s==='Orange')return '오렌지';if(s==='White')return '화이트';if(/^\d/.test(s))return s+'㎡';if(s.startsWith('싱글 붐'))return s+' (+226,000원)';if(s.startsWith('투바'))return s+' (+183,000원)';}return s.replace(/ \(2[56]\/2[67]\)/g,'').replaceAll('White/Grey','화이트 / 그레이').replaceAll('Green/Grey','그린 / 그레이').replaceAll('Dual Handles','듀얼 핸들').replaceAll('Single Boom','싱글 붐').replaceAll('(long bag incl)','(긴 가방 포함)').replaceAll('Leading Edge Handle','리딩엣지 핸들').replaceAll('Orange/Peacock','오렌지 / 피콕').replaceAll('Track','트랙').replaceAll('Tuttle','터틀');}
  const host=document.createElement('div');host.className='product-option-picker';host.setAttribute('aria-label','제품 옵션 선택');
  if(splitEdition){

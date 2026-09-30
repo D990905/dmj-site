@@ -4662,24 +4662,15 @@
       "image": "assets/images/products/ppc/fds/product-official.png",
       "description": "이중 스킨의 공기역학적 구조와 풀 카본 붐을 사용하는 레이스 지향 윙입니다. 본사는 경기와 업윈드 효율을 핵심 용도로 안내합니다.",
       "options": [
-        "4.0m / Leading Edge Handle",
-        "4.5m / Leading Edge Handle",
-        "5.0m / Leading Edge Handle",
-        "5.5m / Leading Edge Handle",
-        "6.0m / Leading Edge Handle",
-        "6.5m / Leading Edge Handle",
-        "7.0m / Leading Edge Handle",
-        "7.5m / Leading Edge Handle",
-        "8.0m / Leading Edge Handle",
-        "4.0m / No Leading Edge Handle",
-        "4.5m / No Leading Edge Handle",
-        "5.0m / No Leading Edge Handle",
-        "5.5m / No Leading Edge Handle",
-        "6.0m / No Leading Edge Handle",
-        "6.5m / No Leading Edge Handle",
-        "7.0m / No Leading Edge Handle",
-        "7.5m / No Leading Edge Handle",
-        "8.0m / No Leading Edge Handle"
+        "4.0m",
+        "4.5m",
+        "5.0m",
+        "5.5m",
+        "6.0m",
+        "6.5m",
+        "7.0m",
+        "7.5m",
+        "8.0m"
       ],
       "price": 3810000,
       "availability": "inquiry",
@@ -4764,116 +4755,62 @@
         "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/9ca423d0dc28ef8ec5eac50324f99095.png?v=1775258010"
       ],
       "specs": {
-        "본사 옵션": "4.0m / Leading Edge Handle / 4.5m / Leading Edge Handle / 5.0m / Leading Edge Handle / 5.5m / Leading Edge Handle / 6.0m / Leading Edge Handle / 6.5m / Leading Edge Handle / 7.0m / Leading Edge Handle / 7.5m / Leading Edge Handle / 8.0m / Leading Edge Handle / 4.0m / No Leading Edge Handle / 4.5m / No Leading Edge Handle / 5.0m / No Leading Edge Handle / 5.5m / No Leading Edge Handle / 6.0m / No Leading Edge Handle / 6.5m / No Leading Edge Handle / 7.0m / No Leading Edge Handle / 7.5m / No Leading Edge Handle / 8.0m / No Leading Edge Handle"
+        "본사 옵션": "4.0m / 4.5m / 5.0m / 5.5m / 6.0m / 6.5m / 7.0m / 7.5m / 8.0m"
       },
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "4.0m / Leading Edge Handle",
+          "option": "4.0m",
           "priceKRW": 3810000,
           "sku": "SNC40M",
           "estimated": false
         },
         {
-          "option": "4.5m / Leading Edge Handle",
+          "option": "4.5m",
           "priceKRW": 3900000,
           "sku": "SNC45M",
           "estimated": false
         },
         {
-          "option": "5.0m / Leading Edge Handle",
+          "option": "5.0m",
           "priceKRW": 3970000,
           "sku": "SNC50M",
           "estimated": false
         },
         {
-          "option": "5.5m / Leading Edge Handle",
+          "option": "5.5m",
           "priceKRW": 4110000,
           "sku": "SNC55M",
           "estimated": false
         },
         {
-          "option": "6.0m / Leading Edge Handle",
+          "option": "6.0m",
           "priceKRW": 4200000,
           "sku": "SNC60M",
           "estimated": false
         },
         {
-          "option": "6.5m / Leading Edge Handle",
+          "option": "6.5m",
           "priceKRW": 4360000,
           "sku": "SNC65M",
           "estimated": false
         },
         {
-          "option": "7.0m / Leading Edge Handle",
+          "option": "7.0m",
           "priceKRW": 4520000,
           "sku": "SNC70M",
           "estimated": false
         },
         {
-          "option": "7.5m / Leading Edge Handle",
+          "option": "7.5m",
           "priceKRW": 4690000,
           "sku": "SNC75M",
           "estimated": false
         },
         {
-          "option": "8.0m / Leading Edge Handle",
+          "option": "8.0m",
           "priceKRW": 4830000,
           "sku": "SNC80M",
-          "estimated": false
-        },
-        {
-          "option": "4.0m / No Leading Edge Handle",
-          "priceKRW": 3810000,
-          "sku": "SNC40MNH",
-          "estimated": false
-        },
-        {
-          "option": "4.5m / No Leading Edge Handle",
-          "priceKRW": 3900000,
-          "sku": "SNC45MNH",
-          "estimated": false
-        },
-        {
-          "option": "5.0m / No Leading Edge Handle",
-          "priceKRW": 3970000,
-          "sku": "SNC50MNH",
-          "estimated": false
-        },
-        {
-          "option": "5.5m / No Leading Edge Handle",
-          "priceKRW": 4110000,
-          "sku": "SNC55MNH",
-          "estimated": false
-        },
-        {
-          "option": "6.0m / No Leading Edge Handle",
-          "priceKRW": 4200000,
-          "sku": "SNC60MNH",
-          "estimated": false
-        },
-        {
-          "option": "6.5m / No Leading Edge Handle",
-          "priceKRW": 4360000,
-          "sku": "SNC65MNH",
-          "estimated": false
-        },
-        {
-          "option": "7.0m / No Leading Edge Handle",
-          "priceKRW": 4520000,
-          "sku": "SNC70MNH",
-          "estimated": false
-        },
-        {
-          "option": "7.5m / No Leading Edge Handle",
-          "priceKRW": 4690000,
-          "sku": "SNC75MNH",
-          "estimated": false
-        },
-        {
-          "option": "8.0m / No Leading Edge Handle",
-          "priceKRW": 4830000,
-          "sku": "SNC80MNH",
           "estimated": false
         }
       ],
