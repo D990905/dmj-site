@@ -6798,7 +6798,7 @@
       "options": [
         "M"
       ],
-      "price": 730000,
+      "price": 850000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -6833,17 +6833,17 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 730000,
+          "priceKRW": 850000,
           "sku": "WIPSTEMK30A-01481",
           "estimated": false
         }
       ],
-      "priceMax": 730000,
+      "priceMax": 850000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/fae26d00d63caa9970.jpg",
         "assets/images/product-stories/133ba8c77eb14ed374.jpg",
@@ -6911,7 +6911,7 @@
       "options": [
         "BLACK CAMO, M"
       ],
-      "price": 510000,
+      "price": 650000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -6946,17 +6946,17 @@
       "retailVariants": [
         {
           "option": "BLACK CAMO, M",
-          "priceKRW": 510000,
+          "priceKRW": 650000,
           "sku": "WIPSTEAM44A-02190",
           "estimated": false
         }
       ],
-      "priceMax": 510000,
+      "priceMax": 650000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "detailMedia": {
         "photos": [],
         "videos": [
@@ -6997,7 +6997,7 @@
       "options": [
         "M"
       ],
-      "price": 460000,
+      "price": 590000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7032,17 +7032,17 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 460000,
+          "priceKRW": 590000,
           "sku": "WIPSTEAMY3A-01486",
           "estimated": false
         }
       ],
-      "priceMax": 460000,
+      "priceMax": 590000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/10f718575b0348a73b.jpg",
         "assets/images/product-stories/c01c5666763bf0a3b1.jpg",
@@ -7112,7 +7112,7 @@
       "options": [
         "M"
       ],
-      "price": 1500000,
+      "price": 1620000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7147,17 +7147,17 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 1500000,
+          "priceKRW": 1620000,
           "sku": "WIPVETHY10A-00210",
           "estimated": false
         }
       ],
-      "priceMax": 1500000,
+      "priceMax": 1620000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "detailMedia": {
         "photos": [],
         "videos": [
@@ -7199,7 +7199,7 @@
         "MK2 M",
         "MK2 L"
       ],
-      "price": 410000,
+      "price": 500000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7235,23 +7235,23 @@
       "retailVariants": [
         {
           "option": "MK2 M",
-          "priceKRW": 410000,
+          "priceKRW": 500000,
           "sku": "WIPVETNLJ3A-01320",
           "estimated": false
         },
         {
           "option": "MK2 L",
-          "priceKRW": 410000,
+          "priceKRW": 500000,
           "sku": "WIPVETNLJ3A-01321",
           "estimated": false
         }
       ],
-      "priceMax": 410000,
+      "priceMax": 500000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/285b9c287e5ec07e1c.png",
         "assets/images/product-stories/efeabf9e716b854f9e.png"
@@ -7305,7 +7305,7 @@
         "S",
         "MK2 S"
       ],
-      "price": 410000,
+      "price": 500000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7341,23 +7341,23 @@
       "retailVariants": [
         {
           "option": "S",
-          "priceKRW": 410000,
+          "priceKRW": 500000,
           "sku": "WIPNLJWOM3A-00842",
           "estimated": false
         },
         {
           "option": "MK2 S",
-          "priceKRW": 410000,
+          "priceKRW": 500000,
           "sku": "WIPNLJWOM3A-01323",
           "estimated": false
         }
       ],
-      "priceMax": 410000,
+      "priceMax": 500000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/dc65a170368729bcff.png",
         "assets/images/product-stories/e3ece6c532d77d66df.jpg",
@@ -7434,7 +7434,7 @@
         "M",
         "L"
       ],
-      "price": 350000,
+      "price": 440000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7470,23 +7470,23 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 350000,
+          "priceKRW": 440000,
           "sku": "WIPSNLJ150A-01352",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 350000,
+          "priceKRW": 440000,
           "sku": "WIPSNLJ150A-01353",
           "estimated": false
         }
       ],
-      "priceMax": 350000,
+      "priceMax": 440000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/86d3dde60c5e3213dd.png"
       ],
@@ -7519,7 +7519,7 @@
       "options": [
         "S"
       ],
-      "price": 350000,
+      "price": 440000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7554,17 +7554,17 @@
       "retailVariants": [
         {
           "option": "S",
-          "priceKRW": 350000,
+          "priceKRW": 440000,
           "sku": "WIPSNLJ15WA-01356",
           "estimated": false
         }
       ],
-      "priceMax": 350000,
+      "priceMax": 440000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/fc0271d8ea286846d3.png"
       ],
@@ -7597,7 +7597,7 @@
       "options": [
         "L"
       ],
-      "price": 370000,
+      "price": 420000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7626,17 +7626,17 @@
       "retailVariants": [
         {
           "option": "L",
-          "priceKRW": 370000,
+          "priceKRW": 420000,
           "sku": "WIPRAPARK1A-00520",
           "estimated": false
         }
       ],
-      "priceMax": 370000,
+      "priceMax": 420000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/fec3ade139a458aa90.jpg"
       ],
@@ -7670,7 +7670,7 @@
         "M",
         "L"
       ],
-      "price": 410000,
+      "price": 500000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7700,23 +7700,23 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 410000,
+          "priceKRW": 500000,
           "sku": "WIPFLESMO2A-01496",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 410000,
+          "priceKRW": 500000,
           "sku": "WIPFLESMO2A-01497",
           "estimated": false
         }
       ],
-      "priceMax": 410000,
+      "priceMax": 500000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/60160fec33217503cf.png"
       ],
@@ -7749,7 +7749,7 @@
       "options": [
         "S"
       ],
-      "price": 310000,
+      "price": 430000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7784,17 +7784,17 @@
       "retailVariants": [
         {
           "option": "S",
-          "priceKRW": 310000,
+          "priceKRW": 430000,
           "sku": "WIP3DSNTWOA-01001",
           "estimated": false
         }
       ],
-      "priceMax": 310000,
+      "priceMax": 430000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "detailMedia": {
         "photos": [],
         "videos": [
@@ -7837,7 +7837,7 @@
         "L",
         "XL"
       ],
-      "price": 170000,
+      "price": 270000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7874,29 +7874,29 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 170000,
+          "priceKRW": 270000,
           "sku": "VELYLSVORTA-00779",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 170000,
+          "priceKRW": 270000,
           "sku": "VELYLSVORTA-00780",
           "estimated": false
         },
         {
           "option": "XL",
-          "priceKRW": 170000,
+          "priceKRW": 270000,
           "sku": "VELYLSVORTA-00781",
           "estimated": false
         }
       ],
-      "priceMax": 170000,
+      "priceMax": 270000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/fb0c5384ff28dcfd9a.jpg",
         "assets/images/product-stories/1c88ff161ab6afaff4.png",
@@ -7961,7 +7961,7 @@
         "M",
         "L"
       ],
-      "price": 160000,
+      "price": 260000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7996,24 +7996,24 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 160000,
+          "priceKRW": 260000,
           "sku": "WIPHOORASHA-02036",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 160000,
+          "priceKRW": 260000,
           "sku": "WIPHOORASHA-02037",
           "estimated": false
         }
       ],
-      "priceMax": 160000,
+      "priceMax": 260000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/089be11582fcc8ac69.jpg",
         "assets/images/product-stories/fe045a6f27064537fa.jpg"
@@ -8065,7 +8065,7 @@
         "M",
         "L"
       ],
-      "price": 110000,
+      "price": 200000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8101,23 +8101,23 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 110000,
+          "priceKRW": 200000,
           "sku": "WIPQUITSH3A-01511",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 110000,
+          "priceKRW": 200000,
           "sku": "WIPQUITSH3A-01512",
           "estimated": false
         }
       ],
-      "priceMax": 110000,
+      "priceMax": 200000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/a7e3e35d58de0581fb.jpg"
       ],
@@ -8151,7 +8151,7 @@
         "M",
         "S"
       ],
-      "price": 700000,
+      "price": 780000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8181,23 +8181,23 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 700000,
+          "priceKRW": 780000,
           "sku": "WIPCOASAL0A-01517",
           "estimated": false
         },
         {
           "option": "S",
-          "priceKRW": 700000,
+          "priceKRW": 780000,
           "sku": "WIPCOASAL0A-01516",
           "estimated": false
         }
       ],
-      "priceMax": 700000,
+      "priceMax": 780000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/b0ad122cb8564877c2.png",
         "assets/images/product-stories/774db1b539978a7891.png"
@@ -8251,7 +8251,7 @@
         "S-M",
         "L-XL"
       ],
-      "price": 460000,
+      "price": 590000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8286,23 +8286,23 @@
       "retailVariants": [
         {
           "option": "S-M",
-          "priceKRW": 460000,
+          "priceKRW": 590000,
           "sku": "DMJ-WIP-WAISTFOIL-3-S-M",
           "estimated": false
         },
         {
           "option": "L-XL",
-          "priceKRW": 460000,
+          "priceKRW": 590000,
           "sku": "WIPWAIFOI3A-01536",
           "estimated": false
         }
       ],
-      "priceMax": 460000,
+      "priceMax": 590000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/245bacee0d705201ca.jpg",
         "assets/images/product-stories/ddbc12c388181747b5.jpg",
@@ -8364,7 +8364,7 @@
       "options": [
         "원 사이즈"
       ],
-      "price": 300000,
+      "price": 410000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8391,19 +8391,19 @@
         "HAWIPWIN33A-01996"
       ],
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceMax": 300000,
+      "priceMax": 410000,
       "priceStatus": "fixed",
-      "priceReviewedAt": "2026-09-25",
-      "priceSource": "WIP SS26 본사 주문서 USD 소비자가 · 최신 견적 재확인 필요",
+      "priceReviewedAt": "2026-09-30",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
       "retailVariants": [
         {
           "option": "원 사이즈",
-          "priceKRW": 300000,
+          "priceKRW": 410000,
           "sku": "HAWIPWIN33A-01996",
           "estimated": false
         }
       ],
-      "priceFixedAt": "2026-09-25",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/80558da47a20871054.jpg"
       ],
@@ -8417,7 +8417,8 @@
             "local": "assets/images/product-stories/80558da47a20871054.jpg"
           }
         ]
-      }
+      },
+      "priceNote": "부가세 포함 고정 판매가"
     },
     {
       "id": "wip-puffer-jacket",
@@ -8436,7 +8437,7 @@
       "options": [
         "M"
       ],
-      "price": 190000,
+      "price": 290000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8465,17 +8466,17 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 190000,
+          "priceKRW": 290000,
           "sku": "WIPVETPUFFA-00775",
           "estimated": false
         }
       ],
-      "priceMax": 190000,
+      "priceMax": 290000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/8d60dd1216c6cfc545.jpg",
         "assets/images/product-stories/916178ea8b1e1c55a2.jpg"
@@ -8527,7 +8528,7 @@
         "M",
         "L"
       ],
-      "price": 190000,
+      "price": 290000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8557,23 +8558,23 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 190000,
+          "priceKRW": 290000,
           "sku": "WIPVETHOO1A-00865",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 190000,
+          "priceKRW": 290000,
           "sku": "WIPVETHOO1A-00866",
           "estimated": false
         }
       ],
-      "priceMax": 190000,
+      "priceMax": 290000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/72f75bdc53b56ca23e.jpg",
         "assets/images/product-stories/1d25343a13b74cb557.jpg",
@@ -8636,7 +8637,7 @@
         "S-M PINK",
         "FLIP OVER 2.0 L-XL"
       ],
-      "price": 180000,
+      "price": 270000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8665,24 +8666,24 @@
       "retailVariants": [
         {
           "option": "S-M PINK",
-          "priceKRW": 180000,
+          "priceKRW": 270000,
           "sku": "WIPVETVVE0A-01842",
           "estimated": false
         },
         {
           "option": "FLIP OVER 2.0 L-XL",
-          "priceKRW": 180000,
+          "priceKRW": 270000,
           "sku": "WIPVETVVE0A-01333",
           "estimated": false
         }
       ],
-      "priceMax": 180000,
+      "priceMax": 270000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/37d171170521d02efa.png",
         "assets/images/product-stories/c6cc86f54491d891d5.jpg"
@@ -8733,7 +8734,7 @@
       "options": [
         "2.0 M"
       ],
-      "price": 270000,
+      "price": 390000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8762,17 +8763,17 @@
       "retailVariants": [
         {
           "option": "2.0 M",
-          "priceKRW": 270000,
+          "priceKRW": 390000,
           "sku": "WIPVETARA1A-01335",
           "estimated": false
         }
       ],
-      "priceMax": 270000,
+      "priceMax": 390000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/ae9f882e82bcc4b6d8.jpg",
         "assets/images/product-stories/19c4270f4dca20fc30.jpg",
@@ -8836,7 +8837,7 @@
       "options": [
         "2.0 M"
       ],
-      "price": 200000,
+      "price": 310000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8865,17 +8866,17 @@
       "retailVariants": [
         {
           "option": "2.0 M",
-          "priceKRW": 200000,
+          "priceKRW": 310000,
           "sku": "WIPVETANO2A-01367",
           "estimated": false
         }
       ],
-      "priceMax": 200000,
+      "priceMax": 310000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/0be6734c993d59b18a.jpg",
         "assets/images/product-stories/e1aed01c5a79013a55.jpg",
@@ -8935,7 +8936,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [],
-      "price": 340000,
+      "price": 390000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8963,17 +8964,17 @@
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
-          "priceKRW": 340000,
+          "priceKRW": 390000,
           "sku": "WIPGPACK11A-00587",
           "estimated": false
         }
       ],
-      "priceMax": 340000,
+      "priceMax": 390000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/c64ae5981f9e8fcd1a.jpg"
       ],
@@ -9230,7 +9231,7 @@
       "options": [
         "41.3-US8"
       ],
-      "price": 200000,
+      "price": 290000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -9265,17 +9266,17 @@
       "retailVariants": [
         {
           "option": "41.3-US8",
-          "priceKRW": 200000,
+          "priceKRW": 290000,
           "sku": "WIPSNEAK22A-01989",
           "estimated": false
         }
       ],
-      "priceMax": 200000,
+      "priceMax": 290000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/579342de06569dff37.jpg"
       ],
@@ -9386,7 +9387,7 @@
       "options": [
         "M"
       ],
-      "price": 790000,
+      "price": 970000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -9415,17 +9416,17 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 790000,
+          "priceKRW": 970000,
           "sku": "WIPCOARACJA-01798",
           "estimated": false
         }
       ],
-      "priceMax": 790000,
+      "priceMax": 970000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "gallery": [
         "assets/images/product-stories/63a72dbf8b8a2100ab.jpg",
         "assets/images/product-stories/e2030c56f81ed95749.jpg",
@@ -9489,7 +9490,7 @@
       "options": [
         "프리사이즈"
       ],
-      "price": 430000,
+      "price": 560000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -9523,17 +9524,17 @@
       "retailVariants": [
         {
           "option": "프리사이즈",
-          "priceKRW": 430000,
+          "priceKRW": 560000,
           "sku": "WIPWPHAR10A-02200",
           "estimated": false
         }
       ],
-      "priceMax": 430000,
+      "priceMax": 560000,
       "priceStatus": "fixed",
-      "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
-      "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25",
+      "priceSource": "WIP 공식 표시가 재확인 · DMJ 고정 소비자가 2026-09-30",
+      "priceReviewedAt": "2026-09-30",
+      "priceNote": "부가세 포함 고정 판매가",
+      "priceFixedAt": "2026-09-30",
       "detailMedia": {
         "photos": [],
         "videos": [
