@@ -8,6 +8,7 @@
  const rows=Array.from(original.options).filter(o=>o.value).map(o=>({value:o.value,parts:o.value.split(' / '),price:Number(o.dataset.priceKrw)}));
  if(!rows.length||rows.some(r=>!r.price||r.parts.length!==rows[0].parts.length))return;
  const count=rows[0].parts.length,chosen=Array(count).fill('');
+ let lastPhotoColor;
  let edition='26/27'; const splitEdition=id==='ppc-m2';
  if(count<1||count>3)return;
  const labels=count===3?['사이즈','색상','핸들 구성']:id==='ppc-r1'?['보드 사이즈','포일 연결 방식']:id==='ppc-orbit'||takoonParawing?['사이즈','색상']:['사이즈','핸들 구성'];
@@ -38,6 +39,12 @@
     option.textContent=korean(value);select.append(option);
    }
    select.value=chosen[i];select.onchange=()=>{chosen[i]=select.value;for(let j=i+1;j<count;j++)chosen[j]='';render({axis:i})};groups[i].append(select);
+  }
+  const colorAxis=labels.indexOf('색상');
+  const photoColor=colorAxis>=0?chosen[colorAxis]:'';
+  if(photoColor!==lastPhotoColor){
+   lastPhotoColor=photoColor;
+   document.dispatchEvent(new CustomEvent('product:color-change',{detail:{color:photoColor}}));
   }
   const selected=chosen.every(Boolean)?rows.find(r=>r.parts.every((v,i)=>v===chosen[i])):null;
   original.value=selected?selected.value:'';original.dispatchEvent(new Event('change',{bubbles:true}));

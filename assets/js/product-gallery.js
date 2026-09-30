@@ -25,6 +25,16 @@
   }
   thumbs.forEach(b=>b.addEventListener('click',()=>select(photos.findIndex(p=>p.src===absolute(b.dataset.productPhoto)))));
   previous.addEventListener('click',()=>select(selected-1));following.addEventListener('click',()=>select(selected+1));
+  const initialPhoto=selected;
+  document.addEventListener('product:color-change',event=>{
+    if(!thumbs.some(b=>b.dataset.productColor))return;
+    const color=event.detail?.color||'';
+    if(!color){select(initialPhoto);return;}
+    const match=thumbs.find(b=>b.dataset.productColor===color&&b.dataset.colorPrimary==='true')||thumbs.find(b=>b.dataset.productColor===color);
+    if(!match)return;
+    const photoIndex=photos.findIndex(p=>p.src===absolute(match.dataset.productPhoto));
+    if(photoIndex>=0)select(photoIndex);
+  });
   select(selected);
   const modal=document.createElement('dialog');modal.className='product-lightbox';modal.setAttribute('aria-label','제품 사진 확대 보기');
   const close=button('닫기 ×','gallery-close');
