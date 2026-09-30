@@ -5831,7 +5831,12 @@
         ],
         "source": "https://takoon.com/products/foil-starter",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "manufacturerLevels": [
+        "beginner"
+      ],
+      "foilType": "complete",
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
     },
     {
       "id": "tkn-xglide-v2",
@@ -6182,7 +6187,12 @@
         ],
         "source": "https://takoon.com/products/foil-x-glide-v2",
         "checkedAt": "2026-09-27"
-      }
+      },
+      "manufacturerLevels": [
+        "beginner"
+      ],
+      "foilType": "complete",
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
     },
     {
       "id": "takoon-boom-v2",
@@ -10632,6 +10642,1666 @@
         "roundingKRW": 10000
       },
       "priceSource": "2026-09-30 본사 세트별 VAT 제외 가격 · 기존 레비타즈 포일 가격 기준"
+    },
+    {
+      "id": "tkn-foil-flare-aluminium",
+      "brand": "takoon",
+      "name": "Foil Flare Aluminium",
+      "category": "foil",
+      "subcategory": "포일 세트",
+      "path": "products/takoon/foil-flare-aluminium.html",
+      "image": "assets/images/products/takoon/catalog-20260930/adb803b8379f1d3e.png",
+      "description": "카빙과 웨이브 중심의 민첩한 포일",
+      "headline": "카빙과 웨이브 중심의 민첩한 포일",
+      "options": [],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-flare-aluminium",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙·마스트·리어윙 조합에 따라 구성이 달라집니다.",
+        "본사는 Carve 리어윙과의 조합을 권장합니다."
+      ],
+      "manufacturerSummary": "카빙과 웨이브 중심의 민첩한 포일",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate"
+      ],
+      "foilType": "complete",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/adb803b8379f1d3e.png"
+      ],
+      "specs": {
+        "본사 옵션": "단일 구성"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-flow-aluminium",
+      "brand": "takoon",
+      "name": "Foil Flow Aluminium",
+      "category": "foil",
+      "subcategory": "포일 세트",
+      "path": "products/takoon/foil-flow-aluminium.html",
+      "image": "assets/images/products/takoon/catalog-20260930/60b3a72aadd5359f.png",
+      "description": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
+      "headline": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
+      "options": [],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-flow-aluminium",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙·마스트·리어윙 조합에 따라 구성이 달라집니다.",
+        "본사는 Glide HA 또는 Carve 리어윙과의 조합을 권장합니다."
+      ],
+      "manufacturerSummary": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate"
+      ],
+      "foilType": "complete",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/60b3a72aadd5359f.png"
+      ],
+      "specs": {
+        "본사 옵션": "단일 구성"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-flare-carbon",
+      "brand": "takoon",
+      "name": "Foil Flare Carbon",
+      "category": "foil",
+      "subcategory": "포일 세트",
+      "path": "products/takoon/foil-flare-carbon.html",
+      "image": "assets/images/products/takoon/catalog-20260930/2e439ef5edcc1e1b.png",
+      "description": "카빙과 웨이브 중심의 민첩한 포일",
+      "headline": "카빙과 웨이브 중심의 민첩한 포일",
+      "options": [],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-flare-carbon",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙·마스트·리어윙 조합에 따라 구성이 달라집니다.",
+        "본사는 Carve 리어윙과의 조합을 권장합니다."
+      ],
+      "manufacturerSummary": "카빙과 웨이브 중심의 민첩한 포일",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "pro"
+      ],
+      "foilType": "complete",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/2e439ef5edcc1e1b.png",
+        "assets/images/products/takoon/catalog-20260930/928572722cb122bc.png"
+      ],
+      "specs": {
+        "본사 옵션": "단일 구성"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-flow-carbon",
+      "brand": "takoon",
+      "name": "Foil Flow Carbon",
+      "category": "foil",
+      "subcategory": "포일 세트",
+      "path": "products/takoon/foil-flow-carbon.html",
+      "image": "assets/images/products/takoon/catalog-20260930/d65d5420c951a7ba.png",
+      "description": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
+      "headline": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
+      "options": [],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-flow-carbon",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙·마스트·리어윙 조합에 따라 구성이 달라집니다.",
+        "본사는 Glide HA 또는 Carve 리어윙과의 조합을 권장합니다."
+      ],
+      "manufacturerSummary": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "pro"
+      ],
+      "foilType": "complete",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/d65d5420c951a7ba.png"
+      ],
+      "specs": {
+        "본사 옵션": "단일 구성"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-starter-front-wing",
+      "brand": "takoon",
+      "name": "Foil Starter Front Wing",
+      "category": "accessory",
+      "subcategory": "프론트윙",
+      "path": "products/takoon/foil-starter-front-wing.html",
+      "image": "assets/images/products/takoon/catalog-20260930/f24afa92a085bce0.png",
+      "description": "저속 양력과 안정성을 중심으로 한 프론트윙",
+      "headline": "저속 양력과 안정성을 중심으로 한 프론트윙",
+      "options": [
+        "1600cm²",
+        "1800cm²",
+        "2000cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-starter-front-wing",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙 단품입니다. 마스트·퓨슬리지·리어윙은 별도입니다.",
+        "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "저속 양력과 안정성을 중심으로 한 프론트윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "beginner"
+      ],
+      "foilType": "front",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/f24afa92a085bce0.png",
+        "assets/images/products/takoon/catalog-20260930/62a7103f51fd64d5.png",
+        "assets/images/products/takoon/catalog-20260930/0261a718e4251129.png",
+        "assets/images/products/takoon/catalog-20260930/eb706a821c6f13c7.png",
+        "assets/images/products/takoon/catalog-20260930/9995fe3380c6a868.png",
+        "assets/images/products/takoon/catalog-20260930/5b39938311327bb4.png",
+        "assets/images/products/takoon/catalog-20260930/21a0cefc1d81a517.png",
+        "assets/images/products/takoon/catalog-20260930/f0a3a4ccb4bc5765.png"
+      ],
+      "specs": {
+        "본사 옵션": "1600cm² / 1800cm² / 2000cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-x-glide-v2-front-wing",
+      "brand": "takoon",
+      "name": "Foil X-Glide V2 Front Wing",
+      "category": "accessory",
+      "subcategory": "프론트윙",
+      "path": "products/takoon/foil-x-glide-v2-front-wing.html",
+      "image": "assets/images/products/takoon/catalog-20260930/36ceaf857e839ba8.png",
+      "description": "다양한 종목과 성장 과정에 대응하는 프론트윙",
+      "headline": "다양한 종목과 성장 과정에 대응하는 프론트윙",
+      "options": [
+        "1050cm²",
+        "1250cm²",
+        "1450cm²",
+        "1700cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-x-glide-v2-front-wing",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙 단품입니다. 마스트·퓨슬리지·리어윙은 별도입니다.",
+        "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "다양한 종목과 성장 과정에 대응하는 프론트윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "beginner"
+      ],
+      "foilType": "front",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/36ceaf857e839ba8.png",
+        "assets/images/products/takoon/catalog-20260930/0181a722f6a3f386.png",
+        "assets/images/products/takoon/catalog-20260930/142ad3b40c00ed03.png",
+        "assets/images/products/takoon/catalog-20260930/956bc850dcf688d1.png",
+        "assets/images/products/takoon/catalog-20260930/83ab4751f3f1c6ba.png",
+        "assets/images/products/takoon/catalog-20260930/89cdfc01d5c7bc07.png",
+        "assets/images/products/takoon/catalog-20260930/aac0ce0c92ee1250.png"
+      ],
+      "specs": {
+        "본사 옵션": "1050cm² / 1250cm² / 1450cm² / 1700cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-flow-front-wing",
+      "brand": "takoon",
+      "name": "Foil Flow Front Wing",
+      "category": "accessory",
+      "subcategory": "프론트윙",
+      "path": "products/takoon/foil-flow-front-wing.html",
+      "image": "assets/images/products/takoon/catalog-20260930/4fde56ee71b809d1.png",
+      "description": "글라이드와 펌핑 효율을 위한 프론트윙",
+      "headline": "글라이드와 펌핑 효율을 위한 프론트윙",
+      "options": [
+        "600cm²",
+        "700cm²",
+        "800cm²",
+        "900cm²",
+        "1050cm²",
+        "1200cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-flow-front-wing",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙 단품입니다. 마스트·퓨슬리지·리어윙은 별도입니다.",
+        "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "글라이드와 펌핑 효율을 위한 프론트윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate",
+        "pro"
+      ],
+      "foilType": "front",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/4fde56ee71b809d1.png",
+        "assets/images/products/takoon/catalog-20260930/dac9bb6f5be0ff85.png",
+        "assets/images/products/takoon/catalog-20260930/c7ed36a050a24360.png",
+        "assets/images/products/takoon/catalog-20260930/48ab858a32af8caf.png",
+        "assets/images/products/takoon/catalog-20260930/9142224b8414fcca.png",
+        "assets/images/products/takoon/catalog-20260930/32a4d24865aab85a.png",
+        "assets/images/products/takoon/catalog-20260930/1395f7e5fcb9f82b.png",
+        "assets/images/products/takoon/catalog-20260930/d059863cc8163c99.png"
+      ],
+      "specs": {
+        "본사 옵션": "600cm² / 700cm² / 800cm² / 900cm² / 1050cm² / 1200cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-flare-front-wing",
+      "brand": "takoon",
+      "name": "Foil Flare Front Wing",
+      "category": "accessory",
+      "subcategory": "프론트윙",
+      "path": "products/takoon/foil-flare-front-wing.html",
+      "image": "assets/images/products/takoon/catalog-20260930/dd7468eb9a88b6d9.png",
+      "description": "웨이브와 정교한 카빙을 위한 프론트윙",
+      "headline": "웨이브와 정교한 카빙을 위한 프론트윙",
+      "options": [
+        "550cm²",
+        "650cm²",
+        "750cm²",
+        "850cm²",
+        "950cm²",
+        "1050cm²",
+        "1200cm²",
+        "1400cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-flare-front-wing",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙 단품입니다. 마스트·퓨슬리지·리어윙은 별도입니다.",
+        "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "웨이브와 정교한 카빙을 위한 프론트윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate",
+        "pro"
+      ],
+      "foilType": "front",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/dd7468eb9a88b6d9.png",
+        "assets/images/products/takoon/catalog-20260930/85f0d4df190c5644.png",
+        "assets/images/products/takoon/catalog-20260930/b75c1f1c0e7d526a.png",
+        "assets/images/products/takoon/catalog-20260930/0ba20e757524b032.png",
+        "assets/images/products/takoon/catalog-20260930/c7b74cda6b3f79ed.png",
+        "assets/images/products/takoon/catalog-20260930/0e5d2c596ba7d3ab.png",
+        "assets/images/products/takoon/catalog-20260930/9042d973e9bfd39f.png",
+        "assets/images/products/takoon/catalog-20260930/5c538f050dd81458.png"
+      ],
+      "specs": {
+        "본사 옵션": "550cm² / 650cm² / 750cm² / 850cm² / 950cm² / 1050cm² / 1200cm² / 1400cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-swell-front-wing",
+      "brand": "takoon",
+      "name": "Foil Swell Front Wing",
+      "category": "accessory",
+      "subcategory": "프론트윙",
+      "path": "products/takoon/foil-swell-front-wing.html",
+      "image": "assets/images/products/takoon/catalog-20260930/a81d39d0bde4d700.png",
+      "description": "스웰을 연결하는 다운윈드 프론트윙",
+      "headline": "스웰을 연결하는 다운윈드 프론트윙",
+      "options": [
+        "900cm²",
+        "1050cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-swell-front-wing",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙 단품입니다. 마스트·퓨슬리지·리어윙은 별도입니다.",
+        "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "스웰을 연결하는 다운윈드 프론트윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "pro"
+      ],
+      "foilType": "front",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/a81d39d0bde4d700.png",
+        "assets/images/products/takoon/catalog-20260930/0c50cdc82d9c8a1d.png",
+        "assets/images/products/takoon/catalog-20260930/aa0fe8adfb5308c6.png",
+        "assets/images/products/takoon/catalog-20260930/efc7af50adb0c837.png",
+        "assets/images/products/takoon/catalog-20260930/8655a16ca11265f4.png",
+        "assets/images/products/takoon/catalog-20260930/33905dcc576a2768.png",
+        "assets/images/products/takoon/catalog-20260930/3dc4c1dbd6a609b4.png"
+      ],
+      "specs": {
+        "본사 옵션": "900cm² / 1050cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-flash-foil-front-wing",
+      "brand": "takoon",
+      "name": "Foil Flash Front Wing",
+      "category": "accessory",
+      "subcategory": "프론트윙",
+      "path": "products/takoon/flash-foil-front-wing.html",
+      "image": "assets/images/products/takoon/catalog-20260930/3f632cf6361082f6.png",
+      "description": "속도와 프리레이스를 위한 프론트윙",
+      "headline": "속도와 프리레이스를 위한 프론트윙",
+      "options": [
+        "450cm²",
+        "530cm²",
+        "680cm²",
+        "770cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/flash-foil-front-wing",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "프론트윙 단품입니다. V3 퓨슬리지와의 조합을 본사가 안내합니다."
+      ],
+      "manufacturerSummary": "속도와 프리레이스를 위한 프론트윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "pro"
+      ],
+      "foilType": "front",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/3f632cf6361082f6.png",
+        "assets/images/products/takoon/catalog-20260930/49c55cb72efd1681.png",
+        "assets/images/products/takoon/catalog-20260930/671cad7cf0b57975.png",
+        "assets/images/products/takoon/catalog-20260930/b6e888cd23dad4ea.png",
+        "assets/images/products/takoon/catalog-20260930/0e54c610e64f6e70.png",
+        "assets/images/products/takoon/catalog-20260930/9bd37c0351cfd316.png",
+        "assets/images/products/takoon/catalog-20260930/59481fb269379e62.png"
+      ],
+      "specs": {
+        "본사 옵션": "450cm² / 530cm² / 680cm² / 770cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-aluminium-mast-v2-17-5-mm",
+      "brand": "takoon",
+      "name": "Foil Aluminium Mast V2 17.5 mm",
+      "category": "accessory",
+      "subcategory": "마스트",
+      "path": "products/takoon/foil-aluminium-mast-v2-17-5-mm.html",
+      "image": "assets/images/products/takoon/catalog-20260930/9d9a6c25cf4a394b.png",
+      "description": "입문부터 활용하는 17.5mm 알루미늄 마스트",
+      "headline": "입문부터 활용하는 17.5mm 알루미늄 마스트",
+      "options": [
+        "50cm",
+        "65cm",
+        "75cm",
+        "80cm",
+        "85cm",
+        "95cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-aluminium-mast-v2-17-5-mm",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요.",
+        "장착에 맞는 플레이트와 퓨슬리지 어댑터가 별도로 필요합니다.",
+        "본사 메뉴상 입문 분류이며, 길이는 수심·파도·숙련도에 맞춰 선택합니다."
+      ],
+      "manufacturerSummary": "입문부터 활용하는 17.5mm 알루미늄 마스트",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "beginner"
+      ],
+      "foilType": "mast",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/9d9a6c25cf4a394b.png",
+        "assets/images/products/takoon/catalog-20260930/7e3dd6ff3f9acba4.png"
+      ],
+      "specs": {
+        "본사 옵션": "50cm / 65cm / 75cm / 80cm / 85cm / 95cm"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-aluminium-mast-v2-19mm",
+      "brand": "takoon",
+      "name": "Foil Aluminium Mast V2 19mm",
+      "category": "accessory",
+      "subcategory": "마스트",
+      "path": "products/takoon/foil-aluminium-mast-v2-19mm.html",
+      "image": "assets/images/products/takoon/catalog-20260930/d3293ee1713a1f74.png",
+      "description": "강성을 중시한 19mm 알루미늄 마스트",
+      "headline": "강성을 중시한 19mm 알루미늄 마스트",
+      "options": [
+        "50cm",
+        "65cm",
+        "70cm",
+        "75cm",
+        "80cm",
+        "85cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-aluminium-mast-v2-19mm",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요.",
+        "장착에 맞는 플레이트와 퓨슬리지 어댑터가 별도로 필요합니다.",
+        "본사 메뉴상 입문 분류이며, 길이는 수심·파도·숙련도에 맞춰 선택합니다."
+      ],
+      "manufacturerSummary": "강성을 중시한 19mm 알루미늄 마스트",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "beginner"
+      ],
+      "foilType": "mast",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/d3293ee1713a1f74.png",
+        "assets/images/products/takoon/catalog-20260930/cf800f83391b3559.png"
+      ],
+      "specs": {
+        "본사 옵션": "50cm / 65cm / 70cm / 75cm / 80cm / 85cm"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-carbon-mast-hr-v2-16-mm",
+      "brand": "takoon",
+      "name": "Foil Carbon Mast HR 16 mm",
+      "category": "accessory",
+      "subcategory": "마스트",
+      "path": "products/takoon/foil-carbon-mast-hr-v2-16-mm.html",
+      "image": "assets/images/products/takoon/catalog-20260930/608bf862cd40b7a4.png",
+      "description": "편안함과 성장을 위한 HR 카본 마스트",
+      "headline": "편안함과 성장을 위한 HR 카본 마스트",
+      "options": [
+        "85cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-hr-v2-16-mm",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "편안함과 성장을 위한 HR 카본 마스트",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate"
+      ],
+      "foilType": "mast",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/608bf862cd40b7a4.png",
+        "assets/images/products/takoon/catalog-20260930/79ee1047fa713754.png",
+        "assets/images/products/takoon/catalog-20260930/3dd4e2695c638b31.png",
+        "assets/images/products/takoon/catalog-20260930/5986e6ae2a57800f.png"
+      ],
+      "specs": {
+        "본사 옵션": "85cm"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-carbon-mast-hm-v2-16-mm",
+      "brand": "takoon",
+      "name": "Foil Carbon Mast HM 16 mm",
+      "category": "accessory",
+      "subcategory": "마스트",
+      "path": "products/takoon/foil-carbon-mast-hm-v2-16-mm.html",
+      "image": "assets/images/products/takoon/catalog-20260930/85fe10bbe313dedc.png",
+      "description": "강성과 글라이드의 균형을 위한 HM 카본 마스트",
+      "headline": "강성과 글라이드의 균형을 위한 HM 카본 마스트",
+      "options": [
+        "70cm",
+        "75cm",
+        "80cm",
+        "85cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-hm-v2-16-mm",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요.",
+        "본사 선택 옵션과 상세 설명의 길이 표기가 달라, 실제 주문 가능 길이는 상담에서 확인합니다."
+      ],
+      "manufacturerSummary": "강성과 글라이드의 균형을 위한 HM 카본 마스트",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate"
+      ],
+      "foilType": "mast",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/85fe10bbe313dedc.png",
+        "assets/images/products/takoon/catalog-20260930/8be55b8a5add8048.png",
+        "assets/images/products/takoon/catalog-20260930/903f25a034042797.png",
+        "assets/images/products/takoon/catalog-20260930/1e5b046177471ef0.png",
+        "assets/images/products/takoon/catalog-20260930/8dfc6e4125aede8d.png",
+        "assets/images/products/takoon/catalog-20260930/04dce629a04de51f.png",
+        "assets/images/products/takoon/catalog-20260930/eda932a2b6d76d9d.png",
+        "assets/images/products/takoon/catalog-20260930/9c46bd9d6c47875c.png"
+      ],
+      "specs": {
+        "본사 옵션": "70cm / 75cm / 80cm / 85cm"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-carbon-mast-hm-v2-13mm",
+      "brand": "takoon",
+      "name": "Foil Carbon mast HM V2 13 mm",
+      "category": "accessory",
+      "subcategory": "마스트",
+      "path": "products/takoon/foil-carbon-mast-hm-v2-13mm.html",
+      "image": "assets/images/products/takoon/catalog-20260930/ff1352b3c05e4e9c.png",
+      "description": "속도와 정밀한 조작을 위한 13mm HM 마스트",
+      "headline": "속도와 정밀한 조작을 위한 13mm HM 마스트",
+      "options": [
+        "75cm",
+        "80cm",
+        "85cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-hm-v2-13mm",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "속도와 정밀한 조작을 위한 13mm HM 마스트",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "pro"
+      ],
+      "foilType": "mast",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/ff1352b3c05e4e9c.png",
+        "assets/images/products/takoon/catalog-20260930/e351388b26deff24.png",
+        "assets/images/products/takoon/catalog-20260930/ba12c92de0938ef3.png",
+        "assets/images/products/takoon/catalog-20260930/905313634abba828.png",
+        "assets/images/products/takoon/catalog-20260930/69b00904af378fe1.png",
+        "assets/images/products/takoon/catalog-20260930/65f8ebbb1d1e449e.png",
+        "assets/images/products/takoon/catalog-20260930/a415ae81ffba30d3.png"
+      ],
+      "specs": {
+        "본사 옵션": "75cm / 80cm / 85cm"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-carbon-mast-uhm-13mm",
+      "brand": "takoon",
+      "name": "Foil Carbon Mast UHM 13 mm",
+      "category": "accessory",
+      "subcategory": "마스트",
+      "path": "products/takoon/foil-carbon-mast-uhm-13mm.html",
+      "image": "assets/images/products/takoon/catalog-20260930/1f31987a43d73702.png",
+      "description": "직접적인 반응을 위한 13mm UHM 마스트",
+      "headline": "직접적인 반응을 위한 13mm UHM 마스트",
+      "options": [
+        "75cm",
+        "80cm",
+        "85cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-uhm-13mm",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "직접적인 반응을 위한 13mm UHM 마스트",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "pro"
+      ],
+      "foilType": "mast",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/1f31987a43d73702.png",
+        "assets/images/products/takoon/catalog-20260930/9a1c1f2f1c070b40.png",
+        "assets/images/products/takoon/catalog-20260930/5c595fe55f0b0f4f.png",
+        "assets/images/products/takoon/catalog-20260930/f747f65b77741388.png",
+        "assets/images/products/takoon/catalog-20260930/28f78fc251c1c322.png",
+        "assets/images/products/takoon/catalog-20260930/215fdd4bb2fadf4f.png",
+        "assets/images/products/takoon/catalog-20260930/f795907fe60b8238.png",
+        "assets/images/products/takoon/catalog-20260930/e5b3b724cb63b617.png"
+      ],
+      "specs": {
+        "본사 옵션": "75cm / 80cm / 85cm"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-carbon-mast-uhm-12-5mm",
+      "brand": "takoon",
+      "name": "Foil Carbon Mast UHM 12.5mm",
+      "category": "accessory",
+      "subcategory": "마스트",
+      "path": "products/takoon/foil-carbon-mast-uhm-12-5mm.html",
+      "image": "assets/images/products/takoon/catalog-20260930/ae633f68aeb1fd2c.png",
+      "description": "얇은 프로파일의 12.5mm UHM 마스트",
+      "headline": "얇은 프로파일의 12.5mm UHM 마스트",
+      "options": [
+        "75cm",
+        "80cm",
+        "85cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-uhm-12-5mm",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "얇은 프로파일의 12.5mm UHM 마스트",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "pro"
+      ],
+      "foilType": "mast",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/ae633f68aeb1fd2c.png",
+        "assets/images/products/takoon/catalog-20260930/98c0b162e572af35.png",
+        "assets/images/products/takoon/catalog-20260930/4f3e080b27d3cf3b.png",
+        "assets/images/products/takoon/catalog-20260930/74abe10bca09072f.png",
+        "assets/images/products/takoon/catalog-20260930/4ad05edf10cba419.png",
+        "assets/images/products/takoon/catalog-20260930/48bbea66e78d05f0.png"
+      ],
+      "specs": {
+        "본사 옵션": "75cm / 80cm / 85cm"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-stab-glide-220",
+      "brand": "takoon",
+      "name": "Foil Stab Glide 220",
+      "category": "accessory",
+      "subcategory": "리어윙",
+      "path": "products/takoon/foil-stab-glide-220.html",
+      "image": "assets/images/products/takoon/catalog-20260930/1e1746e6e915ba51.png",
+      "description": "안정적인 글라이드와 펌핑을 위한 리어윙",
+      "headline": "안정적인 글라이드와 펌핑을 위한 리어윙",
+      "options": [
+        "220cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-stab-glide-220",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "리어윙 단품입니다. 프론트윙과 퓨슬리지의 조합을 확인하세요."
+      ],
+      "manufacturerSummary": "안정적인 글라이드와 펌핑을 위한 리어윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "beginner"
+      ],
+      "foilType": "stab",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/1e1746e6e915ba51.png",
+        "assets/images/products/takoon/catalog-20260930/86840fb6f0873119.png",
+        "assets/images/products/takoon/catalog-20260930/37d30a660e922d14.png",
+        "assets/images/products/takoon/catalog-20260930/42934a30e9583cb7.png",
+        "assets/images/products/takoon/catalog-20260930/2a28361f2a4a8c00.png",
+        "assets/images/products/takoon/catalog-20260930/77a4bc99170f8bbc.png"
+      ],
+      "specs": {
+        "본사 옵션": "220cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-stab-carve",
+      "brand": "takoon",
+      "name": "Foil Stab Carve",
+      "category": "accessory",
+      "subcategory": "리어윙",
+      "path": "products/takoon/foil-stab-carve.html",
+      "image": "assets/images/products/takoon/catalog-20260930/ee2b9801390ff6f4.png",
+      "description": "민첩한 카빙을 위한 리어윙",
+      "headline": "민첩한 카빙을 위한 리어윙",
+      "options": [
+        "130cm²",
+        "145cm²",
+        "160cm²",
+        "190cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-stab-carve",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "리어윙 단품입니다. 프론트윙과 퓨슬리지의 조합을 확인하세요."
+      ],
+      "manufacturerSummary": "민첩한 카빙을 위한 리어윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate",
+        "pro"
+      ],
+      "foilType": "stab",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/ee2b9801390ff6f4.png",
+        "assets/images/products/takoon/catalog-20260930/296f20b7c57ad4e4.png",
+        "assets/images/products/takoon/catalog-20260930/9ade12b45e679089.png",
+        "assets/images/products/takoon/catalog-20260930/4565cdf0c96976fc.png",
+        "assets/images/products/takoon/catalog-20260930/2a3aa4a7dc97c881.png",
+        "assets/images/products/takoon/catalog-20260930/bdd580195792b7e6.png",
+        "assets/images/products/takoon/catalog-20260930/215b2f9c9ba585bb.png",
+        "assets/images/products/takoon/catalog-20260930/55037843a0df54c9.png"
+      ],
+      "specs": {
+        "본사 옵션": "130cm² / 145cm² / 160cm² / 190cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-stab-glide-ha",
+      "brand": "takoon",
+      "name": "Foil Stab Glide HA",
+      "category": "accessory",
+      "subcategory": "리어윙",
+      "path": "products/takoon/foil-stab-glide-ha.html",
+      "image": "assets/images/products/takoon/catalog-20260930/e5988ab20677dc31.png",
+      "description": "효율과 긴 글라이드를 위한 하이애스펙트 리어윙",
+      "headline": "효율과 긴 글라이드를 위한 하이애스펙트 리어윙",
+      "options": [
+        "100cm²",
+        "130cm²",
+        "150cm²",
+        "170cm²",
+        "190cm²"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-stab-glide-ha",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "리어윙 단품입니다. 프론트윙과 퓨슬리지의 조합을 확인하세요."
+      ],
+      "manufacturerSummary": "효율과 긴 글라이드를 위한 하이애스펙트 리어윙",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [
+        "intermediate",
+        "pro"
+      ],
+      "foilType": "stab",
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/e5988ab20677dc31.png",
+        "assets/images/products/takoon/catalog-20260930/ca0cd5addefe3585.png",
+        "assets/images/products/takoon/catalog-20260930/479d0b868ffe69bf.png",
+        "assets/images/products/takoon/catalog-20260930/7317619748681f12.png",
+        "assets/images/products/takoon/catalog-20260930/eb97d328dea645c7.png",
+        "assets/images/products/takoon/catalog-20260930/e08efb93514c7c5a.png",
+        "assets/images/products/takoon/catalog-20260930/15c2b781306526c8.png"
+      ],
+      "specs": {
+        "본사 옵션": "100cm² / 130cm² / 150cm² / 170cm² / 190cm²"
+      },
+      "tables": [],
+      "videos": [],
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+    },
+    {
+      "id": "tkn-foil-board-v-footstrap",
+      "brand": "takoon",
+      "name": "Foil Board V Footstrap",
+      "category": "accessory",
+      "subcategory": "풋스트랩",
+      "path": "products/takoon/foil-board-v-footstrap.html",
+      "image": "assets/images/products/takoon/catalog-20260930/b13e8d5ae6370459.png",
+      "description": "V 형태의 메모리폼 보드 풋스트랩",
+      "headline": "V 형태의 메모리폼 보드 풋스트랩",
+      "options": [],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-board-v-footstrap",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "V 풋스트랩 1개, 와셔 3개, A4 스테인리스 나사 3개.",
+        "나사 규격: 직경 5 × 길이 25mm. 보드 인서트와의 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "V 형태의 메모리폼 보드 풋스트랩",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/b13e8d5ae6370459.png",
+        "assets/images/products/takoon/catalog-20260930/faca34490c8b8c0e.png",
+        "assets/images/products/takoon/catalog-20260930/c549908b12d540f2.png"
+      ],
+      "specs": {
+        "본사 옵션": "단일 구성"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-foil-board-footstrap-single",
+      "brand": "takoon",
+      "name": "Foil Board Footstrap Single",
+      "category": "accessory",
+      "subcategory": "풋스트랩",
+      "path": "products/takoon/foil-board-footstrap-single.html",
+      "image": "assets/images/products/takoon/catalog-20260930/d3eec53a12479aa4.png",
+      "description": "싱글 형태의 메모리폼 보드 풋스트랩",
+      "headline": "싱글 형태의 메모리폼 보드 풋스트랩",
+      "options": [],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foil-board-footstrap-single",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "본사 구성 목록: 싱글 풋스트랩 1개, 와셔 2개, A4 스테인리스 나사 2개.",
+        "나사 규격: 직경 5 × 길이 25mm. 보드 인서트와의 호환성을 확인하세요."
+      ],
+      "manufacturerSummary": "싱글 형태의 메모리폼 보드 풋스트랩",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/d3eec53a12479aa4.png",
+        "assets/images/products/takoon/catalog-20260930/8247f60d83938990.png",
+        "assets/images/products/takoon/catalog-20260930/93bdb59d046e47c4.png"
+      ],
+      "specs": {
+        "본사 옵션": "단일 구성"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-foilboard-day-bag-cruise",
+      "brand": "takoon",
+      "name": "Foilboard Day Bag - Cruise",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/foilboard-day-bag-cruise.html",
+      "image": "assets/images/products/takoon/catalog-20260930/c00b51b8ce9aa158.png",
+      "description": "Cruise 보드를 위한 전용 데이백",
+      "headline": "Cruise 보드를 위한 전용 데이백",
+      "options": [
+        "5'3",
+        "5'6",
+        "5'10",
+        "6'0",
+        "6'2",
+        "6'4"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/foilboard-day-bag-cruise",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "Cruise 2025·2026 보드에 맞춰 설계. 타 브랜드는 보드 치수를 먼저 확인하세요.",
+        "10mm 패딩, 단열·발수 안감, 손잡이와 어깨끈.",
+        "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
+      ],
+      "manufacturerSummary": "Cruise 보드를 위한 전용 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/c00b51b8ce9aa158.png"
+      ],
+      "specs": {
+        "본사 옵션": "5'3 / 5'6 / 5'10 / 6'0 / 6'2 / 6'4"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-wing-day-bag-glide",
+      "brand": "takoon",
+      "name": "Foilboard Day Bag - Glide",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/wing-day-bag-glide.html",
+      "image": "assets/images/products/takoon/catalog-20260930/4efede30a7ec74f6.png",
+      "description": "Glide 보드를 위한 전용 데이백",
+      "headline": "Glide 보드를 위한 전용 데이백",
+      "options": [
+        "4'9",
+        "5'0",
+        "5'2",
+        "5'4"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/wing-day-bag-glide",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "Glide 2025·2026 보드에 맞춰 설계. 타 브랜드는 보드 치수를 먼저 확인하세요.",
+        "10mm 패딩, 단열·발수 안감, 손잡이와 어깨끈.",
+        "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
+      ],
+      "manufacturerSummary": "Glide 보드를 위한 전용 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/4efede30a7ec74f6.png"
+      ],
+      "specs": {
+        "본사 옵션": "4'9 / 5'0 / 5'2 / 5'4"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-wing-day-bag-glide-glide-midlength",
+      "brand": "takoon",
+      "name": "Foilboard Day Bag - Glide Midlength",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/wing-day-bag-glide-glide-midlength.html",
+      "image": "assets/images/products/takoon/catalog-20260930/e6a3d0506d60bf67.png",
+      "description": "Glide Midlength 보드를 위한 전용 데이백",
+      "headline": "Glide Midlength 보드를 위한 전용 데이백",
+      "options": [
+        "5'8",
+        "5'10",
+        "6'0",
+        "6'4",
+        "6'6"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/wing-day-bag-glide-glide-midlength",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "Glide Midlength 2025·2026 보드에 맞춰 설계. 타 브랜드는 보드 치수를 먼저 확인하세요.",
+        "10mm 패딩, 단열·발수 안감, 손잡이와 어깨끈.",
+        "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
+      ],
+      "manufacturerSummary": "Glide Midlength 보드를 위한 전용 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/e6a3d0506d60bf67.png"
+      ],
+      "specs": {
+        "본사 옵션": "5'8 / 5'10 / 6'0 / 6'4 / 6'6"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-wing-day-bag-ultra-glide",
+      "brand": "takoon",
+      "name": "Foilboard Day Bag - Ultra Glide",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/wing-day-bag-ultra-glide.html",
+      "image": "assets/images/products/takoon/catalog-20260930/57d8602abf0b0ad6.png",
+      "description": "Ultra Glide 보드를 위한 전용 데이백",
+      "headline": "Ultra Glide 보드를 위한 전용 데이백",
+      "options": [
+        "6'2",
+        "6'6",
+        "6'8",
+        "6'10",
+        "7'0"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/wing-day-bag-ultra-glide",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "Ultra Glide 2025·2026 보드에 맞춰 설계. 타 브랜드는 보드 치수를 먼저 확인하세요.",
+        "10mm 패딩, 단열·발수 안감, 손잡이와 어깨끈.",
+        "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
+      ],
+      "manufacturerSummary": "Ultra Glide 보드를 위한 전용 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/57d8602abf0b0ad6.png"
+      ],
+      "specs": {
+        "본사 옵션": "6'2 / 6'6 / 6'8 / 6'10 / 7'0"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-wing-day-bag",
+      "brand": "takoon",
+      "name": "Wing Day Bag",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/wing-day-bag.html",
+      "image": "assets/images/products/takoon/catalog-20260930/e4c45aa000a477e5.png",
+      "description": "윙·SUP 포일 보드용 데이백",
+      "headline": "윙·SUP 포일 보드용 데이백",
+      "options": [
+        "4'6",
+        "5'0",
+        "5'4",
+        "6'0"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/wing-day-bag",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "6mm 패딩, 손잡이·탈착식 어깨끈, 내·외부 포켓.",
+        "벨크로 슬롯으로 포일 장착 상태의 이동을 지원합니다.",
+        "본사 치수: 5'0 160×71×15cm / 5'4 169×73×15cm / 6'0 188×80×15cm.",
+        "4'6은 본사 선택 옵션에 있으며 상세 치수는 상담에서 확인합니다."
+      ],
+      "manufacturerSummary": "윙·SUP 포일 보드용 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/e4c45aa000a477e5.png",
+        "assets/images/products/takoon/catalog-20260930/5e424b658fdcd453.png",
+        "assets/images/products/takoon/catalog-20260930/b5ce80d979a95272.png",
+        "assets/images/products/takoon/catalog-20260930/cbe3d9f58a8f2a17.png",
+        "assets/images/products/takoon/catalog-20260930/f41d8fab07e8baff.jpg",
+        "assets/images/products/takoon/catalog-20260930/3b44e4a053a91e9a.png"
+      ],
+      "specs": {
+        "본사 옵션": "4'6 / 5'0 / 5'4 / 6'0"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-pump-day-bag",
+      "brand": "takoon",
+      "name": "Pump Day Bag",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/pump-day-bag.html",
+      "image": "assets/images/products/takoon/catalog-20260930/e489f789cd0c85b8.png",
+      "description": "Pump 보드 전용 데이백",
+      "headline": "Pump 보드 전용 데이백",
+      "options": [
+        "80cm",
+        "90cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/pump-day-bag",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "80cm·90cm Takoon Pump 보드에 맞는 사이즈를 선택하세요.",
+        "P600 원단, 6mm 패딩, 손잡이와 탈착식 어깨끈."
+      ],
+      "manufacturerSummary": "Pump 보드 전용 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/e489f789cd0c85b8.png",
+        "assets/images/products/takoon/catalog-20260930/6392d260158fdbb9.png"
+      ],
+      "specs": {
+        "본사 옵션": "80cm / 90cm"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-pump-scoot-day-bag",
+      "brand": "takoon",
+      "name": "Pump Scoot Day Bag",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/pump-scoot-day-bag.html",
+      "image": "assets/images/products/takoon/catalog-20260930/0d95e083a96afbca.png",
+      "description": "Pump Scoot 전용 95cm 데이백",
+      "headline": "Pump Scoot 전용 95cm 데이백",
+      "options": [
+        "95cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/pump-scoot-day-bag",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "95cm 단일 사이즈. Takoon Pump Scoot 전 모델용.",
+        "P600 원단, 6mm 패딩, 손잡이와 탈착식 어깨끈."
+      ],
+      "manufacturerSummary": "Pump Scoot 전용 95cm 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/0d95e083a96afbca.png",
+        "assets/images/products/takoon/catalog-20260930/5e51ce5484fb6121.png"
+      ],
+      "specs": {
+        "본사 옵션": "95cm"
+      },
+      "tables": [],
+      "videos": []
+    },
+    {
+      "id": "tkn-twin-tip-day-bag",
+      "brand": "takoon",
+      "name": "Twin Tip Day Bag",
+      "category": "accessory",
+      "subcategory": "데이백",
+      "path": "products/takoon/twin-tip-day-bag.html",
+      "image": "assets/images/products/takoon/catalog-20260930/17f13e31e5b88f6c.jpg",
+      "description": "카이트 트윈팁 보드용 데이백",
+      "headline": "카이트 트윈팁 보드용 데이백",
+      "options": [
+        "150 × 50cm",
+        "170 × 50cm"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://takoon.com/en-int/products/twin-tip-day-bag",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride"
+      ],
+      "notes": [
+        "150×50cm / 170×50cm. 패드·스트랩·핀을 장착한 트윈팁 보드용.",
+        "단열을 위한 실버 내부 마감, 손잡이와 탈착식 어깨끈."
+      ],
+      "manufacturerSummary": "카이트 트윈팁 보드용 데이백",
+      "verifiedAt": "2026-09-30",
+      "manufacturerLevels": [],
+      "foilType": null,
+      "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
+      "retailVariants": [],
+      "gallery": [
+        "assets/images/products/takoon/catalog-20260930/17f13e31e5b88f6c.jpg",
+        "assets/images/products/takoon/catalog-20260930/2884ed8d38dffc6f.jpg"
+      ],
+      "specs": {
+        "본사 옵션": "150 × 50cm / 170 × 50cm"
+      },
+      "tables": [],
+      "videos": []
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",

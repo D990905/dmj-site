@@ -822,6 +822,376 @@
         "../../assets/images/levitaz/levitaz_free_series_frontwing_900_v2000x2000px.jpg"
       ],
       "groups": {}
+    },
+    {
+      "id": "tkn-foil-flare-aluminium",
+      "path": "products/takoon/foil-flare-aluminium.html",
+      "source": "https://takoon.com/en-int/products/foil-flare-aluminium",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/adb803b8379f1d3e.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-flow-aluminium",
+      "path": "products/takoon/foil-flow-aluminium.html",
+      "source": "https://takoon.com/en-int/products/foil-flow-aluminium",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/60b3a72aadd5359f.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-flare-carbon",
+      "path": "products/takoon/foil-flare-carbon.html",
+      "source": "https://takoon.com/en-int/products/foil-flare-carbon",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/2e439ef5edcc1e1b.png",
+        "../../assets/images/products/takoon/catalog-20260930/928572722cb122bc.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-flow-carbon",
+      "path": "products/takoon/foil-flow-carbon.html",
+      "source": "https://takoon.com/en-int/products/foil-flow-carbon",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/d65d5420c951a7ba.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-starter-front-wing",
+      "path": "products/takoon/foil-starter-front-wing.html",
+      "source": "https://takoon.com/en-int/products/foil-starter-front-wing",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/f24afa92a085bce0.png",
+        "../../assets/images/products/takoon/catalog-20260930/62a7103f51fd64d5.png",
+        "../../assets/images/products/takoon/catalog-20260930/0261a718e4251129.png",
+        "../../assets/images/products/takoon/catalog-20260930/eb706a821c6f13c7.png",
+        "../../assets/images/products/takoon/catalog-20260930/9995fe3380c6a868.png",
+        "../../assets/images/products/takoon/catalog-20260930/5b39938311327bb4.png",
+        "../../assets/images/products/takoon/catalog-20260930/21a0cefc1d81a517.png",
+        "../../assets/images/products/takoon/catalog-20260930/f0a3a4ccb4bc5765.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-x-glide-v2-front-wing",
+      "path": "products/takoon/foil-x-glide-v2-front-wing.html",
+      "source": "https://takoon.com/en-int/products/foil-x-glide-v2-front-wing",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/36ceaf857e839ba8.png",
+        "../../assets/images/products/takoon/catalog-20260930/0181a722f6a3f386.png",
+        "../../assets/images/products/takoon/catalog-20260930/142ad3b40c00ed03.png",
+        "../../assets/images/products/takoon/catalog-20260930/956bc850dcf688d1.png",
+        "../../assets/images/products/takoon/catalog-20260930/83ab4751f3f1c6ba.png",
+        "../../assets/images/products/takoon/catalog-20260930/89cdfc01d5c7bc07.png",
+        "../../assets/images/products/takoon/catalog-20260930/aac0ce0c92ee1250.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-flow-front-wing",
+      "path": "products/takoon/foil-flow-front-wing.html",
+      "source": "https://takoon.com/en-int/products/foil-flow-front-wing",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/4fde56ee71b809d1.png",
+        "../../assets/images/products/takoon/catalog-20260930/dac9bb6f5be0ff85.png",
+        "../../assets/images/products/takoon/catalog-20260930/c7ed36a050a24360.png",
+        "../../assets/images/products/takoon/catalog-20260930/48ab858a32af8caf.png",
+        "../../assets/images/products/takoon/catalog-20260930/9142224b8414fcca.png",
+        "../../assets/images/products/takoon/catalog-20260930/32a4d24865aab85a.png",
+        "../../assets/images/products/takoon/catalog-20260930/1395f7e5fcb9f82b.png",
+        "../../assets/images/products/takoon/catalog-20260930/d059863cc8163c99.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-flare-front-wing",
+      "path": "products/takoon/foil-flare-front-wing.html",
+      "source": "https://takoon.com/en-int/products/foil-flare-front-wing",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/dd7468eb9a88b6d9.png",
+        "../../assets/images/products/takoon/catalog-20260930/85f0d4df190c5644.png",
+        "../../assets/images/products/takoon/catalog-20260930/b75c1f1c0e7d526a.png",
+        "../../assets/images/products/takoon/catalog-20260930/0ba20e757524b032.png",
+        "../../assets/images/products/takoon/catalog-20260930/c7b74cda6b3f79ed.png",
+        "../../assets/images/products/takoon/catalog-20260930/0e5d2c596ba7d3ab.png",
+        "../../assets/images/products/takoon/catalog-20260930/9042d973e9bfd39f.png",
+        "../../assets/images/products/takoon/catalog-20260930/5c538f050dd81458.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-swell-front-wing",
+      "path": "products/takoon/foil-swell-front-wing.html",
+      "source": "https://takoon.com/en-int/products/foil-swell-front-wing",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/a81d39d0bde4d700.png",
+        "../../assets/images/products/takoon/catalog-20260930/0c50cdc82d9c8a1d.png",
+        "../../assets/images/products/takoon/catalog-20260930/aa0fe8adfb5308c6.png",
+        "../../assets/images/products/takoon/catalog-20260930/efc7af50adb0c837.png",
+        "../../assets/images/products/takoon/catalog-20260930/8655a16ca11265f4.png",
+        "../../assets/images/products/takoon/catalog-20260930/33905dcc576a2768.png",
+        "../../assets/images/products/takoon/catalog-20260930/3dc4c1dbd6a609b4.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-flash-foil-front-wing",
+      "path": "products/takoon/flash-foil-front-wing.html",
+      "source": "https://takoon.com/en-int/products/flash-foil-front-wing",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/3f632cf6361082f6.png",
+        "../../assets/images/products/takoon/catalog-20260930/49c55cb72efd1681.png",
+        "../../assets/images/products/takoon/catalog-20260930/671cad7cf0b57975.png",
+        "../../assets/images/products/takoon/catalog-20260930/b6e888cd23dad4ea.png",
+        "../../assets/images/products/takoon/catalog-20260930/0e54c610e64f6e70.png",
+        "../../assets/images/products/takoon/catalog-20260930/9bd37c0351cfd316.png",
+        "../../assets/images/products/takoon/catalog-20260930/59481fb269379e62.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-aluminium-mast-v2-17-5-mm",
+      "path": "products/takoon/foil-aluminium-mast-v2-17-5-mm.html",
+      "source": "https://takoon.com/en-int/products/foil-aluminium-mast-v2-17-5-mm",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/9d9a6c25cf4a394b.png",
+        "../../assets/images/products/takoon/catalog-20260930/7e3dd6ff3f9acba4.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-aluminium-mast-v2-19mm",
+      "path": "products/takoon/foil-aluminium-mast-v2-19mm.html",
+      "source": "https://takoon.com/en-int/products/foil-aluminium-mast-v2-19mm",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/d3293ee1713a1f74.png",
+        "../../assets/images/products/takoon/catalog-20260930/cf800f83391b3559.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-carbon-mast-hr-v2-16-mm",
+      "path": "products/takoon/foil-carbon-mast-hr-v2-16-mm.html",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-hr-v2-16-mm",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/608bf862cd40b7a4.png",
+        "../../assets/images/products/takoon/catalog-20260930/79ee1047fa713754.png",
+        "../../assets/images/products/takoon/catalog-20260930/3dd4e2695c638b31.png",
+        "../../assets/images/products/takoon/catalog-20260930/5986e6ae2a57800f.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-carbon-mast-hm-v2-16-mm",
+      "path": "products/takoon/foil-carbon-mast-hm-v2-16-mm.html",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-hm-v2-16-mm",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/85fe10bbe313dedc.png",
+        "../../assets/images/products/takoon/catalog-20260930/8be55b8a5add8048.png",
+        "../../assets/images/products/takoon/catalog-20260930/903f25a034042797.png",
+        "../../assets/images/products/takoon/catalog-20260930/1e5b046177471ef0.png",
+        "../../assets/images/products/takoon/catalog-20260930/8dfc6e4125aede8d.png",
+        "../../assets/images/products/takoon/catalog-20260930/04dce629a04de51f.png",
+        "../../assets/images/products/takoon/catalog-20260930/eda932a2b6d76d9d.png",
+        "../../assets/images/products/takoon/catalog-20260930/9c46bd9d6c47875c.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-carbon-mast-hm-v2-13mm",
+      "path": "products/takoon/foil-carbon-mast-hm-v2-13mm.html",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-hm-v2-13mm",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/ff1352b3c05e4e9c.png",
+        "../../assets/images/products/takoon/catalog-20260930/e351388b26deff24.png",
+        "../../assets/images/products/takoon/catalog-20260930/ba12c92de0938ef3.png",
+        "../../assets/images/products/takoon/catalog-20260930/905313634abba828.png",
+        "../../assets/images/products/takoon/catalog-20260930/69b00904af378fe1.png",
+        "../../assets/images/products/takoon/catalog-20260930/65f8ebbb1d1e449e.png",
+        "../../assets/images/products/takoon/catalog-20260930/a415ae81ffba30d3.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-carbon-mast-uhm-13mm",
+      "path": "products/takoon/foil-carbon-mast-uhm-13mm.html",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-uhm-13mm",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/1f31987a43d73702.png",
+        "../../assets/images/products/takoon/catalog-20260930/9a1c1f2f1c070b40.png",
+        "../../assets/images/products/takoon/catalog-20260930/5c595fe55f0b0f4f.png",
+        "../../assets/images/products/takoon/catalog-20260930/f747f65b77741388.png",
+        "../../assets/images/products/takoon/catalog-20260930/28f78fc251c1c322.png",
+        "../../assets/images/products/takoon/catalog-20260930/215fdd4bb2fadf4f.png",
+        "../../assets/images/products/takoon/catalog-20260930/f795907fe60b8238.png",
+        "../../assets/images/products/takoon/catalog-20260930/e5b3b724cb63b617.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-carbon-mast-uhm-12-5mm",
+      "path": "products/takoon/foil-carbon-mast-uhm-12-5mm.html",
+      "source": "https://takoon.com/en-int/products/foil-carbon-mast-uhm-12-5mm",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/ae633f68aeb1fd2c.png",
+        "../../assets/images/products/takoon/catalog-20260930/98c0b162e572af35.png",
+        "../../assets/images/products/takoon/catalog-20260930/4f3e080b27d3cf3b.png",
+        "../../assets/images/products/takoon/catalog-20260930/74abe10bca09072f.png",
+        "../../assets/images/products/takoon/catalog-20260930/4ad05edf10cba419.png",
+        "../../assets/images/products/takoon/catalog-20260930/48bbea66e78d05f0.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-stab-glide-220",
+      "path": "products/takoon/foil-stab-glide-220.html",
+      "source": "https://takoon.com/en-int/products/foil-stab-glide-220",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/1e1746e6e915ba51.png",
+        "../../assets/images/products/takoon/catalog-20260930/86840fb6f0873119.png",
+        "../../assets/images/products/takoon/catalog-20260930/37d30a660e922d14.png",
+        "../../assets/images/products/takoon/catalog-20260930/42934a30e9583cb7.png",
+        "../../assets/images/products/takoon/catalog-20260930/2a28361f2a4a8c00.png",
+        "../../assets/images/products/takoon/catalog-20260930/77a4bc99170f8bbc.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-stab-carve",
+      "path": "products/takoon/foil-stab-carve.html",
+      "source": "https://takoon.com/en-int/products/foil-stab-carve",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/ee2b9801390ff6f4.png",
+        "../../assets/images/products/takoon/catalog-20260930/296f20b7c57ad4e4.png",
+        "../../assets/images/products/takoon/catalog-20260930/9ade12b45e679089.png",
+        "../../assets/images/products/takoon/catalog-20260930/4565cdf0c96976fc.png",
+        "../../assets/images/products/takoon/catalog-20260930/2a3aa4a7dc97c881.png",
+        "../../assets/images/products/takoon/catalog-20260930/bdd580195792b7e6.png",
+        "../../assets/images/products/takoon/catalog-20260930/215b2f9c9ba585bb.png",
+        "../../assets/images/products/takoon/catalog-20260930/55037843a0df54c9.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-stab-glide-ha",
+      "path": "products/takoon/foil-stab-glide-ha.html",
+      "source": "https://takoon.com/en-int/products/foil-stab-glide-ha",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/e5988ab20677dc31.png",
+        "../../assets/images/products/takoon/catalog-20260930/ca0cd5addefe3585.png",
+        "../../assets/images/products/takoon/catalog-20260930/479d0b868ffe69bf.png",
+        "../../assets/images/products/takoon/catalog-20260930/7317619748681f12.png",
+        "../../assets/images/products/takoon/catalog-20260930/eb97d328dea645c7.png",
+        "../../assets/images/products/takoon/catalog-20260930/e08efb93514c7c5a.png",
+        "../../assets/images/products/takoon/catalog-20260930/15c2b781306526c8.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-board-v-footstrap",
+      "path": "products/takoon/foil-board-v-footstrap.html",
+      "source": "https://takoon.com/en-int/products/foil-board-v-footstrap",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/b13e8d5ae6370459.png",
+        "../../assets/images/products/takoon/catalog-20260930/faca34490c8b8c0e.png",
+        "../../assets/images/products/takoon/catalog-20260930/c549908b12d540f2.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-board-footstrap-single",
+      "path": "products/takoon/foil-board-footstrap-single.html",
+      "source": "https://takoon.com/en-int/products/foil-board-footstrap-single",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/d3eec53a12479aa4.png",
+        "../../assets/images/products/takoon/catalog-20260930/8247f60d83938990.png",
+        "../../assets/images/products/takoon/catalog-20260930/93bdb59d046e47c4.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foilboard-day-bag-cruise",
+      "path": "products/takoon/foilboard-day-bag-cruise.html",
+      "source": "https://takoon.com/en-int/products/foilboard-day-bag-cruise",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/c00b51b8ce9aa158.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-wing-day-bag-glide",
+      "path": "products/takoon/wing-day-bag-glide.html",
+      "source": "https://takoon.com/en-int/products/wing-day-bag-glide",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/4efede30a7ec74f6.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-wing-day-bag-glide-glide-midlength",
+      "path": "products/takoon/wing-day-bag-glide-glide-midlength.html",
+      "source": "https://takoon.com/en-int/products/wing-day-bag-glide-glide-midlength",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/e6a3d0506d60bf67.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-wing-day-bag-ultra-glide",
+      "path": "products/takoon/wing-day-bag-ultra-glide.html",
+      "source": "https://takoon.com/en-int/products/wing-day-bag-ultra-glide",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/57d8602abf0b0ad6.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-wing-day-bag",
+      "path": "products/takoon/wing-day-bag.html",
+      "source": "https://takoon.com/en-int/products/wing-day-bag",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/e4c45aa000a477e5.png",
+        "../../assets/images/products/takoon/catalog-20260930/5e424b658fdcd453.png",
+        "../../assets/images/products/takoon/catalog-20260930/b5ce80d979a95272.png",
+        "../../assets/images/products/takoon/catalog-20260930/cbe3d9f58a8f2a17.png",
+        "../../assets/images/products/takoon/catalog-20260930/f41d8fab07e8baff.jpg",
+        "../../assets/images/products/takoon/catalog-20260930/3b44e4a053a91e9a.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-pump-day-bag",
+      "path": "products/takoon/pump-day-bag.html",
+      "source": "https://takoon.com/en-int/products/pump-day-bag",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/e489f789cd0c85b8.png",
+        "../../assets/images/products/takoon/catalog-20260930/6392d260158fdbb9.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-pump-scoot-day-bag",
+      "path": "products/takoon/pump-scoot-day-bag.html",
+      "source": "https://takoon.com/en-int/products/pump-scoot-day-bag",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/0d95e083a96afbca.png",
+        "../../assets/images/products/takoon/catalog-20260930/5e51ce5484fb6121.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-twin-tip-day-bag",
+      "path": "products/takoon/twin-tip-day-bag.html",
+      "source": "https://takoon.com/en-int/products/twin-tip-day-bag",
+      "photos": [
+        "../../assets/images/products/takoon/catalog-20260930/17f13e31e5b88f6c.jpg",
+        "../../assets/images/products/takoon/catalog-20260930/2884ed8d38dffc6f.jpg"
+      ],
+      "groups": {}
     }
   ]
 }
