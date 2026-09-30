@@ -18,7 +18,7 @@
 
 /* Keep every restored photograph discoverable, including on narrow screens. */
 .commerce .gallery{position:static;min-width:0;align-self:start}
-.commerce .gallery .detail-photo{position:relative}
+.commerce .gallery .detail-photo{position:relative;inset:auto}
 .commerce .detail-photo img[role=button]{cursor:zoom-in}
 .commerce .gallery-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px;overflow:visible;margin-top:8px;padding:0;width:100%}
 .commerce .gallery-thumb{width:100%;height:auto;aspect-ratio:1;min-width:0;padding:5px;border-radius:3px}

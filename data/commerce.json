@@ -6620,7 +6620,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/ea4c2b5355a8da4a83.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/vhf-vest-pouch/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/1.VHFpouch.jpg",
+            "alt": "VHF VEST POUCH",
+            "local": "assets/images/product-stories/ea4c2b5355a8da4a83.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-flying-mask-2-0",
@@ -6704,6 +6718,32 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/flying-mask-2-0/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/flying-mask-2-0/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-FLYING-MASK-2.0.jpg",
+            "alt": "FLYING MASK 2.0",
+            "local": "assets/images/product-stories/b0a33684615b6f6613.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-FLYING-MASK-2-2.0.jpg",
+            "alt": "FLYING MASK 2.0 - Image 2",
+            "local": "assets/images/product-stories/24046fb2087f55caa5.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/6.-FLYING-MASK-2-2.0.jpg",
+            "alt": "FLYING MASK 2.0 - Image 3",
+            "local": "assets/images/product-stories/950187a9038d0c2298.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/7.-FLYING-MASK-2.0.jpg",
+            "alt": "FLYING MASK 2.0 - Image 4",
+            "local": "assets/images/product-stories/c66c67b2a480a0e7a3.jpg"
+          }
+        ]
       }
     },
     {
@@ -6791,6 +6831,32 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/steamer-mk3/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/steamer-mk3/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/1.-STEAMER-MK3.jpg",
+            "alt": "STEAMER MK3",
+            "local": "assets/images/product-stories/fae26d00d63caa9970.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/13.-STEAMER-MK3.jpg",
+            "alt": "STEAMER MK3 - Image 2",
+            "local": "assets/images/product-stories/133ba8c77eb14ed374.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/14.-STEAMER-MK3.jpg",
+            "alt": "STEAMER MK3 - Image 3",
+            "local": "assets/images/product-stories/829ece86c15264f690.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/12.-STEAMER-MK3.jpg",
+            "alt": "STEAMER MK3 - Image 4",
+            "local": "assets/images/product-stories/f04c22e8691321a4b3.jpg"
+          }
+        ]
       }
     },
     {
@@ -6863,6 +6929,20 @@
         ],
         "source": "https://www.forward-wip.com/produit/steamy-ls/",
         "checkedAt": "2026-09-27"
+      },
+      "gallery": [
+        "assets/images/product-stories/17cdf9e3a631051e5d.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/steamy-ls/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2026/02/SteamyLS-COLORS-scaled.jpg",
+            "alt": "STEAMY LS",
+            "local": "assets/images/product-stories/17cdf9e3a631051e5d.jpg"
+          }
+        ]
       }
     },
     {
@@ -6952,6 +7032,32 @@
         ],
         "source": "https://www.forward-wip.com/produit/steamy-3-2/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/steamy-3-2/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/1.-STEAMY.jpg",
+            "alt": "STEAMY",
+            "local": "assets/images/product-stories/10f718575b0348a73b.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/01/6.-STEAMY-scaled.jpg",
+            "alt": "STEAMY - Image 2",
+            "local": "assets/images/product-stories/c01c5666763bf0a3b1.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/01/7.-STEAMY-scaled.jpg",
+            "alt": "STEAMY - Image 3",
+            "local": "assets/images/product-stories/f9ffe0cc870260b011.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/01/11.-STEAMY.jpg",
+            "alt": "STEAMY - Image 4",
+            "local": "assets/images/product-stories/4fbc6f7e79ccda5acc.jpg"
+          }
+        ]
       }
     },
     {
@@ -7024,6 +7130,20 @@
         ],
         "source": "https://www.forward-wip.com/produit/hybrid-semi-dry/",
         "checkedAt": "2026-09-27"
+      },
+      "gallery": [
+        "assets/images/product-stories/e0caab305611a8e054.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/hybrid-semi-dry/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-HYBRID-SEMI-DRY-2.jpg",
+            "alt": "HYBRID SEMI DRY",
+            "local": "assets/images/product-stories/e0caab305611a8e054.jpg"
+          }
+        ]
       }
     },
     {
@@ -7114,6 +7234,22 @@
         ],
         "source": "https://www.forward-wip.com/produit/neo-long-john-mk2/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/neo-long-john-mk2/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/neo-long-MK2-.png",
+            "alt": "NEO LONG JOHN MK2",
+            "local": "assets/images/product-stories/285b9c287e5ec07e1c.png"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/neo-long-MK2-back-.png",
+            "alt": "NEO LONG JOHN MK2 - Image 2",
+            "local": "assets/images/product-stories/efeabf9e716b854f9e.png"
+          }
+        ]
       }
     },
     {
@@ -7212,6 +7348,37 @@
         ],
         "source": "https://www.forward-wip.com/produit/neo-long-john-women-mk2/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/neo-long-john-women-mk2/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-NEO-LONG-JOHN-WOMEN-MK2.png",
+            "alt": "NEO LONG JOHN WOMEN MK2",
+            "local": "assets/images/product-stories/dc65a170368729bcff.png"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/4.-WIPEE-1.jpg",
+            "alt": "NEO LONG JOHN WOMEN MK2 - Image 2",
+            "local": "assets/images/product-stories/e3ece6c532d77d66df.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/3.-WIPEE-1.jpg",
+            "alt": "NEO LONG JOHN WOMEN MK2 - Image 3",
+            "local": "assets/images/product-stories/551dc337344d7dc098.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-WIPEE-1.jpg",
+            "alt": "NEO LONG JOHN WOMEN MK2 - Image 4",
+            "local": "assets/images/product-stories/40d6fb4114b3e37272.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-WIPEE-1.jpg",
+            "alt": "NEO LONG JOHN WOMEN MK2 - Image 5",
+            "local": "assets/images/product-stories/68ca502a19bf6c60a9.jpg"
+          }
+        ]
       }
     },
     {
@@ -7284,7 +7451,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/86d3dde60c5e3213dd.png"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/summer-neo-long-john-mk2/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/Image1-2.png",
+            "alt": "SUMMER NEO LONG JOHN MK2",
+            "local": "assets/images/product-stories/86d3dde60c5e3213dd.png"
+          }
+        ]
+      }
     },
     {
       "id": "wip-summer-neo-long-john-women",
@@ -7348,7 +7529,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/fc0271d8ea286846d3.png"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/summer-neo-long-john-women/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-SUMMER-NEO-LONG-JOHN-WOMEN-MK2.png",
+            "alt": "SUMMER NEO LONG JOHN WOMEN MK2",
+            "local": "assets/images/product-stories/fc0271d8ea286846d3.png"
+          }
+        ]
+      }
     },
     {
       "id": "wip-race-parka",
@@ -7406,7 +7601,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/fec3ade139a458aa90.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/race-parka/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-RACE-PARKA.jpg",
+            "alt": "RACE PARKA",
+            "local": "assets/images/product-stories/fec3ade139a458aa90.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-flex-smock-spray-top-mk2",
@@ -7472,7 +7681,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/60160fec33217503cf.png"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/flex-smock-spray-top-mk2/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-FLEX-SMOCK-SPRAY-TOP-MK2.png",
+            "alt": "FLEX SMOCK SPRAY TOP MK2",
+            "local": "assets/images/product-stories/60160fec33217503cf.png"
+          }
+        ]
+      }
     },
     {
       "id": "wip-3ds-neo-top-3mm-women",
@@ -7544,6 +7767,20 @@
         ],
         "source": "https://www.forward-wip.com/produit/3ds-neo-top-3mm-women/",
         "checkedAt": "2026-09-27"
+      },
+      "gallery": [
+        "assets/images/product-stories/9c4d429530eea7c53a.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/3ds-neo-top-3mm-women/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-3DS-NEO-TOP-3MM-WOMEN.jpg",
+            "alt": "3DS NEO TOP WOMEN",
+            "local": "assets/images/product-stories/9c4d429530eea7c53a.jpg"
+          }
+        ]
       }
     },
     {
@@ -7648,6 +7885,27 @@
         ],
         "source": "https://www.forward-wip.com/produit/flow-vortex-rashguard/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/flow-vortex-rashguard/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-FLOW-VORTEX-RASHGUARD.jpg",
+            "alt": "FLOW VORTEX RASHGUARD",
+            "local": "assets/images/product-stories/fb0c5384ff28dcfd9a.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/Image1.png",
+            "alt": "FLOW VORTEX RASHGUARD - Image 2",
+            "local": "assets/images/product-stories/1c88ff161ab6afaff4.png"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/Capture-decran-2021-03-23-154916.png",
+            "alt": "FLOW VORTEX RASHGUARD - Image 3",
+            "local": "assets/images/product-stories/d69c126038d3c94564.png"
+          }
+        ]
       }
     },
     {
@@ -7736,6 +7994,22 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/hooded-uv-rashguard-long-sleeve/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/hooded-uv-rashguard-long-sleeve/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/02/1.-RASGUARD-UV-HOODED.jpg",
+            "alt": "HOODED UV RASHGUARD",
+            "local": "assets/images/product-stories/089be11582fcc8ac69.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/02/3.-RASGUARD-UV-HOODED.jpg",
+            "alt": "HOODED UV RASHGUARD - Image 2",
+            "local": "assets/images/product-stories/fe045a6f27064537fa.jpg"
+          }
+        ]
       }
     },
     {
@@ -7808,7 +8082,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/a7e3e35d58de0581fb.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/quickdry-tshirt-long-3-0/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-QUICKDRY-TSHIRT-LONG-3.0-1-scaled.jpg",
+            "alt": "QUICKDRY TSHIRT LONG 3.0",
+            "local": "assets/images/product-stories/a7e3e35d58de0581fb.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-coastal-racing-salopette",
@@ -7892,6 +8180,22 @@
         ],
         "source": "https://www.forward-wip.com/produit/coastal-racing-salopette/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/coastal-racing-salopette/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/04/1.-SALOPETTE.png",
+            "alt": "COASTAL RACING SALOPETTE",
+            "local": "assets/images/product-stories/b0ad122cb8564877c2.png"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/04/2.-SALOPETTE.png",
+            "alt": "COASTAL RACING SALOPETTE - Image 2",
+            "local": "assets/images/product-stories/774db1b539978a7891.png"
+          }
+        ]
       }
     },
     {
@@ -7985,6 +8289,27 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/waistfoil-harness-3-0/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/waistfoil-harness-3-0/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/07/1.-WAISTFOIL-HARNESS-3.0-.jpg",
+            "alt": "WAISTFOIL HARNESS 3.0",
+            "local": "assets/images/product-stories/245bacee0d705201ca.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/07/2.-WAISTFOIL-HARNESS-3.0-.jpg",
+            "alt": "WAISTFOIL HARNESS 3.0 - Image 2",
+            "local": "assets/images/product-stories/ddbc12c388181747b5.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/03/3.-WAISTFOIL-HARNESS-3.0.jpg",
+            "alt": "WAISTFOIL HARNESS 3.0 - Image 3",
+            "local": "assets/images/product-stories/da83abe65c93b8a171.jpg"
+          }
+        ]
       }
     },
     {
@@ -8043,7 +8368,21 @@
           "estimated": false
         }
       ],
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/80558da47a20871054.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/fr/produit/wing-belt-3-0/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/02/1.-Wingbelt-3.0.jpg",
+            "alt": "WING BELT 3.0",
+            "local": "assets/images/product-stories/80558da47a20871054.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-puffer-jacket",
@@ -8117,6 +8456,22 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/puffer-jacket/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/puffer-jacket/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/1.-PUFFER-JACKET.jpg",
+            "alt": "PUFFER JACKET",
+            "local": "assets/images/product-stories/8d60dd1216c6cfc545.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/2.-PUFFER-JACKET.jpg",
+            "alt": "PUFFER JACKET - Image 2",
+            "local": "assets/images/product-stories/916178ea8b1e1c55a2.jpg"
+          }
+        ]
       }
     },
     {
@@ -8205,6 +8560,27 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/tech-hoodie/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/tech-hoodie/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/1.-TECH-HOODIE.jpg",
+            "alt": "TECH HOODIE",
+            "local": "assets/images/product-stories/72f75bdc53b56ca23e.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/2.-TECH-HOODIE.jpg",
+            "alt": "TECH HOODIE - Image 2",
+            "local": "assets/images/product-stories/1d25343a13b74cb557.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/3.-TECH-HOODIE.jpg",
+            "alt": "TECH HOODIE - Image 3",
+            "local": "assets/images/product-stories/db62cf35fcf819956e.jpg"
+          }
+        ]
       }
     },
     {
@@ -8287,6 +8663,22 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/poncho/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/poncho/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/poncho-pink-carre.png",
+            "alt": "PONCHO FLIP OVER",
+            "local": "assets/images/product-stories/37d171170521d02efa.png"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-PONCHO-FLIP-FLOP.jpg",
+            "alt": "PONCHO FLIP OVER - Image 2",
+            "local": "assets/images/product-stories/c6cc86f54491d891d5.jpg"
+          }
+        ]
       }
     },
     {
@@ -8369,6 +8761,27 @@
         ],
         "source": "https://www.forward-wip.com/produit/dry-sailing-short-2-0/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/dry-sailing-short-2-0/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-DRY-SAILING-SHORT-1.jpg",
+            "alt": "DRY SAILING SHORT 2.0",
+            "local": "assets/images/product-stories/ae9f882e82bcc4b6d8.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-DRY-SAILING-SHORT-1.jpg",
+            "alt": "DRY SAILING SHORT 2.0 - Image 2",
+            "local": "assets/images/product-stories/19c4270f4dca20fc30.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/4.-DRY-SAILING-SHORT-1.jpg",
+            "alt": "DRY SAILING SHORT 2.0 - Image 3",
+            "local": "assets/images/product-stories/b3ff68e52f98970e5b.jpg"
+          }
+        ]
       }
     },
     {
@@ -8449,6 +8862,27 @@
         "videos": [],
         "source": "https://www.forward-wip.com/produit/light-sailing-short-2-0/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/light-sailing-short-2-0/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/1.-LIGHT-SAILING-SHORT-1.jpg",
+            "alt": "LIGHT SAILING SHORT 2.0",
+            "local": "assets/images/product-stories/0be6734c993d59b18a.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/2.-LIGHT-SAILING-SHORT-1.jpg",
+            "alt": "LIGHT SAILING SHORT 2.0 - Image 2",
+            "local": "assets/images/product-stories/e1aed01c5a79013a55.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/3.-LIGHT-SAILING-SHORT-2.jpg",
+            "alt": "LIGHT SAILING SHORT 2.0 - Image 3",
+            "local": "assets/images/product-stories/66f94f75b7b620334b.jpg"
+          }
+        ]
       }
     },
     {
@@ -8504,7 +8938,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/c64ae5981f9e8fcd1a.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/gearpack-100l/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/GEARPACK-100L-04.jpg",
+            "alt": "GEARPACK 100L",
+            "local": "assets/images/product-stories/c64ae5981f9e8fcd1a.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-wing-board-leash-dampener",
@@ -8565,7 +9013,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/61d35165ad189255d0.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/wing-board-leash-dampener/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/02/1.-WING-BOARD-LEASH-DAMPENEUR.jpg",
+            "alt": "WING BOARD LEASH DAMPENER",
+            "local": "assets/images/product-stories/61d35165ad189255d0.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-wing-leash",
@@ -8625,7 +9087,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/59ce3b1e626125bfbb.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/wing-leash/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/03/3.WING-LEASH-scaled.jpg",
+            "alt": "3.WING LEASH",
+            "local": "assets/images/product-stories/59ce3b1e626125bfbb.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-wing-board-leash",
@@ -8686,7 +9162,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/e4b0079902cc79c47e.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/wing-board-leash/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2023/03/3.WING-BOARD-LEASH-scaled.jpg",
+            "alt": "3.WING BOARD LEASH",
+            "local": "assets/images/product-stories/e4b0079902cc79c47e.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-wipsneaker",
@@ -8750,7 +9240,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/579342de06569dff37.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/wipsneaker/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2025/02/WIP-SNEAKERS-scaled.jpg",
+            "alt": "WIPSNEAKER",
+            "local": "assets/images/product-stories/579342de06569dff37.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-neo-gloves",
@@ -8814,7 +9318,21 @@
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/product-stories/f21751197b9d5ab2b9.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/neo-gloves/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2021/02/Neo-Gloves.jpg",
+            "alt": "NEO GLOVES",
+            "local": "assets/images/product-stories/f21751197b9d5ab2b9.jpg"
+          }
+        ]
+      }
     },
     {
       "id": "wip-coastal-racing-jacket",
@@ -8896,6 +9414,27 @@
         ],
         "source": "https://www.forward-wip.com/produit/coastal-racing-jacket/",
         "checkedAt": "2026-09-27"
+      },
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/coastal-racing-jacket/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/001.COASTAL-JACKET.jpg",
+            "alt": "COASTAL RACING JACKET",
+            "local": "assets/images/product-stories/63a72dbf8b8a2100ab.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/14.COASTAL-JACKET.jpg",
+            "alt": "COASTAL RACING JACKET - Image 2",
+            "local": "assets/images/product-stories/e2030c56f81ed95749.jpg"
+          },
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2024/02/13.COASTAL-JACKET.jpg",
+            "alt": "COASTAL RACING JACKET - Image 3",
+            "local": "assets/images/product-stories/0f97dcc8e507aa6ef7.jpg"
+          }
+        ]
       }
     },
     {
@@ -8967,6 +9506,20 @@
         ],
         "source": "https://www.forward-wip.com/produit/wing-wind-pro-harness/",
         "checkedAt": "2026-09-27"
+      },
+      "gallery": [
+        "assets/images/product-stories/132489e378ad183756.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://www.forward-wip.com/produit/wing-wind-pro-harness/",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://www.forward-wip.com/wp-content/uploads/2026/02/WING-WIND-PRO-HARNESS-scaled.jpg",
+            "alt": "WING WIND PRO HARNESS",
+            "local": "assets/images/product-stories/132489e378ad183756.jpg"
+          }
+        ]
       }
     },
     {
