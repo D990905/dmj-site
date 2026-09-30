@@ -9,6 +9,7 @@
   const group = groups.find(g => g.id === id); if (!group) return;
   select.value = id;
   buttons.forEach(b => { b.hidden = b.dataset.photoGroup !== id; b.setAttribute('aria-pressed','false'); });
+  document.dispatchEvent(new CustomEvent('product:gallery-group-change'));
   const first = buttons.find(b => !b.hidden); if (first) first.click();
   note.textContent = group.note || '사진 미리보기 · 주문 구성은 구매 옵션에서 선택';
  }

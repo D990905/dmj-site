@@ -5,7 +5,8 @@
   const gallery = hero.closest('.gallery');
   const thumbs = [...gallery.querySelectorAll('[data-product-photo]')];
   const absolute = src => new URL(src, location.href).href;
-  const photos = [...new Map(thumbs.map(b => [absolute(b.dataset.productPhoto), {src:absolute(b.dataset.productPhoto),alt:b.querySelector('img')?.alt||hero.alt}])).values()];
+  const availablePhotos = () => [...new Map(thumbs.filter(b => !b.hidden).map(b => [absolute(b.dataset.productPhoto), {src:absolute(b.dataset.productPhoto),alt:b.querySelector('img')?.alt||hero.alt}])).values()];
+  let photos = availablePhotos();
   if (!photos.some(p => p.src === hero.src)) photos.unshift({src:hero.src,alt:hero.alt});
   let selected = Math.max(0, photos.findIndex(p => p.src === hero.src));
   let index = selected, previousOverflow = '', opener;
@@ -25,6 +26,10 @@
   }
   thumbs.forEach(b=>b.addEventListener('click',()=>select(photos.findIndex(p=>p.src===absolute(b.dataset.productPhoto)))));
   previous.addEventListener('click',()=>select(selected-1));following.addEventListener('click',()=>select(selected+1));
+  document.addEventListener('product:gallery-group-change', () => {
+    photos = availablePhotos();
+    if (photos.length) select(0);
+  });
   const initialPhoto=selected;
   document.addEventListener('product:color-change',event=>{
     if(!thumbs.some(b=>b.dataset.productColor))return;

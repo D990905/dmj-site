@@ -1,0 +1,827 @@
+{
+  "checkedAt": "2026-09-30",
+  "products": [
+    {
+      "id": "takoon-v4",
+      "path": "products/takoon/wing-v4.html",
+      "source": "https://takoon.com/products/wing-v4",
+      "photos": [
+        "../../assets/images/products/official-details/67ad5db377f0b6.png",
+        "../../assets/images/products/official-details/ff8b5c8e49e0c4.png",
+        "../../assets/images/products/official-details/e5da478de7b598.png",
+        "../../assets/images/products/official-details/b43bdd708a091c.png",
+        "../../assets/images/products/official-details/d88d105969a0e9.png",
+        "../../assets/images/products/official-details/675b67803fcc15.png",
+        "../../assets/images/products/official-details/1004697f93271f.png",
+        "../../assets/images/products/official-details/53f5b2cb4e9082.png",
+        "../../assets/images/products/official-details/3436f6050b2b1f.png",
+        "../../assets/images/products/official-details/bd59c2e9cb7089.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-v4-pro",
+      "path": "products/takoon/wing-v4-pro.html",
+      "source": "https://takoon.com/products/wing-v4-pro",
+      "photos": [
+        "../../assets/images/products/official-details/d93d2c3d75535d.png",
+        "../../assets/images/products/official-details/302f641b270b90.png",
+        "../../assets/images/products/official-details/8ac71c4852e610.png",
+        "../../assets/images/products/official-details/e59b7196c32a9a.png",
+        "../../assets/images/products/official-details/954e68ba83eac8.png",
+        "../../assets/images/products/official-details/32d3d33bbd7f30.png",
+        "../../assets/images/products/official-details/55fd189e6b9d58.png",
+        "../../assets/images/products/official-details/601492fc319d82.png",
+        "../../assets/images/products/official-details/1659def7ffd691.png",
+        "../../assets/images/products/official-details/6007fabd44ba9c.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-vx-pro-2",
+      "path": "products/takoon/wing-vx-pro-2.html",
+      "source": "https://takoon.com/products/wing-vx-pro-2",
+      "photos": [
+        "../../assets/images/products/official-details/233bb30f9b08a4.png",
+        "../../assets/images/products/official-details/296d91de82ae86.png",
+        "../../assets/images/products/official-details/ae5df310204f2a.png",
+        "../../assets/images/products/official-details/9f1abbb1aa7cab.png",
+        "../../assets/images/products/official-details/b0700012670877.png",
+        "../../assets/images/products/official-details/2c5b56bddea5fb.png",
+        "../../assets/images/products/official-details/18f96f53d708b3.png",
+        "../../assets/images/products/official-details/d5c289a7235451.png",
+        "../../assets/images/products/official-details/8f5f01e9224b19.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-cruise",
+      "path": "products/takoon/cruise.html",
+      "source": "https://takoon.com/products/cruise-2026",
+      "photos": [
+        "../../assets/images/products/board-details/eaec2c0cdddf7f55.png",
+        "../../assets/images/products/board-details/ecd2b3bc44a78df0.png",
+        "../../assets/images/products/board-details/7817c633bcf971c8.png",
+        "../../assets/images/products/board-details/e94b6768c78d190e.png",
+        "../../assets/images/products/board-details/0105e79c224a8f74.png",
+        "../../assets/images/products/board-details/b247b8eca8db68a8.png",
+        "../../assets/images/products/board-details/a93c73681bf10fef.png",
+        "../../assets/images/products/board-details/cb111f05d7b7f1d2.png",
+        "../../assets/images/products/board-details/48ac2862abb0ba96.png",
+        "../../assets/images/products/board-details/1ff650e6ef5d784e.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-slide",
+      "path": "products/takoon/slide.html",
+      "source": "https://takoon.com/products/slide",
+      "photos": [
+        "../../assets/images/products/board-details/d3249957ba4f93da.png",
+        "../../assets/images/products/board-details/1c7b2b7bffdbe5a9.png",
+        "../../assets/images/products/board-details/b31faf3768dedf5a.png",
+        "../../assets/images/products/board-details/7ca3beae5a54783a.png",
+        "../../assets/images/products/board-details/af985ab429cd04bd.png",
+        "../../assets/images/products/board-details/c9cba9e0aa313038.png",
+        "../../assets/images/products/board-details/a3f02c5a951cc7e3.png",
+        "../../assets/images/products/board-details/5f5a34a0301d933a.png",
+        "../../assets/images/products/board-details/46e074ad7496b7dd.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-glide",
+      "path": "products/takoon/glide.html",
+      "source": "https://takoon.com/products/glide",
+      "photos": [
+        "../../assets/images/products/board-details/db7077929baed137.png",
+        "../../assets/images/products/board-details/65a4fed11be7ee6f.png",
+        "../../assets/images/products/board-details/c64d58e0a2bc1288.png",
+        "../../assets/images/products/board-details/a53da51792e436ef.png",
+        "../../assets/images/products/board-details/3833cdba1750faa6.png",
+        "../../assets/images/products/board-details/4caae1f9925bf1dc.png",
+        "../../assets/images/products/board-details/fc3b9d85aef9a70f.png",
+        "../../assets/images/products/board-details/b9f7fe9f42159f8f.png",
+        "../../assets/images/products/board-details/cc857c097b3bb5f7.png",
+        "../../assets/images/products/board-details/054ca55c8ec085f8.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-glide-midlength",
+      "path": "products/takoon/glide-midlength.html",
+      "source": "https://takoon.com/products/glide-midlength",
+      "photos": [
+        "../../assets/images/products/board-details/c1a58079a5a5230f.png",
+        "../../assets/images/products/board-details/2904e7b9775f21cc.png",
+        "../../assets/images/products/board-details/59b638e3d0b232dd.png",
+        "../../assets/images/products/board-details/ac2f262f1e7c4272.png",
+        "../../assets/images/products/board-details/ee9b57a8fda33891.png",
+        "../../assets/images/products/board-details/7ad6a4080977f819.png",
+        "../../assets/images/products/board-details/b1a3fd8043c4466a.png",
+        "../../assets/images/products/board-details/fc8444428e85b966.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-ultra-glide",
+      "path": "products/takoon/ultra-glide.html",
+      "source": "https://takoon.com/products/ultra-glide",
+      "photos": [
+        "../../assets/images/products/board-details/21afec8c0c863d0e.png",
+        "../../assets/images/products/board-details/1f32309296c145ac.png",
+        "../../assets/images/products/board-details/63404dab0c0e3999.png",
+        "../../assets/images/products/board-details/78e2a033bbc8b37f.png",
+        "../../assets/images/products/board-details/fde2718968a1076b.png",
+        "../../assets/images/products/board-details/38b830daf2f8b7b1.png",
+        "../../assets/images/products/board-details/73f62a0072711bc1.png",
+        "../../assets/images/products/board-details/4612203e951ba56f.png",
+        "../../assets/images/products/board-details/262e402cc7aecef4.png",
+        "../../assets/images/products/board-details/ca9ce7e7c5a092e8.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-prosurf",
+      "path": "products/takoon/prosurf.html",
+      "source": "https://takoon.com/products/prosurf",
+      "photos": [
+        "../../assets/images/products/board-details/02662d58023a22a5.png",
+        "../../assets/images/products/board-details/dbced13517465e7b.png",
+        "../../assets/images/products/board-details/f6c089fe993bff77.png",
+        "../../assets/images/products/board-details/c1ff10389099f785.png",
+        "../../assets/images/products/board-details/6421d288975f8396.png",
+        "../../assets/images/products/board-details/bffa6e159b9d2d22.png",
+        "../../assets/images/products/board-details/30debca7bdbe877b.png",
+        "../../assets/images/products/board-details/61aaf2b3d6b2904e.png",
+        "../../assets/images/products/board-details/ebfd7d306368b4e0.png",
+        "../../assets/images/products/board-details/527bd8697bc08962.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "ppc-m2",
+      "path": "products/ppc/m2.html",
+      "source": "https://ppcfoiling.com/products/m2-wing-1",
+      "photos": [
+        "../../assets/images/products/ppc/m2/product-official.jpg",
+        "../../assets/images/product-stories/137580ad3db962e627.jpg",
+        "../../assets/images/product-stories/5dd07874688d4e7b39.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "ppc-m1x",
+      "path": "products/ppc/m1-x.html",
+      "source": "https://ppcfoiling.com/products/m1-x-wing",
+      "photos": [
+        "../../assets/images/products/ppc/m1-x/product-top-official.jpg",
+        "../../assets/images/product-stories/3f80b74a31ddbc1c38.jpg",
+        "../../assets/images/product-stories/8316a8db3f3223f1ed.jpg",
+        "../../assets/images/product-stories/39032860f7a9d1c744.jpg",
+        "../../assets/images/product-stories/566898a7cfb156606f.jpg",
+        "../../assets/images/product-stories/631c9b227c4597dac4.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "ppc-m1",
+      "path": "products/ppc/m1.html",
+      "source": "https://ppcfoiling.com/products/m1-wing",
+      "photos": [
+        "../../assets/images/products/ppc/m1/product-official.png",
+        "../../assets/images/product-stories/47d3fe5bb923c177a3.jpg",
+        "../../assets/images/product-stories/4168b7d6131464ac82.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "ppc-fds",
+      "path": "products/ppc/fds.html",
+      "source": "https://ppcfoiling.com/products/ppc-sonic-fds-full-dual-skin-wing",
+      "photos": [
+        "../../assets/images/products/ppc/fds/product-official.png",
+        "../../assets/images/product-stories/70149ef3cf6663e513.png",
+        "../../assets/images/product-stories/8527247448c1ea538b.png",
+        "../../assets/images/product-stories/f06651cc33ef08039b.png",
+        "../../assets/images/product-stories/7e3f4aad5096573203.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "ppc-r1",
+      "path": "products/ppc/r1.html",
+      "source": "https://ppcfoiling.com/products/new-ppc-r1-race-foil-board",
+      "photos": [
+        "../../assets/images/products/official-details/6994e76b7c4563.png",
+        "../../assets/images/products/official-details/34348552bbac9f.png",
+        "../../assets/images/products/official-details/209fadf35fbcbb.jpg",
+        "../../assets/images/products/official-details/409e93f28447a0.jpg",
+        "../../assets/images/products/official-details/19d764057bb194.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "ppc-orbit",
+      "path": "products/ppc/orbit-parawing.html",
+      "source": "https://ppcfoiling.com/products/ppc-orbit-parawing",
+      "photos": [
+        "../../assets/images/products/ppc/orbit/product-official.png",
+        "../../assets/images/product-stories/f4f2a569bb0dc2a9e2.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "lvz-r6",
+      "path": "products/levitaz/r6-race.html",
+      "source": "https://levitaz.com/shop/product/r6-race-series",
+      "photos": [
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V2_vl1000x1000px_2024.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024_2024-08-05-102025_zpav.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1-rwV2-config_set_vl2000x2000px_2026-04-14-120834_qtvz.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1V2-rwV2-config_set_v.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV2-rwV2-config_set_vl2000x2000px_2026-05-11-132601_dtxd.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg"
+      ],
+      "groups": {
+        "18745": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V1_vl1000x1000px_2024.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg"
+        ],
+        "18757": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V2_vl1000x1000px_2024.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_R6V1_v1000x1000px_2024_2024-08-05-102025_zpav.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg"
+        ],
+        "24507": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1-rwV2-config_set_vl2000x2000px_2026-04-14-120834_qtvz.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1V2-rwV2-config_set_v.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg"
+        ],
+        "25772": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV2-rwV2-config_set_vl2000x2000px_2026-05-11-132601_dtxd.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_r6_v2mastV1V2-rwV2-config_set_v.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg"
+        ],
+        "25778": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg"
+        ],
+        "24513": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg"
+        ],
+        "25469": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_o2000x2000px_2026-05-11-132445_zspj.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v1_v2000x2000px.jpg"
+        ],
+        "25513": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_o2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v2_v2000x2000px.jpg"
+        ],
+        "25516": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg"
+        ],
+        "25519": [
+          "../../assets/images/products/levitaz/verified/levitaz_race-series_RW_R6_V1_G463777_o1000x1000px_2024.jpg"
+        ],
+        "25522": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_RW_R6_V2_G462363_o1000x1000px_2025.jpg"
+        ],
+        "25525": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V1_G460700_l1000x1000px_2024.jpg"
+        ],
+        "25528": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_Mast_R6_V2_G462245_l1000x1000px_2024.jpg"
+        ]
+      }
+    },
+    {
+      "id": "lvz-boom-rs-scc",
+      "path": "products/levitaz/boom-rs-scc.html",
+      "source": "https://levitaz.com/shop/product/boom-scc-boards-2/",
+      "photos": [
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_overview2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_deck2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_rail2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_bottom2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_overview2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_deck2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_rail2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_bottom2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_overview2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_deck2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_side2000x2000px.jpg",
+        "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_bottom2000x2000px.jpg"
+      ],
+      "groups": {
+        "25606": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_overview2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_deck2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_rail2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_bottom2000x2000px.jpg"
+        ],
+        "25612": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_overview2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_deck2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_rail2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_83_ssc_bottom2000x2000px.jpg"
+        ],
+        "25618": [
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_overview2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_deck2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_side2000x2000px.jpg",
+          "../../assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_bottom2000x2000px.jpg"
+        ]
+      }
+    },
+    {
+      "id": "tkn-starter",
+      "path": "products/takoon/foil-starter.html",
+      "source": "https://takoon.com/products/foil-starter",
+      "photos": [
+        "../../assets/images/products/takoon/verified/tkn-starter.png",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Starter---Mounted-Foil_71eeebeb-2080-44c3-9d3e-2e460b5ac27a.png?v=1750339287",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Starter---Mounted-Foil_small_58641af3-82d4-4720-bbb8-a9123cea6654.png?v=1750339287"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-xglide-v2",
+      "path": "products/takoon/foil-x-glide-v2.html",
+      "source": "https://takoon.com/products/foil-x-glide-v2",
+      "photos": [
+        "../../assets/images/products/takoon/verified/tkn-xglide-v2.png",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/X-Glide-V2---Mounted-Foil_3b7ffa13-584c-4c74-b034-42effeb2f5d9.png?v=1750339328",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/X-Glide-V2---Mounted-Foil_small_54cbfeff-69a1-4ce9-a6be-c933071e94ab.png?v=1750339328"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-boom-v2",
+      "path": "products/takoon/wing-carbon-boom-v2.html",
+      "source": "https://takoon.com/products/wing-carbon-boom-v2",
+      "photos": [
+        "../../assets/images/products/gallery-verified/9a3d857dbd3c73131607.png",
+        "../../assets/images/products/gallery-verified/9fe15140b49c49fa5706.png",
+        "../../assets/images/products/gallery-verified/67d5eb78f2ed3d4a66c3.png",
+        "../../assets/images/products/gallery-verified/64248fbd9d6c1178d353.png",
+        "../../assets/images/products/gallery-verified/900cd45934eddef9ea92.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-vhf-vest-pouch",
+      "path": "products/wip/vhf-vest-pouch.html",
+      "source": "https://www.forward-wip.com/produit/vhf-vest-pouch/",
+      "photos": [
+        "../../assets/images/product-stories/ea4c2b5355a8da4a83.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-flying-mask-2-0",
+      "path": "products/wip/flying-mask-2-0.html",
+      "source": "https://www.forward-wip.com/produit/flying-mask-2-0/",
+      "photos": [
+        "../../assets/images/product-stories/b0a33684615b6f6613.jpg",
+        "../../assets/images/product-stories/24046fb2087f55caa5.jpg",
+        "../../assets/images/product-stories/950187a9038d0c2298.jpg",
+        "../../assets/images/product-stories/c66c67b2a480a0e7a3.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-steamer-mk3",
+      "path": "products/wip/steamer-mk3.html",
+      "source": "https://www.forward-wip.com/produit/steamer-mk3/",
+      "photos": [
+        "../../assets/images/product-stories/fae26d00d63caa9970.jpg",
+        "../../assets/images/product-stories/133ba8c77eb14ed374.jpg",
+        "../../assets/images/product-stories/829ece86c15264f690.jpg",
+        "../../assets/images/product-stories/f04c22e8691321a4b3.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-steamy-ls",
+      "path": "products/wip/steamy-ls.html",
+      "source": "https://www.forward-wip.com/produit/steamy-ls/",
+      "photos": [
+        "../../assets/images/product-stories/17cdf9e3a631051e5d.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-steamy-3-2",
+      "path": "products/wip/steamy-3-2.html",
+      "source": "https://www.forward-wip.com/produit/steamy-3-2/",
+      "photos": [
+        "../../assets/images/product-stories/10f718575b0348a73b.jpg",
+        "../../assets/images/product-stories/c01c5666763bf0a3b1.jpg",
+        "../../assets/images/product-stories/f9ffe0cc870260b011.jpg",
+        "../../assets/images/product-stories/4fbc6f7e79ccda5acc.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-hybrid-semi-dry",
+      "path": "products/wip/hybrid-semi-dry.html",
+      "source": "https://www.forward-wip.com/produit/hybrid-semi-dry/",
+      "photos": [
+        "../../assets/images/product-stories/e0caab305611a8e054.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-neo-long-john-mk2",
+      "path": "products/wip/neo-long-john-mk2.html",
+      "source": "https://www.forward-wip.com/produit/neo-long-john-mk2/",
+      "photos": [
+        "../../assets/images/product-stories/285b9c287e5ec07e1c.png",
+        "../../assets/images/product-stories/efeabf9e716b854f9e.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-neo-long-john-women-mk2",
+      "path": "products/wip/neo-long-john-women-mk2.html",
+      "source": "https://www.forward-wip.com/produit/neo-long-john-women-mk2/",
+      "photos": [
+        "../../assets/images/product-stories/dc65a170368729bcff.png",
+        "../../assets/images/product-stories/e3ece6c532d77d66df.jpg",
+        "../../assets/images/product-stories/551dc337344d7dc098.jpg",
+        "../../assets/images/product-stories/40d6fb4114b3e37272.jpg",
+        "../../assets/images/product-stories/68ca502a19bf6c60a9.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-summer-neo-long-john-mk2",
+      "path": "products/wip/summer-neo-long-john-mk2.html",
+      "source": "https://www.forward-wip.com/produit/summer-neo-long-john-mk2/",
+      "photos": [
+        "../../assets/images/product-stories/86d3dde60c5e3213dd.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-summer-neo-long-john-women",
+      "path": "products/wip/summer-neo-long-john-women.html",
+      "source": "https://www.forward-wip.com/produit/summer-neo-long-john-women/",
+      "photos": [
+        "../../assets/images/product-stories/fc0271d8ea286846d3.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-race-parka",
+      "path": "products/wip/race-parka.html",
+      "source": "https://www.forward-wip.com/produit/race-parka/",
+      "photos": [
+        "../../assets/images/product-stories/fec3ade139a458aa90.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-flex-smock-spray-top-mk2",
+      "path": "products/wip/flex-smock-spray-top-mk2.html",
+      "source": "https://www.forward-wip.com/produit/flex-smock-spray-top-mk2/",
+      "photos": [
+        "../../assets/images/product-stories/60160fec33217503cf.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-3ds-neo-top-3mm-women",
+      "path": "products/wip/3ds-neo-top-3mm-women.html",
+      "source": "https://www.forward-wip.com/produit/3ds-neo-top-3mm-women/",
+      "photos": [
+        "../../assets/images/product-stories/9c4d429530eea7c53a.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-flow-vortex-rashguard",
+      "path": "products/wip/flow-vortex-rashguard.html",
+      "source": "https://www.forward-wip.com/produit/flow-vortex-rashguard/",
+      "photos": [
+        "../../assets/images/product-stories/fb0c5384ff28dcfd9a.jpg",
+        "../../assets/images/product-stories/1c88ff161ab6afaff4.png",
+        "../../assets/images/product-stories/d69c126038d3c94564.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-hooded-uv-rashguard-long-sleeve",
+      "path": "products/wip/hooded-uv-rashguard-long-sleeve.html",
+      "source": "https://www.forward-wip.com/produit/hooded-uv-rashguard-long-sleeve/",
+      "photos": [
+        "../../assets/images/product-stories/089be11582fcc8ac69.jpg",
+        "../../assets/images/product-stories/fe045a6f27064537fa.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-quickdry-tshirt-long-3-0",
+      "path": "products/wip/quickdry-tshirt-long-3-0.html",
+      "source": "https://www.forward-wip.com/produit/quickdry-tshirt-long-3-0/",
+      "photos": [
+        "../../assets/images/product-stories/a7e3e35d58de0581fb.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-coastal-racing-salopette",
+      "path": "products/wip/coastal-racing-salopette.html",
+      "source": "https://www.forward-wip.com/produit/coastal-racing-salopette/",
+      "photos": [
+        "../../assets/images/product-stories/b0ad122cb8564877c2.png",
+        "../../assets/images/product-stories/774db1b539978a7891.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-waistfoil-harness-3-0",
+      "path": "products/wip/waistfoil-harness-3-0.html",
+      "source": "https://www.forward-wip.com/produit/waistfoil-harness-3-0/",
+      "photos": [
+        "../../assets/images/product-stories/245bacee0d705201ca.jpg",
+        "../../assets/images/product-stories/ddbc12c388181747b5.jpg",
+        "../../assets/images/product-stories/da83abe65c93b8a171.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-wing-belt-3-0",
+      "path": "products/wip/wing-belt-3-0.html",
+      "source": "https://www.forward-wip.com/fr/produit/wing-belt-3-0/",
+      "photos": [
+        "../../assets/images/product-stories/80558da47a20871054.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-puffer-jacket",
+      "path": "products/wip/puffer-jacket.html",
+      "source": "https://www.forward-wip.com/produit/puffer-jacket/",
+      "photos": [
+        "../../assets/images/product-stories/8d60dd1216c6cfc545.jpg",
+        "../../assets/images/product-stories/916178ea8b1e1c55a2.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-tech-hoodie",
+      "path": "products/wip/tech-hoodie.html",
+      "source": "https://www.forward-wip.com/produit/tech-hoodie/",
+      "photos": [
+        "../../assets/images/product-stories/72f75bdc53b56ca23e.jpg",
+        "../../assets/images/product-stories/1d25343a13b74cb557.jpg",
+        "../../assets/images/product-stories/db62cf35fcf819956e.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-poncho",
+      "path": "products/wip/poncho.html",
+      "source": "https://www.forward-wip.com/produit/poncho/",
+      "photos": [
+        "../../assets/images/product-stories/37d171170521d02efa.png",
+        "../../assets/images/product-stories/c6cc86f54491d891d5.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-dry-sailing-short-2-0",
+      "path": "products/wip/dry-sailing-short-2-0.html",
+      "source": "https://www.forward-wip.com/produit/dry-sailing-short-2-0/",
+      "photos": [
+        "../../assets/images/product-stories/ae9f882e82bcc4b6d8.jpg",
+        "../../assets/images/product-stories/19c4270f4dca20fc30.jpg",
+        "../../assets/images/product-stories/b3ff68e52f98970e5b.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-light-sailing-short-2-0",
+      "path": "products/wip/light-sailing-short-2-0.html",
+      "source": "https://www.forward-wip.com/produit/light-sailing-short-2-0/",
+      "photos": [
+        "../../assets/images/product-stories/0be6734c993d59b18a.jpg",
+        "../../assets/images/product-stories/e1aed01c5a79013a55.jpg",
+        "../../assets/images/product-stories/66f94f75b7b620334b.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-gearpack-100l",
+      "path": "products/wip/gearpack-100l.html",
+      "source": "https://www.forward-wip.com/produit/gearpack-100l/",
+      "photos": [
+        "../../assets/images/product-stories/c64ae5981f9e8fcd1a.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-wing-board-leash-dampener",
+      "path": "products/wip/wing-board-leash-dampener.html",
+      "source": "https://www.forward-wip.com/produit/wing-board-leash-dampener/",
+      "photos": [
+        "../../assets/images/product-stories/61d35165ad189255d0.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-wing-leash",
+      "path": "products/wip/wing-leash.html",
+      "source": "https://www.forward-wip.com/produit/wing-leash/",
+      "photos": [
+        "../../assets/images/product-stories/59ce3b1e626125bfbb.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-wing-board-leash",
+      "path": "products/wip/wing-board-leash.html",
+      "source": "https://www.forward-wip.com/produit/wing-board-leash/",
+      "photos": [
+        "../../assets/images/product-stories/e4b0079902cc79c47e.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-wipsneaker",
+      "path": "products/wip/wipsneaker.html",
+      "source": "https://www.forward-wip.com/produit/wipsneaker/",
+      "photos": [
+        "../../assets/images/product-stories/579342de06569dff37.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-neo-gloves",
+      "path": "products/wip/neo-gloves.html",
+      "source": "https://www.forward-wip.com/produit/neo-gloves/",
+      "photos": [
+        "../../assets/images/product-stories/f21751197b9d5ab2b9.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-coastal-racing-jacket",
+      "path": "products/wip/coastal-racing-jacket.html",
+      "source": "https://www.forward-wip.com/produit/coastal-racing-jacket/",
+      "photos": [
+        "../../assets/images/product-stories/63a72dbf8b8a2100ab.jpg",
+        "../../assets/images/product-stories/e2030c56f81ed95749.jpg",
+        "../../assets/images/product-stories/0f97dcc8e507aa6ef7.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "wip-wing-wind-pro-harness",
+      "path": "products/wip/wing-wind-pro-harness.html",
+      "source": "https://www.forward-wip.com/produit/wing-wind-pro-harness/",
+      "photos": [
+        "../../assets/images/product-stories/132489e378ad183756.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-slide-hollow",
+      "path": "products/takoon/slide-hollow.html",
+      "source": "https://takoon.com/products/slide-hollow",
+      "photos": [
+        "../../assets/images/products/board-details/50e07ef3f72c9252.png",
+        "../../assets/images/products/board-details/f9ac25e4b40ea56a.png",
+        "../../assets/images/products/board-details/dee2e3850a62491c.png",
+        "../../assets/images/products/board-details/f2338f83379f8e97.png",
+        "../../assets/images/products/board-details/4cbe0a65db36d048.png",
+        "../../assets/images/products/board-details/0a2c974c5342eb72.png",
+        "../../assets/images/products/board-details/eb428441fcebc94f.png",
+        "../../assets/images/products/board-details/63e9aa533a929c3d.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-cloud-one",
+      "path": "products/takoon/cloud-one.html",
+      "source": "https://takoon.com/en-int/products/cloud-one",
+      "photos": [
+        "../../assets/images/products/gallery-verified/c98ce372172960472945.png",
+        "../../assets/images/products/gallery-verified/e6a446a49597845b9f59.png",
+        "../../assets/images/products/gallery-verified/fae8a4b41661d35143c6.png",
+        "../../assets/images/products/gallery-verified/730659892f262ff0368d.png",
+        "../../assets/images/products/gallery-verified/595e92b7c98fa4fb8521.png",
+        "../../assets/images/products/gallery-verified/89b74913e29770ff29c7.png",
+        "../../assets/images/products/gallery-verified/c9ec379564dc5a29dcb5.png",
+        "../../assets/images/products/gallery-verified/401519aaa5eb28f1f709.png",
+        "../../assets/images/products/gallery-verified/0aad3d74bf787129bee3.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-parawing-cloud",
+      "path": "products/takoon/parawing-cloud.html",
+      "source": "https://takoon.com/en-int/products/parawing-cloud",
+      "photos": [
+        "../../assets/images/products/gallery-verified/7f2b7d8cfbce28670827.png",
+        "../../assets/images/products/gallery-verified/31c4cdcf045cf5755539.png",
+        "../../assets/images/products/gallery-verified/9826da1af36f2abf9a25.png",
+        "../../assets/images/products/gallery-verified/b124db773fd18e48e3f7.png",
+        "../../assets/images/products/gallery-verified/d7736baed125ffe561d0.png",
+        "../../assets/images/products/gallery-verified/b0073de92d9bb6083523.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "takoon-parawing-cloud-lw",
+      "path": "products/takoon/parawing-cloud-lw.html",
+      "source": "https://takoon.com/en-int/products/parawing-cloud-lw",
+      "photos": [
+        "../../assets/images/products/gallery-verified/4617eff0dd628075c759.png",
+        "../../assets/images/products/gallery-verified/94d8321cf4fe267a7043.png",
+        "../../assets/images/products/gallery-verified/7c6816c2e0750c0725fc.png",
+        "../../assets/images/products/gallery-verified/8c4c91caf2c7927435a6.png",
+        "../../assets/images/products/gallery-verified/69692d731694616fe5ab.png",
+        "../../assets/images/products/gallery-verified/076373fb56187301425c.png",
+        "../../assets/images/products/gallery-verified/75376db4e7b4daaf1533.png"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "lvz-fs540",
+      "path": "products/levitaz/fw-540.html",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "photos": [
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_540_u2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_540_v2000x2000px.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "lvz-fs680",
+      "path": "products/levitaz/fw-680.html",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "photos": [
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_680_u2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_680_v2000x2000px.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "lvz-fs790",
+      "path": "products/levitaz/fw-790.html",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "photos": [
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_790_u2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_790_v2000x2000px.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "lvz-fs900",
+      "path": "products/levitaz/fw-900.html",
+      "source": "https://levitaz.com/shop/product/free-series-front-wings/",
+      "photos": [
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_900_u2000x2000px.jpg",
+        "../../assets/images/levitaz/levitaz_free_series_frontwing_900_v2000x2000px.jpg"
+      ],
+      "groups": {}
+    }
+  ]
+}

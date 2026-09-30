@@ -6540,9 +6540,11 @@
       ],
       "videos": [],
       "gallery": [
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wishbone_1200x1200_6980cfbc-b570-4212-8dda-223bd23e3b3d.png?v=1725458541",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-V3-Pro---Image-07_ec5825c2-2d2f-4a59-9158-419b2f82597e.png?v=1747261043",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-V3-Ultra---Gray---Image-02-02_7a3c43bb-1fff-400e-a2b9-b6e4b544c3e9.png?v=1747261043"
+        "assets/images/products/gallery-verified/9a3d857dbd3c73131607.png",
+        "assets/images/products/gallery-verified/9fe15140b49c49fa5706.png",
+        "assets/images/products/gallery-verified/67d5eb78f2ed3d4a66c3.png",
+        "assets/images/products/gallery-verified/64248fbd9d6c1178d353.png",
+        "assets/images/products/gallery-verified/900cd45934eddef9ea92.png"
       ],
       "specs": {
         "본사 옵션": "950 / 1010"
@@ -6565,7 +6567,40 @@
       "priceSource": "https://takoon.com/products/wing-carbon-boom-v2",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25"
+      "priceFixedAt": "2026-09-25",
+      "galleryImages": [
+        "assets/images/products/gallery-verified/9a3d857dbd3c73131607.png",
+        "assets/images/products/gallery-verified/9fe15140b49c49fa5706.png",
+        "assets/images/products/gallery-verified/67d5eb78f2ed3d4a66c3.png",
+        "assets/images/products/gallery-verified/64248fbd9d6c1178d353.png",
+        "assets/images/products/gallery-verified/900cd45934eddef9ea92.png"
+      ],
+      "gallerySource": {
+        "url": "https://takoon.com/products/wing-carbon-boom-v2",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wishbone_1200x1200_6980cfbc-b570-4212-8dda-223bd23e3b3d.png?v=1725458541",
+            "local": "assets/images/products/gallery-verified/9a3d857dbd3c73131607.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V3-Pro---Image-07_ec5825c2-2d2f-4a59-9158-419b2f82597e.png?v=1747261043",
+            "local": "assets/images/products/gallery-verified/9fe15140b49c49fa5706.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V3-Ultra---Gray---Image-02-02_7a3c43bb-1fff-400e-a2b9-b6e4b544c3e9.png?v=1747261043",
+            "local": "assets/images/products/gallery-verified/67d5eb78f2ed3d4a66c3.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-VX-Pro---Cyan-V1---Image-08_61cdbf29-d6ed-49d1-aecd-6569a1142a8b.png?v=1747261043",
+            "local": "assets/images/products/gallery-verified/64248fbd9d6c1178d353.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/VX-Pro-Wings---Bright-Blue---Detail-06_1200x1200_3f5b447d-180f-4f16-acc4-3198a40f2eac.png?v=1747261043",
+            "local": "assets/images/products/gallery-verified/900cd45934eddef9ea92.png"
+          }
+        ]
+      }
     },
     {
       "id": "wip-vhf-vest-pouch",
@@ -9892,10 +9927,15 @@
         "wave"
       ],
       "gallery": [
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---Fuchsia---Image-02.png?v=1778138889",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---Fuchsia---Image-05.png?v=1778138893",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---Fuchsia---Image-01.png?v=1778138899",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud-One---C2---Image-01.png?v=1770287486"
+        "assets/images/products/gallery-verified/c98ce372172960472945.png",
+        "assets/images/products/gallery-verified/e6a446a49597845b9f59.png",
+        "assets/images/products/gallery-verified/fae8a4b41661d35143c6.png",
+        "assets/images/products/gallery-verified/730659892f262ff0368d.png",
+        "assets/images/products/gallery-verified/595e92b7c98fa4fb8521.png",
+        "assets/images/products/gallery-verified/89b74913e29770ff29c7.png",
+        "assets/images/products/gallery-verified/c9ec379564dc5a29dcb5.png",
+        "assets/images/products/gallery-verified/401519aaa5eb28f1f709.png",
+        "assets/images/products/gallery-verified/0aad3d74bf787129bee3.png"
       ],
       "verifiedAt": "2026-09-25",
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
@@ -9983,6 +10023,59 @@
         ],
         "source": "https://takoon.com/en-int/products/cloud-one",
         "checkedAt": "2026-09-27"
+      },
+      "galleryImages": [
+        "assets/images/products/gallery-verified/c98ce372172960472945.png",
+        "assets/images/products/gallery-verified/e6a446a49597845b9f59.png",
+        "assets/images/products/gallery-verified/fae8a4b41661d35143c6.png",
+        "assets/images/products/gallery-verified/730659892f262ff0368d.png",
+        "assets/images/products/gallery-verified/595e92b7c98fa4fb8521.png",
+        "assets/images/products/gallery-verified/89b74913e29770ff29c7.png",
+        "assets/images/products/gallery-verified/c9ec379564dc5a29dcb5.png",
+        "assets/images/products/gallery-verified/401519aaa5eb28f1f709.png",
+        "assets/images/products/gallery-verified/0aad3d74bf787129bee3.png"
+      ],
+      "gallerySource": {
+        "url": "https://takoon.com/en-int/products/cloud-one",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---Fuchsia---Image-02.png?v=1778138889",
+            "local": "assets/images/products/gallery-verified/c98ce372172960472945.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---Fuchsia---Image-05.png?v=1778138893",
+            "local": "assets/images/products/gallery-verified/e6a446a49597845b9f59.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---Fuchsia---Image-01.png?v=1778138899",
+            "local": "assets/images/products/gallery-verified/fae8a4b41661d35143c6.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---C2---Image-01.png?v=1770287486",
+            "local": "assets/images/products/gallery-verified/730659892f262ff0368d.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---C2---Image-05.png?v=1770287486",
+            "local": "assets/images/products/gallery-verified/595e92b7c98fa4fb8521.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---C2---Image-07.png?v=1770287486",
+            "local": "assets/images/products/gallery-verified/89b74913e29770ff29c7.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---Image-01.png?v=1770287486",
+            "local": "assets/images/products/gallery-verified/c9ec379564dc5a29dcb5.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---Image-05.png?v=1770287486",
+            "local": "assets/images/products/gallery-verified/401519aaa5eb28f1f709.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud-One---Image-07.png?v=1770287486",
+            "local": "assets/images/products/gallery-verified/0aad3d74bf787129bee3.png"
+          }
+        ]
       }
     },
     {
@@ -10121,10 +10214,12 @@
         "wave"
       ],
       "gallery": [
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---Image-10.png?v=1775658233",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---Image-09.png?v=1775658233",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---C6---Image-01.png?v=1775658233",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-Cloud---C6---Image-02.png?v=1775658233"
+        "assets/images/products/gallery-verified/7f2b7d8cfbce28670827.png",
+        "assets/images/products/gallery-verified/31c4cdcf045cf5755539.png",
+        "assets/images/products/gallery-verified/9826da1af36f2abf9a25.png",
+        "assets/images/products/gallery-verified/b124db773fd18e48e3f7.png",
+        "assets/images/products/gallery-verified/d7736baed125ffe561d0.png",
+        "assets/images/products/gallery-verified/b0073de92d9bb6083523.png"
       ],
       "verifiedAt": "2026-09-25",
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
@@ -10218,6 +10313,44 @@
         ],
         "source": "https://takoon.com/en-int/products/parawing-cloud",
         "checkedAt": "2026-09-27"
+      },
+      "galleryImages": [
+        "assets/images/products/gallery-verified/7f2b7d8cfbce28670827.png",
+        "assets/images/products/gallery-verified/31c4cdcf045cf5755539.png",
+        "assets/images/products/gallery-verified/9826da1af36f2abf9a25.png",
+        "assets/images/products/gallery-verified/b124db773fd18e48e3f7.png",
+        "assets/images/products/gallery-verified/d7736baed125ffe561d0.png",
+        "assets/images/products/gallery-verified/b0073de92d9bb6083523.png"
+      ],
+      "gallerySource": {
+        "url": "https://takoon.com/en-int/products/parawing-cloud",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---Image-10.png?v=1775658233",
+            "local": "assets/images/products/gallery-verified/7f2b7d8cfbce28670827.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---Image-09.png?v=1775658233",
+            "local": "assets/images/products/gallery-verified/31c4cdcf045cf5755539.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---C6---Image-01.png?v=1775658233",
+            "local": "assets/images/products/gallery-verified/9826da1af36f2abf9a25.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---C6---Image-02.png?v=1775658233",
+            "local": "assets/images/products/gallery-verified/b124db773fd18e48e3f7.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---C5---Image-01.png?v=1775658233",
+            "local": "assets/images/products/gallery-verified/d7736baed125ffe561d0.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-Cloud---C5---Image-02.png?v=1775658233",
+            "local": "assets/images/products/gallery-verified/b0073de92d9bb6083523.png"
+          }
+        ]
       }
     },
     {
@@ -10270,10 +10403,13 @@
         "light"
       ],
       "gallery": [
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-01_updated.png?v=1783525112",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-01_1a1e5834-19f2-4deb-ad05-c20cbf7d4968.png?v=1783516410",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-02_9d7ef0ce-f648-489b-8cd8-482d92319c3e.png?v=1783516410",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Parawing-LW---Image-03_663d412a-5a9e-48bd-a8cc-94e4ac6678f3.png?v=1783516410"
+        "assets/images/products/gallery-verified/4617eff0dd628075c759.png",
+        "assets/images/products/gallery-verified/94d8321cf4fe267a7043.png",
+        "assets/images/products/gallery-verified/7c6816c2e0750c0725fc.png",
+        "assets/images/products/gallery-verified/8c4c91caf2c7927435a6.png",
+        "assets/images/products/gallery-verified/69692d731694616fe5ab.png",
+        "assets/images/products/gallery-verified/076373fb56187301425c.png",
+        "assets/images/products/gallery-verified/75376db4e7b4daaf1533.png"
       ],
       "verifiedAt": "2026-09-25",
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
@@ -10354,6 +10490,49 @@
         ],
         "source": "https://takoon.com/en-int/products/parawing-cloud-lw",
         "checkedAt": "2026-09-27"
+      },
+      "galleryImages": [
+        "assets/images/products/gallery-verified/4617eff0dd628075c759.png",
+        "assets/images/products/gallery-verified/94d8321cf4fe267a7043.png",
+        "assets/images/products/gallery-verified/7c6816c2e0750c0725fc.png",
+        "assets/images/products/gallery-verified/8c4c91caf2c7927435a6.png",
+        "assets/images/products/gallery-verified/69692d731694616fe5ab.png",
+        "assets/images/products/gallery-verified/076373fb56187301425c.png",
+        "assets/images/products/gallery-verified/75376db4e7b4daaf1533.png"
+      ],
+      "gallerySource": {
+        "url": "https://takoon.com/en-int/products/parawing-cloud-lw",
+        "checkedAt": "2026-09-30",
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-01_updated.png?v=1783525112",
+            "local": "assets/images/products/gallery-verified/4617eff0dd628075c759.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-02_9d7ef0ce-f648-489b-8cd8-482d92319c3e.png?v=1783516410",
+            "local": "assets/images/products/gallery-verified/94d8321cf4fe267a7043.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-03_663d412a-5a9e-48bd-a8cc-94e4ac6678f3.png?v=1783516410",
+            "local": "assets/images/products/gallery-verified/7c6816c2e0750c0725fc.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-04_273100ca-ff05-4585-8473-b7fa6634ee08.png?v=1783516410",
+            "local": "assets/images/products/gallery-verified/8c4c91caf2c7927435a6.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-05_96960282-5c0b-4b3c-84f6-cab079e688f3.png?v=1783516410",
+            "local": "assets/images/products/gallery-verified/69692d731694616fe5ab.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-06_d3330e26-1d46-44cd-aa47-dfffed2f4f18.png?v=1783516410",
+            "local": "assets/images/products/gallery-verified/076373fb56187301425c.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Parawing-LW---Image-07_bc78ecae-df8f-48c5-b1f5-ffec80717ee0.png?v=1783516410",
+            "local": "assets/images/products/gallery-verified/75376db4e7b4daaf1533.png"
+          }
+        ]
       }
     },
     {
@@ -10365,10 +10544,12 @@
       "image": "assets/images/levitaz/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
       "description": "속도와 민첩한 반응",
       "headline": "속도와 민첩한 반응",
-      "price": null,
+      "price": 5370000,
       "options": [
         "프론트윙 540cm² 단품",
-        "세트 상담 · 프론트윙 540cm² + 마스트 + 리어윙"
+        "세트 · FW 540 + 마스트 76cm + STAB 180",
+        "세트 · FW 540 + 마스트 84cm + STAB 180",
+        "세트 · FW 540 + 마스트 96cm + STAB 180"
       ],
       "retailVariants": [
         {
@@ -10376,8 +10557,28 @@
           "priceKRW": null
         },
         {
-          "option": "세트 상담 · 프론트윙 540cm² + 마스트 + 리어윙",
-          "priceKRW": null
+          "option": "세트 · FW 540 + 마스트 76cm + STAB 180",
+          "priceKRW": 5370000,
+          "sku": "FS54076180",
+          "mastCM": 76,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=26961",
+          "sourcePriceEUR": 2522.5
+        },
+        {
+          "option": "세트 · FW 540 + 마스트 84cm + STAB 180",
+          "priceKRW": 5440000,
+          "sku": "FS54084180",
+          "mastCM": 84,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=26966",
+          "sourcePriceEUR": 2564.17
+        },
+        {
+          "option": "세트 · FW 540 + 마스트 96cm + STAB 180",
+          "priceKRW": 5600000,
+          "sku": "FS54096180",
+          "mastCM": 96,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27002",
+          "sourcePriceEUR": 2647.5
         }
       ],
       "priority": "performance",
@@ -10396,12 +10597,27 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_540_u2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_540_v2000x2000px.jpg"
-      ]
+      ],
+      "gallery": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_540_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_540_v2000x2000px.jpg"
+      ],
+      "priceMax": 5600000,
+      "priceStatus": "fixed",
+      "pricingBasis": {
+        "fxEURKRW": 1600,
+        "freightEUR": 300,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "roundingKRW": 10000
+      },
+      "priceSource": "2026-09-30 본사 세트별 VAT 제외 가격 · 기존 레비타즈 포일 가격 기준"
     },
     {
       "id": "lvz-fs680",
@@ -10412,10 +10628,12 @@
       "image": "assets/images/levitaz/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
       "description": "속도와 글라이드의 균형",
       "headline": "속도와 글라이드의 균형",
-      "price": null,
+      "price": 5400000,
       "options": [
         "프론트윙 680cm² 단품",
-        "세트 상담 · 프론트윙 680cm² + 마스트 + 리어윙"
+        "세트 · FW 680 + 마스트 76cm + STAB 180",
+        "세트 · FW 680 + 마스트 84cm + STAB 180",
+        "세트 · FW 680 + 마스트 96cm + STAB 180"
       ],
       "retailVariants": [
         {
@@ -10423,8 +10641,28 @@
           "priceKRW": null
         },
         {
-          "option": "세트 상담 · 프론트윙 680cm² + 마스트 + 리어윙",
-          "priceKRW": null
+          "option": "세트 · FW 680 + 마스트 76cm + STAB 180",
+          "priceKRW": 5400000,
+          "sku": "FS68076180",
+          "mastCM": 76,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27016",
+          "sourcePriceEUR": 2539.17
+        },
+        {
+          "option": "세트 · FW 680 + 마스트 84cm + STAB 180",
+          "priceKRW": 5480000,
+          "sku": "FS68084180",
+          "mastCM": 84,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27030",
+          "sourcePriceEUR": 2580.83
+        },
+        {
+          "option": "세트 · FW 680 + 마스트 96cm + STAB 180",
+          "priceKRW": 5630000,
+          "sku": "FS68096180",
+          "mastCM": 96,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27040",
+          "sourcePriceEUR": 2664.17
         }
       ],
       "priority": "performance",
@@ -10443,12 +10681,27 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_680_u2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_680_v2000x2000px.jpg"
-      ]
+      ],
+      "gallery": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_680_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_680_v2000x2000px.jpg"
+      ],
+      "priceMax": 5630000,
+      "priceStatus": "fixed",
+      "pricingBasis": {
+        "fxEURKRW": 1600,
+        "freightEUR": 300,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "roundingKRW": 10000
+      },
+      "priceSource": "2026-09-30 본사 세트별 VAT 제외 가격 · 기존 레비타즈 포일 가격 기준"
     },
     {
       "id": "lvz-fs790",
@@ -10459,10 +10712,12 @@
       "image": "assets/images/levitaz/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
       "description": "이륙과 부드러운 글라이드",
       "headline": "이륙과 부드러운 글라이드",
-      "price": null,
+      "price": 5560000,
       "options": [
         "프론트윙 790cm² 단품",
-        "세트 상담 · 프론트윙 790cm² + 마스트 + 리어윙"
+        "세트 · FW 790 + 마스트 76cm + STAB 180",
+        "세트 · FW 790 + 마스트 84cm + STAB 180",
+        "세트 · FW 790 + 마스트 96cm + STAB 180"
       ],
       "retailVariants": [
         {
@@ -10470,8 +10725,28 @@
           "priceKRW": null
         },
         {
-          "option": "세트 상담 · 프론트윙 790cm² + 마스트 + 리어윙",
-          "priceKRW": null
+          "option": "세트 · FW 790 + 마스트 76cm + STAB 180",
+          "priceKRW": 5560000,
+          "sku": "FS79076180",
+          "mastCM": 76,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27050",
+          "sourcePriceEUR": 2622.5
+        },
+        {
+          "option": "세트 · FW 790 + 마스트 84cm + STAB 180",
+          "priceKRW": 5630000,
+          "sku": "FS79084180",
+          "mastCM": 84,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27060",
+          "sourcePriceEUR": 2664.17
+        },
+        {
+          "option": "세트 · FW 790 + 마스트 96cm + STAB 180",
+          "priceKRW": 5790000,
+          "sku": "FS79096180",
+          "mastCM": 96,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27070",
+          "sourcePriceEUR": 2747.5
         }
       ],
       "priority": "performance",
@@ -10490,12 +10765,27 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_790_u2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_790_v2000x2000px.jpg"
-      ]
+      ],
+      "gallery": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_790_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_790_v2000x2000px.jpg"
+      ],
+      "priceMax": 5790000,
+      "priceStatus": "fixed",
+      "pricingBasis": {
+        "fxEURKRW": 1600,
+        "freightEUR": 300,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "roundingKRW": 10000
+      },
+      "priceSource": "2026-09-30 본사 세트별 VAT 제외 가격 · 기존 레비타즈 포일 가격 기준"
     },
     {
       "id": "lvz-fs900",
@@ -10506,10 +10796,12 @@
       "image": "assets/images/levitaz/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
       "description": "넓은 스팬과 효율적인 글라이드",
       "headline": "넓은 스팬과 효율적인 글라이드",
-      "price": null,
+      "price": 5630000,
       "options": [
         "프론트윙 900cm² 단품",
-        "세트 상담 · 프론트윙 900cm² + 마스트 + 리어윙"
+        "세트 · FW 900 + 마스트 76cm + STAB 180",
+        "세트 · FW 900 + 마스트 84cm + STAB 180",
+        "세트 · FW 900 + 마스트 96cm + STAB 180"
       ],
       "retailVariants": [
         {
@@ -10517,8 +10809,28 @@
           "priceKRW": null
         },
         {
-          "option": "세트 상담 · 프론트윙 900cm² + 마스트 + 리어윙",
-          "priceKRW": null
+          "option": "세트 · FW 900 + 마스트 76cm + STAB 180",
+          "priceKRW": 5630000,
+          "sku": "FS90076180",
+          "mastCM": 76,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27079",
+          "sourcePriceEUR": 2664.17
+        },
+        {
+          "option": "세트 · FW 900 + 마스트 84cm + STAB 180",
+          "priceKRW": 5710000,
+          "sku": "FS90084180",
+          "mastCM": 84,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27090",
+          "sourcePriceEUR": 2705.83
+        },
+        {
+          "option": "세트 · FW 900 + 마스트 96cm + STAB 180",
+          "priceKRW": 5870000,
+          "sku": "FS90096180",
+          "mastCM": 96,
+          "source": "https://levitaz.com/shop/product/free-series-foils/?variant=27102",
+          "sourcePriceEUR": 2789.17
         }
       ],
       "priority": "performance",
@@ -10537,12 +10849,27 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "최신 구성별 가격 확인 후 안내",
+      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_900_u2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_900_v2000x2000px.jpg"
-      ]
+      ],
+      "gallery": [
+        "assets/images/levitaz/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_900_u2000x2000px.jpg",
+        "assets/images/levitaz/levitaz_free_series_frontwing_900_v2000x2000px.jpg"
+      ],
+      "priceMax": 5870000,
+      "priceStatus": "fixed",
+      "pricingBasis": {
+        "fxEURKRW": 1600,
+        "freightEUR": 300,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "roundingKRW": 10000
+      },
+      "priceSource": "2026-09-30 본사 세트별 VAT 제외 가격 · 기존 레비타즈 포일 가격 기준"
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",
