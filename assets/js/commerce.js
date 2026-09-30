@@ -10,6 +10,9 @@
  toggle?.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));toggle.textContent=open?'닫기':'메뉴';nav.classList.toggle('is-open',open)});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&toggle?.getAttribute('aria-expanded')==='true'){toggle.click();toggle.focus()}});
  document.querySelector('[data-share]')?.addEventListener('click',async()=>{const url=document.querySelector('link[rel=canonical]').href;try{if(navigator.share)await navigator.share({title:document.title,url});else await copy(url)}catch(e){if(e.name!=='AbortError')await copy(url)}});
+ let authEntryVersion=0;
+ async function updateAuthEntry(){const version=++authEntryVersion;let logged=false;try{await window.DMJAuth?._ensureClient();const client=window.DMJAuth?._supabase();if(client){const result=await client.auth.getUser();logged=!result.error&&!!result.data.user;}}catch(e){}if(version!==authEntryVersion)return;document.querySelectorAll('[data-customer-auth]').forEach(a=>{a.textContent=logged?'마이페이지':'로그인 / 회원가입';a.href=root+(logged?'profile.html':'login.html')});}
+ window.addEventListener('dmj-auth-change',()=>setTimeout(updateAuthEntry,0));updateAuthEntry();
  const filters=document.querySelector('.catalog-filters');
  if(filters){
   const controls=filters.elements;

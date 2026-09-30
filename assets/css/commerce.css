@@ -69,3 +69,15 @@
 .commerce .product-grid>.product-card>.product-image{flex-shrink:0}
 .commerce .product-grid>.product-card>.product-info{display:flex;flex-direction:column;flex:1}
 .commerce .product-grid>.product-card>.product-info>.product-price{margin-top:auto!important;padding-top:20px;margin-bottom:0}
+
+/* Consistent footer links, independent of label length. */
+.commerce .store-footer .footer-link-row{display:grid;grid-template-columns:110px minmax(0,1fr);align-items:start;gap:16px;padding:18px 0;margin:0;border-top:1px solid var(--line);font-size:13px}
+.commerce .store-footer .footer-link-row>strong{font-size:12px;line-height:24px}
+.commerce .store-footer .footer-link-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 24px}
+.commerce .store-footer .footer-link-list a{display:block;border:0;padding:0;line-height:24px;overflow-wrap:anywhere}
+@media(max-width:600px){.commerce .store-footer .footer-link-row{grid-template-columns:1fr;gap:8px}.commerce .store-footer .footer-link-list{grid-template-columns:1fr;gap:2px}.commerce .store-footer .footer-link-list a{min-height:40px;display:flex;align-items:center}}
+
+.commerce .store-footer .footer-link-list .social-channel{display:flex;align-items:center;gap:10px;min-height:40px}
+.social-icon{width:22px;height:22px;flex:0 0 22px}.social-channel.instagram .social-icon{color:#c13584}.social-channel.youtube .social-icon{color:#e62117}.social-channel.band .social-icon{color:#00a846}
+
+.commerce .store-footer .footer-link-row>strong,.commerce .store-footer .footer-link-list a{min-height:40px;display:flex;align-items:center}

@@ -91,3 +91,14 @@ body.commerce{--space:clamp(20px,5vw,80px);font-size:16px}
  .commerce .product-info h3{overflow-wrap:anywhere}
 }
 @media(max-width:360px){.commerce .footer-top{grid-template-columns:repeat(2,minmax(0,1fr))}.commerce .header-contact{padding:10px}.commerce .store-header{gap:12px}.commerce .product-grid{column-gap:12px}}
+
+/* Keep the customer sign-in entry legible and accessible on every screen. */
+.commerce .utility{height:44px;position:sticky;top:0;z-index:101}
+.commerce .utility-links{margin-left:auto;gap:18px}
+.commerce .utility-links a{display:flex;align-items:center;min-height:44px;font-size:13px;color:#fff}
+.commerce .utility-links [data-customer-auth]{font-weight:700}
+.commerce .utility+.store-header{top:44px}
+.commerce .store-header nav [data-customer-auth]{display:none}
+@media(max-width:800px){.commerce .utility>span{display:none}.commerce .utility-links{width:100%;justify-content:flex-end}.commerce .store-header nav.is-open [data-customer-auth]{display:flex}}
+
+.commerce .utility{gap:20px}
