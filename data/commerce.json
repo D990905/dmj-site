@@ -3998,22 +3998,14 @@
       "image": "assets/images/products/ppc/m2/product-official.jpg",
       "description": "본사는 입문자부터 선수까지 잔잔한 수면과 웨이브에 사용할 수 있는 범용 모델로 소개합니다. Dacron 프레임과 카본 핸들·붐 호환 구성이 특징입니다.",
       "options": [
-        "3m / White/Grey (25/26) / Dual Handles",
-        "3m / White/Grey (25/26) / Single Boom",
-        "4m / White/Grey (25/26) / Dual Handles",
-        "4m / White/Grey (25/26) / Single Boom",
-        "5m / White/Grey (25/26) / Dual Handles",
-        "5m / White/Grey (25/26) / Single Boom",
-        "6m / White/Grey (25/26) / Dual Handles",
-        "6m / White/Grey (25/26) / Single Boom",
-        "3m / Green/Grey (26/27) / Single Boom",
-        "4m / Green/Grey (26/27) / Single Boom",
-        "5m / Green/Grey (26/27) / Single Boom",
-        "6m / Green/Grey (26/27) / Single Boom",
-        "3m / Green/Grey (26/27) / Dual Handles",
-        "4m / Green/Grey (26/27) / Dual Handles",
-        "5m / Green/Grey (26/27) / Dual Handles",
-        "6m / Green/Grey (26/27) / Dual Handles"
+        "3m / White/Grey (25/26)",
+        "4m / White/Grey (25/26)",
+        "5m / White/Grey (25/26)",
+        "6m / White/Grey (25/26)",
+        "3m / Green/Grey (26/27)",
+        "4m / Green/Grey (26/27)",
+        "5m / Green/Grey (26/27)",
+        "6m / Green/Grey (26/27)"
       ],
       "price": 1690000,
       "availability": "inquiry",
@@ -4048,106 +4040,58 @@
         "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/6af55148e8f8580eb1820a8d0496ef09.jpg?v=1774912416"
       ],
       "specs": {
-        "본사 옵션": "3m / White/Grey (25/26) / Dual Handles / 3m / White/Grey (25/26) / Single Boom / 4m / White/Grey (25/26) / Dual Handles / 4m / White/Grey (25/26) / Single Boom / 5m / White/Grey (25/26) / Dual Handles / 5m / White/Grey (25/26) / Single Boom / 6m / White/Grey (25/26) / Dual Handles / 6m / White/Grey (25/26) / Single Boom / 3m / Green/Grey (26/27) / Single Boom / 4m / Green/Grey (26/27) / Single Boom / 5m / Green/Grey (26/27) / Single Boom / 6m / Green/Grey (26/27) / Single Boom / 3m / Green/Grey (26/27) / Dual Handles / 4m / Green/Grey (26/27) / Dual Handles / 5m / Green/Grey (26/27) / Dual Handles / 6m / Green/Grey (26/27) / Dual Handles",
+        "본사 옵션": "3m / White/Grey (25/26) / 4m / White/Grey (25/26) / 5m / White/Grey (25/26) / 6m / White/Grey (25/26) / 3m / Green/Grey (26/27) / 4m / Green/Grey (26/27) / 5m / Green/Grey (26/27) / 6m / Green/Grey (26/27)",
         "프레임": "프리미엄 Dacron",
         "핸들": "카본 핸들·붐 호환"
       },
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "3m / White/Grey (25/26) / Dual Handles",
+          "option": "3m / White/Grey (25/26)",
           "priceKRW": 1690000,
           "sku": "M230M",
           "estimated": false
         },
         {
-          "option": "3m / White/Grey (25/26) / Single Boom",
-          "priceKRW": 1690000,
-          "sku": "M2B30M",
-          "estimated": false
-        },
-        {
-          "option": "4m / White/Grey (25/26) / Dual Handles",
+          "option": "4m / White/Grey (25/26)",
           "priceKRW": 1730000,
           "sku": "M240M",
           "estimated": false
         },
         {
-          "option": "4m / White/Grey (25/26) / Single Boom",
-          "priceKRW": 1730000,
-          "sku": "M2B40M",
-          "estimated": false
-        },
-        {
-          "option": "5m / White/Grey (25/26) / Dual Handles",
+          "option": "5m / White/Grey (25/26)",
           "priceKRW": 1750000,
           "sku": "M250M",
           "estimated": false
         },
         {
-          "option": "5m / White/Grey (25/26) / Single Boom",
-          "priceKRW": 1750000,
-          "sku": "M2B50M",
-          "estimated": false
-        },
-        {
-          "option": "6m / White/Grey (25/26) / Dual Handles",
+          "option": "6m / White/Grey (25/26)",
           "priceKRW": 1830000,
           "sku": "M260M",
           "estimated": false
         },
         {
-          "option": "6m / White/Grey (25/26) / Single Boom",
-          "priceKRW": 1830000,
-          "sku": "M2B60M",
-          "estimated": false
-        },
-        {
-          "option": "3m / Green/Grey (26/27) / Single Boom",
+          "option": "3m / Green/Grey (26/27)",
           "priceKRW": 2060000,
           "sku": "M2B30MG",
           "estimated": false
         },
         {
-          "option": "4m / Green/Grey (26/27) / Single Boom",
+          "option": "4m / Green/Grey (26/27)",
           "priceKRW": 2100000,
           "sku": "M2B40MG",
           "estimated": false
         },
         {
-          "option": "5m / Green/Grey (26/27) / Single Boom",
+          "option": "5m / Green/Grey (26/27)",
           "priceKRW": 2130000,
           "sku": "M2B50MG",
           "estimated": false
         },
         {
-          "option": "6m / Green/Grey (26/27) / Single Boom",
+          "option": "6m / Green/Grey (26/27)",
           "priceKRW": 2230000,
           "sku": "M2B60MG",
-          "estimated": false
-        },
-        {
-          "option": "3m / Green/Grey (26/27) / Dual Handles",
-          "priceKRW": 2060000,
-          "sku": "M230MG",
-          "estimated": false
-        },
-        {
-          "option": "4m / Green/Grey (26/27) / Dual Handles",
-          "priceKRW": 2100000,
-          "sku": "M240MG",
-          "estimated": false
-        },
-        {
-          "option": "5m / Green/Grey (26/27) / Dual Handles",
-          "priceKRW": 2130000,
-          "sku": "M250MG",
-          "estimated": false
-        },
-        {
-          "option": "6m / Green/Grey (26/27) / Dual Handles",
-          "priceKRW": 2230000,
-          "sku": "M260MG",
           "estimated": false
         }
       ],
@@ -4186,22 +4130,14 @@
       "image": "assets/images/products/ppc/m1-x/product-top-official.jpg",
       "description": "M1보다 가벼운 캐노피와 강성 높은 프레임을 강조합니다. 본사는 웨이브에서 윙을 흘려두는 조작과 프리스타일 성능을 주요 용도로 설명합니다.",
       "options": [
-        "3m / Dual Handles",
-        "3.5m / Dual Handles",
-        "3m / Single Boom (long bag incl)",
-        "4m / Dual Handles",
-        "3.5m / Single Boom (long bag incl)",
-        "4.5m / Dual Handles",
-        "5m / Dual Handles",
-        "4m / Single Boom (long bag incl)",
-        "5.5m / Dual Handles",
-        "6m / Dual Handles",
-        "4.5m / Single Boom (long bag incl)",
-        "7m / Dual Handles",
-        "5m / Single Boom (long bag incl)",
-        "5.5m / Single Boom (long bag incl)",
-        "6m / Single Boom (long bag incl)",
-        "7m / Single Boom (long bag incl)"
+        "3m",
+        "3.5m",
+        "4m",
+        "4.5m",
+        "5m",
+        "5.5m",
+        "6m",
+        "7m"
       ],
       "price": 2960000,
       "availability": "inquiry",
@@ -4320,104 +4256,56 @@
         "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/c9dcc73f12da023018bef3b7fe59b54f.jpg?v=1788726569"
       ],
       "specs": {
-        "본사 옵션": "3m / Dual Handles / 3.5m / Dual Handles / 3m / Single Boom (long bag incl) / 4m / Dual Handles / 3.5m / Single Boom (long bag incl) / 4.5m / Dual Handles / 5m / Dual Handles / 4m / Single Boom (long bag incl) / 5.5m / Dual Handles / 6m / Dual Handles / 4.5m / Single Boom (long bag incl) / 7m / Dual Handles / 5m / Single Boom (long bag incl) / 5.5m / Single Boom (long bag incl) / 6m / Single Boom (long bag incl) / 7m / Single Boom (long bag incl)"
+        "본사 옵션": "3m / 3.5m / 4m / 4.5m / 5m / 5.5m / 6m / 7m"
       },
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "3m / Dual Handles",
+          "option": "3m",
           "priceKRW": 2960000,
           "sku": "M1X30M",
           "estimated": false
         },
         {
-          "option": "3.5m / Dual Handles",
+          "option": "3.5m",
           "priceKRW": 2980000,
           "sku": "M1X35M",
           "estimated": false
         },
         {
-          "option": "3m / Single Boom (long bag incl)",
-          "priceKRW": 2960000,
-          "sku": "M1X30MB",
-          "estimated": false
-        },
-        {
-          "option": "4m / Dual Handles",
+          "option": "4m",
           "priceKRW": 2990000,
           "sku": "M1X40M",
           "estimated": false
         },
         {
-          "option": "3.5m / Single Boom (long bag incl)",
-          "priceKRW": 2980000,
-          "sku": "M1X35MB",
-          "estimated": false
-        },
-        {
-          "option": "4.5m / Dual Handles",
+          "option": "4.5m",
           "priceKRW": 3010000,
           "sku": "M1X45M",
           "estimated": false
         },
         {
-          "option": "5m / Dual Handles",
+          "option": "5m",
           "priceKRW": 3040000,
           "sku": "M1X50M",
           "estimated": false
         },
         {
-          "option": "4m / Single Boom (long bag incl)",
-          "priceKRW": 2990000,
-          "sku": "M1X40MB",
-          "estimated": false
-        },
-        {
-          "option": "5.5m / Dual Handles",
+          "option": "5.5m",
           "priceKRW": 3180000,
           "sku": "M1X55M",
           "estimated": false
         },
         {
-          "option": "6m / Dual Handles",
+          "option": "6m",
           "priceKRW": 3270000,
           "sku": "M1X60M",
           "estimated": false
         },
         {
-          "option": "4.5m / Single Boom (long bag incl)",
-          "priceKRW": 3010000,
-          "sku": "M1X45MB",
-          "estimated": false
-        },
-        {
-          "option": "7m / Dual Handles",
+          "option": "7m",
           "priceKRW": 3480000,
           "sku": "M1X70M",
-          "estimated": false
-        },
-        {
-          "option": "5m / Single Boom (long bag incl)",
-          "priceKRW": 3040000,
-          "sku": "M1X50MB",
-          "estimated": false
-        },
-        {
-          "option": "5.5m / Single Boom (long bag incl)",
-          "priceKRW": 3180000,
-          "sku": "M1X55MB",
-          "estimated": false
-        },
-        {
-          "option": "6m / Single Boom (long bag incl)",
-          "priceKRW": 3270000,
-          "sku": "M1X60MB",
-          "estimated": false
-        },
-        {
-          "option": "7m / Single Boom (long bag incl)",
-          "priceKRW": 3480000,
-          "sku": "M1X70MB",
           "estimated": false
         }
       ],
@@ -4461,24 +4349,15 @@
       "image": "assets/images/products/ppc/m1/product-official.png",
       "description": "EXO-PE 리딩에지·스트럿과 Aero-Weave 캐노피를 적용한 모델입니다. 본사는 하중 아래 형상 유지, 제어와 업윈드 성능을 강조합니다.",
       "options": [
-        "3m / Dual Handles",
-        "3.5m / Dual Handles",
-        "3m / Single Boom (long bag incl)",
-        "4m / Dual Handles",
-        "3.5m / Single Boom (long bag incl)",
-        "4.5m / Dual Handles",
-        "5m / Dual Handles",
-        "4m / Single Boom (long bag incl)",
-        "5.5m / Dual Handles",
-        "6m / Dual Handles",
-        "4.5m / Single Boom (long bag incl)",
-        "6.5m / Dual Handles",
-        "7m / Dual Handles",
-        "5m / Single Boom (long bag incl)",
-        "5.5m / Single Boom (long bag incl)",
-        "6m / Single Boom (long bag incl)",
-        "6.5m / Single Boom (long bag incl)",
-        "7m / Single Boom (long bag incl)"
+        "3m",
+        "3.5m",
+        "4m",
+        "4.5m",
+        "5m",
+        "5.5m",
+        "6m",
+        "6.5m",
+        "7m"
       ],
       "price": 2980000,
       "availability": "inquiry",
@@ -4512,118 +4391,64 @@
         "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/fad188bd248c86f285293295b14ffb4e.jpg?v=1773888787"
       ],
       "specs": {
-        "본사 옵션": "3m / Dual Handles / 3.5m / Dual Handles / 3m / Single Boom (long bag incl) / 4m / Dual Handles / 3.5m / Single Boom (long bag incl) / 4.5m / Dual Handles / 5m / Dual Handles / 4m / Single Boom (long bag incl) / 5.5m / Dual Handles / 6m / Dual Handles / 4.5m / Single Boom (long bag incl) / 6.5m / Dual Handles / 7m / Dual Handles / 5m / Single Boom (long bag incl) / 5.5m / Single Boom (long bag incl) / 6m / Single Boom (long bag incl) / 6.5m / Single Boom (long bag incl) / 7m / Single Boom (long bag incl)",
+        "본사 옵션": "3m / 3.5m / 4m / 4.5m / 5m / 5.5m / 6m / 6.5m / 7m",
         "프레임": "EXO-PE",
         "캐노피": "Aero-Weave"
       },
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "3m / Dual Handles",
+          "option": "3m",
           "priceKRW": 2980000,
           "sku": "M130M",
           "estimated": false
         },
         {
-          "option": "3.5m / Dual Handles",
+          "option": "3.5m",
           "priceKRW": 2990000,
           "sku": "M135M",
           "estimated": false
         },
         {
-          "option": "3m / Single Boom (long bag incl)",
-          "priceKRW": 2980000,
-          "sku": "M1B30M",
-          "estimated": false
-        },
-        {
-          "option": "4m / Dual Handles",
+          "option": "4m",
           "priceKRW": 3010000,
           "sku": "M140M",
           "estimated": false
         },
         {
-          "option": "3.5m / Single Boom (long bag incl)",
-          "priceKRW": 2990000,
-          "sku": "M1B35M",
-          "estimated": false
-        },
-        {
-          "option": "4.5m / Dual Handles",
+          "option": "4.5m",
           "priceKRW": 3040000,
           "sku": "M145M",
           "estimated": false
         },
         {
-          "option": "5m / Dual Handles",
+          "option": "5m",
           "priceKRW": 3050000,
           "sku": "M150M",
           "estimated": false
         },
         {
-          "option": "4m / Single Boom (long bag incl)",
-          "priceKRW": 3010000,
-          "sku": "M1B40M",
-          "estimated": false
-        },
-        {
-          "option": "5.5m / Dual Handles",
+          "option": "5.5m",
           "priceKRW": 3210000,
           "sku": "M155M",
           "estimated": false
         },
         {
-          "option": "6m / Dual Handles",
+          "option": "6m",
           "priceKRW": 3360000,
           "sku": "M160M",
           "estimated": false
         },
         {
-          "option": "4.5m / Single Boom (long bag incl)",
-          "priceKRW": 3040000,
-          "sku": "M1B45M",
-          "estimated": false
-        },
-        {
-          "option": "6.5m / Dual Handles",
+          "option": "6.5m",
           "priceKRW": 3580000,
           "sku": "M165M",
           "estimated": false
         },
         {
-          "option": "7m / Dual Handles",
+          "option": "7m",
           "priceKRW": 3800000,
           "sku": "M170M",
-          "estimated": false
-        },
-        {
-          "option": "5m / Single Boom (long bag incl)",
-          "priceKRW": 3050000,
-          "sku": "M1B50M",
-          "estimated": false
-        },
-        {
-          "option": "5.5m / Single Boom (long bag incl)",
-          "priceKRW": 3210000,
-          "sku": "M1B55M",
-          "estimated": false
-        },
-        {
-          "option": "6m / Single Boom (long bag incl)",
-          "priceKRW": 3360000,
-          "sku": "M1B60M",
-          "estimated": false
-        },
-        {
-          "option": "6.5m / Single Boom (long bag incl)",
-          "priceKRW": 3580000,
-          "sku": "M1B65M",
-          "estimated": false
-        },
-        {
-          "option": "7m / Single Boom (long bag incl)",
-          "priceKRW": 3800000,
-          "sku": "M1B70M",
           "estimated": false
         }
       ],
