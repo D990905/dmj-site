@@ -1,0 +1,21 @@
+.commerce #wind-range{background:#fff;scroll-margin-top:100px;padding-block:48px}
+#wind-range h2{margin-bottom:14px}
+#wind-range .wind-intro{color:#62685f;font-size:15px;line-height:1.7;margin-bottom:30px}
+.wind-scroll{width:100%;overflow-x:auto;padding-bottom:10px}
+#wind-range .wind-table{width:100%;min-width:620px;border-collapse:collapse;table-layout:fixed;font-size:15px;color:#202522}
+#wind-range .wind-table th,#wind-range .wind-table td{border:0;background:transparent;padding:0}
+#wind-range .wind-table thead th{padding:0 0 20px;text-align:left;font-weight:600;font-size:13px}
+#wind-range .wind-table .wind-size-col{width:76px}
+#wind-range .wind-table .wind-ms-col{width:112px}
+#wind-range .wind-table thead th:last-child{text-align:right}
+#wind-range .wind-table tbody th{font-weight:600;text-align:left;vertical-align:middle;height:64px;white-space:nowrap}
+#wind-range .wind-table .wind-track{position:relative;height:64px;background:repeating-linear-gradient(to right,#e7e8e5 0,#e7e8e5 1px,transparent 1px,transparent 12.5%);border-right:1px solid #e7e8e5}
+.wind-range-bar{position:absolute;left:var(--wind-start);width:var(--wind-span);top:10px;height:44px;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,#e4e4e5,#c5c7c8);font-size:15px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+#wind-range .wind-table .wind-ms{text-align:right;font-size:13px;color:#62685f;font-variant-numeric:tabular-nums}
+.wind-axis{height:42px;position:relative;font-size:12px;font-variant-numeric:tabular-nums}
+.wind-axis span{position:absolute;top:14px;left:var(--tick);transform:translateX(-50%)}
+.wind-axis span:first-child{transform:none}.wind-axis span:last-child{transform:translateX(-100%)}
+#wind-range .wind-notes{margin-top:24px;padding-top:20px;border-top:1px solid #e2e5de;font-size:13px;color:#62685f;line-height:1.8}
+#wind-range .wind-notes p{margin-bottom:6px}
+#wind-range .wind-notes a{display:inline-block;margin-top:8px;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:600px){.commerce #wind-range{padding-block:32px}#wind-range .wind-intro{font-size:13px;margin-bottom:24px}#wind-range .wind-table{min-width:540px}#wind-range .wind-table .wind-size-col{width:60px}#wind-range .wind-table .wind-ms-col{width:86px}.wind-range-bar{font-size:12px}#wind-range .wind-table tbody th{font-size:13px}#wind-range .wind-table .wind-ms{font-size:11px}}
