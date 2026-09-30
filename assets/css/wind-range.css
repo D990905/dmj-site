@@ -1,4 +1,4 @@
-.commerce #wind-range{background:#fff;scroll-margin-top:100px;padding-block:48px}
+.commerce #wind-range{background:var(--paper);scroll-margin-top:100px;padding-block:48px}
 #wind-range h2{margin-bottom:14px}
 #wind-range .wind-intro{color:#62685f;font-size:15px;line-height:1.7;margin-bottom:30px}
 .wind-scroll{width:100%;overflow-x:auto;padding-bottom:10px}

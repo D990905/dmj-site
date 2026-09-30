@@ -278,7 +278,7 @@
         },
         {
           "option": "2.5 / 싱글 붐 950mm",
-          "priceKRW": 1226000,
+          "priceKRW": 1230000,
           "sku": "TKWV425C9",
           "estimated": false,
           "baseOption": "2.5",
@@ -286,7 +286,7 @@
         },
         {
           "option": "2.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1183000,
+          "priceKRW": 1180000,
           "sku": "TKWV425C9",
           "estimated": false,
           "baseOption": "2.5",
@@ -302,7 +302,7 @@
         },
         {
           "option": "3.0 / 싱글 붐 950mm",
-          "priceKRW": 1266000,
+          "priceKRW": 1270000,
           "sku": "TKWV430C9",
           "estimated": false,
           "baseOption": "3.0",
@@ -310,7 +310,7 @@
         },
         {
           "option": "3.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1223000,
+          "priceKRW": 1220000,
           "sku": "TKWV430C9",
           "estimated": false,
           "baseOption": "3.0",
@@ -326,7 +326,7 @@
         },
         {
           "option": "3.5 / 싱글 붐 950mm",
-          "priceKRW": 1296000,
+          "priceKRW": 1300000,
           "sku": "TKWV435C9",
           "estimated": false,
           "baseOption": "3.5",
@@ -334,7 +334,7 @@
         },
         {
           "option": "3.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1253000,
+          "priceKRW": 1250000,
           "sku": "TKWV435C9",
           "estimated": false,
           "baseOption": "3.5",
@@ -350,7 +350,7 @@
         },
         {
           "option": "4.0 / 싱글 붐 950mm",
-          "priceKRW": 1336000,
+          "priceKRW": 1340000,
           "sku": "TKWV440C9",
           "estimated": false,
           "baseOption": "4.0",
@@ -358,7 +358,7 @@
         },
         {
           "option": "4.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1293000,
+          "priceKRW": 1290000,
           "sku": "TKWV440C9",
           "estimated": false,
           "baseOption": "4.0",
@@ -374,7 +374,7 @@
         },
         {
           "option": "4.5 / 싱글 붐 950mm",
-          "priceKRW": 1376000,
+          "priceKRW": 1380000,
           "sku": "TKWV445C9",
           "estimated": false,
           "baseOption": "4.5",
@@ -382,7 +382,7 @@
         },
         {
           "option": "4.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1333000,
+          "priceKRW": 1330000,
           "sku": "TKWV445C9",
           "estimated": false,
           "baseOption": "4.5",
@@ -398,7 +398,7 @@
         },
         {
           "option": "5.0 / 싱글 붐 1010mm",
-          "priceKRW": 1426000,
+          "priceKRW": 1430000,
           "sku": "TKWV450C9",
           "estimated": false,
           "baseOption": "5.0",
@@ -406,7 +406,7 @@
         },
         {
           "option": "5.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1383000,
+          "priceKRW": 1380000,
           "sku": "TKWV450C9",
           "estimated": false,
           "baseOption": "5.0",
@@ -422,7 +422,7 @@
         },
         {
           "option": "5.5 / 싱글 붐 1010mm",
-          "priceKRW": 1446000,
+          "priceKRW": 1450000,
           "sku": "TKWV455C9",
           "estimated": false,
           "baseOption": "5.5",
@@ -430,7 +430,7 @@
         },
         {
           "option": "5.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1403000,
+          "priceKRW": 1400000,
           "sku": "TKWV455C9",
           "estimated": false,
           "baseOption": "5.5",
@@ -446,7 +446,7 @@
         },
         {
           "option": "6.0 / 싱글 붐 1010mm",
-          "priceKRW": 1476000,
+          "priceKRW": 1480000,
           "sku": "TKWV460C9",
           "estimated": false,
           "baseOption": "6.0",
@@ -454,7 +454,7 @@
         },
         {
           "option": "6.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1433000,
+          "priceKRW": 1430000,
           "sku": "TKWV460C9",
           "estimated": false,
           "baseOption": "6.0",
@@ -509,7 +509,7 @@
           "estimated": false
         }
       ],
-      "priceMax": 1476000,
+      "priceMax": 1480000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -852,7 +852,7 @@
         },
         {
           "option": "2.5 / Orange / 싱글 붐 950mm",
-          "priceKRW": 1436000,
+          "priceKRW": 1440000,
           "sku": "TKWV4P25C8",
           "estimated": false,
           "baseOption": "2.5 / Orange",
@@ -860,7 +860,7 @@
         },
         {
           "option": "2.5 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1393000,
+          "priceKRW": 1390000,
           "sku": "TKWV4P25C8",
           "estimated": false,
           "baseOption": "2.5 / Orange",
@@ -876,7 +876,7 @@
         },
         {
           "option": "2.5 / White / 싱글 붐 950mm",
-          "priceKRW": 1436000,
+          "priceKRW": 1440000,
           "sku": "TKWV4P25C0",
           "estimated": false,
           "baseOption": "2.5 / White",
@@ -884,7 +884,7 @@
         },
         {
           "option": "2.5 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1393000,
+          "priceKRW": 1390000,
           "sku": "TKWV4P25C0",
           "estimated": false,
           "baseOption": "2.5 / White",
@@ -900,7 +900,7 @@
         },
         {
           "option": "3.0 / Orange / 싱글 붐 950mm",
-          "priceKRW": 1476000,
+          "priceKRW": 1480000,
           "sku": "TKWV4P30C8",
           "estimated": false,
           "baseOption": "3.0 / Orange",
@@ -908,7 +908,7 @@
         },
         {
           "option": "3.0 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1433000,
+          "priceKRW": 1430000,
           "sku": "TKWV4P30C8",
           "estimated": false,
           "baseOption": "3.0 / Orange",
@@ -924,7 +924,7 @@
         },
         {
           "option": "3.0 / White / 싱글 붐 950mm",
-          "priceKRW": 1476000,
+          "priceKRW": 1480000,
           "sku": "TKWV4P30C0",
           "estimated": false,
           "baseOption": "3.0 / White",
@@ -932,7 +932,7 @@
         },
         {
           "option": "3.0 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1433000,
+          "priceKRW": 1430000,
           "sku": "TKWV4P30C0",
           "estimated": false,
           "baseOption": "3.0 / White",
@@ -948,7 +948,7 @@
         },
         {
           "option": "3.5 / Orange / 싱글 붐 950mm",
-          "priceKRW": 1526000,
+          "priceKRW": 1530000,
           "sku": "TKWV4P35C8",
           "estimated": false,
           "baseOption": "3.5 / Orange",
@@ -956,7 +956,7 @@
         },
         {
           "option": "3.5 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1483000,
+          "priceKRW": 1480000,
           "sku": "TKWV4P35C8",
           "estimated": false,
           "baseOption": "3.5 / Orange",
@@ -972,7 +972,7 @@
         },
         {
           "option": "3.5 / White / 싱글 붐 950mm",
-          "priceKRW": 1526000,
+          "priceKRW": 1530000,
           "sku": "TKWV4P35C0",
           "estimated": false,
           "baseOption": "3.5 / White",
@@ -980,7 +980,7 @@
         },
         {
           "option": "3.5 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1483000,
+          "priceKRW": 1480000,
           "sku": "TKWV4P35C0",
           "estimated": false,
           "baseOption": "3.5 / White",
@@ -996,7 +996,7 @@
         },
         {
           "option": "4.0 / Orange / 싱글 붐 950mm",
-          "priceKRW": 1566000,
+          "priceKRW": 1570000,
           "sku": "TKWV4P40C8",
           "estimated": false,
           "baseOption": "4.0 / Orange",
@@ -1004,7 +1004,7 @@
         },
         {
           "option": "4.0 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1523000,
+          "priceKRW": 1520000,
           "sku": "TKWV4P40C8",
           "estimated": false,
           "baseOption": "4.0 / Orange",
@@ -1020,7 +1020,7 @@
         },
         {
           "option": "4.0 / White / 싱글 붐 950mm",
-          "priceKRW": 1566000,
+          "priceKRW": 1570000,
           "sku": "TKWV4P40C0",
           "estimated": false,
           "baseOption": "4.0 / White",
@@ -1028,7 +1028,7 @@
         },
         {
           "option": "4.0 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1523000,
+          "priceKRW": 1520000,
           "sku": "TKWV4P40C0",
           "estimated": false,
           "baseOption": "4.0 / White",
@@ -1044,7 +1044,7 @@
         },
         {
           "option": "4.5 / Orange / 싱글 붐 950mm",
-          "priceKRW": 1606000,
+          "priceKRW": 1610000,
           "sku": "TKWV4P45C8",
           "estimated": false,
           "baseOption": "4.5 / Orange",
@@ -1052,7 +1052,7 @@
         },
         {
           "option": "4.5 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1563000,
+          "priceKRW": 1560000,
           "sku": "TKWV4P45C8",
           "estimated": false,
           "baseOption": "4.5 / Orange",
@@ -1068,7 +1068,7 @@
         },
         {
           "option": "4.5 / White / 싱글 붐 950mm",
-          "priceKRW": 1606000,
+          "priceKRW": 1610000,
           "sku": "TKWV4P45C0",
           "estimated": false,
           "baseOption": "4.5 / White",
@@ -1076,7 +1076,7 @@
         },
         {
           "option": "4.5 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1563000,
+          "priceKRW": 1560000,
           "sku": "TKWV4P45C0",
           "estimated": false,
           "baseOption": "4.5 / White",
@@ -1092,7 +1092,7 @@
         },
         {
           "option": "5.0 / Orange / 싱글 붐 950mm",
-          "priceKRW": 1666000,
+          "priceKRW": 1670000,
           "sku": "TKWV4P50C8",
           "estimated": false,
           "baseOption": "5.0 / Orange",
@@ -1100,7 +1100,7 @@
         },
         {
           "option": "5.0 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1623000,
+          "priceKRW": 1620000,
           "sku": "TKWV4P50C8",
           "estimated": false,
           "baseOption": "5.0 / Orange",
@@ -1116,7 +1116,7 @@
         },
         {
           "option": "5.0 / White / 싱글 붐 950mm",
-          "priceKRW": 1666000,
+          "priceKRW": 1670000,
           "sku": "TKWV4P50C0",
           "estimated": false,
           "baseOption": "5.0 / White",
@@ -1124,7 +1124,7 @@
         },
         {
           "option": "5.0 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1623000,
+          "priceKRW": 1620000,
           "sku": "TKWV4P50C0",
           "estimated": false,
           "baseOption": "5.0 / White",
@@ -1140,7 +1140,7 @@
         },
         {
           "option": "5.5 / Orange / 싱글 붐 1010mm",
-          "priceKRW": 1726000,
+          "priceKRW": 1730000,
           "sku": "TKWV4P55C8",
           "estimated": false,
           "baseOption": "5.5 / Orange",
@@ -1148,7 +1148,7 @@
         },
         {
           "option": "5.5 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1683000,
+          "priceKRW": 1680000,
           "sku": "TKWV4P55C8",
           "estimated": false,
           "baseOption": "5.5 / Orange",
@@ -1164,7 +1164,7 @@
         },
         {
           "option": "5.5 / White / 싱글 붐 1010mm",
-          "priceKRW": 1726000,
+          "priceKRW": 1730000,
           "sku": "TKWV4P55C0",
           "estimated": false,
           "baseOption": "5.5 / White",
@@ -1172,7 +1172,7 @@
         },
         {
           "option": "5.5 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1683000,
+          "priceKRW": 1680000,
           "sku": "TKWV4P55C0",
           "estimated": false,
           "baseOption": "5.5 / White",
@@ -1188,7 +1188,7 @@
         },
         {
           "option": "6.0 / Orange / 싱글 붐 1010mm",
-          "priceKRW": 1776000,
+          "priceKRW": 1780000,
           "sku": "TKWV4P60C8",
           "estimated": false,
           "baseOption": "6.0 / Orange",
@@ -1196,7 +1196,7 @@
         },
         {
           "option": "6.0 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1733000,
+          "priceKRW": 1730000,
           "sku": "TKWV4P60C8",
           "estimated": false,
           "baseOption": "6.0 / Orange",
@@ -1212,7 +1212,7 @@
         },
         {
           "option": "6.0 / White / 싱글 붐 1010mm",
-          "priceKRW": 1776000,
+          "priceKRW": 1780000,
           "sku": "TKWV4P60C0",
           "estimated": false,
           "baseOption": "6.0 / White",
@@ -1220,7 +1220,7 @@
         },
         {
           "option": "6.0 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1733000,
+          "priceKRW": 1730000,
           "sku": "TKWV4P60C0",
           "estimated": false,
           "baseOption": "6.0 / White",
@@ -1236,7 +1236,7 @@
         },
         {
           "option": "6.5 / Orange / 싱글 붐 1010mm",
-          "priceKRW": 1836000,
+          "priceKRW": 1840000,
           "sku": "TKWV4P65C8",
           "estimated": false,
           "baseOption": "6.5 / Orange",
@@ -1244,7 +1244,7 @@
         },
         {
           "option": "6.5 / Orange / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1793000,
+          "priceKRW": 1790000,
           "sku": "TKWV4P65C8",
           "estimated": false,
           "baseOption": "6.5 / Orange",
@@ -1260,7 +1260,7 @@
         },
         {
           "option": "6.5 / White / 싱글 붐 1010mm",
-          "priceKRW": 1836000,
+          "priceKRW": 1840000,
           "sku": "TKWV4P65C0",
           "estimated": false,
           "baseOption": "6.5 / White",
@@ -1268,7 +1268,7 @@
         },
         {
           "option": "6.5 / White / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1793000,
+          "priceKRW": 1790000,
           "sku": "TKWV4P65C0",
           "estimated": false,
           "baseOption": "6.5 / White",
@@ -1383,7 +1383,7 @@
           "estimated": false
         }
       ],
-      "priceMax": 1836000,
+      "priceMax": 1840000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -1662,7 +1662,7 @@
         },
         {
           "option": "3.0 / 싱글 붐 950mm",
-          "priceKRW": 1446000,
+          "priceKRW": 1450000,
           "sku": "TKWVXPROV23",
           "estimated": false,
           "baseOption": "3.0",
@@ -1670,7 +1670,7 @@
         },
         {
           "option": "3.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1403000,
+          "priceKRW": 1400000,
           "sku": "TKWVXPROV23",
           "estimated": false,
           "baseOption": "3.0",
@@ -1686,7 +1686,7 @@
         },
         {
           "option": "3.5 / 싱글 붐 950mm",
-          "priceKRW": 1506000,
+          "priceKRW": 1510000,
           "sku": "TKWVXPROV235",
           "estimated": false,
           "baseOption": "3.5",
@@ -1694,7 +1694,7 @@
         },
         {
           "option": "3.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1463000,
+          "priceKRW": 1460000,
           "sku": "TKWVXPROV235",
           "estimated": false,
           "baseOption": "3.5",
@@ -1710,7 +1710,7 @@
         },
         {
           "option": "4.0 / 싱글 붐 950mm",
-          "priceKRW": 1546000,
+          "priceKRW": 1550000,
           "sku": "TKWVXPROV24",
           "estimated": false,
           "baseOption": "4.0",
@@ -1718,7 +1718,7 @@
         },
         {
           "option": "4.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1503000,
+          "priceKRW": 1500000,
           "sku": "TKWVXPROV24",
           "estimated": false,
           "baseOption": "4.0",
@@ -1734,7 +1734,7 @@
         },
         {
           "option": "4.5 / 싱글 붐 950mm",
-          "priceKRW": 1596000,
+          "priceKRW": 1600000,
           "sku": "TKWVXPROV245",
           "estimated": false,
           "baseOption": "4.5",
@@ -1742,7 +1742,7 @@
         },
         {
           "option": "4.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1553000,
+          "priceKRW": 1550000,
           "sku": "TKWVXPROV245",
           "estimated": false,
           "baseOption": "4.5",
@@ -1758,7 +1758,7 @@
         },
         {
           "option": "5.0 / 싱글 붐 950mm",
-          "priceKRW": 1646000,
+          "priceKRW": 1650000,
           "sku": "TKWVXPROV25",
           "estimated": false,
           "baseOption": "5.0",
@@ -1766,7 +1766,7 @@
         },
         {
           "option": "5.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1603000,
+          "priceKRW": 1600000,
           "sku": "TKWVXPROV25",
           "estimated": false,
           "baseOption": "5.0",
@@ -1782,7 +1782,7 @@
         },
         {
           "option": "5.5 / 싱글 붐 1010mm",
-          "priceKRW": 1706000,
+          "priceKRW": 1710000,
           "sku": "TKWVXPROV255",
           "estimated": false,
           "baseOption": "5.5",
@@ -1790,7 +1790,7 @@
         },
         {
           "option": "5.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1663000,
+          "priceKRW": 1660000,
           "sku": "TKWVXPROV255",
           "estimated": false,
           "baseOption": "5.5",
@@ -1806,7 +1806,7 @@
         },
         {
           "option": "6.0 / 싱글 붐 1010mm",
-          "priceKRW": 1766000,
+          "priceKRW": 1770000,
           "sku": "TKWVXPROV26",
           "estimated": false,
           "baseOption": "6.0",
@@ -1814,7 +1814,7 @@
         },
         {
           "option": "6.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1723000,
+          "priceKRW": 1720000,
           "sku": "TKWVXPROV26",
           "estimated": false,
           "baseOption": "6.0",
@@ -1863,7 +1863,7 @@
           "estimated": false
         }
       ],
-      "priceMax": 1766000,
+      "priceMax": 1770000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -4015,7 +4015,7 @@
         "5m / Green/Grey (26/27) / Dual Handles",
         "6m / Green/Grey (26/27) / Dual Handles"
       ],
-      "price": 1691000,
+      "price": 1690000,
       "availability": "inquiry",
       "source": "https://ppcfoiling.com/products/m2-wing-1",
       "priority": "performance",
@@ -4056,25 +4056,25 @@
       "retailVariants": [
         {
           "option": "3m / White/Grey (25/26) / Dual Handles",
-          "priceKRW": 1691000,
+          "priceKRW": 1690000,
           "sku": "M230M",
           "estimated": false
         },
         {
           "option": "3m / White/Grey (25/26) / Single Boom",
-          "priceKRW": 1691000,
+          "priceKRW": 1690000,
           "sku": "M2B30M",
           "estimated": false
         },
         {
           "option": "4m / White/Grey (25/26) / Dual Handles",
-          "priceKRW": 1728000,
+          "priceKRW": 1730000,
           "sku": "M240M",
           "estimated": false
         },
         {
           "option": "4m / White/Grey (25/26) / Single Boom",
-          "priceKRW": 1728000,
+          "priceKRW": 1730000,
           "sku": "M2B40M",
           "estimated": false
         },
@@ -4104,13 +4104,13 @@
         },
         {
           "option": "3m / Green/Grey (26/27) / Single Boom",
-          "priceKRW": 2057000,
+          "priceKRW": 2060000,
           "sku": "M2B30MG",
           "estimated": false
         },
         {
           "option": "4m / Green/Grey (26/27) / Single Boom",
-          "priceKRW": 2101000,
+          "priceKRW": 2100000,
           "sku": "M2B40MG",
           "estimated": false
         },
@@ -4122,19 +4122,19 @@
         },
         {
           "option": "6m / Green/Grey (26/27) / Single Boom",
-          "priceKRW": 2233000,
+          "priceKRW": 2230000,
           "sku": "M2B60MG",
           "estimated": false
         },
         {
           "option": "3m / Green/Grey (26/27) / Dual Handles",
-          "priceKRW": 2057000,
+          "priceKRW": 2060000,
           "sku": "M230MG",
           "estimated": false
         },
         {
           "option": "4m / Green/Grey (26/27) / Dual Handles",
-          "priceKRW": 2101000,
+          "priceKRW": 2100000,
           "sku": "M240MG",
           "estimated": false
         },
@@ -4146,12 +4146,12 @@
         },
         {
           "option": "6m / Green/Grey (26/27) / Dual Handles",
-          "priceKRW": 2233000,
+          "priceKRW": 2230000,
           "sku": "M260MG",
           "estimated": false
         }
       ],
-      "priceMax": 2233000,
+      "priceMax": 2230000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -4203,7 +4203,7 @@
         "6m / Single Boom (long bag incl)",
         "7m / Single Boom (long bag incl)"
       ],
-      "price": 2964000,
+      "price": 2960000,
       "availability": "inquiry",
       "source": "https://ppcfoiling.com/products/m1-x-wing",
       "priority": "performance",
@@ -4326,102 +4326,102 @@
       "retailVariants": [
         {
           "option": "3m / Dual Handles",
-          "priceKRW": 2964000,
+          "priceKRW": 2960000,
           "sku": "M1X30M",
           "estimated": false
         },
         {
           "option": "3.5m / Dual Handles",
-          "priceKRW": 2979000,
+          "priceKRW": 2980000,
           "sku": "M1X35M",
           "estimated": false
         },
         {
           "option": "3m / Single Boom (long bag incl)",
-          "priceKRW": 2964000,
+          "priceKRW": 2960000,
           "sku": "M1X30MB",
           "estimated": false
         },
         {
           "option": "4m / Dual Handles",
-          "priceKRW": 2994000,
+          "priceKRW": 2990000,
           "sku": "M1X40M",
           "estimated": false
         },
         {
           "option": "3.5m / Single Boom (long bag incl)",
-          "priceKRW": 2979000,
+          "priceKRW": 2980000,
           "sku": "M1X35MB",
           "estimated": false
         },
         {
           "option": "4.5m / Dual Handles",
-          "priceKRW": 3008000,
+          "priceKRW": 3010000,
           "sku": "M1X45M",
           "estimated": false
         },
         {
           "option": "5m / Dual Handles",
-          "priceKRW": 3038000,
+          "priceKRW": 3040000,
           "sku": "M1X50M",
           "estimated": false
         },
         {
           "option": "4m / Single Boom (long bag incl)",
-          "priceKRW": 2994000,
+          "priceKRW": 2990000,
           "sku": "M1X40MB",
           "estimated": false
         },
         {
           "option": "5.5m / Dual Handles",
-          "priceKRW": 3184000,
+          "priceKRW": 3180000,
           "sku": "M1X55M",
           "estimated": false
         },
         {
           "option": "6m / Dual Handles",
-          "priceKRW": 3272000,
+          "priceKRW": 3270000,
           "sku": "M1X60M",
           "estimated": false
         },
         {
           "option": "4.5m / Single Boom (long bag incl)",
-          "priceKRW": 3008000,
+          "priceKRW": 3010000,
           "sku": "M1X45MB",
           "estimated": false
         },
         {
           "option": "7m / Dual Handles",
-          "priceKRW": 3477000,
+          "priceKRW": 3480000,
           "sku": "M1X70M",
           "estimated": false
         },
         {
           "option": "5m / Single Boom (long bag incl)",
-          "priceKRW": 3038000,
+          "priceKRW": 3040000,
           "sku": "M1X50MB",
           "estimated": false
         },
         {
           "option": "5.5m / Single Boom (long bag incl)",
-          "priceKRW": 3184000,
+          "priceKRW": 3180000,
           "sku": "M1X55MB",
           "estimated": false
         },
         {
           "option": "6m / Single Boom (long bag incl)",
-          "priceKRW": 3272000,
+          "priceKRW": 3270000,
           "sku": "M1X60MB",
           "estimated": false
         },
         {
           "option": "7m / Single Boom (long bag incl)",
-          "priceKRW": 3477000,
+          "priceKRW": 3480000,
           "sku": "M1X70MB",
           "estimated": false
         }
       ],
-      "priceMax": 3477000,
+      "priceMax": 3480000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -4480,7 +4480,7 @@
         "6.5m / Single Boom (long bag incl)",
         "7m / Single Boom (long bag incl)"
       ],
-      "price": 2979000,
+      "price": 2980000,
       "availability": "inquiry",
       "source": "https://ppcfoiling.com/products/m1-wing",
       "priority": "performance",
@@ -4520,114 +4520,114 @@
       "retailVariants": [
         {
           "option": "3m / Dual Handles",
-          "priceKRW": 2979000,
+          "priceKRW": 2980000,
           "sku": "M130M",
           "estimated": false
         },
         {
           "option": "3.5m / Dual Handles",
-          "priceKRW": 2994000,
+          "priceKRW": 2990000,
           "sku": "M135M",
           "estimated": false
         },
         {
           "option": "3m / Single Boom (long bag incl)",
-          "priceKRW": 2979000,
+          "priceKRW": 2980000,
           "sku": "M1B30M",
           "estimated": false
         },
         {
           "option": "4m / Dual Handles",
-          "priceKRW": 3008000,
+          "priceKRW": 3010000,
           "sku": "M140M",
           "estimated": false
         },
         {
           "option": "3.5m / Single Boom (long bag incl)",
-          "priceKRW": 2994000,
+          "priceKRW": 2990000,
           "sku": "M1B35M",
           "estimated": false
         },
         {
           "option": "4.5m / Dual Handles",
-          "priceKRW": 3038000,
+          "priceKRW": 3040000,
           "sku": "M145M",
           "estimated": false
         },
         {
           "option": "5m / Dual Handles",
-          "priceKRW": 3052000,
+          "priceKRW": 3050000,
           "sku": "M150M",
           "estimated": false
         },
         {
           "option": "4m / Single Boom (long bag incl)",
-          "priceKRW": 3008000,
+          "priceKRW": 3010000,
           "sku": "M1B40M",
           "estimated": false
         },
         {
           "option": "5.5m / Dual Handles",
-          "priceKRW": 3213000,
+          "priceKRW": 3210000,
           "sku": "M155M",
           "estimated": false
         },
         {
           "option": "6m / Dual Handles",
-          "priceKRW": 3359000,
+          "priceKRW": 3360000,
           "sku": "M160M",
           "estimated": false
         },
         {
           "option": "4.5m / Single Boom (long bag incl)",
-          "priceKRW": 3038000,
+          "priceKRW": 3040000,
           "sku": "M1B45M",
           "estimated": false
         },
         {
           "option": "6.5m / Dual Handles",
-          "priceKRW": 3579000,
+          "priceKRW": 3580000,
           "sku": "M165M",
           "estimated": false
         },
         {
           "option": "7m / Dual Handles",
-          "priceKRW": 3798000,
+          "priceKRW": 3800000,
           "sku": "M170M",
           "estimated": false
         },
         {
           "option": "5m / Single Boom (long bag incl)",
-          "priceKRW": 3052000,
+          "priceKRW": 3050000,
           "sku": "M1B50M",
           "estimated": false
         },
         {
           "option": "5.5m / Single Boom (long bag incl)",
-          "priceKRW": 3213000,
+          "priceKRW": 3210000,
           "sku": "M1B55M",
           "estimated": false
         },
         {
           "option": "6m / Single Boom (long bag incl)",
-          "priceKRW": 3359000,
+          "priceKRW": 3360000,
           "sku": "M1B60M",
           "estimated": false
         },
         {
           "option": "6.5m / Single Boom (long bag incl)",
-          "priceKRW": 3579000,
+          "priceKRW": 3580000,
           "sku": "M1B65M",
           "estimated": false
         },
         {
           "option": "7m / Single Boom (long bag incl)",
-          "priceKRW": 3798000,
+          "priceKRW": 3800000,
           "sku": "M1B70M",
           "estimated": false
         }
       ],
-      "priceMax": 3798000,
+      "priceMax": 3800000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -4776,25 +4776,25 @@
         },
         {
           "option": "4.5m / Leading Edge Handle",
-          "priceKRW": 3899000,
+          "priceKRW": 3900000,
           "sku": "SNC45M",
           "estimated": false
         },
         {
           "option": "5.0m / Leading Edge Handle",
-          "priceKRW": 3973000,
+          "priceKRW": 3970000,
           "sku": "SNC50M",
           "estimated": false
         },
         {
           "option": "5.5m / Leading Edge Handle",
-          "priceKRW": 4107000,
+          "priceKRW": 4110000,
           "sku": "SNC55M",
           "estimated": false
         },
         {
           "option": "6.0m / Leading Edge Handle",
-          "priceKRW": 4196000,
+          "priceKRW": 4200000,
           "sku": "SNC60M",
           "estimated": false
         },
@@ -4806,19 +4806,19 @@
         },
         {
           "option": "7.0m / Leading Edge Handle",
-          "priceKRW": 4523000,
+          "priceKRW": 4520000,
           "sku": "SNC70M",
           "estimated": false
         },
         {
           "option": "7.5m / Leading Edge Handle",
-          "priceKRW": 4687000,
+          "priceKRW": 4690000,
           "sku": "SNC75M",
           "estimated": false
         },
         {
           "option": "8.0m / Leading Edge Handle",
-          "priceKRW": 4828000,
+          "priceKRW": 4830000,
           "sku": "SNC80M",
           "estimated": false
         },
@@ -4830,25 +4830,25 @@
         },
         {
           "option": "4.5m / No Leading Edge Handle",
-          "priceKRW": 3899000,
+          "priceKRW": 3900000,
           "sku": "SNC45MNH",
           "estimated": false
         },
         {
           "option": "5.0m / No Leading Edge Handle",
-          "priceKRW": 3973000,
+          "priceKRW": 3970000,
           "sku": "SNC50MNH",
           "estimated": false
         },
         {
           "option": "5.5m / No Leading Edge Handle",
-          "priceKRW": 4107000,
+          "priceKRW": 4110000,
           "sku": "SNC55MNH",
           "estimated": false
         },
         {
           "option": "6.0m / No Leading Edge Handle",
-          "priceKRW": 4196000,
+          "priceKRW": 4200000,
           "sku": "SNC60MNH",
           "estimated": false
         },
@@ -4860,24 +4860,24 @@
         },
         {
           "option": "7.0m / No Leading Edge Handle",
-          "priceKRW": 4523000,
+          "priceKRW": 4520000,
           "sku": "SNC70MNH",
           "estimated": false
         },
         {
           "option": "7.5m / No Leading Edge Handle",
-          "priceKRW": 4687000,
+          "priceKRW": 4690000,
           "sku": "SNC75MNH",
           "estimated": false
         },
         {
           "option": "8.0m / No Leading Edge Handle",
-          "priceKRW": 4828000,
+          "priceKRW": 4830000,
           "sku": "SNC80MNH",
           "estimated": false
         }
       ],
-      "priceMax": 4828000,
+      "priceMax": 4830000,
       "priceStatus": "fixed",
       "priceSource": "2026-09-29 PPC 공식 정상가 · USD 1390원 · 운임 가정 20만원",
       "priceReviewedAt": "2026-09-29",
@@ -4931,7 +4931,7 @@
         "5'6\" x 22\" 93L / Track",
         "5'6\" x 22\" 93L / Tuttle"
       ],
-      "price": 4792000,
+      "price": 4790000,
       "availability": "inquiry",
       "source": "https://ppcfoiling.com/products/new-ppc-r1-race-foil-board",
       "priority": "performance",
@@ -4989,42 +4989,42 @@
       "retailVariants": [
         {
           "option": "5'0\" x 20\" 73L / Track",
-          "priceKRW": 4792000,
+          "priceKRW": 4790000,
           "sku": "R1T73L",
           "estimated": false
         },
         {
           "option": "5'0\" x 20\" 73L / Tuttle",
-          "priceKRW": 4792000,
+          "priceKRW": 4790000,
           "sku": "R173L",
           "estimated": false
         },
         {
           "option": "5'3\" x 21\" 83L / Track",
-          "priceKRW": 4822000,
+          "priceKRW": 4820000,
           "sku": "R1T83L",
           "estimated": false
         },
         {
           "option": "5'3\" x 21\" 83L / Tuttle",
-          "priceKRW": 4822000,
+          "priceKRW": 4820000,
           "sku": "R183L",
           "estimated": false
         },
         {
           "option": "5'6\" x 22\" 93L / Track",
-          "priceKRW": 4865000,
+          "priceKRW": 4870000,
           "sku": "R1T93L",
           "estimated": false
         },
         {
           "option": "5'6\" x 22\" 93L / Tuttle",
-          "priceKRW": 4865000,
+          "priceKRW": 4870000,
           "sku": "R193L",
           "estimated": false
         }
       ],
-      "priceMax": 4865000,
+      "priceMax": 4870000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -5052,7 +5052,7 @@
         "2.7m / Lime/Grey",
         "2.0m / Lime/Grey"
       ],
-      "price": 1965000,
+      "price": 1970000,
       "availability": "inquiry",
       "source": "https://ppcfoiling.com/products/ppc-orbit-parawing",
       "priority": "performance",
@@ -5107,13 +5107,13 @@
       "retailVariants": [
         {
           "option": "2.0m / Orange/Peacock",
-          "priceKRW": 1965000,
+          "priceKRW": 1970000,
           "sku": "ORBITPARA20",
           "estimated": false
         },
         {
           "option": "2.7m / Orange/Peacock",
-          "priceKRW": 1994000,
+          "priceKRW": 1990000,
           "sku": "ORBITPARA27",
           "estimated": false
         },
@@ -5125,25 +5125,25 @@
         },
         {
           "option": "4.5M / Orange/Peacock",
-          "priceKRW": 2345000,
+          "priceKRW": 2350000,
           "sku": "ORBITPARA45",
           "estimated": false
         },
         {
           "option": "5.9m / Orange/Peacock",
-          "priceKRW": 2609000,
+          "priceKRW": 2610000,
           "sku": "ORBITPARA59",
           "estimated": false
         },
         {
           "option": "5.9m / Lime/Grey",
-          "priceKRW": 2609000,
+          "priceKRW": 2610000,
           "sku": "ORBITPARA59GG",
           "estimated": false
         },
         {
           "option": "4.5M / Lime/Grey",
-          "priceKRW": 2345000,
+          "priceKRW": 2350000,
           "sku": "ORBITPARA45GG",
           "estimated": false
         },
@@ -5155,18 +5155,18 @@
         },
         {
           "option": "2.7m / Lime/Grey",
-          "priceKRW": 1994000,
+          "priceKRW": 1990000,
           "sku": "ORBITPARA27GG",
           "estimated": false
         },
         {
           "option": "2.0m / Lime/Grey",
-          "priceKRW": 1965000,
+          "priceKRW": 1970000,
           "sku": "ORBITPARA20GG",
           "estimated": false
         }
       ],
-      "priceMax": 2609000,
+      "priceMax": 2610000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -5205,7 +5205,7 @@
         "R6 V3 (with R6V1 mast)",
         "R6 V3 (with R6V2 mast)"
       ],
-      "price": 8172000,
+      "price": 8170000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/r6-race-series",
       "priority": "performance",
@@ -5259,48 +5259,48 @@
       "retailVariants": [
         {
           "option": "R6 V1 (with R6V1 mast)",
-          "priceKRW": 8172000,
+          "priceKRW": 8170000,
           "sku": "",
           "estimated": false,
           "label": "R6 V1 · 프론트 479cm² · 리어 172cm² · 마스트 V1 113cm"
         },
         {
           "option": "R6 V1 (with R6V2 mast)",
-          "priceKRW": 8172000,
+          "priceKRW": 8170000,
           "sku": "",
           "estimated": false,
           "label": "R6 V1 · 프론트 479cm² · 리어 172cm² · 마스트 V2 113cm"
         },
         {
           "option": "R6 V2 (with R6V1 mast)",
-          "priceKRW": 8172000,
+          "priceKRW": 8170000,
           "sku": "",
           "estimated": false,
           "label": "R6 V2 · 프론트 430cm² · 리어 172cm² · 마스트 V1 113cm"
         },
         {
           "option": "R6 V2 (with R6V2 mast)",
-          "priceKRW": 8172000,
+          "priceKRW": 8170000,
           "sku": "",
           "estimated": false,
           "label": "R6 V2 · 프론트 430cm² · 리어 172cm² · 마스트 V2 113cm"
         },
         {
           "option": "R6 V3 (with R6V1 mast)",
-          "priceKRW": 8172000,
+          "priceKRW": 8170000,
           "sku": "",
           "estimated": false,
           "label": "R6 V3 · 프론트 530cm² · 리어 172cm² · 마스트 V1 113cm"
         },
         {
           "option": "R6 V3 (with R6V2 mast)",
-          "priceKRW": 8172000,
+          "priceKRW": 8170000,
           "sku": "",
           "estimated": false,
           "label": "R6 V3 · 프론트 530cm² · 리어 172cm² · 마스트 V2 113cm"
         }
       ],
-      "priceMax": 8172000,
+      "priceMax": 8170000,
       "priceStatus": "fixed",
       "priceSource": "2026-09-27 사용자 지정 환율 EUR 1600원 및 운임 반영",
       "priceReviewedAt": "2026-09-25",
@@ -5638,7 +5638,7 @@
         "Boom Race Series 83 SCC",
         "Boom Race Series 95 SCC"
       ],
-      "price": 5131000,
+      "price": 5130000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/boom-scc-boards-2/",
       "priority": "performance",
@@ -5687,27 +5687,27 @@
       "retailVariants": [
         {
           "option": "Boom Race Series 63 SCC",
-          "priceKRW": 5131000,
+          "priceKRW": 5130000,
           "sku": "",
           "estimated": false,
           "label": "Boom RS SCC · 63L"
         },
         {
           "option": "Boom Race Series 83 SCC",
-          "priceKRW": 5273000,
+          "priceKRW": 5270000,
           "sku": "",
           "estimated": false,
           "label": "Boom RS SCC · 83L"
         },
         {
           "option": "Boom Race Series 95 SCC",
-          "priceKRW": 5416000,
+          "priceKRW": 5420000,
           "sku": "",
           "estimated": false,
           "label": "Boom RS SCC · 95L"
         }
       ],
-      "priceMax": 5416000,
+      "priceMax": 5420000,
       "priceStatus": "fixed",
       "priceSource": "2026-09-27 사용자 지정 환율 EUR 1600원 및 운임 반영",
       "priceReviewedAt": "2026-09-25",
@@ -5808,7 +5808,7 @@
         "1800",
         "2000"
       ],
-      "price": 1177000,
+      "price": 1180000,
       "availability": "inquiry",
       "source": "https://takoon.com/products/foil-starter",
       "priority": "value",
@@ -6014,24 +6014,24 @@
       "retailVariants": [
         {
           "option": "1600",
-          "priceKRW": 1177000,
+          "priceKRW": 1180000,
           "sku": "TKFS1600",
           "estimated": false
         },
         {
           "option": "1800",
-          "priceKRW": 1202000,
+          "priceKRW": 1200000,
           "sku": "TKFS1800",
           "estimated": false
         },
         {
           "option": "2000",
-          "priceKRW": 1233000,
+          "priceKRW": 1230000,
           "sku": "TKFS2000",
           "estimated": false
         }
       ],
-      "priceMax": 1233000,
+      "priceMax": 1230000,
       "priceSource": "https://takoon.com/products/foil-starter",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -6085,7 +6085,7 @@
         "1450",
         "1700"
       ],
-      "price": 1302000,
+      "price": 1300000,
       "availability": "inquiry",
       "source": "https://takoon.com/products/foil-x-glide-v2",
       "priority": "value",
@@ -6354,30 +6354,30 @@
       "retailVariants": [
         {
           "option": "1050",
-          "priceKRW": 1302000,
+          "priceKRW": 1300000,
           "sku": "TKFXV21050NC",
           "estimated": false
         },
         {
           "option": "1250",
-          "priceKRW": 1335000,
+          "priceKRW": 1340000,
           "sku": "TKFXV21250NC",
           "estimated": false
         },
         {
           "option": "1450",
-          "priceKRW": 1368000,
+          "priceKRW": 1370000,
           "sku": "TKFXV21450NC",
           "estimated": false
         },
         {
           "option": "1700",
-          "priceKRW": 1401000,
+          "priceKRW": 1400000,
           "sku": "TKFXV21700NC",
           "estimated": false
         }
       ],
-      "priceMax": 1401000,
+      "priceMax": 1400000,
       "priceSource": "https://takoon.com/products/foil-x-glide-v2",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -6434,7 +6434,7 @@
         "950",
         "1010"
       ],
-      "price": 231000,
+      "price": 230000,
       "availability": "inquiry",
       "source": "https://takoon.com/products/wing-carbon-boom-v2",
       "priority": "value",
@@ -6550,18 +6550,18 @@
       "retailVariants": [
         {
           "option": "950",
-          "priceKRW": 231000,
+          "priceKRW": 230000,
           "sku": "TKWCBV2950",
           "estimated": false
         },
         {
           "option": "1010",
-          "priceKRW": 231000,
+          "priceKRW": 230000,
           "sku": "TKWCBV21010V3",
           "estimated": false
         }
       ],
-      "priceMax": 231000,
+      "priceMax": 230000,
       "priceSource": "https://takoon.com/products/wing-carbon-boom-v2",
       "priceStatus": "fixed",
       "pricingStatus": "고정 판매가 · 부가세 포함",
@@ -6582,7 +6582,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [],
-      "price": 92000,
+      "price": 90000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -6610,12 +6610,12 @@
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
-          "priceKRW": 92000,
+          "priceKRW": 90000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 92000,
+      "priceMax": 90000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -6637,7 +6637,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [],
-      "price": 209000,
+      "price": 210000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -6671,12 +6671,12 @@
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
-          "priceKRW": 209000,
+          "priceKRW": 210000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 209000,
+      "priceMax": 210000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -6723,7 +6723,7 @@
       "options": [
         "M"
       ],
-      "price": 734000,
+      "price": 730000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -6758,12 +6758,12 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 734000,
+          "priceKRW": 730000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 734000,
+      "priceMax": 730000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -6810,7 +6810,7 @@
       "options": [
         "BLACK CAMO, M"
       ],
-      "price": 514000,
+      "price": 510000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -6845,12 +6845,12 @@
       "retailVariants": [
         {
           "option": "BLACK CAMO, M",
-          "priceKRW": 514000,
+          "priceKRW": 510000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 514000,
+      "priceMax": 510000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -6882,7 +6882,7 @@
       "options": [
         "M"
       ],
-      "price": 456000,
+      "price": 460000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -6917,12 +6917,12 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 456000,
+          "priceKRW": 460000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 456000,
+      "priceMax": 460000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -6971,7 +6971,7 @@
       "options": [
         "M"
       ],
-      "price": 1498000,
+      "price": 1500000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7006,12 +7006,12 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 1498000,
+          "priceKRW": 1500000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 1498000,
+      "priceMax": 1500000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7044,7 +7044,7 @@
         "MK2 M",
         "MK2 L"
       ],
-      "price": 412000,
+      "price": 410000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7080,18 +7080,18 @@
       "retailVariants": [
         {
           "option": "MK2 M",
-          "priceKRW": 412000,
+          "priceKRW": 410000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "MK2 L",
-          "priceKRW": 412000,
+          "priceKRW": 410000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 412000,
+      "priceMax": 410000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7134,7 +7134,7 @@
         "S",
         "MK2 S"
       ],
-      "price": 412000,
+      "price": 410000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7170,18 +7170,18 @@
       "retailVariants": [
         {
           "option": "S",
-          "priceKRW": 412000,
+          "priceKRW": 410000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "MK2 S",
-          "priceKRW": 412000,
+          "priceKRW": 410000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 412000,
+      "priceMax": 410000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7232,7 +7232,7 @@
         "M",
         "L"
       ],
-      "price": 353000,
+      "price": 350000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7268,18 +7268,18 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 353000,
+          "priceKRW": 350000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 353000,
+          "priceKRW": 350000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 353000,
+      "priceMax": 350000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7303,7 +7303,7 @@
       "options": [
         "S"
       ],
-      "price": 353000,
+      "price": 350000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7338,12 +7338,12 @@
       "retailVariants": [
         {
           "option": "S",
-          "priceKRW": 353000,
+          "priceKRW": 350000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 353000,
+      "priceMax": 350000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7367,7 +7367,7 @@
       "options": [
         "L"
       ],
-      "price": 371000,
+      "price": 370000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7396,12 +7396,12 @@
       "retailVariants": [
         {
           "option": "L",
-          "priceKRW": 371000,
+          "priceKRW": 370000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 371000,
+      "priceMax": 370000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7426,7 +7426,7 @@
         "M",
         "L"
       ],
-      "price": 412000,
+      "price": 410000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7456,18 +7456,18 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 412000,
+          "priceKRW": 410000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 412000,
+          "priceKRW": 410000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 412000,
+      "priceMax": 410000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7565,7 +7565,7 @@
         "L",
         "XL"
       ],
-      "price": 171000,
+      "price": 170000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7602,24 +7602,24 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 171000,
+          "priceKRW": 170000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 171000,
+          "priceKRW": 170000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "XL",
-          "priceKRW": 171000,
+          "priceKRW": 170000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 171000,
+      "priceMax": 170000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7668,7 +7668,7 @@
         "M",
         "L"
       ],
-      "price": 163000,
+      "price": 160000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7703,18 +7703,18 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 163000,
+          "priceKRW": 160000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 163000,
+          "priceKRW": 160000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 163000,
+      "priceMax": 160000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7756,7 +7756,7 @@
         "M",
         "L"
       ],
-      "price": 109000,
+      "price": 110000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7792,18 +7792,18 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 109000,
+          "priceKRW": 110000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 109000,
+          "priceKRW": 110000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 109000,
+      "priceMax": 110000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7828,7 +7828,7 @@
         "M",
         "S"
       ],
-      "price": 697000,
+      "price": 700000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7858,18 +7858,18 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 697000,
+          "priceKRW": 700000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "S",
-          "priceKRW": 697000,
+          "priceKRW": 700000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 697000,
+      "priceMax": 700000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7911,7 +7911,7 @@
       "options": [
         "L-XL"
       ],
-      "price": 456000,
+      "price": 460000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -7946,12 +7946,12 @@
       "retailVariants": [
         {
           "option": "L-XL",
-          "priceKRW": 456000,
+          "priceKRW": 460000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 456000,
+      "priceMax": 460000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -7997,7 +7997,7 @@
       "options": [
         "원 사이즈"
       ],
-      "price": 295000,
+      "price": 300000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8024,14 +8024,14 @@
         "HAWIPWIN33A-01996"
       ],
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceMax": 295000,
+      "priceMax": 300000,
       "priceStatus": "fixed",
       "priceReviewedAt": "2026-09-25",
       "priceSource": "WIP SS26 본사 주문서 USD 소비자가 · 최신 견적 재확인 필요",
       "retailVariants": [
         {
           "option": "원 사이즈",
-          "priceKRW": 295000,
+          "priceKRW": 300000,
           "sku": "HAWIPWIN33A-01996",
           "estimated": false
         }
@@ -8055,7 +8055,7 @@
       "options": [
         "S/M"
       ],
-      "price": 397000,
+      "price": 400000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8081,14 +8081,14 @@
         "HAWIPWIN44A-01998"
       ],
       "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceMax": 397000,
+      "priceMax": 400000,
       "priceStatus": "fixed",
       "priceReviewedAt": "2026-09-25",
       "priceSource": "WIP SS26 본사 주문서 USD 소비자가 · 최신 견적 재확인 필요",
       "retailVariants": [
         {
           "option": "S/M",
-          "priceKRW": 397000,
+          "priceKRW": 400000,
           "sku": "HAWIPWIN44A-01998",
           "estimated": false
         }
@@ -8112,7 +8112,7 @@
       "options": [
         "M"
       ],
-      "price": 193000,
+      "price": 190000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8141,12 +8141,12 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 193000,
+          "priceKRW": 190000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 193000,
+      "priceMax": 190000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8187,7 +8187,7 @@
         "M",
         "L"
       ],
-      "price": 193000,
+      "price": 190000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8217,18 +8217,18 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 193000,
+          "priceKRW": 190000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "L",
-          "priceKRW": 193000,
+          "priceKRW": 190000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 193000,
+      "priceMax": 190000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8275,7 +8275,7 @@
         "S-M PINK",
         "FLIP OVER 2.0 L-XL"
       ],
-      "price": 178000,
+      "price": 180000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8304,18 +8304,18 @@
       "retailVariants": [
         {
           "option": "S-M PINK",
-          "priceKRW": 178000,
+          "priceKRW": 180000,
           "sku": "",
           "estimated": false
         },
         {
           "option": "FLIP OVER 2.0 L-XL",
-          "priceKRW": 178000,
+          "priceKRW": 180000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 178000,
+      "priceMax": 180000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8356,7 +8356,7 @@
       "options": [
         "2.0 M"
       ],
-      "price": 273000,
+      "price": 270000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8385,12 +8385,12 @@
       "retailVariants": [
         {
           "option": "2.0 M",
-          "priceKRW": 273000,
+          "priceKRW": 270000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 273000,
+      "priceMax": 270000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8516,7 +8516,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [],
-      "price": 342000,
+      "price": 340000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8544,12 +8544,12 @@
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
-          "priceKRW": 342000,
+          "priceKRW": 340000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 342000,
+      "priceMax": 340000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8632,7 +8632,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [],
-      "price": 85000,
+      "price": 90000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8665,12 +8665,12 @@
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
-          "priceKRW": 85000,
+          "priceKRW": 90000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 85000,
+      "priceMax": 90000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8692,7 +8692,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [],
-      "price": 92000,
+      "price": 90000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8726,12 +8726,12 @@
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
-          "priceKRW": 92000,
+          "priceKRW": 90000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 92000,
+      "priceMax": 90000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8819,7 +8819,7 @@
       "options": [
         "S- M"
       ],
-      "price": 163000,
+      "price": 160000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8854,12 +8854,12 @@
       "retailVariants": [
         {
           "option": "S- M",
-          "priceKRW": 163000,
+          "priceKRW": 160000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 163000,
+      "priceMax": 160000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8883,7 +8883,7 @@
       "options": [
         "M"
       ],
-      "price": 792000,
+      "price": 790000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8912,12 +8912,12 @@
       "retailVariants": [
         {
           "option": "M",
-          "priceKRW": 792000,
+          "priceKRW": 790000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 792000,
+      "priceMax": 790000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -8963,7 +8963,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [],
-      "price": 427000,
+      "price": 430000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -8997,12 +8997,12 @@
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
-          "priceKRW": 427000,
+          "priceKRW": 430000,
           "sku": "",
           "estimated": false
         }
       ],
-      "priceMax": 427000,
+      "priceMax": 430000,
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
@@ -10040,5 +10040,11 @@
       ]
     }
   ],
-  "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님"
+  "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",
+  "retailPriceRounding": {
+    "unitKRW": 10000,
+    "method": "nearest-half-up",
+    "effectiveDate": "2026-09-30",
+    "scope": "current catalog prices; existing orders unchanged"
+  }
 }
