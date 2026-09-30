@@ -6611,7 +6611,7 @@
         {
           "option": "사이즈·구성 상담",
           "priceKRW": 90000,
-          "sku": "",
+          "sku": "WIPVHFVESPA-01776",
           "estimated": false
         }
       ],
@@ -6672,7 +6672,7 @@
         {
           "option": "사이즈·구성 상담",
           "priceKRW": 210000,
-          "sku": "",
+          "sku": "WIPFLMA200A-01304",
           "estimated": false
         }
       ],
@@ -6759,7 +6759,7 @@
         {
           "option": "M",
           "priceKRW": 730000,
-          "sku": "",
+          "sku": "WIPSTEMK30A-01481",
           "estimated": false
         }
       ],
@@ -6846,7 +6846,7 @@
         {
           "option": "BLACK CAMO, M",
           "priceKRW": 510000,
-          "sku": "",
+          "sku": "WIPSTEAM44A-02190",
           "estimated": false
         }
       ],
@@ -6918,7 +6918,7 @@
         {
           "option": "M",
           "priceKRW": 460000,
-          "sku": "",
+          "sku": "WIPSTEAMY3A-01486",
           "estimated": false
         }
       ],
@@ -7007,7 +7007,7 @@
         {
           "option": "M",
           "priceKRW": 1500000,
-          "sku": "",
+          "sku": "WIPVETHY10A-00210",
           "estimated": false
         }
       ],
@@ -7081,13 +7081,13 @@
         {
           "option": "MK2 M",
           "priceKRW": 410000,
-          "sku": "",
+          "sku": "WIPVETNLJ3A-01320",
           "estimated": false
         },
         {
           "option": "MK2 L",
           "priceKRW": 410000,
-          "sku": "",
+          "sku": "WIPVETNLJ3A-01321",
           "estimated": false
         }
       ],
@@ -7171,13 +7171,13 @@
         {
           "option": "S",
           "priceKRW": 410000,
-          "sku": "",
+          "sku": "WIPNLJWOM3A-00842",
           "estimated": false
         },
         {
           "option": "MK2 S",
           "priceKRW": 410000,
-          "sku": "",
+          "sku": "WIPNLJWOM3A-01323",
           "estimated": false
         }
       ],
@@ -7269,13 +7269,13 @@
         {
           "option": "M",
           "priceKRW": 350000,
-          "sku": "",
+          "sku": "WIPSNLJ150A-01352",
           "estimated": false
         },
         {
           "option": "L",
           "priceKRW": 350000,
-          "sku": "",
+          "sku": "WIPSNLJ150A-01353",
           "estimated": false
         }
       ],
@@ -7339,7 +7339,7 @@
         {
           "option": "S",
           "priceKRW": 350000,
-          "sku": "",
+          "sku": "WIPSNLJ15WA-01356",
           "estimated": false
         }
       ],
@@ -7397,7 +7397,7 @@
         {
           "option": "L",
           "priceKRW": 370000,
-          "sku": "",
+          "sku": "WIPRAPARK1A-00520",
           "estimated": false
         }
       ],
@@ -7457,13 +7457,13 @@
         {
           "option": "M",
           "priceKRW": 410000,
-          "sku": "",
+          "sku": "WIPFLESMO2A-01496",
           "estimated": false
         },
         {
           "option": "L",
           "priceKRW": 410000,
-          "sku": "",
+          "sku": "WIPFLESMO2A-01497",
           "estimated": false
         }
       ],
@@ -7527,7 +7527,7 @@
         {
           "option": "S",
           "priceKRW": 310000,
-          "sku": "",
+          "sku": "WIP3DSNTWOA-01001",
           "estimated": false
         }
       ],
@@ -7603,19 +7603,19 @@
         {
           "option": "M",
           "priceKRW": 170000,
-          "sku": "",
+          "sku": "VELYLSVORTA-00779",
           "estimated": false
         },
         {
           "option": "L",
           "priceKRW": 170000,
-          "sku": "",
+          "sku": "VELYLSVORTA-00780",
           "estimated": false
         },
         {
           "option": "XL",
           "priceKRW": 170000,
-          "sku": "",
+          "sku": "VELYLSVORTA-00781",
           "estimated": false
         }
       ],
@@ -7704,13 +7704,13 @@
         {
           "option": "M",
           "priceKRW": 160000,
-          "sku": "",
+          "sku": "WIPHOORASHA-02036",
           "estimated": false
         },
         {
           "option": "L",
           "priceKRW": 160000,
-          "sku": "",
+          "sku": "WIPHOORASHA-02037",
           "estimated": false
         }
       ],
@@ -7793,13 +7793,13 @@
         {
           "option": "M",
           "priceKRW": 110000,
-          "sku": "",
+          "sku": "WIPQUITSH3A-01511",
           "estimated": false
         },
         {
           "option": "L",
           "priceKRW": 110000,
-          "sku": "",
+          "sku": "WIPQUITSH3A-01512",
           "estimated": false
         }
       ],
@@ -7859,13 +7859,13 @@
         {
           "option": "M",
           "priceKRW": 700000,
-          "sku": "",
+          "sku": "WIPCOASAL0A-01517",
           "estimated": false
         },
         {
           "option": "S",
           "priceKRW": 700000,
-          "sku": "",
+          "sku": "WIPCOASAL0A-01516",
           "estimated": false
         }
       ],
@@ -7909,6 +7909,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [
+        "S-M",
         "L-XL"
       ],
       "price": 460000,
@@ -7934,7 +7935,7 @@
         "본사 사이즈": "S-M / L-XL",
         "구조": "탈착식 유연 슬랫",
         "바": "스테인리스 루프·퀵릴리스 버클",
-        "주문 구성에서 선택": "L-XL"
+        "주문 구성에서 선택": "S-M / L-XL"
       },
       "notes": [
         "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
@@ -7945,9 +7946,15 @@
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
+          "option": "S-M",
+          "priceKRW": 460000,
+          "sku": "DMJ-WIP-WAISTFOIL-3-S-M",
+          "estimated": false
+        },
+        {
           "option": "L-XL",
           "priceKRW": 460000,
-          "sku": "",
+          "sku": "WIPWAIFOI3A-01536",
           "estimated": false
         }
       ],
@@ -8085,7 +8092,7 @@
         {
           "option": "M",
           "priceKRW": 190000,
-          "sku": "",
+          "sku": "WIPVETPUFFA-00775",
           "estimated": false
         }
       ],
@@ -8161,13 +8168,13 @@
         {
           "option": "M",
           "priceKRW": 190000,
-          "sku": "",
+          "sku": "WIPVETHOO1A-00865",
           "estimated": false
         },
         {
           "option": "L",
           "priceKRW": 190000,
-          "sku": "",
+          "sku": "WIPVETHOO1A-00866",
           "estimated": false
         }
       ],
@@ -8248,13 +8255,13 @@
         {
           "option": "S-M PINK",
           "priceKRW": 180000,
-          "sku": "",
+          "sku": "WIPVETVVE0A-01842",
           "estimated": false
         },
         {
           "option": "FLIP OVER 2.0 L-XL",
           "priceKRW": 180000,
-          "sku": "",
+          "sku": "WIPVETVVE0A-01333",
           "estimated": false
         }
       ],
@@ -8329,7 +8336,7 @@
         {
           "option": "2.0 M",
           "priceKRW": 270000,
-          "sku": "",
+          "sku": "WIPVETARA1A-01335",
           "estimated": false
         }
       ],
@@ -8411,7 +8418,7 @@
         {
           "option": "2.0 M",
           "priceKRW": 200000,
-          "sku": "",
+          "sku": "WIPVETANO2A-01367",
           "estimated": false
         }
       ],
@@ -8488,7 +8495,7 @@
         {
           "option": "사이즈·구성 상담",
           "priceKRW": 340000,
-          "sku": "",
+          "sku": "WIPGPACK11A-00587",
           "estimated": false
         }
       ],
@@ -8549,7 +8556,7 @@
         {
           "option": "사이즈·구성 상담",
           "priceKRW": 70000,
-          "sku": "",
+          "sku": "R4RWBLEADAA-02096",
           "estimated": false
         }
       ],
@@ -8609,7 +8616,7 @@
         {
           "option": "사이즈·구성 상담",
           "priceKRW": 90000,
-          "sku": "",
+          "sku": "R4RWLEASH2A-01436",
           "estimated": false
         }
       ],
@@ -8670,7 +8677,7 @@
         {
           "option": "사이즈·구성 상담",
           "priceKRW": 90000,
-          "sku": "",
+          "sku": "R4RWBLEA10A-01435",
           "estimated": false
         }
       ],
@@ -8734,7 +8741,7 @@
         {
           "option": "41.3-US8",
           "priceKRW": 200000,
-          "sku": "",
+          "sku": "WIPSNEAK22A-01989",
           "estimated": false
         }
       ],
@@ -8798,7 +8805,7 @@
         {
           "option": "S- M",
           "priceKRW": 160000,
-          "sku": "",
+          "sku": "GANEOWI100A-00440",
           "estimated": false
         }
       ],
@@ -8856,7 +8863,7 @@
         {
           "option": "M",
           "priceKRW": 790000,
-          "sku": "",
+          "sku": "WIPCOARACJA-01798",
           "estimated": false
         }
       ],
@@ -8905,7 +8912,9 @@
       "source": "https://www.forward-wip.com/produit/wing-wind-pro-harness/",
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
-      "options": [],
+      "options": [
+        "프리사이즈"
+      ],
       "price": 430000,
       "availability": "inquiry",
       "priority": "performance",
@@ -8927,7 +8936,7 @@
       ],
       "specs": {
         "플레이트": "6mm 다층 카본",
-        "본사 사이즈": "One Size",
+        "본사 사이즈": "프리사이즈 (One Size)",
         "후면": "리시 루프"
       },
       "notes": [
@@ -8939,9 +8948,9 @@
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "사이즈·구성 상담",
+          "option": "프리사이즈",
           "priceKRW": 430000,
-          "sku": "",
+          "sku": "WIPWPHAR10A-02200",
           "estimated": false
         }
       ],
