@@ -64,3 +64,8 @@
 .commerce .product-card[data-product="takoon-parawing-cloud"] .product-image img{position:absolute!important;width:99.623%!important;height:99.623%!important;max-width:none!important;max-height:none!important;left:50.872%!important;top:51.992%!important;padding:0!important;object-fit:fill!important;transform:translate(-50%,-50%)!important}
 .commerce .product-card[data-product="takoon-parawing-cloud-lw"] .product-image img{position:absolute!important;width:99.497%!important;height:99.497%!important;max-width:none!important;max-height:none!important;left:50.829%!important;top:48.259%!important;padding:0!important;object-fit:fill!important;transform:translate(-50%,-50%)!important}
 .commerce .product-card[data-product="ppc-orbit"] .product-image img{position:absolute!important;width:95.884%!important;height:71.913%!important;max-width:none!important;max-height:none!important;left:51.438%!important;top:50.040%!important;padding:0!important;object-fit:fill!important;transform:translate(-50%,-50%) scaleX(-1)!important}
+
+/* Product card photography: clean overlay and matched front/back R1 views. */
+.commerce .product-image>i{display:none!important}
+.commerce .product-card[data-product="ppc-r1"] .product-image img{position:absolute!important;width:93%!important;height:93%!important;max-width:none!important;max-height:none!important;left:36%!important;top:50%!important;padding:0!important;object-fit:contain!important;transform:translate(-50%,-50%)!important}
+.commerce .product-card[data-product="ppc-r1"] .product-image img.r1-back{width:90.5%!important;height:90.5%!important;left:64%!important;top:49%!important}

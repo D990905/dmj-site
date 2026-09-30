@@ -51,7 +51,7 @@
   <div class="wrap">
     <div class="auth">
       <div class="section__head center">
-        <h1>다시 오셨네요</h1>
+        <h1>로그인</h1>
         <p class="t-lead">라이딩 기록을 계정에 연결합니다. 다른 기기에서 사용하려면 기록 저장 후 계정 동기화 완료 여부를 확인해 주세요.</p>
       </div>
 
@@ -162,12 +162,13 @@ document.addEventListener('DOMContentLoaded', function () {
   function getSafeRedirect() {
     try {
       var u = new URL(window.location.href);
-      var r = u.searchParams.get('redirect');
+      var r = u.searchParams.get('redirect') || u.searchParams.get('next');
+      if (r && r.charAt(0)==='/' && r.charAt(1)!=='/') r=r.slice(1);
       if (!r) return null;
       // Reject absolute URLs and protocol-relative ones.
       if (/^(https?:|\/\/)/i.test(r)) return null;
       // Whitelist common destinations.
-      var allow = ['inquiry.html', 'cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
+      var allow = ['admin/index.html', 'admin/outlet.html', 'admin/operations.html', 'inquiry.html', 'cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
       if (allow.indexOf(r) >= 0) return r;
       return null;
     } catch (e) { return null; }
@@ -237,12 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }).catch(function () {});
   })();
 
-  function nextUrl() {
-    try {
-      var q = new URLSearchParams(location.search).get('next');
-      if (q && /^\/[^/]/.test(q)) return location.origin + q;
-    } catch (e) {}
-    return location.origin + '/profile.html';
+  function nextUrl() { return new URL(nextDest, location.origin + '/').href;
   }
 
   form.addEventListener('submit', async function (e) {
@@ -255,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
       await window.DMJAuth.login(email, password);
       window.location.assign(nextDest);
     } catch (ex) {
-      err.textContent = ex.message || '로그인에 실패했습니다.';
+      err.textContent = '로그인하지 못했습니다. ' + (ex.message || '잠시 후 다시 시도해 주세요.');
       err.hidden = false;
     }
   });

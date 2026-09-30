@@ -1,0 +1,26 @@
+(function(){'use strict';
+const labels={used:'중고제품',carryover:'이월제품',display:'전시상품'};
+const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
+const money=n=>'₩'+Number(n).toLocaleString('ko-KR');
+const safeURL=s=>{try{const u=new URL(s);return ['https:','blob:'].includes(u.protocol)?u.href:''}catch{return ''}};
+async function client(){await DMJAuth._ensureClient();const c=DMJAuth._supabase();if(!c)throw Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');return c}
+async function signed(c,media){const paths=[...new Set(media.map(m=>m.path).filter(Boolean))];if(!paths.length)return {};const r=await c.storage.from('outlet-media').createSignedUrls(paths,3600);if(r.error)throw Error('사진·영상을 불러오지 못했습니다. 새로고침해 주세요.');return Object.fromEntries(r.data.filter(x=>x.signedUrl).map(x=>[x.path,x.signedUrl]))}
+async function listings(){const c=await client(),r=await c.rpc('outlet_catalog');if(r.error)throw Error('상품을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');return {client:c,items:r.data||[]}}
+function badges(item){const box=el('div','outlet-badges');box.append(el('span','outlet-badge '+item.category,labels[item.category]||'상품'));if(item.sale_status&&item.sale_status!=='available')box.append(el('span','outlet-badge sold',item.sale_status==='sold'?'판매완료':'예약 중'));return box}
+function price(item){const box=el('p');if(item.original_price_krw>item.price_krw)box.append(el('del','outlet-old-price',money(item.original_price_krw)));box.append(el('strong','outlet-price',money(item.price_krw)));return box}
+function card(item,urls,base=''){const a=el('article','outlet-card'),link=el('a','outlet-card-photo');link.href=base+'outlet-product.html?id='+encodeURIComponent(item.id);const pic=item.media.find(m=>m.type==='image'),src=pic&&(urls[pic.path]||pic.url);if(src){const img=el('img');img.src=src;img.alt=item.title;img.loading='lazy';link.append(img)}a.append(link,badges(item));const h=el('h2'),name=el('a','',item.title);name.href=link.href;h.append(name);a.append(h,el('p','outlet-muted',[item.brand,item.model_year,item.size].filter(Boolean).join(' · ')),price(item));return a}
+function detail(item,urls,base=''){const wrap=el('div','outlet-detail-grid'),gallery=el('div'),info=el('div'),photos=item.media.filter(m=>m.type==='image');let at=0;
+ const hero=el('img','outlet-main-media');hero.alt=item.title;const strip=el('div','outlet-media-strip');
+ function show(i){at=(i+photos.length)%photos.length;hero.src=urls[photos[at].path]||photos[at].url;[...strip.children].forEach((b,n)=>b.setAttribute('aria-pressed',String(n===at)))}
+ photos.forEach((p,i)=>{const b=el('button'),im=el('img');b.type='button';b.setAttribute('aria-label','제품 사진 '+(i+1));im.src=urls[p.path]||p.url;im.alt=item.title+' 사진 '+(i+1);b.append(im);b.onclick=()=>show(i);strip.append(b)});
+ if(photos.length){show(0);hero.tabIndex=0;hero.setAttribute('role','button');hero.setAttribute('aria-label','제품 사진 확대');const zoom=()=>{const dialog=el('dialog','outlet-lightbox'),img=el('img'),bar=el('div','outlet-actions'),close=el('button','','닫기 ×'),prev=el('button','','← 이전'),next=el('button','','다음 →'),status=el('span');function update(){img.src=urls[photos[at].path]||photos[at].url;img.alt=item.title+' 사진 '+(at+1);status.textContent=(at+1)+' / '+photos.length}prev.onclick=()=>{show(at-1);update()};next.onclick=()=>{show(at+1);update()};prev.hidden=next.hidden=photos.length<2;close.onclick=()=>dialog.close();dialog.addEventListener('close',()=>{dialog.remove();hero.focus()});dialog.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){prev.click();e.preventDefault()}if(e.key==='ArrowRight'){next.click();e.preventDefault()}});bar.append(prev,status,next);dialog.append(close,img,bar);document.body.append(dialog);update();dialog.showModal()};hero.onclick=zoom;hero.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();zoom()}};gallery.append(hero,strip)}
+ for(const m of item.media.filter(m=>m.type==='video')){const v=el('video','outlet-video');v.src=urls[m.path]||m.url;v.controls=true;v.preload='metadata';v.playsInline=true;gallery.append(v)}
+ if(safeURL(item.video_url)){const v=el('a','','제품 영상 보기 ↗');v.href=safeURL(item.video_url);v.target='_blank';v.rel='noopener';gallery.append(v)}
+ info.append(badges(item),el('p','eyebrow',[item.brand,item.model_year,item.size].filter(Boolean).join(' · ')),el('h1','',item.title),price(item));
+ for(const [k,t] of [['condition','제품 상태·사용 이력'],['repairs','수리·손상 이력'],['included','포함 구성품'],['description','상세 설명']])if(item[k])info.append(el('h2','',t),el('p','outlet-copy',item[k]));
+ const note=labels[item.category]+' · '+item.title+' · '+(item.size||'')+' · '+money(item.price_krw)+' · 상품번호 '+item.id;
+ if(!item.sale_status||item.sale_status==='available'){const q=el('a','outlet-button','이 상품 구매 문의 ↗');q.href=base+'inquiry.html?note='+encodeURIComponent(note);info.append(q,el('p','outlet-hint','상담 후 재고와 상태를 확인하고 구매를 확정합니다.'))}else info.append(el('p','outlet-hint',item.sale_status==='sold'?'판매가 완료된 상품입니다.':'현재 예약 중인 상품입니다.'));
+ wrap.append(gallery,info);return wrap}
+const activePromo=i=>i.sale_status==='available'&&(!i.promo_start||Date.parse(i.promo_start)<=Date.now())&&(!i.promo_end||Date.parse(i.promo_end)>Date.now());
+window.DMJOutlet={el,money,safeURL,labels,client,signed,listings,card,detail,activePromo};
+})();

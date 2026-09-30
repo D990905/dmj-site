@@ -1,0 +1,9 @@
+(async function(){'use strict';const O=DMJOutlet,$=id=>document.getElementById(id);let items=[],urls={},kind='all',busy=false;const id=new URLSearchParams(location.search).get('id');
+ function render(){if($('outlet-detail')){const item=items.find(i=>i.id===id);if(!item){$('outlet-status').textContent='현재 공개 중인 상품이 없습니다. 전체 목록에서 다른 장비를 확인해 주세요.';$('outlet-detail').replaceChildren();return}document.title=item.title+' | DMJ 아울렛';$('outlet-status').textContent='';$('outlet-detail').replaceChildren(O.detail(item,urls));return}
+ const query=$('outlet-search').value.trim().toLowerCase(),sort=$('outlet-sort').value;
+ const list=items.filter(i=>(kind==='all'||i.category===kind)&&($('show-sold').checked||i.sale_status!=='sold')&&[i.title,i.brand,i.model_year,i.size].join(' ').toLowerCase().includes(query));
+ if(sort!=='new')list.sort((a,b)=>(a.price_krw-b.price_krw)*(sort==='low'?1:-1));$('outlet-grid').replaceChildren(...list.map(i=>O.card(i,urls)));$('outlet-status').textContent=list.length+'개 상품';$('outlet-empty').hidden=!!list.length;$('outlet-empty').querySelector('h2').textContent=items.length?'조건에 맞는 상품이 없습니다.':'등록된 상품을 준비 중입니다.';
+ }
+ async function load(){if(busy)return;busy=true;try{const r=await O.listings();items=r.items;const visible=$('outlet-detail')?items.filter(i=>i.id===id):items;urls=await O.signed(r.client,visible.flatMap(i=>i.media));render()}catch(e){$('outlet-status').textContent=e.message}finally{busy=false}}
+ document.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{kind=b.dataset.kind;document.querySelectorAll('[data-kind]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render()});for(const key of ['outlet-search','outlet-sort','show-sold'])$(key)?.addEventListener('input',render);await load();setInterval(()=>{if(!document.hidden&&!document.querySelector('dialog[open]'))load()},60000);
+})();
