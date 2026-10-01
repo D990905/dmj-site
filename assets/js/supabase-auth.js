@@ -91,6 +91,7 @@
 
       // 세션 변경 listener — OAuth callback / token refresh / 다른 탭 로그인
       sb.auth.onAuthStateChange(function (event, session) {
+        const accountChanged = (cachedSession?.user?.id || null) !== (session?.user?.id || null);
         cachedSession = session;
         if (session) {
           refreshProfile().then(function () {
@@ -110,7 +111,7 @@
         // legacy nav-auth.js 등이 listen 가능
         try {
           window.dispatchEvent(new CustomEvent('dmj-auth-change', {
-            detail: { event: event, isLoggedIn: !!session }
+            detail: { event: event, isLoggedIn: !!session, accountChanged: accountChanged }
           }));
         } catch (e) {}
       });
@@ -985,7 +986,7 @@
       }).then(function () {
         try {
           window.dispatchEvent(new CustomEvent('dmj-auth-change', {
-            detail: { event: 'PROFILE_SYNCED', isLoggedIn: true }
+            detail: { event: 'PROFILE_SYNCED', isLoggedIn: true, accountChanged: false }
           }));
         } catch (e) {}
       });
