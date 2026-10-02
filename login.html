@@ -23,7 +23,7 @@
   .auth-links { display: flex; justify-content: space-between; margin-top: var(--sp-3); font-size: 14px; }
   .auth-sso-note { color: var(--warn); font-size: 13px; margin-top: var(--sp-3); }
 </style>
-<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-service-theme.css?v=20260924-1&tone=20260925-soft"><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"></head>
+<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-service-theme.css?v=20260924-1&tone=20260925-soft"><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"><style>.admin-login .auth > .lab,.admin-login .auth-sso,.admin-login .auth-sso-note,.admin-login .auth-sep,.admin-login a[href="signup.html"]{display:none!important}.admin-login .auth .card{border-top:4px solid #202522}.admin-login .auth button[type="submit"]{background:#202522;color:#fff}.admin-login-badge{font-size:13px;letter-spacing:.18em;font-weight:700;color:#626b32}.member-login-link{display:block;text-align:center;margin-top:24px}.admin-login .auth .t-lead{font-size:18px;line-height:1.7}</style></head>
 <body class="dmj"><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="catalog.html">장비 둘러보기</a><a href="riding-dashboard/v2.html">라이딩 분석</a><a href="inquiry.html">구매 상담 ↗</a></div></nav>
 
 <!--#nav:begin-->
@@ -169,14 +169,24 @@ document.addEventListener('DOMContentLoaded', function () {
       if (/^(https?:|\/\/)/i.test(r)) return null;
       // Whitelist common destinations.
       var allow = ['admin/index.html', 'admin/outlet.html', 'admin/operations.html', 'inquiry.html', 'cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
-      if (allow.indexOf(r) >= 0) return r;
+      var dest = new URL(r, location.origin + '/');
+      if (dest.origin === location.origin && allow.indexOf(dest.pathname.slice(1)) >= 0) return dest.pathname.slice(1) + dest.search + dest.hash;
       return null;
     } catch (e) { return null; }
   }
   var nextDest = getSafeRedirect() || 'profile.html';
+  var adminLogin = nextDest.startsWith('admin/');
+  async function checkAdmin() {
+    await window.DMJAuth._ensureClient();
+    var client = window.DMJAuth._supabase(), user = await client.auth.getUser();
+    if(user.error || !user.data.user) throw Error('관리자 계정으로 로그인해 주세요.');
+    var role = await client.rpc('is_ops_admin');
+    if(role.error || role.data !== true) throw Error('이 계정에는 관리자 권한이 없습니다. 관리자 계정으로 다시 로그인해 주세요.');
+  }
+
 
   // 이미 로그인 상태면 redirect/profile 로
-  if (window.DMJAuth && window.DMJAuth.isLoggedIn()) {
+  if (!adminLogin && window.DMJAuth && window.DMJAuth.isLoggedIn()) {
     window.location.replace(nextDest);
     return;
   }
@@ -186,6 +196,17 @@ document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('login-form');
   var err = document.getElementById('auth-error');
   if (!form) return;
+  if (adminLogin) {
+    document.title = '관리자 로그인 | 단무지상사 DMJ';
+    document.documentElement.classList.add('admin-login');
+    document.getElementById('login-heading').textContent = '관리자 로그인';
+    document.querySelector('.auth .t-lead').textContent = '단무지상사 운영자 전용입니다. 관리자 권한이 등록된 계정으로 로그인해 주세요.';
+    form.querySelector('button[type="submit"]').textContent = '관리자 로그인';
+    document.querySelector('label[for="lg-email"]').textContent = '관리자 이메일';
+    const link = document.createElement('a'); link.href = 'login.html'; link.textContent = '일반 회원 로그인으로 이동'; link.className = 'member-login-link'; form.after(link);
+    const badge = document.createElement('p'); badge.className = 'admin-login-badge'; badge.textContent = 'DMJ ADMIN'; document.getElementById('login-heading').before(badge);
+  }
+
   /* §527 — 소셜 로그인 버튼 배선 */
   var sso = document.getElementById('auth-sso');
   var ssoNote = document.getElementById('auth-sso-note');
@@ -244,13 +265,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    document.getElementById('login-heading').textContent = '로그인';
+    document.getElementById('login-heading').textContent = adminLogin ? '관리자 로그인' : '로그인';
     err.hidden = true; err.textContent = '';
     var data = new FormData(form);
     var email = String(data.get('email') || '');
     var password = String(data.get('password') || '');
     try {
       await window.DMJAuth.login(email, password);
+      if (adminLogin) await checkAdmin();
       window.location.assign(nextDest);
     } catch (ex) {
       err.textContent = '로그인하지 못했습니다. ' + (ex.message || '잠시 후 다시 시도해 주세요.');
