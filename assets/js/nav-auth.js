@@ -327,8 +327,8 @@
     if (lo) {
       lo.addEventListener('click', function (e) {
         e.preventDefault();
-        try { localStorage.removeItem('dmj_session'); } catch (_) {}
-        location.href = prefix + 'index.html';
+        if (!window.DMJAuth?.logout) { alert('로그인 연결을 확인하지 못했습니다. 새로고침 후 다시 시도해 주세요.'); return; }
+        window.DMJAuth.logout().then(function(){ localStorage.removeItem('dmj_session'); location.href = prefix + 'login.html'; }).catch(function(){ alert('로그아웃하지 못했습니다. 다시 시도해 주세요.'); });
       });
     }
   }
