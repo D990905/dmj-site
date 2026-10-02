@@ -5845,7 +5845,7 @@
       "category": "foil",
       "path": "products/takoon/foil-x-glide-v2.html",
       "image": "assets/images/products/takoon/verified/tkn-xglide-v2.png",
-      "description": "본사는 중급~상급 라이더의 윙포일·서프·SUP·펌프포일용으로 안내합니다. Starter와 더 높은 성능의 포일 사이에서 글라이드와 주행 범위를 확장하는 모델입니다.",
+      "description": "입문~초급 라이더를 위한 미드 애스펙트 포일입니다. 체중과 풍속, 보드에 맞는 프론트윙 크기를 선택해 기본 포일링과 프리라이드를 연습하는 용도로 추천합니다.",
       "options": [
         "1050",
         "1250",
@@ -5856,7 +5856,7 @@
       "availability": "inquiry",
       "source": "https://takoon.com/products/foil-x-glide-v2",
       "priority": "value",
-      "minLevel": 1,
+      "minLevel": 0,
       "raceOnly": false,
       "discipline": "wing",
       "environments": [
@@ -5865,17 +5865,17 @@
         "wave",
         "light"
       ],
-      "headline": "Starter 다음 단계의 미드 애스펙트 포일",
+      "headline": "입문~초급용 미드 애스펙트 포일",
       "notes": [
         "프론트 윙 1050·1250·1450·1700cm² 안내",
-        "입문 기본 추천과 성장 단계 추천을 구분"
+        "입문~초급 추천 · 체중과 풍속에 따라 면적 선택"
       ],
       "purposes": [
         "freeride",
         "wave"
       ],
       "verifiedAt": "2026-09-24",
-      "manufacturerSummary": "본사는 중급~상급 라이더의 윙포일·서프·SUP·펌프포일용으로 안내합니다. Starter와 더 높은 성능의 포일 사이에서 글라이드와 주행 범위를 확장하는 모델입니다.",
+      "manufacturerSummary": "입문~초급 라이더를 위한 미드 애스펙트 포일입니다. 체중과 풍속, 보드에 맞는 프론트윙 크기를 선택해 기본 포일링과 프리라이드를 연습하는 용도로 추천합니다.",
       "recommendationPolicy": "제조사 용도 설명을 바탕으로 한 DMJ 상담 후보 분류. 수치화된 숙련도 경계는 DMJ 운영 기준.",
       "tables": [
         [

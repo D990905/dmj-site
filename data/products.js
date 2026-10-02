@@ -688,7 +688,7 @@ window.DMJ_PRODUCTS_INLINE = {
       "level_target": [
         "beginner"
       ],
-      "tagline": "입문~중급 cross — light-wind 강점",
+      "tagline": "입문~초급용 미드 애스펙트 포일",
       "page_url": "takoon.html#foil-xglide-v2",
       "status": "danny-review",
       "why": "약풍 day에서 paddle-up이 일찍 살아남. 입문 후 1년차까지 OK."
