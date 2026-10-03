@@ -1,0 +1,1 @@
+document.getElementById('detail-option')?.addEventListener('change',function(){document.querySelectorAll('[data-product-photo]')[this.selectedIndex]?.click();});

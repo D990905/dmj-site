@@ -35,6 +35,13 @@
       "label": "PREMIUM ACCESSORIES",
       "headline": "라이딩 전후까지, 나에게 맞게.",
       "description": "윙·세일링을 위한 의류, 하네스와 액세서리"
+    },
+    "lisa": {
+      "name": "LISA",
+      "url": "https://www.patrikinternational.com/en/shop/winging/wing-accessories/lisa-harness-lines-wing-duo-race.html",
+      "label": "HARNESS LINES",
+      "description": "윙포일 하네스라인",
+      "image": "assets/images/lisa/duo-red.jpg"
     }
   },
   "products": [
@@ -12302,6 +12309,107 @@
       },
       "tables": [],
       "videos": []
+    },
+    {
+      "id": "lisa-harness-lines-wing-duo-race",
+      "brand": "lisa",
+      "name": "LISA Harness Lines Wing DUO Race",
+      "category": "accessory",
+      "subcategory": "leash",
+      "path": "products/lisa/wing-duo-race.html",
+      "image": "assets/images/lisa/duo-red.jpg",
+      "description": "윙포일용 LISA DUO Race 하네스라인입니다. 레드·블루·블랙·투명 4가지 색상을 선택할 수 있습니다.",
+      "headline": "윙포일용 DUO Race 하네스라인",
+      "manufacturerSummary": "윙포일용 LISA DUO Race 하네스라인.",
+      "source": "https://www.patrikinternational.com/en/shop/winging/wing-accessories/lisa-harness-lines-wing-duo-race.html",
+      "verifiedAt": "2026-10-03",
+      "sourceStatus": "verified",
+      "options": [
+        "레드",
+        "블루",
+        "블랙",
+        "투명"
+      ],
+      "price": 100000,
+      "availability": "inquiry",
+      "priority": "performance",
+      "minLevel": 0,
+      "discipline": "accessory",
+      "raceOnly": false,
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [
+        "freeride",
+        "wave",
+        "freestyle",
+        "parawing",
+        "race-wing"
+      ],
+      "specs": {
+        "용도": "윙포일 하네스라인",
+        "모델": "DUO Race",
+        "색상": "레드 / 블루 / 블랙 / 투명"
+      },
+      "notes": [
+        "색상별 재고와 입고 일정은 구매 상담에서 확인해 주세요."
+      ],
+      "invoiceSkus": [
+        "L12260002202",
+        "L12260002204",
+        "L12260002203",
+        "L12260002201"
+      ],
+      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "retailVariants": [
+        {
+          "option": "레드",
+          "priceKRW": 100000,
+          "sku": "L12260002202",
+          "estimated": false
+        },
+        {
+          "option": "블루",
+          "priceKRW": 100000,
+          "sku": "L12260002204",
+          "estimated": false
+        },
+        {
+          "option": "블랙",
+          "priceKRW": 100000,
+          "sku": "L12260002203",
+          "estimated": false
+        },
+        {
+          "option": "투명",
+          "priceKRW": 100000,
+          "sku": "L12260002201",
+          "estimated": false
+        }
+      ],
+      "priceMax": 100000,
+      "priceStatus": "fixed",
+      "priceSource": "DMJ 판매가 확정 2026-10-03",
+      "priceReviewedAt": "2026-09-25",
+      "priceNote": "부가세 포함 · 전 색상 동일 가격",
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/lisa/duo-red.jpg",
+        "assets/images/lisa/duo-blue.jpg",
+        "assets/images/lisa/duo-black.jpg",
+        "assets/images/lisa/duo-transparent.jpg"
+      ],
+      "detailMedia": {
+        "photos": [],
+        "videos": [
+          "https://www.youtube.com/watch?v=a-_l4KynAvQ"
+        ],
+        "source": "https://www.patrikinternational.com/en/shop/winging/wing-accessories/lisa-harness-lines-wing-duo-race.html",
+        "checkedAt": "2026-10-03"
+      }
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",
