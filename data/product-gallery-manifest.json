@@ -1192,6 +1192,17 @@
         "../../assets/images/products/takoon/catalog-20260930/2884ed8d38dffc6f.jpg"
       ],
       "groups": {}
+    },
+    {
+      "id": "lisa-harness-lines-wing-duo-race",
+      "path": "products/lisa/wing-duo-race.html",
+      "photos": [
+        "../../assets/images/lisa/duo-red.jpg",
+        "../../assets/images/lisa/duo-blue.jpg",
+        "../../assets/images/lisa/duo-black.jpg",
+        "../../assets/images/lisa/duo-transparent.jpg"
+      ],
+      "groups": {}
     }
   ]
 }
