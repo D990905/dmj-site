@@ -8027,7 +8027,6 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [
-        "S-M",
         "L-XL"
       ],
       "price": 460000,
@@ -8053,7 +8052,7 @@
         "본사 사이즈": "S-M / L-XL",
         "구조": "탈착식 유연 슬랫",
         "바": "스테인리스 루프·퀵릴리스 버클",
-        "주문 구성에서 선택": "S-M / L-XL"
+        "주문 구성에서 선택": "L-XL"
       },
       "notes": [
         "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
@@ -8063,12 +8062,6 @@
       ],
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
-        {
-          "option": "S-M",
-          "priceKRW": 460000,
-          "sku": "DMJ-WIP-WAISTFOIL-3-S-M",
-          "estimated": false
-        },
         {
           "option": "L-XL",
           "priceKRW": 460000,
@@ -9266,7 +9259,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [
-        "프리사이즈"
+        "S-M"
       ],
       "price": 430000,
       "availability": "inquiry",
@@ -9290,10 +9283,11 @@
       "specs": {
         "플레이트": "6mm 다층 카본",
         "본사 사이즈": "프리사이즈 (One Size)",
-        "후면": "리시 루프"
+        "후면": "리시 루프",
+        "매장 보유 사이즈": "S-M"
       },
       "notes": [
-        "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
+        "매장 보유 재고: S-M. 착용 범위는 상담에서 확인합니다."
       ],
       "invoiceSkus": [
         "WIPWPHAR10A-02200"
@@ -9301,7 +9295,7 @@
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "프리사이즈",
+          "option": "S-M",
           "priceKRW": 430000,
           "sku": "WIPWPHAR10A-02200",
           "estimated": false
@@ -12573,7 +12567,7 @@
         "블랙",
         "투명"
       ],
-      "price": 100000,
+      "price": 110000,
       "availability": "inquiry",
       "priority": "performance",
       "minLevel": 0,
@@ -12610,32 +12604,32 @@
       "retailVariants": [
         {
           "option": "레드",
-          "priceKRW": 100000,
+          "priceKRW": 110000,
           "sku": "L12260002202",
           "estimated": false
         },
         {
           "option": "블루",
-          "priceKRW": 100000,
+          "priceKRW": 110000,
           "sku": "L12260002204",
           "estimated": false
         },
         {
           "option": "블랙",
-          "priceKRW": 100000,
+          "priceKRW": 110000,
           "sku": "L12260002203",
           "estimated": false
         },
         {
           "option": "투명",
-          "priceKRW": 100000,
+          "priceKRW": 110000,
           "sku": "L12260002201",
           "estimated": false
         }
       ],
-      "priceMax": 100000,
+      "priceMax": 110000,
       "priceStatus": "fixed",
-      "priceSource": "DMJ 판매가 확정 2026-10-03",
+      "priceSource": "DMJ 판매가 확정 2026-10-03 · 110,000원",
       "priceReviewedAt": "2026-09-25",
       "priceNote": "부가세 포함 · 전 색상 동일 가격",
       "priceFixedAt": "2026-09-25",
