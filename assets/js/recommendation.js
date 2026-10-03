@@ -52,6 +52,7 @@
     for(const value of values){let text=value;if(takoon){text=text.replace('Orange','오렌지').replace('White','화이트');if(i===0)text+='㎡';if(text.startsWith('싱글 붐'))text+=' (+226,000원)';if(text.startsWith('투바'))text+=' (+183,000원)'}const option=el('option',text);option.value=value;select.append(option)}select.value=chosen[i];select.disabled=!values.length;
    }
    const key=takoon?chosen.join(' / '):chosen[0],variant=variants.find(v=>v.option===key);
+   if(p.id==='lisa-harness-lines-wing-duo-race'){const color={'레드':'red','블루':'blue','블랙':'black','투명':'transparent'}[chosen[0]];image.src=color?'assets/images/lisa/duo-'+color+'.jpg':p.image;image.alt=p.name+(color?' · '+chosen[0]:'');}
    if(variant){selections.set(category,{product:p,variant});price.textContent=Number(variant.priceKRW)>0?money(variant.priceKRW):'가격 확인 후 견적 안내'}else{selections.delete(category);price.textContent='옵션을 선택하면 금액이 표시됩니다'}
    if(typeof update==='function')update();
   }
