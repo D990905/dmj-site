@@ -11909,7 +11909,7 @@
         "6'2",
         "6'4"
       ],
-      "price": null,
+      "price": 210000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foilboard-day-bag-cruise",
       "priority": "value",
@@ -11931,11 +11931,54 @@
         "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
       ],
       "manufacturerSummary": "Cruise 보드를 위한 전용 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "5'3",
+          "priceKRW": 210000,
+          "sku": "TKFBDBC53",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "5'6",
+          "priceKRW": 210000,
+          "sku": "TKFBDBC56",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "5'10",
+          "priceKRW": 210000,
+          "sku": "TKFBDBC510",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "6'0",
+          "priceKRW": 210000,
+          "sku": "TKFBDBC60",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "6'2",
+          "priceKRW": 210000,
+          "sku": "TKFBDBC62",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "6'4",
+          "priceKRW": 210000,
+          "sku": "TKFBDBC64",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/c00b51b8ce9aa158.png"
       ],
@@ -11943,7 +11986,11 @@
         "본사 옵션": "5'3 / 5'6 / 5'10 / 6'0 / 6'2 / 6'4"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 210000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "tkn-wing-day-bag-glide",
@@ -11961,7 +12008,7 @@
         "5'2",
         "5'4"
       ],
-      "price": null,
+      "price": 210000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/wing-day-bag-glide",
       "priority": "value",
@@ -11983,11 +12030,40 @@
         "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
       ],
       "manufacturerSummary": "Glide 보드를 위한 전용 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "4'9",
+          "priceKRW": 210000,
+          "sku": "TKFBDBG49",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "5'0",
+          "priceKRW": 210000,
+          "sku": "TKFBDBG50",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "5'2",
+          "priceKRW": 210000,
+          "sku": "TKFBDBG52",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        },
+        {
+          "option": "5'4",
+          "priceKRW": 220000,
+          "sku": "TKFBDBG54",
+          "sourcePriceEUR": 65.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/4efede30a7ec74f6.png"
       ],
@@ -11995,7 +12071,11 @@
         "본사 옵션": "4'9 / 5'0 / 5'2 / 5'4"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 220000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "tkn-wing-day-bag-glide-glide-midlength",
@@ -12014,7 +12094,7 @@
         "6'4",
         "6'6"
       ],
-      "price": null,
+      "price": 220000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/wing-day-bag-glide-glide-midlength",
       "priority": "value",
@@ -12036,11 +12116,47 @@
         "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
       ],
       "manufacturerSummary": "Glide Midlength 보드를 위한 전용 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "5'8",
+          "priceKRW": 220000,
+          "sku": "TKFBDBGML58",
+          "sourcePriceEUR": 65.0,
+          "estimated": false
+        },
+        {
+          "option": "5'10",
+          "priceKRW": 220000,
+          "sku": "TKFBDBGML510",
+          "sourcePriceEUR": 65.0,
+          "estimated": false
+        },
+        {
+          "option": "6'0",
+          "priceKRW": 220000,
+          "sku": "TKFBDBGML60",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        },
+        {
+          "option": "6'4",
+          "priceKRW": 220000,
+          "sku": "TKFBDBGML64",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        },
+        {
+          "option": "6'6",
+          "priceKRW": 220000,
+          "sku": "TKFBDBGML66",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/e6a3d0506d60bf67.png"
       ],
@@ -12048,7 +12164,11 @@
         "본사 옵션": "5'8 / 5'10 / 6'0 / 6'4 / 6'6"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 220000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "tkn-wing-day-bag-ultra-glide",
@@ -12067,7 +12187,7 @@
         "6'10",
         "7'0"
       ],
-      "price": null,
+      "price": 220000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/wing-day-bag-ultra-glide",
       "priority": "value",
@@ -12089,11 +12209,47 @@
         "벨크로 개구부로 포일을 장착한 상태의 이동을 지원합니다."
       ],
       "manufacturerSummary": "Ultra Glide 보드를 위한 전용 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "6'2",
+          "priceKRW": 220000,
+          "sku": "TKFBDUG62",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        },
+        {
+          "option": "6'6",
+          "priceKRW": 220000,
+          "sku": "TKFBDUG66",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        },
+        {
+          "option": "6'8",
+          "priceKRW": 220000,
+          "sku": "TKFBDUG68",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        },
+        {
+          "option": "6'10",
+          "priceKRW": 220000,
+          "sku": "TKFBDUG610",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        },
+        {
+          "option": "7'0",
+          "priceKRW": 220000,
+          "sku": "TKFBDUG70",
+          "sourcePriceEUR": 69.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/57d8602abf0b0ad6.png"
       ],
@@ -12101,7 +12257,11 @@
         "본사 옵션": "6'2 / 6'6 / 6'8 / 6'10 / 7'0"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 220000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "tkn-wing-day-bag",
@@ -12119,7 +12279,7 @@
         "5'4",
         "6'0"
       ],
-      "price": null,
+      "price": 170000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/wing-day-bag",
       "priority": "value",
@@ -12142,11 +12302,40 @@
         "4'6은 본사 선택 옵션에 있으며 상세 치수는 상담에서 확인합니다."
       ],
       "manufacturerSummary": "윙·SUP 포일 보드용 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "4'6",
+          "priceKRW": 170000,
+          "sku": "TKWDB46",
+          "sourcePriceEUR": 37.0,
+          "estimated": false
+        },
+        {
+          "option": "5'0",
+          "priceKRW": 170000,
+          "sku": "TKWDB50",
+          "sourcePriceEUR": 38.0,
+          "estimated": false
+        },
+        {
+          "option": "5'4",
+          "priceKRW": 170000,
+          "sku": "TKWDB54",
+          "sourcePriceEUR": 39.0,
+          "estimated": false
+        },
+        {
+          "option": "6'0",
+          "priceKRW": 170000,
+          "sku": "TKWDB60",
+          "sourcePriceEUR": 40.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/e4c45aa000a477e5.png",
         "assets/images/products/takoon/catalog-20260930/5e424b658fdcd453.png",
@@ -12159,7 +12348,11 @@
         "본사 옵션": "4'6 / 5'0 / 5'4 / 6'0"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 170000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "tkn-pump-day-bag",
@@ -12172,10 +12365,10 @@
       "description": "Pump 보드 전용 데이백",
       "headline": "Pump 보드 전용 데이백",
       "options": [
-        "80cm",
-        "90cm"
+        "80",
+        "90"
       ],
-      "price": null,
+      "price": 170000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/pump-day-bag",
       "priority": "value",
@@ -12196,11 +12389,26 @@
         "P600 원단, 6mm 패딩, 손잡이와 탈착식 어깨끈."
       ],
       "manufacturerSummary": "Pump 보드 전용 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "80",
+          "priceKRW": 170000,
+          "sku": "TKPUMPDB-80",
+          "sourcePriceEUR": 39.0,
+          "estimated": false
+        },
+        {
+          "option": "90",
+          "priceKRW": 170000,
+          "sku": "TKPUMPDB-90",
+          "sourcePriceEUR": 39.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/e489f789cd0c85b8.png",
         "assets/images/products/takoon/catalog-20260930/6392d260158fdbb9.png"
@@ -12209,7 +12417,11 @@
         "본사 옵션": "80cm / 90cm"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 170000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "tkn-pump-scoot-day-bag",
@@ -12222,9 +12434,9 @@
       "description": "Pump Scoot 전용 95cm 데이백",
       "headline": "Pump Scoot 전용 95cm 데이백",
       "options": [
-        "95cm"
+        "단일 사이즈"
       ],
-      "price": null,
+      "price": 180000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/pump-scoot-day-bag",
       "priority": "value",
@@ -12245,11 +12457,19 @@
         "P600 원단, 6mm 패딩, 손잡이와 탈착식 어깨끈."
       ],
       "manufacturerSummary": "Pump Scoot 전용 95cm 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "단일 사이즈",
+          "priceKRW": 180000,
+          "sku": "TKPSDAYBAG",
+          "sourcePriceEUR": 45.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/0d95e083a96afbca.png",
         "assets/images/products/takoon/catalog-20260930/5e51ce5484fb6121.png"
@@ -12258,7 +12478,11 @@
         "본사 옵션": "95cm"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 180000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "tkn-twin-tip-day-bag",
@@ -12271,10 +12495,10 @@
       "description": "카이트 트윈팁 보드용 데이백",
       "headline": "카이트 트윈팁 보드용 데이백",
       "options": [
-        "150 × 50cm",
-        "170 × 50cm"
+        "150",
+        "170"
       ],
-      "price": null,
+      "price": 190000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/twin-tip-day-bag",
       "priority": "value",
@@ -12295,11 +12519,26 @@
         "단열을 위한 실버 내부 마감, 손잡이와 탈착식 어깨끈."
       ],
       "manufacturerSummary": "카이트 트윈팁 보드용 데이백",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "150",
+          "priceKRW": 190000,
+          "sku": "TKTTDB150",
+          "sourcePriceEUR": 49.0,
+          "estimated": false
+        },
+        {
+          "option": "170",
+          "priceKRW": 210000,
+          "sku": "TKTTDB170",
+          "sourcePriceEUR": 59.0,
+          "estimated": false
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/17f13e31e5b88f6c.jpg",
         "assets/images/products/takoon/catalog-20260930/2884ed8d38dffc6f.jpg"
@@ -12308,7 +12547,11 @@
         "본사 옵션": "150 × 50cm / 170 × 50cm"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 210000,
+      "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
+      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceStatus": "fixed"
     },
     {
       "id": "lisa-harness-lines-wing-duo-race",

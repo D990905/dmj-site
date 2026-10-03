@@ -14,20 +14,36 @@
  summary.append(el('h2',s.category==='all'?'나에게 맞는 전체 셋업':'조건에 맞는 '+DMJRecommend.labels.category[s.category]),el('p',DMJRecommend.summary(s)));
  out.warnings.forEach(w=>summary.append(el('p',w,'recommend-note')));
  const categories=s.category==='all'?[s.purpose==='parawing'?'parawing':'wing','board','foil']:[s.category];
- const selections=new Map(), controls=[];
+ const mainCategories=[...categories];
+ const extras={
+ suit:{title:'슈트도 함께 준비할까요?',ids:['wip-neo-long-john-mk2','wip-neo-long-john-women-mk2','wip-summer-neo-long-john-mk2','wip-steamer-mk3'],note:'수온·계절과 체형에 따라 두께와 사이즈를 확인하세요.'},
+ harness:{title:'하네스가 필요하신가요?',ids:['wip-waistfoil-harness-3-0','wip-wing-wind-pro-harness'],note:'허리 사이즈와 사용 목적에 맞게 선택하세요.'},
+ harnessline:{title:'하네스라인도 필요하신가요?',ids:['lisa-harness-lines-wing-duo-race'],note:'윙 핸들·붐과의 호환성을 상담에서 확인합니다.'},
+ wingleash:{title:'윙 리시는 준비하셨나요?',ids:['wip-wing-leash'],note:'윙과 라이더를 연결하는 리시입니다.'},
+ boardleash:{title:'보드 리시도 필요하신가요?',ids:['wip-wing-board-leash','wip-wing-board-leash-dampener'],note:'Dampener는 완충 부품이며 단독 보드 리시가 아닙니다.'},
+ goggles:{title:'고글도 함께 볼까요?',ids:['wip-flying-mask-2-0'],note:'착용감과 사용 환경을 확인하세요.'},
+ boardbag:{title:'보드 운반·보관용 백이 필요하신가요?',ids:products.filter(p=>p.brand==='takoon'&&p.id.includes('bag')).map(p=>p.id),note:'보드 모델·길이·폭을 확인해 선택하세요. 보드에 백이 포함된 경우 추가 구매가 필요하지 않을 수 있습니다. 운송비는 표시 가격에 반영되어 있습니다.'}
+ };
+ categories.push(...Object.keys(extras));
+ const labelFor=c=>extras[c]?.title||DMJRecommend.labels.category[c];
+ const selections=new Map(), controls=[],requestedExtras=new Set();
  for(const category of categories){
- const candidates=out.results.filter(r=>r.product.category===category),section=el('section',null,'setup-category');section.append(el('h3',DMJRecommend.labels.category[category]));results.append(section);
+ const candidates=extras[category]?products.filter(p=>extras[category].ids.includes(p.id)).map(product=>({product,reasons:[extras[category].note]})):out.results.filter(r=>r.product.category===category),section=el('section',null,'setup-category');section.append(el('h3',labelFor(category)));results.append(section);
  if(!candidates.length){section.append(el('p','현재 조건에 맞는 검증된 후보가 없습니다 조건을 조정하거나 상담에서 구성을 확인해 주세요','recommend-note'));continue}
- const productLabel=el('label','제품'),productSelect=el('select');productSelect.setAttribute('aria-label',DMJRecommend.labels.category[category]+' 제품 선택');
+ if(extras[category])section.append(el('p',extras[category].note));
+ const productLabel=el('label',extras[category]?'추가 선택 (선택 사항)':'제품'),productSelect=el('select');productSelect.setAttribute('aria-label',labelFor(category)+' 제품 선택');
+ if(extras[category]){const skip=el('option','이미 보유 / 이번에는 건너뛰기');skip.value='';productSelect.append(skip)}
  candidates.forEach(({product:p})=>{const o=el('option',p.name);o.value=p.id;productSelect.append(o)});productLabel.append(productSelect);section.append(productLabel);
  const body=el('div',null,'setup-product'), options=el('div',null,'setup-options'),price=el('p',null,'setup-line-price');section.append(body,options,price);
  function chooseProduct(){
+ if(extras[category]){if(productSelect.value)requestedExtras.add(category);else requestedExtras.delete(category)}
+ if(!productSelect.value){body.replaceChildren();options.replaceChildren();price.textContent='';selections.delete(category);update();return}
   const {product:p,reasons}=candidates.find(r=>r.product.id===productSelect.value);body.replaceChildren();options.replaceChildren();selections.delete(category);
   const photo=el('a');photo.href=p.path;const image=el('img');image.src=p.image;image.alt=p.name;image.loading='lazy';photo.append(image);
   const intro=el('div'),link=el('a',p.name+' 상세 보기 ↗');link.href=p.path;intro.append(link,el('p',reasons.slice(0,2).join(' · ')));body.append(photo,intro);
   const variants=(p.retailVariants||[]).filter(v=>p.brand!=='takoon'||p.category!=='wing'||(p.options||[]).includes(v.option));
   const takoon=['takoon-v4','takoon-v4-pro','takoon-vx-pro-2'].includes(p.id);const axes=takoon?(p.id==='takoon-v4-pro'?['사이즈','색상','핸들 구성']:['사이즈','핸들 구성']):['사이즈·구성'];const chosen=axes.map(()=>''),selects=[];
-  for(const name of axes){const label=el('label',name),select=el('select');select.setAttribute('aria-label',DMJRecommend.labels.category[category]+' '+name);label.append(select);options.append(label);selects.push(select)}
+  for(const name of axes){const label=el('label',name),select=el('select');select.setAttribute('aria-label',labelFor(category)+' '+name);label.append(select);options.append(label);selects.push(select)}
   function sync(start){
    for(let i=start;i<axes.length;i++){
     const eligible=variants.filter(v=>!takoon||v.option.split(' / ').slice(0,i).every((x,j)=>x===chosen[j]));const values=[...new Set(eligible.map(v=>takoon?v.option.split(' / ')[i]:v.option))];
@@ -47,7 +63,7 @@
  const order=el('a','이대로 주문 요청','button dark'),consult=el('a','이대로 상담 신청','button dark'),quote=el('a','견적서 요청','text-link'),download=el('button','견적서 내려받기','button');download.type='button';actions.append(order,consult,download,quote);
  let current=[],sum=0,complete=false,priced=false;
  function update(){
-  current=categories.flatMap(c=>selections.has(c)?[selections.get(c)]:[]);sum=current.reduce((n,x)=>n+Number(x.variant.priceKRW),0);complete=current.length===categories.length;priced=complete&&current.every(x=>Number(x.variant.priceKRW)>0);lines.replaceChildren();
+  current=categories.flatMap(c=>selections.has(c)?[selections.get(c)]:[]);sum=current.reduce((n,x)=>n+Number(x.variant.priceKRW),0);complete=mainCategories.every(c=>selections.has(c))&&[...requestedExtras].every(c=>selections.has(c));priced=complete&&current.every(x=>Number(x.variant.priceKRW)>0);lines.replaceChildren();
   current.forEach(x=>lines.append(el('p',x.product.name+' · '+x.variant.option+' — '+(Number(x.variant.priceKRW)>0?money(x.variant.priceKRW):'가격 문의'))));total.textContent=(priced?'총 상품금액 ':'가격이 확인된 상품 합계 ')+money(sum);
   status.textContent=complete&&!priced?'가격 확인이 필요한 장비가 있습니다 구성 그대로 상담과 견적 요청이 가능합니다':complete?'부가세 포함 · 재고와 배송비, 호환성을 확인한 뒤 주문이 확정됩니다':'각 장비의 사이즈와 구성을 선택해 주세요';download.disabled=!priced;
   const detail=current.map(x=>x.product.name+' / '+x.variant.option+' / '+(Number(x.variant.priceKRW)>0?money(x.variant.priceKRW):'가격 문의')).join('\n')+'\n총 상품금액 '+money(sum);
