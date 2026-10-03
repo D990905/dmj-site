@@ -574,6 +574,486 @@
       }
     },
     {
+      "id": "takoon-vx-pro-2",
+      "brand": "takoon",
+      "name": "Wing VX Pro V2",
+      "category": "wing",
+      "path": "products/takoon/wing-vx-pro-2.html",
+      "image": "assets/images/products/official-details/b0700012670877.png",
+      "description": "본사는 레이스, 빅에어, 프리스타일과 웨이브를 포함한 퍼포먼스 용도로 소개합니다. UPE Project 85 프레임과 Aerotech 캐노피를 사용합니다.",
+      "options": [
+        "3.0 / 직물 핸들 (기본)",
+        "3.0 / 싱글 붐 950mm",
+        "3.0 / 투바 카본 핸들 (앞·뒤)",
+        "3.5 / 직물 핸들 (기본)",
+        "3.5 / 싱글 붐 950mm",
+        "3.5 / 투바 카본 핸들 (앞·뒤)",
+        "4.0 / 직물 핸들 (기본)",
+        "4.0 / 싱글 붐 950mm",
+        "4.0 / 투바 카본 핸들 (앞·뒤)",
+        "4.5 / 직물 핸들 (기본)",
+        "4.5 / 싱글 붐 950mm",
+        "4.5 / 투바 카본 핸들 (앞·뒤)",
+        "5.0 / 직물 핸들 (기본)",
+        "5.0 / 싱글 붐 950mm",
+        "5.0 / 투바 카본 핸들 (앞·뒤)",
+        "5.5 / 직물 핸들 (기본)",
+        "5.5 / 싱글 붐 1010mm",
+        "5.5 / 투바 카본 핸들 (앞·뒤)",
+        "6.0 / 직물 핸들 (기본)",
+        "6.0 / 싱글 붐 1010mm",
+        "6.0 / 투바 카본 핸들 (앞·뒤)"
+      ],
+      "price": 1220000,
+      "availability": "inquiry",
+      "source": "https://takoon.com/products/wing-vx-pro-2",
+      "priority": "value",
+      "minLevel": 1,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "headline": "레이스·프리스타일까지 확장하는 퍼포먼스 윙",
+      "notes": [
+        "고속 주행·점프·레이스 목적 비교",
+        "핸들·붐·리시 구성 별도 확인"
+      ],
+      "purposes": [
+        "freeride",
+        "wave",
+        "freestyle",
+        "race-wing"
+      ],
+      "verifiedAt": "2026-09-24",
+      "manufacturerSummary": "본사는 레이스, 빅에어, 프리스타일과 웨이브를 포함한 퍼포먼스 용도로 소개합니다. UPE Project 85 프레임과 Aerotech 캐노피를 사용합니다.",
+      "recommendationPolicy": "제조사 용도 설명을 바탕으로 한 DMJ 상담 후보 분류. 수치화된 숙련도 경계는 DMJ 운영 기준.",
+      "tables": [
+        [
+          [
+            "",
+            "55 kg",
+            "65 - 75 kg",
+            "75 - 85 kg",
+            "90+ kg"
+          ],
+          [
+            "Quiver 1 wing",
+            "3.5m",
+            "4.5m",
+            "5m",
+            "6m"
+          ],
+          [
+            "Quiver 2 wings",
+            "3m / 4m",
+            "3.5m / 5m",
+            "4m / 5.5m",
+            "4.5m / 6m"
+          ]
+        ],
+        [
+          [
+            "Boom V2 950",
+            "VX Pro 2.5m / 3m / 3.5m / 4m / 4.5m / 5m"
+          ],
+          [
+            "Boom V2 1010",
+            "VX Pro 5.5m / 6m / 6.5m"
+          ]
+        ],
+        [
+          [
+            "VX Pro",
+            "3",
+            "3.5",
+            "4",
+            "4.5",
+            "5",
+            "5.5",
+            "6"
+          ],
+          [
+            "Wing span (m)",
+            "2.69",
+            "2.9",
+            "3.1",
+            "3.3",
+            "3.43",
+            "3.44",
+            "3.53"
+          ],
+          [
+            "Chord (m)",
+            "1.5",
+            "1.61",
+            "1.73",
+            "1.83",
+            "1.95",
+            "2.15",
+            "2.27"
+          ],
+          [
+            "Poids sans poignée (kg)",
+            "1.8",
+            "2.15",
+            "2.04",
+            "2.15",
+            "2.34",
+            "2.49",
+            "2.61"
+          ],
+          [
+            "Pression recommandé (PSI)",
+            "10",
+            "10",
+            "10",
+            "10",
+            "10",
+            "10",
+            "9"
+          ]
+        ],
+        [
+          [
+            "Poignées",
+            "Type",
+            "Poids (g)"
+          ],
+          [
+            "Avant",
+            "Souple",
+            "92"
+          ],
+          [
+            "Carbone",
+            "110"
+          ],
+          [
+            "Arrière",
+            "Souple",
+            "92"
+          ],
+          [
+            "Carbone",
+            "100"
+          ]
+        ],
+        [
+          [
+            "",
+            "55 kg",
+            "65 - 75 kg",
+            "75 - 85 kg",
+            "90+ kg"
+          ],
+          [
+            "Quiver 1 wing",
+            "3.5m",
+            "4.5m",
+            "5m",
+            "6m"
+          ],
+          [
+            "Quiver 2 wings",
+            "3m / 4m",
+            "3.5m / 5m",
+            "4m / 5.5m",
+            "4.5m / 6m"
+          ]
+        ],
+        [
+          [
+            "Boom V2 950",
+            "VX Pro 2.5m / 3m / 3.5m / 4m / 4.5m / 5m"
+          ],
+          [
+            "Boom V2 1010",
+            "VX Pro 5.5m / 6m / 6.5m"
+          ]
+        ]
+      ],
+      "videos": [
+        "https://cdn.shopify.com/videos/c/o/v/374b24a7f0a242a9af2663520225f3a5.mp4",
+        "https://cdn.shopify.com/videos/c/o/v/2ee3ce78ffe34db5a283bc694c226f88.mp4"
+      ],
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-VX-pro2-5.0---Image-03_updated.png?v=1768054301",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-VX-pro2-5.0---Image-03_b0af5931-2e35-4823-97e5-2f97f6b9884f.png?v=1768212401",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-VX-pro2-5.0---Image-12_1200_489822e9-117e-4176-ab9a-bb7ccaac634e.png?v=1768233853"
+      ],
+      "specs": {
+        "본사 옵션": "3.0 / 3.5 / 4.0 / 4.5 / 5.0 / 5.5 / 6.0"
+      },
+      "retailVariants": [
+        {
+          "option": "3.0 / 직물 핸들 (기본)",
+          "priceKRW": 1220000,
+          "sku": "TKWVXPROV23",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.0 / 싱글 붐 950mm",
+          "priceKRW": 1450000,
+          "sku": "TKWVXPROV23",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1400000,
+          "sku": "TKWVXPROV23",
+          "estimated": false,
+          "baseOption": "3.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.5 / 직물 핸들 (기본)",
+          "priceKRW": 1280000,
+          "sku": "TKWVXPROV235",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "3.5 / 싱글 붐 950mm",
+          "priceKRW": 1510000,
+          "sku": "TKWVXPROV235",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "3.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1460000,
+          "sku": "TKWVXPROV235",
+          "estimated": false,
+          "baseOption": "3.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.0 / 직물 핸들 (기본)",
+          "priceKRW": 1320000,
+          "sku": "TKWVXPROV24",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.0 / 싱글 붐 950mm",
+          "priceKRW": 1550000,
+          "sku": "TKWVXPROV24",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1500000,
+          "sku": "TKWVXPROV24",
+          "estimated": false,
+          "baseOption": "4.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "4.5 / 직물 핸들 (기본)",
+          "priceKRW": 1370000,
+          "sku": "TKWVXPROV245",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "4.5 / 싱글 붐 950mm",
+          "priceKRW": 1600000,
+          "sku": "TKWVXPROV245",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "4.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1550000,
+          "sku": "TKWVXPROV245",
+          "estimated": false,
+          "baseOption": "4.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.0 / 직물 핸들 (기본)",
+          "priceKRW": 1420000,
+          "sku": "TKWVXPROV25",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.0 / 싱글 붐 950mm",
+          "priceKRW": 1650000,
+          "sku": "TKWVXPROV25",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1600000,
+          "sku": "TKWVXPROV25",
+          "estimated": false,
+          "baseOption": "5.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "5.5 / 직물 핸들 (기본)",
+          "priceKRW": 1480000,
+          "sku": "TKWVXPROV255",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "5.5 / 싱글 붐 1010mm",
+          "priceKRW": 1710000,
+          "sku": "TKWVXPROV255",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "5.5 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1660000,
+          "sku": "TKWVXPROV255",
+          "estimated": false,
+          "baseOption": "5.5",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "6.0 / 직물 핸들 (기본)",
+          "priceKRW": 1540000,
+          "sku": "TKWVXPROV26",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 0
+        },
+        {
+          "option": "6.0 / 싱글 붐 1010mm",
+          "priceKRW": 1770000,
+          "sku": "TKWVXPROV26",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 226000
+        },
+        {
+          "option": "6.0 / 투바 카본 핸들 (앞·뒤)",
+          "priceKRW": 1720000,
+          "sku": "TKWVXPROV26",
+          "estimated": false,
+          "baseOption": "6.0",
+          "handleAdditionalKRW": 183000
+        },
+        {
+          "option": "3.0",
+          "priceKRW": 1220000,
+          "sku": "TKWVXPROV23",
+          "estimated": false
+        },
+        {
+          "option": "3.5",
+          "priceKRW": 1280000,
+          "sku": "TKWVXPROV235",
+          "estimated": false
+        },
+        {
+          "option": "4.0",
+          "priceKRW": 1320000,
+          "sku": "TKWVXPROV24",
+          "estimated": false
+        },
+        {
+          "option": "4.5",
+          "priceKRW": 1370000,
+          "sku": "TKWVXPROV245",
+          "estimated": false
+        },
+        {
+          "option": "5.0",
+          "priceKRW": 1420000,
+          "sku": "TKWVXPROV25",
+          "estimated": false
+        },
+        {
+          "option": "5.5",
+          "priceKRW": 1480000,
+          "sku": "TKWVXPROV255",
+          "estimated": false
+        },
+        {
+          "option": "6.0",
+          "priceKRW": 1540000,
+          "sku": "TKWVXPROV26",
+          "estimated": false
+        }
+      ],
+      "priceMax": 1770000,
+      "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
+      "priceStatus": "fixed",
+      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "priceFixedAt": "2026-09-25",
+      "detailMedia": {
+        "photos": [
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-vx-pro-v2_carousel-1_1200x.jpg?v=7028903966989421488",
+            "kind": "riding",
+            "local": "assets/images/product-stories/2936a8d0e128d4d547.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/wing-vx-pro-v2_carousel-2_1200x.jpg?v=293383036378359048",
+            "kind": "riding",
+            "local": "assets/images/product-stories/5cd18551c8708b240b.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/White_Fabric_-_Image_04_1200x.jpg?v=1770915647",
+            "kind": "feature",
+            "local": "assets/images/product-stories/d109bfe574542a663e.jpg"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-VX-pro2-5.0_1200x.png?v=1768053953",
+            "kind": "feature",
+            "local": "assets/images/product-stories/a9c6e1fcf602bbbc4b.png"
+          },
+          {
+            "url": "https://takoon.com/cdn/shop/files/Wings-V3-Pro---Image-10_1200x1300_c01e1ef8-414e-4dca-8ff7-a7b653db775a_1200x.png?v=1768047377",
+            "kind": "feature",
+            "local": "assets/images/product-stories/081809f7825830ef44.png"
+          }
+        ],
+        "videos": [
+          "https://youtu.be/yUrkwm7mamU",
+          "https://youtu.be/iizJUcrADiA",
+          "https://cdn.shopify.com/videos/c/o/v/374b24a7f0a242a9af2663520225f3a5.mp4"
+        ],
+        "source": "https://takoon.com/products/wing-vx-pro-2",
+        "checkedAt": "2026-09-27"
+      },
+      "handlePricing": {
+        "EURKRW": 1600,
+        "freightAllowanceKRW": 20000,
+        "dutyAssumption": 0.08,
+        "vat": 0.1,
+        "discount": 0.1,
+        "boomEUR": 120,
+        "dualHandleEUR": 95,
+        "textileIncludedByDMJ": true,
+        "reviewedAt": "2026-09-29"
+      }
+    },
+    {
       "id": "takoon-v4-pro",
       "brand": "takoon",
       "name": "Wing V4 Pro",
@@ -1444,486 +1924,6 @@
       }
     },
     {
-      "id": "takoon-vx-pro-2",
-      "brand": "takoon",
-      "name": "Wing VX Pro V2",
-      "category": "wing",
-      "path": "products/takoon/wing-vx-pro-2.html",
-      "image": "assets/images/products/official-details/b0700012670877.png",
-      "description": "본사는 레이스, 빅에어, 프리스타일과 웨이브를 포함한 퍼포먼스 용도로 소개합니다. UPE Project 85 프레임과 Aerotech 캐노피를 사용합니다.",
-      "options": [
-        "3.0 / 직물 핸들 (기본)",
-        "3.0 / 싱글 붐 950mm",
-        "3.0 / 투바 카본 핸들 (앞·뒤)",
-        "3.5 / 직물 핸들 (기본)",
-        "3.5 / 싱글 붐 950mm",
-        "3.5 / 투바 카본 핸들 (앞·뒤)",
-        "4.0 / 직물 핸들 (기본)",
-        "4.0 / 싱글 붐 950mm",
-        "4.0 / 투바 카본 핸들 (앞·뒤)",
-        "4.5 / 직물 핸들 (기본)",
-        "4.5 / 싱글 붐 950mm",
-        "4.5 / 투바 카본 핸들 (앞·뒤)",
-        "5.0 / 직물 핸들 (기본)",
-        "5.0 / 싱글 붐 950mm",
-        "5.0 / 투바 카본 핸들 (앞·뒤)",
-        "5.5 / 직물 핸들 (기본)",
-        "5.5 / 싱글 붐 1010mm",
-        "5.5 / 투바 카본 핸들 (앞·뒤)",
-        "6.0 / 직물 핸들 (기본)",
-        "6.0 / 싱글 붐 1010mm",
-        "6.0 / 투바 카본 핸들 (앞·뒤)"
-      ],
-      "price": 1220000,
-      "availability": "inquiry",
-      "source": "https://takoon.com/products/wing-vx-pro-2",
-      "priority": "value",
-      "minLevel": 1,
-      "raceOnly": false,
-      "discipline": "wing",
-      "environments": [
-        "flat",
-        "chop",
-        "wave",
-        "light"
-      ],
-      "headline": "레이스·프리스타일까지 확장하는 퍼포먼스 윙",
-      "notes": [
-        "고속 주행·점프·레이스 목적 비교",
-        "핸들·붐·리시 구성 별도 확인"
-      ],
-      "purposes": [
-        "freeride",
-        "wave",
-        "freestyle",
-        "race-wing"
-      ],
-      "verifiedAt": "2026-09-24",
-      "manufacturerSummary": "본사는 레이스, 빅에어, 프리스타일과 웨이브를 포함한 퍼포먼스 용도로 소개합니다. UPE Project 85 프레임과 Aerotech 캐노피를 사용합니다.",
-      "recommendationPolicy": "제조사 용도 설명을 바탕으로 한 DMJ 상담 후보 분류. 수치화된 숙련도 경계는 DMJ 운영 기준.",
-      "tables": [
-        [
-          [
-            "",
-            "55 kg",
-            "65 - 75 kg",
-            "75 - 85 kg",
-            "90+ kg"
-          ],
-          [
-            "Quiver 1 wing",
-            "3.5m",
-            "4.5m",
-            "5m",
-            "6m"
-          ],
-          [
-            "Quiver 2 wings",
-            "3m / 4m",
-            "3.5m / 5m",
-            "4m / 5.5m",
-            "4.5m / 6m"
-          ]
-        ],
-        [
-          [
-            "Boom V2 950",
-            "VX Pro 2.5m / 3m / 3.5m / 4m / 4.5m / 5m"
-          ],
-          [
-            "Boom V2 1010",
-            "VX Pro 5.5m / 6m / 6.5m"
-          ]
-        ],
-        [
-          [
-            "VX Pro",
-            "3",
-            "3.5",
-            "4",
-            "4.5",
-            "5",
-            "5.5",
-            "6"
-          ],
-          [
-            "Wing span (m)",
-            "2.69",
-            "2.9",
-            "3.1",
-            "3.3",
-            "3.43",
-            "3.44",
-            "3.53"
-          ],
-          [
-            "Chord (m)",
-            "1.5",
-            "1.61",
-            "1.73",
-            "1.83",
-            "1.95",
-            "2.15",
-            "2.27"
-          ],
-          [
-            "Poids sans poignée (kg)",
-            "1.8",
-            "2.15",
-            "2.04",
-            "2.15",
-            "2.34",
-            "2.49",
-            "2.61"
-          ],
-          [
-            "Pression recommandé (PSI)",
-            "10",
-            "10",
-            "10",
-            "10",
-            "10",
-            "10",
-            "9"
-          ]
-        ],
-        [
-          [
-            "Poignées",
-            "Type",
-            "Poids (g)"
-          ],
-          [
-            "Avant",
-            "Souple",
-            "92"
-          ],
-          [
-            "Carbone",
-            "110"
-          ],
-          [
-            "Arrière",
-            "Souple",
-            "92"
-          ],
-          [
-            "Carbone",
-            "100"
-          ]
-        ],
-        [
-          [
-            "",
-            "55 kg",
-            "65 - 75 kg",
-            "75 - 85 kg",
-            "90+ kg"
-          ],
-          [
-            "Quiver 1 wing",
-            "3.5m",
-            "4.5m",
-            "5m",
-            "6m"
-          ],
-          [
-            "Quiver 2 wings",
-            "3m / 4m",
-            "3.5m / 5m",
-            "4m / 5.5m",
-            "4.5m / 6m"
-          ]
-        ],
-        [
-          [
-            "Boom V2 950",
-            "VX Pro 2.5m / 3m / 3.5m / 4m / 4.5m / 5m"
-          ],
-          [
-            "Boom V2 1010",
-            "VX Pro 5.5m / 6m / 6.5m"
-          ]
-        ]
-      ],
-      "videos": [
-        "https://cdn.shopify.com/videos/c/o/v/374b24a7f0a242a9af2663520225f3a5.mp4",
-        "https://cdn.shopify.com/videos/c/o/v/2ee3ce78ffe34db5a283bc694c226f88.mp4"
-      ],
-      "gallery": [
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-VX-pro2-5.0---Image-03_updated.png?v=1768054301",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-VX-pro2-5.0---Image-03_b0af5931-2e35-4823-97e5-2f97f6b9884f.png?v=1768212401",
-        "https://cdn.shopify.com/s/files/1/2503/9576/files/Wings-VX-pro2-5.0---Image-12_1200_489822e9-117e-4176-ab9a-bb7ccaac634e.png?v=1768233853"
-      ],
-      "specs": {
-        "본사 옵션": "3.0 / 3.5 / 4.0 / 4.5 / 5.0 / 5.5 / 6.0"
-      },
-      "retailVariants": [
-        {
-          "option": "3.0 / 직물 핸들 (기본)",
-          "priceKRW": 1220000,
-          "sku": "TKWVXPROV23",
-          "estimated": false,
-          "baseOption": "3.0",
-          "handleAdditionalKRW": 0
-        },
-        {
-          "option": "3.0 / 싱글 붐 950mm",
-          "priceKRW": 1450000,
-          "sku": "TKWVXPROV23",
-          "estimated": false,
-          "baseOption": "3.0",
-          "handleAdditionalKRW": 226000
-        },
-        {
-          "option": "3.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1400000,
-          "sku": "TKWVXPROV23",
-          "estimated": false,
-          "baseOption": "3.0",
-          "handleAdditionalKRW": 183000
-        },
-        {
-          "option": "3.5 / 직물 핸들 (기본)",
-          "priceKRW": 1280000,
-          "sku": "TKWVXPROV235",
-          "estimated": false,
-          "baseOption": "3.5",
-          "handleAdditionalKRW": 0
-        },
-        {
-          "option": "3.5 / 싱글 붐 950mm",
-          "priceKRW": 1510000,
-          "sku": "TKWVXPROV235",
-          "estimated": false,
-          "baseOption": "3.5",
-          "handleAdditionalKRW": 226000
-        },
-        {
-          "option": "3.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1460000,
-          "sku": "TKWVXPROV235",
-          "estimated": false,
-          "baseOption": "3.5",
-          "handleAdditionalKRW": 183000
-        },
-        {
-          "option": "4.0 / 직물 핸들 (기본)",
-          "priceKRW": 1320000,
-          "sku": "TKWVXPROV24",
-          "estimated": false,
-          "baseOption": "4.0",
-          "handleAdditionalKRW": 0
-        },
-        {
-          "option": "4.0 / 싱글 붐 950mm",
-          "priceKRW": 1550000,
-          "sku": "TKWVXPROV24",
-          "estimated": false,
-          "baseOption": "4.0",
-          "handleAdditionalKRW": 226000
-        },
-        {
-          "option": "4.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1500000,
-          "sku": "TKWVXPROV24",
-          "estimated": false,
-          "baseOption": "4.0",
-          "handleAdditionalKRW": 183000
-        },
-        {
-          "option": "4.5 / 직물 핸들 (기본)",
-          "priceKRW": 1370000,
-          "sku": "TKWVXPROV245",
-          "estimated": false,
-          "baseOption": "4.5",
-          "handleAdditionalKRW": 0
-        },
-        {
-          "option": "4.5 / 싱글 붐 950mm",
-          "priceKRW": 1600000,
-          "sku": "TKWVXPROV245",
-          "estimated": false,
-          "baseOption": "4.5",
-          "handleAdditionalKRW": 226000
-        },
-        {
-          "option": "4.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1550000,
-          "sku": "TKWVXPROV245",
-          "estimated": false,
-          "baseOption": "4.5",
-          "handleAdditionalKRW": 183000
-        },
-        {
-          "option": "5.0 / 직물 핸들 (기본)",
-          "priceKRW": 1420000,
-          "sku": "TKWVXPROV25",
-          "estimated": false,
-          "baseOption": "5.0",
-          "handleAdditionalKRW": 0
-        },
-        {
-          "option": "5.0 / 싱글 붐 950mm",
-          "priceKRW": 1650000,
-          "sku": "TKWVXPROV25",
-          "estimated": false,
-          "baseOption": "5.0",
-          "handleAdditionalKRW": 226000
-        },
-        {
-          "option": "5.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1600000,
-          "sku": "TKWVXPROV25",
-          "estimated": false,
-          "baseOption": "5.0",
-          "handleAdditionalKRW": 183000
-        },
-        {
-          "option": "5.5 / 직물 핸들 (기본)",
-          "priceKRW": 1480000,
-          "sku": "TKWVXPROV255",
-          "estimated": false,
-          "baseOption": "5.5",
-          "handleAdditionalKRW": 0
-        },
-        {
-          "option": "5.5 / 싱글 붐 1010mm",
-          "priceKRW": 1710000,
-          "sku": "TKWVXPROV255",
-          "estimated": false,
-          "baseOption": "5.5",
-          "handleAdditionalKRW": 226000
-        },
-        {
-          "option": "5.5 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1660000,
-          "sku": "TKWVXPROV255",
-          "estimated": false,
-          "baseOption": "5.5",
-          "handleAdditionalKRW": 183000
-        },
-        {
-          "option": "6.0 / 직물 핸들 (기본)",
-          "priceKRW": 1540000,
-          "sku": "TKWVXPROV26",
-          "estimated": false,
-          "baseOption": "6.0",
-          "handleAdditionalKRW": 0
-        },
-        {
-          "option": "6.0 / 싱글 붐 1010mm",
-          "priceKRW": 1770000,
-          "sku": "TKWVXPROV26",
-          "estimated": false,
-          "baseOption": "6.0",
-          "handleAdditionalKRW": 226000
-        },
-        {
-          "option": "6.0 / 투바 카본 핸들 (앞·뒤)",
-          "priceKRW": 1720000,
-          "sku": "TKWVXPROV26",
-          "estimated": false,
-          "baseOption": "6.0",
-          "handleAdditionalKRW": 183000
-        },
-        {
-          "option": "3.0",
-          "priceKRW": 1220000,
-          "sku": "TKWVXPROV23",
-          "estimated": false
-        },
-        {
-          "option": "3.5",
-          "priceKRW": 1280000,
-          "sku": "TKWVXPROV235",
-          "estimated": false
-        },
-        {
-          "option": "4.0",
-          "priceKRW": 1320000,
-          "sku": "TKWVXPROV24",
-          "estimated": false
-        },
-        {
-          "option": "4.5",
-          "priceKRW": 1370000,
-          "sku": "TKWVXPROV245",
-          "estimated": false
-        },
-        {
-          "option": "5.0",
-          "priceKRW": 1420000,
-          "sku": "TKWVXPROV25",
-          "estimated": false
-        },
-        {
-          "option": "5.5",
-          "priceKRW": 1480000,
-          "sku": "TKWVXPROV255",
-          "estimated": false
-        },
-        {
-          "option": "6.0",
-          "priceKRW": 1540000,
-          "sku": "TKWVXPROV26",
-          "estimated": false
-        }
-      ],
-      "priceMax": 1770000,
-      "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
-      "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
-      "priceFixedAt": "2026-09-25",
-      "detailMedia": {
-        "photos": [
-          {
-            "url": "https://takoon.com/cdn/shop/files/wing-vx-pro-v2_carousel-1_1200x.jpg?v=7028903966989421488",
-            "kind": "riding",
-            "local": "assets/images/product-stories/2936a8d0e128d4d547.jpg"
-          },
-          {
-            "url": "https://takoon.com/cdn/shop/files/wing-vx-pro-v2_carousel-2_1200x.jpg?v=293383036378359048",
-            "kind": "riding",
-            "local": "assets/images/product-stories/5cd18551c8708b240b.jpg"
-          },
-          {
-            "url": "https://takoon.com/cdn/shop/files/White_Fabric_-_Image_04_1200x.jpg?v=1770915647",
-            "kind": "feature",
-            "local": "assets/images/product-stories/d109bfe574542a663e.jpg"
-          },
-          {
-            "url": "https://takoon.com/cdn/shop/files/Wings-VX-pro2-5.0_1200x.png?v=1768053953",
-            "kind": "feature",
-            "local": "assets/images/product-stories/a9c6e1fcf602bbbc4b.png"
-          },
-          {
-            "url": "https://takoon.com/cdn/shop/files/Wings-V3-Pro---Image-10_1200x1300_c01e1ef8-414e-4dca-8ff7-a7b653db775a_1200x.png?v=1768047377",
-            "kind": "feature",
-            "local": "assets/images/product-stories/081809f7825830ef44.png"
-          }
-        ],
-        "videos": [
-          "https://youtu.be/yUrkwm7mamU",
-          "https://youtu.be/iizJUcrADiA",
-          "https://cdn.shopify.com/videos/c/o/v/374b24a7f0a242a9af2663520225f3a5.mp4"
-        ],
-        "source": "https://takoon.com/products/wing-vx-pro-2",
-        "checkedAt": "2026-09-27"
-      },
-      "handlePricing": {
-        "EURKRW": 1600,
-        "freightAllowanceKRW": 20000,
-        "dutyAssumption": 0.08,
-        "vat": 0.1,
-        "discount": 0.1,
-        "boomEUR": 120,
-        "dualHandleEUR": 95,
-        "textileIncludedByDMJ": true,
-        "reviewedAt": "2026-09-29"
-      }
-    },
-    {
       "id": "takoon-cruise",
       "brand": "takoon",
       "name": "Cruise",
@@ -2148,12 +2148,6 @@
       },
       "retailVariants": [
         {
-          "option": "5'10 / 110 L",
-          "priceKRW": 1720000,
-          "sku": "TKCRUISE26510110L",
-          "estimated": false
-        },
-        {
           "option": "5'3 / 80 L",
           "priceKRW": 1400000,
           "sku": "TKCRUISE265380L",
@@ -2163,6 +2157,12 @@
           "option": "5'6 / 90 L",
           "priceKRW": 1470000,
           "sku": "TKCRUISE265690L",
+          "estimated": false
+        },
+        {
+          "option": "5'10 / 110 L",
+          "priceKRW": 1720000,
+          "sku": "TKCRUISE26510110L",
           "estimated": false
         },
         {
@@ -3245,12 +3245,6 @@
           "estimated": false
         },
         {
-          "option": "5'10 / 75 L",
-          "priceKRW": 1830000,
-          "sku": "TKGML2026CST510",
-          "estimated": false
-        },
-        {
           "option": "5'4 / 55 L",
           "priceKRW": 1770000,
           "sku": "TKGLIDEML2654",
@@ -3263,15 +3257,15 @@
           "estimated": false
         },
         {
-          "option": "6'0 / 85 L",
-          "priceKRW": 1900000,
-          "sku": "TKGML2026CST60",
+          "option": "5'10 / 75 L",
+          "priceKRW": 1830000,
+          "sku": "TKGML2026CST510",
           "estimated": false
         },
         {
-          "option": "6'10 / 125 L",
-          "priceKRW": 2030000,
-          "sku": "TKGML2026CST610",
+          "option": "6'0 / 85 L",
+          "priceKRW": 1900000,
+          "sku": "TKGML2026CST60",
           "estimated": false
         },
         {
@@ -3290,6 +3284,12 @@
           "option": "6'8 / 115 L",
           "priceKRW": 2030000,
           "sku": "TKGML2026CST68",
+          "estimated": false
+        },
+        {
+          "option": "6'10 / 125 L",
+          "priceKRW": 2030000,
+          "sku": "TKGML2026CST610",
           "estimated": false
         },
         {
@@ -3623,21 +3623,15 @@
       },
       "retailVariants": [
         {
-          "option": "5'10 / 70 L",
-          "priceKRW": 1900000,
-          "sku": "TKULTRAGLIDE26510",
-          "estimated": false
-        },
-        {
           "option": "5'8 / 60 L",
           "priceKRW": 1830000,
           "sku": "TKULTRAGLIDE2658",
           "estimated": false
         },
         {
-          "option": "6'10 / 110 L",
-          "priceKRW": 2030000,
-          "sku": "TKULTRAGLIDE26610",
+          "option": "5'10 / 70 L",
+          "priceKRW": 1900000,
+          "sku": "TKULTRAGLIDE26510",
           "estimated": false
         },
         {
@@ -3656,6 +3650,12 @@
           "option": "6'8 / 100 L",
           "priceKRW": 2030000,
           "sku": "TKULTRAGLIDE2668",
+          "estimated": false
+        },
+        {
+          "option": "6'10 / 110 L",
+          "priceKRW": 2030000,
+          "sku": "TKULTRAGLIDE26610",
           "estimated": false
         },
         {
@@ -3924,15 +3924,15 @@
       },
       "retailVariants": [
         {
-          "option": "4'10 / 55 L",
-          "priceKRW": 1770000,
-          "sku": "TKPS2026CST410",
-          "estimated": false
-        },
-        {
           "option": "4'9 / 50 L",
           "priceKRW": 1740000,
           "sku": "TKPS2026CST49",
+          "estimated": false
+        },
+        {
+          "option": "4'10 / 55 L",
+          "priceKRW": 1770000,
+          "sku": "TKPS2026CST410",
           "estimated": false
         },
         {
@@ -10654,8 +10654,10 @@
       "image": "assets/images/products/takoon/catalog-20260930/adb803b8379f1d3e.png",
       "description": "카빙과 웨이브 중심의 민첩한 포일",
       "headline": "카빙과 웨이브 중심의 민첩한 포일",
-      "options": [],
-      "price": null,
+      "options": [
+        "본사 기본 구성 (세부 구성 확인)"
+      ],
+      "price": 1880000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flare-aluminium",
       "priority": "value",
@@ -10676,13 +10678,20 @@
         "본사는 Carve 리어윙과의 조합을 권장합니다."
       ],
       "manufacturerSummary": "카빙과 웨이브 중심의 민첩한 포일",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate"
       ],
       "foilType": "complete",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "본사 기본 구성 (세부 구성 확인)",
+          "priceKRW": 1880000,
+          "sku": "",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/adb803b8379f1d3e.png"
       ],
@@ -10691,7 +10700,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 1880000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-flow-aluminium",
@@ -10703,8 +10716,10 @@
       "image": "assets/images/products/takoon/catalog-20260930/60b3a72aadd5359f.png",
       "description": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
       "headline": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
-      "options": [],
-      "price": null,
+      "options": [
+        "본사 기본 구성 (세부 구성 확인)"
+      ],
+      "price": 1840000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flow-aluminium",
       "priority": "value",
@@ -10725,13 +10740,20 @@
         "본사는 Glide HA 또는 Carve 리어윙과의 조합을 권장합니다."
       ],
       "manufacturerSummary": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate"
       ],
       "foilType": "complete",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "본사 기본 구성 (세부 구성 확인)",
+          "priceKRW": 1840000,
+          "sku": null,
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/60b3a72aadd5359f.png"
       ],
@@ -10740,7 +10762,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 1840000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-flare-carbon",
@@ -10752,8 +10778,10 @@
       "image": "assets/images/products/takoon/catalog-20260930/2e439ef5edcc1e1b.png",
       "description": "카빙과 웨이브 중심의 민첩한 포일",
       "headline": "카빙과 웨이브 중심의 민첩한 포일",
-      "options": [],
-      "price": null,
+      "options": [
+        "본사 기본 구성 (세부 구성 확인)"
+      ],
+      "price": 2370000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flare-carbon",
       "priority": "performance",
@@ -10774,13 +10802,20 @@
         "본사는 Carve 리어윙과의 조합을 권장합니다."
       ],
       "manufacturerSummary": "카빙과 웨이브 중심의 민첩한 포일",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "pro"
       ],
       "foilType": "complete",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "본사 기본 구성 (세부 구성 확인)",
+          "priceKRW": 2370000,
+          "sku": "",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/2e439ef5edcc1e1b.png",
         "assets/images/products/takoon/catalog-20260930/928572722cb122bc.png"
@@ -10790,7 +10825,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 2370000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-flow-carbon",
@@ -10802,8 +10841,10 @@
       "image": "assets/images/products/takoon/catalog-20260930/d65d5420c951a7ba.png",
       "description": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
       "headline": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
-      "options": [],
-      "price": null,
+      "options": [
+        "본사 기본 구성 (세부 구성 확인)"
+      ],
+      "price": 2330000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flow-carbon",
       "priority": "performance",
@@ -10824,13 +10865,20 @@
         "본사는 Glide HA 또는 Carve 리어윙과의 조합을 권장합니다."
       ],
       "manufacturerSummary": "긴 글라이드와 펌핑·다운윈드를 위한 포일",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "pro"
       ],
       "foilType": "complete",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "본사 기본 구성 (세부 구성 확인)",
+          "priceKRW": 2330000,
+          "sku": null,
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/d65d5420c951a7ba.png"
       ],
@@ -10839,7 +10887,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 2330000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-starter-front-wing",
@@ -10852,11 +10904,11 @@
       "description": "저속 양력과 안정성을 중심으로 한 프론트윙",
       "headline": "저속 양력과 안정성을 중심으로 한 프론트윙",
       "options": [
-        "1600cm²",
-        "1800cm²",
-        "2000cm²"
+        "1600",
+        "1800",
+        "2000"
       ],
-      "price": null,
+      "price": 450000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-starter-front-wing",
       "priority": "value",
@@ -10877,13 +10929,32 @@
         "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
       ],
       "manufacturerSummary": "저속 양력과 안정성을 중심으로 한 프론트윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "beginner"
       ],
       "foilType": "front",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "1600",
+          "priceKRW": 450000,
+          "sku": "TKFSFW1600",
+          "estimated": true
+        },
+        {
+          "option": "1800",
+          "priceKRW": 490000,
+          "sku": "TKFSFW1800",
+          "estimated": true
+        },
+        {
+          "option": "2000",
+          "priceKRW": 530000,
+          "sku": "TKFSFW2000",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/f24afa92a085bce0.png",
         "assets/images/products/takoon/catalog-20260930/62a7103f51fd64d5.png",
@@ -10899,7 +10970,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 530000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-x-glide-v2-front-wing",
@@ -10912,12 +10987,12 @@
       "description": "다양한 종목과 성장 과정에 대응하는 프론트윙",
       "headline": "다양한 종목과 성장 과정에 대응하는 프론트윙",
       "options": [
-        "1050cm²",
-        "1250cm²",
-        "1450cm²",
-        "1700cm²"
+        "1050",
+        "1250",
+        "1450",
+        "1700"
       ],
-      "price": null,
+      "price": 560000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-x-glide-v2-front-wing",
       "priority": "value",
@@ -10938,13 +11013,38 @@
         "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
       ],
       "manufacturerSummary": "다양한 종목과 성장 과정에 대응하는 프론트윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "beginner"
       ],
       "foilType": "front",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "1050",
+          "priceKRW": 560000,
+          "sku": "TKFXV2FW1050",
+          "estimated": true
+        },
+        {
+          "option": "1250",
+          "priceKRW": 570000,
+          "sku": "TKFXV2FW1250",
+          "estimated": true
+        },
+        {
+          "option": "1450",
+          "priceKRW": 610000,
+          "sku": "TKFXV2FW1450",
+          "estimated": true
+        },
+        {
+          "option": "1700",
+          "priceKRW": 640000,
+          "sku": "TKFXV2FW1700",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/36ceaf857e839ba8.png",
         "assets/images/products/takoon/catalog-20260930/0181a722f6a3f386.png",
@@ -10959,7 +11059,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 640000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-flow-front-wing",
@@ -10972,14 +11076,14 @@
       "description": "글라이드와 펌핑 효율을 위한 프론트윙",
       "headline": "글라이드와 펌핑 효율을 위한 프론트윙",
       "options": [
-        "600cm²",
-        "700cm²",
-        "800cm²",
-        "900cm²",
-        "1050cm²",
-        "1200cm²"
+        "600",
+        "700",
+        "800",
+        "900",
+        "1050",
+        "1200"
       ],
-      "price": null,
+      "price": 710000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flow-front-wing",
       "priority": "value",
@@ -11000,14 +11104,51 @@
         "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
       ],
       "manufacturerSummary": "글라이드와 펌핑 효율을 위한 프론트윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate",
         "pro"
       ],
       "foilType": "front",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "600",
+          "priceKRW": 710000,
+          "sku": "TKFFWFLOW600",
+          "estimated": true
+        },
+        {
+          "option": "700",
+          "priceKRW": 750000,
+          "sku": "TKFFWFLOW700",
+          "estimated": true
+        },
+        {
+          "option": "800",
+          "priceKRW": 780000,
+          "sku": "TKFFWFLOW800",
+          "estimated": true
+        },
+        {
+          "option": "900",
+          "priceKRW": 810000,
+          "sku": "TKFFWFLOW900",
+          "estimated": true
+        },
+        {
+          "option": "1050",
+          "priceKRW": 840000,
+          "sku": "TKFFWFLOW1050",
+          "estimated": true
+        },
+        {
+          "option": "1200",
+          "priceKRW": 890000,
+          "sku": "TKFFWFLOW1200",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/4fde56ee71b809d1.png",
         "assets/images/products/takoon/catalog-20260930/dac9bb6f5be0ff85.png",
@@ -11023,7 +11164,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 890000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-flare-front-wing",
@@ -11036,16 +11181,16 @@
       "description": "웨이브와 정교한 카빙을 위한 프론트윙",
       "headline": "웨이브와 정교한 카빙을 위한 프론트윙",
       "options": [
-        "550cm²",
-        "650cm²",
-        "750cm²",
-        "850cm²",
-        "950cm²",
-        "1050cm²",
-        "1200cm²",
-        "1400cm²"
+        "550",
+        "650",
+        "750",
+        "850",
+        "950",
+        "1050",
+        "1200",
+        "1400"
       ],
-      "price": null,
+      "price": 560000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flare-front-wing",
       "priority": "value",
@@ -11066,14 +11211,63 @@
         "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
       ],
       "manufacturerSummary": "웨이브와 정교한 카빙을 위한 프론트윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate",
         "pro"
       ],
       "foilType": "front",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "550",
+          "priceKRW": 560000,
+          "sku": "TKFFW550",
+          "estimated": true
+        },
+        {
+          "option": "650",
+          "priceKRW": 560000,
+          "sku": "TKFFW650",
+          "estimated": true
+        },
+        {
+          "option": "750",
+          "priceKRW": 560000,
+          "sku": "TKFFW750",
+          "estimated": true
+        },
+        {
+          "option": "850",
+          "priceKRW": 590000,
+          "sku": "TKFFW850",
+          "estimated": true
+        },
+        {
+          "option": "950",
+          "priceKRW": 630000,
+          "sku": "TKFFW950",
+          "estimated": true
+        },
+        {
+          "option": "1050",
+          "priceKRW": 650000,
+          "sku": "TKFFW1050",
+          "estimated": true
+        },
+        {
+          "option": "1200",
+          "priceKRW": 700000,
+          "sku": "TKFFW1200",
+          "estimated": true
+        },
+        {
+          "option": "1400",
+          "priceKRW": 720000,
+          "sku": "TKFFW1400",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/dd7468eb9a88b6d9.png",
         "assets/images/products/takoon/catalog-20260930/85f0d4df190c5644.png",
@@ -11089,7 +11283,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 720000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-swell-front-wing",
@@ -11102,10 +11300,10 @@
       "description": "스웰을 연결하는 다운윈드 프론트윙",
       "headline": "스웰을 연결하는 다운윈드 프론트윙",
       "options": [
-        "900cm²",
-        "1050cm²"
+        "900",
+        "1050"
       ],
-      "price": null,
+      "price": 620000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-swell-front-wing",
       "priority": "performance",
@@ -11126,13 +11324,26 @@
         "장착 전 기존 퓨슬리지의 세대와 호환성을 확인하세요."
       ],
       "manufacturerSummary": "스웰을 연결하는 다운윈드 프론트윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "pro"
       ],
       "foilType": "front",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "900",
+          "priceKRW": 620000,
+          "sku": "TKFSFW900",
+          "estimated": true
+        },
+        {
+          "option": "1050",
+          "priceKRW": 660000,
+          "sku": "TKFSFW1050",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/a81d39d0bde4d700.png",
         "assets/images/products/takoon/catalog-20260930/0c50cdc82d9c8a1d.png",
@@ -11147,7 +11358,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 660000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-flash-foil-front-wing",
@@ -11160,12 +11375,12 @@
       "description": "속도와 프리레이스를 위한 프론트윙",
       "headline": "속도와 프리레이스를 위한 프론트윙",
       "options": [
-        "450cm²",
-        "530cm²",
-        "680cm²",
-        "770cm²"
+        "450",
+        "530",
+        "680",
+        "770"
       ],
-      "price": null,
+      "price": 750000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/flash-foil-front-wing",
       "priority": "performance",
@@ -11185,13 +11400,38 @@
         "프론트윙 단품입니다. V3 퓨슬리지와의 조합을 본사가 안내합니다."
       ],
       "manufacturerSummary": "속도와 프리레이스를 위한 프론트윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "pro"
       ],
       "foilType": "front",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "450",
+          "priceKRW": 870000,
+          "sku": "TKFFW450",
+          "estimated": true
+        },
+        {
+          "option": "530",
+          "priceKRW": 750000,
+          "sku": "TKFFW530",
+          "estimated": true
+        },
+        {
+          "option": "680",
+          "priceKRW": 780000,
+          "sku": "TKFFW680",
+          "estimated": true
+        },
+        {
+          "option": "770",
+          "priceKRW": 940000,
+          "sku": "TKFFW770",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/3f632cf6361082f6.png",
         "assets/images/products/takoon/catalog-20260930/49c55cb72efd1681.png",
@@ -11206,7 +11446,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 940000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-aluminium-mast-v2-17-5-mm",
@@ -11219,14 +11463,14 @@
       "description": "입문부터 활용하는 17.5mm 알루미늄 마스트",
       "headline": "입문부터 활용하는 17.5mm 알루미늄 마스트",
       "options": [
-        "50cm",
-        "65cm",
-        "75cm",
-        "80cm",
-        "85cm",
-        "95cm"
+        "50",
+        "65",
+        "75",
+        "80",
+        "85",
+        "95"
       ],
-      "price": null,
+      "price": 180000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-aluminium-mast-v2-17-5-mm",
       "priority": "value",
@@ -11248,13 +11492,50 @@
         "본사 메뉴상 입문 분류이며, 길이는 수심·파도·숙련도에 맞춰 선택합니다."
       ],
       "manufacturerSummary": "입문부터 활용하는 17.5mm 알루미늄 마스트",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "beginner"
       ],
       "foilType": "mast",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "50",
+          "priceKRW": 180000,
+          "sku": "TKMAV250BLA",
+          "estimated": true
+        },
+        {
+          "option": "65",
+          "priceKRW": 230000,
+          "sku": "TKMAV265BLA",
+          "estimated": true
+        },
+        {
+          "option": "75",
+          "priceKRW": 240000,
+          "sku": "TKMAV275BLA",
+          "estimated": true
+        },
+        {
+          "option": "80",
+          "priceKRW": 220000,
+          "sku": "TKMAV280BLA",
+          "estimated": true
+        },
+        {
+          "option": "85",
+          "priceKRW": 260000,
+          "sku": "TKMAV285BLA",
+          "estimated": true
+        },
+        {
+          "option": "95",
+          "priceKRW": 270000,
+          "sku": "TKMAV295BLA",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/9d9a6c25cf4a394b.png",
         "assets/images/products/takoon/catalog-20260930/7e3dd6ff3f9acba4.png"
@@ -11264,7 +11545,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 270000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-aluminium-mast-v2-19mm",
@@ -11277,14 +11562,14 @@
       "description": "강성을 중시한 19mm 알루미늄 마스트",
       "headline": "강성을 중시한 19mm 알루미늄 마스트",
       "options": [
-        "50cm",
-        "65cm",
-        "70cm",
-        "75cm",
-        "80cm",
-        "85cm"
+        "50",
+        "65",
+        "70",
+        "75",
+        "80",
+        "85"
       ],
-      "price": null,
+      "price": 160000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-aluminium-mast-v2-19mm",
       "priority": "value",
@@ -11306,13 +11591,50 @@
         "본사 메뉴상 입문 분류이며, 길이는 수심·파도·숙련도에 맞춰 선택합니다."
       ],
       "manufacturerSummary": "강성을 중시한 19mm 알루미늄 마스트",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "beginner"
       ],
       "foilType": "mast",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "50",
+          "priceKRW": 160000,
+          "sku": "TKAM19MM50",
+          "estimated": true
+        },
+        {
+          "option": "65",
+          "priceKRW": 180000,
+          "sku": "TKAM19MM65",
+          "estimated": true
+        },
+        {
+          "option": "70",
+          "priceKRW": 210000,
+          "sku": "TKAM19MM70",
+          "estimated": true
+        },
+        {
+          "option": "75",
+          "priceKRW": 190000,
+          "sku": "TKAM19MM75",
+          "estimated": true
+        },
+        {
+          "option": "80",
+          "priceKRW": 190000,
+          "sku": "TKAM19MM80",
+          "estimated": true
+        },
+        {
+          "option": "85",
+          "priceKRW": 190000,
+          "sku": "TKAM19MM85",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/d3293ee1713a1f74.png",
         "assets/images/products/takoon/catalog-20260930/cf800f83391b3559.png"
@@ -11322,7 +11644,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 210000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-carbon-mast-hr-v2-16-mm",
@@ -11335,9 +11661,9 @@
       "description": "편안함과 성장을 위한 HR 카본 마스트",
       "headline": "편안함과 성장을 위한 HR 카본 마스트",
       "options": [
-        "85cm"
+        "85"
       ],
-      "price": null,
+      "price": 920000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-carbon-mast-hr-v2-16-mm",
       "priority": "value",
@@ -11357,13 +11683,20 @@
         "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
       ],
       "manufacturerSummary": "편안함과 성장을 위한 HR 카본 마스트",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate"
       ],
       "foilType": "mast",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "85",
+          "priceKRW": 920000,
+          "sku": "TKFCMHR16MM85",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/608bf862cd40b7a4.png",
         "assets/images/products/takoon/catalog-20260930/79ee1047fa713754.png",
@@ -11375,7 +11708,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 920000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-carbon-mast-hm-v2-16-mm",
@@ -11388,12 +11725,12 @@
       "description": "강성과 글라이드의 균형을 위한 HM 카본 마스트",
       "headline": "강성과 글라이드의 균형을 위한 HM 카본 마스트",
       "options": [
-        "70cm",
-        "75cm",
-        "80cm",
-        "85cm"
+        "70",
+        "75",
+        "80",
+        "85"
       ],
-      "price": null,
+      "price": 1220000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-carbon-mast-hm-v2-16-mm",
       "priority": "value",
@@ -11414,13 +11751,38 @@
         "본사 선택 옵션과 상세 설명의 길이 표기가 달라, 실제 주문 가능 길이는 상담에서 확인합니다."
       ],
       "manufacturerSummary": "강성과 글라이드의 균형을 위한 HM 카본 마스트",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate"
       ],
       "foilType": "mast",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "70",
+          "priceKRW": 1220000,
+          "sku": "TKFCMHM16MM70",
+          "estimated": true
+        },
+        {
+          "option": "75",
+          "priceKRW": 1250000,
+          "sku": "TKFCMHM16MM75",
+          "estimated": true
+        },
+        {
+          "option": "80",
+          "priceKRW": 1290000,
+          "sku": "TKFCMHM16MM80",
+          "estimated": true
+        },
+        {
+          "option": "85",
+          "priceKRW": 1320000,
+          "sku": "TKFCMHM16MM85",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/85fe10bbe313dedc.png",
         "assets/images/products/takoon/catalog-20260930/8be55b8a5add8048.png",
@@ -11436,7 +11798,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 1320000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-carbon-mast-hm-v2-13mm",
@@ -11449,11 +11815,11 @@
       "description": "속도와 정밀한 조작을 위한 13mm HM 마스트",
       "headline": "속도와 정밀한 조작을 위한 13mm HM 마스트",
       "options": [
-        "75cm",
-        "80cm",
-        "85cm"
+        "75",
+        "80",
+        "85"
       ],
-      "price": null,
+      "price": 1410000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-carbon-mast-hm-v2-13mm",
       "priority": "performance",
@@ -11473,13 +11839,32 @@
         "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
       ],
       "manufacturerSummary": "속도와 정밀한 조작을 위한 13mm HM 마스트",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "pro"
       ],
       "foilType": "mast",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "75",
+          "priceKRW": 1410000,
+          "sku": "TKFCMHM13MM75",
+          "estimated": true
+        },
+        {
+          "option": "80",
+          "priceKRW": 1420000,
+          "sku": "TKFCMHM13MM80",
+          "estimated": true
+        },
+        {
+          "option": "85",
+          "priceKRW": 1440000,
+          "sku": "TKFCMHM13MM",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/ff1352b3c05e4e9c.png",
         "assets/images/products/takoon/catalog-20260930/e351388b26deff24.png",
@@ -11494,7 +11879,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 1440000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-carbon-mast-uhm-13mm",
@@ -11507,11 +11896,11 @@
       "description": "직접적인 반응을 위한 13mm UHM 마스트",
       "headline": "직접적인 반응을 위한 13mm UHM 마스트",
       "options": [
-        "75cm",
-        "80cm",
-        "85cm"
+        "75",
+        "80",
+        "85"
       ],
-      "price": null,
+      "price": 1560000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-carbon-mast-uhm-13mm",
       "priority": "performance",
@@ -11531,13 +11920,32 @@
         "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
       ],
       "manufacturerSummary": "직접적인 반응을 위한 13mm UHM 마스트",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "pro"
       ],
       "foilType": "mast",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "75",
+          "priceKRW": 1560000,
+          "sku": "TKFCMUHM13MM75",
+          "estimated": true
+        },
+        {
+          "option": "80",
+          "priceKRW": 1580000,
+          "sku": "TKFCMUHM13MM80",
+          "estimated": true
+        },
+        {
+          "option": "85",
+          "priceKRW": 1600000,
+          "sku": "TKFCMUHM13MM85",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/1f31987a43d73702.png",
         "assets/images/products/takoon/catalog-20260930/9a1c1f2f1c070b40.png",
@@ -11553,7 +11961,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 1600000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-carbon-mast-uhm-12-5mm",
@@ -11566,11 +11978,11 @@
       "description": "얇은 프로파일의 12.5mm UHM 마스트",
       "headline": "얇은 프로파일의 12.5mm UHM 마스트",
       "options": [
-        "75cm",
-        "80cm",
-        "85cm"
+        "75",
+        "80",
+        "85"
       ],
-      "price": null,
+      "price": 1760000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-carbon-mast-uhm-12-5mm",
       "priority": "performance",
@@ -11590,13 +12002,32 @@
         "마스트 단품입니다. 기존 포일 및 보드와의 호환성을 확인하세요."
       ],
       "manufacturerSummary": "얇은 프로파일의 12.5mm UHM 마스트",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "pro"
       ],
       "foilType": "mast",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "75",
+          "priceKRW": 1760000,
+          "sku": "TKFCMUHM125MM75",
+          "estimated": true
+        },
+        {
+          "option": "80",
+          "priceKRW": 1780000,
+          "sku": "TKFCMUHM125MM80",
+          "estimated": true
+        },
+        {
+          "option": "85",
+          "priceKRW": 1790000,
+          "sku": "TKFCMUHM125MM85",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/ae633f68aeb1fd2c.png",
         "assets/images/products/takoon/catalog-20260930/98c0b162e572af35.png",
@@ -11610,7 +12041,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 1790000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-stab-glide-220",
@@ -11623,9 +12058,9 @@
       "description": "안정적인 글라이드와 펌핑을 위한 리어윙",
       "headline": "안정적인 글라이드와 펌핑을 위한 리어윙",
       "options": [
-        "220cm²"
+        "220"
       ],
-      "price": null,
+      "price": 250000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-stab-glide-220",
       "priority": "value",
@@ -11645,13 +12080,20 @@
         "리어윙 단품입니다. 프론트윙과 퓨슬리지의 조합을 확인하세요."
       ],
       "manufacturerSummary": "안정적인 글라이드와 펌핑을 위한 리어윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "beginner"
       ],
       "foilType": "stab",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "220",
+          "priceKRW": 250000,
+          "sku": "TKSG220ND",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/1e1746e6e915ba51.png",
         "assets/images/products/takoon/catalog-20260930/86840fb6f0873119.png",
@@ -11665,7 +12107,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 250000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-stab-carve",
@@ -11678,12 +12124,12 @@
       "description": "민첩한 카빙을 위한 리어윙",
       "headline": "민첩한 카빙을 위한 리어윙",
       "options": [
-        "130cm²",
-        "145cm²",
-        "160cm²",
-        "190cm²"
+        "130",
+        "145",
+        "160",
+        "190"
       ],
-      "price": null,
+      "price": 270000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-stab-carve",
       "priority": "value",
@@ -11703,14 +12149,39 @@
         "리어윙 단품입니다. 프론트윙과 퓨슬리지의 조합을 확인하세요."
       ],
       "manufacturerSummary": "민첩한 카빙을 위한 리어윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate",
         "pro"
       ],
       "foilType": "stab",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "130",
+          "priceKRW": 300000,
+          "sku": "TKSC130ND",
+          "estimated": true
+        },
+        {
+          "option": "145",
+          "priceKRW": 310000,
+          "sku": "TKSC145ND",
+          "estimated": true
+        },
+        {
+          "option": "160",
+          "priceKRW": 270000,
+          "sku": "TKSC160ND",
+          "estimated": true
+        },
+        {
+          "option": "190",
+          "priceKRW": 280000,
+          "sku": "TKSC190ND",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/ee2b9801390ff6f4.png",
         "assets/images/products/takoon/catalog-20260930/296f20b7c57ad4e4.png",
@@ -11726,7 +12197,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 310000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-stab-glide-ha",
@@ -11739,13 +12214,13 @@
       "description": "효율과 긴 글라이드를 위한 하이애스펙트 리어윙",
       "headline": "효율과 긴 글라이드를 위한 하이애스펙트 리어윙",
       "options": [
-        "100cm²",
-        "130cm²",
-        "150cm²",
-        "170cm²",
-        "190cm²"
+        "100",
+        "130",
+        "150",
+        "170",
+        "190"
       ],
-      "price": null,
+      "price": 260000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-stab-glide-ha",
       "priority": "value",
@@ -11765,14 +12240,45 @@
         "리어윙 단품입니다. 프론트윙과 퓨슬리지의 조합을 확인하세요."
       ],
       "manufacturerSummary": "효율과 긴 글라이드를 위한 하이애스펙트 리어윙",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [
         "intermediate",
         "pro"
       ],
       "foilType": "stab",
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "100",
+          "priceKRW": 260000,
+          "sku": "TKFSGHA100",
+          "estimated": true
+        },
+        {
+          "option": "130",
+          "priceKRW": 270000,
+          "sku": "TKFSGHA130",
+          "estimated": true
+        },
+        {
+          "option": "150",
+          "priceKRW": 270000,
+          "sku": "TKFSGHA150",
+          "estimated": true
+        },
+        {
+          "option": "170",
+          "priceKRW": 280000,
+          "sku": "TKFSGHA170",
+          "estimated": true
+        },
+        {
+          "option": "190",
+          "priceKRW": 290000,
+          "sku": "TKFSGHA190",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/e5988ab20677dc31.png",
         "assets/images/products/takoon/catalog-20260930/ca0cd5addefe3585.png",
@@ -11787,7 +12293,11 @@
       },
       "tables": [],
       "videos": [],
-      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups"
+      "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
+      "priceMax": 290000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-board-v-footstrap",
@@ -11799,8 +12309,10 @@
       "image": "assets/images/products/takoon/catalog-20260930/b13e8d5ae6370459.png",
       "description": "V 형태의 메모리폼 보드 풋스트랩",
       "headline": "V 형태의 메모리폼 보드 풋스트랩",
-      "options": [],
-      "price": null,
+      "options": [
+        "기본 구성"
+      ],
+      "price": 100000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-board-v-footstrap",
       "priority": "value",
@@ -11821,11 +12333,18 @@
         "나사 규격: 직경 5 × 길이 25mm. 보드 인서트와의 호환성을 확인하세요."
       ],
       "manufacturerSummary": "V 형태의 메모리폼 보드 풋스트랩",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "기본 구성",
+          "priceKRW": 100000,
+          "sku": "TKFBVFV3",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/b13e8d5ae6370459.png",
         "assets/images/products/takoon/catalog-20260930/faca34490c8b8c0e.png",
@@ -11835,7 +12354,11 @@
         "본사 옵션": "단일 구성"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 100000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foil-board-footstrap-single",
@@ -11847,8 +12370,10 @@
       "image": "assets/images/products/takoon/catalog-20260930/d3eec53a12479aa4.png",
       "description": "싱글 형태의 메모리폼 보드 풋스트랩",
       "headline": "싱글 형태의 메모리폼 보드 풋스트랩",
-      "options": [],
-      "price": null,
+      "options": [
+        "기본 구성"
+      ],
+      "price": 60000,
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-board-footstrap-single",
       "priority": "value",
@@ -11869,11 +12394,18 @@
         "나사 규격: 직경 5 × 길이 25mm. 보드 인서트와의 호환성을 확인하세요."
       ],
       "manufacturerSummary": "싱글 형태의 메모리폼 보드 풋스트랩",
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-03",
       "manufacturerLevels": [],
       "foilType": null,
       "recommendationPolicy": "타쿤 공식 메뉴의 모델별 분류. 액세서리는 숙련도 대신 용도·호환성으로 선택.",
-      "retailVariants": [],
+      "retailVariants": [
+        {
+          "option": "기본 구성",
+          "priceKRW": 60000,
+          "sku": "TKFBFSV3",
+          "estimated": true
+        }
+      ],
       "gallery": [
         "assets/images/products/takoon/catalog-20260930/d3eec53a12479aa4.png",
         "assets/images/products/takoon/catalog-20260930/8247f60d83938990.png",
@@ -11883,7 +12415,11 @@
         "본사 옵션": "단일 구성"
       },
       "tables": [],
-      "videos": []
+      "videos": [],
+      "priceMax": 60000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
       "id": "tkn-foilboard-day-bag-cruise",
