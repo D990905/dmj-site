@@ -21,8 +21,8 @@
     "levitaz": {
       "name": "Levitaz",
       "country": "AUSTRIA",
-      "headline": "R6로 완성하는 레이스 셋업",
-      "description": "R6 레이스 포일 중심의 셋업",
+      "headline": "R6 레이스 포일 × SCC 할로 보드",
+      "description": "R6 포일과 가볍고 단단한 Boom RS SCC 할로 보드",
       "image": "assets/images/products/levitaz/r6/r6-foil-official.jpg",
       "url": "https://levitaz.com",
       "label": "FOIL · BOARD"
@@ -5401,7 +5401,7 @@
       "category": "board",
       "path": "products/levitaz/boom-rs-scc.html",
       "image": "assets/images/products/levitaz/boom/boom-rs-scc-official.jpg",
-      "description": "본사 제품명은 Boom RS SCC이며 윙용 Race Series 63·83·95 옵션이 있습니다. DMJ 레이스 셋업은 사용자가 지정한 터틀 모델을 기준으로 구성합니다.",
+      "description": "Boom RS SCC는 내부가 빈 할로(중공) 구조의 레이스 보드입니다. 가벼운 무게와 높은 강성, 직접적인 힘 전달을 중시했으며 63·83·95L 터틀 구성으로 R6 포일과 조합합니다.",
       "options": [
         "Boom Race Series 63 SCC",
         "Boom Race Series 83 SCC",
@@ -5420,8 +5420,9 @@
         "wave",
         "light"
       ],
-      "headline": "R6와 함께 구성하는 Boom RS SCC",
+      "headline": "가볍고 단단한 SCC 할로 레이스 보드",
       "notes": [
+        "SCC 할로 구조: 경량·높은 강성·직접적인 힘 전달",
         "구형 Boom 44 RS와 구분",
         "선택한 R6 구성과 터틀 장착 규격 확인"
       ],
@@ -5429,14 +5430,15 @@
         "race-wing"
       ],
       "verifiedAt": "2026-09-24",
-      "manufacturerSummary": "본사 제품명은 Boom RS SCC이며 윙용 Race Series 63·83·95 옵션이 있습니다. DMJ 레이스 셋업은 사용자가 지정한 터틀 모델을 기준으로 구성합니다.",
+      "manufacturerSummary": "Boom RS SCC는 내부가 빈 할로(중공) 구조의 레이스 보드입니다. 가벼운 무게와 높은 강성, 직접적인 힘 전달을 중시했으며 63·83·95L 터틀 구성으로 R6 포일과 조합합니다.",
       "recommendationPolicy": "제조사 용도 설명을 바탕으로 한 DMJ 상담 후보 분류. 수치화된 숙련도 경계는 DMJ 운영 기준.",
       "tables": [],
       "videos": [],
       "specs": {
         "본사 옵션": "Boom Race Series 63 SCC / 83 SCC / 95 SCC",
         "DMJ 구성": "터틀 모델",
-        "함께 상담할 포일": "R6 Race Series"
+        "함께 상담할 포일": "R6 Race Series",
+        "보드 구조": "SCC 할로(중공) 구조"
       },
       "gallery": [
         "assets/images/products/levitaz/verified/levitaz_race_series_boom_63_ssc_overview2000x2000px.jpg",
@@ -5562,7 +5564,10 @@
         "dutyAssumption": 0.08,
         "vat": 0.1,
         "discount": 0.1
-      }
+      },
+      "construction": "SCC 할로(중공) 구조",
+      "constructionVerifiedAt": "2026-10-08",
+      "constructionSource": "https://levitaz.com/shop/product/boom-scc-boards-2/?variant=25606"
     },
     {
       "id": "tkn-starter",

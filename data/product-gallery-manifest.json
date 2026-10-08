@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-09-30",
+  "checkedAt": "2026-10-08",
   "products": [
     {
       "id": "takoon-v4",
@@ -1201,6 +1201,97 @@
         "../../assets/images/lisa/duo-blue.jpg",
         "../../assets/images/lisa/duo-black.jpg",
         "../../assets/images/lisa/duo-transparent.jpg"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-fuselage-aluminium-v3",
+      "path": "products/takoon/foil-fuselage-aluminium-v3.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/60cm.png?v=1732697085",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Image03.png?v=1755185966",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/1.12_1200x1200_29e6f8d2-3611-4c8a-bbd6-d33cbcb8b262.png?v=1755185966",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Detail-01_00683ad9-e152-47e4-9489-6ff3cac9734f.png?v=1755185966"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-fuselage-aluminium-v3-long",
+      "path": "products/takoon/foil-fuselage-aluminium-v3-long.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/64cm.png?v=1732697105",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Bottom-Angle-View-01b.png?v=1728761635",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Detail-01.png?v=1728761638",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Detail-02.png?v=1728761640",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Side-View-01b.png?v=1728761665",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Top-Angle-View-01b.png?v=1728761669"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-fuselage-titanium-v3",
+      "path": "products/takoon/foil-fuselage-titanium-v3.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-03.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-04.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-05.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-01.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-02.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long-Short_1200x1200_fb95281e-90f1-451d-84f6-42b90cde8829.png?v=1782162228",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long-vs-Short---Image-03.png?v=1781617397",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long-vs-Short---Image-01.png?v=1781617397",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long---Image-03.png?v=1781617444",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long---Image-04.png?v=1781617445",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long---Image-05.png?v=1781617444"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-fuselage-titanium-front-part",
+      "path": "products/takoon/foil-fuselage-titanium-front-part.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Titan---Side-View_1200x1200_ec89a39b-61e4-4120-975a-9b21600a6cc4.png?v=1732697232",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Titan---Metal---Top-Angle-View-01_1200x1200_cce6db87-a3f6-49f7-a980-0da21ffd3459.png?v=1733128697",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Titan---Metal---Bottom-Angle-View-01_1200x1200_d3f4c0b2-bf55-46f6-abd8-fa50c5565032.png?v=1733128697"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-fuselage-carbon-v3",
+      "path": "products/takoon/foil-fuselage-carbon-v3.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/64cmCarbone.png?v=1732697118",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage---Standard-Carbone---Bottom-Angle-View_1200x1200_d27a1c87-e92d-44c4-9214-3809e413e83e.png?v=1732783718",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage---Standard-Carbone---Top-Angle-View_1200x1200_06b45fdf-4142-4c5e-8cd8-54f254972c9f.png?v=1732783720"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-fuselage-carbon-part",
+      "path": "products/takoon/fuselage-carbon-part.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Full-Carbon-Tail---Image-01.png?v=1757921925",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Full-Carbon-Tail---Image-02.png?v=1757921925",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Full-Carbon-Tail---Image-03.png?v=1757921925"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-fuselage-x-glide-black",
+      "path": "products/takoon/fuselage-x-glide-black.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/21-03-08-13h23-_DG_7976_1200px_black.png?v=1665581349",
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/c1_a9e6bf8c-94a9-4019-9dd8-16480243894b.jpg?v=1665581349"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-fuselage",
+      "path": "products/takoon/fuselage.html",
+      "photos": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/22-01-14-11h41-_DG_5334.png?v=1644273333",
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/Takoon-AE4A9690.jpg?v=1649323431",
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/Takoon-AE4A9823.jpg?v=1649323431"
       ],
       "groups": {}
     }
