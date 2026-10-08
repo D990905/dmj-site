@@ -13698,6 +13698,66 @@
       "verifiedAt": "2026-10-08",
       "foilType": "fuselage",
       "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "wip-wing-wind-hybrid-belt",
+      "brand": "wip",
+      "name": "Wing-Wind Hybrid Belt",
+      "category": "accessory",
+      "subcategory": "harness",
+      "path": "products/wip/wing-wind-hybrid-belt.html",
+      "image": "assets/images/wip/ordered/wing-wind-hybrid-belt.jpg",
+      "description": "윙포일과 윈드서핑에 사용하는 하이브리드 벨트입니다. 측면 스트랩으로 조절하며 등 지지부와 후면 보드 리시 루프를 갖췄습니다.",
+      "headline": "윙과 윈드서핑을 위한 하이브리드 벨트",
+      "manufacturerSummary": "윙포일과 윈드서핑에 사용하는 하이브리드 벨트입니다. 측면 스트랩으로 조절하며 등 지지부와 후면 보드 리시 루프를 갖췄습니다.",
+      "source": "https://windforce.ca/products/forward-wip-wing-wind-hybrid-belt",
+      "verifiedAt": "2026-09-25",
+      "sourceStatus": "retailer-model-matched",
+      "options": [
+        "S/M"
+      ],
+      "price": 400000,
+      "availability": "inquiry",
+      "priority": "performance",
+      "minLevel": 0,
+      "discipline": "accessory",
+      "raceOnly": false,
+      "environments": [
+        "flat",
+        "chop",
+        "wave",
+        "light"
+      ],
+      "purposes": [],
+      "specs": {
+        "모델 코드": "HAWIPWIN44",
+        "주문 사이즈": "S/M",
+        "조절 방식": "측면 스트랩",
+        "후면": "보드 리시 연결 루프"
+      },
+      "notes": [
+        "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
+      ],
+      "invoiceSkus": [
+        "HAWIPWIN44A-01998"
+      ],
+      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "priceMax": 400000,
+      "priceStatus": "fixed",
+      "priceReviewedAt": "2026-09-25",
+      "priceSource": "WIP SS26 본사 주문서 USD 소비자가 · 최신 견적 재확인 필요",
+      "retailVariants": [
+        {
+          "option": "S/M",
+          "priceKRW": 400000,
+          "sku": "HAWIPWIN44A-01998",
+          "estimated": false
+        }
+      ],
+      "priceFixedAt": "2026-09-25",
+      "gallery": [
+        "assets/images/wip/ordered/wing-wind-hybrid-belt.jpg"
+      ]
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",

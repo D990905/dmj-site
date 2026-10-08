@@ -1294,6 +1294,14 @@
         "https://cdn.shopify.com/s/files/1/2503/9576/products/Takoon-AE4A9823.jpg?v=1649323431"
       ],
       "groups": {}
+    },
+    {
+      "id": "wip-wing-wind-hybrid-belt",
+      "path": "products/wip/wing-wind-hybrid-belt.html",
+      "photos": [
+        "../../assets/images/wip/ordered/wing-wind-hybrid-belt.jpg"
+      ],
+      "groups": {}
     }
   ]
 }
