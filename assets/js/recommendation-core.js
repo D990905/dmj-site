@@ -20,6 +20,7 @@
  if(level===0&&p.id==='takoon-v4')rank=95;
  if(level===0&&p.id==='tkn-starter')rank=90;
  if(level===1&&p.id==='tkn-xglide-v2')rank=90;
+ if(level>=1&&!race&&['tkn-foil-flare-carbon','tkn-foil-flow-carbon'].includes(p.id)){rank=92;reasons.unshift('DMJ 추천: 중급부터 카본 마스트 구성');}
  if(level===1&&p.id==='takoon-glide')rank=85;
  if(s.purpose==='parawing'&&p.id==='takoon-slide'){rank=90;reasons.unshift('본사가 파라윙을 우선 용도로 안내하는 보드');}
  if(s.purpose==='wave'&&['ppc-m1x','takoon-prosurf'].includes(p.id))rank=85;

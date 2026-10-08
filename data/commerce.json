@@ -10785,7 +10785,7 @@
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flare-carbon",
       "priority": "performance",
-      "minLevel": 3,
+      "minLevel": 1,
       "raceOnly": false,
       "discipline": "wing",
       "environments": [
@@ -10829,7 +10829,13 @@
       "priceMax": 2370000,
       "priceStatus": "estimated",
       "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
-      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03",
+      "storeRecommendedLevels": [
+        "intermediate",
+        "advanced",
+        "pro"
+      ],
+      "storeRecommendation": "DMJ는 중급부터 카본 마스트 구성을 추천합니다."
     },
     {
       "id": "tkn-foil-flow-carbon",
@@ -10848,7 +10854,7 @@
       "availability": "inquiry",
       "source": "https://takoon.com/en-int/products/foil-flow-carbon",
       "priority": "performance",
-      "minLevel": 3,
+      "minLevel": 1,
       "raceOnly": false,
       "discipline": "wing",
       "environments": [
@@ -10891,7 +10897,13 @@
       "priceMax": 2330000,
       "priceStatus": "estimated",
       "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
-      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
+      "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03",
+      "storeRecommendedLevels": [
+        "intermediate",
+        "advanced",
+        "pro"
+      ],
+      "storeRecommendation": "DMJ는 중급부터 카본 마스트 구성을 추천합니다."
     },
     {
       "id": "tkn-foil-starter-front-wing",
@@ -13183,6 +13195,504 @@
         "source": "https://www.patrikinternational.com/en/shop/winging/wing-accessories/lisa-harness-lines-wing-duo-race.html",
         "checkedAt": "2026-10-03"
       }
+    },
+    {
+      "id": "tkn-foil-fuselage-aluminium-v3",
+      "brand": "takoon",
+      "name": "Foil Fuselage Aluminium V3",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/foil-fuselage-aluminium-v3.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/60cm.png?v=1732697085",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/60cm.png?v=1732697085",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Image03.png?v=1755185966",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/1.12_1200x1200_29e6f8d2-3611-4c8a-bbd6-d33cbcb8b262.png?v=1755185966",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Detail-01_00683ad9-e152-47e4-9489-6ff3cac9734f.png?v=1755185966"
+      ],
+      "description": "프론트윙 연결부를 새롭게 설계한 알루미늄 퓨즐라지입니다. 교체 가능한 희생양극을 적용해 카본과 접촉하는 알루미늄의 부식을 줄이도록 설계했습니다.",
+      "headline": "60cm 알루미늄 V3 퓨즐라지",
+      "options": [
+        "60 cm"
+      ],
+      "retailVariants": [
+        {
+          "option": "60 cm",
+          "priceKRW": 220000,
+          "sku": "TKFUSNC",
+          "estimated": true,
+          "manufacturerAvailable": true
+        }
+      ],
+      "price": 220000,
+      "priceMax": 220000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": true,
+      "source": "https://takoon.com/en-int/products/foil-fuselage-aluminium-v3",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "프론트윙과 마스트 연결 규격을 확인해 주세요.",
+        "희생양극은 나사로 교체할 수 있습니다."
+      ],
+      "specs": {
+        "소재": "알루미늄",
+        "길이": "60 cm",
+        "중량": "700 g"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "tkn-foil-fuselage-aluminium-v3-long",
+      "brand": "takoon",
+      "name": "Foil Fuselage Aluminium V3 Long",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/foil-fuselage-aluminium-v3-long.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/64cm.png?v=1732697105",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/64cm.png?v=1732697105",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Bottom-Angle-View-01b.png?v=1728761635",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Detail-01.png?v=1728761638",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Detail-02.png?v=1728761640",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Side-View-01b.png?v=1728761665",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Long---Top-Angle-View-01b.png?v=1728761669"
+      ],
+      "description": "V3 연결 구조와 교체 가능한 희생양극을 적용한 63cm 알루미늄 퓨즐라지입니다. 본사 펌프포일 라인업에도 포함된 롱 모델입니다.",
+      "headline": "63cm 롱 알루미늄 V3 퓨즐라지",
+      "options": [
+        "63 cm"
+      ],
+      "retailVariants": [
+        {
+          "option": "63 cm",
+          "priceKRW": 240000,
+          "sku": "TKFUSV3LNC",
+          "estimated": true,
+          "manufacturerAvailable": true
+        }
+      ],
+      "price": 240000,
+      "priceMax": 240000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": true,
+      "source": "https://takoon.com/en-int/products/foil-fuselage-aluminium-v3-long",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "표준 60cm 모델과 길이가 다릅니다. 기존 셋업의 연결 규격을 확인해 주세요."
+      ],
+      "specs": {
+        "소재": "알루미늄",
+        "길이": "63 cm"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "tkn-foil-fuselage-titanium-v3",
+      "brand": "takoon",
+      "name": "Foil Fuselage Titanium V3",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/foil-fuselage-titanium-v3.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-03.png?v=1781617374",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-03.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-04.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-05.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-01.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Short---Image-02.png?v=1781617374",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long-Short_1200x1200_fb95281e-90f1-451d-84f6-42b90cde8829.png?v=1782162228",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long-vs-Short---Image-03.png?v=1781617397",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long-vs-Short---Image-01.png?v=1781617397",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long---Image-03.png?v=1781617444",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long---Image-04.png?v=1781617445",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-V3-Long---Image-05.png?v=1781617444"
+      ],
+      "description": "강성과 내식성을 중시한 티타늄 퓨즐라지입니다. 본사는 60cm를 민첩한 반응에, 63cm를 전후 안정성과 고속 제어에 초점을 맞춘 구성으로 안내합니다.",
+      "headline": "60·63cm 티타늄 V3 퓨즐라지",
+      "options": [
+        "Standard / 60 cm",
+        "Long / 63 cm"
+      ],
+      "retailVariants": [
+        {
+          "option": "Standard / 60 cm",
+          "priceKRW": 590000,
+          "sku": "TKFFTITANEV3",
+          "estimated": true,
+          "manufacturerAvailable": true
+        },
+        {
+          "option": "Long / 63 cm",
+          "priceKRW": 610000,
+          "sku": "TKFFTITANEV4",
+          "estimated": true,
+          "manufacturerAvailable": true
+        }
+      ],
+      "price": 590000,
+      "priceMax": 610000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": true,
+      "source": "https://takoon.com/en-int/products/foil-fuselage-titanium-v3",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "윙포일·펌프포일·다운윈드·SUP 포일·파라윙 용도로 안내됩니다.",
+        "Standard와 Long의 길이를 구분해 선택해 주세요."
+      ],
+      "specs": {
+        "소재": "티타늄",
+        "Standard": "60 cm / 990 g",
+        "Long": "63 cm / 1,050 g",
+        "포함 구성": "보호 커버·장착용 나사"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "tkn-foil-fuselage-titanium-front-part",
+      "brand": "takoon",
+      "name": "Foil Fuselage Titanium Front Part V3",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/foil-fuselage-titanium-front-part.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Titan---Side-View_1200x1200_ec89a39b-61e4-4120-975a-9b21600a6cc4.png?v=1732697232",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Titan---Side-View_1200x1200_ec89a39b-61e4-4120-975a-9b21600a6cc4.png?v=1732697232",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Titan---Metal---Top-Angle-View-01_1200x1200_cce6db87-a3f6-49f7-a980-0da21ffd3459.png?v=1733128697",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Titan---Metal---Bottom-Angle-View-01_1200x1200_d3f4c0b2-bf55-46f6-abd8-fa50c5565032.png?v=1733128697"
+      ],
+      "description": "모노블록 스태빌라이저와 결합하도록 설계한 V3 티타늄 퓨즐라지 앞부분입니다. 본사는 프리스타일과 펌핑 용도로 안내합니다.",
+      "headline": "모노블록 스태빌라이저용 티타늄 앞부분",
+      "options": [
+        "단품"
+      ],
+      "retailVariants": [
+        {
+          "option": "단품",
+          "priceKRW": 510000,
+          "sku": "TKFTFFPB",
+          "estimated": true,
+          "manufacturerAvailable": true
+        }
+      ],
+      "price": 510000,
+      "priceMax": 510000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": true,
+      "source": "https://takoon.com/en-int/products/foil-fuselage-titanium-front-part",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "완성형 퓨즐라지가 아닙니다. 후방 부품·스태빌라이저의 호환 규격을 확인해 주세요.",
+        "본사 설명과 사양표의 중량이 달라 확정 중량은 구매 상담에서 확인합니다."
+      ],
+      "specs": {
+        "소재": "티타늄",
+        "제품 구성": "퓨즐라지 앞부분 단품",
+        "길이": "Carve 160 모노블록 조합 시 60 cm",
+        "중량": "본사 설명 949 g / 사양표 760 g — 주문 전 확인",
+        "포함 나사": "M8×25 mm 3개 / M6×20 mm 2개"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "tkn-foil-fuselage-carbon-v3",
+      "brand": "takoon",
+      "name": "Foil Fuselage Carbon V3",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/foil-fuselage-carbon-v3.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/64cmCarbone.png?v=1732697118",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/64cmCarbone.png?v=1732697118",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage---Standard-Carbone---Bottom-Angle-View_1200x1200_d27a1c87-e92d-44c4-9214-3809e413e83e.png?v=1732783718",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage---Standard-Carbone---Top-Angle-View_1200x1200_06b45fdf-4142-4c5e-8cd8-54f254972c9f.png?v=1732783720"
+      ],
+      "description": "알루미늄 V3와 같은 형상을 사용하는 60cm 풀카본 퓨즐라지입니다. 본사 기준 중량은 507g으로, 알루미늄 모델보다 약 200g 가볍습니다.",
+      "headline": "507g 풀카본 V3 퓨즐라지",
+      "options": [
+        "60 cm"
+      ],
+      "retailVariants": [
+        {
+          "option": "60 cm",
+          "priceKRW": 450000,
+          "sku": "TKFFCV3",
+          "estimated": true,
+          "manufacturerAvailable": true
+        }
+      ],
+      "price": 450000,
+      "priceMax": 450000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": true,
+      "source": "https://takoon.com/en-int/products/foil-fuselage-carbon-v3",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "펌프포일용으로 설계되지 않았으며, 본사 보증은 펌프포일 사용을 포함하지 않습니다.",
+        "펌프포일에는 본사가 안내하는 알루미늄 또는 티타늄 퓨즐라지를 선택해 주세요."
+      ],
+      "specs": {
+        "소재": "카본",
+        "길이": "60 cm",
+        "중량": "507 g",
+        "포함 구성": "보호 커버 / M8×25 mm 3개 / M6×16 mm 2개"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "tkn-fuselage-carbon-part",
+      "brand": "takoon",
+      "name": "Foil Stab Carbon Tail V3",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/fuselage-carbon-part.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Full-Carbon-Tail---Image-01.png?v=1757921925",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Full-Carbon-Tail---Image-01.png?v=1757921925",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Full-Carbon-Tail---Image-02.png?v=1757921925",
+        "https://cdn.shopify.com/s/files/1/2503/9576/files/Fuselage-Full-Carbon-Tail---Image-03.png?v=1757921925"
+      ],
+      "description": "본사 퓨즐라지 카테고리의 카본 테일 단품입니다. 완성형 퓨즐라지나 리어윙 전체가 아니므로, 함께 사용할 앞부분과 스태빌라이저의 연결 규격을 확인해 주세요.",
+      "headline": "V3 분리형 카본 테일 부품",
+      "options": [
+        "단품"
+      ],
+      "retailVariants": [
+        {
+          "option": "단품",
+          "priceKRW": 250000,
+          "sku": "TKFCPART",
+          "estimated": true,
+          "manufacturerAvailable": true
+        }
+      ],
+      "price": 250000,
+      "priceMax": 250000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": true,
+      "source": "https://takoon.com/en-int/products/fuselage-carbon-part",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "길이는 본사 사양표에 TBC로 기재되어 있습니다.",
+        "상세 호환 목록은 본사에 공개되어 있지 않아 기존 부품과의 결합 여부를 주문 전에 확인합니다."
+      ],
+      "specs": {
+        "제품 구성": "카본 테일 단품",
+        "중량": "220 g (본사 사양표)",
+        "길이": "본사 미공개"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "tkn-fuselage-x-glide-black",
+      "brand": "takoon",
+      "name": "V1 Fuselage",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/fuselage-x-glide-black.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/products/21-03-08-13h23-_DG_7976_1200px_black.png?v=1665581349",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/21-03-08-13h23-_DG_7976_1200px_black.png?v=1665581349",
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/c1_a9e6bf8c-94a9-4019-9dd8-16480243894b.jpg?v=1665581349"
+      ],
+      "description": "X-Glide V1 라인업과 호환되는 퓨즐라지입니다. 넓고 둥근 헤드 연결부와 나사로 고정하는 리어윙 구조를 사용합니다.",
+      "headline": "X-Glide V1용 퓨즐라지",
+      "options": [
+        "단품"
+      ],
+      "retailVariants": [
+        {
+          "option": "단품",
+          "priceKRW": 280000,
+          "sku": "TKFV1",
+          "estimated": true,
+          "manufacturerAvailable": false
+        }
+      ],
+      "price": 280000,
+      "priceMax": 280000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": false,
+      "source": "https://takoon.com/en-int/products/fuselage-x-glide-black",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "본사 품절 확인: 2026년 10월 8일. 국내 재고·재입고 가능 여부는 별도 문의해 주세요.",
+        "V2·V3와의 호환을 보장하는 제품이 아닙니다. 기존 포일 세대를 확인해 주세요."
+      ],
+      "specs": {
+        "호환 라인업": "X-Glide V1",
+        "길이·중량": "본사 미공개"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
+    },
+    {
+      "id": "tkn-fuselage",
+      "brand": "takoon",
+      "name": "V2 Fuselage",
+      "category": "accessory",
+      "subcategory": "퓨즐라지",
+      "path": "products/takoon/fuselage.html",
+      "image": "https://cdn.shopify.com/s/files/1/2503/9576/products/22-01-14-11h41-_DG_5334.png?v=1644273333",
+      "gallery": [
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/22-01-14-11h41-_DG_5334.png?v=1644273333",
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/Takoon-AE4A9690.jpg?v=1649323431",
+        "https://cdn.shopify.com/s/files/1/2503/9576/products/Takoon-AE4A9823.jpg?v=1649323431"
+      ],
+      "description": "프론트윙과의 연결에 육각 테이퍼 구조를 적용한 V2 퓨즐라지입니다. 연결부의 강성과 정렬을 중시한 설계로, 기존 포일의 세대와 결합 규격에 맞춰 선택합니다.",
+      "headline": "육각 테이퍼 연결 구조의 V2 퓨즐라지",
+      "options": [
+        "단품"
+      ],
+      "retailVariants": [
+        {
+          "option": "단품",
+          "priceKRW": 220000,
+          "sku": "TKFV2",
+          "estimated": true,
+          "manufacturerAvailable": true
+        }
+      ],
+      "price": 220000,
+      "priceMax": 220000,
+      "priceStatus": "estimated",
+      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
+      "availability": "inquiry",
+      "manufacturerAvailable": true,
+      "source": "https://takoon.com/en-int/products/fuselage",
+      "priority": "value",
+      "minLevel": 0,
+      "raceOnly": false,
+      "discipline": "wing",
+      "purposes": [],
+      "environments": [
+        "flat",
+        "chop",
+        "wave"
+      ],
+      "notes": [
+        "V1·V3와의 호환을 임의로 가정하지 말고 기존 마스트·프론트윙·리어윙 규격을 확인해 주세요."
+      ],
+      "specs": {
+        "연결 구조": "육각 테이퍼 소켓",
+        "길이·중량": "본사 미공개"
+      },
+      "tables": [],
+      "videos": [],
+      "verifiedAt": "2026-10-08",
+      "foilType": "fuselage",
+      "recommendationPolicy": "퓨즐라지·연결 부품은 숙련도보다 기존 포일의 연결 규격과 용도로 선택합니다."
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",
