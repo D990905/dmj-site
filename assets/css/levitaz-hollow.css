@@ -1,12 +1,12 @@
 /* Levitaz Boom RS SCC: hollow construction as the primary board feature. */
 .commerce .hollow-badge{display:inline-flex;align-items:center;gap:8px;background:#26372e;color:#fff;padding:7px 12px;font-size:12px;font-weight:700;letter-spacing:.07em;line-height:1.4;margin:0 0 16px}
 .commerce .product-labels .hollow-label{background:#26372e;color:#fff;border-color:#26372e;font-weight:700}
-.commerce .levitaz-hollow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center;background:#edf0e5;border-block:1px solid #d5dacd;padding:clamp(28px,5vw,64px);margin-block:40px}
+.commerce .levitaz-hollow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:center;background:#f0f0f0;border-block:0;padding:clamp(28px,5vw,64px);margin-block:40px}
 .commerce .levitaz-hollow h2{font-size:clamp(27px,3.2vw,46px);line-height:1.25;letter-spacing:-.04em;margin:8px 0 22px;word-break:keep-all}
 .commerce .levitaz-hollow p{line-height:1.8;word-break:keep-all}
-.commerce .levitaz-hollow figure{margin:0;min-width:0;background:#fff}
+.commerce .levitaz-hollow figure{margin:0;min-width:0;background:transparent}
 .commerce .levitaz-hollow img{display:block;width:100%;height:auto;max-height:440px;object-fit:contain}
-.commerce .levitaz-hollow figcaption{padding:12px 18px;font-size:12px;color:#596357}
+.commerce .levitaz-hollow figcaption{padding:12px 0;font-size:12px;color:#596357}
 .commerce .hollow-benefits{display:grid;gap:14px;padding:0;margin:24px 0;list-style:none}
 .commerce .hollow-benefits li{padding-left:14px;border-left:3px solid #52664d;line-height:1.6}
 .commerce .hollow-benefits strong{display:block;color:#26372e}
