@@ -65,6 +65,7 @@
   var cachedSession = null;
   var cachedProfile = null;
   var clientReady = null;    // Promise
+  var profileGeneration = 0;
 
   function loadSDK() {
     return new Promise(function (resolve, reject) {
@@ -93,6 +94,11 @@
       sb.auth.onAuthStateChange(function (event, session) {
         const accountChanged = (cachedSession?.user?.id || null) !== (session?.user?.id || null);
         cachedSession = session;
+        if (accountChanged || !session) {
+          profileGeneration++;
+          cachedProfile = null;
+          try { localStorage.removeItem(USER_CACHE_KEY); } catch (e) {}
+        }
         if (session) {
           refreshProfile().then(function () {
             if (event === 'SIGNED_IN') {
@@ -256,10 +262,10 @@
 
   function refreshProfile() {
     if (!cachedSession || !sb) return Promise.resolve(null);
-    var profileOwner=cachedSession.user.id, profileAuthUser=cachedSession.user;
+    var profileOwner=cachedSession.user.id, profileAuthUser=cachedSession.user, generation=profileGeneration;
     return sb.from('profiles').select('*').eq('id', profileOwner).single()
       .then(function (res) {
-        if (!cachedSession || cachedSession.user.id !== profileOwner || !res.data || res.data.id !== profileOwner) return null;
+        if (generation !== profileGeneration || !cachedSession || cachedSession.user.id !== profileOwner || !res.data || res.data.id !== profileOwner) return null;
         if (res.error) {
           console.warn('[DMJAuth §180] refreshProfile error', res.error);
           return null;
@@ -273,10 +279,8 @@
   // ─────────────────────────────────────────────────────────────────────
   // 3) localStorage 캐시 부트 — 새로고침 시 sync API 즉시 반응
   // ─────────────────────────────────────────────────────────────────────
-  try {
-    var raw = localStorage.getItem(USER_CACHE_KEY);
-    if (raw) cachedProfile = JSON.parse(raw);
-  } catch (e) {}
+  // The profile cache is presentation data, not proof of a live identity.
+  // Populate currentUser only after the current session's profile is verified.
 
   // ─────────────────────────────────────────────────────────────────────
   // 4) Auth API
@@ -478,6 +482,7 @@
     }).then(function (result) {
       if (result && result.error) throw result.error;
       try { sessionStorage.setItem('dmj_logout_complete', '1'); } catch (e) {}
+      profileGeneration++;
       cachedSession = null;
       cachedProfile = null;
       try { localStorage.removeItem(USER_CACHE_KEY); } catch (e) {}

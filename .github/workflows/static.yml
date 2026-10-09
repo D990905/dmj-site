@@ -35,11 +35,21 @@ jobs:
         run: python3 scripts/check-product-galleries.py
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Stage public assets without internal control data
+        run: |
+          mkdir -p _site
+          rsync -a --exclude='/.git/' --exclude='/.github/' --exclude='/.agents/' --exclude='/.codex/' --exclude='/_site/' --exclude='/_experts/' --exclude='/_team/' --exclude='/orchestrator/' --exclude='/admin/dashboard/' --exclude='dashboard-state.json' --exclude='dashboard-messages.json' --exclude='/admin/team-live.html' --exclude='/admin/work-status.json' ./ _site/
+          mkdir -p _site/admin/dashboard
+          cp admin/dashboard/index.html admin/dashboard/sw.js _site/admin/dashboard/
+          test ! -e _site/admin/dashboard/dashboard-state.json
+          test ! -e _site/admin/team-live.html
+          test ! -e _site/_team
+          test -z "$(find _site -type f \( -name 'dashboard-state.json' -o -name 'dashboard-messages.json' \) -print -quit)"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: '.'
+          # Upload only the staged public site
+          path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
