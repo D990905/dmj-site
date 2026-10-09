@@ -59,11 +59,10 @@
   // 사실: riding-dashboard/ 에는 내부 인증 체크·로그인 리다이렉트가 전혀 없다.
   //   직접 URL 로 열면 로그인 없이 완전히 동작한다. 유일한 게이트는 "nav 진입 링크가
   //   로그인 상태에서만 렌더된다"는 점뿐이었다.
-  // 조치: 아래 플래그가 false 인 동안 injectRidingDashboardLink() 가 로그아웃
-  //   상태에서도 '라이딩 분석' 링크를 nav 에 노출한다.
-  // Phase 12 (Supabase Auth) 연동 시 → 이 값을 true 로 되돌리면 주입이 중단되고
-  //   원래대로 로그인 dropdown 안에서만 노출된다. (코드 삭제 X — 플래그 토글만.)
-  var RIDING_DASHBOARD_REQUIRES_LOGIN = false;
+  // 현재: 공개 라이딩 메뉴를 잠시 노출하지 않는다 (2026-10-09).
+  // 아래 플래그는 로그아웃 메뉴 주입만 제어하며, 로그인 계정 메뉴에서도 링크를 제거했다.
+  // 라이딩 코드·저장 데이터·직접 URL 접근은 그대로 유지한다.
+  var RIDING_DASHBOARD_REQUIRES_LOGIN = true; // 공개 메뉴 노출 중단; 직접 URL 접근은 변경하지 않음.
 
   // ---- Auth state detection ----
   // §179 Supabase 전환 (데이빗 2026-06-03): 라이브 인증은 supabase-auth.js (window.DMJAuth,
@@ -164,7 +163,6 @@
       '</button>' +
       '<div class="nav__sub nav-auth__menu" id="' + menuId + '" role="menu">' +
         '<a href="' + prefix + 'profile.html" class="nav__sub-link" role="menuitem"><b>마이페이지</b><span>프로필 · 장비 · 진단 결과</span></a>' +
-        '<a href="' + prefix + 'riding-dashboard/index.html" class="nav__sub-link" role="menuitem"><b>라이딩 분석</b><span>GPX 세션 분석</span></a>' +
         '<a href="' + prefix + 'skill-assessment.html" class="nav__sub-link" role="menuitem"><b>스킬 진단</b><span>10축 + Speed</span></a>' +
         '<a href="' + prefix + 'find-my-gear.html" class="nav__sub-link" role="menuitem"><b>Find My Gear</b><span>1분 셋업 진단</span></a>' +
         '<a href="' + prefix + 'membership.html" class="nav__sub-link" role="menuitem"><b>회원 등급</b><span>현재 등급 · 혜택</span></a>' +
@@ -311,7 +309,6 @@
       '</div>' +
       '<div class="mobile-auth-card__actions">' +
         '<a href="' + prefix + 'profile.html">마이페이지</a>' +
-        '<a href="' + prefix + 'riding-dashboard/index.html">라이딩 분석</a>' +
         '<a href="' + prefix + 'skill-assessment.html">스킬 진단</a>' +
         '<a href="#" data-nav-logout-mobile>로그아웃</a>' +
       '</div>';
@@ -387,7 +384,7 @@
     try {
       if (MEMBER_UI_HIDDEN) {
         // §426 — 회원 UI 표면 hide. 계정 드롭다운은 만들지 않고(render* 스킵)
-        // 진입점 anchor 만 숨긴다. '라이딩 분석' 링크는 아래에서 그대로 주입.
+        // 회원 진입점만 숨긴다. 공개 라이딩 링크 주입은 현재 중단 상태다.
         hideMemberUI();
       } else {
         renderDesktopNav();
