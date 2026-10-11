@@ -840,6 +840,9 @@
     var v = document.createElement('div');
     v.id = 'replay-view';
     v.className = 'replay';
+    v.setAttribute('role', 'dialog');
+    v.setAttribute('aria-modal', 'true');
+    v.setAttribute('aria-label', '라이딩 재생');
     v.hidden = true;
     v.innerHTML =
       /* 배경 — 영상 블러 캔버스 + 어둡게 덮는 스크림 */
@@ -2016,6 +2019,7 @@
     if (b) { b.textContent = satellite ? '분석 지도' : '위성 지도'; b.setAttribute('aria-pressed', satellite ? 'true' : 'false'); }
   }
   function replaySegmentValid(a, b) {
+    if (a && (a.gpsOutlier || a._excluded) || b && (b.gpsOutlier || b._excluded)) return false;
     return !!a && !!b && isFinite(a.lat) && isFinite(a.lng) &&
       isFinite(b.lat) && isFinite(b.lng) && b.t > a.t && b.t - a.t <= GAP_SEC &&
       !(a.legId != null && b.legId != null && a.legId !== b.legId);
@@ -3637,6 +3641,25 @@
     // 키보드 — Space 재생/정지, ←→ 이동(Shift=10초), ESC 닫기
     R.keyHandler = function (e) {
       if (!R) return;
+      if (e.key === 'Tab') {
+        var focusable = Array.prototype.filter.call(el('replay-view').querySelectorAll(
+          'button, input, select, textarea, a[href], [tabindex="0"], [contenteditable="true"]'), function (node) {
+          return !node.disabled && node.getAttribute('tabindex') !== '-1' &&
+            node.getClientRects && node.getClientRects().length;
+        });
+        if (focusable.length) {
+          var first = focusable[0], last = focusable[focusable.length - 1];
+          var outside = focusable.indexOf(document.activeElement) < 0;
+          if (e.shiftKey && (document.activeElement === first || outside)) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && (document.activeElement === last || outside)) { e.preventDefault(); first.focus(); }
+        }
+        return;
+      }
+      // Editable fields and native buttons keep their own arrow/Space behavior.
+      var target = e.target;
+      if (e.key !== 'Escape' && target &&
+          (/^(INPUT|SELECT|TEXTAREA)$/i.test(target.tagName) || target.isContentEditable ||
+          (/^BUTTON$/i.test(target.tagName) && (e.key === ' ' || e.key === 'Spacebar')))) return;
       if (e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault(); setPlaying(!R.playing);
       } else if (e.key === 'ArrowLeft') {
@@ -3713,6 +3736,7 @@
 
     R = {
       session: session, analysis: opts.analysis || {}, samples: samples,
+      restoreFocus: document.activeElement,
       ghost: ghost, ghostState: null, ghostTrackScale: null,
       leadMode: 'me', lead: 'me', leadNow: 'me', leadWhy: '', primaryT: null, primaryCum: null,   /* §596 */
       windDir: windDir,
@@ -3812,6 +3836,7 @@
     bindEvents();
 
     setLayout('map');     // 영상 전 — 지도 모드로 시작
+    if (el('replay-close-x').focus) el('replay-close-x').focus();
 
     // 캔버스 크기·프리렌더는 레이아웃이 잡힌 다음 프레임에
     setTimeout(function () {
@@ -3831,6 +3856,7 @@
 
   function close() {
     if (!R) return;
+    var restoreFocus = R.restoreFocus;
     if (R.raf) { try { global.cancelAnimationFrame(R.raf); } catch (e) {} }
     /* 동기화 저장 flush (데이빗 2026-06-03) — 디바운스(400ms) 저장이 대기 중인데
        리플레이를 닫으면 옛 코드는 타이머만 취소해 저장이 통째로 유실됐다.
@@ -3863,6 +3889,7 @@
     document.body.style.overflow = '';
     document.body.classList.remove('rd-replay-active');   // 전역 KO/EN 토글 복원
     R = null;
+    if (restoreFocus && restoreFocus.focus && restoreFocus.isConnected !== false) restoreFocus.focus();
     try { onClose(); } catch (e) {}
   }
 
