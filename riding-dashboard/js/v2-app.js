@@ -11288,10 +11288,6 @@
       if (!CUR.session || !window.RDReplay) return;
       if (!CUR.session.hasTime) { rp.textContent = 'No time data';
         setTimeout(function () { rp.textContent = '▶ Replay'; }, 1800); return; }
-      if (window.RDReplayWorkspace && p0CurrentRider()) {
-        RDReplayWorkspace.open(p0CurrentId());
-        return;
-      }
       try {
         /* 예전 페이지가 넘기던 옵션을 전부 맞춘다. sessionSig 가 없으면
            영상 업로드·싱크 상태가 저장되지 않고, hasVideoFlag 가 없으면
