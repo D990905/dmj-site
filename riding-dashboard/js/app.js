@@ -651,6 +651,10 @@
   }
 
   function loadSample() {
+    if (window.RD_PUBLIC_NO_SAMPLE) {
+      showError('저장한 기록을 선택하거나 GPX 파일을 열어 주세요.');
+      return;
+    }
     /* §463 — 데모 세션은 훈련부하 원장에 넣지 않는다. 남의 라이딩이
        내 체력 추세가 되면 안 된다. */
     state.isDemo = true;
@@ -1803,10 +1807,12 @@
     renderDashboard();
   }
 
-  function saveEditedCopy() {
+  async function saveEditedCopy() {
+    var saveOwnerSession = state.session;
     if (!state.session || !state.analysis) return;
     var edited = !!(state.session.edited);
-    var res = Storage.saveSession({
+    var persist = Storage.saveSessionWithLock || Storage.saveSession;
+    var res = persist({
       name: state.sessionName,
       edited: edited,
       dateEpoch: state.session.startEpoch || Date.now(),
@@ -1817,6 +1823,8 @@
       sig: state.sessionSig,         // §463 자동 기록분과 중복 방지
       gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
+    if (res && typeof res.then === 'function') res = await res;
+    if (state.session !== saveOwnerSession) return;
     var st = $('save-status');
     st.hidden = false;
     if (res.ok) {
@@ -2088,16 +2096,8 @@
     resizeWindGrid();
     WG.deg = currentWindGridDeg();
     if (!WG.glintRaf) drawWindGrid(WG.deg, 0);
-    var maxKt = (state.analysis.summary.maxSpeedMs || 1) * KT;
-    var stops = '';
-    for (var i = 0; i <= 6; i++) {
-      stops += Charts.mapSpeedColor(maxKt * i / 6, maxKt) + ' ' + (i / 6 * 100) + '%' +
-        (i < 6 ? ',' : '');
-    }
-    $('map-legend').innerHTML =
-      '<span>' + i18nT('느림') + '</span><span class="map-legend__bar" style="background:' +
-      'linear-gradient(90deg,' + stops + ')"></span><span>' + i18nT('빠름') + ' (' +
-      fmtSpeed(state.analysis.summary.maxSpeedMs, 0) + ' ' + unitLabel() + ')</span>';
+    $('map-legend').innerHTML=window.RDMapV2.speedScale.legendHtml();
+    $('map-legend').setAttribute('aria-label','고정 SOG 속도 · kt (노트)');
     /* 지도가 새로 그려졌으므로(전체화면·리플레이 토글 등) 선택된
        고속 구간이 있으면 강조를 다시 적용한다. */
     if (state.selectedRun != null && state.analysis && state.analysis.runs) {
@@ -5401,10 +5401,12 @@
   });
 
   /* ---------- 세션 저장 / 저장된 세션 ---------- */
-  function saveCurrentSession() {
+  async function saveCurrentSession() {
+    var saveOwnerSession = state.session;
     /* 제목 본문(state.sessionName)과 편집본 여부(edited)를 분리해 저장한다 —
        이름에 ' · 편집본' 을 박지 않고 레코드 플래그로 둔다(헤더 배지로 표시). */
-    var res = Storage.saveSession({
+    var persist = Storage.saveSessionWithLock || Storage.saveSession;
+    var res = persist({
       name: state.sessionName,
       edited: !!(state.session && state.session.edited),
       dateEpoch: state.session.startEpoch || Date.now(),
@@ -5417,6 +5419,8 @@
       sig: state.sessionSig,         // §463 자동 기록분과 중복 방지
       gpxText: trackTextForSave()   // §434 — 융합 세션은 컴팩트 JSON, 그 외 원본 GPX
     }, state.analysis);
+    if (res && typeof res.then === 'function') res = await res;
+    if (state.session !== saveOwnerSession) return;
     var st = $('save-status');
     st.hidden = false;
     if (res.ok) {
@@ -5775,9 +5779,12 @@
     var d = e.target.closest('[data-del]');
     if (d) {
       var delId = d.getAttribute('data-del');
-      Storage.deleteSession(delId);
-      deleteSessionFromCloud(delId);          /* §415-del — cloud 에서도 삭제 */
-      renderSavedSessions();
+      Storage.mutateSessionWithLock('remove', delId, null).then(function(result) {
+        if (!result.ok) { console.warn('Local delete failed', result); return; }
+        deleteSessionFromCloud(delId);
+        renderSavedSessions();
+      }).catch(function(e){console.warn('Local delete failed', e);});
+      // Cloud deletion only follows a successful locked local commit.
       return;
     }
     /* 커리어 최고 기록 타일 → 그 세션 분석으로 이동 + 기록 구간 강조 */

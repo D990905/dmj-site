@@ -5,7 +5,7 @@
  * 그대로 재사용할 수 있도록 UI·DOM 의존성 없이 순수 로직만 담는다.
  *
  * 파이프라인:
- *   parseGPX 결과 -> normalizeSession() -> 1Hz 리샘플 + 운동학 계산
+ *   parseGPX 결과 -> normalizeSession() -> 원본 시각 보존 + 운동학 계산
  *   -> analyzeSession() 으로 모든 지표 산출
  *
  * 내부 단위: 거리 m, 시간 s, 속도 m/s, 각도 도(0~360).
@@ -62,9 +62,12 @@
     return out;
   }
   function avgSpeed(S, lo, hi) {
-    var sum = 0, n = 0;
-    for (var i = lo; i <= hi; i++) { if (S[i]) { sum += S[i].speed; n++; } }
-    return n ? sum / n : 0;
+    var sum=0,weight=0,leg={start:lo,end:hi};
+    for(var i=lo;i<=hi;i++) if(S[i] && isFinite(S[i].speed)) {
+      var support=timeSupport(S,leg,i), w=Math.max(0,support[1]-support[0]);
+      sum+=S[i].speed*w;weight+=w;
+    }
+    return weight ? sum/weight : (S[lo] && S[lo].speed || 0);
   }
 
   /* 각도 정규화 — 0~360 / 0~180(축) */
@@ -82,6 +85,10 @@
      GPS 헤딩 노이즈에 휘둘리지 않는다. 유효 구간이 아니면 null. */
   function spanVmg(S, lo, hi, goalDir) {
     if (lo == null || hi == null || lo >= hi || !S[lo] || !S[hi]) return null;
+    // gpsOutlier marks a rejected incoming segment; reject either endpoint
+    // and every intervening segment instead of projecting a raw GPS jump.
+    if (S[lo].gpsOutlier || S[hi + 1] && S[hi + 1].gpsOutlier) return null;
+    for (var q = lo + 1; q <= hi; q++) if (S[q].gpsOutlier) return null;
     var dt = S[hi].t - S[lo].t;
     if (dt <= 0) return null;
     var d = Geo.haversine(S[lo], S[hi]);
@@ -156,37 +163,81 @@
 
   /* 시간 기반 이동평균 (±halfSec) — 샘플 간격이 불규칙해도 정확.
      원본 GPS 포인트를 솎아내지 않고 그대로 두고 표시·검출용 평활만 한다. */
+  // Midpoint time support, clipped to each recorded leg. Endpoints own half
+  // their adjacent interval; no weight crosses a recording gap.
+  function timeSupport(S, leg, i) {
+    return [i > leg.start ? (S[i-1].t + S[i].t) / 2 : S[i].t,
+            i < leg.end ? (S[i].t + S[i+1].t) / 2 : S[i].t];
+  }
+  function sampleTimeWeights(session, opts) {
+    opts=opts||{};
+    if (session.analysisWeights && opts.fromSec==null && opts.toSec==null) return session.analysisWeights.slice();
+    var S = session.samples, weights = S.map(function () { return 0; });
+    var gap=opts.gapSec==null?4:opts.gapSec;
+    function linked(i,j,leg){return i>=leg.start&&j<=leg.end&&!S[i].gpsOutlier&&!S[j].gpsOutlier&&
+      typeof S[i].t==='number'&&isFinite(S[i].t)&&typeof S[j].t==='number'&&isFinite(S[j].t)&&S[j].t>S[i].t&&S[j].t-S[i].t<=gap}
+    (session.legs||[{start:0,end:S.length-1}]).forEach(function (leg) {
+      for (var i = leg.start; i <= leg.end; i++) {
+        if(S[i].gpsOutlier||typeof S[i].t!=='number'||!isFinite(S[i].t))continue;
+        var a=linked(i-1,i,leg)?(S[i-1].t+S[i].t)/2:S[i].t;
+        var b=linked(i,i+1,leg)?(S[i].t+S[i+1].t)/2:S[i].t;
+        if(opts.fromSec!=null)a=Math.max(a,opts.fromSec);
+        if(opts.toSec!=null)b=Math.min(b,opts.toSec);
+        weights[i] = Math.max(0,b-a);
+      }
+    });
+    return weights;
+  }
+  function windowStart(S, leg, lo) {
+    var a=leg.start,b=leg.end;
+    while(a<b) { var m=(a+b)>>1; if(S[m].t<lo) a=m+1; else b=m; }
+    return Math.max(leg.start,a-1);
+  }
   function smoothByTime(S, leg, srcKey, dstKey, halfSec) {
     for (var i = leg.start; i <= leg.end; i++) {
-      var sum = 0, n = 0, ti = S[i].t;
-      for (var j = i; j >= leg.start && ti - S[j].t <= halfSec; j--) {
-        if (S[j][srcKey] != null) { sum += S[j][srcKey]; n++; }
+      var sum = 0, weight = 0, lo = S[i].t - halfSec, hi = S[i].t + halfSec;
+      for (var j = windowStart(S, leg, lo); j <= leg.end; j++) {
+        var support = timeSupport(S, leg, j);
+        if (support[0] > hi) break;
+        var w = Math.max(0, Math.min(hi, support[1]) - Math.max(lo, support[0]));
+        if (w && S[j][srcKey] != null && isFinite(S[j][srcKey])) { sum += w * S[j][srcKey]; weight += w; }
       }
-      for (var j = i + 1; j <= leg.end && S[j].t - ti <= halfSec; j++) {
-        if (S[j][srcKey] != null) { sum += S[j][srcKey]; n++; }
-      }
-      S[i][dstKey] = n ? sum / n : 0;
+      S[i][dstKey] = weight ? sum / weight : (S[i][srcKey] || 0);
     }
   }
   function smoothHeadingByTime(S, leg, halfSec) {
-    var tmp = [];
     for (var i = leg.start; i <= leg.end; i++) {
-      var angs = [], ti = S[i].t;
-      for (var j = i; j >= leg.start && ti - S[j].t <= halfSec; j--) {
-        if (S[j].headingRaw != null) angs.push(S[j].headingRaw);
+      // Never manufacture a course at a position adjoining a rejected segment.
+      if (S[i].headingRaw == null) { S[i].heading = null; continue; }
+      var x = 0, y = 0, weight = 0, lo = S[i].t-halfSec, hi = S[i].t+halfSec;
+      for (var j = windowStart(S, leg, lo); j <= leg.end; j++) {
+        var support = timeSupport(S, leg, j);
+        if (support[0] > hi) break;
+        var w = Math.max(0, Math.min(hi,support[1])-Math.max(lo,support[0]));
+        if (w && S[j].headingRaw != null) { x += w*Math.cos(Geo.toRad(S[j].headingRaw)); y += w*Math.sin(Geo.toRad(S[j].headingRaw)); weight += w; }
       }
-      for (var j = i + 1; j <= leg.end && S[j].t - ti <= halfSec; j++) {
-        if (S[j].headingRaw != null) angs.push(S[j].headingRaw);
-      }
-      tmp[i] = angs.length ? Geo.circularMean(angs) : S[i].headingRaw;
+      S[i].heading = weight && Math.hypot(x,y)>1e-12 ? norm360(Math.atan2(y,x)*180/Math.PI) : null;
     }
-    for (var i = leg.start; i <= leg.end; i++) S[i].heading = tmp[i];
+  }
+  function reduceWeightedPolar(arr, binDeg) {
+    return arr.map(function (list, b) {
+      list.sort(function (a,c) { return a.speed-c.speed; });
+      var duration = 0, sum = 0;
+      list.forEach(function (p) { duration += p.weight; sum += p.speed*p.weight; });
+      function pct(q) {
+        var target = duration*q/100, acc = 0;
+        for (var k=0; k<list.length; k++) { acc+=list[k].weight; if (acc>=target) return list[k].speed; }
+        return 0;
+      }
+      return { twaCenter:(b+.5)*binDeg, count:list.length, durationSec:duration,
+        p95Ms:duration ? pct(95):0, p90Ms:duration ? pct(90):0, avgMs:duration ? sum/duration:0 };
+    });
   }
 
   /* ============================================================
    * 1) 세션 정규화 — parseGPX 결과 -> 원본 GPS 포인트 전량 트랙
    * 다운샘플링·리샘플 보간 없음. 입력 trkpt 를 100% 그대로 사용한다.
-   * (불규칙 간격이어도 모든 분석이 dt 기반이라 정확.)
+   * (시간 기반 요약과 시간가중 폴라/평활을 사용한다. 기타 지표는 별도 검증 필요.)
    * ============================================================ */
   function normalizeSession(parsed, opts) {
     var cfg = Object.assign({}, DEFAULTS, opts || {});
@@ -194,7 +245,7 @@
     var raw = [];
     parsed.tracks.forEach(function (tr) {
       tr.segments.forEach(function (seg) {
-        seg.forEach(function (p) { raw.push(p); });
+        seg.forEach(function (p) { raw.push(Object.assign({}, p, {sourceOrdinal: p.sourceOrdinal != null ? p.sourceOrdinal : raw.length})); });
       });
     });
     if (raw.length < 2) throw new Error('분석할 트랙 포인트가 부족합니다.');
@@ -224,12 +275,18 @@
       return session;
     }
 
-    /* --- 시각 정보 있음: 정렬·중복제거·leg 분리 후 1Hz 리샘플 --- */
+    /* --- 시각 정보 있음: 정렬·중복제거·leg 분리 후 원본 포인트 유지 --- */
     raw = raw.filter(function (p) { return p.time != null; })
              .sort(function (a, b) { return a.time - b.time; });
     var dedup = [];
     for (var i = 0; i < raw.length; i++) {
-      if (i > 0 && raw[i].time === raw[i - 1].time) continue;
+      if (i > 0 && Number(raw[i].time) === Number(raw[i - 1].time)) {
+        var kept=dedup[dedup.length-1],discarded=raw[i];
+        var fields=Object.keys(discarded).filter(function(k){return k!=='sourceOrdinal'&&k!=='_timestampDuplicates'&&JSON.stringify(kept[k])!==JSON.stringify(discarded[k])});
+        var original=function(p){var q=Object.assign({},p);delete q._timestampDuplicates;return JSON.parse(JSON.stringify(q))};
+        kept._timestampDuplicates=(kept._timestampDuplicates||[]).concat([{utcMs:Number(discarded.time),retained:original(kept),discarded:original(discarded),conflictingFields:fields}]);
+        continue;
+      }
       dedup.push(raw[i]);
     }
     raw = dedup;
@@ -250,6 +307,7 @@
       var legStart = session.samples.length;
       legPts.forEach(function (p) {
         var smp = {
+          sourceOrdinal: p.sourceOrdinal,
           t: (p.time - t0) / 1000, lat: p.lat, lng: p.lng, ele: p.ele,
           speedDevice: (p.speed != null ? p.speed : null),
           speed: 0, heading: null, cumDist: 0, segDist: 0,
@@ -261,6 +319,14 @@
            .vkx 파서가 채워 주면 바이올린 차트에 자동 반영된다. */
         if (p.heel != null) smp.heel = p.heel;
         if (p.pitch != null) smp.pitch = p.pitch;
+        /* Preserve parser-measured channels verbatim. heading below remains GPS COG,
+           never substitute a measured board/compass direction into course analysis. */
+        ['gforceX','gforceY','gforceZ','gyroX','gyroY','gyroZ','leanAngle',
+         'headingDevice','headingDeviceSource','headingDeviceUnit'].forEach(function (key) {
+          if (p[key] != null) smp[key] = p[key];
+        });
+        if (p._timestampDuplicates) smp._timestampDuplicates = JSON.parse(JSON.stringify(p._timestampDuplicates));
+        smp.headingSource = 'gps-cog';
         session.samples.push(smp);
       });
       session.legs.push({ start: legStart, end: session.samples.length - 1 });
@@ -375,7 +441,8 @@
 
       // 헤딩 (다음 점 방향) + 원형 평활
       for (var i = leg.start; i <= leg.end; i++) {
-        if (i < leg.end) S[i].headingRaw = Geo.bearing(S[i], S[i + 1]);
+        if (S[i].gpsOutlier || (i < leg.end && S[i + 1].gpsOutlier)) S[i].headingRaw = null;
+        else if (i < leg.end) S[i].headingRaw = Geo.bearing(S[i], S[i + 1]);
         else S[i].headingRaw = (i > leg.start) ? S[i - 1].headingRaw : 0;
       }
       smoothHeadingByTime(S, leg, cfg.headingSmoothSec);
@@ -399,6 +466,7 @@
     var S = session.samples;
     var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
     for (var i = 0; i < S.length; i++) {
+      if (S[i].gpsOutlier) continue;
       if (S[i].lat < minLat) minLat = S[i].lat;
       if (S[i].lat > maxLat) maxLat = S[i].lat;
       if (S[i].lng < minLng) minLng = S[i].lng;
@@ -455,7 +523,9 @@
        코치 지표로 부적합 → 2초 평균 peak 으로 정의. 이렇게 하면
        최고(2s) ≥ 10s ≥ 100m ≥ 250m ≥ 500m ≥ 1NM 단조 일관이 보장된다. */
     var pk2 = peakForWindow(session, 2);
-    res.maxSpeedMs = pk2.speedMs > 0 ? pk2.speedMs : instMax;
+    res.maxSpeedMs = pk2.speedMs;
+    res.maxSpeedAvailable = pk2.available;
+    res.maxSpeedCoverageSec = pk2.coverageSec;
     res.maxSpeedIdx = pk2.startIdx;
     res.instantMaxSpeedMs = instMax;   // 참고용 — 노이즈 포함 순간 최고
     res.avgSpeedMovingMs = movingTime > 0 ? movingDist / movingTime : 0;
@@ -498,27 +568,38 @@
      단일 GPS 포인트 순간속도는 노이즈가 커, 짧은 구간이라도 거리÷시간으로
      평균낸 값을 쓴다. win 이 작을수록 값이 크다(단조). */
   function peakForWindow(session, win) {
-    var S = session.samples;
-    var best = 0, bestIdx = -1;
+    var S = session.samples, best = null, maxCoverage = 0;
+    /* Same conservative 4s interpolation limit as replay. A leg alone is not
+       evidence of uninterrupted measurement; reject invalid GPS and gaps. */
     session.legs.forEach(function (leg) {
       for (var i = leg.start; i <= leg.end; i++) {
-        var targetT = S[i].t + win;
-        var j = i;
-        while (j < leg.end && S[j].t < targetT) j++;
-        var dt = S[j].t - S[i].t;
-        if (dt <= 0) continue;
-        var spd = (S[j].cumDist - S[i].cumDist) / dt;
-        if (spd > best) { best = spd; bestIdx = i; }
+        if (S[i].gpsOutlier || !isFinite(S[i].cumDist)) continue;
+        var targetT = S[i].t + win, j = i, valid = true;
+        while (j < leg.end && S[j].t < targetT) {
+          var next = S[j + 1], dt = next.t - S[j].t;
+          if (!(dt > 0) || dt > 4 || next.gpsOutlier || !isFinite(next.cumDist)) { valid = false; break; }
+          j++;
+        }
+        maxCoverage = Math.max(maxCoverage, Math.min(win, S[j].t - S[i].t));
+        if (!valid || S[j].t < targetT || j === i) continue;
+        var prev = S[j - 1], f = (targetT - prev.t) / (S[j].t - prev.t);
+        var endDist = prev.cumDist + f * (S[j].cumDist - prev.cumDist);
+        var speed = (endDist - S[i].cumDist) / win;
+        if (speed >= 0 && (!best || speed > best.speedMs)) best = {
+          speedMs: speed, startIdx: i, endIdx: j, startSec: S[i].t,
+          endSec: targetT, coverageSec: win, available: true
+        };
       }
     });
-    return { speedMs: best, startIdx: bestIdx };
+    return best || { speedMs: null, startIdx: -1, endIdx: -1, startSec: null,
+      endSec: null, coverageSec: maxCoverage, available: false,
+      reason: 'insufficient-continuous-coverage' };
   }
 
   function computePeakSpeeds(session) {
     if (!session.hasTime) return [];
     return session.cfg.peakWindowsSec.map(function (win) {
-      var r = peakForWindow(session, win);
-      return { windowSec: win, speedMs: r.speedMs, startIdx: r.startIdx };
+      var r = peakForWindow(session, win); r.windowSec = win; return r;
     });
   }
 
@@ -659,17 +740,9 @@
         } else rate[i] = 0;
       }
       // 시간 기반 평활 (±turnRateSmoothSec)
-      var rs = [];
-      for (var i = leg.start; i <= leg.end; i++) {
-        var sum = 0, cnt = 0, ti = S[i].t;
-        for (var j = i; j >= leg.start && ti - S[j].t <= cfg.turnRateSmoothSec; j--) {
-          sum += rate[j]; cnt++;
-        }
-        for (var j = i + 1; j <= leg.end && S[j].t - ti <= cfg.turnRateSmoothSec; j++) {
-          sum += rate[j]; cnt++;
-        }
-        rs[i] = cnt ? sum / cnt : 0;
-      }
+      var rates = S.map(function (p,k) { return {t:p.t, raw:rate[k]}; });
+      smoothByTime(rates, leg, 'raw', 'smoothed', cfg.turnRateSmoothSec);
+      var rs = rates.map(function (p) { return p.smoothed; });
 
       // 1차: |회전율| 이 임계 이상인 연속 구간(region)을 모두 수집
       var thr = cfg.turnRateThresholdDegSec;
@@ -1000,6 +1073,7 @@
   function computeWindMetrics(session, windDir, windSpeedKt) {
     if (!session.hasTime || windDir == null) return null;
     var S = session.samples;
+    S.forEach(function(p) { p.twa = null; p.vmg = null; });
     var wd = ((windDir % 360) + 360) % 360;
     /* AWA(겉보기 풍각) 계산 가능 여부 — 풍속이 있어야 한다 */
     var hasTws = windSpeedKt != null && isFinite(windSpeedKt) && windSpeedKt > 0;
@@ -1317,7 +1391,7 @@
   function computePolar(session, windDir, binDeg) {
     if (!session.hasTime || windDir == null) return null;
     binDeg = binDeg || session.cfg.polarBinDeg;
-    var S = session.samples;
+    var S = session.samples, weights = sampleTimeWeights(session);
     var wd = ((windDir % 360) + 360) % 360;
     var nBins = Math.ceil(180 / binDeg);
     var port = [], stbd = [], all = [];
@@ -1326,35 +1400,21 @@
     session.legs.forEach(function (leg) {
       for (var i = leg.start; i <= leg.end; i++) {
         var sp = S[i].speed;
-        if (sp < 1.0 || S[i].heading == null) continue;
+        if (sp < 1.0 || S[i].heading == null || !weights[i]) continue;
         var signed = Geo.angleDiff(wd, S[i].heading); // -180..180
         var twa = Math.abs(signed);
         var b = Math.min(nBins - 1, Math.floor(twa / binDeg));
         /* §421 — 표준 convention 정정: angleDiff>=0 → Port (computeWindMetrics·
            maneuverSide 와 동일 부호 규약). 옛 규약(>=0→stbd)에서 swap.
            검증: selftest-421-vmg-parity.js. DO_NOT_REVERT §421. */
-        (signed >= 0 ? port : stbd)[b].push(sp);
+        (signed >= 0 ? port : stbd)[b].push({speed:sp,weight:weights[i]});
         /* combined — 택을 합산한 빈. 타깃 폴라(개인 베스트)는 택을
            가리지 않는 '능력 한계'이므로 포트·스타보드를 함께 모은다. */
-        all[b].push(sp);
+        all[b].push({speed:sp,weight:weights[i]});
       }
     });
-    function reduce(arr) {
-      return arr.map(function (list, b) {
-        list.sort(function (a, c) { return a - c; });
-        var sum = 0;
-        for (var k = 0; k < list.length; k++) sum += list[k];
-        return {
-          twaCenter: (b + 0.5) * binDeg,
-          count: list.length,
-          p95Ms: list.length ? Geo.percentile(list, 95) : 0,
-          p90Ms: list.length ? Geo.percentile(list, 90) : 0,
-          avgMs: list.length ? sum / list.length : 0
-        };
-      });
-    }
     return { binDeg: binDeg, windDir: wd,
-             port: reduce(port), starboard: reduce(stbd), combined: reduce(all) };
+             port: reduceWeightedPolar(port, binDeg), starboard: reduceWeightedPolar(stbd, binDeg), combined: reduceWeightedPolar(all, binDeg) };
   }
 
   /* ============================================================
@@ -2646,18 +2706,19 @@
     var crop = {
       cfg: session.cfg, hasTime: true, speedSource: session.speedSource,
       trackName: session.trackName, samples: [], legs: [],
-      startEpoch: (session.startEpoch || 0) + Math.round(t0) * 1000,
+      startEpoch: session.startEpoch == null ? null : session.startEpoch + t0 * 1000,
       cropped: { fromSec: fromSec, toSec: toSec, durationSec: toSec - fromSec }
     };
     for (var i = iStart; i <= iEnd; i++) {
       var s = S[i];
-      crop.samples.push({
+      crop.samples.push(Object.assign({}, s, {
         t: s.t - t0, lat: s.lat, lng: s.lng, ele: s.ele,
         speed: s.speed, heading: s.heading, hr: (s.hr != null ? s.hr : null),
         cumDist: s.cumDist - d0, segDist: (i === iStart) ? 0 : s.segDist,
+        _timestampDuplicates: s._timestampDuplicates ? JSON.parse(JSON.stringify(s._timestampDuplicates)) : undefined,
         speedDevice: s.speedDevice, speedRaw: s.speedRaw,
-        speedDerived: s.speedDerived, headingRaw: s.headingRaw
-      });
+        speedDerived: s.speedDerived, headingRaw: s.headingRaw, gpsOutlier: !!s.gpsOutlier
+      }));
     }
     session.legs.forEach(function (leg) {
       var a = Math.max(leg.start, iStart), b = Math.min(leg.end, iEnd);
@@ -2667,6 +2728,7 @@
 
     var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
     crop.samples.forEach(function (s) {
+      if (s.gpsOutlier) return;
       if (s.lat < minLat) minLat = s.lat;
       if (s.lat > maxLat) maxLat = s.lat;
       if (s.lng < minLng) minLng = s.lng;
@@ -2715,7 +2777,7 @@
     var ed = {
       cfg: session.cfg, hasTime: true, speedSource: session.speedSource,
       trackName: session.trackName, samples: [], legs: [],
-      startEpoch: (session.startEpoch || 0) + Math.round(t0) * 1000,
+      startEpoch: session.startEpoch == null ? null : session.startEpoch + t0 * 1000,
       edited: hasEdit,
       editApplied: { trimStart: trimStart, trimEnd: trimEnd, excludeRanges: excludes.slice() }
     };
@@ -2736,7 +2798,7 @@
       }
       var segDist = (k > 0 && contiguous) ? (s.segDist || 0) : 0;
       cum += segDist;
-      var es = {
+      var es = Object.assign({}, s, {
         t: s.t - t0,
         /* §493 — 편집본은 시각을 0 부터 다시 매긴다. 그러면 화면에서
            고른 구간을 **원본 어디인지** 되돌릴 방법이 없어진다.
@@ -2748,9 +2810,10 @@
         lat: s.lat, lng: s.lng, ele: s.ele,
         speed: s.speed, heading: s.heading, hr: (s.hr != null ? s.hr : null),
         cumDist: cum, segDist: segDist,
+        _timestampDuplicates: s._timestampDuplicates ? JSON.parse(JSON.stringify(s._timestampDuplicates)) : undefined,
         speedDevice: s.speedDevice, speedRaw: s.speedRaw,
-        speedDerived: s.speedDerived, headingRaw: s.headingRaw
-      };
+        speedDerived: s.speedDerived, headingRaw: s.headingRaw, gpsOutlier: !!s.gpsOutlier
+      });
       /* 자세(heel·pitch) 데이터 보존 — .vkx 세션이 트림·구간제외로
          편집되어도 원본 자세값을 그대로 옮긴다. 값이 있을 때만 키를
          부여해 'heel 키 없음 = 자세 데이터 없음' 규약을 지킨다.
@@ -2764,6 +2827,7 @@
 
     var minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity;
     ed.samples.forEach(function (s) {
+      if (s.gpsOutlier) return;
       if (s.lat < minLat) minLat = s.lat;
       if (s.lat > maxLat) maxLat = s.lat;
       if (s.lng < minLng) minLng = s.lng;
@@ -3827,6 +3891,8 @@
   var Analysis = {
     DEFAULTS: DEFAULTS,
     normalizeSession: normalizeSession,
+    sampleTimeWeights: sampleTimeWeights,
+    reduceWeightedPolar: reduceWeightedPolar,
     computeSummary: computeSummary,
     computeHistogram: computeHistogram,
     computePeakSpeeds: computePeakSpeeds,

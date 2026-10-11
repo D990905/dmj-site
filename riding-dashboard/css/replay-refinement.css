@@ -72,3 +72,39 @@
  .replay .replay__mapbtn{font-size:10px;padding:5px 6px}
  .replay .replay__scrubrow{padding:10px;gap:6px}
 }
+
+/* 2026-09-27: additive review navigation and video telemetry. */
+.replay [hidden]{display:none!important}
+.replay__review-status,.replay__review-nav,.replay__overlay-tools{position:relative;z-index:19;display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:7px 16px;background:#182126;color:var(--rp-text);font-size:12px;border-bottom:1px solid var(--rp-line)}
+.replay__review-btn,.replay__review-nav select{background:#283337;color:var(--rp-text);border:1px solid #596568;border-radius:7px;min-height:36px;padding:5px 9px;font:inherit}
+.replay__review-btn[aria-pressed="true"]{border-color:var(--rp-accent);color:var(--rp-accent)}
+#replay-event{max-width:300px}#replay-event-range,#replay-wind-status{color:#bdc7c9}#replay-data-status{color:#ffd18a}
+.replay :is(select,button,input):focus-visible{outline:2px solid var(--rp-accent);outline-offset:2px}
+@media(max-width:768px){.replay__review-status,.replay__review-nav{padding:5px 10px;gap:5px 8px}.replay__review-nav label{display:none}#replay-event{max-width:180px;min-width:0}#replay-event-range{font-size:11px}.replay__review-btn{min-height:36px}.replay__review-status{font-size:11px}}
+/* Video-local telemetry follows the panel in map, video and split layouts. */
+.replay__overlay-tools { position:relative; z-index:19; display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:7px 18px; background:#152236; font-size:13px; }
+.replay__overlay-tools select { color:#eef5ff; background:#1c2a3d; border:1px solid #52637b; border-radius:6px; min-height:36px; font:inherit; padding:5px; }
+.replay__overlay-tools span { color:#bdc9d8; }
+.replay__vpanel { position:relative; container-type:inline-size; }
+.replay-hud { position:absolute; z-index:8; left:3%; bottom:4%; max-width:94%; padding:10px 14px; border:1px solid #ffffff50; border-radius:9px; background:rgba(6,14,25,.84); color:white; pointer-events:none; font-variant-numeric:tabular-nums; box-shadow:0 2px 12px #0005; }
+.replay-hud[data-position="bottom-right"] { left:auto; right:3%; }
+.replay-hud[data-position="top-left"] { bottom:auto; top:4%; }
+.replay-hud[data-position="top-right"] { bottom:auto; top:4%; left:auto; right:3%; }
+.replay-hud__time,.replay-hud__note { font-size:12px; color:#d8e7f8; }
+.replay-hud__metrics { display:flex; flex-wrap:wrap; gap:8px 20px; margin:6px 0; }
+.replay-hud__metrics span { display:block; font-size:12px; color:#d8e7f8; }
+.replay-hud__metrics b { display:block; font-size:clamp(18px,4cqw,32px); font-weight:700; line-height:1.25; }
+.replay-hud__metrics small { font-size:12px; font-weight:500; margin-left:4px; }
+.replay__vpanel--vout .replay-hud { display:none; }
+@container (max-width:400px) { .replay-hud { padding:6px 8px; } .replay-hud__metrics { gap:5px 12px; } .replay-hud__note { font-size:10px; } }
+/* Put the selected primary view first on small screens. */
+@media (max-width:768px) {
+  .replay--video .replay__cstage,.replay--both .replay__cstage { order:0; flex:0 0 auto; min-height:300px; }
+  .replay--video .replay__cstage > .replay__vpanel { min-height:300px; height:300px; }
+  .replay--both .replay__cstage > .replay__vpanel { min-height:260px; }
+  .replay__overlay-tools { padding:6px 10px; }
+  .replay__overlay-tools span { display:none; }
+}
+.replay--video.replay--hud-visible .replay__rider { display:none; }
+/* Prevent focus-induced scrolling from clipping the fixed replay header. */
+.replay{overflow:clip}

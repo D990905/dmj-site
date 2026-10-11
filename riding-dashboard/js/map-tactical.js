@@ -52,6 +52,7 @@
     catch (e) {}
   }
   function addTiles(map) {
+    if (global.RD_MAP_TILES_APPROVED !== true) return global.L.layerGroup().addTo(map);
     var t = TILES[tileKey()] || TILES.map;
     return global.L.tileLayer(t.url, t.opts).addTo(map);
   }
@@ -229,7 +230,7 @@
     var step = Math.max(1, Math.floor(pts.length / 3000));
     var line = [];
     for (var i = 0; i < pts.length; i += step) line.push([pts[i].lat, pts[i].lng]);
-    global.L.polyline(line, { color: '#8b98a5', weight: 1.5, opacity: 0.45 }).addTo(map);
+    if(global.RDMapV2) global.RDMapV2.addSpeedTrack(map,session);
 
     var maxLoss = 0, scored = 0, unscored = 0;
     mans.forEach(function (m, k) {
@@ -306,29 +307,14 @@
     var map = global.L.map(host, { zoomControl: true });
     addTiles(map);
 
-    /* 색·굵기가 바뀔 때만 선을 끊는다 — 점마다 그리면 레이어가 수천 개다. */
-    var step = Math.max(1, Math.floor(pts.length / 3000));
-    var seg = [], curC = null, curW = null, drawn = 0;
-    function flush() {
-      if (seg.length > 1 && curC) {
-        global.L.polyline(seg, { color: curC, weight: curW, opacity: 0.85 }).addTo(map);
-        drawn++;
-      }
-      seg = [];
+    /* Track strokes always encode fixed SOG. Tactical colour is a separate point layer. */
+    var drawn=global.RDMapV2?global.RDMapV2.addSpeedTrack(map,session):0;
+    var step=Math.max(1,Math.ceil(pts.length/80));
+    for(var i=0;i<pts.length;i+=step){
+      var c=res.series[i],p=pts[i];if(!c||p.gpsOutlier||p._excluded)continue;
+      var col=mode==='tack'?tackColor(c.side):shiftColor(c.deltaSmooth,opts.shiftSpanDeg||10);
+      global.L.circleMarker([p.lat,p.lng],{radius:widthFor(c.pressureSmooth)+1,color:col,fillColor:col,fillOpacity:.7,weight:1}).bindTooltip('GPS 추정 '+c.side+' · 변화 '+c.deltaSmooth.toFixed(1)+'° · SOG '+(p.speed*1.94384).toFixed(1)+' kt').addTo(map);
     }
-    for (var i = 0; i < pts.length; i += step) {
-      var c = res.series[i];
-      if (!c) { flush(); curC = null; continue; }
-      var col = mode === 'tack' ? tackColor(c.side)
-                                : shiftColor(c.deltaSmooth, opts.shiftSpanDeg || 10);
-      var w = Math.round(widthFor(c.pressureSmooth) * 2) / 2;
-      if (col !== curC || w !== curW) {
-        if (seg.length) { seg.push([pts[i].lat, pts[i].lng]); flush(); }
-        curC = col; curW = w;
-      }
-      seg.push([pts[i].lat, pts[i].lng]);
-    }
-    flush();
 
     var la = pts.map(function (p) { return p.lat; }), ln = pts.map(function (p) { return p.lng; });
     var bounds = [[Math.min.apply(null, la), Math.min.apply(null, ln)],
@@ -352,7 +338,7 @@
               widthFor: widthFor, tackBaselines: tackBaselines, classify: classify,
               classifySeries: classifySeries, summarize: summarize,
               signedTwa: signedTwa, bucketOf: bucketOf,
-              tileKey: tileKey, setTileKey: setTileKey };
+              addTiles: addTiles, tileKey: tileKey, setTileKey: setTileKey };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else global.RDMapTactical = API;
 })(typeof window !== 'undefined' ? window : globalThis);

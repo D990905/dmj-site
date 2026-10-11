@@ -38,13 +38,14 @@ jobs:
       - name: Stage public assets without internal control data
         run: |
           mkdir -p _site
-          rsync -a --exclude='/.git/' --exclude='/.github/' --exclude='/.agents/' --exclude='/.codex/' --exclude='/_site/' --exclude='/_experts/' --exclude='/_team/' --exclude='/orchestrator/' --exclude='/admin/dashboard/' --exclude='dashboard-state.json' --exclude='dashboard-messages.json' --exclude='/admin/team-live.html' --exclude='/admin/work-status.json' ./ _site/
+          rsync -a --exclude='.*' --exclude='_*' --exclude='_experts/' --exclude='_team/' --exclude='orchestrator/' --exclude='docs/' --exclude='supabase/' --exclude='sample/' --exclude='samples/' --exclude='fixture/' --exclude='fixtures/' --exclude='test/' --exclude='tests/' --exclude='selftest-*' --exclude='*.gpx*' --exclude='*.GPX*' --exclude='*.csv' --exclude='*.CSV' --exclude='*.md' --exclude='*.MD' --exclude='*.map' --exclude='*.log' --exclude='*.py' --exclude='*.pyc' --exclude='*.sql' --exclude='*.yml' --exclude='*.yaml' --exclude='*.bak*' --exclude='*.command' --exclude='*.plist' --exclude='*.example' --exclude='/admin/dashboard/' --exclude='dashboard-state.json' --exclude='dashboard-messages.json' --exclude='team-live.html' --exclude='work-status.json' ./ _site/
           mkdir -p _site/admin/dashboard
           cp admin/dashboard/index.html admin/dashboard/sw.js _site/admin/dashboard/
           test ! -e _site/admin/dashboard/dashboard-state.json
           test ! -e _site/admin/team-live.html
           test ! -e _site/_team
-          test -z "$(find _site -type f \( -name 'dashboard-state.json' -o -name 'dashboard-messages.json' \) -print -quit)"
+          test -z "$(find _site -type f \( -iname '*.gpx*' -o -iname '*.csv' -o -iname '*.md' -o -iname '*.map' -o -name 'selftest-*' -o -name 'dashboard-state.json' -o -name 'dashboard-messages.json' -o -name 'work-status.json' -o -name 'team-live.html' \) -print -quit)"
+          test -z "$(find _site -type d \( -name '_team' -o -name '_experts' -o -name 'orchestrator' -o -name 'sample' -o -name 'samples' -o -name 'fixture' -o -name 'fixtures' \) -print -quit)"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

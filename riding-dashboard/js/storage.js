@@ -248,7 +248,11 @@
   }
   function loadTrack(id) {
     try {
-      var t = global.localStorage ? global.localStorage.getItem(trackKey(id)) : null;
+      var rec = readAll().filter(function (r) { return r.id === id; })[0];
+      var key = rec && rec.trackRef && rec.trackRef.indexOf(trackKey(id) + ':rev:') === 0 ? rec.trackRef : trackKey(id);
+      var t = global.localStorage ? global.localStorage.getItem(key) : null;
+      // A record imported from another store may reference its private revision key.
+      if (!t && key !== trackKey(id)) t = global.localStorage.getItem(trackKey(id));
       return (typeof t === 'string' && t) ? t : null;
     } catch (e) { return null; }
   }
@@ -274,7 +278,20 @@
    * ============================================================ */
   var TRACK_MAGIC = 'RDTRK1';
 
-  function encodeTrack(samples) {
+  // Version 2 is an explicit lossless path for raw telemetry. Legacy v1
+  // remains readable; existing records are never rewritten automatically.
+  function encodeTrack(samples, opts) {
+    if (opts && opts.preserveRaw) {
+      if (!samples || samples.length < 2) return null;
+      var rows = samples.map(function (p) {
+        var q = Object.assign({}, p);
+        q.t = p.__abs != null ? p.__abs : p.t;
+        delete q.__abs;delete q.__hasTime;
+        return q;
+      });
+      if (rows.some(function (p) { return !isFinite(p.t) || !isFinite(p.lat) || !isFinite(p.lng); })) return null;
+      return 'RDTRK2|' + JSON.stringify({hasTime:opts.hasTime!==false&&samples[0].__hasTime!==false,speedSource:opts.speedSource || 'derived',samples:rows});
+    }
     if (!samples || !samples.length) return null;
     var pts = [];
     for (var i = 0; i < samples.length; i++) {
@@ -301,6 +318,17 @@
 
   /* 돌려주는 것 = [{lat, lng, t}] (t 는 epoch 초). 형식이 아니면 null. */
   function decodeTrack(text) {
+    if (typeof text === 'string' && text.indexOf('RDTRK2|') === 0) {
+      try {
+        var raw = JSON.parse(text.slice(7)), rows = raw.samples;
+        if (!Array.isArray(rows) || rows.length < 2 || rows.some(function(p) {
+          return !p || typeof p.t !== 'number' || !isFinite(p.t) || typeof p.lat !== 'number' || !isFinite(p.lat) || typeof p.lng !== 'number' || !isFinite(p.lng);
+        })) return null;
+        rows.hasTime=raw.hasTime!==false;
+        rows.speedSource = raw.speedSource === 'device' ? 'device' : 'derived';
+        return rows;
+      } catch (e) { return null; }
+    }
     if (typeof text !== 'string' || text.slice(0, TRACK_MAGIC.length) !== TRACK_MAGIC) {
       return null;
     }
@@ -324,7 +352,7 @@
 
   function isCompactTrack(text) {
     return typeof text === 'string'
-        && text.slice(0, TRACK_MAGIC.length) === TRACK_MAGIC;
+        && (text.slice(0, TRACK_MAGIC.length) === TRACK_MAGIC || text.indexOf('RDTRK2|') === 0);
   }
 
   /* GPX 트랙을 저장 전 가볍게 압축한다 — 태그 사이의 들여쓰기·줄바꿈
@@ -554,6 +582,7 @@
   function saveSession(meta, analysis) {
     var rec = buildRecord(meta, analysis);
     var arr = readAll();
+    var commitKey = K_SESSIONS(), beforeList = global.localStorage.getItem(commitKey);
 
     /* §537 (옥대표 "왜 지난세션 데이터들을 볼 수 없다고 하지?")
        — 트랙이 용량 부족으로 밀려난 세션들이다(storeTrackWithEviction).
@@ -580,7 +609,8 @@
         if (arr[ri2].id === meta.replaceId) { replacedIdx = ri2; break; }
       }
     }
-    if (replacedIdx < 0 && rec.sig) {
+    if (meta.replaceId && replacedIdx < 0) return {ok:false,error:"The opened session no longer exists; no other record was changed."};
+    if (replacedIdx < 0 && rec.sig && !meta.preserveRaw) {
       for (var si = 0; si < arr.length; si++) {
         if (arr[si].sig && arr[si].sig === rec.sig) { replacedIdx = si; break; }
       }
@@ -606,7 +636,7 @@
        잇고, 나머지는 그대로 남아 사용자가 지울 수 있다(§543).
        ⚠ 들어오는 기록에 sig 가 **있을 때만** 이 길을 탄다. sig 없는 저장까지
        합치면 근거 없이 두 세션을 묶게 된다(§537 테스트가 잡았다). */
-    if (replacedIdx < 0 && rec.sig && rec.dateEpoch) {
+    if (replacedIdx < 0 && rec.sig && rec.dateEpoch && !meta.preserveRaw) {
       var dayOf = function (ep) {
         var d = new Date(ep);
         return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
@@ -631,6 +661,9 @@
     }
     if (replacedIdx >= 0) {
       var prev = arr[replacedIdx];
+      if (meta.expectedRevision != null && Number(meta.expectedRevision) !== Number(prev.revision || 0))
+        return {ok:false,error:'다른 창에서 이 기록을 저장했습니다. 최신 기록을 다시 연 뒤 변경해 주세요.'};
+      rec.revision = Number(prev.revision || 0) + 1;
       rec.id = prev.id;                     /* 트랙 키·문답 답변이 id 에 묶인다 */
       if (prev.gear && !rec.gear) rec.gear = prev.gear;   /* 붙여 둔 장비 보존 */
       /* §594 — 게스트 세션을 다시 저장해도 게스트로 남는다 */
@@ -640,6 +673,7 @@
       if (!prev.sig && prev.name && prev.name !== rec.name) rec.name = prev.name;
       arr[replacedIdx] = rec;
     } else {
+      rec.revision = 1;
       arr.push(rec);
     }
     arr.sort(function (a, b) { return a.dateEpoch - b.dateEpoch; });
@@ -653,20 +687,73 @@
        샘플이 있으면 그걸 쓰고, 없으면 예전처럼 GPX 를 담는다. */
     var payload = null;
     if (meta.samples && meta.samples.length) {
-      payload = encodeTrack(meta.samples);
+      payload = encodeTrack(meta.samples, {preserveRaw:!!meta.preserveRaw, speedSource:meta.speedSource,hasTime:meta.hasTime!==false});
     }
+    if (meta.preserveRaw && !payload) return {ok:false,error:'Raw telemetry could not be encoded; no lossy fallback was used.'};
     if (!payload && typeof meta.gpxText === 'string') {
       payload = compactGpx(meta.gpxText);
     }
     if (payload && payload.length > MAX_TRACK_CHARS) {
       return {ok:false,error:"기록 용량이 너무 커 저장하지 못했습니다. 기존 기록은 유지됩니다. 원본 파일을 보관해 주세요."};
     }
-    if (payload) {
-      rec.hasTrack = storeTrackWithEviction(rec.id, payload, arr);
-      if (!rec.hasTrack) return {ok:false,error:"저장 공간이 부족합니다. 기존 기록은 삭제하지 않았습니다. 원본 파일을 보관하고 공간을 확보한 뒤 다시 저장해 주세요."};
+    // Stage under a new immutable key. The single list write is the commit point;
+    // no existing track is overwritten before or after a failed commit.
+    var stagedKey = null;
+    if (replacedIdx >= 0 && !payload) rec.trackRef = prev.trackRef;
+    try {
+      if (payload) {
+        stagedKey = trackKey(rec.id) + ':rev:' + Date.now() + '-' + Math.random().toString(36).slice(2);
+        global.localStorage.setItem(stagedKey, payload);
+        rec.trackRef = stagedKey; rec.hasTrack = true;
+      }
+      if (K_SESSIONS() !== commitKey || global.localStorage.getItem(commitKey) !== beforeList)
+        throw new Error('concurrent-change');
+      global.localStorage.setItem(commitKey, JSON.stringify(arr));
+      return {ok:true,record:rec};
+    } catch (e) {
+      if (stagedKey) { try { global.localStorage.removeItem(stagedKey); } catch (_) {} }
+      return {ok:false,error:e.message === 'concurrent-change' ?
+        '다른 창에서 기록이 변경되었습니다. 목록을 새로 확인한 뒤 저장해 주세요.' :
+        '저장하지 못했습니다. 기존 기록은 유지됩니다. 원본 파일을 보관해 주세요.'};
     }
-    var w = writeAll(arr);
-    return w.ok ? { ok: true, record: rec } : w;
+  }
+
+  // The V2 UI uses an exclusive origin/namespace lock across cooperating tabs.
+  // Refuse this path if locks are unavailable rather than silently dropping safety.
+  function withSessionLock(work) {
+    var owner = nsPrefix();
+    if (!global.navigator || !global.navigator.locks || !global.navigator.locks.request)
+      return Promise.resolve({ok:false,error:'이 브라우저는 안전한 다중 창 저장을 지원하지 않습니다. 최신 브라우저에서 원본 파일을 다시 열어 주세요.'});
+    return global.navigator.locks.request('dmj-session-save:' + owner, function () {
+      if (nsPrefix() !== owner) return {ok:false,error:'저장 중 계정이 변경되었습니다. 다시 확인해 주세요.'};
+      return work();
+    });
+  }
+  function saveSessionWithLock(meta, analysis) {
+    return withSessionLock(function () { return saveSession(meta, analysis); });
+  }
+  function mutateSessionWithLock(kind, id, value, expectedRevision) {
+    return withSessionLock(function () {
+      var rec = readAll().filter(function(r) {return r.id === id;})[0];
+      if (!rec) return {ok:false,error:'not found'};
+      if (expectedRevision != null && Number(rec.revision || 0) !== Number(expectedRevision))
+        return {ok:false,error:'다른 창에서 이 기록을 변경했습니다. 최신 기록을 다시 열어 주세요.'};
+      var operations = {inputs:setSessionInputs,gear:setSessionGear,guest:setSessionGuest,remove:deleteSession};
+      if (kind === 'remove') {
+        var key = nsPrefix() + 'cloud_deleted_v1', before = global.localStorage.getItem(key);
+        var tomb = before ? JSON.parse(before) : {};
+        tomb[id] = Date.now();
+        try { global.localStorage.setItem(key, JSON.stringify(tomb)); }
+        catch (e) { return {ok:false,error:'삭제 표지를 저장하지 못했습니다. 기존 기록은 유지됩니다.'}; }
+        var result = deleteSession(id);
+        if (!result.ok) {
+          if (before == null) global.localStorage.removeItem(key);
+          else global.localStorage.setItem(key,before);
+        }
+        return result;
+      }
+      return operations[kind] ? operations[kind](id,value) : {ok:false,error:'unknown mutation'};
+    });
   }
 
   /* §548 (옥대표 "여기도 입력하고 나면 그 세션에 해당 정보를 저장하는 저장
@@ -679,6 +766,7 @@
     for (var i = 0; i < arr.length; i++) {
       if (arr[i].id !== id) continue;
       found = true;
+      arr[i].revision = Number(arr[i].revision || 0) + 1;
       if (patch.rider) arr[i].rider = patch.rider;
       if (patch.windSpeedKt != null) arr[i].windSpeedKt = patch.windSpeedKt;
       if (patch.windDir != null) arr[i].windDir = patch.windDir;
@@ -701,6 +789,7 @@
     for (var i = 0; i < arr.length; i++) {
       if (arr[i].id !== id) continue;
       found = true;
+      arr[i].revision = Number(arr[i].revision || 0) + 1;
       if (gear == null) { arr[i].gear = null; break; }
       var g = {};
       Object.keys(gear).forEach(function (k) { g[k] = gear[k]; });
@@ -740,6 +829,7 @@
       if (name == null || name === false) delete arr[i].guest;
       else arr[i].guest = { name: String(name).slice(0, 60) || 'Guest', since: Date.now() };
       found = true;
+      arr[i].revision = Number(arr[i].revision || 0) + 1;
       break;
     }
     if (!found) return { ok: false, error: 'not_found' };
@@ -756,9 +846,11 @@
     for (var i = 0; i < all.length; i++) {
       if (all[i].id === id) { target = all[i]; break; }
     }
-    removeTrack(id);
     var arr = all.filter(function (r) { return r.id !== id; });
     var res = writeAll(arr);
+    if (!res.ok) return res;
+    removeTrack(id);
+    if (target && target.trackRef) { try { global.localStorage.removeItem(target.trackRef); } catch (_) {} }
     var sig = target && target.sig;
     if (sig) {
       var stillUsed = false;
@@ -982,9 +1074,11 @@
         try {
           var tx = db.transaction(VIDEO_DB_STORE, mode);
           var store = tx.objectStore(VIDEO_DB_STORE);
+          var result;
+          tx.oncomplete=function(){resolve(result)};
           tx.onerror = function () { reject(tx.error || new Error('IndexedDB tx failed')); };
           tx.onabort = function () { reject(tx.error || new Error('IndexedDB tx aborted')); };
-          fn(store, resolve, reject);
+          fn(store, function(value){result=value}, reject);
         } catch (e) { reject(e); }
       });
     });
@@ -2156,6 +2250,9 @@ function suggestLandWorkout(gap, profile, prefs, history, opts) {
     sessionsKey: K_SESSIONS,
     currentUid: _currentUid,
     saveSession: saveSession,
+    saveSessionWithLock: saveSessionWithLock,
+    withSessionLock: withSessionLock,
+    mutateSessionWithLock: mutateSessionWithLock,
     setSessionGear: setSessionGear,
     setSessionInputs: setSessionInputs,
     listSessions: listSessions,

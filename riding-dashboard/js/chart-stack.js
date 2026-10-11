@@ -59,7 +59,7 @@
     if (!S.length) return null;
     var maxPts = opts.maxPoints || 1800;
     var step = Math.max(1, Math.floor(S.length / maxPts));
-    var t0 = S[0].t;
+    var t0 = opts.timeOriginSec != null ? opts.timeOriginSec : S[0].t;
     var compress = opts.compress !== false;
     var gapSec = (session.cfg && session.cfg.gapThresholdSec) || 8;
     var legEnd = {};
@@ -129,6 +129,7 @@
 
   /* 실제 경과초 → 화면 x. 접힌 구간 안이면 그 구간의 시작으로 붙인다. */
   function realToComp(series, tSec) {
+    if (series && !series.compressed) return tSec;
     if (!series || !series.segments || !series.segments.length) return tSec;
     var segs = series.segments;
     for (var i = 0; i < segs.length; i++) {
@@ -141,6 +142,7 @@
   }
   /* 화면 x → 실제 경과초. 드래그한 구간을 원본에서 지우려면 이게 필요하다. */
   function compToReal(series, x) {
+    if (series && !series.compressed) return x;
     if (!series || !series.segments || !series.segments.length) return x;
     var segs = series.segments;
     for (var i = 0; i < segs.length; i++) {
@@ -218,6 +220,7 @@
     var syncKey = uPlot.sync('rd-stack-' + (opts.syncId || 'main'));
     while (host.firstChild) host.removeChild(host.firstChild);
 
+    function emitInspection(u) { if (opts._pointerInspection !== false && !opts._applyingCursor && !(opts._externalCursorLeft != null && Math.abs(u.cursor.left-opts._externalCursorLeft)<1) && opts.onInspection && u.cursor.idx != null) opts.onInspection(compToReal(series,series.x[u.cursor.idx])+series.t0); }
     var readout = null;
     if (opts.readoutHost) {
       readout = opts.readoutHost;
@@ -356,7 +359,7 @@
         cursor: { drag: { x: true, y: false, setScale: false },
                   sync: { key: syncKey.key } },
         legend: { show: false },
-        scales: { x: { time: false }, y: scaleOpts },
+        scales: { x: { time: false, range: opts.xRange ? function(){ return opts.xRange; } : undefined }, y: scaleOpts },
         axes: [
           { stroke: theme.dim, grid: { stroke: theme.grid }, ticks: { stroke: theme.grid },
             font: '11px "IBM Plex Mono", monospace',
@@ -377,8 +380,10 @@
           draw: [drawManeuvers],
           /* §566 — 어느 판 위에 있든 세 판의 값을 한 상자에 */
           setCursor: [function (uu) {
+            if (opts._pointerInspection === false) { hideTip(); return; }
             if (uu.cursor.left == null || uu.cursor.left < 0) { hideTip(); return; }
             showTip(uu, uu.cursor.idx);
+            emitInspection(uu);
           }],
           setSelect: [function (uu) {
             if (!uu.select || uu.select.width < 4) return;
@@ -388,6 +393,7 @@
           }]
         }
       }, [series.x, series.y[k]], wrap);
+      if (u.over && u.over.addEventListener) u.over.addEventListener('mousemove', function(){ opts._pointerInspection=true; opts._externalCursorLeft=null; }, true);
       wrap.addEventListener('mouseleave', hideTip);
       /* 판 이름표 — 축 라벨을 판마다 반복하지 않고 왼쪽 위에 한 줄. */
       var tag = document.createElement('div');
@@ -426,7 +432,8 @@
                     false);
       });
       if (readout) renderReadout(readout, st, clearSelection, opts);
-      if (opts.onSelect) opts.onSelect(st);
+      // Let uPlot finish its pointer release before subscribers destroy/redraw plots.
+      if (opts.onSelect) setTimeout(function(){ opts.onSelect(st); }, 0);
     }
 
     /* §536 (옥대표 "버그일까?") — **버그가 맞았다.**
@@ -457,6 +464,7 @@
 
     return {
       plots: plots, series: series,
+      setInspection: function (t) { opts._pointerInspection=false; opts._applyingCursor = true; plots.forEach(function(u){ opts._externalCursorLeft=u.valToPos(realToComp(series,t-series.t0),'x'); u.setCursor({left:opts._externalCursorLeft,top:0}, false); }); opts._applyingCursor = false; },
       destroy: function () {
         if (ro) { try { ro.disconnect(); } catch (e) {} ro = null; }
         plots.forEach(function (u) { try { u.destroy(); } catch (e) {} });

@@ -76,14 +76,14 @@
      지도의 흐린 배경 트랙·안 고른 회전 점에도 쓰인다. 글자를 밝히자고
      그 표식까지 밝히면 '고른 것 vs 안 고른 것' 대비가 무너진다.
      → 글자·축라벨은 axisText, 표식은 dim 그대로. */
-  var THEME_DARK = { accent: '#c9d58b', warn: '#d6ae67', grid: '#3b413c',
-                     dim: '#929985', axisText: '#b0b7ae', bg: '#232725',
+  var THEME_DARK = { accent: '#89c6ed', warn: '#efc67f', grid: '#344454',
+                     dim: '#91a4b6', axisText: '#b1c0ce', bg: '#192530',
                      port: '#e03131', stbd: '#2f9e44', gybe: '#d09275',
-                     ink: '#f1f2e9' };
-  var THEME_LIGHT = { accent: '#626f40', warn: '#946d2e', grid: '#d9dbd0',
-                      dim: '#73776c', axisText: '#62675e', bg: '#ffffff',
+                     ink: '#eaf0f6' };
+  var THEME_LIGHT = { accent: '#236f9c', warn: '#986515', grid: '#dce3e9',
+                      dim: '#64768a', axisText: '#526477', bg: '#ffffff',
                       port: '#c92a2a', stbd: '#1e7e34', gybe: '#a75e45',
-                      ink: '#202522' };
+                      ink: '#172b40' };
   function currentThemeName() {
     try {
       var t = localStorage.getItem('rd_theme');
@@ -325,7 +325,56 @@
   var stackInst = null;
   /* §569 — 타임라인에 그릴 채널. null 이면 모듈 기본값(speed·VMG·CWA·HR). */
   var TL_CHANNELS = null;
+  var p0PolarInstance = null;
+  var p0SourceIds = new WeakMap(), p0SourceSequence = 0;
+  function p0CurrentId() {
+    if (CUR.openedRecId) return String(CUR.openedRecId);
+    var source = CUR.fullSession || CUR.session;
+    if (!p0SourceIds.has(source)) p0SourceIds.set(source, 'current-source-' + (++p0SourceSequence));
+    return p0SourceIds.get(source);
+  }
+  // P0 adapters retain the native local time used by editing; UTC stays in the store.
+  function p0CurrentRider() {
+    if (!window.RDP0Panel || !CUR.session) return null;
+    var id = p0CurrentId();
+    var frame = RDP0Panel.getFrame();
+    return frame && frame.riders[id] || null;
+  }
+  function p0ViewSession(session) {
+    var r = p0CurrentRider();
+    if (!r) return session;
+    var view = RDAnalysisWorkspace.sessionForView(r);
+    view.startEpoch = session.startEpoch;
+    view.samples.forEach(function(p,i){ p.t = r.trace.session.samples[i].t; });
+    return view;
+  }
+  function p0InspectLocal(sec, origin) {
+    var r=p0CurrentRider();
+    if (!r) return;
+    var c=r.trace.clock, first=r.trace.session.samples[0];
+    var utc=RDAnalysisWorkspace.toUtc(r.trace,first)+(sec-first.t)*1000*(c.scale || 1);
+    RDP0Panel.store.setInspection({utcMs:utc,riderId:r.trace.id,originView:origin});
+  }
+  function p0InspectIds(ids, origin) {
+    var r=p0CurrentRider();
+    var p=r && r.samples.find(function(x){return ids.indexOf(x._sampleId)>=0});
+    if(p) RDP0Panel.store.setInspection({utcMs:p._utcMs,riderId:r.trace.id,originView:origin});
+  }
+  function p0CurrentIncluded() {
+    var r=p0CurrentRider();
+    return !r || RDP0Panel.store.getSnapshot().fleet.riders[r.trace.id].calculationIncluded;
+  }
+  function p0AttachTacticalInspection() {
+    if(!mapInst || !mapInst.map || mapInst.setInspection || !window.L)return;
+    var map=mapInst.map, marker=null;
+    mapInst.setInspection=function(p){if(marker){map.removeLayer(marker);marker=null;}if(p&&p.lat!=null&&p.lng!=null&&!p.gpsOutlier)marker=L.circleMarker([p.lat,p.lng],{radius:7,color:'#ffd43b',fillOpacity:1}).addTo(map);};
+    map.on('click',function(ev){var r=p0CurrentRider();if(!r)return;var best=null,dist=Infinity;r.samples.forEach(function(p){if(p._excluded||!p._weightSec||p.gpsOutlier)return;var d=Math.pow(p.lat-ev.latlng.lat,2)+Math.pow(p.lng-ev.latlng.lng,2);if(d<dist){dist=d;best=p;}});if(best)p0InspectIds([best._sampleId],'track');});
+  }
+  function p0PolarOptions() {
+    return {onBin:function(bin,side){var r=p0CurrentRider();if(!r)return;var ids=r.samples.filter(function(p){return p._weightSec>0&&p.twa>=bin-3.75&&p.twa<bin+3.75&&p.tack===side}).map(function(p){return p._sampleId});p0InspectIds(ids,'polar');}};
+  }
   function renderTimeline(session, analysis) {
+    session = p0ViewSession(session);
     var host = $('chart-timeline');
     var S = session.samples || [];
     if (!host) return;
@@ -339,6 +388,8 @@
       theme: THEME,
       readoutHost: $('timeline-readout'),
       channels: TL_CHANNELS,
+      onInspection: function(sec){p0InspectLocal(sec,'graph');},
+      onSelect: function(st){var r=p0CurrentRider();if(!r)return;var first=r.trace.session.samples[0], base=RDAnalysisWorkspace.toUtc(r.trace,first), scale=r.trace.clock.scale || 1;RDP0Panel.store.commitSelection(st?{fromUtcMs:base+(st.realFromSec==null?st.fromSec:st.realFromSec)*1000*scale,toUtcMs:base+(st.realToSec==null?st.toSec:st.realToSec)*1000*scale}:null);},
       /* §569 — 칩을 누르면 고른 채널만 다시 그린다. 선택은 세션을 바꿔도
          유지한다(같은 사람이 같은 관심으로 다음 세션을 본다). */
       onChannels: function (next) {
@@ -487,7 +538,7 @@
     if (ranges.length) {
       var caveat = el('div', 'text-secondary mt-1');
       caveat.style.cssText = 'font-size:.8125rem;opacity:.9';
-      caveat.textContent = '점수는 회전 효율과 풍상 VMG 상위 50% 등을 반영하므로 느린 구간을 제외해도 변화가 작을 수 있습니다.';
+      caveat.textContent = '점수는 회전 효율과 풍상 VMG 상위 20% 등을 반영하므로 느린 구간을 제외해도 변화가 작을 수 있습니다.';
       host.appendChild(caveat);
     }
     if (!ranges.length) return;
@@ -852,10 +903,8 @@
     var map = L.map(mapHost, { zoomControl: false, attributionControl: false });
     windMap = map;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-    var step = Math.max(1, Math.floor(S.length / 1200));
-    var line = [];
-    for (var i = 0; i < S.length; i += step) line.push([S[i].lat, S[i].lng]);
-    L.polyline(line, { color: THEME.accent, weight: 2, opacity: 0.9 }).addTo(map);
+    RDMapV2.addSpeedTrack(map,CUR.session);
+    RDMapV2.addSpeedLegend(map);
 
     var la = S.map(function (p) { return p.lat; });
     var ln = S.map(function (p) { return p.lng; });
@@ -1015,7 +1064,7 @@
     });
   }
 
-  function applyWindToDay(dir) {
+  async function applyWindToDay(dir) {
     var list = sameDaySaved();
     if (!list.length || !Store || !Store.setSessionInputs) return;
     var lines = list.map(function (r) {
@@ -1028,11 +1077,11 @@
         + '\n\nTheir saved scores were calculated with the old direction and will be '
         + 'marked \u21bb until you open each one and press Save session.')) return;
     var bad = 0;
-    list.forEach(function (r) {
-      if (r.windDir != null && Math.round(r.windDir) === dir) return;   /* 이미 같으면 표시도 안 한다 */
-      var res = Store.setSessionInputs(r.id, { windDir: dir, scoreStale: true });
+    for (var r of list) {
+      if (r.windDir != null && Math.round(r.windDir) === dir) continue;   /* 이미 같으면 표시도 안 한다 */
+      var res = await Store.mutateSessionWithLock('inputs', r.id, { windDir: dir, scoreStale: true }, r.revision || 0);
       if (!res || res.ok === false) bad++;
-    });
+    }
     if (bad && window.console) console.error('[v2 §591] wind to day: ' + bad + ' writes failed');
     if (CUR.windDir == null || Math.round(CUR.windDir) !== dir) applyWind(dir, null);
     else { try { renderSessions(); } catch (e) {} try { renderRace(); } catch (e) {} }
@@ -1047,18 +1096,25 @@
        ① 부표마다 경기별 진입 → 최저 → 탈출
        ② 부표 사이 구간 시간과 오늘의 최고 구간을 이은 '이론상 최고'
      출발선·결승선은 모른다(트랙을 어디서 잘랐는지에 달림) — 부표 사이만 잰다. */
+  function sameRideAsOpen(r, st0, dur0, openedId) {
+    // Concurrent racers share timestamps. Only an explicit saved-record identity
+    // proves this is the currently open record; overlap alone is not provenance.
+    return !!(r && openedId && r.id === openedId);
+  }
+
   function renderRace() {
     var host = $('race-host');
     if (!host) return;
     while (host.firstChild) host.removeChild(host.firstChild);
     if (!window.RDSlalom || !CUR.session || !CUR.analysis) return;
     var st0 = CUR.session.startEpoch || 0;
+    var dur0 = (CUR.analysis.summary && CUR.analysis.summary.totalDurationSec) || 0;
     /* §594 — 같은 날 같은 부표를 돈 게스트(다른 선수)도 겨룬다 */
     var sibs = sameDaySaved(true).filter(function (r) {
       if (!r.hasTrack) return false;
       if (CUR.openedRecId && r.id === CUR.openedRecId) return false;
       /* 방금 올린 파일이 이미 저장돼 있으면 그 사본은 빼야 자기 자신과 겨루지 않는다 */
-      if (st0 && r.dateEpoch && Math.abs(r.dateEpoch - st0) < 5000) return false;
+      if (sameRideAsOpen(r, st0, dur0, CUR.openedRecId)) return false;
       return true;
     }).slice(0, 12);
     if (!sibs.length) return;
@@ -1575,10 +1631,10 @@
     if (window.RDPolar) {
       /* 칼럼이 넓어졌으니 차트도 키운다 — 각도 눈금이 촘촘해서
          작으면 읽으려고 만든 눈금이 도리어 뭉갠다 */
-      RDPolar.render(polarHost, heldPolar(a),
+      p0PolarInstance = RDPolar.render(polarHost, heldPolar(a),
         { grid: THEME.grid, dim: THEME.dim, port: THEME.port, starboard: THEME.stbd,
           size: Math.min(520, polarHost.clientWidth || 460),
-          band: true, minN: 5 });
+          band: true, minN: 5, onBin: p0PolarOptions().onBin });
       /* 최적각은 **오른쪽 칼럼**에 별도 카드로 — 폴라 카드에 붙이면
          왼쪽이 더 길어져 원래 문제가 반대로 재현된다 */
       var cardO = el('div', 'card mt-3');
@@ -3203,7 +3259,8 @@
       var LABEL = {
         'not-sailing': 'the boat was barely moving before and after',
         'no-reference-window': 'they sit at the very start or end of the session',
-        'no-boundaries': 'the engine could not bound the turn'
+        'no-boundaries': 'the engine could not bound the turn',
+        'no-valid-gps-coverage': 'no valid GPS intervals covered the turn'
       };
       missing.push(sum.notComputed[k] + ' because ' + (LABEL[k] || k));
     });
@@ -3211,11 +3268,14 @@
       missing.push(sum.skippedAmbiguous + ' because the measured wind angle '
         + 'disagreed with the turn type');
     }
+    var gpsMeasured=0,gpsRequested=0;
+    (L||[]).forEach(function(l){if(l.ok&&!l.zoneConflict){gpsMeasured+=l.measuredSec||0;gpsRequested+=l.lossWindowSec||0}});
     var f = el('div', 'card-footer text-secondary');
     f.style.fontSize = '.8125rem';
     f.textContent = 'Counted ' + sum.countedTurns + ' of '
       + ((a.maneuvers || []).length) + ' turns'
       + (missing.length ? ' \u2014 skipped ' + missing.join('; ') + '.' : '.')
+      + ' GPS time coverage '+gpsMeasured.toFixed(1)+' / '+gpsRequested.toFixed(1)+' s; rejected points and gaps are excluded from both integrals. Partial coverage costs cover measured time only.'
       + ' These are distances, not speed drops: a turn costing 40 m means you '
       + 'ended up 40 m further from where you were heading than if you had held '
       + 'your pace through it. Cost is the ground you fell behind your own best '
@@ -3398,10 +3458,12 @@
     while (hostEl.firstChild) hostEl.removeChild(hostEl.firstChild);
     var t;
     try {
-      t = RDBinTable.build(CUR.session, {
+      var p0r = p0CurrentRider();
+      t = RDBinTable.build(p0ViewSession(CUR.session), {
+        weights: p0r ? (p0CurrentIncluded() ? p0r.weights : p0r.weights.map(function(){return 0})) : null,
         rowDim: binState.rowDim, colDim: binState.colDim, metric: binState.metric,
         derived: binState.metric === '__derived' ? derivedMetric() : null,
-        windDir: ctlOpts.windDir, maxHr: ctlOpts.maxHr, minSpeedKt: ctlOpts.minSpeedKt
+        windDir: p0r ? RDP0Panel.store.getSnapshot().wind.directionDeg : ctlOpts.windDir, maxHr: ctlOpts.maxHr, minSpeedKt: p0r ? 0 : ctlOpts.minSpeedKt
       });
     } catch (e) { t = null; }
     if (!t || !t.rows.length || !t.cols.length) {
@@ -3444,6 +3506,7 @@
           td.style.background = 'rgba(77,171,247,' + (0.05 + f * 0.28).toFixed(3) + ')';
           td.title = fmtClock(c.seconds) + ' in this cell';
         }
+        if(c.sampleIds && c.sampleIds.length) { td.dataset.p0Samples=JSON.stringify(c.sampleIds);td.tabIndex=0; td.setAttribute('role','button'); td.addEventListener('click',function(){p0InspectIds(c.sampleIds,'table')}); td.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();p0InspectIds(c.sampleIds,'table')}}); }
         tr.appendChild(td);
       });
       var rt = t.rowTotals[i];
@@ -4133,7 +4196,7 @@
        속도만이 아니라 '돌아올 수 있는' 속도라 성격이 다르다. */
     var splitRows = [];
     (a.peaks || []).forEach(function (p) {
-      splitRows.push({ label: p.windowSec + ' s', kind: 'time', ms: p.speedMs });
+      splitRows.push({ label: p.windowSec + ' s', kind: 'time', ms: p.speedMs, note: p.available === false ? 'unavailable · coverage ' + p.coverageSec.toFixed(1) + '/' + p.windowSec + ' s' : null });
     });
     (a.distanceBests || []).forEach(function (d) {
       splitRows.push({
@@ -4168,9 +4231,9 @@
         tr.appendChild(el('td', null, r.label));
         tr.appendChild(el('td', 'text-end text-secondary',
           KIND[r.kind] + (r.note ? ' · ' + r.note : '')));
-        tr.appendChild(el('td', 'text-end num', (r.ms * KT).toFixed(2) + ' kt'));
+        tr.appendChild(el('td', 'text-end num', r.ms == null ? '—' : (r.ms * KT).toFixed(2) + ' kt'));
         tr.appendChild(el('td', 'text-end num text-secondary',
-          (r.ms * 3.6).toFixed(1)));
+          r.ms == null ? '—' : (r.ms * 3.6).toFixed(1)));
         stb.appendChild(tr);
       });
       st.appendChild(stb); sw.appendChild(st); sc.appendChild(sw);
@@ -4474,14 +4537,17 @@
   }
 
   function openSavedSession(rec, cloudAttempted) {
+    var request = arguments[2] || {seq:CUR.requestSeq=(CUR.requestSeq||0)+1,scope:window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'};
+    if(request.seq!==CUR.requestSeq||request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'))return;
+    if (!rec || !window.RDStorage) return;
     if (!cloudAttempted && window.RDCloud && !RDStorage.loadTrack(rec.id)) {
       var owner = window.DMJAuth && DMJAuth.currentUserId();
       RDCloud.ensureTrack(rec.id).then(function(result){
-        if (owner !== DMJAuth.currentUserId()) return;
-        if (result.ok) openSavedSession(rec, true);
+        if (owner !== DMJAuth.currentUserId() || request.seq!==CUR.requestSeq || request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_')) return;
+        if (result.ok) openSavedSession(rec, true, request);
         else alertLine("기록 복원 실패: 연결을 확인한 뒤 다시 시도하세요.");
       });
-      return;
+      return true;
     }
     if (!rec || !window.RDStorage) return;
     /* §554 — 정체성(CUR.openedRecId)은 **세션이 실제로 열린 뒤에만** 잡는다.
@@ -4513,12 +4579,11 @@
          t 가 전부 null 이 되고 속도가 0 으로 떨어진다 — 화면엔 날짜가
          '+058346' 으로 뜬다. 저장된 초를 ms 로 올려 준다. */
       var seg = pts.map(function (q) {
-        return { lat: q.lat, lng: q.lng, ele: null,
-                 time: q.t * 1000, speed: null, hr: null };
+        return Object.assign({}, q, {time:pts.hasTime===false?null:q.t*1000, speed:q.speedDevice != null ? q.speedDevice : null});
       });
       var sess = An.normalizeSession({
         tracks: [{ name: rec.name || 'Session', segments: [seg] }],
-        hasTime: true, speedSource: 'derived',
+        hasTime: pts.hasTime!==false, speedSource: pts.speedSource || 'derived',
         trackName: rec.name || 'Session'
       });
       var est2 = estimateWind(sess);
@@ -4541,16 +4606,15 @@
       CUR.est = est2;
       CUR.windDir = wd2;
       var an2 = An.analyzeSession(sess, wd2, analysisOpts(est2));
-      CUR.openedRecId = rec.id;        /* §554 — 여기까지 왔으면 진짜 열렸다 */
+      CUR.openedRecId = rec.id; CUR.openedRevision = Number(rec.revision || 0);        /* §554 — 여기까지 왔으면 진짜 열렸다 */
       show(sess, an2, rec.name || 'Session', est2);
       restoreSavedExclusions(rec);     /* §590 */
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
-      return;
+      return true;
     }
 
     if (!gpx) {
-      alertLine('This session is stored as a summary only — its track was cleared '
-        + 'to make space, so it cannot be reopened.');
+      alertLine('This session is stored as a summary only — no linked track file is available. The reason is unverified.');
       return;
     }
     /* 융합 세션(여러 파일 합본)은 v2 에 복원 경로가 없다. 조용히 실패하는
@@ -4561,11 +4625,12 @@
       return;
     }
     /* 저장 당시 입력 복원 — 폼을 먼저 채우고 분석을 돌린다 */
+    try { An.normalizeSession(Gpx.parseGPX(gpx)); } catch (e) { alertLine('Could not reopen this session: ' + e.message); return; }
     try { restoreRiderInputs(rec); } catch (e) {}
     try {
       CUR.restoringSaved = true;
-      CUR.openedRecId = rec.id;        /* §554 — 트랙이 있는 걸 확인한 뒤 */
-      loadGpxText(gpx, rec.name || 'Saved session');
+      CUR.openedRecId = rec.id; CUR.openedRevision = Number(rec.revision || 0);        /* §554 — 트랙이 있는 걸 확인한 뒤 */
+      loadGpxText(gpx, rec.name || 'Saved session',request);
       /* 저장된 풍향이 있으면 추정 대신 그 값으로 다시 분석한다 */
       if (rec.windDir != null && CUR.fullSession) {
         CUR.windDir = rec.windDir;
@@ -4575,6 +4640,7 @@
       var el2 = document.getElementById('chart-timeline');
       if (el2) el2.scrollIntoView({ block: 'start', behavior: 'smooth' });
       CUR.restoringSaved = false;
+      return true;
     } catch (e) {
       CUR.restoringSaved = false;
       alertLine('Could not reopen this session: ' + (e && e.message ? e.message : e));
@@ -4625,7 +4691,7 @@
     host.appendChild(box);
   }
 
-  function setGuest(rec, name) {
+  async function setGuest(rec, name) {
     if (!Store || !Store.setSessionGuest) return;
     if (name === undefined) {
       var n = window.prompt('Whose session is "' + (rec.name || 'this') + '"?\n'
@@ -4634,7 +4700,7 @@
       if (n == null) return;
       name = n.trim() || 'Guest';
     }
-    var res = Store.setSessionGuest(rec.id, name);
+    var res = await Store.mutateSessionWithLock('guest', rec.id, name, rec.revision || 0);
     if (!res || res.ok === false) {
       if (window.console) console.error('[v2 §594] set guest failed', res);
       alertLine('Could not move that session \u2014 nothing was changed.');
@@ -4652,7 +4718,7 @@
      같은 계열의 여덟 번째다.
      지운 세션이 지금 화면에 열려 있는 것이면 그대로 두되, 저장 목록에서
      사라졌다는 걸 알려 준다(조용히 두면 '저장돼 있다'고 착각한다). */
-  function deleteSavedSession(rec) {
+  async function deleteSavedSession(rec) {
     if (!rec || !Store || !Store.deleteSession) return;
     var d = rec.dateEpoch ? new Date(rec.dateEpoch).toISOString().slice(0, 10) : '';
     var what = (rec.name || 'Session')
@@ -4664,7 +4730,7 @@
       + 'training-load ledger. It cannot be undone.';
     if (!window.confirm(msg)) return;
     var openNow = CUR.session && sessionSig(CUR.session) === rec.sig;
-    try { Store.deleteSession(rec.id); } catch (e) {
+    try { var deleted = await Store.mutateSessionWithLock('remove', rec.id, null, rec.revision || 0); if (!deleted || !deleted.ok) throw new Error(deleted && deleted.error || 'delete failed'); } catch (e) {
       if (window.console) console.error('[v2 §543] delete failed', e);
       alertLine('That session could not be deleted.');
       return;
@@ -4795,11 +4861,7 @@
       var noteWrap = el('div', 'card-body py-2');
       var note = el('div', 'text-secondary');
       note.style.fontSize = '.8125rem';
-      note.textContent = (list.length - openable.length) + ' of these were saved '
-        + 'before tracks were compressed, and their tracks were dropped when '
-        + 'storage filled up \u2014 so they open as summaries only. Upload the '
-        + 'same file again and it reconnects to the existing row instead of '
-        + 'adding a duplicate. Tracks are 11\u00d7 smaller now, so they fit.';
+      note.textContent = (list.length - openable.length) + '개 기록에 연결된 경로 파일을 확인할 수 없어 요약만 표시합니다. 경로가 없는 이유는 아직 확인되지 않았습니다.';
       noteWrap.appendChild(note);
       card.appendChild(noteWrap);
     }
@@ -4827,8 +4889,7 @@
         tr.title = 'Open this session';
         tr.addEventListener('click', function () { openSavedSession(r); });
       } else {
-        tr.title = 'Summary only — the track was cleared to save space, '
-                 + 'so this one cannot be reopened.';
+        tr.title = '연결된 경로 파일을 확인할 수 없어 요약만 표시합니다.';
         tr.style.opacity = '0.72';
       }
       var d = r.dateEpoch ? new Date(r.dateEpoch) : null;
@@ -5262,7 +5323,11 @@
     track(new uPlot({
       width: plot.clientWidth || 800, height: 280, padding: [12, 14, 4, 6],
       cursor: { drag: { x: false, y: false } },
-      scales: { x: { time: false } },
+      scales: { x: { time: false, range: function (u, min, max) {
+        // Constant speed scatter needs a meaningful display span above floating point noise.
+        var pad = Math.max(0.5, Math.abs(min) * 0.01);
+        return max - min < pad * 2 ? [min - pad, max + pad] : [min, max];
+      } } },
       axes: [
         { stroke: THEME.axisText, grid: { stroke: THEME.grid }, ticks: { stroke: THEME.grid },
           font: '11px "IBM Plex Mono", monospace',
@@ -6304,11 +6369,9 @@
     turnMiniMap = map;
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-    /* 트랙은 배경 — 주인공은 회전 점이다 */
-    var step = Math.max(1, Math.floor(pts.length / 1500));
-    var line = [];
-    for (var i = 0; i < pts.length; i += step) line.push([pts[i].lat, pts[i].lng]);
-    L.polyline(line, { color: THEME.dim, weight: 1.5, opacity: 0.45 }).addTo(map);
+    /* Track SOG and maneuver identity use separate visual channels. */
+    RDMapV2.addSpeedTrack(map,CUR.session);
+    RDMapV2.addSpeedLegend(map);
 
     var selSet = {};
     selIdx.forEach(function (i) { selSet[i] = true; });
@@ -6726,9 +6789,12 @@
   var TURN_PAD_SEC = 2;
   var OPT_MIN_SEC = 15;        /* 최적각 후보가 되려면 그 각도에서 이만큼(초) 탔어야 한다 */
   function heldPolar(a) {
+    var p0r=p0CurrentRider();
+    if(p0r && !p0CurrentIncluded())return null;
+    if(p0r) return RDAnalysis.computePolar(p0ViewSession(CUR.session),RDP0Panel.store.getSnapshot().wind.directionDeg,7.5);
     if (!a || !a.polar || !CUR.session || a.windDir == null) return a && a.polar;
     if (a._heldPolar) return a._heldPolar;
-    var S = CUR.session.samples || [], bd = a.polar.binDeg || 7.5;
+    var S = CUR.session.samples || [], weights = RDAnalysis.sampleTimeWeights(CUR.session), bd = a.polar.binDeg || 7.5;
     var nB = Math.ceil(180 / bd), port = [], stbd = [], all = [], i, k;
     for (k = 0; k < nB; k++) { port.push([]); stbd.push([]); all.push([]); }
     var inTurn = new Uint8Array(S.length);
@@ -6742,27 +6808,14 @@
     var wd = ((a.windDir % 360) + 360) % 360;
     for (i = 0; i < S.length; i++) {
       var p = S[i];
-      if (p.speed == null || p.speed < 1.0 || p.heading == null) continue;
+      if (p.speed == null || p.speed < 1.0 || p.heading == null || !weights[i]) continue;
       var sg = ((p.heading - wd + 540) % 360) - 180, twa = Math.abs(sg);
       if (inTurn[i]) { removed++; if (twa < 30) removedLow++; continue; }
       var bi = Math.min(nB - 1, Math.floor(twa / bd));
-      (sg >= 0 ? port : stbd)[bi].push(p.speed);
-      all[bi].push(p.speed);
+      (sg >= 0 ? port : stbd)[bi].push({speed:p.speed,weight:weights[i]});
+      all[bi].push({speed:p.speed,weight:weights[i]});
     }
-    function pct(sorted, q) {
-      if (!sorted.length) return 0;
-      var x = (sorted.length - 1) * q / 100, lo = Math.floor(x), hi = Math.ceil(x);
-      return sorted[lo] + (sorted[hi] - sorted[lo]) * (x - lo);
-    }
-    function reduce(arr) {
-      return arr.map(function (list, bi) {
-        list.sort(function (x, y) { return x - y; });
-        var sum = 0; for (var n = 0; n < list.length; n++) sum += list[n];
-        return { twaCenter: (bi + 0.5) * bd, count: list.length,
-                 p95Ms: pct(list, 95), p90Ms: pct(list, 90), avgMs: list.length ? sum / list.length : 0 };
-      });
-    }
-    var out = Object.assign({}, a.polar, { port: reduce(port), starboard: reduce(stbd), combined: reduce(all) });
+    var out = Object.assign({}, a.polar, { port: RDAnalysis.reduceWeightedPolar(port, bd), starboard: RDAnalysis.reduceWeightedPolar(stbd, bd), combined: RDAnalysis.reduceWeightedPolar(all, bd) });
     out.turnSamplesRemoved = removed;
     out.turnSamplesBelow30 = removedLow;
     a._heldPolar = out;
@@ -6779,11 +6832,8 @@
        숫자로 단언하는 것이라 더 두꺼운 근거(OPT_MIN_N=15)를 써야 한다. */
     /* §598 — 표본 '개수' 기준(15)은 기록 간격에 따라 뜻이 달라진다: 1 Hz 에서는
        15 초, 25 Hz RaceBox 에서는 0.6 초다. 최적각은 **시간**으로 요구한다. */
-    var S0 = (CUR.session && CUR.session.samples) || [];
-    var hz = S0.length > 1 ? (S0.length - 1) / Math.max(1, S0[S0.length - 1].t - S0[0].t) : 1;
-    var needN = Math.max(15, Math.round(OPT_MIN_SEC * hz));
-    var up = RDPolar.optimalAngle(bins, 'upwind', needN);
-    var dn = RDPolar.optimalAngle(bins, 'downwind', needN);
+    var up = RDPolar.optimalAngle(bins, 'upwind', null, OPT_MIN_SEC);
+    var dn = RDPolar.optimalAngle(bins, 'downwind', null, OPT_MIN_SEC);
     if (!up.ok && !dn.ok && up.reason === 'no_data' && dn.reason === 'no_data') return;
 
     var body = el('div', 'card-body border-top pt-3');
@@ -6821,7 +6871,7 @@
       box.appendChild(el('div', 'lab mt-1', mode === 'upwind'
         ? 'best VMG ' + r.vmgKt.toFixed(1) + ' kt  (at ' + r.speedKt.toFixed(1) + ' kt)'
         : 'fastest ' + r.speedKt.toFixed(1) + ' kt  (VMG ' + r.vmgKt.toFixed(1) + ' kt)'));
-      box.appendChild(el('div', 'lab', Math.round(r.count / hz) + ' s at this angle'));
+      box.appendChild(el('div', 'lab', Math.round(r.durationSec || 0) + ' s at this angle'));
       if (r.atEdge) {
         var w = el('div', 'lab mt-1');
         w.style.color = THEME.warn;
@@ -7086,7 +7136,7 @@
     var seg = segs[SEGSTEP.idx];
     var S = CUR.session.samples || [];
     var wd = a.windDir;
-    var st = RDSegments.segStats(S, seg, wd);
+    var st = RDSegments.segStats(S, seg, wd,{session:CUR.session});
 
     var card = el('div', 'card');
     var head = el('div', 'card-header d-flex flex-wrap align-items-center gap-2');
@@ -7224,8 +7274,8 @@
       ? (S[m.endIdx].cumDist - S[m.startIdx].cumDist) : null;
     if (ref > 0 && dur != null && actual != null) {
       var lostM = Math.max(0, ref * dur - actual);
-      wrap.appendChild(cell('Lost in the turn', Math.round(lostM) + ' m',
-        'vs holding ' + kt(ref), lostM > 0 ? THEME.warn : null));
+      wrap.appendChild(cell('SOG distance shortfall', Math.round(lostM) + ' m',
+        'vs max(entry, exit) SOG ' + kt(ref) + ' · not VMG', lostM > 0 ? THEME.warn : null));
     }
     wrap.appendChild(cell('Recovery',
       m.recoverySec == null ? '\u2014' : m.recoverySec.toFixed(1) + ' s',
@@ -7573,7 +7623,7 @@
      고른 회전이 전부 같은 종류면 그 종류로 좁힌다 — 택 곡선을 자이브
      밴드에 대고 읽는 건 의미가 없다. */
 
-  var TURN_PAD_SEC = 12, TURN_STEP = 0.5;
+  var TURN_CURVE_PAD_SEC = 12, TURN_STEP = 0.5;
 
   /* 한 회전을 apex=0 격자 위에 올린다 */
   function turnCurveOn(S, m, xs) {
@@ -7582,8 +7632,8 @@
     var pts = [];
     for (var i = 0; i < S.length; i++) {
       var dt = S[i].t - apexT;
-      if (dt < -TURN_PAD_SEC) continue;
-      if (dt > TURN_PAD_SEC) break;
+      if (dt < -TURN_CURVE_PAD_SEC) continue;
+      if (dt > TURN_CURVE_PAD_SEC) break;
       if (S[i].speed == null) continue;
       pts.push([dt, S[i].speed * KT]);
     }
@@ -7630,7 +7680,7 @@
     if (!S.length) return;
 
     var xs = [];
-    for (var x = -TURN_PAD_SEC; x <= TURN_PAD_SEC; x += TURN_STEP) xs.push(x);
+    for (var x = -TURN_CURVE_PAD_SEC; x <= TURN_CURVE_PAD_SEC; x += TURN_STEP) xs.push(x);
 
     /* ---- 고른 회전 ---- */
     var lines = [];
@@ -9186,7 +9236,7 @@
     var save = el('button', 'btn btn-sm btn-primary', 'Save gear');
     save.type = 'button';
     var msg = el('div', 'lab mt-2');
-    save.addEventListener('click', function () {
+    save.addEventListener('click', async function () {
       var g = {};
       function put(key, bank, nameKey) {
         var id = picks[key].value;
@@ -9207,7 +9257,7 @@
         msg.textContent = 'Nothing picked \u2014 choose at least one.';
         return;
       }
-      var r = RDStorage.setSessionGear(rec.id, g);
+      var r = await RDStorage.mutateSessionWithLock('gear', rec.id, g, rec.revision || 0);
       if (!r.ok) { msg.textContent = 'Could not save: ' + (r.error || 'unknown'); return; }
       if (box.parentNode) box.parentNode.removeChild(box);
       renderSessions();
@@ -9879,6 +9929,7 @@
   }
 
   function renderTrack(session, analysis) {
+    session = p0ViewSession(session);
     mapCtx = { session: session, analysis: analysis };
     var host = $('map-host');
     if (!host) return;
@@ -9906,9 +9957,9 @@
 
     if (mapMode === 'speed') {
       if (!window.RDMapV2) return;
-      mapInst = RDMapV2.render(host, session, analysis, { height: 460 });
+      mapInst = RDMapV2.render(host, session, analysis, { height: 460, onInspection:function(p){p0InspectLocal(p.t,'track')} });
       if (!mapInst || !lg) return;
-      if (note) note.textContent = 'colour = boat speed';
+      if (note) note.textContent = '항적 색 = SOG · kt(노트) · 전 선수 공통 고정 범위 / 줌·필터 무관';
       var prev = 0;
       mapInst.tiers.forEach(function (t) {
         lg.appendChild(legendItem(mapSwatch(t.c, 14, 6),
@@ -9949,7 +10000,7 @@
             }, 60);
           } });
       if (!mapInst) return;
-      if (note) note.textContent = 'circle area = distance lost in the turn';
+      if (note) note.textContent = '항적 색 = SOG(kt) 고정 · 원 면적 = 회전 거리 손실';
       lg.appendChild(legendItem(mapSwatch('#4dabf7', 10, 10, true), 'tack'));
       lg.appendChild(legendItem(mapSwatch('#f76707', 10, 10, true), 'gybe'));
       var ls = mapInst.stats;
@@ -9969,15 +10020,16 @@
     if (!mapInst) return;
 
     if (mapMode === 'tack') {
-      if (note) note.textContent = 'colour = which tack \u00b7 width = wind pressure';
+      if (note) note.textContent = '항적 색 = SOG(kt) 고정 · 점 색 = 택 · 점 크기 = 속도 기반 상대 압력 추정';
       lg.appendChild(legendItem(mapSwatch(RDMapTactical.tackColor('P'), 14, 6), 'port'));
       lg.appendChild(legendItem(mapSwatch(RDMapTactical.tackColor('S'), 14, 6), 'starboard'));
     } else {
-      if (note) note.textContent = 'colour = wind shift \u00b7 width = wind pressure';
+      if (note) note.textContent = '항적 색 = SOG(kt) 고정 · 점 색 = GPS 기반 변화 추정 · 점 크기 = 속도 기반 상대 압력 추정';
       lg.appendChild(legendItem(mapSwatch(RDMapTactical.shiftColor(-10), 14, 6), 'lifted'));
       lg.appendChild(legendItem(mapSwatch(RDMapTactical.shiftColor(0), 14, 6), 'as usual'));
       lg.appendChild(legendItem(mapSwatch(RDMapTactical.shiftColor(10), 14, 6), 'headed'));
     }
+    RDMapV2.speedScale.tiers.forEach(function(t,i){var lo=i?RDMapV2.speedScale.tiers[i-1].max:0;lg.appendChild(legendItem(mapSwatch(t.c,14,6),'SOG '+lo+'–'+(t.max>100?'∞':t.max)+' kt'));});
     lg.appendChild(legendItem(mapSwatch('#8b98a5', 14, 2), 'lull'));
     lg.appendChild(legendItem(mapSwatch('#8b98a5', 14, 6), 'gust'));
 
@@ -10003,7 +10055,7 @@
 
       if (mapMode !== 'tack') {
         var d1 = el('div', 'mt-2');
-        d1.appendChild(el('span', 'fw-bold', 'What the colour means. '));
+        d1.appendChild(el('span', 'fw-bold', 'What the point colour means. '));
         d1.appendChild(el('span', null,
           'Green is a lift \u2014 the wind swung so you could point higher without '
           + 'changing anything. Orange is a header \u2014 it swung the other way and '
@@ -10021,10 +10073,10 @@
         cav.appendChild(d2);
 
         var d3 = el('div', 'mt-2');
-        d3.appendChild(el('span', 'fw-bold', 'Line width is pressure. '));
+        d3.appendChild(el('span', 'fw-bold', 'Point size is relative pressure. '));
         d3.appendChild(el('span', null,
-          'Thick means you were going faster than your own median on that tack, '
-          + 'thin means slower \u2014 read as gust and lull.'));
+          'Larger points mean you were going faster than your own median on that tack, '
+          + 'smaller means slower \u2014 read as inferred gust and lull.'));
         cav.appendChild(d3);
       }
 
@@ -10391,6 +10443,7 @@
     CUR.session = session; CUR.name = name; CUR.est = est;
     CUR.windDir = analysis.windDir;
     CUR.analysis = analysis;
+    var pageBody=document.querySelector&&document.querySelector('.page-body');if(pageBody)pageBody.style.visibility='';
     plots.length = 0;
     /* §539 (옥대표 "세션 제목 수정가능하게 해줘") — 파일명이 그대로
        제목이 되어 'Waterspeed 2026-09-03T05.21.45.000Z' 처럼 읽히지 않는다.
@@ -10486,6 +10539,7 @@
        whatIf 를 남겨 둔다(예전에는 CUR 에 없어 undefined 가 넘어갔다). */
     CUR.whatIf = whatIf;
     renderCoach(analysis, vps, whatIf);
+    if (window.RDP0Panel) RDP0Panel.open(session, analysis, { id: p0CurrentId(), label: CUR.name || session.trackName || '현재 세션', windDir: CUR.windDir, windSource: CUR.est ? 'track-estimate' : 'manual', windReference: 'north', windConfidence: CUR.est && CUR.est.confidence, gearId: JSON.stringify(gearForSave()), windSpeedKt: windSpeedFromForm() });
     document.dispatchEvent(new CustomEvent('rd:rendered', {detail:{identity:session.startEpoch, demo:!!CUR.isDemo, saved:!!CUR.openedRecId, wind:CUR.windDir}}));
   }
 
@@ -10707,12 +10761,11 @@
       if (!pts || !pts.length) return null;
       /* ⚠ time 은 epoch **밀리초** 숫자다(§509 는 초로 저장한다). */
       var seg = pts.map(function (q) {
-        return { lat: q.lat, lng: q.lng, ele: null,
-                 time: q.t * 1000, speed: null, hr: null };
+        return Object.assign({}, q, {time:pts.hasTime===false?null:q.t*1000, speed:q.speedDevice != null ? q.speedDevice : null});
       });
       return An.normalizeSession({
         tracks: [{ name: 'Comparison', segments: [seg] }],
-        hasTime: true, speedSource: 'derived', trackName: 'Comparison'
+        hasTime: pts.hasTime!==false, speedSource: pts.speedSource || 'derived', trackName: 'Comparison'
       });
     }
     if (typeof gpx === 'string' && gpx.slice(0, 8) === 'RDFUSED1') return null;
@@ -10730,6 +10783,7 @@
   function storedAnalysis(rec) {
     var key = rec.id + '|' + (rec.savedAt || '') + '|' + (rec.windDir != null ? rec.windDir : '')
       + '|' + JSON.stringify(rec.excludeRanges || null);
+    key=(Store&&Store.nsPrefix?Store.nsPrefix():'rd_')+'|'+(rec.revision||0)+'|'+(rec.trackRevision||'')+'|'+key;
     if (STORED_AN[rec.id] && STORED_AN[rec.id].key === key) return STORED_AN[rec.id].v;
     var v = storedAnalysisFresh(rec);
     STORED_AN[rec.id] = { key: key, v: v };
@@ -10902,7 +10956,7 @@
       if (!gs || !gs.samples || !gs.samples.length || !gs.hasTime) return null;
       var opt = sel.options[sel.selectedIndex];
       return { session: gs, label: (opt && opt.textContent) || 'Comparison',
-               color: '#B86BFF', mode: 'start' };
+               color: '#B86BFF', mode: 'clock' };
     } catch (e) {
       if (window.console) console.warn('[v2 §544] ghost failed to build', e);
       return null;
@@ -10931,6 +10985,7 @@
         catch (e) { if (window.console) console.error('[v2 §589] compare', e); }
       });
     }
+    if (!sel._p0Compare) { sel._p0Compare=true; sel.addEventListener('change',function(){ if (window.RDP0Panel && sel.value) { var gh=buildGhost(); if(gh){ var p0rec=listSessions({guests:'all'}).find(function(r){return r.id===sel.value;})||{}; RDP0Panel.open(gh.session,null,{id:sel.value,label:gh.label,gearId:JSON.stringify(p0rec.gear||{}),windSpeedKt:p0rec.windSpeedKt}); } } }); }
     var n = 0;
     listSessions({ guests: 'all' }).forEach(function (r) {   /* §594 — 게스트와도 비교 */
       if (!r || !r.hasTrack) return;
@@ -11020,15 +11075,18 @@
       $('hdr-title').textContent = 'VKX parser not loaded';
       return;
     }
+    var request=arguments[1]||{seq:CUR.requestSeq=(CUR.requestSeq||0)+1,scope:window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'};
     var fr = new FileReader();
-    fr.onerror = function () { $('hdr-title').textContent = 'Could not read the file'; };
+    fr.onerror = function () { if(request.seq!==CUR.requestSeq||request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'))return; $('hdr-title').textContent = 'Could not read the file'; };
     fr.onload = function () {
+      if(request.seq!==CUR.requestSeq||request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'))return;
       try {
         var parsed = RDVkx.parseVKX(fr.result);
         var session = An.normalizeSession(parsed);
         var est = estimateWind(session);
         var wd = est && est.windDir != null ? est.windDir : null;
         var analysis = An.analyzeSession(session, wd, analysisOpts(est));
+        if(request.commit)request.commit();
         CUR.edit = null; CUR.fullSession = null; CUR.gpxText = null; CUR.fusion = null;
         renderFusionBanner(null);
         show(session, analysis, file.name.replace(/\.vkx$/i, ''), est);
@@ -11055,6 +11113,15 @@
   function loadFiles(fileList) {
     var files = [].slice.call(fileList || []);
     if (!files.length) return;
+    var request={seq:CUR.requestSeq=(CUR.requestSeq||0)+1,scope:window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'};
+    function commitImport(){
+      CUR.restoredInputs = null;
+      CUR.sessionGear = null;
+      CUR.openedRecId = null;
+      CUR.openedRevision = null;
+      try { restoreRiderInputs(null); } catch (e) {}
+    }
+    request.commit=commitImport;
     /* §550 — 초기화는 **여기**여야 한다. §547 은 loadGpxText 에만 넣었는데,
        파일이 하나여도 융합 경로를 타므로(포맷 감지가 거기 있다) 그 함수를
        안 거치는 업로드가 있다. 그래서 새로 올린 파일인데도 직전 세션의
@@ -11062,13 +11129,9 @@
        업로드에서 실측(25kt·4.0 이 그대로 따라왔다).
        프로필은 다시 싣는다: 몸무게·스킬은 라이더 값이라 맞고, 윙·풍속은
        이 세션 것이 아니라고 표시된다. */
-    CUR.restoredInputs = null;
-    CUR.sessionGear = null;
-    CUR.openedRecId = null;      /* §553 — 새로 올린 파일은 새 세션이다 */
-    try { restoreRiderInputs(null); } catch (e) {}
     /* .vkx 는 하나씩 — 바이너리라 융합 경로에 섞을 수 없다 */
     var vkx = files.filter(function (f) { return /\.vkx$/i.test(f.name); });
-    if (vkx.length) { loadVkxFile(vkx[0]); return; }
+    if (vkx.length) { loadVkxFile(vkx[0],request); return; }
     var textLike = files.filter(function (f) { return /\.(gpx|csv|tcx)$/i.test(f.name); });
     if (!textLike.length) {
       $('hdr-title').textContent = 'Unsupported file type';
@@ -11076,12 +11139,13 @@
       return;
     }
     readAllAsText(textLike, function (loaded, err) {
+      if(request.seq!==CUR.requestSeq||request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'))return;
       if (err) { $('hdr-title').textContent = 'Could not read ' + err; return; }
       /* 파일이 하나여도 융합 경로를 태운다 — 포맷 감지가 여기 있다
          (RaceBox CSV 는 GPX 파서로는 못 읽는다). */
       if (!window.RDSessionMerger) {
         if (loaded.length === 1) return loadGpxText(loaded[0].text,
-          loaded[0].name.replace(/\.[^.]+$/, ''));
+          loaded[0].name.replace(/\.[^.]+$/, ''),request);
         $('hdr-title').textContent = 'Merger unavailable';
         return;
       }
@@ -11095,6 +11159,7 @@
         var name = (primary && primary.fileName)
           ? primary.fileName.replace(/\.[^.]+$/, '')
           : loaded[0].name.replace(/\.[^.]+$/, '');
+        commitImport();
         CUR.edit = null; CUR.fullSession = null;
         CUR.gpxText = null;
         loaded.forEach(function (l) {
@@ -11113,12 +11178,11 @@
   }
 
   function loadGpxText(text, name) {
-    CUR.gpxText = text;
+    var request = arguments[2] || {seq:CUR.requestSeq=(CUR.requestSeq||0)+1,scope:window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'};
+    if(request.seq!==CUR.requestSeq||request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'))return;
+
     /* §547 — 새로 올린 파일에는 저장된 입력이 없다. 이전 세션에서 복원한
        표시가 남아 있으면 '이 세션에서 복원했다'는 거짓말이 된다. */
-    if (!CUR.restoringSaved) { CUR.restoredInputs = null; CUR.sessionGear = null; }
-    CUR.edit = null; CUR.fullSession = null; CUR.fusion = null;
-    renderFusionBanner(null);
     var parsed = Gpx.parseGPX(text);
     var session = An.normalizeSession(parsed);
     /* 풍향이 없으면 택/자이브 분류·VMG·폴라가 전부 잠긴다.
@@ -11126,6 +11190,13 @@
     var est = estimateWind(session);
     var wd = est && est.windDir != null ? est.windDir : null;
     var analysis = An.analyzeSession(session, wd, analysisOpts(est));
+    if (!CUR.restoringSaved) { CUR.restoredInputs = null; CUR.sessionGear = null;
+      if(request.commit)request.commit();
+      else {CUR.openedRecId=null;CUR.openedRevision=null;}
+    }
+    CUR.gpxText = text;
+    CUR.edit = null; CUR.fullSession = null; CUR.fusion = null;
+    renderFusionBanner(null);
     show(session, analysis, name, est);
   }
 
@@ -11159,11 +11230,19 @@
     if (rec) {
       CUR.isDemo = false;
       try {
-        openSavedSession(rec);
-        if (CUR.session) return;        /* 열렸으면 데모는 건드리지 않는다 */
+        var opened = openSavedSession(rec);
+        if (CUR.session) return;
+        if (opened) return; /* 복원이 진행 중이면 데모 요청을 시작하지 않는다. */
       } catch (e) {
         if (window.console) console.warn('[v2 §543] latest session failed to open', e);
       }
+    }
+    var request={seq:CUR.requestSeq=(CUR.requestSeq||0)+1,scope:window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'};
+    if (window.RD_PUBLIC_NO_SAMPLE) {
+      CUR.isDemo = true;
+      $('hdr-title').textContent = '라이딩 기록을 선택하세요';
+      $('hdr-date').textContent = '로그인 후 저장 기록을 열거나 파일을 선택하세요';
+      return;
     }
     fetch('sample/sample-songjeong-busan.gpx')
       .then(function (r) { return r.text(); })
@@ -11171,21 +11250,23 @@
         /* ⚠ 늦게 온 응답이 그 사이 올라온 세션을 덮지 않게. 이게 없어서
            편집 중에 데모가 끼어들었다. */
         if (CUR.session) return;
+        if(request.seq!==CUR.requestSeq||request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'))return;
         /* §463 — 데모 세션은 훈련부하 원장에 넣지 않는다. 페이지를 열
            때마다 자동으로 실려 남의 라이딩이 내 체력 추세가 되어버린다. */
         CUR.isDemo = true;
-        loadGpxText(t, 'Songjeong, Busan');
+        loadGpxText(t, 'Songjeong, Busan',request);
       })
       .catch(function (err) {
-        alertLine('분석 화면 오류: '+err.message);
         if (CUR.session) return;
+        if(request.seq!==CUR.requestSeq||request.scope!==(window.RDStorage&&window.RDStorage.nsPrefix?window.RDStorage.nsPrefix():'rd_'))return;
+        alertLine('분석 화면 오류: '+err.message);
         $('hdr-title').textContent = 'Could not load the sample session';
         $('hdr-date').textContent = String(err && err.message ? err.message : err);
         if (window.console) console.error('[v2] sample load failed', err);
       });
   }
 
-  window.addEventListener('rd:cloud-synced', function(){ try { renderSessions(); } catch(e) {} });
+  window.addEventListener('rd:cloud-synced', function(ev){ try { renderSessions(); if (window.RD_PUBLIC_NO_SAMPLE && CUR.isDemo && !CUR.session) { var latest=latestOpenable(); if(latest){CUR.isDemo=false;openSavedSession(latest);} } if (ev.detail && ev.detail.conflicts && window.DMJAuth && ev.detail.owner === DMJAuth.currentUserId()) alertLine('이 기기의 최신 기록을 유지했습니다. 계정의 다른 버전은 검토용 복구 기록으로 보관했습니다.'); } catch(e) {} });
   document.addEventListener('DOMContentLoaded', function () {
     /* 이 페이지는 영어다. 엔진이 돌려주는 안내문(풍향 추정 노트 등)은
        i18n 사전을 타므로 언어를 먼저 영어로 고정해야 한글이 새지 않는다. */
@@ -11206,6 +11287,10 @@
       if (!CUR.session || !window.RDReplay) return;
       if (!CUR.session.hasTime) { rp.textContent = 'No time data';
         setTimeout(function () { rp.textContent = '▶ Replay'; }, 1800); return; }
+      if (window.RDReplayWorkspace && p0CurrentRider()) {
+        RDReplayWorkspace.open(p0CurrentId());
+        return;
+      }
       try {
         /* 예전 페이지가 넘기던 옵션을 전부 맞춘다. sessionSig 가 없으면
            영상 업로드·싱크 상태가 저장되지 않고, hasVideoFlag 가 없으면
@@ -11223,6 +11308,8 @@
           analysis: CUR.analysis,
           ghost: gh,
           windDir: CUR.windDir,
+          windSource: CUR.est ? "트랙 추정" : "사용자 설정",
+          windConfidence: CUR.est && CUR.est.confidence,
           windSpeedKt: windSpeedFromForm(),
           unit: 'kt',
           sessionSig: sessionSig(CUR.session),
@@ -11248,18 +11335,27 @@
        §412 가 말한 그 이벤트다: 로그인 상태가 바뀌면 namespace 가 바뀌므로
        **화면 전체를 다시 그려야** 남의(혹은 이전의) 데이터가 안 남는다. */
     try { renderAuthChip(); } catch (e) {}
+    function resetAccountState(){
+      var seq=CUR.requestSeq||0;
+      if(window.RDReplayWorkspace)RDReplayWorkspace.close();
+      if(window.RDReplay&&RDReplay.isOpen())RDReplay.close();
+      if(window.RDP0Panel){var ids=RDP0Panel.store.getSnapshot().fleet.openRiderIds.slice();ids.forEach(function(id){RDP0Panel.store.dispatch({type:'close',riderId:id})})}
+      CUR={session:null,name:null,est:null,requestSeq:seq};STORED_AN={};
+      plots.forEach(function(p){try{p.destroy()}catch(e){}});plots.length=0;
+      if(mapInst&&mapInst.map){try{mapInst.map.remove()}catch(e){}}mapInst=null;mapCtx=null;segHl=null;
+      var pageBody=document.querySelector&&document.querySelector('.page-body');if(pageBody)pageBody.style.visibility='hidden';
+      var ghost=$('replay-ghost');if(ghost)ghost.value='';
+      var fileInput=$('v2-file');if(fileInput)fileInput.value='';
+      try{restoreRiderInputs(null)}catch(e){}
+      $('hdr-title').textContent='계정이 변경되었습니다. 현재 계정의 기록을 불러옵니다.';$('hdr-date').textContent='';$('nav-meta').textContent='';
+    }
+    var authScope=Store&&Store.nsPrefix?Store.nsPrefix():'rd_';
     window.addEventListener('dmj-auth-change', function () {
+      var nextScope=Store&&Store.nsPrefix?Store.nsPrefix():'rd_';
+      if(nextScope!==authScope){authScope=nextScope;CUR.requestSeq=(CUR.requestSeq||0)+1;resetAccountState();bootOpen()}
       try { renderAuthChip(); } catch (e) {}
-      /* 세션 목록·훈련부하는 namespace 를 타므로 다시 그린다 */
       try { renderSessions(); } catch (e) {}
       try { renderTraining(); } catch (e) {}
-      /* §543 — 로그인은 비동기로 복원된다. 부팅 시점엔 anon namespace 라
-         저장 세션이 안 보여 데모가 떴을 수 있다. 아직 데모면 지금 다시
-         고른다 — 로그인해서 들어왔는데 데모가 떠 있으면 안 된다. */
-      if (CUR.isDemo) {
-        var latest = latestOpenable();
-        if (latest) { CUR.isDemo = false; try { openSavedSession(latest); } catch (e) {} }
-      }
     });
 
     var pb = $('btn-pdf');
@@ -11310,15 +11406,17 @@
       });
     }
     var sb = $('btn-save');
-    if (sb) sb.addEventListener('click', function () {
+    if (sb) sb.addEventListener('click', async function () {
       if (!CUR.session || !Store || !Store.saveSession) return;
+      var saveOwnerSession = CUR.session;
       sb.disabled = true;
       document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'saving', text:'분석과 기록을 저장하는 중…'}}));
       /* Recompute with exactly the inputs being persisted; preserve wind. */
       try {
         riderFromFormSynced();
         applyWind(null, 'keep');
-        var res = Store.saveSession({
+        var persist = Store.saveSessionWithLock || Store.saveSession;
+        var res = persist({
           name: CUR.name || 'Session',
           /* §590 — 제거한 구간을 레코드에 같이 담는다(트랙은 원본 전체).
              예전엔 edited:false 고정 + 구간 미저장이라, 다시 열면 제거가
@@ -11333,7 +11431,8 @@
           purpose: ($('in-purpose')||{}).value || 'freeride',
           performanceV1: window.RDPerformanceScore ? RDPerformanceScore.compute(CUR.analysis,CUR.vps,{windConfidence:CUR.est&&CUR.est.confidence,windSource:CUR.est?'track':'manual'}) : null,
           windDir: CUR.windDir,
-          windSpeedKt: windSpeedFromForm(),
+          windSource: CUR.est ? "트랙 추정" : "사용자 설정",
+          windConfidence: CUR.est && CUR.est.confidence,
           windSpeedKt: windSpeedFromForm(),
           /* §547 (옥대표 "어떤 세션을 선택해도 신체정보랑 기본 정보입력은
              늘 같거나 최종 사용했던게 반복적으로 나타남") — 몸무게·윙·스킬은
@@ -11359,10 +11458,14 @@
           /* §553 — 저장된 세션을 다시 연 것이면 그 줄을 잇는다. 압축 트랙은
              손실이라 다시 열면 sig 가 미세하게 달라져 사본이 생겼다. */
           replaceId: CUR.openedRecId || null,
+          expectedRevision: CUR.openedRecId ? CUR.openedRevision : null,
           /* §509 — 트랙을 압축 형식으로 담기 위해 샘플을 같이 넘긴다.
              normalizeSession 의 t 는 세션 시작 기준 상대초라, 저장할 때
              절대 epoch 로 되돌려 준다(__abs). 안 그러면 다시 열 때
              날짜가 1970 년이 된다. */
+          preserveRaw: true,
+          speedSource: (CUR.fullSession || CUR.session).speedSource,
+          hasTime: (CUR.fullSession || CUR.session).hasTime!==false,
           samples: (function () {
             var S0 = (CUR.fullSession || CUR.session);
             /* ⚠ 단위가 섞이기 쉬운 자리다. startEpoch 는 **밀리초**이고
@@ -11372,11 +11475,13 @@
                보이므로 눈에 잘 안 띈다. 초로 맞춰 더한다. */
             var baseSec = ((S0 && S0.startEpoch) || 0) / 1000;
             return ((S0 && S0.samples) || []).map(function (p) {
-              return { lat: p.lat, lng: p.lng, __abs: baseSec + p.t };
+              return Object.assign({}, p, { __abs: S0.hasTime===false?null:baseSec+p.t,__hasTime:S0.hasTime!==false });
             });
           })(),
           gpxText: CUR.gpxText
         }, CUR.analysis);
+        if (res && typeof res.then === 'function') res = await res;
+        if (CUR.session !== saveOwnerSession) { sb.disabled = false; return; }
         if (res && res.ok) {
           /* §555b — 저장했으면 이 값들은 이제 **이 세션의 것**이다.
              안내문을 안 고치면 방금 저장한 뒤에도 "이 세션에 저장되지 않아
@@ -11394,7 +11499,7 @@
           };
           /* §553 — 방금 만든(혹은 이은) 줄이 이 세션의 정체성이 된다.
              안 잡으면 바로 다음 저장이 또 새 줄을 만든다. */
-          if (res.record && res.record.id) CUR.openedRecId = res.record.id;
+          if (res.record && res.record.id) { CUR.openedRecId = res.record.id; CUR.openedRevision = res.record.revision; }
           try { renderRiderNote(); } catch (e) {}
           try { renderInputSources(); } catch (e) {}
           renderSessions();
@@ -11408,18 +11513,19 @@
             sb.textContent = '계정에 저장 중…';
             document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'syncing', text:'이 기기에 저장됨 · 계정 동기화 중…'}}));
             RDCloud.pushSession(res.record, Store.loadTrack(res.record.id)).then(function(result){
-              if (saveOwner !== DMJAuth.currentUserId()) return;
+              if (saveOwner !== DMJAuth.currentUserId() || CUR.session !== saveOwnerSession) return;
               sb.textContent = result.ok ? '계정 저장 완료' : '동기화 다시 시도';
               sb.disabled = result.ok;
               document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:result.ok?'saved':'error', text:result.ok?'이 기기와 계정에 저장 완료':'이 기기에 저장됨 · 계정 동기화 실패, 다시 저장해 주세요.'}}));
-            }).catch(function(){sb.disabled=false;sb.textContent='동기화 다시 시도';document.dispatchEvent(new CustomEvent('rd:save-state',{detail:{state:'error',text:'이 기기에 저장됨 · 계정 연결을 확인하고 다시 저장해 주세요.'}}));});
+            }).catch(function(){if (saveOwner !== DMJAuth.currentUserId() || CUR.session !== saveOwnerSession) return; sb.disabled=false;sb.textContent='동기화 다시 시도';document.dispatchEvent(new CustomEvent('rd:save-state',{detail:{state:'error',text:'이 기기에 저장됨 · 계정 연결을 확인하고 다시 저장해 주세요.'}}));});
           }
         } else {
           sb.textContent = '다시 저장';
-          document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'error', text:'저장하지 못했습니다. 입력값은 유지됩니다.'}}));
+          document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'error', text:res && res.error ? res.error : '저장하지 못했습니다. 입력값은 유지됩니다.'}}));
           if (window.console) console.warn('[v2] save failed', res);
         }
       } catch (e) {
+        if (CUR.session !== saveOwnerSession) { sb.disabled = false; return; }
         sb.textContent = '다시 저장';
         document.dispatchEvent(new CustomEvent('rd:save-state', {detail:{state:'error', text:'저장하지 못했습니다. 입력값은 유지됩니다.'}}));
         if (window.console) console.error('[v2] save threw', e);
@@ -11467,6 +11573,30 @@
   });
   /* 편집을 코드에서도 걸 수 있게 최소 API 를 연다 — 자동 검증과
      추후 딥링크(공유 URL 에 제외 구간 담기)에 쓴다. */
+  if (window.RDP0Panel) RDP0Panel.store.subscribe(function(state, action) {
+    if (!CUR.session || !CUR.analysis) return;
+    if (action.type === 'inspection') {
+      var r=p0CurrentRider(), utc=state.inspection.utcMs;
+      if(!r || utc==null)return;
+      var first=r.trace.session.samples[0], base=RDAnalysisWorkspace.toUtc(r.trace,first);
+      if(stackInst && stackInst.setInspection)stackInst.setInspection(first.t+(utc-base)/1000/(r.trace.clock.scale||1));
+      var looked=RDAnalysisWorkspace.sampleAtUtc(r.trace,utc,state.policy.gapSec);
+      if(mapInst && mapInst.setInspection)mapInst.setInspection(looked.sample || null);
+      if(p0PolarInstance && p0PolarInstance.setInspection)p0PolarInstance.setInspection(looked.sample || null,utc);
+      var tableHost=$('bin-table-host');if(tableHost)Array.prototype.forEach.call(tableHost.querySelectorAll('[data-p0-samples]'),function(td){var ids=JSON.parse(td.dataset.p0Samples);td.style.outline=(looked.sampleIds||[]).some(function(id){return ids.indexOf(id)>=0})?'2px solid #ffd43b':'';});
+      return;
+    }
+    renderTimeline(CUR.session,CUR.analysis);
+    renderTrack(CUR.session,CUR.analysis);
+    p0AttachTacticalInspection();
+    var current=p0CurrentRider();
+    var hidden=current && state.fleet.riders[current.trace.id].presentationRole==='hidden';
+    ['chart-timeline','map-host','bin-table-host','chart-polar'].forEach(function(id){var n=$(id);if(n)n.hidden=!!hidden;});
+    var p0bin=$('bin-table-host');
+    if(p0bin)drawBinGrid(p0bin,CUR.analysis,{windDir:state.wind.directionDeg,maxHr:riderFromForm().maxHr,minSpeedKt:0});
+    var p0polar=$('chart-polar');
+    if(p0polar && window.RDPolar)p0PolarInstance=RDPolar.render(p0polar,heldPolar(CUR.analysis),{size:Math.min(520,p0polar.clientWidth||460),band:true,minN:1,minSeconds:15,onBin:p0PolarOptions().onBin});
+  });
   window.RDV2 = {
     addExclusion: addExclusion,
     removeExclusion: removeExclusion,

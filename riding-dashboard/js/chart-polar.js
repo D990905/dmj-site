@@ -61,12 +61,12 @@
   /* bins: [{twaCenter, count, p95Ms, avgMs}] — count 0 은 건너뛴다.
      minN 미만도 건너뛴다: 두세 점으로 만든 '그 각도의 실력' 은 실력이
      아니라 우연이다. 건너뛴 자리는 선이 **끊긴다**(0 으로 잇지 않는다). */
-  function toPoints(bins, side, metric, minN) {
+  function toPoints(bins, side, metric, minN, minSeconds) {
     if (!bins) return [];
     var need = (minN == null) ? 1 : minN;
     var out = [];
     bins.forEach(function (b) {
-      if (!b || !b.count || b.count < need) return;
+      if (!b || !b.count || (minSeconds != null ? !(b.durationSec >= minSeconds) : b.count < need)) return;
       var ms = metric === 'avg' ? b.avgMs : b.p95Ms;
       if (!(ms > 0)) return;
       out.push({ twa: b.twaCenter, kt: ms * KT, side: side, count: b.count });
@@ -100,7 +100,7 @@
     return Math.max(m, 1);
   }
 
-  function optimalAngle(bins, mode, minN) {
+  function optimalAngle(bins, mode, minN, minSec) {
     if (!bins || !bins.length) return { ok: false, reason: 'no_data' };
     /* 그리는 기준(MIN_N=5)보다 **두껍게** 요구한다. 최적 각도는 하나의
        숫자로 단언하는 것이라, 다섯 점으로 고른 '최적' 은 최적이 아니다.
@@ -127,7 +127,7 @@
 
     var best = null, considered = 0, exBins = 0, exSamples = 0, exTwa = null;
     bins.forEach(function (b) {
-      if (!b || b.count < need) return;
+      if (!b || (minSec != null ? !(b.durationSec >= minSec) : b.count < need)) return;
       var twa = b.twaCenter;
       if (!inMode(twa)) return;
       var kt = (b.avgMs || 0) * KT;
@@ -144,7 +144,7 @@
       var vmg = kt * Math.abs(Math.cos(twa * Math.PI / 180));
       var score = (mode === 'downwind') ? kt : vmg;
       if (!best || score > best.score) {
-        best = { twaDeg: twa, speedKt: kt, vmgKt: vmg, count: b.count, score: score };
+        best = { twaDeg: twa, speedKt: kt, vmgKt: vmg, count: b.count, durationSec: b.durationSec, score: score };
       }
     });
 
@@ -162,7 +162,7 @@
     /* 최적이 관측 범위의 끝이면 '최적' 이 아니라 '못 가 본 곳' 이다 */
     var lo = null, hi = null;
     bins.forEach(function (b) {
-      if (!b || b.count < need) return;
+      if (!b || (minSec != null ? !(b.durationSec >= minSec) : b.count < need)) return;
       if (!plausible(b.twaCenter)) return;
       if (lo == null || b.twaCenter < lo) lo = b.twaCenter;
       if (hi == null || b.twaCenter > hi) hi = b.twaCenter;
@@ -191,14 +191,14 @@
     /* §521 — 두 계열을 겹쳐 **띠**로 그린다: 안쪽 = 평소(avg),
        바깥 = 잘 됐을 때(p95). 선 하나는 "이게 내 실력" 처럼 보이지만
        실제로는 폭이 있고, 그 폭이 곧 일관성이다. */
-    var portAvg = toPoints(polar.port, 'P', 'avg', minN);
-    var portHi  = toPoints(polar.port, 'P', 'p95', minN);
-    var stbdAvg = toPoints(polar.starboard, 'S', 'avg', minN);
-    var stbdHi  = toPoints(polar.starboard, 'S', 'p95', minN);
+    var portAvg = toPoints(polar.port, 'P', 'avg', minN, opts.minSeconds);
+    var portHi  = toPoints(polar.port, 'P', 'p95', minN, opts.minSeconds);
+    var stbdAvg = toPoints(polar.starboard, 'S', 'avg', minN, opts.minSeconds);
+    var stbdHi  = toPoints(polar.starboard, 'S', 'p95', minN, opts.minSeconds);
     var port = metric === 'avg' ? portAvg : portHi;
     var stbd = metric === 'avg' ? stbdAvg : stbdHi;
     if (!port.length && !stbd.length) {
-      host.textContent = minN > 1
+      host.textContent = opts.minSeconds != null ? '선택 조건에서 각도별 유효 시간이 '+opts.minSeconds+'초 미만입니다.' : minN > 1
         ? 'No wind angle has ' + minN + ' or more samples yet \u2014 not enough to draw a polar.'
         : 'Not enough sailing data';
       return null;
@@ -399,9 +399,25 @@
       tip.style.left = Math.min(mx + 12, size - 150) + 'px';
       tip.style.top = Math.max(0, my - 44) + 'px';
     });
+    if (opts.onBin) cv.addEventListener('click', function(ev) {
+      var r=cv.getBoundingClientRect(), dx=ev.clientX-r.left-cx, dy=ev.clientY-r.top-cy;
+      if (Math.sqrt(dx*dx+dy*dy)>R+8) return;
+      var a=Math.atan2(Math.abs(dx),-dy)*180/Math.PI;
+      opts.onBin((Math.floor(a/binDeg)+.5)*binDeg,dx<0?'P':'S');
+    });
     cv.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
 
-    return { canvas: cv, maxKt: maxKt, port: port, starboard: stbd, metric: metric,
+    var cursorDot = document.createElement('span');
+    cursorDot.style.cssText='position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid #ffd43b;background:#202a38;pointer-events:none;display:none;transform:translate(-50%,-50%)';
+    host.appendChild(cursorDot);
+    function setInspection(sample, utcMs) {
+      if(!sample || sample.speed==null || sample.heading==null || sample.gpsOutlier || polar.windDir==null){cursorDot.style.display='none';return;}
+      var d=(sample.heading-polar.windDir)%360;if(d>180)d-=360;if(d<=-180)d+=360;
+      var xy=pos(Math.abs(d),sample.speed*KT,d>=0?'P':'S');
+      cursorDot.style.left=xy[0]+'px';cursorDot.style.top=xy[1]+'px';cursorDot.style.display='block';
+      cursorDot.setAttribute('aria-label','검사 시각 '+new Date(utcMs).toISOString());
+    }
+    return { canvas: cv, maxKt: maxKt, setInspection: setInspection, port: port, starboard: stbd, metric: metric,
              minN: minN, banded: showBand,
              drawn: { portAvg: portAvg.length, portHi: portHi.length,
                       stbdAvg: stbdAvg.length, stbdHi: stbdHi.length } };

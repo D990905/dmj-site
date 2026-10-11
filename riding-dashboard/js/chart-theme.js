@@ -162,9 +162,9 @@
     '"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif';
 
   var BASE = {
-    ink:       '#62675e',            /* 축 눈금·범례·축 제목 (slate) */
-    inkStrong: '#202522',            /* 강조 라벨 (navy) */
-    inkDim:    '#73776c',            /* 보조·캡션 */
+    ink:       '#526477',            /* 축 눈금·범례·축 제목 (slate) */
+    inkStrong: '#172b40',            /* 강조 라벨 (navy) */
+    inkDim:    '#627285',            /* 보조·캡션 */
     onDark:    '#FFFFFF',
     grid:      'rgba(32,37,34,0.07)',
     gridWidth: 1,
@@ -188,10 +188,10 @@
   /* 폰트 — 캔버스 ctx.font 문자열 헬퍼 + 표준 크기 */
   var FONT = {
     family: FONT_FAMILY,
-    sizeAxisTitle: 11,  /* 축 제목 */
-    sizeTick: 10,       /* 축 눈금 라벨 */
-    sizeLegend: 11,     /* 범례 */
-    sizeLabel: 10,      /* 데이터 라벨 */
+    sizeAxisTitle: 12,  /* 축 제목 */
+    sizeTick: 11,       /* 축 눈금 라벨 */
+    sizeLegend: 12,     /* 범례 */
+    sizeLabel: 11,      /* 데이터 라벨 */
     /* 캔버스용 — css(weight, px) → "600 11px <family>" */
     css: function (weight, px) {
       return (weight ? weight + ' ' : '') + px + 'px ' + FONT_FAMILY;

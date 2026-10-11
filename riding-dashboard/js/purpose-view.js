@@ -37,17 +37,15 @@ if(window.L&&valid.length>1){
  track.classList.add('rd-analysis-map');
  let base=null,satellite=true;
  const setBase=()=>{if(base)previewMap.removeLayer(base);track.classList.toggle('rd-satellite-map',satellite);base=L.tileLayer(satellite?'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}':'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,maxNativeZoom:satellite?18:19,attribution:satellite?'Imagery © Esri, Maxar, Earthstar Geographics':'© OpenStreetMap'}).addTo(previewMap);};setBase();
- const legStarts=new Set((options?.session?.legs||[]).map(l=>l.start));
- const maxSpeed=(sum.maxSpeedMs>0?sum.maxSpeedMs:valid.reduce((m,p)=>Math.max(m,Number.isFinite(p.speed)?p.speed:0),0));
- const ramp=f=>{f=Math.max(0,Math.min(1,f));const stops=[[231,76,60],[243,156,18],[46,204,113]],k=f<.5?0:1,t=(f-k*.5)*2;return 'rgb('+stops[k].map((v,j)=>Math.round(v+(stops[k+1][j]-v)*t)).join(',')+')';};
- samples.forEach((p,i)=>{const prev=samples[i-1];if(!prev||legStarts.has(i)||![p.lat,p.lng,prev.lat,prev.lng,p.speed].every(Number.isFinite)||p.t<=prev.t||p.t-prev.t>4||(p.legId!=null&&prev.legId!=null&&p.legId!==prev.legId))return;L.polyline([[prev.lat,prev.lng],[p.lat,p.lng]],{color:ramp(maxSpeed?p.speed/maxSpeed:0),weight:2.5,opacity:.95}).addTo(previewMap);});
+ RDMapV2.addSpeedTrack(previewMap,options.session);
  const fit=()=>previewMap.fitBounds(valid.map(p=>[p.lat,p.lng]),{padding:[42,42],maxZoom:15});fit();
  const controls=L.control({position:'topright'});controls.onAdd=()=>{const bar=e('div','rd-map-tools');L.DomEvent.disableClickPropagation(bar);L.DomEvent.disableScrollPropagation(bar);const toggle=e('button','','분석 지도'),reset=e('button','','전체 경로');toggle.type=reset.type='button';toggle.onclick=()=>{satellite=!satellite;setBase();toggle.textContent=satellite?'분석 지도':'위성 지도';toggle.setAttribute('aria-pressed',String(satellite));};reset.onclick=fit;bar.append(toggle,reset);return bar;};controls.addTo(previewMap);
  L.control.scale({position:'bottomright',imperial:false}).addTo(previewMap);
  const north=L.control({position:'topleft'});north.onAdd=()=>e('div','rd-map-north','↑ N');north.addTo(previewMap);
  const launch=L.control({position:'bottomright'});launch.onAdd=()=>{const b=e('button','rd-map-launch','▶ 라이딩 재생');b.type='button';L.DomEvent.disableClickPropagation(b);b.onclick=()=>document.getElementById('btn-replay')?.click();return b;};launch.addTo(previewMap);
  [valid[0],valid[valid.length-1]].forEach((p,i)=>L.circleMarker([p.lat,p.lng],{radius:5,color:'#fff',weight:2,fillColor:i?'#202622':'#dce65a',fillOpacity:1}).bindTooltip(i?'도착':'출발').addTo(previewMap));
- const legend=L.control({position:'bottomleft'});legend.onAdd=()=>{const box=e('div','rd-map-speed');box.append(e('span','','0'),e('i'),e('span','',(maxSpeed*1.94384).toFixed(1)+' kt'));box.setAttribute('aria-label','속도: 빨강 느림, 주황 중간, 초록 빠름');return box;};legend.addTo(previewMap);
+ RDMapV2.addSpeedLegend(previewMap);
+
 
  requestAnimationFrame(()=>{if(previewMap)previewMap.invalidateSize();});
 }else track.textContent='주행 위치 정보 없음';

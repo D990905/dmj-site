@@ -87,25 +87,11 @@
     return SPEED_TIER[i];
   }
 
-  /* 지도 트랙 선·범례 — 느림=빨강·중간=주황·빠름=초록. 밝은 OSM 타일
-     위에서 또렷하고 산뜻하게 보이도록 채도 높은 밝은 톤을 쓴다. 리플레이
-     뷰어 지도(replay.js speedRamp)와 동일 ramp 로 두 지도의 항적선 색을
-     맞춘다 (Danny 2026-05-24: 항적선이 어둡다 → 밝게). 속도 히스토그램
-     버킷색(speedColor)과는 별개의 ramp 다. */
+  /* All track views use the same absolute SOG scale. maxKt remains a
+     compatibility argument and never changes a track color. */
   function mapSpeedColor(kt, maxKt) {
-    var f = maxKt > 0 ? Math.max(0, Math.min(1, kt / maxKt)) : 0;
-    var stops = [[0, [231, 76, 60]], [0.5, [243, 156, 18]], [1, [46, 204, 113]]];
-    for (var i = 1; i < stops.length; i++) {
-      if (f <= stops[i][0]) {
-        var lo = stops[i - 1], hi = stops[i];
-        var k = (f - lo[0]) / (hi[0] - lo[0] || 1);
-        return 'rgb(' +
-          Math.round(lo[1][0] + (hi[1][0] - lo[1][0]) * k) + ',' +
-          Math.round(lo[1][1] + (hi[1][1] - lo[1][1]) * k) + ',' +
-          Math.round(lo[1][2] + (hi[1][2] - lo[1][2]) * k) + ')';
-      }
-    }
-    return 'rgb(46,204,113)';
+    var api=global.RDMapV2||(typeof module!=='undefined'&&module.exports?require('./map-v2.js'):null);
+    return typeof kt==='number'&&isFinite(kt)&&api?api.speedScale.colorFor(kt):'#8996a2';
   }
 
   /* 회전 종류색 — 택/자이브/회전 (범주 성격, 좋·나쁨 의미 없음) */
@@ -159,21 +145,8 @@
     }).addTo(map);
     map.fitBounds([[b.minLat, b.minLng], [b.maxLat, b.maxLng]], { padding: [28, 28] });
 
-    // 속도 그라데이션 폴리라인 — 모든 GPS 포인트 사용 (다운샘플링 없음)
-    var maxKt = (analysis.summary && analysis.summary.maxSpeedMs || 1) * KT;
-    var legs = session.legs && session.legs.length
-      ? session.legs : [{ start: 0, end: S.length - 1 }];
-    legs.forEach(function (leg) {
-      for (var i = leg.start + 1; i <= leg.end; i++) {
-        var p0 = S[i - 1], p1 = S[i];
-        var kt = (p1.speed || 0) * KT;
-        L.polyline([[p0.lat, p0.lng], [p1.lat, p1.lng]], {
-          /* 가는 선 — 마커를 가리지 않게 (Danny 2026-05-24: 항적선이
-             굵다 → 가늘게). 리플레이 뷰어 지도와 동일 두께. */
-          color: mapSpeedColor(kt, maxKt), weight: 2.5, opacity: 0.95
-        }).addTo(map);
-      }
-    });
+    global.RDMapV2.addSpeedTrack(map,session);
+    global.RDMapV2.addSpeedLegend(map);
 
     // 시작·끝 마커
     L.circleMarker([S[0].lat, S[0].lng], {

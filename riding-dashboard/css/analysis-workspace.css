@@ -1,0 +1,13 @@
+#analysis-workspace-p0 { overflow: hidden; }
+#analysis-workspace-p0 > div:first-child { padding: 1rem 1.25rem; }
+#analysis-workspace-p0 .p0-controls label { flex: 1 1 9rem; max-width: 18rem; }
+#analysis-workspace-p0 > p { margin: .5rem 1.25rem; overflow-wrap: anywhere; }
+#analysis-workspace-p0 .p0-view-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+#analysis-workspace-p0 .p0-view-card { min-width: 0; padding: .75rem; border: 1px solid var(--tblr-border-color); border-radius: .5rem; overflow: auto; }
+#analysis-workspace-p0 .p0-view-card h5 { margin-bottom: .75rem; }
+#analysis-workspace-p0 .p0-view-card p { margin: .5rem 0 0; }
+#analysis-workspace-p0 .p0-view-card canvas { max-width: 100%; }
+@media (max-width: 800px) {
+  #analysis-workspace-p0 .p0-view-grid { grid-template-columns: minmax(0, 1fr); }
+  #analysis-workspace-p0 .p0-controls label { max-width: none; }
+}

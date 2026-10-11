@@ -85,6 +85,13 @@
       return true;
     } catch (e) { return false; }
   }
+  function recordContent(rec) {
+    var clean = {};
+    Object.keys(rec).sort().forEach(function(k) {
+      if (k !== '_cloud' && k !== 'hasTrack' && k !== '_hasVideo') clean[k] = rec[k];
+    });
+    return JSON.stringify(clean);
+  }
   // Preserve divergent local metadata before a server merge. Never prune recovery
   // versions automatically. If backup storage fails, abort rather than overwrite.
   function preserveMergeVersions(local, incoming) {
@@ -105,9 +112,9 @@
     incoming.forEach(function(rec) {
       var old = byId[rec.id];
       if (!old || comparable(old) === comparable(rec)) return;
-      var previous = comparable(old);
+      var previous = comparable(old.revision > 0 ? rec : old);
       if (journal.some(function(v) { return v.record && v.record.id === old.id && comparable(v.record) === previous; })) return;
-      journal.push({savedAt:new Date().toISOString(), reason:'before-cloud-merge', record:old});
+      journal.push({savedAt:new Date().toISOString(), reason:old.revision > 0 ? 'incoming-cloud-conflict' : 'before-cloud-merge', record:old.revision > 0 ? rec : old});
       added++;
     });
     if (added) global.localStorage.setItem(key, JSON.stringify(journal));
@@ -115,6 +122,7 @@
   }
   function readLocalTrack(id) {
     try {
+      if (global.RDStorage && global.RDStorage.loadTrack) return global.RDStorage.loadTrack(id);
       var k = trackKey(id); if (!k) return null;
       var t = global.localStorage ? global.localStorage.getItem(k) : null;
       return (typeof t === 'string' && t) ? t : null;
@@ -148,7 +156,7 @@
       return true;
     } catch (e) { return false; }
   }
-  function markDeleted(id)   { var o = readTomb(); o[id] = Date.now(); writeTomb(o); }
+  function markDeleted(id)   { var o = readTomb(); if (o[id] != null) return; o[id] = Date.now(); writeTomb(o); }
   function unmarkDeleted(id) { var o = readTomb(); if (o[id] != null) { delete o[id]; writeTomb(o); } }
 
   /* ---------- 값 정규화 (DB 컬럼 타입 안전) ---------- */
@@ -332,6 +340,9 @@
       var cloudRecs = (sRes.data || []).map(function (row) {
         return rowToRecord(row, !!trackBySessionRow[row.id]);
       });
+      if (!global.RDStorage || !global.RDStorage.withSessionLock) throw new Error('safe-storage-lock-unavailable');
+      return global.RDStorage.withSessionLock(function () {
+      if (uid() !== u) return {ok:false,reason:'account-changed'};
       /* §415-del tombstone 반영: 삭제된 세션은 병합에서 제외(부활 차단).
          아직 cloud 에 남아 있으면 cloud 재삭제를 재시도(비동기), cloud 에서
          이미 사라졌으면 tombstone 을 정리한다. */
@@ -342,22 +353,30 @@
       for (var tid in tomb) {
         if (!tomb.hasOwnProperty(tid)) continue;
         if (cloudIds[tid]) { deleteSession(tid); }        /* 아직 cloud 에 있음 → 재삭제 */
-        else { delete tomb[tid]; tombChanged = true; }    /* cloud 에 없음 → tombstone 불필요 */
+        /* Keep deletion evidence even when a response omits this id: later stale
+           responses must not resurrect it. No automatic tombstone pruning. */
       }
       if (tombChanged) writeTomb(tomb);
 
       /* 병합: 로컬 → cloud 덮어쓰기 (cloud-first), id 기준 합집합. tombstone 제외. */
       var byId = {};
       var local = readSessions();
-      var preserved = preserveMergeVersions(local, cloudRecs);
+      var preserved = preserveMergeVersions(local, cloudRecs), conflicts = 0;
       local.forEach(function (rec) { if (rec && rec.id) byId[rec.id] = rec; });
-      cloudRecs.forEach(function (rec) { if (rec && rec.id) { if (readLocalTrack(rec.id)) rec.hasTrack = true; byId[rec.id] = rec; } });
+      cloudRecs.forEach(function (rec) {
+        if (!rec || !rec.id) return;
+        var existing = byId[rec.id];
+        if (existing && existing.revision > 0) { if (recordContent(existing) !== recordContent(rec)) conflicts++; return; }
+        if (readLocalTrack(rec.id)) rec.hasTrack = true;
+        byId[rec.id] = rec;
+      });
       var merged = [];
       for (var id in byId) { if (byId.hasOwnProperty(id) && !tomb[id]) merged.push(byId[id]); }
       merged.sort(function (a, b) { return (a.dateEpoch || 0) - (b.dateEpoch || 0); });
       if (!writeSessions(merged)) throw new Error('기기 저장 공간이 부족합니다. 기존 기록은 유지됩니다');
-      dispatch('rd:cloud-synced', { count: cloudRecs.length, total: merged.length });
-      return { ok: true, count: cloudRecs.length, total: merged.length, preserved: preserved };
+      dispatch('rd:cloud-synced', { count: cloudRecs.length, total: merged.length, conflicts:conflicts, owner:u });
+      return { ok: true, count: cloudRecs.length, total: merged.length, preserved: preserved, conflicts:conflicts };
+      });
     }).catch(function (e) {
       console.warn('[RDCloud §415] pullSessions failed', e);
       return { ok: false, error: String((e && e.message) || e) };
@@ -438,9 +457,13 @@
     }).then(function (text) {
       if (uid() !== downloadOwner) return {ok:false,reason:'account-changed'};
       if (typeof text !== 'string' || !text) return { ok: false, reason: 'empty' };
-      return writeLocalTrack(id, text)
-        ? { ok: true, source: 'cloud' }
-        : { ok: false, reason: 'local-write-failed' };
+      if (!global.RDStorage || !global.RDStorage.withSessionLock) return {ok:false,reason:'safe-storage-lock-unavailable'};
+      return global.RDStorage.withSessionLock(function () {
+        if (uid() !== downloadOwner) return {ok:false,reason:'account-changed'};
+        if (readTomb()[id]) return {ok:false,reason:'deleted'};
+        if (readLocalTrack(id)) return {ok:true,source:'local'};
+        return writeLocalTrack(id, text) ? {ok:true,source:'cloud'} : {ok:false,reason:'local-write-failed'};
+      });
     }).catch(function (e) {
       console.warn('[RDCloud §415] ensureTrack failed', id, e);
       return { ok: false, error: String((e && e.message) || e) };
@@ -472,7 +495,7 @@
         })
         .then(function (res) {
           if (res && res.error) throw res.error;
-          unmarkDeleted(id);                      /* cloud 삭제 확정 → tombstone 제거 */
+          /* Retain deletion evidence: an older in-flight pull can still contain this id. */
           return { ok: true };
         });
     }).catch(function (e) {

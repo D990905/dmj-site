@@ -1,5 +1,6 @@
 /* Exact UI messages and anchored generated sentences, never arbitrary user data. */
 window.RDKoreanExtra={dictionary:{
+'This session is stored as a summary only — no linked track file is available. The reason is unverified.':'연결된 경로 파일을 확인할 수 없어 요약만 표시합니다. 경로가 없는 이유는 아직 확인되지 않았습니다.',
 "Wind angle":"주행 풍각","Violin":"분포 밀도","Box plot":"상자 그림","Upwind only":"풍상만","Downwind only":"풍하만","Whole session":"전체 라이딩","Show this run on the map":"이 구간을 지도에서 보기","Other board":"다른 보드","Pick a saved session: its numbers appear side by side under the summary, and Replay races it as a second (purple) board.":"저장한 라이딩을 선택하면 요약 지표를 나란히 비교하고 재생 화면에서 보라색 보드로 함께 표시합니다.",
 
 'Tacks by side':'태킹 방향별 비교','Gybes by side':'자이빙 방향별 비교','Grouped by the direction of the turn, not by which tack you were on. A rider can be fine turning one way and poor the other — that is a different thing to fix than being slow on one tack.':'이 표는 진입 택이 아닌 회전 방향으로 구분합니다. 한쪽 회전의 약점과 특정 택의 주행 속도 차이를 구별해서 확인하세요.',

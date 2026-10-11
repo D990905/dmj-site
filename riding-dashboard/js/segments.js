@@ -100,38 +100,45 @@
   /* ---- 구간 통계 — 표본에서 직접 ----
      VMG 는 풍향이 있어야 낼 수 있다. 없으면 null 로 두고 화면이
      그렇다고 말하게 한다(0 으로 채우면 "VMG 0" 처럼 보인다). */
-  function segStats(S, seg, windDir) {
+  function segStats(S, seg, windDir, opts) {
     if (!S || !seg) return null;
     var a = Math.max(0, seg.startIdx), b = Math.min(S.length - 1, seg.endIdx);
     if (b <= a) return null;
-    var n = 0, sumSp = 0, maxSp = 0, sumVmg = 0, maxVmg = -Infinity, nV = 0;
+    opts=opts||{};
+    var Analysis=typeof module!=='undefined'&&module.exports?require('./analysis.js'):global.RDAnalysis;
+    var session=opts.session||{samples:S,legs:opts.legs};
+    var weights=Analysis.sampleTimeWeights(session,{fromSec:S[a].t,toSec:S[b].t,gapSec:opts.gapSec});
+    var n = 0, sumSp = 0, maxSp = 0, sumVmg = 0, maxVmg = -Infinity, nV = 0, speedSec=0,vmgSec=0,hrSec=0,measuredSec=0;
     var sumTwaCos = 0, sumTwaSin = 0, sumHr = 0, nHr = 0;
+    function valid(v){return typeof v==='number'&&isFinite(v)}
     for (var i = a; i <= b; i++) {
+      var w=weights[i]||0;if(!(w>0))continue;
+      measuredSec+=w;
       var sp = S[i].speed;
-      if (sp != null) { n++; sumSp += sp; if (sp > maxSp) maxSp = sp; }
-      if (S[i].hr != null) { sumHr += S[i].hr; nHr++; }
-      if (windDir != null && S[i].heading != null && sp != null) {
+      if (valid(sp)) { n++; sumSp += sp*w;speedSec+=w; if (sp > maxSp) maxSp = sp; }
+      if (valid(S[i].hr)) { sumHr += S[i].hr*w;hrSec+=w; nHr++; }
+      if (valid(windDir) && valid(S[i].heading) && valid(sp)) {
         var twa = angDiff(windDir, S[i].heading);   /* -180..180 */
         var ang = Math.abs(twa);
         var vmg = sp * Math.cos(ang * Math.PI / 180);   /* +풍상 / -풍하 */
-        sumVmg += vmg; nV++;
+        sumVmg += vmg*w;vmgSec+=w; nV++;
         if (Math.abs(vmg) > Math.abs(maxVmg) || maxVmg === -Infinity) maxVmg = vmg;
         var r = ang * Math.PI / 180;
-        sumTwaCos += Math.cos(r); sumTwaSin += Math.sin(r);
+        sumTwaCos += Math.cos(r)*w; sumTwaSin += Math.sin(r)*w;
       }
     }
     if (!n) return null;
     var distM = (S[b].cumDist != null && S[a].cumDist != null)
       ? (S[b].cumDist - S[a].cumDist) : null;
     var durSec = S[b].t - S[a].t;
-    var avgTwa = nV ? (Math.atan2(sumTwaSin / nV, sumTwaCos / nV) * 180 / Math.PI) : null;
+    var avgTwa = nV ? (Math.atan2(sumTwaSin / vmgSec, sumTwaCos / vmgSec) * 180 / Math.PI) : null;
     if (avgTwa != null && avgTwa < 0) avgTwa += 360;
-    var avgVmg = nV ? sumVmg / nV : null;
+    var avgVmg = vmgSec ? sumVmg / vmgSec : null;
     return {
       startIdx: a, endIdx: b,
       durationSec: durSec,
       distanceM: distM,
-      avgSpeedMs: sumSp / n,
+      avgSpeedMs: speedSec ? sumSp / speedSec : null,
       maxSpeedMs: maxSp,
       avgVmgMs: avgVmg,
       maxVmgMs: (maxVmg === -Infinity) ? null : maxVmg,
@@ -139,7 +146,8 @@
       /* 풍상/풍하 판정은 **평균 TWA** 로 — 순간 VMG 부호로 하면
          회전 하나에 방향이 뒤집힌다 */
       direction: (avgTwa == null) ? null : (avgTwa < 90 ? 'upwind' : 'downwind'),
-      avgHr: nHr ? sumHr / nHr : null,
+      avgHr: hrSec ? sumHr / hrSec : null,
+      measuredSec:measuredSec,coverage:durSec>0?measuredSec/durSec:0,metricSeconds:{speed:speedSec,vmg:vmgSec,hr:hrSec},weightPolicy:'midpoint-4sec',
       samples: n
     };
   }

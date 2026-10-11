@@ -53,16 +53,19 @@
   function toLocal(p, origin) {
     var mPerLat = 111132;
     var mPerLng = 111320 * Math.cos(toRad(origin.lat));
-    return { x: (p.lng - origin.lng) * mPerLng, y: (p.lat - origin.lat) * mPerLat };
+    return { x: (((p.lng-origin.lng+540)%360)-180) * mPerLng, y: (p.lat - origin.lat) * mPerLat };
   }
 
   /* 샘플별 ladder rung 좌표(m). 첫 샘플이 0. */
+  function validGps(p){return p&&!p.gpsOutlier&&typeof p.lat==='number'&&isFinite(p.lat)&&Math.abs(p.lat)<=90&&typeof p.lng==='number'&&isFinite(p.lng)&&Math.abs(p.lng)<=180}
   function ladderRung(session, twd) {
     var S = (session && session.samples) || [];
     if (!S.length || twd == null) return null;
-    var o = S[0], u = upwindUnit(twd);
-    var out = new Array(S.length);
+    var o = S.filter(validGps)[0], u = upwindUnit(twd);
+    if(!o)return null;
+    var out = new Array(S.length);out._legs=session.legs||null;
     for (var i = 0; i < S.length; i++) {
+      if(!validGps(S[i])){out[i]=null;continue}
       var q = toLocal(S[i], o);
       out[i] = q.x * u.x + q.y * u.y;
     }
@@ -86,16 +89,18 @@
      모순이 생긴다(실측에서 10건). 그래서 이 모듈은 rung 변화율 하나만
      쓴다 — 위치가 유일한 진실이다. */
   function rungRateAt(rung, S, i, sgn) {
-    if (i < 1 || i >= S.length) return null;
+    if (i < 1 || i >= S.length || !validGps(S[i-1]) || !validGps(S[i]) ||
+      typeof rung[i-1]!=='number'||!isFinite(rung[i-1])||typeof rung[i]!=='number'||!isFinite(rung[i])) return null;
+    if(rung._legs&&!rung._legs.some(function(l){return i-1>=l.start&&i<=l.end}))return null;
     var dt = S[i].t - S[i - 1].t;
-    if (!(dt > 0) || dt > 5) return null;
+    if (!(dt > 0) || dt > 4) return null;
     return { v: sgn * (rung[i] - rung[i - 1]) / dt, dt: dt };
   }
 
   /* 시간가중 평균 목표방향 진행 속도(m/s) — [i0, i1]. 표본 부족이면 null. */
   function meanRate(rung, S, i0, i1, sgn) {
     var sum = 0, w = 0, n = 0;
-    for (var i = Math.max(1, i0); i <= i1 && i < S.length; i++) {
+    for (var i = Math.max(1, i0+1); i <= i1 && i < S.length; i++) {
       var r = rungRateAt(rung, S, i, sgn);
       if (!r) continue;
       sum += r.v * r.dt; w += r.dt; n++;
@@ -146,8 +151,7 @@
     var S = (session && session.samples) || [];
     if (!S.length || twd == null || !maneuvers || !maneuvers.length) return [];
     var rung = ladderRung(session, twd);
-    if (!rung) return [];
-    var u = upwindUnit(twd), o = S[0];
+    if (!rung) return maneuvers.map(function(m,k){return {index:k,type:m.type,ok:false,vmgLossM:null,pathLossM:null,measuredSec:0,coverage:0,reason:'no-valid-gps-coverage'}});
 
     return maneuvers.map(function (m, k) {
       var res = { index: k, type: m.type, side: m.side, tSec: m.tSec,
@@ -203,7 +207,7 @@
          내면 그 건너뛴 시간이 B 에만 들어가 B>A 가 된다(실측 1건).
          같은 루프에서 부족분(A)과 순차(B)를 함께 쌓으면 정의상 B ≤ A. */
       var lossA = 0, netB = 0, usedSec = 0;
-      for (var i = Math.max(1, iStart); i <= iLossEnd && i < S.length; i++) {
+      for (var i = Math.max(1, iStart+1); i <= iLossEnd && i < S.length; i++) {
         var rr = rungRateAt(rung, S, i, sgn);
         if (!rr) continue;
         var diff = vref - rr.v;
@@ -211,6 +215,9 @@
         netB += diff * rr.dt;
         usedSec += rr.dt;
       }
+      res.measuredSec = usedSec;
+      res.coverage = res.lossWindowSec>0?usedSec/res.lossWindowSec:0;
+      if(!(usedSec>0)){res.reason='no-valid-gps-coverage';return res}
       res.vmgLossM = lossA;
       res.pathLossM = netB;
       res.measuredSec = usedSec;
@@ -226,7 +233,7 @@
       /* 목표 반대로 간 구간이 있었나 — "느렸다" 와 "거꾸로 갔다" 는
          같은 손실 수치라도 코칭이 다르다. */
       var wrongWay = 0;
-      for (var w = Math.max(1, iStart); w <= iLossEnd && w < S.length; w++) {
+      for (var w = Math.max(1, iStart+1); w <= iLossEnd && w < S.length; w++) {
         var rw = rungRateAt(rung, S, w, sgn);
         if (rw && rw.v < 0) wrongWay += rw.dt;
       }
@@ -278,7 +285,8 @@
     for (var i = 0; i < S.length; i++) {
       var z = zoneOf(S[i]);
       var side = (S[i].twa != null && S[i].twa < 0) ? 'P' : 'S';
-      if (z && cur && cur.zone === z && cur.side === side) continue;
+      if(!validGps(S[i]))z=null;
+      if (z && cur && cur.zone === z && cur.side === side && rungRateAt(rung,S,i,1)) continue;
       if (cur) close(i - 1 >= cur.i0 ? i - 1 : cur.i0);
       if (z) cur = { zone: z, side: side, i0: i };
     }
@@ -303,15 +311,17 @@
     if (!rung) return { upwindM: 0, downwindM: 0, upwindSec: 0, downwindSec: 0 };
     var up = 0, down = 0, upSec = 0, downSec = 0;
     for (var i = 1; i < S.length; i++) {
-      var dt = S[i].t - S[i - 1].t;
-      if (!(dt > 0) || dt > 5) continue;
+      var rate=rungRateAt(rung,S,i,1);if(!rate)continue;
+      var dt = rate.dt;
       if (S[i].twa == null || S[i].speed == null) continue;
       if (S[i].speed * KT < minKt) continue;
       var twa = Math.abs(S[i].twa), d = rung[i] - rung[i - 1];
       if (twa < 70) { up += d; upSec += dt; }
       else if (twa > 110) { down += -d; downSec += dt; }
     }
-    return { upwindM: up, downwindM: down, upwindSec: upSec, downwindSec: downSec };
+    var requested=S.length>1?S[S.length-1].t-S[0].t:0,validSec=0;
+    for(var j=1;j<S.length;j++){var r=rungRateAt(rung,S,j,1);if(r)validSec+=r.dt}
+    return { upwindM: up, downwindM: down, upwindSec: upSec, downwindSec: downSec,measuredSec:validSec,requestedSec:requested,coverage:requested>0?validSec/requested:0 };
   }
 
   /* ---------- 바람이 자리에 따라 달랐나, 시간에 따라 달랐나 ----------
