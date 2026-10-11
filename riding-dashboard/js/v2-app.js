@@ -2547,6 +2547,7 @@
     /* 로그인 후 여기로 돌아오게 한다 — 로그인하고 홈으로 튕기면
        하던 분석을 다시 열어야 한다 */
     var next = '/riding-dashboard/v2.html';
+    if (new URLSearchParams(window.location.search).get('review') === 'readonly') next += '?review=readonly';
     return '../login.html?next=' + encodeURIComponent(next);
   }
 

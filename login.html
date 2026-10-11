@@ -170,7 +170,8 @@ document.addEventListener('DOMContentLoaded', function () {
       // Whitelist common destinations.
       var allow = ['admin/index.html', 'admin/outlet.html', 'admin/operations.html', 'inquiry.html', 'cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
       var dest = new URL(r, location.origin + '/');
-      if (dest.origin === location.origin && allow.indexOf(dest.pathname.slice(1)) >= 0) return dest.pathname.slice(1) + dest.search + dest.hash;
+      var readOnlyDashboard = dest.pathname === '/riding-dashboard/v2.html' && dest.searchParams.get('review') === 'readonly';
+      if (dest.origin === location.origin && (allow.indexOf(dest.pathname.slice(1)) >= 0 || readOnlyDashboard)) return dest.pathname.slice(1) + dest.search + dest.hash;
       return null;
     } catch (e) { return null; }
   }
