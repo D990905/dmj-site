@@ -2,7 +2,7 @@
 const button=document.getElementById('save-inquiry'),status=document.getElementById('inquiry-save-status'),form=document.getElementById('inquiry-form');
 if(!button||!form)return;let requestId=null,lastPayload='';
 const draftKey='dmj_inquiry_draft_v1';
-try{const draft=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(draft&&Date.now()-draft.at<3600000){for(const name of ['product','size','experience','setup','note'])if(form.elements[name])form.elements[name].value=draft[name]||'';form.dispatchEvent(new Event('input',{bubbles:true}))}sessionStorage.removeItem(draftKey)}catch(e){}
+try{const draft=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(draft&&Date.now()-draft.at<3600000){window.DMJInquiryDraftProduct={product:draft.product||'',size:draft.size||''};for(const name of ['product','size','experience','setup','note'])if(form.elements[name]&&(name!=='product'||[...form.elements.product.options].some(o=>o.value===(draft[name]||''))))form.elements[name].value=draft[name]||'';form.dispatchEvent(new Event('input',{bubbles:true}))}sessionStorage.removeItem(draftKey)}catch(e){}
 document.getElementById('inquiry-login')?.addEventListener('click',()=>{try{const draft={at:Date.now()};for(const name of ['product','size','experience','setup','note'])draft[name]=form.elements[name].value;sessionStorage.setItem(draftKey,JSON.stringify(draft))}catch(e){}});
 
 button.addEventListener('click',async()=>{

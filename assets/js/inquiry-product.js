@@ -29,9 +29,18 @@
   }
   const legacy = params.get("note") || "",
     legacyId = legacy.match(/상품번호\s+([0-9a-f-]{36})$/i),
-    outlet = params.get("outlet") || legacyId?.[1],
-    product = params.get("product"),
-    size = (params.get("size") || "").slice(0, 80);
+    outlet =
+      params.get("outlet") ||
+      legacyId?.[1] ||
+      (/^[0-9a-f-]{36}$/i.test(window.DMJInquiryDraftProduct?.product || "")
+        ? window.DMJInquiryDraftProduct.product
+        : null),
+    product = params.get("product") || window.DMJInquiryDraftProduct?.product,
+    size = (
+      params.get("size") ||
+      window.DMJInquiryDraftProduct?.size ||
+      ""
+    ).slice(0, 80);
   window.DMJInquiryProductPending = !!outlet || !!(product && size);
   (async () => {
     try {
@@ -73,6 +82,8 @@
     } catch {
       document.getElementById("inquiry-save-status").textContent =
         "선택한 상품을 확인하지 못했습니다. 제품을 다시 선택하거나 카카오채널에서 알려 주세요.";
-    } finally { window.DMJInquiryProductPending = false; }
+    } finally {
+      window.DMJInquiryProductPending = false;
+    }
   })();
 })();
