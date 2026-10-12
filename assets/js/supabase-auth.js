@@ -295,6 +295,7 @@
     }).then(function (res) {
       if (res.error) throw new Error(_translateAuthError(res.error.message));
       cachedSession = res.data.session;
+      if(!cachedSession){profileGeneration++;cachedProfile=null;try{localStorage.removeItem(USER_CACHE_KEY)}catch(_){}}
       // signup 시 trigger 가 profile row 생성 → refresh
       return refreshProfile();
     });

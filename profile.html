@@ -5,8 +5,9 @@
      Phase 12 Supabase 백엔드 연동 시 데이터 layer 만 교체. footer §145-G v3 4-col 적용.
      2026-05-16: 카피 누수 정리 — 섹션 제목 8개의 "§A~§H " 접두어를 렌더 텍스트에서 제거 (섹션 구조·id·기능 동일, 내부 § 표기만 비노출). -->
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-profile-auth="pending">
 <head>
+<style>html:not([data-profile-auth="ready"]) .profile-page{display:none!important}#profile-auth-status{max-width:680px;margin:40px auto;padding:24px}html[data-profile-auth="ready"] #profile-auth-status{display:none}</style>
 <meta charset="UTF-8">
 <!-- §427a: §426 B pivot revert (옥대표 2026-07-02 "마이페이지 필요") — 마이페이지
      접근 차단 redirect 제거. 회원 기능 복원으로 이 페이지 정상 노출. -->
@@ -164,7 +165,7 @@
 </div>
 
 <!-- ========== Profile Page ========== -->
-<nav class="store-account-nav" aria-label="쇼핑 메뉴"><a href="catalog.html">전체 장비</a><a href="find-my-gear.html">내 장비 찾기</a><a href="inquiry.html">구매 문의</a><a href="#member-operations">내 문의·주문</a></nav><main class="profile-page">
+<nav class="store-account-nav" aria-label="쇼핑 메뉴"><a href="catalog.html">전체 장비</a><a href="find-my-gear.html">내 장비 찾기</a><a href="inquiry.html">구매 문의</a><a href="#member-operations">내 문의·주문</a></nav><section id="profile-auth-status" role="status" aria-live="polite"><p id="profile-auth-message">로그인 상태를 확인하고 있습니다.</p><button type="button" id="profile-auth-retry" hidden onclick="location.reload()">다시 확인</button></section><main class="profile-page">
   <div class="container">
 
     <!-- 1. Hero -->
@@ -590,7 +591,7 @@
   <option value="Flash 3/2mm Wetsuit"><option value="Flash 4/3mm Wetsuit"><option value="Wetsuit Boots 3mm">
 </datalist>
 
-<script src="assets/js/supabase-auth.js?v=20261001-drafts" defer></script>
+<script src="assets/js/supabase-auth.js?v=20261013-session-ready" defer></script>
 <!-- §412 (Alex Park #4 · 2026-06-11) — 라이딩 storage per-user namespace + legacy
      마이그레이션 (RDStorage.migrateLegacyIfNeeded). 마이페이지는 storage.js 를
      쓰지 않았으나, 전역 bare 'rd_*' 키 제거(데이터 격리)를 위해 마이그레이션을
@@ -611,13 +612,43 @@
 (function () {
   'use strict';
 
-  // Wait for DOMContentLoaded + DMJAuth available
-  function ready() {
-    if (!window.DMJAuth) { setTimeout(ready, 30); return; }
-
-    var user = window.DMJAuth.currentUser();
-    if (!user) {
-      window.location.replace('login.html');
+  var profileInitialized = false, profileIdentityGeneration = 0;
+  window.addEventListener('dmj-auth-change', function (event) {
+    var d = event.detail || {};
+    if (d.accountChanged || d.isLoggedIn === false) {
+      profileIdentityGeneration++;
+      document.documentElement.dataset.profileAuth = 'pending';
+      if (profileInitialized) window.location.replace('login.html?next=%2Fprofile.html');
+    }
+  });
+  window.addEventListener('pagehide', function () { document.documentElement.dataset.profileAuth = 'pending'; });
+  window.addEventListener('pageshow', function (event) { if (event.persisted) window.location.reload(); });
+  function authDeadline(promise) {
+    return new Promise(function (resolve, reject) {
+      var timer=setTimeout(function(){reject(new Error('로그인 확인 시간이 초과되었습니다.'));},12000);
+      promise.then(function(value){clearTimeout(timer);resolve(value);},function(error){clearTimeout(timer);reject(error);});
+    });
+  }
+  async function ready() {
+    var user;
+    try {
+      if (!window.DMJAuth || !window.DMJAuth._ensureClient) throw new Error('로그인 도구를 불러오지 못했습니다.');
+      await authDeadline(window.DMJAuth._ensureClient());
+      var generation=profileIdentityGeneration;
+      var restored=await authDeadline(window.DMJAuth._supabase().auth.getSession());
+      if(restored.error)throw new Error('로그인 세션을 확인하지 못했습니다.');
+      if(!restored.data || !restored.data.session){window.location.replace('login.html?next=%2Fprofile.html');return;}
+      var result=await authDeadline(window.DMJAuth._supabase().auth.getUser());
+      if (result.error) throw new Error('로그인 상태를 확인하지 못했습니다.');
+      if (!result.data || !result.data.user) { window.location.replace('login.html?next=%2Fprofile.html'); return; }
+      user=window.DMJAuth.currentUser();
+      if (!user || user.id!==result.data.user.id) user=await authDeadline(window.DMJAuth._refreshProfile());
+      if (generation!==profileIdentityGeneration || !user || user.id!==result.data.user.id) throw new Error('회원 정보를 확인하지 못했습니다.');
+      profileInitialized=true;
+      document.documentElement.dataset.profileAuth='ready';
+    } catch (error) {
+      document.getElementById('profile-auth-message').textContent=error.message+' 잠시 후 다시 확인해 주세요.';
+      document.getElementById('profile-auth-retry').hidden=false;
       return;
     }
 

@@ -164,23 +164,24 @@
 })();
 </script>
 <!--#foot:end-->
-<script src="assets/js/supabase-auth.js?v=20261001-drafts"></script>
+<script src="assets/js/supabase-auth.js?v=20261013-session-ready"></script>
 <script>
 // §169 Day 1B — signup submit handler (localStorage sprint shim)
 // §171-B 보완 — ?redirect=cart.html 등 쿼리 파라미터 지원 (whitelist).
 document.addEventListener('DOMContentLoaded', function () {
   function getSafeRedirect() {
     try {
-      var u = new URL(window.location.href);
-      var r = u.searchParams.get('redirect');
-      if (!r) return null;
-      if (/^(https?:|\/\/)/i.test(r)) return null;
-      var allow = ['cart.html', 'quote.html', 'profile.html', 'skill-assessment.html', 'find-my-gear.html', 'membership.html', 'consult.html'];
-      if (allow.indexOf(r) >= 0) return r;
-      return null;
-    } catch (e) { return null; }
+      var q=new URL(location.href).searchParams, value=q.get('redirect')||q.get('next');
+      if (!value || /^(https?:|\/\/)/i.test(value)) return null;
+      var dest=new URL(value,location.origin+'/');
+      var allow=['cart.html','quote.html','profile.html','skill-assessment.html','find-my-gear.html','membership.html','consult.html','inquiry.html'];
+      var readonly=dest.pathname==='/riding-dashboard/v2.html'&&dest.searchParams.get('review')==='readonly';
+      if (dest.origin!==location.origin || !(allow.includes(dest.pathname.slice(1))||readonly)) return null;
+      return dest.pathname.slice(1)+dest.search+dest.hash;
+    } catch (_) { return null; }
   }
   var nextDest = getSafeRedirect() || 'profile.html';
+  document.querySelector('.auth-links a').href='login.html?next='+encodeURIComponent('/'+nextDest);
 
   if (window.DMJAuth && window.DMJAuth.isLoggedIn()) {
     window.location.replace(nextDest);
@@ -199,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (ssoNote) ssoNote.textContent = '';
       try {
         await window.DMJAuth.signInWithProvider(b.getAttribute('data-provider'),
-          { redirectTo: location.origin + '/profile.html' });
+          { redirectTo: new URL(nextDest,location.origin+'/').href });
       } catch (err) {
         b.disabled = false; b.textContent = was;
         if (ssoNote) ssoNote.textContent = (err && err.message) || '가입에 실패했습니다.';
@@ -242,24 +243,32 @@ document.addEventListener('DOMContentLoaded', function () {
   var form = document.getElementById('signup-form');
   var err = document.getElementById('auth-error');
   if (!form) return;
+  var submitting=false;
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
+    if(submitting)return;
     err.hidden = true; err.textContent = '';
     var data = new FormData(form);
-    var email = String(data.get('email') || '');
+    var email = String(data.get('email') || '').trim();
     var password = String(data.get('password') || '');
     var confirm = String(data.get('password_confirm') || '');
     var agree = data.get('agree');
     try {
       if (!agree) throw new Error('이용약관에 동의해주세요.');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error('이메일을 확인해 주세요.');
+      if (password.length<8) throw new Error('비밀번호는 8자 이상 입력해 주세요.');
       if (password !== confirm) throw new Error('비밀번호가 일치하지 않습니다.');
+      submitting=true;form.querySelector('button[type=submit]').disabled=true;
       await window.DMJAuth.signup(email, password);
+      var sessionResult=await window.DMJAuth._supabase().auth.getSession();
+      if(sessionResult.error) throw new Error('가입 후 로그인 상태를 확인하지 못했습니다.');
+      if(!sessionResult.data.session){err.textContent='가입 응답을 받았지만 로그인은 아직 완료되지 않았습니다. 아래 로그인 링크로 이동해 주세요. 이메일 인증이 필요한 경우 수신 여부를 먼저 확인해 주세요.';err.hidden=false;return;}
       try { sessionStorage.setItem('dmj_signup_toast', '1'); } catch (e2) {}
       window.location.assign(nextDest);
     } catch (ex) {
       err.textContent = ex.message || '회원가입에 실패했습니다.';
       err.hidden = false;
-    }
+    } finally {submitting=false;form.querySelector('button[type=submit]').disabled=false;}
   });
 });
 </script>
