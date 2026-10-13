@@ -3,3 +3,9 @@
 /* Keep each price and the discounted-price pair on one line. */
 .outlet-price-row{display:flex;align-items:baseline;gap:10px;flex-wrap:nowrap;font-variant-numeric:tabular-nums}.outlet-price-row .outlet-old-price{margin-right:0}.outlet-price,.outlet-old-price{white-space:nowrap;word-break:normal;overflow-wrap:normal}.outlet-card{min-width:0;container-type:inline-size}
 @media(max-width:850px){.outlet-card .outlet-price-row{gap:5px}.outlet-card .outlet-price{font-size:clamp(12px,8cqw,16px)}.outlet-card .outlet-old-price{font-size:clamp(9px,6cqw,12px)}}
+
+/* Discount badges stay in normal flow, alongside the sale condition. */
+.outlet-hot-sale{background:#ffd54a;color:#7b1111;border:1px solid #a61b1b;font-weight:800;line-height:1.35;white-space:nowrap;animation:outlet-sale-glow 2.8s ease-in-out infinite}
+.outlet-sale-spark{display:inline-block;margin-right:3px}
+@keyframes outlet-sale-glow{0%,100%{background-color:#ffd54a;border-color:#a61b1b}50%{background-color:#ffeb8a;border-color:#c62828}}
+@media(prefers-reduced-motion:reduce){.outlet-hot-sale{animation:none}}
