@@ -209,8 +209,8 @@
           <label class="profile-field__label" for="f-gender">성별</label>
           <select id="f-gender" name="gender">
             <option value="">선택</option>
-            <option value="male">남</option>
-            <option value="female">여</option>
+            <option value="m">남</option>
+            <option value="f">여</option>
             <option value="other">기타</option>
           </select>
         </div>
@@ -591,7 +591,7 @@
   <option value="Flash 3/2mm Wetsuit"><option value="Flash 4/3mm Wetsuit"><option value="Wetsuit Boots 3mm">
 </datalist>
 
-<script src="assets/js/supabase-auth.js?v=20261013-session-ready" defer></script>
+<script src="assets/js/supabase-auth.js?v=20261013-profile-save" defer></script>
 <!-- §412 (Alex Park #4 · 2026-06-11) — 라이딩 storage per-user namespace + legacy
      마이그레이션 (RDStorage.migrateLegacyIfNeeded). 마이페이지는 storage.js 를
      쓰지 않았으나, 전역 bare 'rd_*' 키 제거(데이터 격리)를 위해 마이그레이션을
@@ -790,7 +790,7 @@
 
     function loadInfoForm(u) {
       document.getElementById('f-nickname').value = u.nickname || '';
-      document.getElementById('f-gender').value = u.gender || '';
+      document.getElementById('f-gender').value = u.gender === 'male' ? 'm' : u.gender === 'female' ? 'f' : (u.gender || '');
       document.getElementById('f-birth').value = u.birthYear ? String(u.birthYear) : '';
       // §169-M — Riding start: split YYYY-MM into year + month dropdowns
       var rs = (u.ridingStart || '').split('-');
@@ -911,7 +911,7 @@
         bits.push('📅 ' + u.birthYear + '년 (' + age + '세)');
       }
       if (u.gender) {
-        var g = u.gender === 'male' ? '남' : u.gender === 'female' ? '여' : '기타';
+        var g = (u.gender === 'm' || u.gender === 'male') ? '남' : (u.gender === 'f' || u.gender === 'female') ? '여' : '기타';
         bits.push(g);
       }
       if (u.stance) {
@@ -989,9 +989,15 @@
       if (expanded.hidden) expandInfoForm();
       else renderInfoCompact(window.DMJAuth.currentUser() || {});
     });
+    var infoDirty = false, infoSaving = false;
+    var infoForm = document.getElementById('info-form');
+    infoForm.addEventListener('input', function () { infoDirty = true; });
+    infoForm.addEventListener('change', function () { infoDirty = true; });
     // Cancel button → back to compact (discard unsaved changes)
     var cancelBtn = document.getElementById('info-cancel-btn');
     if (cancelBtn) cancelBtn.addEventListener('click', function () {
+      if (infoSaving) return;
+      infoDirty = false;
       loadInfoForm(window.DMJAuth.currentUser() || {});
       renderInfoCompact(window.DMJAuth.currentUser() || {});
     });
@@ -1000,6 +1006,11 @@
 
     document.getElementById('info-form').addEventListener('submit', function (e) {
       e.preventDefault();
+      if (infoSaving) return;
+      infoDirty = true;
+      infoSaving = true;
+      var saveBtn = infoForm.querySelector('button[type=submit]');
+      if (saveBtn) saveBtn.disabled = true;
       // §169-A — read checkbox-based multi-select (sports)
       var picks = [];
       var boxes = document.querySelectorAll('#ms-sports input[type=checkbox]');
@@ -1047,6 +1058,7 @@
       // 직접 객체로 쓰던 옛 sync-shim 코드 회귀 X.
       Promise.resolve(window.DMJAuth.updateUser(patch)).then(function () {
         var updated = window.DMJAuth.currentUser() || {};
+        infoDirty = false;
         renderHero(updated);
         var st = document.getElementById('info-save-status');
         st.textContent = '저장 완료';
@@ -1056,7 +1068,13 @@
         // §169-N v5-B — 저장 후 compact view 로 자동 collapse
         renderInfoCompact(updated);
       }).catch(function () {
-        toast('저장 중 오류가 발생했습니다');
+        var status = document.getElementById('info-save-status');
+        status.classList.remove('is-ok');
+        status.textContent = '기본 정보 저장에 실패했습니다. 입력 내용은 이 화면에 남아 있습니다. 추가 정보는 별도로 저장되었을 수 있습니다.';
+        toast('기본 정보를 저장하지 못했습니다');
+      }).finally(function () {
+        infoSaving = false;
+        if (saveBtn) saveBtn.disabled = false;
       });
     });
 
@@ -1073,7 +1091,7 @@
       var editing = expanded && !expanded.hidden &&
                     expanded.contains(document.activeElement) &&
                     document.activeElement !== document.body;
-      if (!editing) {
+      if (!editing && !infoDirty && !infoSaving) {
         loadInfoForm(u);
         renderInfoCompact(u);
       }
@@ -3247,5 +3265,5 @@
   <!-- §173 — Coach Danny AI Agent (전 페이지 영구 노출). DO_NOT_REVERT §173 -->
   <link rel="stylesheet" href="assets/css/agent-deny.css?tone=20260925-soft">
   <script src="assets/js/agent-deny.js" defer></script>
-<script src="assets/js/account-sync-status.js?v=1"></script><script src="assets/js/member-operations.js?v=20261001-drafts"></script><script src="assets/js/member-backup.js?v=recovery-20260925"></script><script defer src="assets/js/riding-gear-usage.js?v=20260925"></script></body>
+<script src="assets/js/account-sync-status.js?v=20261013-profile-save"></script><script src="assets/js/member-operations.js?v=20261001-drafts"></script><script src="assets/js/member-backup.js?v=recovery-20260925"></script><script defer src="assets/js/riding-gear-usage.js?v=20260925"></script></body>
 </html>

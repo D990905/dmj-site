@@ -250,7 +250,7 @@
     var db = {};
     if ('name' in patch) db.display_name = patch.name;
     if ('nickname' in patch) db.nickname = patch.nickname;
-    if ('gender' in patch) db.gender = patch.gender;
+    if ('gender' in patch) db.gender = patch.gender === 'male' ? 'm' : patch.gender === 'female' ? 'f' : patch.gender;
     if ('birthYear' in patch) db.birth_year = patch.birthYear ? Number(patch.birthYear) : null;
     if ('ridingStart' in patch) db.riding_start = patch.ridingStart;
     if ('mainSports' in patch) db.main_sports = patch.mainSports;
