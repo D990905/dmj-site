@@ -12,6 +12,11 @@
 (function () {
   'use strict';
 
+  // Temporary diagnosis maintenance: keep existing data, hide new-entry links.
+  var diagnosisNoticeStyle=document.createElement('style');
+  diagnosisNoticeStyle.textContent='a[href*="skill-assessment.html"]{display:none!important}';
+  document.head.appendChild(diagnosisNoticeStyle);
+
   // ── §427a: §426 B pivot revert (옥대표 2026-07-02 "마이페이지 필요") ─────────
   // §426 은 Supabase auto-pause(§425) 대응으로 회원 UI 를 표면 hide 했으나, 옥대표
   //   결정 번복으로 회원 기능을 다시 복원한다. 플래그 = false (원상 복구).
