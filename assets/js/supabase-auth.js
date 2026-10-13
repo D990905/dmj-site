@@ -843,7 +843,7 @@
   }
 
   var _pullGeneration = 0;
-  function pullUserDataFromCloud() {
+  function pullUserDataFromCloud(strictAssessmentRead) {
     return ensureClient().then(function () {
       if (!cachedSession) return;
       var uid = cachedSession.user.id;
@@ -860,9 +860,13 @@
         sb.from('user_data').select('suffix, data').eq('user_id', uid),
         sb.from('cart_items').select('*').eq('user_id', uid)
       ]).then(function (results) {
-        if (!cachedSession || cachedSession.user.id !== uid || generation !== _pullGeneration) return;
+        if (!cachedSession || cachedSession.user.id !== uid || generation !== _pullGeneration) {
+          if(strictAssessmentRead===true)throw new Error('진단 불러오기 상태가 변경되었습니다');
+          return;
+        }
         var udRes = results[0];
         var cartRes = results[1];
+        if(strictAssessmentRead===true && (udRes.error || !Array.isArray(udRes.data)))throw new Error('진단을 불러오지 못했습니다');
         // user_data 8종
         if (!udRes.error && Array.isArray(udRes.data)) {
           var present = {};
@@ -871,7 +875,7 @@
             if (!canApply(row.suffix)) return;
             var k = USER_NS_PREFIX + uid + '_' + row.suffix;
             var v = typeof row.data === 'string' ? row.data : JSON.stringify(row.data);
-            try { localStorage.setItem(k, v); } catch (e) {}
+            try { localStorage.setItem(k, v); } catch (e) {if(strictAssessmentRead===true && row.suffix==='skill_assessment_v1')throw new Error('진단을 이 기기에 불러오지 못했습니다');}
             _markCloudKnown(uid, row.suffix);
           });
           // Only previously synchronized fields can be cleared by a confirmed

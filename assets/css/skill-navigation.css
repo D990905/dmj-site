@@ -1,0 +1,24 @@
+[hidden] { display:none !important; }
+html.skill-detail-mode { overflow-anchor:none; scroll-behavior:auto !important; }
+#skill-summary #overall-body, #skill-summary .skill-overall__cta,
+#skill-summary .skill-weakness-card__legacy { display:none; }
+.skill-detail-mode .cons-hero, .skill-detail-mode #assessment,
+.skill-detail-mode .site-footer { display:none; }
+.skill-detail-mode [id^="agent-deny"], .skill-detail-mode .agent-deny-fab,
+.skill-detail-mode .agent-deny-teaser { display:none !important; }
+#skill-detail-view { min-height:70vh; padding-top:24px; }
+#skill-detail-title { margin:24px 0 16px; scroll-margin-top:110px; }
+#skill-detail-content { margin-bottom:32px; overflow-wrap:anywhere; }
+#skill-detail-view[data-kind="axis"] #skill-detail-content { padding:20px; background:#202522; color:#fff; border-radius:16px; }
+#skill-detail-content .skill-detail { display:block; }
+#skill-detail-view [data-skill-back] { min-height:48px; }
+.skill-next-practice { font-size:14px; line-height:1.6; margin:16px 0; }
+.skill-summary-help { line-height:1.7; }
+.speed-gauge__bar { height:28px; margin:18px 0 12px; background:linear-gradient(to right,#4ade80 0 20%,#67e8f9 20% 36%,#3FB8C9 36% 50%,#FF8A3D 50% 60%,#FFB800 60% 100%); }
+.speed-gauge__pointer { display:none; }
+#speed-range { width:100%; height:44px; margin:0; position:absolute; left:0; top:-8px; appearance:none; -webkit-appearance:none; background:transparent; cursor:pointer; }
+#speed-range::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:24px; height:40px; border:3px solid #202522; border-radius:7px; background:#fff; }
+#speed-range::-moz-range-thumb { width:20px; height:34px; border:3px solid #202522; border-radius:7px; background:#fff; }
+#speed-range:focus-visible { outline:3px solid #3FB8C9; outline-offset:4px; }
+.speed-gauge .speed-input-row { margin:14px 0; padding:12px; }
+@media(max-width:900px) { .skill-weakness__cards { grid-template-columns:1fr; } }
