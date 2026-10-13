@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
   async function goAfterLogin(replace){const destination=await DMJLoginDestination.resolve(nextDest,!!explicitDest);if(replace)location.replace(destination);else location.assign(destination)}
-  (async()=>{try{const q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.slice(1));if(q.has('error')||h.has('error'))return;await DMJAuth._ensureClient();const c=DMJAuth._supabase(),u=c&&await c.auth.getUser();if(!u?.error&&u?.data?.user)await goAfterLogin(true)}catch(e){const notice=document.getElementById('auth-error');if(notice){notice.textContent=e.message;notice.hidden=false}}})();
+  (async()=>{try{const q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.slice(1));if(q.has('error')||h.has('error')){try{sessionStorage.removeItem('dmj_admin_oauth_return')}catch(_){}return;}await DMJAuth._ensureClient();const c=DMJAuth._supabase(),u=c&&await c.auth.getUser();if(!u?.error&&u?.data?.user)await goAfterLogin(true)}catch(e){const notice=document.getElementById('auth-error');if(notice){notice.textContent=e.message;notice.hidden=false}}})();
 
   try { if (sessionStorage.getItem('dmj_logout_complete') === '1') { document.getElementById('login-heading').textContent = '로그아웃되었습니다'; document.querySelector('.auth .t-lead').textContent = '다시 이용하시려면 로그인해 주세요.'; sessionStorage.removeItem('dmj_logout_complete'); } } catch (e) {}
   var form = document.getElementById('login-form');
@@ -218,9 +218,11 @@ document.addEventListener('DOMContentLoaded', function () {
       b.disabled = true; b.textContent = '이동 중…';
       if (ssoNote) ssoNote.textContent = '';
       try {
+        try{if(nextDest==='profile.html')sessionStorage.setItem('dmj_admin_oauth_return',String(Date.now()+300000));else sessionStorage.removeItem('dmj_admin_oauth_return')}catch(_){}
         await window.DMJAuth.signInWithProvider(name, { redirectTo: nextUrl() });
         /* 성공하면 브라우저가 제공자 페이지로 떠나므로 여기 아래는 안 온다 */
       } catch (err) {
+        try{sessionStorage.removeItem('dmj_admin_oauth_return')}catch(_){}
         b.disabled = false; b.textContent = was;
         if (ssoNote) {
           ssoNote.textContent = (err && err.message) ? err.message : '로그인에 실패했습니다.';
@@ -259,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }).catch(function () {});
   })();
 
-  function nextUrl() { return new URL('login.html?next='+encodeURIComponent('/'+nextDest), location.origin + '/').href;
+  function nextUrl() { return new URL(nextDest, location.origin + '/').href;
   }
 
   form.addEventListener('submit', async function (e) {

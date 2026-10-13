@@ -591,7 +591,7 @@
   <option value="Flash 3/2mm Wetsuit"><option value="Flash 4/3mm Wetsuit"><option value="Wetsuit Boots 3mm">
 </datalist>
 
-<script src="assets/js/supabase-auth.js?v=20261013-profile-save" defer></script>
+<script src="assets/js/supabase-auth.js?v=20261013-profile-save" defer></script><script src="assets/js/login-destination.js?v=20261013-server-role" defer></script>
 <!-- §412 (Alex Park #4 · 2026-06-11) — 라이딩 storage per-user namespace + legacy
      마이그레이션 (RDStorage.migrateLegacyIfNeeded). 마이페이지는 storage.js 를
      쓰지 않았으나, 전역 bare 'rd_*' 키 제거(데이터 격리)를 위해 마이그레이션을
@@ -641,6 +641,10 @@
       var result=await authDeadline(window.DMJAuth._supabase().auth.getUser());
       if (result.error) throw new Error('로그인 상태를 확인하지 못했습니다.');
       if (!result.data || !result.data.user) { window.location.replace('login.html?next=%2Fprofile.html'); return; }
+      // Keep the existing OAuth callback URL; route only after server identity/role checks.
+      var adminOAuthReturn=false;
+      try{adminOAuthReturn=Number(sessionStorage.getItem('dmj_admin_oauth_return'))>Date.now()&&!new URLSearchParams(location.search).has('error')&&!new URLSearchParams(location.hash.slice(1)).has('error');sessionStorage.removeItem('dmj_admin_oauth_return')}catch(_){}
+      if(adminOAuthReturn){try{var destination=await DMJLoginDestination.resolve('profile.html',false);if(generation!==profileIdentityGeneration)return;if(destination!=='profile.html'){window.location.replace(destination);return;}}catch(_){if(generation!==profileIdentityGeneration)return;}}
       user=window.DMJAuth.currentUser();
       if (!user || user.id!==result.data.user.id) user=await authDeadline(window.DMJAuth._refreshProfile());
       if (generation!==profileIdentityGeneration || !user || user.id!==result.data.user.id) throw new Error('회원 정보를 확인하지 못했습니다.');
