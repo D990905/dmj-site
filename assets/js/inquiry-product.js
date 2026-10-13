@@ -51,21 +51,13 @@
         safe.searchParams.set("outlet", outlet);
         history.replaceState(null, "", safe);
         if (legacyId) e.note.value = "";
-        await DMJAuth._ensureClient();
-        const r = await DMJAuth._supabase().rpc("outlet_catalog");
-        if (r.error) throw Error();
-        const item = r.data?.find(
-          (i) =>
-            i.id === outlet &&
-            (!i.sale_status || i.sale_status === "available"),
-        );
-        if (!item) throw Error();
-        display({
-          id: item.id,
-          name: item.title,
-          option: item.size || "",
-          price: item.price_krw,
-        });
+        summary.hidden = false;
+        questions.hidden = true;
+        document.getElementById("selected-product-text").textContent =
+          "아울렛 상품은 가격 재검토 중입니다. 재개 후 상품과 가격을 확인해 주세요.";
+        document.getElementById("inquiry-save-status").textContent =
+          "아울렛 상품 가격 안내를 임시 중단했습니다.";
+        return;
       } else if (product && size) {
         const r = await fetch("data/commerce.json");
         if (!r.ok) throw Error();
