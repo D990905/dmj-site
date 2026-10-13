@@ -26,7 +26,7 @@
  if(s.purpose==='wave'&&['ppc-m1x','takoon-prosurf'].includes(p.id))rank=85;
  if(s.environment==='light'&&['takoon-ultra-glide','takoon-glide-midlength'].includes(p.id)){rank=level===0?50:85;reasons.push('글라이드와 이륙을 중시하는 보드 후보');}
  if(race&&p.brand==='levitaz')rank=p.category==='foil'?95:90;
- if(p.category==='accessory'){rank=0;reasons.push('사이즈·착용감·현재 장비와의 호환성을 확인하세요.');}
+ if(p.category==='accessory'||(p.category==='foil'&&p.foilType&&p.foilType!=='set')){rank=0;reasons.push('사이즈·착용감·현재 장비와의 호환성을 확인하세요.');}
  const v=p.volumeGuidance?.[s.level];
  if(s.weight&&v)reasons.push('본사 볼륨 가이드: 약 '+(s.weight+v[0])+(v[1]!==v[0]?'–'+(s.weight+v[1]):'')+'L. 실제 생산 사이즈와 조건을 상담에서 확인하세요.');
  return {product:p,reasons,rank};

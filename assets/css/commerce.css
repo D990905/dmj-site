@@ -81,3 +81,5 @@
 .social-icon{width:22px;height:22px;flex:0 0 22px}.social-channel.instagram .social-icon{color:#c13584}.social-channel.youtube .social-icon{color:#e62117}.social-channel.band .social-icon{color:#00a846}
 
 .commerce .store-footer .footer-link-row>strong,.commerce .store-footer .footer-link-list a{min-height:40px;display:flex;align-items:center}
+
+.free-series-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.race-series-grid{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:850px){.free-series-grid,.race-series-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:500px){.race-series-grid{grid-template-columns:1fr}}

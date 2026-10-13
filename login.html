@@ -23,7 +23,7 @@
   .auth-links { display: flex; justify-content: space-between; margin-top: var(--sp-3); font-size: 14px; }
   .auth-sso-note { color: var(--warn); font-size: 13px; margin-top: var(--sp-3); }
 </style>
-<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-service-theme.css?v=20260924-1&tone=20260925-soft"><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"><style>.admin-login .auth > .lab,.admin-login .auth-sso,.admin-login .auth-sso-note,.admin-login .auth-sep,.admin-login a[href="signup.html"]{display:none!important}.admin-login .auth .card{border-top:4px solid #202522}.admin-login .auth button[type="submit"]{background:#202522;color:#fff}.admin-login-badge{font-size:13px;letter-spacing:.18em;font-weight:700;color:#626b32}.member-login-link{display:block;text-align:center;margin-top:24px}.admin-login .auth .t-lead{font-size:18px;line-height:1.7}</style></head>
+<link rel="stylesheet" href="assets/css/commerce-bridge.css?v=20260924&tone=20260925-soft"><link rel="stylesheet" href="assets/css/dmj-service-theme.css?v=20260924-1&tone=20260925-soft"><link rel="stylesheet" href="assets/css/site-unified.css?v=20260925-3&tone=20260925-soft"><style>.admin-login .auth > .lab,.admin-login .auth-sso,.admin-login .auth-sso-note,.admin-login .auth-sep,.admin-login a[href="signup.html"]{display:none!important}.admin-login .auth .card{border-top:4px solid #202522}.admin-login .auth button[type="submit"]{background:#202522;color:#fff}.admin-login-badge{font-size:13px;letter-spacing:.18em;font-weight:700;color:#626b32}.member-login-link{display:block;text-align:center;margin-top:24px}.admin-login .auth .t-lead{font-size:18px;line-height:1.7}</style><script defer src="assets/js/login-destination.js?v=20261013-server-role"></script></head>
 <body class="dmj"><nav class="dmj-bridge" aria-label="DMJ 서비스"><a href="index.html"><strong>DMJ</strong><span>GEAR & RIDING</span></a><div><a href="catalog.html">장비 둘러보기</a><a href="inquiry.html">구매 상담 ↗</a></div></nav>
 
 <!--#nav:begin-->
@@ -175,7 +175,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return null;
     } catch (e) { return null; }
   }
-  var nextDest = getSafeRedirect() || 'profile.html';
+  var explicitDest=getSafeRedirect();
+  var nextDest = explicitDest || 'profile.html';
   var adminLogin = nextDest.startsWith('admin/');
   if(!adminLogin)document.querySelector('.auth-links a').href='signup.html?next='+encodeURIComponent('/'+nextDest);
   async function checkAdmin() {
@@ -187,12 +188,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
 
-  // 이미 로그인 상태면 redirect/profile 로
-  if (!adminLogin && window.DMJAuth && window.DMJAuth.isLoggedIn()) {
-    window.location.replace(nextDest);
-    return;
-  }
-
+  async function goAfterLogin(replace){const destination=await DMJLoginDestination.resolve(nextDest,!!explicitDest);if(replace)location.replace(destination);else location.assign(destination)}
+  (async()=>{try{const q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.slice(1));if(q.has('error')||h.has('error'))return;await DMJAuth._ensureClient();const c=DMJAuth._supabase(),u=c&&await c.auth.getUser();if(!u?.error&&u?.data?.user)await goAfterLogin(true)}catch(e){const notice=document.getElementById('auth-error');if(notice){notice.textContent=e.message;notice.hidden=false}}})();
 
   try { if (sessionStorage.getItem('dmj_logout_complete') === '1') { document.getElementById('login-heading').textContent = '로그아웃되었습니다'; document.querySelector('.auth .t-lead').textContent = '다시 이용하시려면 로그인해 주세요.'; sessionStorage.removeItem('dmj_logout_complete'); } } catch (e) {}
   var form = document.getElementById('login-form');
@@ -262,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }).catch(function () {});
   })();
 
-  function nextUrl() { return new URL(nextDest, location.origin + '/').href;
+  function nextUrl() { return new URL('login.html?next='+encodeURIComponent('/'+nextDest), location.origin + '/').href;
   }
 
   form.addEventListener('submit', async function (e) {
@@ -276,8 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))throw new Error('이메일을 확인해 주세요.');
       if(!password)throw new Error('비밀번호를 입력해 주세요.');
       await window.DMJAuth.login(email, password);
-      if (adminLogin) await checkAdmin();
-      window.location.assign(nextDest);
+      await goAfterLogin(false);
     } catch (ex) {
       err.textContent = '로그인하지 못했습니다. ' + (ex.message || '잠시 후 다시 시도해 주세요.');
       err.hidden = false;

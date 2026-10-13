@@ -71,12 +71,12 @@
         if (!r.ok) throw Error();
         const item = (await r.json()).products?.find((p) => p.id === product),
           variant = item?.retailVariants?.find((v) => v.option === size);
-        if (variant)
+        if (variant || item?.options?.includes(size))
           display({
             id: item.id,
             name: item.name,
             option: size,
-            price: variant.priceKRW,
+            price: variant?.priceKRW || null,
           });
       }
     } catch {

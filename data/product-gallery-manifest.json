@@ -1302,6 +1302,38 @@
         "../../assets/images/wip/ordered/wing-wind-hybrid-belt.jpg"
       ],
       "groups": {}
+    },
+    {
+      "id": "tkn-foil-stab-flash",
+      "path": "products/takoon/foil-stab-flash.html",
+      "photos": [
+        "../../assets/images/products/takoon/verified-20261013/flash.webp"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-stab-evo-300",
+      "path": "products/takoon/foil-stab-evo-300.html",
+      "photos": [
+        "../../assets/images/products/takoon/verified-20261013/evo.webp"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-pace-front-wing",
+      "path": "products/takoon/foil-pace-front-wing.html",
+      "photos": [
+        "../../assets/images/products/takoon/verified-20261013/pace.webp"
+      ],
+      "groups": {}
+    },
+    {
+      "id": "tkn-foil-xs-glide-front-wing",
+      "path": "products/takoon/foil-xs-glide-front-wing.html",
+      "photos": [
+        "../../assets/images/products/takoon/verified-20261013/xs.webp"
+      ],
+      "groups": {}
     }
   ]
 }
