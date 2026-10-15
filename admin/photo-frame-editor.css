@@ -1,0 +1,23 @@
+.outlet-frame-editor{min-width:0}
+.outlet-frame-stage{width:min(100%,500px);cursor:grab;touch-action:none;outline-offset:4px;border:1px solid #cdd1c7;box-sizing:border-box;background:#fff}
+.outlet-frame-stage:active{cursor:grabbing}
+.outlet-frame-stage img{user-select:none;-webkit-user-select:none;pointer-events:none}
+.outlet-frame-controls{width:min(100%,500px);margin-top:16px}
+.outlet-frame-controls label{display:grid;grid-template-columns:1fr auto;gap:8px}
+.outlet-frame-controls input[type=range]{grid-column:1/-1;padding:0;min-height:44px;accent-color:#6c781f}
+.outlet-frame-controls output{grid-column:2;grid-row:1;font-variant-numeric:tabular-nums}
+.outlet-frame-editor .outlet-actions{gap:8px;margin:12px 0}
+.outlet-frame-editor .outlet-actions button{padding:10px 12px}
+.outlet-frame-editor [aria-pressed=true]{border:2px solid #6c781f;background:#e8ebe1}
+.outlet-frame-preview{width:min(100%,368px)}
+.outlet-frame-preview[data-view=mobile]{width:min(100%,350px)}
+.outlet-frame-preview .outlet-price-row{gap:12px}
+.outlet-frame-preview .outlet-card h2{font-size:clamp(16px,6cqw,24px)}
+.outlet-frame-preview .outlet-card .outlet-price-label{font-size:13px}
+.outlet-frame-preview .outlet-card .outlet-reference-price{font-size:clamp(12px,4.3cqw,16px)}
+.outlet-frame-preview .outlet-card .outlet-price{font-size:clamp(16px,5.8cqw,22px)}
+.outlet-frame-preview[data-view=mobile] .outlet-card .outlet-price-row{gap:10px}
+.outlet-frame-preview[data-view=mobile] .outlet-card .outlet-price-label{font-size:12px}
+.outlet-frame-preview[data-view=mobile] .outlet-card .outlet-reference-price{font-size:15px}
+.outlet-frame-preview[data-view=mobile] .outlet-card .outlet-price{font-size:21px}
+@media(max-width:500px){.outlet-frame-editor .outlet-actions button{flex:1 1 140px}}
