@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const dialog = document.getElementById('lisa-brochure-popup');
-  if (!dialog || typeof dialog.showModal !== 'function') return;
+  if (!dialog || typeof dialog.showModal !== 'function' || document.getElementById('outlet-closeout-popup')) return;
   const key = 'dmj-lisa-brochure-hide-20261008';
   const today = new Date().toLocaleDateString('sv-SE');
   try { if (localStorage.getItem(key) === today) return; } catch (_) {}
