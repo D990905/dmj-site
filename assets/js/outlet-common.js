@@ -4,7 +4,7 @@ const labels={used:'중고제품',carryover:'이월제품',display:'전시상품
 const stockSpecialIds=new Set(['9e2611fb-6faa-44de-b5ea-c9a5aa0e2745','d1095472-691e-4154-adfa-632bd1db7dc7','35f2c4fb-7dbb-40fb-8b5a-0bf9faac6f1e']);
 const categoryLabel=item=>item.category==='carryover'&&stockSpecialIds.has(item.id)&&/\bV3\b/i.test(item.title||'')?'재고특별가':(labels[item.category]||'상품');
 const filterLabel=kind=>({beginner:'입문·초급용',intermediate:'중급용',advanced:'상급자용',race:'레이스용'})[kind]||'전체';
-function uses(item){const m=(item.title||'').match(/\bM1(?:-[LRX])?\b|SONIC/i)?.[0].toUpperCase();return ({'M1-L':['beginner','intermediate'],'M1-X':['intermediate'],'M1':['intermediate','advanced'],'M1-R':['advanced','race'],'SONIC':['race']})[m]||[]}
+function uses(item){const m=(item.title||'').match(/\bM1(?:-[LRX])?\b|SONIC/i)?.[0].toUpperCase();return ({'M1-L':['beginner','intermediate'],'M1-X':['intermediate'],'M1':['intermediate','advanced'],'M1-R':['advanced','race'],'SONIC':['advanced','race']})[m]||[]}
 function numericDiscount(item){const p=Number(item.price_krw),r=Number(item.original_price_krw);return Number.isFinite(p)&&Number.isFinite(r)&&p>0&&r>p?(r-p)/r:null}
 document.querySelectorAll('[data-kind="carryover"]').forEach(button=>{button.textContent=filterLabel('carryover')});
 
