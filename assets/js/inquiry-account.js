@@ -10,7 +10,7 @@ async function prefillContact(){const generation=++contactGeneration;
  try{await DMJAuth._ensureClient();const sb=DMJAuth._supabase(),auth=await sb.auth.getUser();
  if(generation!==contactGeneration)return;if(auth.error&&auth.error.name!=='AuthSessionMissingError'&&auth.error.status!==401)return;const owner=auth.error?null:auth.data.user?.id;
  if(contactOwner&&contactOwner!==owner){for(const name of contactFields)form.elements[name].value='';edited.clear();requestId=null;lastPayload=''}
- contactOwner=owner||null;if(!owner)return;
+ contactOwner=owner||null;for(const name of contactFields)form.elements[name].disabled=!owner;document.getElementById('inquiry-login').hidden=!!owner;if(!owner)return;
  const profile=await DMJAuth._refreshProfile();const current=await sb.auth.getUser();
  if(generation!==contactGeneration||current.data.user?.id!==owner||profile?.id!==owner)return;
  for(const [name,value] of [['callback_name',profile.name],['callback_phone',profile.phone]])if(!edited.has(name)&&!form.elements[name].value)form.elements[name].value=String(value||'').slice(0,name==='callback_name'?80:24);
