@@ -8032,7 +8032,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [
-        "L-XL"
+        "M-L"
       ],
       "price": 460000,
       "availability": "inquiry",
@@ -8057,7 +8057,7 @@
         "본사 사이즈": "S-M / L-XL",
         "구조": "탈착식 유연 슬랫",
         "바": "스테인리스 루프·퀵릴리스 버클",
-        "주문 구성에서 선택": "L-XL"
+        "주문 구성에서 선택": "M-L (사용자 확인)"
       },
       "notes": [
         "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
@@ -8068,7 +8068,7 @@
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "L-XL",
+          "option": "M-L",
           "priceKRW": 460000,
           "sku": "WIPWAIFOI3A-01536",
           "estimated": false
@@ -13702,19 +13702,19 @@
     {
       "id": "wip-wing-wind-hybrid-belt",
       "brand": "wip",
-      "name": "Wing-Wind Hybrid Belt",
+      "name": "Waist Foil Harness 2.0",
       "category": "accessory",
       "subcategory": "harness",
       "path": "products/wip/wing-wind-hybrid-belt.html",
-      "image": "assets/images/wip/ordered/wing-wind-hybrid-belt.jpg",
-      "description": "윙포일과 윈드서핑에 사용하는 하이브리드 벨트입니다. 측면 스트랩으로 조절하며 등 지지부와 후면 보드 리시 루프를 갖췄습니다.",
-      "headline": "윙과 윈드서핑을 위한 하이브리드 벨트",
-      "manufacturerSummary": "윙포일과 윈드서핑에 사용하는 하이브리드 벨트입니다. 측면 스트랩으로 조절하며 등 지지부와 후면 보드 리시 루프를 갖췄습니다.",
-      "source": "https://windforce.ca/products/forward-wip-wing-wind-hybrid-belt",
-      "verifiedAt": "2026-09-25",
-      "sourceStatus": "retailer-model-matched",
+      "image": "assets/images/wip/waistfoil-2-0/5.jpg",
+      "description": "EXO Carbon 프레임과 두 개의 배튼으로 등을 지지하는 경량 허리 하네스입니다. 벨크로로 연결한 허리 벨트와 EXO 하네스의 두 부분 구조로 버클 높이를 조절하며, 앞 포켓에 포일 웨지와 육각렌치를 보관할 수 있습니다. ION BAR가 포함됩니다.",
+      "headline": "등을 지지하는 EXO 프레임 허리 하네스",
+      "manufacturerSummary": "EXO Carbon 프레임과 두 개의 배튼으로 등을 지지하는 경량 허리 하네스입니다. 벨크로로 연결한 허리 벨트와 EXO 하네스의 두 부분 구조로 버클 높이를 조절하며, 앞 포켓에 포일 웨지와 육각렌치를 보관할 수 있습니다. ION BAR가 포함됩니다.",
+      "source": "https://boatcrewgear.com/wip-waist-foil-harness-2-0-forward-wip-clearance/",
+      "verifiedAt": "2026-10-20",
+      "sourceStatus": "user-corrected-retailer-reference",
       "options": [
-        "S/M"
+        "S-M"
       ],
       "price": 400000,
       "availability": "inquiry",
@@ -13730,16 +13730,18 @@
       ],
       "purposes": [],
       "specs": {
-        "모델 코드": "HAWIPWIN44",
-        "주문 사이즈": "S/M",
-        "조절 방식": "측면 스트랩",
-        "후면": "보드 리시 연결 루프"
+        "모델 코드": "HAWIPWAFOI",
+        "재고 사이즈": "S-M (사용자 확인)",
+        "등 지지 구조": "EXO Carbon 프레임 · 배튼 2개",
+        "조절 방식": "벨크로 연결 2부분 구조 · 버클 높이 조절",
+        "앞 포켓": "포일 웨지·육각렌치 보관",
+        "포함 구성": "ION BAR 포함"
       },
       "notes": [
-        "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
+        "DMJ 재고 사이즈: S-M."
       ],
       "invoiceSkus": [
-        "HAWIPWIN44A-01998"
+        "DMJ-WIP-WAISTFOIL-2"
       ],
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "priceMax": 400000,
@@ -13748,16 +13750,57 @@
       "priceSource": "WIP SS26 본사 주문서 USD 소비자가 · 최신 견적 재확인 필요",
       "retailVariants": [
         {
-          "option": "S/M",
+          "option": "S-M",
           "priceKRW": 400000,
-          "sku": "HAWIPWIN44A-01998",
+          "sku": "DMJ-WIP-WAISTFOIL-2",
           "estimated": false
         }
       ],
       "priceFixedAt": "2026-09-25",
       "gallery": [
-        "assets/images/wip/ordered/wing-wind-hybrid-belt.jpg"
-      ]
+        "assets/images/wip/waistfoil-2-0/5.jpg",
+        "assets/images/wip/waistfoil-2-0/6.jpg",
+        "assets/images/wip/waistfoil-2-0/1.jpg",
+        "assets/images/wip/waistfoil-2-0/2.jpg",
+        "assets/images/wip/waistfoil-2-0/3.jpg",
+        "assets/images/wip/waistfoil-2-0/4.jpg"
+      ],
+      "gallerySource": {
+        "url": "https://boatcrewgear.com/wip-waist-foil-harness-2-0-forward-wip-clearance/",
+        "checkedAt": "2026-10-20",
+        "photos": [
+          {
+            "url": "https://cdn11.bigcommerce.com/s-dom6h/images/stencil/1280x1280/products/1780/7206/BoatCrewGear-Forward-WIP-Waist-Foil-Harness-5__79612.1769647916.jpg?c=2",
+            "local": "assets/images/wip/waistfoil-2-0/5.jpg",
+            "alt": "Waist Foil Harness 2.0"
+          },
+          {
+            "url": "https://cdn11.bigcommerce.com/s-dom6h/images/stencil/1280x1280/products/1780/7207/BoatCrewGear-Forward-WIP-Waist-Foil-Harness-6__42272.1769647916.jpg?c=2",
+            "local": "assets/images/wip/waistfoil-2-0/6.jpg",
+            "alt": "Waist Foil Harness 2.0"
+          },
+          {
+            "url": "https://cdn11.bigcommerce.com/s-dom6h/images/stencil/1280x1280/products/1780/7205/BoatCrewGear-Forward-WIP-Waist-Foil-Harness-1__00840.1769647749.JPG?c=2",
+            "local": "assets/images/wip/waistfoil-2-0/1.jpg",
+            "alt": "Waist Foil Harness 2.0"
+          },
+          {
+            "url": "https://cdn11.bigcommerce.com/s-dom6h/images/stencil/1280x1280/products/1780/7208/BoatCrewGear-Forward-WIP-Waist-Foil-Harness-2__90956.1611906085.jpg?c=2",
+            "local": "assets/images/wip/waistfoil-2-0/2.jpg",
+            "alt": "Waist Foil Harness 2.0"
+          },
+          {
+            "url": "https://cdn11.bigcommerce.com/s-dom6h/images/stencil/1280x1280/products/1780/7210/BoatCrewGear-Forward-WIP-Waist-Foil-Harness-3__18545.1611906086.jpg?c=2",
+            "local": "assets/images/wip/waistfoil-2-0/3.jpg",
+            "alt": "Waist Foil Harness 2.0"
+          },
+          {
+            "url": "https://cdn11.bigcommerce.com/s-dom6h/images/stencil/1280x1280/products/1780/7209/BoatCrewGear-Forward-WIP-Waist-Foil-Harness-4__97537.1611906086.JPG?c=2",
+            "local": "assets/images/wip/waistfoil-2-0/4.jpg",
+            "alt": "Waist Foil Harness 2.0"
+          }
+        ]
+      }
     },
     {
       "id": "tkn-foil-stab-flash",
