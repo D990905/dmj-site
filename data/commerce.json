@@ -8032,7 +8032,7 @@
       "verifiedAt": "2026-09-24",
       "sourceStatus": "verified",
       "options": [
-        "M-L"
+        "L-XL"
       ],
       "price": 460000,
       "availability": "inquiry",
@@ -8057,7 +8057,7 @@
         "본사 사이즈": "S-M / L-XL",
         "구조": "탈착식 유연 슬랫",
         "바": "스테인리스 루프·퀵릴리스 버클",
-        "주문 구성에서 선택": "M-L (사용자 확인)"
+        "주문 구성에서 선택": "L-XL (사용자 확인)"
       },
       "notes": [
         "실제 구매 가능한 색상·사이즈와 입고 일정은 상담으로 확인합니다."
@@ -8068,7 +8068,7 @@
       "pricingStatus": "고정 판매가 · 부가세 포함",
       "retailVariants": [
         {
-          "option": "M-L",
+          "option": "L-XL",
           "priceKRW": 460000,
           "sku": "WIPWAIFOI3A-01536",
           "estimated": false
