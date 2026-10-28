@@ -33,7 +33,7 @@
   const dialog = document.createElement('dialog');
   dialog.className = 'ss-lightbox';
   dialog.setAttribute('aria-label', 'SUPERSONIC 영상 프레임 크게 보기');
-  dialog.innerHTML = '<div class="ss-lightbox-header"><span data-ss-caption></span><button type="button" data-ss-close autofocus aria-label="사진 닫기">닫기 ×</button></div><img class="ss-lightbox-image" alt=""><div class="ss-lightbox-footer"><span data-ss-count></span><a target="_blank" rel="noopener" data-ss-original>원본 이미지 ↗</a><div class="ss-lightbox-controls"><button type="button" data-ss-prev aria-label="이전 사진">←</button><button type="button" data-ss-next aria-label="다음 사진">→</button></div></div>';
+  dialog.innerHTML = '<div class="ss-lightbox-header"><span data-ss-caption aria-live="polite"></span><button type="button" data-ss-close autofocus aria-label="사진 닫기">닫기 ×</button></div><img class="ss-lightbox-image" alt=""><div class="ss-lightbox-footer"><span data-ss-count></span><a target="_blank" rel="noopener" data-ss-original>큰 이미지 새 창으로 ↗</a><div class="ss-lightbox-controls"><button type="button" data-ss-prev aria-label="이전 사진">←</button><button type="button" data-ss-next aria-label="다음 사진">→</button></div></div>';
   document.body.append(dialog);
   let index = 0, trigger = null;
   const large = dialog.querySelector('img');
