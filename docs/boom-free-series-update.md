@@ -2,7 +2,7 @@
 
 Baseline: `0b174b0a4015af1930a4d3c172043d9ee87f0841`.
 
-Update the existing FS 63/83/95 detail URLs and add their Hybrid variants to the live commerce catalog and brand/catalog discovery. Existing BOOM RS SCC turtle-mount race boards, prices, availability and all other products remain unchanged. New FS Hybrid variants have no retail price; display is inquiry only.
+Update the existing FS 63/83/95 detail URLs and add their Hybrid variants to the live commerce catalog and brand/catalog discovery. Existing BOOM RS SCC turtle-mount race boards, prices, availability and all other products remain unchanged. FS Hybrid consumer prices were explicitly approved by the user on 2026-11-03: 63L KRW 3,190,000; 83L KRW 3,290,000; 95L KRW 3,390,000, VAT included. Stock and delivery still require consultation.
 
 Primary source: manufacturer-provided **BOOM FREE SERIES Product Sheet_EN_V2_Optimized.pdf**, all seven pages reviewed. Rendered/extracted product images use the original PDF alpha masks. Private supplier correspondence and supplier prices are excluded from the public repository and product pages.
 
@@ -16,4 +16,8 @@ SCC = Shell Composite Construction, hollow shell, reinforced US mast track. Pres
 
 Public reference: https://levitaz.com/shop/product/boom-scc-boards/
 
-Retail price remains unconfirmed pending landed shipping, currency, import costs, warranty reserve and margin review. No order or supplier contact is performed by this update.
+Approved consumer prices are reflected in the product pages, brand/catalog cards and matching inquiry variants. No supplier costs are published. No order or supplier contact is performed by this update.
+
+## Homepage launch popup
+
+The user requested a public launch announcement after approving retail prices. The homepage dialog shows the three VAT-inclusive prices and links to the FS Hybrid product pages. Automatic display is once per tab session; an explicit seven-day hide option persists across tabs. A homepage button opens the announcement again on demand. Native dialog behavior provides keyboard focus containment and Escape dismissal; closing restores focus and scroll. The script does not open over another active dialog. Existing Supersonic, outlet and LISA campaign settings are preserved. No stock, immediate shipment or delivery date is promised.

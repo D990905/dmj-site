@@ -13967,7 +13967,7 @@
       "options": [
         "63 L / SCC Hybrid"
       ],
-      "price": null,
+      "price": 3190000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/boom-scc-boards/",
       "priority": "performance",
@@ -13988,7 +13988,15 @@
         "freeride",
         "downwind"
       ],
-      "verifiedAt": "2026-11-03"
+      "verifiedAt": "2026-11-03",
+      "retailVariants": [
+        {
+          "option": "63 L / SCC Hybrid",
+          "priceKRW": 3190000,
+          "estimated": false
+        }
+      ],
+      "retailPriceIncludesVAT": true
     },
     {
       "id": "lvz-boom-fs83",
@@ -14001,7 +14009,7 @@
       "options": [
         "83 L / SCC Hybrid"
       ],
-      "price": null,
+      "price": 3290000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/boom-scc-boards/",
       "priority": "performance",
@@ -14022,7 +14030,15 @@
         "freeride",
         "downwind"
       ],
-      "verifiedAt": "2026-11-03"
+      "verifiedAt": "2026-11-03",
+      "retailVariants": [
+        {
+          "option": "83 L / SCC Hybrid",
+          "priceKRW": 3290000,
+          "estimated": false
+        }
+      ],
+      "retailPriceIncludesVAT": true
     },
     {
       "id": "lvz-boom-fs95",
@@ -14035,7 +14051,7 @@
       "options": [
         "95 L / SCC Hybrid"
       ],
-      "price": null,
+      "price": 3390000,
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/boom-scc-boards/",
       "priority": "performance",
@@ -14056,7 +14072,15 @@
         "freeride",
         "downwind"
       ],
-      "verifiedAt": "2026-11-03"
+      "verifiedAt": "2026-11-03",
+      "retailVariants": [
+        {
+          "option": "95 L / SCC Hybrid",
+          "priceKRW": 3390000,
+          "estimated": false
+        }
+      ],
+      "retailPriceIncludesVAT": true
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",
