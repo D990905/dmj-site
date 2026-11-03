@@ -1,5 +1,6 @@
 (function(root){'use strict';
 const headers=['Group','Model','Size','Quantity','Already paid amount','Currency','New order unit cost','New order amount','Status','Notes'];
+function assertEnglish(list,rows){if(rows.some(r=>r.notes_ko?.trim()&&(!r.notes?.trim()||r.notes_english_confirmed!==true)))throw Error('English notes need review before export or sharing.');for(const value of [list.name,...rows.flatMap(r=>[r.model,r.size,r.notes])])if(/[^\x20-\x7e]/.test(value||''))throw Error('PDF export requires English ASCII text. Please review the list.')}
 const cents=v=>v==null?null:Math.round(Number(v)*100);
 function amount(row){return row.quantity==null||row.planned_unit_cost==null?null:Math.round(cents(row.planned_unit_cost)*row.quantity)/100}
 function matrix(rows){return rows.map(r=>[r.list_group==='undelivered'?'Undelivered':'Additional order',r.model,r.size,r.quantity,r.amount_paid,r.currency,r.planned_unit_cost,amount(r),r.status,r.notes])}
@@ -11,6 +12,7 @@ function zip(files){let offset=0;const parts=[],central=[];const u=(n,size)=>{co
  const size=central.reduce((n,a)=>n+a.length,0),count=Object.keys(files).length;parts.push(...central,u(0x06054b50,4),u(0,2),u(0,2),u(count,2),u(count,2),u(size,4),u(offset,4),u(0,2));const out=new Uint8Array(parts.reduce((n,a)=>n+a.length,0));let at=0;for(const p of parts){out.set(p,at);at+=p.length}return out;
 }
 function xlsx(list,rows){
+ assertEnglish(list,rows);
  const groups=['undelivered','additional'],files={};const declaration='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
  files['[Content_Types].xml']=declaration+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'+groups.map((g,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')+'</Types>';
  files['xl/styles.xml']=declaration+'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE2E635"/></patternFill></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf><xf numFmtId="2" fontId="0" fillId="0" borderId="0"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
@@ -28,6 +30,7 @@ function xlsx(list,rows){
 }
 const printable=s=>{s=String(s??'Not specified');if(/[^\x20-\x7e\n]/.test(s))throw Error('PDF export requires English ASCII text. Please review the list.');return s};
 function pdf(list,rows){
+ assertEnglish(list,rows);
  const widths=[65,135,50,40,65,45,65,75,65,67],pages=[];let commands=[],y=0;
  const escape=s=>s.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
  const line=(s,x,y,size=8)=>commands.push('BT /F1 '+size+' Tf '+x+' '+y+' Td ('+escape(printable(s))+') Tj ET');
@@ -38,6 +41,6 @@ function pdf(list,rows){
  for(const content of pages){const page=objects.length+1,stream=page+1;kids.push(page+' 0 R');objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R >> >> /Contents '+stream+' 0 R >>','<< /Length '+enc.encode(content).length+' >>\nstream\n'+content+'\nendstream')}
  objects[1]='<< /Type /Pages /Count '+pages.length+' /Kids ['+kids.join(' ')+'] >>';let output='%PDF-1.4\n',offsets=[0];objects.forEach((o,i)=>{offsets.push(enc.encode(output).length);output+=(i+1)+' 0 obj\n'+o+'\nendobj\n'});const xref=enc.encode(output).length;output+='xref\n0 '+(objects.length+1)+'\n0000000000 65535 f \n'+offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')+'trailer\n<< /Size '+(objects.length+1)+' /Root 1 0 R >>\nstartxref\n'+xref+'\n%%EOF\n';return enc.encode(output);
 }
-function email(list,rows){return list.name+'\nStatus: '+list.status+'\n\n'+matrix(rows).map((r,i)=>(i+1)+'. '+headers.map((h,k)=>h+': '+(r[k]??'Not specified')).join(' | ')).join('\n')+'\n\nAlready paid amounts are row totals and are separate from new order amounts. Unknown quantities/currencies remain unspecified. This is a planning list, not an order placement or payment.'}
+function email(list,rows){assertEnglish(list,rows);return list.name+'\nStatus: '+list.status+'\n\n'+matrix(rows).map((r,i)=>(i+1)+'. '+headers.map((h,k)=>h+': '+(r[k]??'Not specified')).join(' | ')).join('\n')+'\n\nAlready paid amounts are row totals and are separate from new order amounts. Unknown quantities/currencies remain unspecified. This is a planning list, not an order placement or payment.'}
 const api={headers,matrix,amount,xlsx,pdf,email};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.DMJSupplierExport=api;
 })(typeof window==='undefined'?globalThis:window);

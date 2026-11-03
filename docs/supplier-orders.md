@@ -28,3 +28,9 @@ Email preview shows the full saved list and exact recipient. An explicit checkbo
 - Existing outlet/auth, consent/ingestion tests, and product gallery checker must remain green.
 
 UI security also checks account changes, page restoration, and visibility changes. Unsaved edits survive switching tabs only while the same administrator is reverified; changing accounts clears private state. Exported files remain private information on the user's own device and are not revoked by later sign-out.
+
+## Korean UI / English exports
+
+The administrator UI, status labels, fixed instructions, and known source-note labels are Korean. Stored product names, original English notes, and enum values are preserved. Excel, PDF, and email use the original English data only. Korean free-text notes have a separate `notes_ko` field; the matching English `notes` must be explicitly reviewed via `notes_english_confirmed`. Changing either note in the UI resets the review checkbox. Unreviewed Korean notes block all three export/share formats; no translation service or guessed translation is used. Proper model names remain unchanged. New list names and export subjects require English input.
+
+`node tests/supplier-localization.cjs` verifies UI labels, fixed status mapping, English-only exports, original model names, and review gating. Native XLSX/PDF reopening confirms English notes and statuses. A local synthetic-data browser test verified Korean-note saving, unreviewed-share rejection in Korean, and explicit English review.
