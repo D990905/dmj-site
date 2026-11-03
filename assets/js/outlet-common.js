@@ -15,8 +15,24 @@ const money=n=>'₩'+Number(n).toLocaleString('ko-KR');
 const safeURL=s=>{try{const u=new URL(s);return ['https:','blob:'].includes(u.protocol)?u.href:''}catch{return ''}};
 async function client(){await DMJAuth._ensureClient();const c=DMJAuth._supabase();if(!c)throw Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');return c}
 let signedCache=new Map(),signedGeneration=0;
-window.addEventListener('dmj-auth-change',()=>{signedGeneration++;signedCache.clear()});
-async function signed(c,media){const generation=signedGeneration,paths=[...new Set((window.DMJOutletPhotoVariants?.requests(media)||media).map(m=>m.path).filter(Boolean))],now=Date.now(),fresh=paths.filter(p=>!signedCache.has(p)||signedCache.get(p).until<=now);if(fresh.length){const ttl=window.DMJOutletPhotoVariants?.enabled?600:3600,r=await c.storage.from('outlet-media').createSignedUrls(fresh,ttl);if(r.error)throw Error('사진·영상을 불러오지 못했습니다. 새로고침해 주세요.');if(generation!==signedGeneration)throw Error('로그인 상태가 변경되었습니다. 다시 시도해 주세요.');for(const x of r.data||[])if(x.signedUrl)signedCache.set(x.path,{url:x.signedUrl,until:now+(ttl-100)*1000})}return Object.fromEntries(paths.filter(p=>signedCache.has(p)).map(p=>[p,signedCache.get(p).url]))}
+// Profile synchronization and same-account token refresh do not revoke photo URLs.
+window.addEventListener('dmj-auth-change',event=>{if(event.detail?.accountChanged===false&&event.detail?.event!=='SIGNED_OUT')return;signedGeneration++;signedCache.clear()});
+async function signed(c,media){
+ const paths=[...new Set((window.DMJOutletPhotoVariants?.requests(media)||media).map(m=>m.path).filter(Boolean))];
+ // A restored session can arrive while the first photo request is in flight.
+ // Discard that response and retry under the current session without another click.
+ for(let attempt=0;attempt<3;attempt++){
+  const generation=signedGeneration,now=Date.now(),fresh=paths.filter(p=>!signedCache.has(p)||signedCache.get(p).until<=now);
+  if(fresh.length){
+   const ttl=window.DMJOutletPhotoVariants?.enabled?600:3600,r=await c.storage.from('outlet-media').createSignedUrls(fresh,ttl);
+   if(generation!==signedGeneration)continue;
+   if(r.error)throw Error('사진·영상을 불러오지 못했습니다. 새로고침해 주세요.');
+   for(const x of r.data||[])if(x.signedUrl)signedCache.set(x.path,{url:x.signedUrl,until:now+(ttl-100)*1000});
+  }
+  return Object.fromEntries(paths.filter(p=>signedCache.has(p)).map(p=>[p,signedCache.get(p).url]));
+ }
+ throw Error('로그인 상태를 확인 중입니다. 잠시 후 새로고침해 주세요.');
+}
 async function listings(){const c=await client(),r=await c.rpc('outlet_catalog');if(r.error)throw Error('상품을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');return {client:c,items:r.data||[]}}
 function discountedSale(item){return item.sale_status==='available'&&Number(item.available)>0&&numericDiscount(item)!==null&&activePromo(item)}
 function hotSale(item){return discountedSale(item)&&numericDiscount(item)>=.5}

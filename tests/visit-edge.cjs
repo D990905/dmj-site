@@ -1,0 +1,10 @@
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),{webcrypto:crypto}=require('node:crypto');
+let handler,stored=[];vm.runInNewContext(fs.readFileSync('supabase/edge/visit/index.ts','utf8'),{Deno:{serve:f=>handler=f,env:{get:n=>n==='SUPABASE_URL'?'https://backend':'test-secret'}},crypto,TextEncoder,TextDecoder,Uint8Array,Response,fetch:async(url,o)=>{stored.push({url,body:JSON.parse(o.body)});return Response.json(true)}});
+const payload={id:crypto.randomUUID(),session:crypto.randomUUID(),page:'/outlet.html',event:'view',consent:'analytics-2026-11-03',source_group:'social',device_type:'mobile',utm_source:'instagram',utm_campaign:'private@example.com'};
+const request=(d,extra={})=>new Request('https://edge/visit',{method:'POST',headers:{origin:'https://dmjgroup.kr',apikey:'sb_publishable_Xt5qEA_0Ar1HWWuecR4AAQ_9qxooFY1','content-type':'application/json',...extra},body:JSON.stringify(d)});
+(async()=>{
+ assert.equal((await handler(request(payload))).status,200);assert.equal(stored[0].body.p_context.utm_campaign,'other');assert.equal(stored[0].body.p_context.is_test,false);assert(!JSON.stringify(stored).includes('example.com'));assert(stored[0].url.endsWith('ops_record_visit_v2'));console.log('PASS v2 minimization and RPC routing');
+ assert.equal((await handler(request({...payload,page:'/outlet.html?email=private'}))).status,400);assert.equal(stored.length,1);assert.equal((await handler(request(payload,{'user-agent':'Googlebot'}))).status,204);assert.equal(stored.length,1);console.log('PASS private query rejection and bot exclusion');
+ assert.equal((await handler(request({...payload,consent:'no'}))).status,400);assert.equal((await handler(request(payload,{origin:'https://untrusted.test'}))).status,403);console.log('PASS consent/origin restrictions');
+ await handler(request(payload,{origin:'http://127.0.0.1:8765'}));assert.equal(stored[1].body.p_context.is_test,true);console.log('PASS local ingestion marked test');
+})().catch(e=>{console.error(e);process.exitCode=1});

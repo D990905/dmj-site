@@ -2,5 +2,35 @@
   "visitorAnalyticsEnabled": true,
   "visitEndpoint": "https://uzwennkeoeihqyvnxech.supabase.co/functions/v1/visit",
   "visitPublicKey": "sb_publishable_Xt5qEA_0Ar1HWWuecR4AAQ_9qxooFY1",
-  "notice": "이용자 선택 동의 후 수집 · 방문 기록과 방문 알림만 90일 경과 후 매일 삭제"
+  "notice": "이용자 선택 동의 후 수집 · 방문 기록과 방문 알림만 90일 경과 후 매일 삭제",
+  "analyticsUtmAllowlist": {
+    "source": [
+      "google",
+      "naver",
+      "instagram",
+      "facebook",
+      "youtube",
+      "kakao",
+      "band",
+      "newsletter",
+      "dmj"
+    ],
+    "medium": [
+      "organic",
+      "social",
+      "cpc",
+      "email",
+      "referral",
+      "qr"
+    ],
+    "campaign": [
+      "supersonic",
+      "outlet",
+      "lisa",
+      "takoon",
+      "ppc",
+      "levitaz",
+      "wip"
+    ]
+  }
 }
