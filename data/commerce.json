@@ -13955,6 +13955,108 @@
       "videos": [],
       "priceStatus": "inquiry",
       "priceNote": "국내 가격·재고·인도 일정은 상담 후 안내"
+    },
+    {
+      "id": "lvz-boom-fs63",
+      "brand": "levitaz",
+      "name": "BOOM FS SCC Hybrid 63",
+      "category": "board",
+      "path": "products/levitaz/boom-fs-63.html",
+      "image": "assets/images/products/levitaz/boom-free/boom-free-63.webp",
+      "description": "컴팩트한 길이와 날렵한 폭으로 빠르고 정확한 조작을 원하는 숙련 라이더를 위한 63L 보드입니다. 바람이 강해졌을 때의 기민한 반응과 속도 구간에서의 컨트롤에 초점을 맞췄습니다.",
+      "options": [
+        "63 L / SCC Hybrid"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://levitaz.com/shop/product/boom-scc-boards/",
+      "priority": "performance",
+      "minLevel": 3,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "light"
+      ],
+      "headline": "스포티하고 직접적인 반응",
+      "notes": [
+        "SCC Hybrid · US 마스트 트랙",
+        "Hybrid 3.9 kg / Full Carbon 참고 3.6 kg"
+      ],
+      "purposes": [
+        "freeride",
+        "downwind"
+      ],
+      "verifiedAt": "2026-11-03"
+    },
+    {
+      "id": "lvz-boom-fs83",
+      "brand": "levitaz",
+      "name": "BOOM FS SCC Hybrid 83",
+      "category": "board",
+      "path": "products/levitaz/boom-fs-83.html",
+      "image": "assets/images/products/levitaz/boom-free/boom-free-83.webp",
+      "description": "이륙 효율, 속도에서의 컨트롤, 턴과 전환의 기동성을 고르게 추구한 83L 보드입니다. 제조사는 윙뿐 아니라 패러윙과 다운윈드에서도 폭넓게 활용할 수 있는 모델로 설명합니다.",
+      "options": [
+        "83 L / SCC Hybrid"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://levitaz.com/shop/product/boom-scc-boards/",
+      "priority": "performance",
+      "minLevel": 2,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "light"
+      ],
+      "headline": "글라이드와 기동성의 균형",
+      "notes": [
+        "SCC Hybrid · US 마스트 트랙",
+        "Hybrid 4.6 kg / Full Carbon 참고 4.1 kg"
+      ],
+      "purposes": [
+        "freeride",
+        "downwind"
+      ],
+      "verifiedAt": "2026-11-03"
+    },
+    {
+      "id": "lvz-boom-fs95",
+      "brand": "levitaz",
+      "name": "BOOM FS SCC Hybrid 95",
+      "category": "board",
+      "path": "products/levitaz/boom-fs-95.html",
+      "image": "assets/images/products/levitaz/boom-free/boom-free-95.webp",
+      "description": "시리즈 중 가장 긴 194cm의 아웃라인과 효율적인 레일·바닥 형상으로 출발할 때의 글라이드를 중시한 95L 보드입니다. 약풍이나 체중이 더 나가는 라이더, 터치다운 후 다시 속도를 올리는 상황을 고려했습니다.",
+      "options": [
+        "95 L / SCC Hybrid"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://levitaz.com/shop/product/boom-scc-boards/",
+      "priority": "performance",
+      "minLevel": 2,
+      "raceOnly": false,
+      "discipline": "wing",
+      "environments": [
+        "flat",
+        "chop",
+        "light"
+      ],
+      "headline": "약풍에서의 이륙과 여유로운 글라이드",
+      "notes": [
+        "SCC Hybrid · US 마스트 트랙",
+        "Hybrid 4.9 kg / Full Carbon 참고 4.4 kg"
+      ],
+      "purposes": [
+        "freeride",
+        "downwind"
+      ],
+      "verifiedAt": "2026-11-03"
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",
