@@ -2,9 +2,11 @@
   'use strict';
   const dialog=document.getElementById('boom-free-launch');
   if(!dialog||typeof dialog.showModal!=='function')return;
-  const seenKey='dmj-three-news-seen-20261104',hideKey='dmj-three-news-hide-until-20261104';
-  let opener;
+  const campaign=dialog.dataset.popupCampaign==='three-news'?'three-news-20261104-all':'hybrid-sale-20261108',seenKey='dmj-'+campaign+'-seen',hideKey='dmj-'+campaign+'-hide-until';
+  let opener,pendingManual=false;
   function open(manual=false){
+    if(document.querySelector('[data-launch-price],[data-launch-summary]')&&document.documentElement.dataset.launchPricesReady!=='true'){pendingManual=manual;return;}
+    if(!manual&&dialog.dataset.popupCampaign!=='three-news'&&document.documentElement.dataset.launchOfferActive==='false')return;
     if(dialog.open||document.querySelector('dialog[open]'))return;
     if(!manual){try{if(sessionStorage.getItem(seenKey)||Number(localStorage.getItem(hideKey))>Date.now())return}catch(_){}}
     opener=document.activeElement;
@@ -17,5 +19,6 @@
   dialog.addEventListener('close',()=>{document.documentElement.classList.remove('boom-free-popup-open');if(opener?.isConnected)opener.focus()});
   dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close()});
   document.querySelectorAll('[data-boom-open]').forEach(button=>button.addEventListener('click',()=>open(true)));
+  window.addEventListener('dmj-launch-prices-ready',()=>open(pendingManual));
   open();
 })();
