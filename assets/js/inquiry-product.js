@@ -22,6 +22,7 @@
       item.name,
       item.option,
       item.price ? "₩" + Number(item.price).toLocaleString("ko-KR") : null,
+      item.promotion ? item.promotion.title+" · "+item.promotion.deadlineLabel+" · "+item.promotion.allocationLabel+" · "+item.promotion.deliveryLabel+" · "+item.promotion.confirmationLabel : null,
     ]
       .filter(Boolean)
       .join(" · ");
@@ -76,7 +77,8 @@
             id: item.id,
             name: item.name,
             option: size,
-            price: variant?.priceKRW || null,
+            price: DMJCommerce.selectedRetailPrice([item], item.id, size),
+            promotion: DMJCommerce.activePromotion(item),
           });
       }
     } catch {

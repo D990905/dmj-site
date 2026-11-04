@@ -14003,7 +14003,17 @@
           "estimated": false
         }
       ],
-      "retailPriceIncludesVAT": true
+      "retailPriceIncludesVAT": true,
+      "promotion": {
+        "id": "boom-hybrid-launch-20261108",
+        "title": "출시 기념 특가",
+        "priceKRW": 2890000,
+        "endsAt": "2026-11-09T00:00:00+09:00",
+        "deadlineLabel": "2026년 11월 8일(일) 주문·입금 마감",
+        "allocationLabel": "한정수량 · 선착순",
+        "deliveryLabel": "배송 7~10일",
+        "confirmationLabel": "잔여 수량·행사 적용 및 배송 기산일은 상담에서 확인합니다."
+      }
     },
     {
       "id": "lvz-boom-fs83",
@@ -14045,7 +14055,17 @@
           "estimated": false
         }
       ],
-      "retailPriceIncludesVAT": true
+      "retailPriceIncludesVAT": true,
+      "promotion": {
+        "id": "boom-hybrid-launch-20261108",
+        "title": "출시 기념 특가",
+        "priceKRW": 2950000,
+        "endsAt": "2026-11-09T00:00:00+09:00",
+        "deadlineLabel": "2026년 11월 8일(일) 주문·입금 마감",
+        "allocationLabel": "한정수량 · 선착순",
+        "deliveryLabel": "배송 7~10일",
+        "confirmationLabel": "잔여 수량·행사 적용 및 배송 기산일은 상담에서 확인합니다."
+      }
     },
     {
       "id": "lvz-boom-fs95",
@@ -14087,7 +14107,17 @@
           "estimated": false
         }
       ],
-      "retailPriceIncludesVAT": true
+      "retailPriceIncludesVAT": true,
+      "promotion": {
+        "id": "boom-hybrid-launch-20261108",
+        "title": "출시 기념 특가",
+        "priceKRW": 2990000,
+        "endsAt": "2026-11-09T00:00:00+09:00",
+        "deadlineLabel": "2026년 11월 8일(일) 주문·입금 마감",
+        "allocationLabel": "한정수량 · 선착순",
+        "deliveryLabel": "배송 7~10일",
+        "confirmationLabel": "잔여 수량·행사 적용 및 배송 기산일은 상담에서 확인합니다."
+      }
     }
   ],
   "policy": "DMJ 매장 추천 기준 · 2026-09-24 · 제조사 성능 등급 아님",

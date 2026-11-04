@@ -41,7 +41,7 @@
   const {product:p,reasons}=candidates.find(r=>r.product.id===productSelect.value);body.replaceChildren();options.replaceChildren();selections.delete(category);
   const photo=el('a');photo.href=p.path;const image=el('img');image.src=p.image;image.alt=p.name;image.loading='lazy';photo.append(image);
   const intro=el('div'),link=el('a',p.name+' 상세 보기 ↗');link.href=p.path;intro.append(link,el('p',reasons.slice(0,2).join(' · ')));body.append(photo,intro);
-  const variants=(p.retailVariants||[]).filter(v=>p.brand!=='takoon'||p.category!=='wing'||(p.options||[]).includes(v.option));
+  const variants=(DMJCommerce.pricedProduct(p).retailVariants||[]).filter(v=>p.brand!=='takoon'||p.category!=='wing'||(p.options||[]).includes(v.option));
   const takoon=['takoon-v4','takoon-v4-pro','takoon-vx-pro-2'].includes(p.id);const axes=takoon?(p.id==='takoon-v4-pro'?['사이즈','색상','핸들 구성']:['사이즈','핸들 구성']):['사이즈·구성'];const chosen=axes.map(()=>''),selects=[];
   for(const name of axes){const label=el('label',name),select=el('select');select.setAttribute('aria-label',labelFor(category)+' '+name);label.append(select);options.append(label);selects.push(select)}
   function sync(start){
@@ -64,7 +64,7 @@
  const order=el('a','이대로 주문 요청','button dark'),consult=el('a','이대로 상담 신청','button dark'),quote=el('a','견적서 요청','text-link'),download=el('button','견적서 내려받기','button');download.type='button';actions.append(order,consult,download,quote);
  let current=[],sum=0,complete=false,priced=false;
  function update(){
-  current=categories.flatMap(c=>selections.has(c)?[selections.get(c)]:[]);sum=current.reduce((n,x)=>n+Number(x.variant.priceKRW),0);complete=mainCategories.every(c=>selections.has(c))&&[...requestedExtras].every(c=>selections.has(c));priced=complete&&current.every(x=>Number(x.variant.priceKRW)>0);lines.replaceChildren();
+  current=categories.flatMap(c=>selections.has(c)?[selections.get(c)]:[]).map(x=>({...x,variant:DMJCommerce.pricedProduct(x.product).retailVariants.find(v=>v.option===x.variant.option)||x.variant}));sum=current.reduce((n,x)=>n+Number(x.variant.priceKRW),0);complete=mainCategories.every(c=>selections.has(c))&&[...requestedExtras].every(c=>selections.has(c));priced=complete&&current.every(x=>Number(x.variant.priceKRW)>0);lines.replaceChildren();
   current.forEach(x=>lines.append(el('p',x.product.name+' · '+x.variant.option+' — '+(Number(x.variant.priceKRW)>0?money(x.variant.priceKRW):'가격 문의'))));total.textContent=(priced?'총 상품금액 ':'가격이 확인된 상품 합계 ')+money(sum);
   status.textContent=complete&&!priced?'가격 확인이 필요한 장비가 있습니다 구성 그대로 상담과 견적 요청이 가능합니다':complete?'재고와 배송비, 호환성을 확인한 뒤 주문이 확정됩니다':'각 장비의 사이즈와 구성을 선택해 주세요';download.disabled=!priced;
   const detail=current.map(x=>x.product.name+' / '+x.variant.option+' / '+(Number(x.variant.priceKRW)>0?money(x.variant.priceKRW):'가격 문의')).join('\n')+'\n총 상품금액 '+money(sum);
