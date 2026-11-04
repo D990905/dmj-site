@@ -22,9 +22,11 @@
       item.name,
       item.option,
       item.price ? "₩" + Number(item.price).toLocaleString("ko-KR") : null,
+      item.promotion ? item.promotion.title+" · "+item.promotion.deadlineLabel+" · "+item.promotion.allocationLabel+" · "+item.promotion.deliveryLabel+" · "+item.promotion.confirmationLabel : null,
     ]
       .filter(Boolean)
       .join(" · ");
+    if(item.catalogProduct){const reference=DMJCommerce.inquiryReference(item.catalogProduct,item.option);e.note.maxLength=Math.max(1,600-reference.length-1);}
     form.dispatchEvent(new Event("input", { bubbles: true }));
   }
   const legacy = params.get("note") || "",
@@ -76,7 +78,9 @@
             id: item.id,
             name: item.name,
             option: size,
-            price: variant?.priceKRW || null,
+            price: DMJCommerce.selectedRetailPrice([item], item.id, size),
+            promotion: DMJCommerce.activePromotion(item),
+            catalogProduct: item,
           });
       }
     } catch {
