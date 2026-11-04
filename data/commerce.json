@@ -519,7 +519,7 @@
       "priceMax": 1480000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -1003,7 +1003,7 @@
       "priceMax": 1770000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -1873,7 +1873,7 @@
       "priceMax": 1840000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -2187,7 +2187,7 @@
       "priceMax": 1720000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -2556,7 +2556,7 @@
       "priceMax": 2030000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -2869,7 +2869,7 @@
       "priceMax": 1900000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -3308,7 +3308,7 @@
       "priceMax": 2060000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -3680,7 +3680,7 @@
       "priceMax": 2050000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -3957,7 +3957,7 @@
       "priceMax": 1900000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -4051,7 +4051,7 @@
         "프레임": "프리미엄 Dacron",
         "핸들": "카본 핸들·붐 호환"
       },
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "3m / White/Grey (25/26)",
@@ -4106,7 +4106,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -4265,7 +4265,7 @@
       "specs": {
         "본사 옵션": "3m / 3.5m / 4m / 4.5m / 5m / 5.5m / 6m / 7m"
       },
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "3m",
@@ -4320,7 +4320,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -4402,7 +4402,7 @@
         "프레임": "EXO-PE",
         "캐노피": "Aero-Weave"
       },
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "3m",
@@ -4463,7 +4463,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -4589,7 +4589,7 @@
       "specs": {
         "본사 옵션": "4.0m / 4.5m / 5.0m / 5.5m / 6.0m / 6.5m / 7.0m / 7.5m / 8.0m"
       },
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "4.0m",
@@ -4650,7 +4650,7 @@
       "priceStatus": "fixed",
       "priceSource": "2026-09-29 PPC 공식 정상가 · USD 1390원 · 운임 가정 20만원",
       "priceReviewedAt": "2026-09-29",
-      "priceNote": "부가세 포함 고정 판매가",
+      "priceNote": "고정 판매가",
       "priceFixedAt": "2026-09-29",
       "detailMedia": {
         "photos": [
@@ -4797,8 +4797,8 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25"
     },
     {
@@ -4939,8 +4939,8 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -5024,7 +5024,7 @@
         "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_o2000x2000px.jpg",
         "assets/images/products/levitaz/verified/levitaz_race_series_frontwing_r6_v3_v2000x2000px.jpg"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "R6 V1 (with R6V1 mast)",
@@ -5073,7 +5073,7 @@
       "priceStatus": "fixed",
       "priceSource": "2026-09-27 사용자 지정 환율 EUR 1600원 및 운임 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "부가세 포함 고정 판매가",
+      "priceNote": "고정 판매가",
       "priceFixedAt": "2026-09-27",
       "mediaGroups": [
         {
@@ -5454,7 +5454,7 @@
         "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_side2000x2000px.jpg",
         "assets/images/products/levitaz/verified/levitaz_race_series_boom_95_ssc_bottom2000x2000px.jpg"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "Boom Race Series 63 SCC",
@@ -5482,7 +5482,7 @@
       "priceStatus": "fixed",
       "priceSource": "2026-09-27 사용자 지정 환율 EUR 1600원 및 운임 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "부가세 포함 고정 판매가",
+      "priceNote": "고정 판매가",
       "priceFixedAt": "2026-09-27",
       "mediaGroups": [
         {
@@ -5808,7 +5808,7 @@
       "priceMax": 1230000,
       "priceSource": "https://takoon.com/products/foil-starter",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -6159,7 +6159,7 @@
       "priceMax": 1400000,
       "priceSource": "https://takoon.com/products/foil-x-glide-v2",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -6350,7 +6350,7 @@
       "priceMax": 230000,
       "priceSource": "https://takoon.com/products/wing-carbon-boom-v2",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "galleryImages": [
         "assets/images/products/gallery-verified/9a3d857dbd3c73131607.png",
@@ -6425,7 +6425,7 @@
       "invoiceSkus": [
         "WIPVHFVESPA-01776"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
@@ -6438,7 +6438,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/ea4c2b5355a8da4a83.jpg"
@@ -6500,7 +6500,7 @@
       "invoiceSkus": [
         "WIPFLMA200A-01304"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
@@ -6513,7 +6513,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/b0a33684615b6f6613.jpg",
@@ -6613,7 +6613,7 @@
       "invoiceSkus": [
         "WIPSTEMK30A-01481"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -6626,7 +6626,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/fae26d00d63caa9970.jpg",
@@ -6726,7 +6726,7 @@
       "invoiceSkus": [
         "WIPSTEAM44A-02190"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "BLACK CAMO, M",
@@ -6739,7 +6739,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [],
@@ -6812,7 +6812,7 @@
       "invoiceSkus": [
         "WIPSTEAMY3A-01486"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -6825,7 +6825,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/10f718575b0348a73b.jpg",
@@ -6927,7 +6927,7 @@
       "invoiceSkus": [
         "WIPVETHY10A-00210"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -6940,7 +6940,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [],
@@ -7015,7 +7015,7 @@
         "WIPVETNLJ3A-01320",
         "WIPVETNLJ3A-01321"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "MK2 M",
@@ -7034,7 +7034,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/285b9c287e5ec07e1c.png",
@@ -7121,7 +7121,7 @@
         "WIPNLJWOM3A-00842",
         "WIPNLJWOM3A-01323"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "S",
@@ -7140,7 +7140,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/dc65a170368729bcff.png",
@@ -7250,7 +7250,7 @@
         "WIPSNLJ150A-01352",
         "WIPSNLJ150A-01353"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -7269,7 +7269,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/86d3dde60c5e3213dd.png"
@@ -7334,7 +7334,7 @@
       "invoiceSkus": [
         "WIPSNLJ15WA-01356"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "S",
@@ -7347,7 +7347,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/fc0271d8ea286846d3.png"
@@ -7406,7 +7406,7 @@
       "invoiceSkus": [
         "WIPRAPARK1A-00520"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "L",
@@ -7419,7 +7419,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/fec3ade139a458aa90.jpg"
@@ -7480,7 +7480,7 @@
         "WIPFLESMO2A-01496",
         "WIPFLESMO2A-01497"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -7499,7 +7499,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/60160fec33217503cf.png"
@@ -7564,7 +7564,7 @@
       "invoiceSkus": [
         "WIP3DSNTWOA-01001"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "S",
@@ -7577,7 +7577,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [],
@@ -7654,7 +7654,7 @@
         "VELYLSVORTA-00780",
         "VELYLSVORTA-00781"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -7679,7 +7679,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/fb0c5384ff28dcfd9a.jpg",
@@ -7795,8 +7795,8 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/089be11582fcc8ac69.jpg",
@@ -7881,7 +7881,7 @@
         "WIPQUITSH3A-01511",
         "WIPQUITSH3A-01512"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -7900,7 +7900,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/a7e3e35d58de0581fb.jpg"
@@ -7961,7 +7961,7 @@
         "WIPCOASAL0A-01517",
         "WIPCOASAL0A-01516"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -7980,7 +7980,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/b0ad122cb8564877c2.png",
@@ -8065,7 +8065,7 @@
       "invoiceSkus": [
         "WIPWAIFOI3A-01536"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "L-XL",
@@ -8078,7 +8078,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/245bacee0d705201ca.jpg",
@@ -8167,7 +8167,7 @@
       "invoiceSkus": [
         "HAWIPWIN33A-01996"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceMax": 300000,
       "priceStatus": "fixed",
       "priceReviewedAt": "2026-09-25",
@@ -8238,7 +8238,7 @@
       "invoiceSkus": [
         "WIPVETPUFFA-00775"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -8251,7 +8251,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/8d60dd1216c6cfc545.jpg",
@@ -8330,7 +8330,7 @@
         "WIPVETHOO1A-00865",
         "WIPVETHOO1A-00866"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -8349,7 +8349,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/72f75bdc53b56ca23e.jpg",
@@ -8457,8 +8457,8 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/37d171170521d02efa.png",
@@ -8535,7 +8535,7 @@
       "invoiceSkus": [
         "WIPVETARA1A-01335"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "2.0 M",
@@ -8548,7 +8548,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/ae9f882e82bcc4b6d8.jpg",
@@ -8638,7 +8638,7 @@
       "invoiceSkus": [
         "WIPVETANO2A-01367"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "2.0 M",
@@ -8651,7 +8651,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/0be6734c993d59b18a.jpg",
@@ -8736,7 +8736,7 @@
       "invoiceSkus": [
         "WIPGPACK11A-00587"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
@@ -8749,7 +8749,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/c64ae5981f9e8fcd1a.jpg"
@@ -8811,7 +8811,7 @@
       "invoiceSkus": [
         "R4RWBLEADAA-02096"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
@@ -8824,7 +8824,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/61d35165ad189255d0.jpg"
@@ -8885,7 +8885,7 @@
       "invoiceSkus": [
         "R4RWLEASH2A-01436"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
@@ -8898,7 +8898,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/59ce3b1e626125bfbb.jpg"
@@ -8960,7 +8960,7 @@
       "invoiceSkus": [
         "R4RWBLEA10A-01435"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "사이즈·구성 상담",
@@ -8973,7 +8973,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/e4b0079902cc79c47e.jpg"
@@ -9038,7 +9038,7 @@
       "invoiceSkus": [
         "WIPSNEAK22A-01989"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "41.3-US8",
@@ -9051,7 +9051,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/579342de06569dff37.jpg"
@@ -9116,7 +9116,7 @@
       "invoiceSkus": [
         "GANEOWI100A-00440"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "S- M",
@@ -9129,7 +9129,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/f21751197b9d5ab2b9.jpg"
@@ -9188,7 +9188,7 @@
       "invoiceSkus": [
         "WIPCOARACJA-01798"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "M",
@@ -9201,7 +9201,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/product-stories/63a72dbf8b8a2100ab.jpg",
@@ -9297,7 +9297,7 @@
       "invoiceSkus": [
         "WIPWPHAR10A-02200"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "S-M",
@@ -9310,7 +9310,7 @@
       "priceStatus": "fixed",
       "priceSource": "공식 본사 가격 재확인 2026-09-25 · 예상 운임·관부가세 반영",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "예상 소비자가 · 부가세 포함 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
+      "priceNote": "예상 소비자가 · 사이즈·구성·운임 확인 후 상담에서 주문금액 확정",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [],
@@ -9562,7 +9562,7 @@
       "priceMax": 2980000,
       "priceSource": "takoon_korea_pricing_2026-09-24_final.xlsx",
       "priceStatus": "fixed",
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceFixedAt": "2026-09-25",
       "detailMedia": {
         "photos": [
@@ -10375,7 +10375,7 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
+      "priceNote": "세트 판매가 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_540_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_540_u2000x2000px.jpg",
@@ -10459,7 +10459,7 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
+      "priceNote": "세트 판매가 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_680_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_680_u2000x2000px.jpg",
@@ -10543,7 +10543,7 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
+      "priceNote": "세트 판매가 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_790_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_790_u2000x2000px.jpg",
@@ -10627,7 +10627,7 @@
       ],
       "availability": "inquiry",
       "source": "https://levitaz.com/shop/product/free-series-front-wings/",
-      "priceNote": "세트 판매가 · 부가세 포함 · 프론트윙 단품 별도 문의",
+      "priceNote": "세트 판매가 · 프론트윙 단품 별도 문의",
       "galleryImages": [
         "assets/images/levitaz/levitaz_free_series_frontwing_900_o2000x2000px.jpg",
         "assets/images/levitaz/levitaz_free_series_frontwing_900_u2000x2000px.jpg",
@@ -10708,7 +10708,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 1880000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -10770,7 +10770,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 1840000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -10833,7 +10833,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 2370000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03",
       "storeRecommendedLevels": [
         "intermediate",
@@ -10901,7 +10901,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 2330000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03",
       "storeRecommendedLevels": [
         "intermediate",
@@ -10990,7 +10990,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 530000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11079,7 +11079,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 640000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11184,7 +11184,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 890000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11303,7 +11303,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 720000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11378,7 +11378,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 660000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11466,7 +11466,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 940000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11565,7 +11565,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 270000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11664,7 +11664,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 210000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11728,7 +11728,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 920000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11818,7 +11818,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 1320000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11899,7 +11899,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 1440000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -11981,7 +11981,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 1600000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -12061,7 +12061,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 1790000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -12127,7 +12127,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 250000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -12217,7 +12217,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 310000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -12313,7 +12313,7 @@
       "manufacturerLevelSource": "https://takoon.com/en-int/collections/foil-full-setups",
       "priceMax": 290000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -12374,7 +12374,7 @@
       "videos": [],
       "priceMax": 100000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -12435,7 +12435,7 @@
       "videos": [],
       "priceMax": 60000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 현재가 기준 예상 직구 총비용 대비 10% 할인 · 2026-10-03"
     },
     {
@@ -12536,7 +12536,7 @@
       "videos": [],
       "priceMax": 210000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -12621,7 +12621,7 @@
       "videos": [],
       "priceMax": 220000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -12714,7 +12714,7 @@
       "videos": [],
       "priceMax": 220000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -12807,7 +12807,7 @@
       "videos": [],
       "priceMax": 220000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -12898,7 +12898,7 @@
       "videos": [],
       "priceMax": 170000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -12967,7 +12967,7 @@
       "videos": [],
       "priceMax": 170000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -13028,7 +13028,7 @@
       "videos": [],
       "priceMax": 180000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -13097,7 +13097,7 @@
       "videos": [],
       "priceMax": 210000,
       "priceSource": "본사 EUR 판매가 × 1780 + 개당 운송비 100000원, 만원 단위 반올림",
-      "priceNote": "부가세 포함 · 해외 운송비 10만 원 반영",
+      "priceNote": "해외 운송비 10만 원 반영",
       "priceStatus": "fixed"
     },
     {
@@ -13153,7 +13153,7 @@
         "L12260002203",
         "L12260002201"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "retailVariants": [
         {
           "option": "레드",
@@ -13184,7 +13184,7 @@
       "priceStatus": "fixed",
       "priceSource": "DMJ 판매가 확정 2026-10-03 · 110,000원",
       "priceReviewedAt": "2026-09-25",
-      "priceNote": "부가세 포함 · 전 색상 동일 가격",
+      "priceNote": "전 색상 동일 가격",
       "priceFixedAt": "2026-09-25",
       "gallery": [
         "assets/images/lisa/duo-red.jpg",
@@ -13232,7 +13232,7 @@
       "price": 220000,
       "priceMax": 220000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": true,
@@ -13295,7 +13295,7 @@
       "price": 240000,
       "priceMax": 240000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": true,
@@ -13369,7 +13369,7 @@
       "price": 590000,
       "priceMax": 610000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": true,
@@ -13430,7 +13430,7 @@
       "price": 510000,
       "priceMax": 510000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": true,
@@ -13492,7 +13492,7 @@
       "price": 450000,
       "priceMax": 450000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": true,
@@ -13553,7 +13553,7 @@
       "price": 250000,
       "priceMax": 250000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": true,
@@ -13612,7 +13612,7 @@
       "price": 280000,
       "priceMax": 280000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": false,
@@ -13671,7 +13671,7 @@
       "price": 220000,
       "priceMax": 220000,
       "priceStatus": "estimated",
-      "priceNote": "부가세 포함 예상 소비자가 · 재고와 구성 확인 후 주문 확정",
+      "priceNote": "예상 소비자가 · 재고와 구성 확인 후 주문 확정",
       "priceSource": "본사 USD 가격·기존 매장 예상가 정책 적용 · 2026-10-08",
       "availability": "inquiry",
       "manufacturerAvailable": true,
@@ -13743,7 +13743,7 @@
       "invoiceSkus": [
         "DMJ-WIP-WAISTFOIL-2"
       ],
-      "pricingStatus": "고정 판매가 · 부가세 포함",
+      "pricingStatus": "고정 판매가",
       "priceMax": 400000,
       "priceStatus": "fixed",
       "priceReviewedAt": "2026-09-25",

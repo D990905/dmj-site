@@ -630,7 +630,7 @@ def render_sized_spec_table(sku):
           {"".join(rows)}
         </tbody>
       </table>
-      <p class="spec-table__note">* 사이즈별 정확 견적은 카톡 1:1 상담으로 확인하세요. EU RRP는 본사 reference 가격 (한국 retail은 운송·관부가세·마진 포함 별도 산출).</p>
+      <p class="spec-table__note">* 사이즈별 정확 견적은 카톡 1:1 상담으로 확인하세요. EU RRP는 본사 reference 가격 (한국 retail은 운송·수입 세금·마진 포함 별도 산출).</p>
     </div>'''
 
     # Other SKUs: SIZED_SPEC fallback
@@ -1144,7 +1144,7 @@ def render_brand_compare(brand):
     <h2 class="section-head section-head--center">{BRAND_LABELS[brand]} 라인업 가로 비교</h2>
     <p class="section-sub section-sub--center">선수관리사이트 스타일 — 가격·스킬·체중·풍속·핵심 attribute 한눈에 비교. 모델명 클릭 시 detail page로 이동합니다.</p>
     {"".join(sections)}
-    <p class="compare-disclaimer reveal">* 가격은 RRP × 환율 + 운송·관부가세·마진 반영 한국 retail. 정확한 견적은 카톡 1:1 상담으로 확인하세요. * 별점은 단무지공방 자체 캘리브레이션 기준 (5 = best in class).</p>
+    <p class="compare-disclaimer reveal">* 가격은 RRP × 환율 + 운송·수입 세금·마진 반영 한국 retail. 정확한 견적은 카톡 1:1 상담으로 확인하세요. * 별점은 단무지공방 자체 캘리브레이션 기준 (5 = best in class).</p>
   </div>
 </section>
 '''
