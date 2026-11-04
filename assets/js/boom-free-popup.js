@@ -2,7 +2,7 @@
   'use strict';
   const dialog=document.getElementById('boom-free-launch');
   if(!dialog||typeof dialog.showModal!=='function')return;
-  const seenKey='dmj-boom-free-launch-seen-20261103',hideKey='dmj-boom-free-launch-hide-until-20261103';
+  const seenKey='dmj-three-news-seen-20261104',hideKey='dmj-three-news-hide-until-20261104';
   let opener;
   function open(manual=false){
     if(dialog.open||document.querySelector('dialog[open]'))return;

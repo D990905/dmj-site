@@ -4819,7 +4819,8 @@
         "4.5M / Lime/Grey",
         "3.5m / Lime/Grey",
         "2.7m / Lime/Grey",
-        "2.0m / Lime/Grey"
+        "2.0m / Lime/Grey",
+        "Red/Grey 색상 상담"
       ],
       "price": 1970000,
       "availability": "inquiry",
@@ -4867,8 +4868,9 @@
       ],
       "videos": [],
       "gallery": [
-        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/f022aa06c141e39d373b489e5e772da8.png?v=1786404816",
-        "https://cdn.shopify.com/s/files/1/0639/7814/3929/files/f5dbf31c6faa6986a51c95755eb26a3e.png?v=1790066524"
+        "assets/images/products/ppc/orbit/colors/orange-peacock.png",
+        "assets/images/products/ppc/orbit/colors/lime-grey.png",
+        "assets/images/products/ppc/orbit/colors/red-grey.png"
       ],
       "specs": {
         "본사 옵션": "2.0m / Orange/Peacock / 2.7m / Orange/Peacock / 3.5m / Orange/Peacock / 4.5M / Orange/Peacock / 5.9m / Orange/Peacock / 5.9m / Lime/Grey / 4.5M / Lime/Grey / 3.5m / Lime/Grey / 2.7m / Lime/Grey / 2.0m / Lime/Grey"
@@ -4956,7 +4958,12 @@
         "source": "https://ppcfoiling.com/products/ppc-orbit-parawing",
         "checkedAt": "2026-09-27",
         "videoSource": "https://ppcfoiling.com/pages/technology"
-      }
+      },
+      "colors": [
+        "Orange/Peacock",
+        "Lime/Grey",
+        "Red/Grey"
+      ]
     },
     {
       "id": "lvz-r6",

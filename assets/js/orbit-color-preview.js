@@ -1,0 +1,1 @@
+(()=>{'use strict';function show(){const id=location.hash.slice(1);if(['orbit-orange-peacock','orbit-lime-grey','orbit-red-grey'].includes(id))document.getElementById(id)?.click()}window.addEventListener('hashchange',show);show()})();

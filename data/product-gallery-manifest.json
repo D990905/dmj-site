@@ -226,8 +226,9 @@
       "path": "products/ppc/orbit-parawing.html",
       "source": "https://ppcfoiling.com/products/ppc-orbit-parawing",
       "photos": [
-        "../../assets/images/products/ppc/orbit/product-official.png",
-        "../../assets/images/product-stories/f4f2a569bb0dc2a9e2.png"
+        "../../assets/images/products/ppc/orbit/colors/orange-peacock.png",
+        "../../assets/images/products/ppc/orbit/colors/lime-grey.png",
+        "../../assets/images/products/ppc/orbit/colors/red-grey.png"
       ],
       "groups": {}
     },

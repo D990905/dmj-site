@@ -1,0 +1,1 @@
+.orbit-card-colors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:6px}.orbit-card-colors img{width:100%;aspect-ratio:4/3;object-fit:contain;display:block;background:white}

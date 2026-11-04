@@ -22,6 +22,8 @@
   function filter(){const priority=controls.priority?.value||'all',brand=controls.brand.value,category=controls.category.value,q=controls.q.value.trim().toLocaleLowerCase();let count=0;
    document.querySelectorAll('.product-card').forEach(c=>{const show=(priority==='all'||priority===c.dataset.priority)&&(brand==='all'||brand===c.dataset.brand)&&(category==='all'||category===c.dataset.category)&&(!q||(c.dataset.search+' '+c.dataset.brand).includes(q));c.hidden=!show;if(show)count++});
    document.querySelectorAll('[data-catalog-group]').forEach(g=>{g.hidden=![...g.querySelectorAll('.product-card')].some(c=>!c.hidden)});
+   document.querySelectorAll('[data-catalog-brand]').forEach(g=>{g.hidden=![...g.querySelectorAll('.product-card')].some(c=>!c.hidden)});
+   document.querySelectorAll('[data-foil-heading]').forEach(h=>{let n=h.nextElementSibling,show=false;while(n&&!n.matches('[data-foil-heading]')){if(n.matches('.product-card')&&!n.hidden)show=true;n=n.nextElementSibling}h.hidden=!show});
    document.querySelector('.result-count').textContent=`${count}개 모델`;
    document.querySelectorAll('[data-category-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.categoryFilter===category)));
    document.querySelector('.empty-state').hidden=count>0;

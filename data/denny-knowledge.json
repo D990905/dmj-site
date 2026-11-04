@@ -1053,27 +1053,6 @@
       "content": "**PPC 윙 — 페인포인트·선호별 추천**:\n\n| 페인포인트 / 선호 | 추천 | 이유 |\n|---|---|---|\n| 택킹이 잘 안 됨 (펄럭임 싫음) | **PPC M1** | 펄럭임 최소, 리딩엣지 플랫 |\n| 리딩엣지 최대 플랫 원함 | **PPC M1** | 프로파일 가장 평평, 정밀 컨트롤 |\n| 가벼워야 함 | **PPC M1-X** | M1 대비 경량화, 장시간·펌핑·이륙 부담 ↓ |\n| 가성비 중시 | **PPC M2** | M1·M1-X 대비 가격 우호적 + 적정 성능 |\n| 최저가 우선 | **Takoon Wing V4** | PPC 라인 아래 가격대, 입문·세컨드 |\n\n**풍속 빈도 ↔ 가격 비례 원칙**: 자주 라이딩하는 풍속 구간 → 고급 모델 (투자 가치 ↑). 가끔 타는 구간 → 가성비 모델. 사용 빈도 10% 미만 구간은 추천에서 제외합니다."
     },
     {
-      "id": "kb-wip-pricing-policy",
-      "category": "policy",
-      "topic": "wip-pricing",
-      "brand": "WIP",
-      "tags": [
-        "Forward WIP",
-        "WIP",
-        "B2B",
-        "SS26",
-        "선주문",
-        "pre-order",
-        "할인",
-        "wholesale",
-        "한국 판매가",
-        "관부가세"
-      ],
-      "source": "reference_wip_pricing_policy.md",
-      "title": "Forward WIP B2B 정책 SS26",
-      "content": "**Forward WIP (Swiss Retailer) B2B 정책 SS26**:\n\n**Pre-order timeline**: Start 2025-06-16 / Deadline before production 2025-08-07 / Final 2025-10-10 / 배송 시작 2026-03-01 (split 2nd 2026-05-01). 최소 1st order 1,500 CHF.\n\n**Wholesale mark-up**: 1.8 / 40%\n\n**Pre-order discount**: Aug 7 이전 조기 발주 = 더 큰 할인 (최대 14% — >20K€ + 15% pre-order increase). Oct 10 이전 정상. In-season re-order mark-up 1.80-1.90.\n\n**Payment**: 주문 ≥10,000€ → 20% 선금 + 40% (30일) + 40% (60일). <10,000€ → 선금 또는 30일 net.\n\n**Shipment**: Suisse >1,000 CHF Franco 무료. B2C dropship PD <350€ → +5€ picking fee.\n\n**한국 판매가 산식 (WIP)**: (RETAIL Ex VAT € × 환율) + 운송료 + 관부가세 (× 1.08 × 1.10)"
-    },
-    {
       "id": "kb-community-clubs-verified",
       "category": "community",
       "topic": "watersports-clubs",
