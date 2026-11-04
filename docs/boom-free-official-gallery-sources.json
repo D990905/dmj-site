@@ -1,0 +1,87 @@
+{
+  "checkedAt": "2026-11-04",
+  "photos": [
+    {
+      "volume": 63,
+      "angle": "deck",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_63_ssc_deck2000x2000px_2026-05-18-104728_diwh.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-63-deck.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25554"
+    },
+    {
+      "volume": 63,
+      "angle": "rail",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_63_ssc_rail2000x2000px_2026-05-18-104731_nzhf.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-63-rail.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25554"
+    },
+    {
+      "volume": 63,
+      "angle": "bottom",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_63_ssc_bottom2000x2000px_2026-05-18-104725_mcvr.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-63-bottom.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25554"
+    },
+    {
+      "volume": 83,
+      "angle": "deck",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_83_ssc_deck2000x2000px_2026-05-18-105855_kqki.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-83-deck.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25590"
+    },
+    {
+      "volume": 83,
+      "angle": "rail",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_83_ssc_rail2000x2000px_2026-05-18-105858_cada.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-83-rail.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25590"
+    },
+    {
+      "volume": 83,
+      "angle": "bottom",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_83_ssc_bottom2000x2000px_2026-05-18-105853_uubg.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-83-bottom.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25590"
+    },
+    {
+      "volume": 95,
+      "angle": "deck",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_95_ssc_deck2000x2000px_2026-05-18-110430_umgr.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-95-deck.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25596"
+    },
+    {
+      "volume": 95,
+      "angle": "rail",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_95_ssc_rail2000x2000px_2026-05-18-110433_vimp.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-95-rail.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25596"
+    },
+    {
+      "volume": 95,
+      "angle": "bottom",
+      "url": "https://levitaz.com/uploads/shop/levitaz_free_series_boom_95_ssc_bottom2000x2000px_2026-05-18-110428_hfhr.jpg",
+      "local": "assets/images/products/levitaz/boom-free/official-20261104/boom-fs-95-bottom.webp",
+      "page": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25596"
+    }
+  ],
+  "materialAttribution": "Official web options distinguish volume, not Full Carbon vs Hybrid. Images are not claimed to identify Hybrid construction.",
+  "webWeightsKg": {
+    "63": 3.8,
+    "83": 4.1,
+    "95": 4.5
+  },
+  "pdfWeightsKg": {
+    "Full Carbon": {
+      "63": 3.6,
+      "83": 4.1,
+      "95": 4.4
+    },
+    "Hybrid": {
+      "63": 3.9,
+      "83": 4.6,
+      "95": 4.9
+    }
+  },
+  "pricing": "No verified domestic Full Carbon retail price. Official SCC EUR options cannot be attributed to Full Carbon; not published as domestic prices."
+}

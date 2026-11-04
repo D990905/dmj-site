@@ -1343,30 +1343,33 @@
     {
       "id": "lvz-boom-fs63",
       "path": "products/levitaz/boom-fs-63.html",
-      "source": "Manufacturer-provided BOOM FREE SERIES Product Sheet EN V2, pages 2 and 5",
+      "source": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25554",
       "photos": [
-        "../../assets/images/products/levitaz/boom-free/boom-free-63.webp",
-        "../../assets/images/products/levitaz/boom-free/boom-free-lineup.webp"
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-63-deck.webp",
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-63-rail.webp",
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-63-bottom.webp"
       ],
       "groups": {}
     },
     {
       "id": "lvz-boom-fs83",
       "path": "products/levitaz/boom-fs-83.html",
-      "source": "Manufacturer-provided BOOM FREE SERIES Product Sheet EN V2, pages 2 and 6",
+      "source": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25590",
       "photos": [
-        "../../assets/images/products/levitaz/boom-free/boom-free-83.webp",
-        "../../assets/images/products/levitaz/boom-free/boom-free-lineup.webp"
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-83-deck.webp",
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-83-rail.webp",
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-83-bottom.webp"
       ],
       "groups": {}
     },
     {
       "id": "lvz-boom-fs95",
       "path": "products/levitaz/boom-fs-95.html",
-      "source": "Manufacturer-provided BOOM FREE SERIES Product Sheet EN V2, pages 2 and 7",
+      "source": "https://levitaz.com/shop/product/boom-scc-boards/?variant=25596",
       "photos": [
-        "../../assets/images/products/levitaz/boom-free/boom-free-95.webp",
-        "../../assets/images/products/levitaz/boom-free/boom-free-lineup.webp"
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-95-deck.webp",
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-95-rail.webp",
+        "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-95-bottom.webp"
       ],
       "groups": {}
     }

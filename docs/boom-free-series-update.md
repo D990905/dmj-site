@@ -21,3 +21,11 @@ Approved consumer prices are reflected in the product pages, brand/catalog cards
 ## Homepage launch popup
 
 The user requested a public launch announcement after approving retail prices. The homepage dialog shows the three VAT-inclusive prices and links to the FS Hybrid product pages. Automatic display is once per tab session; an explicit seven-day hide option persists across tabs. A homepage button opens the announcement again on demand. Native dialog behavior provides keyboard focus containment and Escape dismissal; closing restores focus and scroll. The script does not open over another active dialog. Existing Supersonic, outlet and LISA campaign settings are preserved. No stock, immediate shipment or delivery date is promised.
+
+## Model-specific official galleries and material comparison — 2026-11-04
+
+After the popup edit was independently deployed as `e4d6e1e`, replace only the three FS detail galleries with the matching 63/83/95L official deck, rail and bottom views. The multi-size lineup is no longer in these detail galleries. Keep the popup and brand/catalog images, all prices, RS products and stock/delivery language unchanged. Public manufacturer URLs and photo-to-model mapping are recorded in `boom-free-official-gallery-sources.json`.
+
+The current official web options do not identify Full Carbon vs Hybrid material. Captions therefore identify the exact volume and view without claiming the image proves Hybrid construction. PDF comparison remains 3.6/3.9, 4.1/4.6, 4.4/4.9kg (Full Carbon/Hybrid); web SCC option weights of 3.8, 4.1, 4.5kg are a separately dated source and are not reassigned to a material. Public comparison explains the discrepancy. Official EUR option prices cannot be attributed to Full Carbon and are not used as domestic Full Carbon prices. No domestic Full Carbon price is invented or calculated. Hybrid remains KRW3,190,000 / 3,290,000 / 3,390,000.
+
+Validation: all nine images opened and checked against volume/view, gallery thumbnail selection, lightbox and wraparound navigation; mobile page width remains contained and comparison table scrolls horizontally with keyboard access. Required gallery manifest updated and deployment gallery check passes.
