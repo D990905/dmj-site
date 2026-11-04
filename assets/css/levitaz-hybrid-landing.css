@@ -1,0 +1,17 @@
+/* Brand landing introduction only. Product and RS pricing remain unchanged. */
+.commerce .levitaz-hybrid-intro{width:100%;max-width:none;margin:0 0 64px;padding:0}
+.commerce .levitaz-hybrid-intro .section-heading{align-items:flex-start;margin-bottom:30px}
+.commerce .levitaz-hybrid-intro .section-heading h2{font-size:clamp(28px,3.5vw,52px);line-height:1.2;letter-spacing:-.04em;margin:12px 0 20px;word-break:keep-all}
+.commerce .levitaz-hybrid-intro .section-heading h2 span{color:#53613e}
+.commerce .levitaz-hybrid-intro .section-heading p{max-width:680px;line-height:1.8}
+.commerce .levitaz-hybrid-intro .product-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:clamp(16px,2vw,32px)}
+.commerce .levitaz-hybrid-intro .product-card{min-width:0;background:#f3f4ed}
+.commerce .levitaz-hybrid-intro .product-image{aspect-ratio:1/1.08;min-height:0;width:100%;padding:0;background:#eef0e7;overflow:hidden}
+.commerce .levitaz-hybrid-intro .product-image img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center;padding:8px;transform:none}
+.commerce .levitaz-hybrid-intro .product-image>span{font-size:10px;letter-spacing:.09em;top:14px;left:14px}
+.commerce .levitaz-hybrid-intro .product-info{padding:24px clamp(16px,1.8vw,28px) 28px}
+.commerce .levitaz-hybrid-intro h3{font-size:clamp(20px,2vw,29px);line-height:1.3;letter-spacing:-.035em;margin:10px 0 16px}
+.commerce .levitaz-hybrid-intro .product-info>p:not(.product-price){min-height:2.8em;line-height:1.6;color:#5d6758}
+.commerce .levitaz-hybrid-intro .product-price{margin:20px 0 0;font-size:clamp(22px,2vw,30px)}
+.commerce .levitaz-hybrid-image-note{font-size:12px;line-height:1.75;color:#5d6758;margin:18px 0 0;max-width:980px}
+@media(max-width:760px){.commerce .levitaz-hybrid-intro .product-grid{grid-template-columns:1fr;gap:28px}.commerce .levitaz-hybrid-intro .product-image{aspect-ratio:1/1}.commerce .levitaz-hybrid-intro .product-info>p:not(.product-price){min-height:0}.commerce .levitaz-hybrid-intro .product-image img{padding:6px}.commerce .levitaz-hybrid-intro .product-info{padding:20px}.commerce .levitaz-hybrid-intro .section-heading h2{font-size:31px}}
