@@ -28,10 +28,13 @@
   const sale=activePromotion(product,now),regular=product.regularPriceKRW??product.price;
   return {...product,regularPriceKRW:regular,price:sale?sale.priceKRW:regular,retailVariants:(product.retailVariants||[]).map(v=>{const base=v.regularPriceKRW??v.priceKRW;return {...v,regularPriceKRW:base,priceKRW:sale?sale.priceKRW:base}})};
  }
+ function inquiryReference(product,option,now=Date.now()){
+  const price=selectedRetailPrice([product],product.id,option,now),sale=activePromotion(product,now);const lines=[];lines[0]='상품: '+String(product.name||'').slice(0,160);if(price)lines.push('접수 시 사이트 표시가: ₩'+Math.round(price).toLocaleString('ko-KR'));if(sale)lines.push(sale.title+' · '+sale.deadlineLabel,sale.allocationLabel+' · '+sale.deliveryLabel,sale.confirmationLabel);return lines.join('\n');
+ }
  function selectedRetailPrice(products,id,option,now=Date.now()){
   const raw=products.find(p=>p.id===id);if(!raw)return null;const p=pricedProduct(raw,now);
   const match=(p.retailVariants||[]).find(v=>v.option===String(option||'').trim());
   return match&&Number.isFinite(match.priceKRW)&&match.priceKRW>0?match.priceKRW:null;
  }
- return{campaignFrom,inquiryText,campaignUrl,matches,selectedRetailPrice,activePromotion,pricedProduct};
+ return{campaignFrom,inquiryText,campaignUrl,matches,selectedRetailPrice,activePromotion,pricedProduct,inquiryReference};
 });

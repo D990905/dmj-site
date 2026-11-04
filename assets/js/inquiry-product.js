@@ -26,6 +26,7 @@
     ]
       .filter(Boolean)
       .join(" · ");
+    if(item.catalogProduct){const reference=DMJCommerce.inquiryReference(item.catalogProduct,item.option);e.note.maxLength=Math.max(1,600-reference.length-1);}
     form.dispatchEvent(new Event("input", { bubbles: true }));
   }
   const legacy = params.get("note") || "",
@@ -79,6 +80,7 @@
             option: size,
             price: DMJCommerce.selectedRetailPrice([item], item.id, size),
             promotion: DMJCommerce.activePromotion(item),
+            catalogProduct: item,
           });
       }
     } catch {
