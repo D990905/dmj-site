@@ -90,7 +90,7 @@
   /* 샘플 1개를 리플레이 상태 객체로 — 없는 지표는 null.
      심박(hr)을 포함해 6종 지표를 모두 보존한다. */
   function sampleState(s) {
-    if (!s || s.gpsOutlier) return null;
+    if (!s || s.gpsOutlier || s._excluded) return null;
     function num(v) { return (v != null && isFinite(v)) ? v : null; }
     return {
       t: s.t,
@@ -105,9 +105,28 @@
     };
   }
 
-  /* 시각 t 에서의 보간 상태. 두 샘플 간격이 gapSec 보다 크면
-     (leg 공백·제외 구간) 보간하지 않고 가까운 샘플로 스냅한다. */
-  function interpAtTime(samples, t, gapSec) {
+  function replayLegStarts(session) {
+    var starts = {};
+    ((session && session.legs) || []).forEach(function (leg) {
+      starts[leg.start] = true;
+    });
+    return starts;
+  }
+
+  /* A short excluded interval is still a gap. Cache leg boundaries once per
+     replay, and share the same rule between interpolation and graph paths. */
+  function replayBreakBefore(samples, i, legStarts, gapSec) {
+    if (i <= 0) return false;
+    var a = samples[i - 1], b = samples[i];
+    var dt = b.t - a.t;
+    return !!(legStarts && legStarts[i]) || !(dt > 0) ||
+      dt > (gapSec == null ? 4 : gapSec) ||
+      (a.legId != null && b.legId != null && a.legId !== b.legId);
+  }
+
+  /* Missing intervals have no interpolated state. Retained samples at either
+     edge remain valid, and elapsed time is never compressed. */
+  function interpAtTime(samples, t, gapSec, legStarts) {
     gapSec = (gapSec == null) ? 4 : gapSec;
     var i = sampleIndexAtTime(samples, t);
     if (i < 0) return null;
@@ -117,7 +136,7 @@
     var b = samples[i + 1];
     var dt = b.t - a.t;
     if (t === a.t) return sampleState(a);
-    if (!(dt > 0) || dt > gapSec) return null;
+    if (replayBreakBefore(samples, i + 1, legStarts, gapSec)) return null;
     if (t <= a.t) return sampleState(a);
     if (t >= b.t) return sampleState(b);
     var f = (t - a.t) / dt;
@@ -164,7 +183,7 @@
   /* primary 기준 경과초를 ghost 샘플 시각으로 변환해 보간한다.
      clock offset 이 양수면 ghost 가 그만큼 늦게 시작한다. 범위 밖 또는
      잘못된 입력은 예외 없이 null. */
-  function ghostStateAt(ghostSession, elapsedSec, offsetSec) {
+  function ghostStateAt(ghostSession, elapsedSec, offsetSec, legStarts) {
     var samples = ghostSession && ghostSession.samples;
     if (!samples || !samples.length || !isFinite(elapsedSec)) return null;
     offsetSec = isFinite(offsetSec) ? offsetSec : 0;
@@ -174,7 +193,7 @@
     var idx = sampleIndexAtTime(samples, target);
     if (idx >= 0 && idx < samples.length - 1 && target > samples[idx].t
         && samples[idx + 1].t - samples[idx].t > 4) return null;
-    return interpAtTime(samples, target);
+    return interpAtTime(samples, target, 4, legStarts || replayLegStarts(ghostSession));
   }
 
   /* 기본과 고스트가 같은 Y축을 쓰도록 지표 범위를 합친다.
@@ -1498,8 +1517,9 @@
       ctx.beginPath();
       var gpen = false;
       for (var j = j0; j < gs.length; j++) {
+        if (replayBreakBefore(gs, j, R.ghost.legStarts, GAP_SEC)) gpen = false;
         var gv = gs[j][def.field];
-        if (gv == null || !isFinite(gv)) { gpen = false; if (mt[j] > winHi) break; continue; }
+        if (gs[j].gpsOutlier || gs[j]._excluded || gv == null || !isFinite(gv)) { gpen = false; if (mt[j] > winHi) break; continue; }
         var gx = xFor(mt[j]), gy = yFor(gv);
         if (!gpen) { ctx.moveTo(gx, gy); gpen = true; } else ctx.lineTo(gx, gy);
         if (mt[j] > winHi) break;
@@ -1520,6 +1540,8 @@
     var pen = false;
     for (var i = i0; i < R.samples.length; i++) {
       var sv = R.samples[i];
+      if (replayBreakBefore(R.samples, i, R.legStarts, GAP_SEC)) pen = false;
+      if (sv.gpsOutlier || sv._excluded) { pen = false; continue; }
       if (sv.t > winHi + 0.001) {
         var rawEnd = sv[def.field];
         if (rawEnd != null && isFinite(rawEnd)) {
@@ -1699,19 +1721,25 @@
       if (g.def.key === 'sog') {
         ctx.beginPath();
         var started = false;
+        var lastX;
+        function endFill() {
+          if (!started) return;
+          ctx.lineTo(lastX, padT + plotH);
+          ctx.closePath();
+          started = false;
+        }
         for (var k = i0; k <= i1; k++) {
-          var sp = R.samples[k][g.def.field];
-          if (sp == null || !isFinite(sp)) continue;
+          var sample = R.samples[k], sp = sample[g.def.field];
+          if (replayBreakBefore(R.samples, k, R.legStarts, GAP_SEC)) endFill();
+          if (sample.gpsOutlier || sample._excluded || sp == null || !isFinite(sp)) { endFill(); continue; }
           var xx = xFor(R.samples[k].t);
           if (!started) { ctx.moveTo(xx, padT + plotH); started = true; }
           ctx.lineTo(xx, yFor(sp));
+          lastX = xx;
         }
-        if (started) {
-          ctx.lineTo(xFor(R.samples[i1].t), padT + plotH);
-          ctx.closePath();
-          ctx.fillStyle = 'rgba(51,161,255,0.16)';
-          ctx.fill();
-        }
+        endFill();
+        ctx.fillStyle = 'rgba(51,161,255,0.16)';
+        ctx.fill();
       }
       ctx.strokeStyle = g.def.color;
       ctx.lineWidth = (g.def.key === 'sog') ? 1.8 : 1.4;
@@ -1719,8 +1747,9 @@
       ctx.beginPath();
       var pen = false;
       for (var j = i0; j <= i1; j++) {
+        if (replayBreakBefore(R.samples, j, R.legStarts, GAP_SEC)) pen = false;
         var raw = R.samples[j][g.def.field];
-        if (raw == null || !isFinite(raw)) { pen = false; continue; }
+        if (R.samples[j].gpsOutlier || R.samples[j]._excluded || raw == null || !isFinite(raw)) { pen = false; continue; }
         var x = xFor(R.samples[j].t), y = yFor(raw);
         if (!pen) { ctx.moveTo(x, y); pen = true; } else ctx.lineTo(x, y);
       }
@@ -1758,9 +1787,10 @@
       ctx.beginPath();
       var ghostPen = false;
       for (var gi = 0; gi < ghostSamples.length; gi++) {
+        if (replayBreakBefore(ghostSamples, gi, R.ghost.legStarts, GAP_SEC)) ghostPen = false;
         var gp = ghostSamples[gi];
         var gt = ghostPrimaryTime(gp);
-        if (gt < winLo || gt > winHi || gp.speed == null || !isFinite(gp.speed)) {
+        if (gp.gpsOutlier || gp._excluded || gt < winLo || gt > winHi || gp.speed == null || !isFinite(gp.speed)) {
           ghostPen = false;
           continue;
         }
@@ -1939,6 +1969,7 @@
       /* 상단 레인의 클립 바를 잡으면 — 클립 드래그(시작 시각 이동, §C2) */
       var clip = clipAt(ev);
       if (clip) {
+        invalidateClipOcr(clip);
         R.clipDrag = { id: clip.id,
           grabDT: tAt(ev) - (R.t0 + clip.startElapsed) };
         try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
@@ -2053,17 +2084,24 @@
       var north=L.control({position:"topleft"});north.onAdd=function(){var n=L.DomUtil.create("div","rd-map-north");n.textContent="↑ N";n.title="북쪽 · 지도는 북쪽 고정";return n;};north.addTo(R.map);
     } catch (e) { R.map = null; return; }
 
+    // Leaflet can finish an animated move after close or after a new replay opens.
+    // Keep those callbacks bound to the session and map that created them.
+    var mapOwner = R, ownedMap = R.map;
+    function ownsCurrentMap() { return R === mapOwner && R.map === ownedMap; }
     // 사용자가 직접 팬/줌하면 보드 자동추적을 끈다 (프로그램 이동은 제외)
-    R.map.on('dragstart', function () {
-      if (!R._mapProg) R.mapUserMoved = true;
+    ownedMap.on('dragstart', function () {
+      if (ownsCurrentMap() && !R._mapProg) R.mapUserMoved = true;
     });
-    R.map.on('zoomstart', function () {
-      if (!R._mapProg) R.mapUserMoved = true;
+    ownedMap.on('zoomstart', function () {
+      if (ownsCurrentMap() && !R._mapProg) R.mapUserMoved = true;
     });
     /* 지도 이동·줌이 끝나면 풍상 레드라인을 보드 위치에 다시 맞춘다
        (정지 중 줌·재배치 시에도 ladder rung 이 보드에 붙어 있게). */
-    R.map.on('moveend', function () { R._mapProg = false; drawBoardLines(); });
-    R.map.on('zoomend', function () { drawBoardLines(); });
+    ownedMap.on('moveend', function () {
+      if (!ownsCurrentMap()) return;
+      R._mapProg = false; drawBoardLines();
+    });
+    ownedMap.on('zoomend', function () { if (ownsCurrentMap()) drawBoardLines(); });
 
     /* 재생 위치 마커 — 동적 보드 아이콘. 보드 아웃라인(Levitaz Free
        Series 탑뷰 실루엣)은 진행 방향(헤딩)으로 회전(.rd-ph__rot),
@@ -2143,7 +2181,13 @@
   /* 재생 헤드 — 마커 이동·헤딩 회전·세일 거동. 보드 추적 시 화면
      가장자리에 닿으면 부드럽게 보드를 다시 중앙으로 가져온다. */
   function updateMapPlayhead(st) {
-    if (!R.map || !R.mapPlayhead || !st) return;
+    if (!R.map || !R.mapPlayhead) return;
+    if (!st || !isFinite(st.lat) || !isFinite(st.lng)) {
+      R.mapPlayhead.setOpacity(0);
+      drawBoardLines();
+      return;
+    }
+    R.mapPlayhead.setOpacity(1);
     R.mapPlayhead.setLatLng([st.lat, st.lng]);
     var rootEl = R.mapPlayhead.getElement();
     if (rootEl) {
@@ -2354,7 +2398,7 @@
     if (!ctx || typeof ctx.clearRect !== 'function') return;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, w, h);
-    if (!R || R.windDir == null || w <= 0 || h <= 0) return;
+    if (!R || !R.curState || R.windDir == null || w <= 0 || h <= 0) return;
     if (!R.showWindAxis && !R.showLadder) return;     // 둘 다 꺼짐
     var map = R.map;
     if (!map || typeof map.latLngToContainerPoint !== 'function') return;
@@ -2731,6 +2775,7 @@
     }
     if (idx < 0) return;
     var clip = R.clips[idx];
+    invalidateClipOcr(clip);
     try { URL.revokeObjectURL(clip.url); } catch (e) {}
     /* §189 (샘 2026-06-04) — 클립 제거 시 보존된 blob 도 삭제.
        (close() 는 removeClip 을 부르지 않으므로 닫기만으로는 안 지워진다 —
@@ -2979,42 +3024,70 @@
      결과는 자동 신뢰가 아니므로 사용자가 확인·미세조정할 수 있게 그대로
      남긴다(수동 미세조정 UI 유지). 감지값은 수동 배치처럼 저장돼 재방문
      시 복원된다. */
+  function invalidateClipOcr(clip) {
+    if (!clip) return;
+    clip._ocrRequest = null;
+    clip._ocrStatus = '';
+  }
+
   function ocrPlaceClip(clip, btn) {
-    if (!clip || !R) return;
+    if (!clip || !R || R.clips.indexOf(clip) < 0) return;
     var VTD = global.VideoTimeDetect;
     var startEpoch = R.session && R.session.startEpoch;
     if (!VTD || startEpoch == null || !isFinite(startEpoch)) return;
-    if (btn && btn.disabled) return;                 // 중복 실행 방지
+    if (clip._ocrRequest || (btn && btn.disabled)) return;
+
+    /* DOM buttons are rebuilt while OCR runs. Ownership therefore lives on
+       the clip, and a newer placement/attempt invalidates the old callback. */
+    var owner = R, request = {}, url = clip.url;
+    clip._ocrRequest = request;
+    function current() {
+      return R === owner && R.clips.indexOf(clip) >= 0 &&
+        clip.url === url && clip._ocrRequest === request;
+    }
 
     var box = el('replay-sync');
     function statusNode() {
       return box ? box.querySelector('[data-clip-ocrstatus="' + clip.id + '"]') : null;
     }
-    function setStatus(msg) { var s = statusNode(); if (s) s.textContent = msg; }
+    function setStatus(msg) {
+      if (!current()) return;
+      clip._ocrStatus = msg;
+      var s = statusNode(); if (s) s.textContent = msg;
+    }
     var origLabel = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = '⏳ Reading…'; }
     setStatus('Loading OCR engine…');
 
-    function reenable() {
+    function finish(msg) {
+      if (!current()) return;
+      setStatus(msg);
+      clip._ocrRequest = null;
       var b = box ? box.querySelector('.replay-sync__ocr[data-clip-ocr="' + clip.id + '"]') : btn;
       if (b) { b.disabled = false; b.textContent = origLabel || '🕑 Detect time from screen (OCR)'; }
     }
 
     /* §429b — detectVideoStart 는 화면 시각을 읽고, 초가 없는 오버레이면
        '분이 바뀌는 순간'을 이분탐색으로 찾아 초 단위까지 정밀 정합한다. */
-    VTD.detectVideoStart(clip.url, {
-      onProgress: function (msg) { setStatus(msg); }
-    }).then(function (hit) {
+    var pending;
+    try {
+      pending = VTD.detectVideoStart(url, {
+        onProgress: function (msg) { setStatus(msg); }
+      });
+    } catch (e) {
+      finish('OCR failed to run. Enter the start time above manually.');
+      return;
+    }
+    Promise.resolve(pending).then(function (hit) {
+      if (!current()) return;
       if (!hit) {
-        setStatus('Couldn’t read a clock on screen. Enter the start time above manually.');
-        reenable();
+        finish('Couldn’t read a clock on screen. Enter the start time above manually.');
         return;
       }
       var res = VTD.resolveStartElapsed(
         hit, hit.frameSec, startEpoch, parseClockToElapsed, clip.startElapsed);
       if (!res || !isFinite(res.startElapsed)) {
-        setStatus('Read “' + (hit.raw || '') + '” but couldn’t place it. Enter manually.');
-        reenable();
+        finish('Read “' + (hit.raw || '') + '” but couldn’t place it. Enter manually.');
         return;
       }
       /* 배치 적용 — 수동 배치처럼 저장·복원되게 하고, 출처·정밀도를 표기.
@@ -3035,14 +3108,14 @@
       rebuildTrack();
       seek(R.playT, !R.playing);
     })['catch'](function () {
-      setStatus('OCR failed to run. Enter the start time above manually.');
-      reenable();
+      finish('OCR failed to run. Enter the start time above manually.');
     });
   }
 
   /* 모든 클립을 자동 배치 다시 — '자동 정렬 다시' 버튼 */
   function autoPlaceAll() {
     R.clips.forEach(function (c) {
+      invalidateClipOcr(c);
       if (c.place !== 'manual') { c.place = 'pending'; }
     });
     R.clips.forEach(function (c) { autoPlaceClip(c); });
@@ -3148,9 +3221,10 @@
         ocrRow =
           '<div class="replay-sync__row replay-sync__ocrrow">' +
             '<button type="button" class="replay-sync__act replay-sync__ocr" ' +
-              'data-clip-ocr="' + clip.id + '">🕑 Detect time from screen (OCR)</button>' +
+              'data-clip-ocr="' + clip.id + '"' + (clip._ocrRequest ? ' disabled' : '') + '>' +
+              (clip._ocrRequest ? '⏳ Reading…' : '🕑 Detect time from screen (OCR)') + '</button>' +
             '<span class="replay-sync__ocrstatus" data-clip-ocrstatus="' + clip.id +
-              '">' + escapeHtml(ocrHint) + '</span>' +
+              '">' + escapeHtml(clip._ocrStatus || ocrHint) + '</span>' +
           '</div>';
       }
       html +=
@@ -3255,7 +3329,8 @@
   var clipSaveTimer = null;
   /* 클립을 수동으로 배치 — 트랙·동기화 패널 갱신 + 디바운스 저장 */
   function setClipStart(clip, startElapsed) {
-    if (!clip || !isFinite(startElapsed)) return;
+    if (!R || !clip || R.clips.indexOf(clip) < 0 || !isFinite(startElapsed)) return;
+    invalidateClipOcr(clip);
     startElapsed = clamp(startElapsed, -7200, 7200);
     clip.startElapsed = Math.round(startElapsed * 10) / 10;
     clip.place = 'manual';
@@ -3374,10 +3449,10 @@
     if (!R) return;
     playT = clamp(playT, R.t0, R.t1);
     R.playT = playT;
-    var st = interpAtTime(R.samples, playT, GAP_SEC);
+    var st = interpAtTime(R.samples, playT, GAP_SEC, R.legStarts);
     R.curState = st;
     R.ghostState = R.ghost
-      ? ghostStateAt(R.ghost.session, playT - R.t0, R.ghost.align.offsetSec)
+      ? ghostStateAt(R.ghost.session, playT - R.t0, R.ghost.align.offsetSec, R.ghost.legStarts)
       : null;
 
     updateRider(playT, st);
@@ -3717,6 +3792,7 @@
       var ghostMode = opts.ghost.mode === 'start' ? 'start' : 'clock';
       ghost = {
         session: opts.ghost.session,
+        legStarts: replayLegStarts(opts.ghost.session),
         label: opts.ghost.label || opts.ghost.session.trackName || 'Ghost',
         color: opts.ghost.color || '#B86BFF'
       };
@@ -3736,6 +3812,7 @@
 
     R = {
       session: session, analysis: opts.analysis || {}, samples: samples,
+      legStarts: replayLegStarts(session),
       restoreFocus: document.activeElement,
       ghost: ghost, ghostState: null, ghostTrackScale: null,
       leadMode: 'me', lead: 'me', leadNow: 'me', leadWhy: '', primaryT: null, primaryCum: null,   /* §596 */
@@ -3881,6 +3958,7 @@
     }
     // 모든 클립의 object URL 해제
     (R.clips || []).forEach(function (c) {
+      invalidateClipOcr(c);
       try { URL.revokeObjectURL(c.url); } catch (e) {}
     });
     var onClose = R.onClose;

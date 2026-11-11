@@ -25,8 +25,9 @@ var branch=code.slice(i, code.indexOf('if (!gpx) {', i));
 
 console.log('[1] 압축 분기가 이전 세션 상태를 비운다');
 ok('★ CUR.fullSession 을 비운다', /CUR\.fullSession = null/.test(branch));
-ok('★ 편집 구간도 비운다 (이전 세션의 제외구간이 따라오면 안 된다)',
-   /CUR\.edit = null/.test(branch));
+ok('★ 이전 편집 대신 열린 기록의 제외구간만 설치한다',
+   /CUR\.edit = savedEdit/.test(branch) && /var savedEdit = rec\.excludeRanges/.test(code)
+   && /: null;/.test(code.slice(code.indexOf('var savedEdit ='), code.indexOf('var previousInputs'))));
 ok('★ 융합 상태도 비운다', /CUR\.fusion = null/.test(branch));
 ok('융합 배너도 지운다', /renderFusionBanner\(null\)/.test(branch));
 ok('gpxText 는 계속 null', /CUR\.gpxText = null/.test(branch));
@@ -37,7 +38,11 @@ var iShow=branch.indexOf('show(sess, an2');
 ok('★ 초기화가 show() 앞', iClear>=0 && iShow>iClear, 'clear@'+iClear+' show@'+iShow);
 
 console.log('\n[3] 다른 진입 경로도 같은 초기화를 한다 (비교)');
-ok('loadGpxText', /CUR\.edit = null; CUR\.fullSession = null; CUR\.fusion = null;/.test(code));
+var loadStart=code.indexOf('function loadGpxText(');
+var loadBody=code.slice(loadStart, code.indexOf('function latestOpenable()',loadStart));
+ok('loadGpxText 는 저장 기록의 편집만 복원하고 새 파일은 초기화한다',
+   /CUR\.edit = CUR\.restoringSaved \? \(request\.savedEdit \|\| null\) : null;/.test(loadBody)
+   && /CUR\.fullSession = null; CUR\.fusion = null;/.test(loadBody));
 ok('loadVkxFile', /CUR\.edit = null; CUR\.fullSession = null; CUR\.gpxText = null; CUR\.fusion = null;/.test(code));
 
 console.log('\n[4] ★ 저장은 CUR.fullSession 에서 샘플을 뽑는다 (그래서 이 버그가 위험하다)');

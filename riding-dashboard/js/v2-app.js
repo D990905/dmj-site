@@ -474,7 +474,8 @@
     try { reapplyEdits(); }
     catch (e) {
       if (window.console) console.error('[v2 §590] restore exclusions', e);
-      CUR.edit = null;
+      /* Keep the saved exclusions pending so a later Save cannot silently drop them. */
+      alertLine('Saved exclusions could not be fully analyzed. Retry before saving.');
     }
   }
 
@@ -2586,11 +2587,9 @@
                   .catch(function () { out.disabled = false; out.textContent = 'sign out'; });
       });
       host.appendChild(out);
-      /* §586k — 예전 문구 "they follow you to another browser or phone" 는
-         사실이 아니었다. v2 는 cloud-sync.js 를 싣지 않아 로그인해도
-         기록이 이 브라우저에만 있다. 동기화를 켜기 전까지는 그렇게 말한다. */
-      host.title = 'Signed in. Rides on this dashboard are still kept in this '
-                 + 'browser \u2014 moving them between devices is not switched on yet.';
+      /* Cloud sync is loaded here, but signing in alone does not prove upload success. */
+      host.title = '로그인 상태입니다. 이 브라우저에 기록 사본을 보관하며, '
+                 + '계정 동기화가 완료된 기록은 다른 기기에서 불러올 수 있습니다.';
       return;
     }
 
@@ -2620,8 +2619,8 @@
     var link = el('a', 'btn btn-sm btn-ghost-secondary ms-2 p-0 px-1', 'sign in');
     link.href = authLoginUrl();
     host.appendChild(link);
-    host.title = 'Rides are stored in this browser. Moving them between '
-               + 'devices is not switched on in this dashboard yet (§586k).';
+    host.title = '로그인하지 않은 기록은 현재 브라우저에만 저장됩니다. '
+               + '로그인하면 계정 동기화를 사용할 수 있습니다.';
   }
 
   function renderTargetExertion(body, decision, rp) {
@@ -4564,10 +4563,40 @@
     var gpx = null;
     try { gpx = RDStorage.loadTrack(rec.id); } catch (e) { gpx = null; }
 
+    /* Prepare a saved session without losing the session currently on screen.
+       Parser/analysis failures must not change the next Save target or its inputs.
+       Once show() installs a complete new session, a drawing failure is reported
+       as such; rolling only its identity back would pair two different tracks. */
+    var previousState = Object.assign({}, CUR);
+    var savedEdit = rec.excludeRanges && rec.excludeRanges.length
+      ? { excludeRanges: rec.excludeRanges.map(function (r) { return { from: +r.from, to: +r.to }; }) } : null;
+    request.savedEdit = savedEdit;
+    var previousInputs = {};
+    ['in-purpose', 'in-windspeed', 'in-weight', 'in-wing', 'in-skill'].forEach(function (id) {
+      var input = $(id);
+      if (input) previousInputs[id] = input.value;
+    });
+    function failedOpen(error) {
+      if (CUR.session === previousState.session) {
+        Object.keys(CUR).forEach(function (key) { if (!(key in previousState)) delete CUR[key]; });
+        Object.assign(CUR, previousState);
+        Object.keys(previousInputs).forEach(function (id) {
+          var input = $(id); if (input) input.value = previousInputs[id];
+        });
+        alertLine('Could not reopen this session: ' + (error && error.message ? error.message : error));
+        return;
+      }
+      CUR.restoringSaved = false;
+      alertLine('The session loaded, but analysis or a panel could not finish: '
+        + (error && error.message ? error.message : error));
+      return true;
+    }
+
     /* §509 — 압축 형식(RDTRK1)이면 GPX 파싱을 건너뛰고 바로 세션을 만든다.
        normalizeSession 이 속도·방위·거리를 다시 계산하므로 lat/lng/시각
        셋이면 충분하다. */
     if (RDStorage.isCompactTrack && RDStorage.isCompactTrack(gpx)) {
+      try {
       var pts = RDStorage.decodeTrack(gpx);
       if (!pts) { alertLine('This session\u2019s track could not be read.'); return; }
       try { restoreRiderInputs(rec); } catch (e) {}
@@ -4590,6 +4619,7 @@
       var est2 = estimateWind(sess);
       var wd2 = (rec.windDir != null) ? rec.windDir
                 : (est2 && est2.windDir != null ? est2.windDir : null);
+      var an2 = An.analyzeSession(sess, wd2, analysisOpts(est2));
       CUR.gpxText = null;          /* 원문은 더 이상 갖고 있지 않다 */
       /* §552 — 이 분기가 CUR.fullSession 을 안 비웠다. show() 는
          `CUR.fullSession = fullSession || CUR.fullSession || session` 이라
@@ -4600,18 +4630,18 @@
          날짜는 오늘, 거리 29.09km(=직전에 보던 4.0 세션)인 행이 생겼다.
          저장 시 samples 도 CUR.fullSession 에서 뽑으므로 **남의 트랙이
          저장된다** — 조용히 일어나서 알아채기 어렵다. */
-      CUR.edit = null;
+      CUR.edit = savedEdit;
       CUR.fullSession = null;
       CUR.fusion = null;
       renderFusionBanner(null);
       CUR.est = est2;
       CUR.windDir = wd2;
-      var an2 = An.analyzeSession(sess, wd2, analysisOpts(est2));
       CUR.openedRecId = rec.id; CUR.openedRevision = Number(rec.revision || 0);        /* §554 — 여기까지 왔으면 진짜 열렸다 */
       show(sess, an2, rec.name || 'Session', est2);
       restoreSavedExclusions(rec);     /* §590 */
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
       return true;
+      } catch (e) { return failedOpen(e); }
     }
 
     if (!gpx) {
@@ -4629,22 +4659,18 @@
     try { An.normalizeSession(Gpx.parseGPX(gpx)); } catch (e) { alertLine('Could not reopen this session: ' + e.message); return; }
     try { restoreRiderInputs(rec); } catch (e) {}
     try {
+      /* Use the saved wind in the initial analysis, before committing the track. */
+      request.savedWindDir = rec.windDir;
       CUR.restoringSaved = true;
       CUR.openedRecId = rec.id; CUR.openedRevision = Number(rec.revision || 0);        /* §554 — 트랙이 있는 걸 확인한 뒤 */
       loadGpxText(gpx, rec.name || 'Saved session',request);
-      /* 저장된 풍향이 있으면 추정 대신 그 값으로 다시 분석한다 */
-      if (rec.windDir != null && CUR.fullSession) {
-        CUR.windDir = rec.windDir;
-        reapplyEdits();
-      }
       restoreSavedExclusions(rec);     /* §590 */
       var el2 = document.getElementById('chart-timeline');
       if (el2) el2.scrollIntoView({ block: 'start', behavior: 'smooth' });
       CUR.restoringSaved = false;
       return true;
     } catch (e) {
-      CUR.restoringSaved = false;
-      alertLine('Could not reopen this session: ' + (e && e.message ? e.message : e));
+      return failedOpen(e);
     }
   }
 
@@ -10426,6 +10452,9 @@
 
   var qaApplying = false;
   function show(session, analysis, name, est, fullSession) {
+    CUR.session = session; CUR.name = name; CUR.est = est;
+    CUR.windDir = analysis.windDir;
+    CUR.analysis = analysis;
     CUR.fullSession = fullSession || CUR.fullSession || session;
     /* §487 — 저장된 문답 답변이 만든 제외구간을 **첫 표시에서도** 적용한다.
        예전에는 답을 누른 그 순간에만 반영되고, 다음에 파일을 다시 열면
@@ -10435,15 +10464,12 @@
     if (!qaApplying && session === CUR.fullSession) {
       var qx = [];
       try { qx = qaExclusions(); } catch (e) { qx = []; }
-      if (qx.length) {
+      if (qx.length || (CUR.edit && CUR.edit.excludeRanges && CUR.edit.excludeRanges.length)) {
         qaApplying = true;
         try { reapplyEdits(); } finally { qaApplying = false; }
         return;
       }
     }
-    CUR.session = session; CUR.name = name; CUR.est = est;
-    CUR.windDir = analysis.windDir;
-    CUR.analysis = analysis;
     var pageBody=document.querySelector&&document.querySelector('.page-body');if(pageBody)pageBody.style.visibility='';
     plots.length = 0;
     /* §539 (옥대표 "세션 제목 수정가능하게 해줘") — 파일명이 그대로
@@ -11189,14 +11215,16 @@
     /* 풍향이 없으면 택/자이브 분류·VMG·폴라가 전부 잠긴다.
        트랙에서 자동 추정해 기본값으로 쓰고, 추정임을 화면에 밝힌다. */
     var est = estimateWind(session);
-    var wd = est && est.windDir != null ? est.windDir : null;
+    var wd = CUR.restoringSaved && request.savedWindDir != null
+      ? request.savedWindDir : (est && est.windDir != null ? est.windDir : null);
     var analysis = An.analyzeSession(session, wd, analysisOpts(est));
     if (!CUR.restoringSaved) { CUR.restoredInputs = null; CUR.sessionGear = null;
       if(request.commit)request.commit();
       else {CUR.openedRecId=null;CUR.openedRevision=null;}
     }
     CUR.gpxText = text;
-    CUR.edit = null; CUR.fullSession = null; CUR.fusion = null;
+    CUR.edit = CUR.restoringSaved ? (request.savedEdit || null) : null;
+    CUR.fullSession = null; CUR.fusion = null;
     renderFusionBanner(null);
     show(session, analysis, name, est);
   }
@@ -11285,7 +11313,14 @@
     try { renderTraining(); } catch (e) {}
     var rp = $('btn-replay');
     if (rp) rp.addEventListener('click', function () {
-      if (!CUR.session || !window.RDReplay) return;
+      if (!CUR.session) {
+        alertLine('라이딩 기록을 먼저 선택하거나 GPX·VKX·CSV 파일을 불러와 주세요.');
+        return;
+      }
+      if (!window.RDReplay) {
+        alertLine('재생 기능을 불러오지 못했습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요.');
+        return;
+      }
       if (!CUR.session.hasTime) { rp.textContent = 'No time data';
         setTimeout(function () { rp.textContent = '▶ Replay'; }, 1800); return; }
       try {
@@ -11412,6 +11447,9 @@
       try {
         riderFromFormSynced();
         applyWind(null, 'keep');
+        /* Reanalysis can replace the displayed session with its edited copy.
+           Guard the subsequent async write against navigation, not that copy. */
+        saveOwnerSession = CUR.session;
         var persist = Store.saveSessionWithLock || Store.saveSession;
         var res = persist({
           name: CUR.name || 'Session',
