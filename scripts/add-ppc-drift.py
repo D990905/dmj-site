@@ -44,3 +44,8 @@ for name in ['ppc.html','catalog.html','index.html']:
 f=ROOT/'inquiry.html';s=f.read_text();option='<option value="ppc-drift">PPC · Drift Wing</option>';s=s.replace(option,'');s=s.replace('<option value="ppc-m2">',option+'<option value="ppc-m2">',1);f.write_text(s)
 f=ROOT/'sitemap.xml';s=f.read_text();url='https://dmjgroup.kr/'+p['path'];s=re.sub(r'\s*<url>\s*<loc>'+re.escape(url)+r'</loc>.*?</url>','',s,flags=re.S);s=s.replace('</urlset>',f'  <url><loc>{url}</loc><lastmod>2026-11-11</lastmod></url>\n</urlset>');f.write_text(s)
 print('Added Drift: commerce record, detail page, gallery manifest, PPC/catalog/home cards, inquiry and sitemap.')
+
+# Keep the shared card-framing correction fresh when rebuilding Drift surfaces.
+for name in ['ppc.html', 'catalog.html', 'index.html', p['path']]:
+    f = ROOT / name
+    f.write_text(re.sub(r'product-framing\.css\?v=[^"<>]+', 'product-framing.css?v=20261111-drift-framing', f.read_text()))
