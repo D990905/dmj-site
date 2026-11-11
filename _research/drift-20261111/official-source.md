@@ -20,3 +20,7 @@ Official image DOM src URLs, downloaded and visually inspected:
 - product-2.jpg: https://ppcfoiling.com/cdn/shop/files/25450f645a333afb2e51af67f67992e7.jpg?v=1793749051&width=1200 (leading edge, 1200x900)
 - product-3.jpg: https://ppcfoiling.com/cdn/shop/files/0e14a44c4e3a69f53e3bde5c62e738ca.jpg?v=1794358222&width=1200 (underside/boom, 1200x989)
 The canopy photos show a 3.5 marking; the official page uses the same gallery for 4.3m. They are common product photos, not size-specific views.
+
+## Full specifications requested (2026-11-11)
+
+The user’s latest request to include the supplied specifications in the site and BAND post supersedes the earlier decision to omit the weight columns. The screenshot and official product page agree: 2.7m 1.61 / 2.02 / 28–40+ kts; 3.5m 1.80 / 2.21 / 20–38+ kts; 4.3m 1.99 / 2.40 / 15–27 kts (without boom / with boom / wind). Show the original weight values with an explicit note that the source does not state the unit. Do not infer kg. Retain the wind safety disclaimer and official source link. Pricing is unchanged.
