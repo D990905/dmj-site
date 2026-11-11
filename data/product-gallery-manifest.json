@@ -1373,6 +1373,18 @@
         "../../assets/images/products/levitaz/boom-free/official-20261104/boom-fs-95-bottom.webp"
       ],
       "groups": {}
+    },
+    {
+      "id": "ppc-drift",
+      "path": "products/ppc/drift-wing.html",
+      "source": "https://ppcfoiling.com/products/drift-wing",
+      "photos": [
+        "../../assets/images/products/ppc/drift/product-1.jpg",
+        "../../assets/images/products/ppc/drift/product-2.jpg",
+        "../../assets/images/products/ppc/drift/product-3.jpg"
+      ],
+      "groups": {},
+      "checkedAt": "2026-11-11"
     }
   ]
 }

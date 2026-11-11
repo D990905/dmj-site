@@ -3997,6 +3997,54 @@
       ]
     },
     {
+      "id": "ppc-drift",
+      "brand": "ppc",
+      "name": "Drift Wing",
+      "category": "wing",
+      "path": "products/ppc/drift-wing.html",
+      "image": "assets/images/products/ppc/drift/product-1.jpg",
+      "description": "PPC가 웨이브와 스웰 라이딩을 위해 설계한 듀얼스킨 윙으로 소개하는 모델입니다. EXO-PE 리딩엣지, FlyLite 스킨과 싱글 붐 구성이 특징입니다.",
+      "options": [
+        "2.7m",
+        "3.5m",
+        "4.3m"
+      ],
+      "price": null,
+      "availability": "inquiry",
+      "source": "https://ppcfoiling.com/products/drift-wing",
+      "priority": "performance",
+      "discipline": "wing",
+      "environments": [
+        "wave"
+      ],
+      "purposes": [
+        "wave"
+      ],
+      "raceOnly": false,
+      "headline": "웨이브·스웰을 위한 듀얼스킨 윙",
+      "manufacturerSummary": "PPC가 웨이브와 스웰 라이딩을 위해 설계한 듀얼스킨 윙으로 소개하는 모델입니다. EXO-PE 리딩엣지, FlyLite 스킨과 싱글 붐 구성이 특징입니다.",
+      "verifiedAt": "2026-11-11",
+      "priceStatus": "inquiry",
+      "pricingStatus": "가격·입고 문의",
+      "priceNote": "국내 판매가 미확정 · 가격, 붐 포함 구성과 입고 일정은 상담에서 확인",
+      "gallery": [
+        "assets/images/products/ppc/drift/product-1.jpg",
+        "assets/images/products/ppc/drift/product-2.jpg",
+        "assets/images/products/ppc/drift/product-3.jpg"
+      ],
+      "specs": {
+        "사이즈": "2.7m / 3.5m / 4.3m",
+        "구조": "듀얼스킨",
+        "리딩엣지": "EXO-PE",
+        "스킨": "FlyLite",
+        "핸들": "싱글 붐"
+      },
+      "notes": [
+        "본사 설명에 따른 제품 소개이며 독립 성능 시험 결과가 아닙니다.",
+        "사진은 공식 3.5m 샘플로, 사이즈별 외관은 다를 수 있습니다."
+      ]
+    },
+    {
       "id": "ppc-m2",
       "brand": "ppc",
       "name": "M2",
