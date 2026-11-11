@@ -1,3 +1,14 @@
+// Keep the public storefront menu consistent across home, catalog and product pages.
+(() => {
+ 'use strict';
+ const nav=document.querySelector('#store-nav');
+ if(!nav||/(^|\/)admin\//.test(location.pathname)||nav.querySelector('a[href$="riding-dashboard/v2.html"]'))return;
+ const link=document.createElement('a');
+ link.href=(document.currentScript?.dataset.root||'')+'riding-dashboard/v2.html';
+ link.textContent='라이딩 분석';
+ nav.insertBefore(link,nav.querySelector('[data-customer-auth]'));
+})();
+
 (() => {
  'use strict';
  const script=document.currentScript,root=script?.dataset.root||'';
