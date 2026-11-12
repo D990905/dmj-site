@@ -5,6 +5,10 @@ const vm = require('node:vm');
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 const html = read('index.html'), script = read('assets/js/drift-video.js'), css = read('assets/css/drift-video.css');
 assert.equal((html.match(/id="drift-film"/g) || []).length, 1);
+// Korean headings and noun phrases have no decorative comma or final period.
+assert(html.includes('id="drift-film-title">파도를 따라<br>Drift</h2>'));
+assert(html.includes('웨이브·스웰을 위한 듀얼스킨 윙<br>PPC 공식 소개 영상으로 만나보세요.'));
+assert(html.includes('재생 버튼을 누르면 YouTube에 연결됩니다.'));
 assert(html.indexOf('id="drift-film"') < html.indexOf('id="outlet-home"'));
 assert(html.includes('https://www.youtube.com/watch?v=89btxH-v94k'));
 assert(html.includes('ppc.html#supersonic'));
