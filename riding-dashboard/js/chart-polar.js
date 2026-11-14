@@ -175,6 +175,14 @@
        를 붙여서 두 해석(파도 / 풍향 오차)을 같이 내놓는다. */
     if (mode === 'downwind' && best.twaDeg >= EXTREME_DEEP_DEG) best.extreme = 'deep';
     if (mode === 'upwind' && best.twaDeg <= EXTREME_HIGH_DEG) best.extreme = 'high';
+    // This is course-over-ground relative to entered wind, not measured board heading.
+    // Keep the observed candidate in diagnostics, but do not promote an extreme
+    // upwind bin to a sailing target without independent wind/course validation.
+    if (best.extreme === 'high') {
+      best.ok = false;
+      best.reason = 'wind_course_validation_required';
+      return best;
+    }
     best.ok = true;
     return best;
   }

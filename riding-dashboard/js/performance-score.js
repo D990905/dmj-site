@@ -57,11 +57,18 @@
           scores.push(.4*retention+.3*recScore+.3*(m.turnSuccess?100:0));
         });
         c.validCount=scores.length;c.censoredCount=censored;
+        c.invalidCount=turns.length-scores.length-censored;
+        c.observedScore=null;c.coveragePct=turns.length?100*scores.length/turns.length:null;
         c.metrics={lossPct:mean(losses),recoverySec:mean(recoveries),recoveredCount:recoveries.length,notRecoveredCount:turns.filter(function(m){return m.recoveryStatus==='not-recovered';}).length,censoredCount:censored,successCount:success,attemptCount:turns.length,successRate:turns.length?100*success/turns.length:null};
         if(!windUsable){c.status='wind-unavailable';return;}
         if(!turns.length)return;
         // Do not drop poorly observed attempts and inflate the remaining score.
-        if(scores.length!==turns.length){c.status='incomplete-observation';return;}
+        if(scores.length!==turns.length){
+          c.status='incomplete-observation';
+          // Descriptive subset only: never substitutes for the full-session score.
+          if(scores.length>=3)c.observedScore=round(mean(scores));
+          return;
+        }
         if(scores.length<3){c.status='insufficient';return;}
         c.score=round(mean(scores));c.eligible=scores.length>=5;
         c.status=c.eligible?'eligible':'provisional';c.confidence=scores.length>=10?'more-coverage':'limited';
@@ -71,7 +78,7 @@
     var total={score:null,S:null,P:null,status:'partial',eligibleCells:eligibleCells,requiredCells:8};
     ['S','P'].forEach(function(side){if(Object.keys(domains).every(function(k){return domains[k][side].eligible;}))total[side]=round(Object.keys(domains).reduce(function(sum,k){return sum+WEIGHTS[k]*domains[k][side].score;},0));});
     if(eligibleCells===8){total.score=round(Object.keys(domains).reduce(function(sum,k){return sum+WEIGHTS[k]*(domains[k].S.score+domains[k].P.score)/2;},0));total.status='complete';}
-    return {version:'draft-v1',label:'모델 대비 참고 점수',total:total,domains:domains,wind:{source:o.windSource||'unknown',confidence:o.windConfidence||'unknown',usable:windUsable},notes:['검토용 휴리스틱이며 실력 등급이 아닙니다.','풍상: VMG 상위 50% / 풍상 예측 VMG / 1.2. 풍하: SOG 상위 50% / 풍상 예측 속도 / 2.6.','회전: 최저 속도 유지 40% + 회복 30% + 속도 기준 추정 성공 30%. 회복 25초 이상은 회복 항목 0점.','분석 대상 구간 기준입니다. 회전의 S/P는 진입 택입니다.']};
+    return {version:'draft-v1.1-observed-subset',label:'모델 대비 참고 점수',total:total,domains:domains,wind:{source:o.windSource||'unknown',confidence:o.windConfidence||'unknown',usable:windUsable},notes:['관측 표본 점수는 완전히 관측된 회전만의 잠정 기술통계입니다. 관측 중단 편향이 있을 수 있어 전체 점수·좌우 우열 판정에 넣지 않습니다.','검토용 휴리스틱이며 실력 등급이 아닙니다.','풍상: VMG 상위 50% / 풍상 예측 VMG / 1.2. 풍하: SOG 상위 50% / 풍상 예측 속도 / 2.6.','회전: 최저 속도 유지 40% + 회복 30% + 속도 기준 추정 성공 30%. 회복 25초 이상은 회복 항목 0점.','분석 대상 구간 기준입니다. 회전의 S/P는 진입 택입니다.']};
   }
   var api={compute:compute,weights:WEIGHTS};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;

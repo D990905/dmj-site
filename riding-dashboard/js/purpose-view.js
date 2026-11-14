@@ -7,7 +7,7 @@ maneuver:{label:'태킹 · 자이빙 연습',focus:'진입 택별 속도 유지�
 slalom:{label:'슬라럼 연습',focus:'지속 속도와 자이빙 후 재가속을 확인합니다.',next:'자이빙 진입·최저·탈출 속도와 회복을 먼저 보세요. 부표가 지정된 기록에서만 구간·랩 비교가 의미 있습니다.',target:'tab-turns'},
 speed:{label:'스피드 기록',focus:'순간 최고보다 일정 구간에서 유지한 속도를 봅니다.',next:'2초·10초·100m·500m·1해리 기록을 비교하세요. 알파 500은 회전이 포함된 별도 기록입니다.',target:'tab-perf'}
 };
-const status={'no-data':'기록 없음','wind-unavailable':'풍향 확인 필요','model-unavailable':'조건 입력 필요','insufficient':'표본 부족','incomplete-observation':'회복 관측 부족','provisional':'잠정 점수','eligible':'산출 가능'};
+const status={'no-data':'기록 없음','wind-unavailable':'풍향 확인 필요','model-unavailable':'조건 입력 필요','insufficient':'표본 부족','incomplete-observation':'전체 관측 불완전','provisional':'잠정 점수','eligible':'산출 가능'};
 function e(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
 function number(v,suffix){return typeof v==='number'&&Number.isFinite(v)?v.toFixed(1)+(suffix||''):'—';}
 function scaled(v,f){return typeof v==='number'&&Number.isFinite(v)?v*f:NaN;}
@@ -50,11 +50,29 @@ if(window.L&&valid.length>1){
  requestAnimationFrame(()=>{if(previewMap)previewMap.invalidateSize();});
 }else track.textContent='주행 위치 정보 없음';
 if(!score.wind.usable){const flag=e('button','rd-wind-flag','풍향 확인 필요');flag.type='button';flag.onclick=()=>document.getElementById('rd-edit').click();card.insertBefore(flag,track);}
+
+const summary=e('section','rd-tack-summary');summary.append(e('h3','','풍상·풍하 및 회전 · 택별 요약'));
+summary.append(e('p','','주행은 시간가중 평균입니다. VMG는 각 목표 방향의 유효속도이며 각도는 입력 풍향과 GPS 진행방향으로 추정한 풍각입니다. 회전은 진입 택 기준입니다. 진입→탈출 손실은 음수이면 개선이며 VMG 진입값 1 m/s 미만은 제외합니다.'));
+const sw=e('div','rd-score-table-wrap'),st=e('table','rd-score-table');st.setAttribute('aria-label','풍상 풍하 VMG 속도 각도 및 회전 택별 요약');
+const sh=e('thead'),sr=e('tr');['구분','지표','스타보드 S','포트 P'].forEach(t=>sr.append(e('th','',t)));sh.append(sr);st.append(sh);const sb=e('tbody');
+['upwind','downwind'].forEach(zone=>{
+ [['vmg','VMG',' kt',1.9438444924406],['sog','속도 SOG',' kt',1.9438444924406],['twa','풍각 추정 (GPS)','°',1]].forEach(([metric,label,unit,factor])=>{
+ const row=e('tr');row.append(e('th','',zone==='upwind'?'풍상':'풍하'),e('th','',label));
+ ['S','P'].forEach(side=>{const g=a.wind?.tackSplit?.[zone]?.[side];const td=e('td');const usable=score.wind.usable&&g&&g.count>0&&g.timeSec>0;
+ td.append(e('strong','',usable?number(scaled(g[metric]?.avg,factor),unit):'—'),e('small','',!score.wind.usable?'풍향 확인 필요':usable?number(g.timeSec,'초 관측'):'기록 없음'));row.append(td);});sb.append(row);
+ });});
+['tack','gybe'].forEach(key=>{const row=e('tr');row.append(e('th','',key==='tack'?'태킹':'자이빙'),e('th','','성공·손실·회복'));
+ ['S','P'].forEach(side=>{const c=score.domains[key][side],td=e('td');td.append(e('strong','',c.count?c.metrics.successCount+'/'+c.count+'회 속도 기준 추정 성공':'기록 없음'));
+ const turns=(a.maneuvers||[]).filter(m=>m.type===key&&m.side===side);const change=(entry,exit,min)=>{const vals=turns.filter(m=>Number.isFinite(m[entry])&&m[entry]>=min&&Number.isFinite(m[exit])).map(m=>100*(1-m[exit]/m[entry]));return vals.length?number(vals.reduce((x,y)=>x+y,0)/vals.length,'%')+' · '+vals.length+'/'+turns.length+'회':'—';};
+ if(c.count){td.append(e('small','','진입→탈출 속도 손실 '+change('entrySpeedMs','exitSpeedMs',0.01)),e('small','','진입→탈출 VMG 손실 '+(score.wind.usable?change('entryVmgMs','exitVmgMs',1):'풍향 확인 필요')));}
+ if(c.count)td.append(e('small','','최저속 손실 '+number(c.metrics.lossPct,'%')),e('small','','회복한 '+c.metrics.recoveredCount+'회 평균 '+number(c.metrics.recoverySec,'초')),e('small','','관측 중단 '+c.censoredCount+'회 · 측정값 부족 '+(c.invalidCount||0)+'회'));
+ row.append(td);});sb.append(row);});st.append(sb);sw.append(st);summary.append(sw);host.append(summary);
+
 const section=e('details','rd-score-panel');section.open=true;section.append(e('summary','','점수와 좌우 택 비교'));
 const head=e('div','rd-score-heading');head.append(e('h3','','전체 점수 '+(score.total.score==null?'—':score.total.score+' / 100')),e('p','',score.total.score==null?'점수 산출 조건을 충족한 항목 '+score.total.eligibleCells+'/8 · 부족한 항목을 0점으로 계산하지 않습니다.':'풍상 35% · 풍하 35% · 태킹 15% · 자이빙 15%'));section.append(head);
 section.append(e('p','rd-score-caution','검토용 참고 점수입니다. 목적에 따라 강조하는 지표가 달라지며, 동일 점수의 산식은 바꾸지 않습니다. 풍향의 신뢰도가 낮으면 택별 점수를 보류합니다.'));
 const wrap=e('div','rd-score-table-wrap'),table=e('table','rd-score-table');const h=e('thead'),r=e('tr');['항목','종합','스타보드 택','포트 택'].forEach(t=>r.append(e('th','',t)));h.append(r);table.append(h);const body=e('tbody');
-Object.entries({upwind:'풍상 VMG',downwind:'풍하 주행속도',tack:'태킹',gybe:'자이빙'}).forEach(([k,label])=>{const domain=score.domains[k],row=e('tr');row.append(e('th','',label),e('td','rd-domain-total',domain.score==null?'—':domain.score));['S','P'].forEach(side=>{const c=domain[side],td=e('td');td.append(e('strong','rd-cell-score',c.score==null?'—':c.score),e('span','rd-cell-status',status[c.status]||c.status));if(k==='tack'||k==='gybe'){td.append(e('small','','진입 '+c.count+'회 · 추정 성공 '+c.metrics.successCount+'/'+c.count),e('small','','평균 손실 '+number(c.metrics.lossPct,'%')),e('small','','회복 관측 '+(c.metrics.recoveredCount||0)+'/'+c.count+'회 · 회복한 경우 평균 '+number(c.metrics.recoverySec,'초')),e('small','','미회복 '+(c.metrics.notRecoveredCount||0)+'회 · 관측 중단 '+(c.censoredCount||0)+'회'));}else{td.append(e('small','',Math.round(c.seconds)+'초 관측'),e('small','',(k==='upwind'?'풍상 VMG ':'주행 속도 ')+number(c.metrics.measuredKt,' kt')));}row.append(td);});body.append(row);});table.append(body);wrap.append(table);section.append(wrap);
+Object.entries({upwind:'풍상 VMG',downwind:'풍하 주행속도',tack:'태킹',gybe:'자이빙'}).forEach(([k,label])=>{const domain=score.domains[k],row=e('tr');row.append(e('th','',label),e('td','rd-domain-total',domain.score==null?'—':domain.score));['S','P'].forEach(side=>{const c=domain[side],td=e('td');td.append(e('strong','rd-cell-score',c.score==null?'—':c.score),e('span','rd-cell-status',status[c.status]||c.status));if(k==='tack'||k==='gybe'){if(c.observedScore!=null){td.append(e('strong','rd-observed-score','관측 표본 '+c.observedScore+' / 100'),e('small','','잠정 · '+c.validCount+'/'+c.count+'회 ('+number(c.coveragePct,'%')+') · 전체 점수 제외'));}if(c.invalidCount){td.append(e('small','','필수 측정값 부족 '+c.invalidCount+'회'));}td.append(e('small','','진입 '+c.count+'회 · 추정 성공 '+c.metrics.successCount+'/'+c.count),e('small','','평균 손실 '+number(c.metrics.lossPct,'%')),e('small','','회복 관측 '+(c.metrics.recoveredCount||0)+'/'+c.count+'회 · 회복한 경우 평균 '+number(c.metrics.recoverySec,'초')),e('small','','미회복 '+(c.metrics.notRecoveredCount||0)+'회 · 관측 중단 '+(c.censoredCount||0)+'회'));}else{td.append(e('small','',Math.round(c.seconds)+'초 관측'),e('small','',(k==='upwind'?'풍상 VMG ':'주행 속도 ')+number(c.metrics.measuredKt,' kt')));}row.append(td);});body.append(row);});table.append(body);wrap.append(table);section.append(wrap);
 const details=e('details','rd-score-method');details.append(e('summary','','점수 계산과 해석 기준'));details.append(e('p','','풍상·풍하 각 택은 60초 이상, 회전은 각 진입 택별 5회 이상 완전한 관측이 필요합니다. 회전 3~4회는 잠정 점수입니다. 이는 검토용 기준이며 통계적 신뢰도를 보장하지 않습니다.'));
 score.notes.forEach(n=>details.append(e('p','',n)));details.append(e('p','','스타보드 택은 바람을 오른쪽에서, 포트 택은 왼쪽에서 받는 주행입니다. 태킹·자이빙은 회전 전 진입 택으로 구분합니다. 풍하 점수는 기존 속도 모델의 참고값이며 풍하 VMG 실력 등급이 아닙니다.'));section.append(details);host.append(section);
 }

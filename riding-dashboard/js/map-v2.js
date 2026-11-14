@@ -26,7 +26,7 @@
 
   function legendHtml() {
     var lo=0;
-    return '<span>SOG · kt (노트)</span><span style="display:flex;flex-wrap:wrap;gap:3px 7px;max-width:240px">'+TIERS.map(function(t,i){
+    return '<span class="rd-speed-title">SOG · kt</span><span class="rd-speed-tiers">'+TIERS.map(function(t,i){
       var label=i===TIERS.length-1?'24+':lo+'–'+t.max;lo=t.max;
       return '<span style="display:inline-flex;align-items:center;gap:3px"><i style="width:10px;height:6px;background:'+t.c+'"></i>'+label+'</span>';
     }).join('')+'<span style="display:inline-flex;align-items:center;gap:3px"><i style="width:10px;height:6px;background:#8996a2"></i>미측정</span></span>';
@@ -34,7 +34,9 @@
   function addSpeedLegend(map, position) {
     if (!global.L.control || !global.document) return null;
     var legend=global.L.control({position:position||'bottomleft'});
-    legend.onAdd=function(){var box=global.document.createElement('div');box.className='rd-map-speed';box.style.display='block';box.setAttribute('aria-label','고정 SOG 속도 · kt (노트)');box.innerHTML=legendHtml();return box;};
+    var box=null;function resizeLegend(){if(box)box.style.maxWidth=Math.max(80,map.getSize().x-20)+'px';}
+    legend.onAdd=function(){box=global.document.createElement('div');box.className='rd-map-speed';box.tabIndex=0;box.title='Speed legend · scroll horizontally on narrow screens';box.setAttribute('aria-label','고정 SOG 속도 · kt (노트)');box.innerHTML=legendHtml();resizeLegend();map.on('resize',resizeLegend);if(global.L.DomEvent){global.L.DomEvent.disableClickPropagation(box);global.L.DomEvent.disableScrollPropagation(box);}return box;};
+    legend.onRemove=function(){map.off('resize',resizeLegend);box=null;};
     legend.addTo(map);return legend;
   }
   function addSpeedTrack(map, session) {

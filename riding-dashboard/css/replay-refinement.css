@@ -81,3 +81,13 @@
  .replay.replay--no-video .replay-rider__clock{margin-bottom:4px}
  .replay.replay--no-video .replay-rider__m{min-width:0}
 }
+
+/* Single-row legend: retain every tier, scroll instead of wrapping on mobile. */
+.rd-map-speed{display:flex;flex-wrap:nowrap;white-space:nowrap;max-width:calc(100vw - 52px);box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;gap:8px}
+.rd-map-speed .rd-speed-title{flex:none;font-weight:600}
+.rd-map-speed .rd-speed-tiers{display:flex;flex-wrap:nowrap;gap:7px;flex:none}
+.rd-map-speed .rd-speed-tiers>span{flex:none}
+.rd-map-speed .rd-speed-tiers i{flex:none}
+.rd-map-speed:focus-visible{outline:2px solid #22b8cf;outline-offset:2px}
+
+@media(max-width:600px){.rd-summary-map .leaflet-bottom.leaflet-left{bottom:90px}}

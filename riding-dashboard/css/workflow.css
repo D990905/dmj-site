@@ -60,3 +60,6 @@ body .rd-mobile-result-actions,body[data-rd-phase=results] .rd-mobile-result-act
 body[data-rd-phase=results] #rd-flow-summary{display:block!important}
 body[data-rd-phase=results] .rd-workflow{justify-content:space-between;margin-bottom:18px}
 #kpi-row .card{height:100%}#kpi-row .kpi__val{font-size:30px;line-height:1.2}#kpi-row .kpi__sub{font-size:12px;line-height:1.5}
+/* Summary coaching: use the available desktop width; keep mobile text readable. */
+.rd-next-practice > summary { white-space: nowrap; }
+.rd-next-practice > p { max-width: none; overflow-wrap: anywhere; }

@@ -26,7 +26,7 @@
  function panelIndex(id){
   if(id==='purpose-results')return;
   var page=document.getElementById(id);if(!page)return;
-  var titles=Array.from(page.querySelectorAll('.card-title')).filter(function(t){return t.textContent.trim();});
+  var titles=Array.from(page.querySelectorAll('.card-title')).filter(function(t){return t.textContent.trim()&&!t.closest('.rd-user-hidden-card');});
   var tools=page.querySelector(':scope > .sl-page-tools');
   if(titles.length<4){if(tools)tools.remove();return;}
   var signature=titles.map(function(t){return t.textContent.trim();}).join('|');
@@ -37,7 +37,7 @@
   var first=document.createElement('option');first.value='';first.textContent='확인할 항목으로 이동';select.append(first);
   titles.forEach(function(t,i){var opt=document.createElement('option');opt.value=String(i);opt.textContent=t.textContent.trim();select.append(opt);});
   count.textContent=titles.length+'개 분석 패널';
-  select.addEventListener('change',function(){if(select.value==='')return;var currentTitles=Array.from(page.querySelectorAll('.card-title')).filter(function(t){return t.textContent.trim();});var title=currentTitles[Number(select.value)];if(title){title.tabIndex=-1;title.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});title.focus({preventScroll:true});}});
+  select.addEventListener('change',function(){if(select.value==='')return;var currentTitles=Array.from(page.querySelectorAll('.card-title')).filter(function(t){return t.textContent.trim()&&!t.closest('.rd-user-hidden-card');});var title=currentTitles[Number(select.value)];if(title){title.tabIndex=-1;title.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});title.focus({preventScroll:true});}});
   tools.append(label,select,count);page.querySelector('.sl-section-heading').after(tools);
  }
  function alignConditionFields(){

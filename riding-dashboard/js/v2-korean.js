@@ -22,6 +22,7 @@ Object.assign(dictionary,{
   "Save to this session": "이 라이딩 기록에 저장",
   "Gear for this session": "이날 사용한 장비",
   "Your gear today": "오늘 사용할 장비",
+  "Gear used in this session": "사용했던 장비",
   "Front wing": "프런트 포일",
   "Rear wing": "리어 포일",
   "Hand wing": "핸드윙",

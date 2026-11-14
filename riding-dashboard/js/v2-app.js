@@ -852,7 +852,7 @@
     var curDir = a.windDir;
     if (curDir == null) return;
 
-    var card = el('div', 'card mb-3');
+    var card = el('div', 'card mb-3 rd-condition-map-card');
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title', 'Confirm the wind direction'));
     card.appendChild(head);
@@ -863,7 +863,9 @@
       + 'with how the session felt — upwind legs should sit either side of the arrows.'));
 
     var mapHost = el('div');
-    mapHost.style.cssText = 'height:340px;border-radius:4px;overflow:hidden';
+    mapHost.id = 'rd-condition-map';
+    mapHost.className = 'rd-wind-confirm-map rd-analysis-map';
+    mapHost.style.cssText = 'height:408px;border-radius:4px;overflow:hidden';
     body.appendChild(mapHost);
 
     /* 슬라이더 + 현재 값 */
@@ -888,6 +890,7 @@
 
     /* 실시간 대칭 판정 */
     var live = el('div', 'mt-2');
+    live.id = 'rd-condition-wind-feedback';
     body.appendChild(live);
 
     /* 최적 풍향 제안 */
@@ -901,9 +904,31 @@
     /* ---- 지도 ---- */
     if (windMapRO) { try { windMapRO.disconnect(); } catch (e) {} windMapRO = null; }
     if (windMap) { try { windMap.remove(); } catch (e) {} windMap = null; }
-    var map = L.map(mapHost, { zoomControl: false, attributionControl: false });
+    var map = L.map(mapHost, { zoomControl: false, attributionControl: true });
     windMap = map;
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    var base = null, satellite = true;
+    function setBase() {
+      if (base) map.removeLayer(base);
+      mapHost.classList.toggle('rd-satellite-map', satellite);
+      base = L.tileLayer(satellite
+        ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19, maxNativeZoom: satellite ? 18 : 19,
+          attribution: satellite ? 'Imagery © Esri, Maxar, Earthstar Geographics' : '© OpenStreetMap'
+        }).addTo(map);
+    }
+    setBase();
+    var baseControl = L.control({ position: 'topright' });
+    baseControl.onAdd = function () {
+      var bar = el('div', 'rd-map-tools'), toggle = el('button', '', '분석 지도');
+      toggle.type = 'button';
+      toggle.setAttribute('aria-label', '배경 지도 전환');
+      toggle.setAttribute('aria-pressed', 'true');
+      toggle.onclick = function () { satellite = !satellite; setBase(); toggle.textContent = satellite ? '분석 지도' : '위성 지도'; toggle.setAttribute('aria-pressed', String(satellite)); };
+      L.DomEvent.disableClickPropagation(bar); L.DomEvent.disableScrollPropagation(bar);
+      bar.appendChild(toggle); return bar;
+    };
+    baseControl.addTo(map);
     RDMapV2.addSpeedTrack(map,CUR.session);
     RDMapV2.addSpeedLegend(map);
 
@@ -1355,7 +1380,11 @@
     var tf = el('div', 'card-footer');
     var eb = el('div'); eb.id = 'edit-bar';
     tf.appendChild(eb); tc.appendChild(tf);
-    host.appendChild(tc);
+    var conditionMap = $('rd-condition-map');
+    if (conditionMap) {
+      tc.classList.add('rd-condition-track');
+      conditionMap.insertAdjacentElement('afterend', tc);
+    } else host.appendChild(tc);
     renderTrimChart();
     renderEditBar();
 
@@ -1555,7 +1584,14 @@
     try { var variationHost = document.getElementById("rd-wind-variation"); if (variationHost) { variationHost.replaceChildren(); renderWindVariation(variationHost, a); } }
     catch (e) { if (window.console) console.error('[v2 §588] wind variation', e); }
     /* 트랙·장비·바다·몸은 풍향이 안 풀려도 보여야 한다 — return 앞에 */
-    try { renderConditionSetup(host); }
+    try {
+      renderConditionSetup(host);
+      var feedback = $('rd-condition-wind-feedback');
+      if (feedback) {
+        ctl.classList.add('rd-condition-wind-input');
+        feedback.parentNode.insertBefore(ctl, feedback);
+      }
+    }
     catch (e) { if (window.console) console.error('[v2 §588] condition setup', e); }
     if (!w) { renderWindAnalysis(a); return; }
 
@@ -3027,6 +3063,9 @@
     if (w.placeSpreadKt == null && w.timeSpreadKt == null) return;
 
     var card = el('div', 'card mt-3');
+    // User removed this presentation card; calculations and source data remain intact.
+    card.classList.add('rd-user-hidden-card');
+    card.hidden = true;
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title', 'Was the wind about where, or about when?'));
     head.appendChild(el('div', 'card-actions lab', w.cellM + ' m squares'));
@@ -3312,6 +3351,9 @@
   function renderBinTable(host, a) {
     if (!window.RDBinTable || !CUR.session) return;
     var card = el('div', 'card mt-3');
+    // User removed this presentation card; calculations and source data remain intact.
+    card.classList.add('rd-user-hidden-card');
+    card.hidden = true;
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title', 'Bin table'));
     var binToggle = el('button', 'btn btn-sm btn-ghost-secondary ms-auto',
@@ -4253,6 +4295,8 @@
     var rw = a.runs || {}, runs = rw.runs || [];
     var card = el('div', 'card');
     var h = el('div', 'card-header');
+    card.classList.add('rd-user-hidden-card');
+    card.hidden = true;
     h.appendChild(el('h3', 'card-title', 'Fast runs'));
     h.appendChild(el('div', 'card-actions lab',
       runs.length + ' runs · threshold ' + (rw.thresholdMs ? (rw.thresholdMs * KT).toFixed(1) : '—') + ' kt'));
@@ -5932,6 +5976,9 @@
     if (!sum || !sum.count) return;
 
     var card = el('div', 'card mb-3');
+    // User removed this presentation card; calculations and source data remain intact.
+    card.classList.add('rd-user-hidden-card');
+    card.hidden = true;
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title', 'How the foiling was strung together'));
     head.appendChild(el('div', 'card-actions lab',
@@ -6818,21 +6865,25 @@
   function heldPolar(a) {
     var p0r=p0CurrentRider();
     if(p0r && !p0CurrentIncluded())return null;
-    if(p0r) return RDAnalysis.computePolar(p0ViewSession(CUR.session),RDP0Panel.store.getSnapshot().wind.directionDeg,7.5);
-    if (!a || !a.polar || !CUR.session || a.windDir == null) return a && a.polar;
-    if (a._heldPolar) return a._heldPolar;
-    var S = CUR.session.samples || [], weights = RDAnalysis.sampleTimeWeights(CUR.session), bd = a.polar.binDeg || 7.5;
+    if (!a || !a.polar || !CUR.session) return a && a.polar;
+    // P0 must not bypass turn removal. Its filtered trace and wind are authoritative.
+    var session = p0r ? p0ViewSession(CUR.session) : CUR.session;
+    var wind = p0r ? RDP0Panel.store.getSnapshot().wind.directionDeg : a.windDir;
+    if (wind == null || !Number.isFinite(wind)) return null;
+    if (!p0r && a._heldPolar) return a._heldPolar;
+    var maneuvers = p0r ? RDAnalysis.detectManeuvers(session, wind) : (a.maneuvers || []);
+    var S = session.samples || [], weights = RDAnalysis.sampleTimeWeights(session), bd = a.polar.binDeg || 7.5;
     var nB = Math.ceil(180 / bd), port = [], stbd = [], all = [], i, k;
     for (k = 0; k < nB; k++) { port.push([]); stbd.push([]); all.push([]); }
     var inTurn = new Uint8Array(S.length);
-    (a.maneuvers || []).forEach(function (m) {
+    maneuvers.forEach(function (m) {
       if (m.startIdx == null || m.endIdx == null || !S[m.startIdx] || !S[m.endIdx]) return;
       var t0 = S[m.startIdx].t - TURN_PAD_SEC, t1 = S[m.endIdx].t + TURN_PAD_SEC;
       for (var j = m.startIdx; j >= 0 && S[j].t >= t0; j--) inTurn[j] = 1;
       for (var j2 = m.startIdx; j2 < S.length && S[j2].t <= t1; j2++) inTurn[j2] = 1;
     });
     var removed = 0, removedLow = 0;
-    var wd = ((a.windDir % 360) + 360) % 360;
+    var wd = ((wind % 360) + 360) % 360;
     for (i = 0; i < S.length; i++) {
       var p = S[i];
       if (p.speed == null || p.speed < 1.0 || p.heading == null || !weights[i]) continue;
@@ -6845,13 +6896,14 @@
     var out = Object.assign({}, a.polar, { port: RDAnalysis.reduceWeightedPolar(port, bd), starboard: RDAnalysis.reduceWeightedPolar(stbd, bd), combined: RDAnalysis.reduceWeightedPolar(all, bd) });
     out.turnSamplesRemoved = removed;
     out.turnSamplesBelow30 = removedLow;
-    a._heldPolar = out;
+    if (!p0r) a._heldPolar = out;
     return out;
   }
 
   function renderOptimalAngles(card, a) {
     if (!window.RDPolar || !RDPolar.optimalAngle || !a || !a.polar) return;
     var hp = heldPolar(a);                 /* §598 — 붙잡은 각도만 */
+    if (!hp) return;
     var bins = hp.combined || hp.starboard;
     if (!bins || !bins.length) return;
     /* ⚠ minN 을 넘기지 않는다. 넘기면 그리기 기준(5)이 최적 각도에도
@@ -6871,6 +6923,7 @@
 
     var row = el('div', 'row g-3 mt-1');
     function why(r) {
+      if (r.reason === 'wind_course_validation_required') return '풍향·GPS 진행각 검증 필요 — 관측된 극단각은 최적 주행각으로 확정하지 않습니다';
       if (r.reason === 'need_more_samples') {
         return 'No angle here was sailed for ' + OPT_MIN_SEC + ' s or more (turns excluded).';
       }
@@ -8011,6 +8064,8 @@
 
     var card = el('div', 'card mt-3');
     var head = el('div', 'card-header');
+    card.classList.add('rd-user-hidden-card');
+    card.hidden = true;
     head.appendChild(el('h3', 'card-title', 'How the turns went over the session'));
     head.appendChild(el('div', 'card-actions lab',
       mans.length + ' turns, split into quarters'));
@@ -9423,7 +9478,7 @@
     var card = el('div', 'card mb-3');
     var head = el('div', 'card-header');
     head.appendChild(el('h3', 'card-title',
-      CUR.sessionGear ? 'Gear for this session' : 'Your gear today'));
+      'Gear used in this session'));
     var acts = el('div', 'card-actions d-flex align-items-center gap-2');
 
     /* §548 (옥대표 "여기도 입력하고 나면 그 세션에 해당 정보를 저장하는
