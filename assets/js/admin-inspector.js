@@ -24,7 +24,7 @@
   return box;
  }
  function clear(){state.admin=false;state.inventory=[];state.costs=[];state.estimates=[];state.products=[];state.client=null;document.querySelectorAll('.admin-inspect,.admin-toolbar').forEach(e=>e.remove());document.querySelectorAll('[data-admin-entry]').forEach(e=>{e.textContent='관리자 로그인';e.href=root+'login.html?next=/admin/index.html'});window.dispatchEvent(new Event('dmj-admin-ready'));}
- function decorate(){if(!state.admin)return;document.querySelectorAll('.product-card[data-product]').forEach(card=>{
+ function decorate(){if(!state.admin)return;document.querySelectorAll('.product-card[data-product],.fs-component-card[data-product]').forEach(card=>{
   card.querySelector('.admin-inspect')?.remove();const host=el('div',null,'admin-inspect'),button=el('a','매입·재고'),panel=el('div',null,'admin-inspect-panel');button.href=root+'admin/operations.html?product='+encodeURIComponent(card.dataset.product)+'#stock';button.setAttribute('aria-label','이 제품 매입·재고 관리');panel.setAttribute('aria-label','예상 매입가, 공시 소비자가, 차액과 실재고');
   const rows=state.inventory.filter(x=>x.product_id===card.dataset.product),estimate=state.estimates.find(x=>x.product_id===card.dataset.product);
   panel.append(comparison(state.products.find(p=>p.id===card.dataset.product),estimate));
